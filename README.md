@@ -98,13 +98,16 @@ pnpm dev
 
 ### Variáveis de ambiente
 
-| Variável                                    | Descrição                                                                                |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                              | URL do Postgres. Na Vercel, use a URL **pooled** do Neon (`...-pooler...`).              |
-| `BETTER_AUTH_SECRET`                        | Segredo aleatório com 32+ caracteres (`openssl rand -base64 32`).                        |
-| `BETTER_AUTH_URL`                           | URL pública do app (ex.: `https://boramarcar.vercel.app`). Se ausente, usa `VERCEL_URL`. |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciais OAuth do Google Cloud.                                                       |
-| `SKIP_ENV_VALIDATION`                       | `1` para build/testes sem segredos reais (usado na CI).                                  |
+| Variável                                    | Descrição                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                              | URL do Postgres. Na Vercel, use a URL **pooled** do Neon (`...-pooler...`).                                               |
+| `BETTER_AUTH_SECRET`                        | Segredo aleatório com 32+ caracteres (`openssl rand -base64 32`).                                                         |
+| `BETTER_AUTH_URL`                           | URL pública do app (ex.: `https://boramarcar.vercel.app`). Se ausente, usa `VERCEL_URL`.                                  |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciais OAuth do Google Cloud.                                                                                        |
+| `RESEND_API_KEY`                            | Opcional. Chave do [Resend](https://resend.com) para os avisos por e-mail. Sem ela, os e-mails só são registrados no log. |
+| `EMAIL_FROM`                                | Opcional. Remetente (padrão: `Bora Marcar <onboarding@resend.dev>`, que só entrega para o dono da conta Resend).          |
+| `CRON_SECRET`                               | Segredo (16+ caracteres) que a Vercel envia ao cron de lembretes (`/api/cron/reminders`).                                 |
+| `SKIP_ENV_VALIDATION`                       | `1` para build/testes sem segredos reais (usado na CI).                                                                   |
 
 ### Scripts
 
@@ -154,7 +157,7 @@ O workflow `migrate.yml` aplica as migrations no banco de produção quando elas
 3. **Google OAuth**: no [Google Cloud Console](https://console.cloud.google.com/apis/credentials), crie um _OAuth Client ID_ (Web) com:
    - Origem autorizada: `https://SEU-DOMINIO`
    - URI de redirecionamento: `https://SEU-DOMINIO/api/auth/callback/google` (e `http://localhost:3000/api/auth/callback/google` para desenvolvimento)
-4. **Variáveis** na Vercel: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
+4. **Variáveis** na Vercel: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` e, para os e-mails, `RESEND_API_KEY` e `CRON_SECRET` (o cron diário de lembretes está em `apps/web/vercel.json`).
 5. **Migrations**: rodam automaticamente no build de produção (`apps/web/scripts/vercel-build.sh`), usando `DATABASE_URL_UNPOOLED` (criada pela integração do Neon) ou `DATABASE_URL`. Se a migration falhar, o deploy falha e a versão anterior continua no ar. Em previews, só migram com `MIGRATE_ON_BUILD=1` (use apenas com um branch do Neon por preview).
 
 > Deploys de preview usam URLs diferentes a cada PR; o login do Google só funciona nas URLs cadastradas. Veja o item correspondente no roadmap.

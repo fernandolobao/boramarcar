@@ -9,14 +9,21 @@ export const GET = authed(async ({ db, user }) => ({
 }));
 
 const schema = z
-  .object({ timeZone: z.string().min(1).max(64).optional(), locale: z.enum(LOCALES).optional() })
-  .refine((v) => v.timeZone || v.locale, { message: 'Informe timeZone ou locale' });
+  .object({
+    timeZone: z.string().min(1).max(64).optional(),
+    locale: z.enum(LOCALES).optional(),
+    emailNotifications: z.boolean().optional(),
+  })
+  .refine((v) => v.timeZone || v.locale || v.emailNotifications !== undefined, {
+    message: 'Informe timeZone, locale ou emailNotifications',
+  });
 
+/** Salva fuso, idioma (também usados nos e-mails) e se a pessoa quer receber avisos. */
 export const PUT = authed(async ({ req, db, user }) => {
   const body = await parseJson(req, schema);
-  const response = Response.json({ preferences: body });
+  const preferences = await updateUserPreferences(db, { userId: user.id, ...body });
+  const response = Response.json({ preferences });
   if (body.timeZone) {
-    await updateUserPreferences(db, { userId: user.id, timeZone: body.timeZone });
     response.headers.append('Set-Cookie', preferenceCookie(TIME_ZONE_COOKIE, body.timeZone));
   }
   if (body.locale) {

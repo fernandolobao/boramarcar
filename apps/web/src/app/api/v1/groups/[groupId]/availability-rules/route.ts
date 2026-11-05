@@ -1,6 +1,8 @@
 import { addAvailabilityRule, listAvailabilityRules } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
+import { notifyNewWindows } from '@/server/notify';
+import { runAfterResponse } from '@/server/background';
 
 export const GET = authed<{ groupId: string }>(async ({ db, user, params }) => ({
   rules: await listAvailabilityRules(db, { groupId: params.groupId, userId: user.id }),
@@ -32,6 +34,7 @@ export const POST = authed<{ groupId: string }>(
         }),
       );
     }
+    runAfterResponse(() => notifyNewWindows(db, { groupId: params.groupId, actorId: user.id }));
     return { rules };
   },
   { status: 201 },

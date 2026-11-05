@@ -1,6 +1,8 @@
 import { setAvailabilityRange } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, isoDate, parseJson } from '@/server/http';
+import { notifyNewWindows } from '@/server/notify';
+import { runAfterResponse } from '@/server/background';
 
 const schema = z.object({ start: isoDate, end: isoDate, available: z.boolean() });
 
@@ -8,5 +10,8 @@ const schema = z.object({ start: isoDate, end: isoDate, available: z.boolean() }
 export const PUT = authed<{ groupId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, schema);
   await setAvailabilityRange(db, { ...body, groupId: params.groupId, userId: user.id });
+  if (body.available) {
+    runAfterResponse(() => notifyNewWindows(db, { groupId: params.groupId, actorId: user.id }));
+  }
   return { available: body.available };
 });

@@ -9,6 +9,12 @@ const schema = z.object({
   VERCEL_URL: z.string().optional(),
   /** User-Agent autorizado pelo Moxfield (opcional; sem ele a API costuma recusar). */
   MOXFIELD_USER_AGENT: z.string().min(1).optional(),
+  /** Chave da API do Resend (opcional; sem ela os e-mails são apenas registrados no log). */
+  RESEND_API_KEY: z.string().min(1).optional(),
+  /** Remetente dos e-mails. Sem domínio verificado no Resend, use o de testes. */
+  EMAIL_FROM: z.string().min(3).default('Bora Marcar <onboarding@resend.dev>'),
+  /** Segredo que a Vercel envia no header Authorization ao chamar os cron jobs. */
+  CRON_SECRET: z.string().min(16).optional(),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -30,6 +36,9 @@ export function getEnv(): Env {
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? 'missing',
       VERCEL_URL: process.env.VERCEL_URL,
       MOXFIELD_USER_AGENT: process.env.MOXFIELD_USER_AGENT,
+      RESEND_API_KEY: process.env.RESEND_API_KEY,
+      EMAIL_FROM: process.env.EMAIL_FROM ?? 'Bora Marcar <onboarding@resend.dev>',
+      CRON_SECRET: process.env.CRON_SECRET,
     };
     return cached;
   }
@@ -40,6 +49,11 @@ export function getEnv(): Env {
   }
   cached = parsed.data;
   return cached;
+}
+
+/** Só para testes: descarta o cache para reler `process.env`. */
+export function resetEnvCache() {
+  cached = null;
 }
 
 /** URL base do app (BETTER_AUTH_URL, ou a URL do deploy na Vercel). */

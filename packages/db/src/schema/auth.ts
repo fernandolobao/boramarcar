@@ -12,6 +12,10 @@ export const user = pgTable('user', {
   image: text('image'),
   /** Fuso IANA preferido (ex.: America/Sao_Paulo). Nulo = padrão do app. Não é usado pelo Better Auth. */
   timeZone: text('time_zone'),
+  /** Idioma preferido para e-mails (pt-BR | en). Nulo = padrão do app. */
+  locale: text('locale'),
+  /** Aceita receber notificações por e-mail. */
+  emailNotifications: boolean('email_notifications').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

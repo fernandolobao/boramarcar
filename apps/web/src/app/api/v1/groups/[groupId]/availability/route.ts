@@ -1,6 +1,8 @@
 import { addAvailability, listAvailability } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, isoDate, parseJson, parseQuery } from '@/server/http';
+import { notifyNewWindows } from '@/server/notify';
+import { runAfterResponse } from '@/server/background';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -28,9 +30,9 @@ const createSchema = z.object({
 export const POST = authed<{ groupId: string }>(
   async ({ req, db, user, params }) => {
     const body = await parseJson(req, createSchema);
-    return {
-      slot: await addAvailability(db, { ...body, groupId: params.groupId, userId: user.id }),
-    };
+    const slot = await addAvailability(db, { ...body, groupId: params.groupId, userId: user.id });
+    runAfterResponse(() => notifyNewWindows(db, { groupId: params.groupId, actorId: user.id }));
+    return { slot };
   },
   { status: 201 },
 );

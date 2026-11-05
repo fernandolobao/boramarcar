@@ -35,6 +35,7 @@ describe('getBaseUrl', () => {
       BETTER_AUTH_SECRET: '',
       GOOGLE_CLIENT_ID: '',
       GOOGLE_CLIENT_SECRET: '',
+      EMAIL_FROM: 'Bora Marcar <x@example.com>',
     };
     expect(
       getBaseUrl({ ...base, BETTER_AUTH_URL: 'https://a.app', VERCEL_URL: 'b.vercel.app' }),

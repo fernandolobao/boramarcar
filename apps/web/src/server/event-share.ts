@@ -1,11 +1,11 @@
 import 'server-only';
 import type { getEventDetail } from '@boramarcar/db';
 import { getFormatter, getTranslations } from 'next-intl/server';
-import { getBaseUrl } from '@/env';
+import { eventUrl } from './event-ics';
 
 type EventDetail = Awaited<ReturnType<typeof getEventDetail>>;
 
-export const eventUrl = (eventId: string) => `${getBaseUrl()}/eventos/${eventId}`;
+export { eventUrl };
 
 /** Texto para compartilhar o encontro (WhatsApp, Web Share), no idioma e fuso do usuário. */
 export async function buildEventShareText(event: EventDetail) {
