@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 interface MoxfieldBlocked {
   url: string;
@@ -97,6 +98,7 @@ export function DeckImportForm() {
             className={mode === value ? 'btn-primary' : 'btn-secondary'}
             onClick={() => setMode(value)}
           >
+            <Icon name={value === 'url' ? 'fromUrl' : 'fromText'} />
             {value === 'url' ? t('fromUrl') : t('fromText')}
           </button>
         ))}
@@ -155,6 +157,7 @@ export function DeckImportForm() {
       </div>
 
       <button className="btn-primary" disabled={pending}>
+        <Icon name="upload" />
         {t('import')}
       </button>
       <FormError message={error} />

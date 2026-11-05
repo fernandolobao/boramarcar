@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
+import { Icon } from '@/components/icons';
 
 export const generateMetadata = navMetadata('decks');
 
@@ -17,6 +18,7 @@ export default async function DecksPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="page-title">{t('title')}</h1>
         <Link href="/decks/importar" className="btn-primary">
+          <Icon name="upload" />
           {t('import')}
         </Link>
       </div>

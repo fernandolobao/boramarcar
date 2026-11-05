@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { Icon, type IconName } from './icons';
 import { FormError, useApiAction } from './use-api-action';
 
 type Role = 'owner' | 'admin' | 'member';
@@ -23,7 +24,9 @@ function ConfirmButton({
   contextName,
   onConfirm,
   disabled,
+  icon,
 }: {
+  icon: IconName;
   label: string;
   confirmLabel: string;
   contextName: string;
@@ -43,6 +46,7 @@ function ConfirmButton({
         onConfirm();
       }}
     >
+      <Icon name={icon} />
       {confirming ? confirmLabel : label}
       <span className="sr-only"> ({contextName})</span>
     </button>
@@ -81,6 +85,7 @@ export function MemberActions({ groupId, actorId, actorRole, member, memberCount
           )
         }
       >
+        <Icon name={canPromote ? 'makeAdmin' : 'removeAdmin'} />
         {canPromote ? t('makeAdmin') : t('removeAdmin')}
         <span className="sr-only"> ({member.name})</span>
       </button>,
@@ -90,6 +95,7 @@ export function MemberActions({ groupId, actorId, actorRole, member, memberCount
     actions.push(
       <ConfirmButton
         key="transfer"
+        icon="transfer"
         label={t('transfer')}
         confirmLabel={t('confirmTransfer')}
         contextName={member.name}
@@ -106,6 +112,7 @@ export function MemberActions({ groupId, actorId, actorRole, member, memberCount
     actions.push(
       <ConfirmButton
         key="remove"
+        icon="removeMember"
         label={t('removeMember')}
         confirmLabel={t('confirmRemove')}
         contextName={member.name}
@@ -120,6 +127,7 @@ export function MemberActions({ groupId, actorId, actorRole, member, memberCount
     actions.push(
       <ConfirmButton
         key="leave"
+        icon="leave"
         label={t('leave')}
         confirmLabel={t('confirmLeave')}
         contextName={member.name}

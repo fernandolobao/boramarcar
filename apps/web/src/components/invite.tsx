@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 /** Aceita um convite (usuário já logado) e leva para o painel. */
 export function JoinInviteButton({ inviteCode }: { inviteCode: string }) {
@@ -24,6 +25,7 @@ export function JoinInviteButton({ inviteCode }: { inviteCode: string }) {
           )
         }
       >
+        <Icon name="join" />
         {t('join')}
       </button>
       <FormError message={error} />
@@ -54,6 +56,7 @@ export function RegenerateInviteButton({ groupId }: { groupId: string }) {
         }}
         onBlur={() => setConfirming(false)}
       >
+        <Icon name="refresh" />
         {confirming ? t('regenerateConfirm') : t('regenerate')}
       </button>
       <FormError message={error} />

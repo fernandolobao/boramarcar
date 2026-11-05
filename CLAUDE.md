@@ -28,6 +28,7 @@ A plataforma segue **WCAG 2.2 nível AA**. Toda tela ou componente novo — ou a
 9. **Movimento**: animações com `motion-reduce:`.
 10. **Selects** usam a classe `select` (seta própria com espaçamento), não `input`.
 11. **Cursor**: tudo que é clicável mostra `cursor: pointer` (botões, rótulos de checkbox/radio, selects); desabilitado mostra `not-allowed`. Já está no CSS global e nas classes `btn*`/`select` — não sobrescreva.
+12. **Ícones**: use só o mapa `Icons`/`<Icon name>` de `apps/web/src/components/icons.tsx` (Lucide), para a mesma ação ter sempre o mesmo ícone. Ícone acompanha texto visível e é decorativo (`aria-hidden`). Botão só com ícone exige `aria-label` (ou texto `sr-only`) e, se possível, dica visível no foco/hover. Precisa de um ícone novo? Adicione-o ao mapa com um nome semântico (ex.: `delete`, não `trash`).
 
 ### Como auditar (automatizado + manual)
 

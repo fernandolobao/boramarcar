@@ -1,6 +1,7 @@
 import type { ColorSymbol, DeckAnalysis, ManaCurveBucket } from '@boramarcar/core';
 import { MANA_CURVE_BUCKETS } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
+import { Icon } from './icons';
 
 export function ManaCurve({ curve }: { curve: Record<ManaCurveBucket, number> }) {
   const t = useTranslations('analysis');
@@ -162,6 +163,7 @@ export function DeckSuggestions({ analysis }: { analysis: DeckAnalysis }) {
                   rel="noreferrer"
                 >
                   {t('searchScryfall')}
+                  <Icon name="externalLink" className="ml-1 inline size-3.5 align-[-2px]" />
                   {/* Contexto extra para leitores de tela, mantendo o texto visível no nome (WCAG 2.5.3). */}
                   <span className="sr-only">
                     {' '}
