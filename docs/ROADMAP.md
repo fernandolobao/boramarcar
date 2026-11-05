@@ -20,13 +20,12 @@ Este documento lista tudo o que falta para entregar as funcionalidades planejada
 
 ### Configuração pendente (você)
 
-- [ ] Criar projeto na Vercel com **Root Directory `apps/web`**
-- [ ] Adicionar **Neon** pelo Vercel Marketplace (região `sa-east-1`)
-- [ ] Criar OAuth Client no Google Cloud e cadastrar as URIs de callback
-- [ ] Configurar `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` na Vercel
-- [ ] Rodar `pnpm db:migrate` no Neon (ou configurar o secret `DATABASE_URL` no environment `production` do GitHub)
+- [x] Criar projeto na Vercel com **Root Directory `apps/web`**
+- [x] Adicionar **Neon** pelo Vercel Marketplace (região `sa-east-1`)
+- [x] Criar OAuth Client no Google Cloud e cadastrar as URIs de callback
+- [x] Configurar `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` na Vercel
+- [x] Rodar `pnpm db:migrate` no Neon (ou configurar o secret `DATABASE_URL` no environment `production` do GitHub)
 - [ ] Proteger a branch `main` exigindo os checks da CI
-- [ ] **Revogar o token do GitHub** compartilhado durante a criação do projeto e gerar um novo, se necessário
 
 ---
 
