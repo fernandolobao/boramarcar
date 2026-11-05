@@ -1,0 +1,194 @@
+{
+  "common": {
+    "appName": "Bora Marcar",
+    "tagline": "Schedule your next Commander night.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Remove",
+    "loading": "Loading…",
+    "signIn": "Sign in with Google",
+    "signOut": "Sign out",
+    "optional": "optional",
+    "anyLocation": "Any location",
+    "locationTbd": "Location TBD",
+    "players": "{count, plural, =1 {1 player} other {# players}}",
+    "minutes": "{count} min"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "availability": "Availability",
+    "events": "Game nights",
+    "ranking": "Ranking",
+    "decks": "Decks",
+    "group": "Group"
+  },
+  "landing": {
+    "title": "No more polls in the group chat.",
+    "subtitle": "Everyone marks when and where they can play. Bora Marcar finds the time when a 4-player pod comes together, records the games and keeps the ranking.",
+    "features": {
+      "schedule": "Availability and automatic time suggestions",
+      "ranking": "Ranking with wins, losses and draws",
+      "decks": "Decks imported from Archidekt, Moxfield or plain text, with analysis and proxy tracking"
+    }
+  },
+  "dashboard": {
+    "hello": "Hi, {name}!",
+    "nextEvents": "Upcoming game nights",
+    "noEvents": "No game nights scheduled yet.",
+    "bestWindows": "Best times to play",
+    "noWindows": "No time slot fits a full pod yet. Add your availability!",
+    "topPlayers": "Top of the ranking"
+  },
+  "group": {
+    "title": "Your group",
+    "noGroup": "You're not in a group yet. Create one or join with an invite code.",
+    "create": "Create group",
+    "name": "Group name",
+    "join": "Join a group",
+    "inviteCode": "Invite code",
+    "inviteHint": "Share the code {code} with your friends.",
+    "members": "Members",
+    "locations": "Locations",
+    "addLocation": "Add location",
+    "locationName": "Location name",
+    "address": "Address",
+    "switch": "Use this group",
+    "active": "Active group",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member"
+    }
+  },
+  "availability": {
+    "title": "Availability",
+    "add": "Add availability",
+    "start": "Start",
+    "end": "End",
+    "locations": "Where you can play",
+    "note": "Note",
+    "mine": "My availability",
+    "everyone": "Group availability",
+    "empty": "Nobody has added availability for the next days.",
+    "windows": "Times when the pod comes together",
+    "createEvent": "Schedule game night",
+    "locationsHint": "None selected = any location."
+  },
+  "events": {
+    "title": "Game nights",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "empty": "No game nights.",
+    "new": "New game night",
+    "eventTitle": "Title",
+    "defaultTitle": "Commander",
+    "when": "When",
+    "where": "Where",
+    "participants": "Participants",
+    "rsvp": {
+      "yes": "Going",
+      "maybe": "Maybe",
+      "no": "Not going"
+    },
+    "games": "Games",
+    "noGames": "No games recorded.",
+    "game": "Game {number}",
+    "winner": "Winner: {name}",
+    "draw": "Draw",
+    "recordGame": "Record game",
+    "result": {
+      "win": "Won",
+      "loss": "Lost",
+      "draw": "Draw"
+    },
+    "playing": "Played",
+    "deck": "Deck",
+    "notes": "Notes",
+    "isDraw": "The game ended in a draw"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "empty": "No games recorded yet.",
+    "position": "#",
+    "player": "Player",
+    "games": "Games",
+    "wins": "W",
+    "losses": "L",
+    "draws": "D",
+    "points": "Pts",
+    "winRate": "Win %",
+    "pointsRule": "A win is worth 3 points and a draw 1.",
+    "totalGames": "{count, plural, =0 {No games} =1 {1 game} other {# games}}"
+  },
+  "decks": {
+    "title": "My decks",
+    "empty": "You have no decks yet.",
+    "import": "Import deck",
+    "fromUrl": "Archidekt or Moxfield link",
+    "fromText": "Paste list",
+    "name": "Deck name",
+    "list": "Card list",
+    "listHint": "One card per line, e.g. \"1 Sol Ring\". Use Commander/Deck/Sideboard sections. Mark proxies with #proxy.",
+    "notFound": "Cards not found on Scryfall: {names}",
+    "cards": "{count, plural, =1 {1 card} other {# cards}}",
+    "proxies": "{count, plural, =0 {no proxies} =1 {1 proxy} other {# proxies}}",
+    "proxy": "Proxy",
+    "source": "Source",
+    "boards": {
+      "commander": "Commander",
+      "mainboard": "Deck",
+      "sideboard": "Sideboard",
+      "maybeboard": "Maybe"
+    }
+  },
+  "analysis": {
+    "title": "Analysis",
+    "score": "Score",
+    "manaCurve": "Mana curve",
+    "averageCmc": "Average MV",
+    "lands": "Lands",
+    "colorPips": "Mana symbols",
+    "roles": {
+      "ramp": "Ramp",
+      "draw": "Card draw",
+      "removal": "Removal",
+      "wipe": "Board wipe"
+    },
+    "components": {
+      "lands": "Lands",
+      "ramp": "Ramp",
+      "draw": "Card draw",
+      "removal": "Removal",
+      "wipe": "Board wipes",
+      "curve": "Curve"
+    },
+    "validationTitle": "Commander validation",
+    "valid": "Deck is Commander legal.",
+    "validation": {
+      "deck_size": "The deck has {actual} cards (expected {expected}).",
+      "no_commander": "No commander set.",
+      "too_many_commanders": "Too many commanders ({actual}).",
+      "not_singleton": "{name} appears {quantity} times.",
+      "color_identity": "{name} is outside the commander's color identity.",
+      "unknown_card": "{name} was not found on Scryfall."
+    },
+    "suggestionsTitle": "Suggestions",
+    "suggestions": {
+      "more_lands": "Add about {missing} lands.",
+      "fewer_lands": "Consider cutting {extra} lands.",
+      "more_role": "About {missing} more {role} cards needed.",
+      "lower_curve": "The curve is high (average MV {averageCmc}). Swap some expensive cards for cheaper ones."
+    },
+    "searchScryfall": "Search replacements on Scryfall",
+    "disclaimer": "Early heuristic based on card text — see the roadmap for upcoming improvements."
+  },
+  "errors": {
+    "invalid_input": "Please check the data you entered.",
+    "unauthorized": "Sign in to continue.",
+    "forbidden": "You don't have permission to do that.",
+    "not_found": "Not found.",
+    "conflict": "Conflicts with existing data.",
+    "upstream_error": "The external service didn't respond as expected. Try again or paste the list as text.",
+    "internal_error": "Something went wrong. Please try again."
+  }
+}
