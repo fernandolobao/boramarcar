@@ -2,11 +2,13 @@ import 'server-only';
 import {
   attachCardData,
   fetchScryfallCollection,
+  isDomainError,
   resolveDeckImport,
   type DeckImportInput,
   type FetchLike,
 } from '@boramarcar/core';
 import { findCachedCards, saveImportedDeck, type Database } from '@boramarcar/db';
+import { getEnv } from '@/env';
 
 /**
  * Importa um deck: resolve a origem (URL ou texto), reaproveita cartas do cache local
@@ -18,7 +20,16 @@ export async function importDeck(
   input: DeckImportInput,
   fetchFn: FetchLike = fetch,
 ) {
-  const deck = await resolveDeckImport(input, { fetch: fetchFn });
+  const deck = await resolveDeckImport(input, {
+    fetch: fetchFn,
+    moxfieldUserAgent: getEnv().MOXFIELD_USER_AGENT,
+  }).catch((error: unknown) => {
+    // Registra a falha da origem externa para diagnóstico nos logs da Vercel.
+    if (isDomainError(error) && error.code === 'upstream_error') {
+      console.warn('[import-deck] origem externa falhou', error.message, error.details);
+    }
+    throw error;
+  });
   const cached = await findCachedCards(db, deck.entries);
   const missing = attachCardData(deck.entries, cached).filter((entry) => !entry.card);
   const { cards, notFound } = missing.length

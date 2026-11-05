@@ -4,6 +4,7 @@ import { fetchArchidektDeck, mapArchidektDeck } from './importers/archidekt';
 import { fetchMoxfieldDeck, mapMoxfieldDeck } from './importers/moxfield';
 import { parseDeckUrl } from './importers/url';
 import { resolveDeckImport } from './import';
+import moxfieldReal from '../test/moxfield-real.json';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -124,15 +125,72 @@ describe('Moxfield', () => {
     expect(deck.entries[1]?.isFoil).toBe(true);
   });
 
-  it('erro amigável quando a API bloqueia', async () => {
+  it('lê a resposta real da API v3 (trecho de um deck público), com proxy e dupla face', () => {
+    const deck = mapMoxfieldDeck(moxfieldReal);
+    expect(deck).toMatchObject({
+      name: 'Sidar (Cavaleiros dos zodiacos)',
+      sourceId: 'KCHp6Hzy40yvWVYq2GVxjg',
+    });
+    expect(deck.entries.find((e) => e.board === 'commander')?.name).toBe('Sidar Jabari of Zhalfir');
+    expect(deck.entries.find((e) => e.name === 'Sol Ring')).toMatchObject({
+      isProxy: true,
+      collectorNumber: 'C18-222',
+    });
+    expect(deck.entries.find((e) => e.name.startsWith('Cecil'))?.scryfallId).toBe(
+      '026e7167-d665-43d0-a51e-8df2d68cdb5e',
+    );
+    expect(deck.entries).toHaveLength(5);
+  });
+
+  it('identifica o bloqueio do Moxfield para a interface sugerir a importação por texto', async () => {
     const fetchFn = vi.fn().mockResolvedValue(json({}, 403));
     await expect(fetchMoxfieldDeck('abc', fetchFn)).rejects.toMatchObject({
       code: 'upstream_error',
+      details: { source: 'moxfield', status: 403, url: 'https://moxfield.com/decks/abc' },
+    });
+  });
+
+  it('trata falha de rede e deck privado/inexistente', async () => {
+    await expect(
+      fetchMoxfieldDeck('abc', vi.fn().mockRejectedValue(new TypeError('fetch failed'))),
+    ).rejects.toMatchObject({
+      code: 'upstream_error',
+      details: { source: 'moxfield', status: null },
+    });
+    await expect(
+      fetchMoxfieldDeck('abc', vi.fn().mockResolvedValue(json({}, 404))),
+    ).rejects.toMatchObject({ code: 'not_found' });
+  });
+
+  it('envia o User-Agent configurado', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(json(moxfieldPayload));
+    await resolveDeckImport(
+      { kind: 'url', url: 'https://moxfield.com/decks/abc-123' },
+      { fetch: fetchFn, moxfieldUserAgent: 'BoraMarcar/1.0 (contato)' },
+    );
+    expect(fetchFn.mock.calls[0]?.[1]?.headers).toMatchObject({
+      'User-Agent': 'BoraMarcar/1.0 (contato)',
     });
   });
 });
 
 describe('resolveDeckImport', () => {
+  it('usa o nome do cabeçalho do Arena quando o nome não é informado', async () => {
+    const deck = await resolveDeckImport(
+      { kind: 'text', text: 'About\nName Meu Arena\n\nDeck\n1 Sol Ring' },
+      { fetch: vi.fn() },
+    );
+    expect(deck).toMatchObject({
+      name: 'Meu Arena',
+      entries: [{ name: 'Sol Ring', board: 'mainboard' }],
+    });
+    const unnamed = await resolveDeckImport(
+      { kind: 'text', text: '1 Sol Ring' },
+      { fetch: vi.fn() },
+    );
+    expect(unnamed.name).toBe('Deck importado');
+  });
+
   it('importa texto', async () => {
     const deck = await resolveDeckImport(
       { kind: 'text', name: 'Meu deck', text: '1 Sol Ring' },

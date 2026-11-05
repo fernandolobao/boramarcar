@@ -170,7 +170,16 @@
       "maybeboard": "Maybe"
     },
     "importMode": "Import method",
-    "deleteDeck": "Remove deck {name}"
+    "deleteDeck": "Remove deck {name}",
+    "nameHint": "If left blank, we use the deck name from the source.",
+    "moxfieldBlocked": {
+      "title": "Moxfield didn't allow the automatic import",
+      "intro": "Moxfield blocks other sites from reading its deck lists. You can import it in seconds by copying the text:",
+      "step1": "Open the deck on Moxfield",
+      "step2": "Click “More” → “Export”",
+      "step3": "Click “Copy Plain Text” and paste the list in the field below",
+      "openDeck": "Open the deck on Moxfield"
+    }
   },
   "analysis": {
     "title": "Analysis",

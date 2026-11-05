@@ -55,6 +55,36 @@ describe('parseDeckText', () => {
     expect(entries.find((e) => e.name === 'Sol Ring')?.board).toBe('mainboard');
   });
 
+  it('lê as exportações do Moxfield ("Copy Plain Text" e "Copy for Moxfield")', () => {
+    const plain = parseDeckText(
+      '1 Adarkar Wastes\n1 Sol Ring\n1 Wonder\n\n1 Sidar Jabari of Zhalfir\n',
+    );
+    expect(plain.find((e) => e.name === 'Sidar Jabari of Zhalfir')?.board).toBe('commander');
+    expect(plain.filter((e) => e.board === 'mainboard')).toHaveLength(3);
+
+    const moxfield = parseDeckText(
+      '1 Sidar Jabari of Zhalfir (MOC) 5\n1 Bojuka Bog (PLST) C18-238\n1 Artifacts (FMSC) 3',
+    );
+    expect(moxfield[1]).toEqual({
+      name: 'Bojuka Bog',
+      quantity: 1,
+      board: 'mainboard',
+      setCode: 'plst',
+      collectorNumber: 'C18-238',
+    });
+  });
+
+  it('ignora o cabeçalho do formato Arena', () => {
+    expect(
+      parseDeckText(
+        'About\nName Meu deck\n\nCommander\n1 Sidar Jabari of Zhalfir\n\nDeck\n1 Sol Ring',
+      ),
+    ).toEqual([
+      { name: 'Sidar Jabari of Zhalfir', quantity: 1, board: 'commander' },
+      { name: 'Sol Ring', quantity: 1, board: 'mainboard' },
+    ]);
+  });
+
   it('mantém nomes com vírgulas, apóstrofos e dupla face', () => {
     const entries = parseDeckText("1 Jace, Vryn's Prodigy // Jace, Telepath Unbound");
     expect(entries[0]?.name).toBe("Jace, Vryn's Prodigy // Jace, Telepath Unbound");
