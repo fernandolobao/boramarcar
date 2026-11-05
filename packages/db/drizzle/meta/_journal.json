@@ -15,6 +15,13 @@
       "when": 1793906727561,
       "tag": "0001_agenda_convites",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793910860070,
+      "tag": "0002_agenda_madura",
+      "breakpoints": true
     }
   ]
 }

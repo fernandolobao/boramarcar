@@ -1,0 +1,45 @@
+name: Contrato com serviços externos
+
+# Chama Scryfall, Archidekt e Moxfield de verdade uma vez por semana para detectar
+# mudanças nas APIs ou bloqueios. Fica fora dos PRs: uma instabilidade externa não
+# trava merges. Se falhar, abre (ou comenta) uma issue.
+on:
+  schedule:
+    - cron: '17 12 * * 1' # segundas, 12:17 UTC (09:17 em Brasília)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Testes de contrato
+        env:
+          MOXFIELD_USER_AGENT: ${{ secrets.MOXFIELD_USER_AGENT }}
+        run: pnpm --filter @boramarcar/core test:contract
+      - name: Abrir issue em caso de falha
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Integração externa quebrou (teste de contrato)"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "Falhou de novo: $RUN_URL"
+          else
+            gh issue create --title "$TITLE" --body "O teste de contrato semanal falhou: $RUN_URL
+
+          Uma das integrações (Scryfall, Archidekt ou Moxfield) mudou ou está bloqueando o app. Veja o resumo da execução."
+          fi

@@ -20,6 +20,8 @@ const archidektDeckSchema = z.object({
       quantity: z.number().int().positive(),
       categories: z.array(z.string()).nullable().default([]),
       modifier: z.string().optional(),
+      /** Cartas removidas do deck continuam na resposta com `deletedAt` preenchido. */
+      deletedAt: z.string().nullish(),
       card: z.object({
         uid: z.string().optional(),
         collectorNumber: z.string().optional(),
@@ -58,6 +60,7 @@ export function mapArchidektDeck(payload: unknown): ImportedDeck {
 
   const entries: DeckEntry[] = [];
   for (const item of deck.cards) {
+    if (item.deletedAt) continue;
     const board = boardFor(item.categories ?? []);
     if (!board) continue;
     const entry: DeckEntry = { name: item.card.oracleCard.name, quantity: item.quantity, board };
