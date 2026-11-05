@@ -1,0 +1,34 @@
+{
+  "name": "@boramarcar/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Schema Drizzle (Postgres/Neon), migrations e serviços de acesso a dados.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./client": "./src/client.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:check": "drizzle-kit check"
+  },
+  "dependencies": {
+    "@boramarcar/core": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15",
+    "@types/node": "^22.19.0",
+    "@types/pg": "^8.15.6",
+    "drizzle-kit": "^0.31.11",
+    "typescript": "~6.0.3",
+    "vitest": "5.1.0"
+  }
+}

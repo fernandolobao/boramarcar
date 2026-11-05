@@ -1,0 +1,194 @@
+{
+  "common": {
+    "appName": "Bora Marcar",
+    "tagline": "Marque o próximo Commander com a sua mesa.",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Remover",
+    "loading": "Carregando…",
+    "signIn": "Entrar com Google",
+    "signOut": "Sair",
+    "optional": "opcional",
+    "anyLocation": "Qualquer local",
+    "locationTbd": "Local a definir",
+    "players": "{count, plural, =1 {1 jogador} other {# jogadores}}",
+    "minutes": "{count} min"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "availability": "Disponibilidade",
+    "events": "Encontros",
+    "ranking": "Ranking",
+    "decks": "Decks",
+    "group": "Grupo"
+  },
+  "landing": {
+    "title": "Chega de enquete no grupo do WhatsApp.",
+    "subtitle": "Cada um marca quando e onde pode jogar. O Bora Marcar encontra o horário em que a mesa de 4 fecha, registra as partidas e mantém o ranking.",
+    "features": {
+      "schedule": "Disponibilidade e sugestão automática de horários",
+      "ranking": "Ranking com vitórias, derrotas e empates",
+      "decks": "Decks importados do Archidekt, Moxfield ou em texto, com análise e controle de proxies"
+    }
+  },
+  "dashboard": {
+    "hello": "Olá, {name}!",
+    "nextEvents": "Próximos encontros",
+    "noEvents": "Nenhum encontro marcado ainda.",
+    "bestWindows": "Melhores horários para jogar",
+    "noWindows": "Ainda não há horário em que a mesa feche. Marque sua disponibilidade!",
+    "topPlayers": "Topo do ranking"
+  },
+  "group": {
+    "title": "Seu grupo",
+    "noGroup": "Você ainda não participa de um grupo. Crie um ou entre com um código de convite.",
+    "create": "Criar grupo",
+    "name": "Nome do grupo",
+    "join": "Entrar em um grupo",
+    "inviteCode": "Código de convite",
+    "inviteHint": "Compartilhe o código {code} com os amigos.",
+    "members": "Membros",
+    "locations": "Locais",
+    "addLocation": "Adicionar local",
+    "locationName": "Nome do local",
+    "address": "Endereço",
+    "switch": "Usar este grupo",
+    "active": "Grupo ativo",
+    "roles": {
+      "owner": "Dono",
+      "admin": "Admin",
+      "member": "Membro"
+    }
+  },
+  "availability": {
+    "title": "Disponibilidade",
+    "add": "Adicionar disponibilidade",
+    "start": "Início",
+    "end": "Fim",
+    "locations": "Onde você pode jogar",
+    "note": "Observação",
+    "mine": "Minhas disponibilidades",
+    "everyone": "Disponibilidade do grupo",
+    "empty": "Ninguém marcou disponibilidade para os próximos dias.",
+    "windows": "Horários em que a mesa fecha",
+    "createEvent": "Marcar encontro",
+    "locationsHint": "Nenhum marcado = qualquer local."
+  },
+  "events": {
+    "title": "Encontros",
+    "upcoming": "Próximos",
+    "past": "Anteriores",
+    "empty": "Nenhum encontro.",
+    "new": "Novo encontro",
+    "eventTitle": "Título",
+    "defaultTitle": "Commander",
+    "when": "Quando",
+    "where": "Onde",
+    "participants": "Participantes",
+    "rsvp": {
+      "yes": "Vou",
+      "maybe": "Talvez",
+      "no": "Não vou"
+    },
+    "games": "Partidas",
+    "noGames": "Nenhuma partida registrada.",
+    "game": "Partida {number}",
+    "winner": "Vencedor: {name}",
+    "draw": "Empate",
+    "recordGame": "Registrar partida",
+    "result": {
+      "win": "Venceu",
+      "loss": "Perdeu",
+      "draw": "Empatou"
+    },
+    "playing": "Jogou",
+    "deck": "Deck",
+    "notes": "Observações",
+    "isDraw": "A partida terminou empatada"
+  },
+  "ranking": {
+    "title": "Ranking",
+    "empty": "Nenhuma partida registrada ainda.",
+    "position": "#",
+    "player": "Jogador",
+    "games": "Jogos",
+    "wins": "V",
+    "losses": "D",
+    "draws": "E",
+    "points": "Pts",
+    "winRate": "% Vit.",
+    "pointsRule": "Vitória vale 3 pontos e empate vale 1.",
+    "totalGames": "{count, plural, =0 {Nenhuma partida} =1 {1 partida} other {# partidas}}"
+  },
+  "decks": {
+    "title": "Meus decks",
+    "empty": "Você ainda não cadastrou decks.",
+    "import": "Importar deck",
+    "fromUrl": "Link do Archidekt ou Moxfield",
+    "fromText": "Colar lista",
+    "name": "Nome do deck",
+    "list": "Lista de cartas",
+    "listHint": "Uma carta por linha, ex.: \"1 Sol Ring\". Use seções Commander/Deck/Sideboard. Marque proxies com #proxy.",
+    "notFound": "Cartas não encontradas no Scryfall: {names}",
+    "cards": "{count, plural, =1 {1 carta} other {# cartas}}",
+    "proxies": "{count, plural, =0 {sem proxies} =1 {1 proxy} other {# proxies}}",
+    "proxy": "Proxy",
+    "source": "Origem",
+    "boards": {
+      "commander": "Comandante",
+      "mainboard": "Deck",
+      "sideboard": "Sideboard",
+      "maybeboard": "Talvez"
+    }
+  },
+  "analysis": {
+    "title": "Análise",
+    "score": "Nota",
+    "manaCurve": "Curva de mana",
+    "averageCmc": "CMC médio",
+    "lands": "Terrenos",
+    "colorPips": "Símbolos de mana",
+    "roles": {
+      "ramp": "Ramp",
+      "draw": "Compra",
+      "removal": "Remoção",
+      "wipe": "Board wipe"
+    },
+    "components": {
+      "lands": "Terrenos",
+      "ramp": "Ramp",
+      "draw": "Compra",
+      "removal": "Remoção",
+      "wipe": "Board wipes",
+      "curve": "Curva"
+    },
+    "validationTitle": "Validação de Commander",
+    "valid": "Deck válido para Commander.",
+    "validation": {
+      "deck_size": "O deck tem {actual} cartas (esperado: {expected}).",
+      "no_commander": "Nenhum comandante definido.",
+      "too_many_commanders": "Comandantes demais ({actual}).",
+      "not_singleton": "{name} aparece {quantity} vezes.",
+      "color_identity": "{name} está fora da identidade de cor do comandante.",
+      "unknown_card": "{name} não foi encontrada no Scryfall."
+    },
+    "suggestionsTitle": "Sugestões",
+    "suggestions": {
+      "more_lands": "Adicione cerca de {missing} terrenos.",
+      "fewer_lands": "Considere tirar {extra} terrenos.",
+      "more_role": "Faltam ~{missing} cartas de {role}.",
+      "lower_curve": "A curva está alta (CMC médio {averageCmc}). Troque algumas cartas caras por mais baratas."
+    },
+    "searchScryfall": "Buscar substitutos no Scryfall",
+    "disclaimer": "Heurística inicial baseada no texto das cartas — veja o roadmap para as próximas melhorias."
+  },
+  "errors": {
+    "invalid_input": "Confira os dados informados.",
+    "unauthorized": "Faça login para continuar.",
+    "forbidden": "Você não tem permissão para isso.",
+    "not_found": "Não encontrado.",
+    "conflict": "Conflito com dados existentes.",
+    "upstream_error": "O serviço externo não respondeu como esperado. Tente novamente ou cole a lista em texto.",
+    "internal_error": "Algo deu errado. Tente novamente."
+  }
+}

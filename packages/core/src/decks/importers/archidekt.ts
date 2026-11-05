@@ -1,0 +1,90 @@
+import { z } from 'zod';
+import { DomainError } from '../../errors';
+import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
+import { mergeDuplicates } from './text';
+
+const archidektDeckSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  categories: z
+    .array(
+      z.object({
+        name: z.string(),
+        includedInDeck: z.boolean().optional(),
+        isPremier: z.boolean().optional(),
+      }),
+    )
+    .default([]),
+  cards: z.array(
+    z.object({
+      quantity: z.number().int().positive(),
+      categories: z.array(z.string()).nullable().default([]),
+      modifier: z.string().optional(),
+      card: z.object({
+        uid: z.string().optional(),
+        collectorNumber: z.string().optional(),
+        edition: z.object({ editioncode: z.string() }).partial().optional(),
+        oracleCard: z.object({ name: z.string() }),
+      }),
+    }),
+  ),
+});
+
+export type ArchidektDeckResponse = z.input<typeof archidektDeckSchema>;
+
+/** Converte a resposta de `GET https://archidekt.com/api/decks/{id}/` em um deck importado. */
+export function mapArchidektDeck(payload: unknown): ImportedDeck {
+  const parsed = archidektDeckSchema.safeParse(payload);
+  if (!parsed.success) {
+    throw new DomainError(
+      'upstream_error',
+      'Resposta inesperada do Archidekt',
+      parsed.error.issues,
+    );
+  }
+  const deck = parsed.data;
+  const categoryInfo = new Map(deck.categories.map((c) => [c.name.toLowerCase(), c]));
+
+  const boardFor = (categories: string[]): DeckBoard | null => {
+    const names = categories.map((c) => c.toLowerCase());
+    if (names.includes('commander')) return 'commander';
+    if (names.includes('sideboard')) return 'sideboard';
+    if (names.includes('maybeboard')) return 'maybeboard';
+    const primary = names[0];
+    const info = primary ? categoryInfo.get(primary) : undefined;
+    if (info && info.includedInDeck === false) return 'maybeboard';
+    return 'mainboard';
+  };
+
+  const entries: DeckEntry[] = [];
+  for (const item of deck.cards) {
+    const board = boardFor(item.categories ?? []);
+    if (!board) continue;
+    const entry: DeckEntry = { name: item.card.oracleCard.name, quantity: item.quantity, board };
+    if (item.card.uid) entry.scryfallId = item.card.uid;
+    if (item.card.edition?.editioncode) entry.setCode = item.card.edition.editioncode;
+    if (item.card.collectorNumber) entry.collectorNumber = item.card.collectorNumber;
+    if (item.modifier === 'Foil' || item.modifier === 'Etched') entry.isFoil = true;
+    entries.push(entry);
+  }
+
+  return {
+    name: deck.name,
+    source: 'archidekt',
+    sourceId: String(deck.id),
+    sourceUrl: `https://archidekt.com/decks/${deck.id}`,
+    entries: mergeDuplicates(entries),
+  };
+}
+
+export async function fetchArchidektDeck(id: string, fetchFn: FetchLike): Promise<ImportedDeck> {
+  const response = await fetchFn(`https://archidekt.com/api/decks/${encodeURIComponent(id)}/`, {
+    headers: { Accept: 'application/json' },
+  });
+  if (response.status === 404)
+    throw new DomainError('not_found', 'Deck não encontrado no Archidekt');
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Archidekt respondeu ${response.status}`);
+  }
+  return mapArchidektDeck(await response.json());
+}

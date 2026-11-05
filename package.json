@@ -1,0 +1,52 @@
+{
+  "name": "boramarcar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Organize encontros de Magic: The Gathering (Commander) com seu grupo: disponibilidade, partidas, ranking e decks.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm --filter @boramarcar/web test:e2e",
+    "db:generate": "pnpm --filter @boramarcar/db db:generate",
+    "db:migrate": "pnpm --filter @boramarcar/db db:migrate",
+    "db:studio": "pnpm --filter @boramarcar/db db:studio",
+    "db:check": "pnpm --filter @boramarcar/db db:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@vitest/coverage-v8": "5.1.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.4.5",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "5.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ],
+    "ignoredBuiltDependencies": [
+      "@parcel/watcher",
+      "@swc/core"
+    ]
+  }
+}

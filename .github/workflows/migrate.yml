@@ -1,0 +1,42 @@
+name: Migrar banco de produção
+
+# Aplica as migrations no Neon de produção quando elas mudam na main.
+# Requer o secret DATABASE_URL (URL direta, sem "-pooler") no environment "production".
+on:
+  push:
+    branches: [main]
+    paths: ['packages/db/drizzle/**']
+  workflow_dispatch:
+
+concurrency:
+  group: migrate-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Secret ausente
+        if: env.DATABASE_URL == ''
+        run: echo "::warning::Secret DATABASE_URL não configurado no environment production; nada a fazer."
+      - uses: actions/checkout@v5
+        if: env.DATABASE_URL != ''
+      - uses: pnpm/action-setup@v4
+        if: env.DATABASE_URL != ''
+      - uses: actions/setup-node@v5
+        if: env.DATABASE_URL != ''
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: env.DATABASE_URL != ''
+        run: pnpm install --frozen-lockfile
+      - name: drizzle-kit migrate
+        if: env.DATABASE_URL != ''
+        run: pnpm db:migrate
