@@ -1,0 +1,77 @@
+{
+  "publicId": "KCHp6Hzy40yvWVYq2GVxjg",
+  "name": "Sidar (Cavaleiros dos zodiacos)",
+  "boards": {
+    "commanders": {
+      "cards": {
+        "EW5Bx": {
+          "quantity": 1,
+          "isFoil": false,
+          "finish": "nonFoil",
+          "isProxy": false,
+          "card": {
+            "name": "Sidar Jabari of Zhalfir",
+            "scryfall_id": "5fc707be-9286-4ba1-90f6-475265d19ed2",
+            "set": "moc",
+            "cn": "5"
+          }
+        }
+      }
+    },
+    "mainboard": {
+      "cards": {
+        "kaN49": {
+          "quantity": 1,
+          "isFoil": false,
+          "finish": "nonFoil",
+          "isProxy": false,
+          "card": {
+            "name": "Island",
+            "scryfall_id": "0e443748-edf1-4499-9507-3649dd57ee95",
+            "set": "j25",
+            "cn": "86"
+          }
+        },
+        "EZyKV": {
+          "quantity": 1,
+          "isFoil": false,
+          "finish": "nonFoil",
+          "isProxy": true,
+          "card": {
+            "name": "Sol Ring",
+            "scryfall_id": "1b3a4537-1d51-47ac-a12e-6b8d68f530e6",
+            "set": "plst",
+            "cn": "C18-222"
+          }
+        },
+        "kAAVx": {
+          "quantity": 1,
+          "isFoil": false,
+          "finish": "nonFoil",
+          "isProxy": false,
+          "card": {
+            "name": "Cecil, Dark Knight // Cecil, Redeemed Paladin",
+            "scryfall_id": "026e7167-d665-43d0-a51e-8df2d68cdb5e",
+            "set": "fin",
+            "cn": "91"
+          }
+        },
+        "kq0ND": {
+          "quantity": 1,
+          "isFoil": false,
+          "finish": "nonFoil",
+          "isProxy": false,
+          "card": {
+            "name": "Artifacts",
+            "scryfall_id": "29ace12a-7ec2-4ae9-a6f7-d68d1497c5b0",
+            "set": "fmsc",
+            "cn": "3"
+          }
+        }
+      }
+    },
+    "sideboard": { "cards": {} },
+    "maybeboard": { "cards": {} }
+  },
+  "attractions": { "cards": {} }
+}

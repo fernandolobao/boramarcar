@@ -11,6 +11,7 @@ const boardSchema = z
         z.object({
           quantity: z.number().int().positive(),
           isFoil: z.boolean().optional(),
+          isProxy: z.boolean().optional(),
           finish: z.string().optional(),
           card: z.object({
             name: z.string(),
@@ -64,6 +65,7 @@ export function mapMoxfieldDeck(payload: unknown): ImportedDeck {
       if (item.card.set) entry.setCode = item.card.set;
       if (item.card.cn) entry.collectorNumber = item.card.cn;
       if (item.isFoil || (item.finish && item.finish !== 'nonFoil')) entry.isFoil = true;
+      if (item.isProxy) entry.isProxy = true;
       entries.push(entry);
     }
   }
@@ -76,21 +78,45 @@ export function mapMoxfieldDeck(payload: unknown): ImportedDeck {
   };
 }
 
+/** Detalhes anexados ao erro quando o Moxfield recusa a importação automática. */
+export interface MoxfieldUpstreamDetails {
+  source: 'moxfield';
+  status: number | null;
+  url: string;
+}
+
+/**
+ * Busca o deck na API do Moxfield. A API não é pública: o Moxfield costuma recusar (403)
+ * requisições de servidores sem um User-Agent autorizado por eles. Nesse caso o erro traz
+ * `details.source = 'moxfield'` para a interface sugerir a importação por texto.
+ */
 export async function fetchMoxfieldDeck(
   publicId: string,
   fetchFn: FetchLike,
   userAgent = 'BoraMarcar/0.1',
 ): Promise<ImportedDeck> {
-  const response = await fetchFn(
-    `https://api2.moxfield.com/v3/decks/all/${encodeURIComponent(publicId)}`,
-    { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
-  );
-  if (response.status === 404)
-    throw new DomainError('not_found', 'Deck não encontrado no Moxfield');
+  const details = (status: number | null): MoxfieldUpstreamDetails => ({
+    source: 'moxfield',
+    status,
+    url: `https://moxfield.com/decks/${publicId}`,
+  });
+  let response: Response;
+  try {
+    response = await fetchFn(
+      `https://api2.moxfield.com/v3/decks/all/${encodeURIComponent(publicId)}`,
+      { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
+    );
+  } catch {
+    throw new DomainError('upstream_error', 'Não foi possível conectar ao Moxfield', details(null));
+  }
+  if (response.status === 404) {
+    throw new DomainError('not_found', 'Deck não encontrado no Moxfield (ele é público?)');
+  }
   if (!response.ok) {
     throw new DomainError(
       'upstream_error',
-      `Moxfield respondeu ${response.status}. Tente importar colando a lista em texto.`,
+      `Moxfield respondeu ${response.status}. Importe colando a lista em texto.`,
+      details(response.status),
     );
   }
   return mapMoxfieldDeck(await response.json());

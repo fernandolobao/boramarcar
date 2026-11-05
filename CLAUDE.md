@@ -27,6 +27,7 @@ A plataforma segue **WCAG 2.2 nível AA**. Toda tela ou componente novo — ou a
 8. **Toque e reflow**: alvos ≥ 24×24px (checkbox/radio já são 20px + rótulo clicável), layout sem rolagem horizontal em 320px.
 9. **Movimento**: animações com `motion-reduce:`.
 10. **Selects** usam a classe `select` (seta própria com espaçamento), não `input`.
+11. **Cursor**: tudo que é clicável mostra `cursor: pointer` (botões, rótulos de checkbox/radio, selects); desabilitado mostra `not-allowed`. Já está no CSS global e nas classes `btn*`/`select` — não sobrescreva.
 
 ### Como auditar (automatizado + manual)
 

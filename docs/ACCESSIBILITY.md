@@ -42,6 +42,14 @@ navegação por teclado automatizada (ordem e visibilidade do foco), reflow em 3
 Resultado após as correções: **0 violações** do axe em 15 telas × 2 temas × 2 dispositivos; foco visível em todos os elementos;
 sem rolagem horizontal em 320px.
 
+### Revisão de 05/11/2026 (importação do Moxfield e cursor)
+
+| Problema                                                                                              | Critério            | Correção                                                                             |
+| ----------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| Botões, rótulos de checkbox/radio e selects sem cursor de "mãozinha" (o Tailwind v4 removeu o padrão) | Usabilidade         | `cursor: pointer` global para elementos clicáveis e `not-allowed` para desabilitados |
+| Placeholder com contraste baixo                                                                       | 1.4.3 (boa prática) | `placeholder:text-zinc-500` / `zinc-400` no escuro                                   |
+| Falha do Moxfield mostrava só um erro genérico                                                        | 3.3.3 (AA)          | Passo a passo em `role="alert"`, troca para "Colar lista" e foco no campo de texto   |
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

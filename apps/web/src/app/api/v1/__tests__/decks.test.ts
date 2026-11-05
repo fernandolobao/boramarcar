@@ -152,11 +152,28 @@ describe('API v1 — decks', () => {
       'fetch',
       vi.fn(async () => new Response('erro', { status: 500 })),
     );
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const res = await call(decks.POST, {
       method: 'POST',
       body: { kind: 'url', url: 'https://moxfield.com/decks/abc' },
     });
     expect(res.status).toBe(502);
-    expect(res.body!.error.code).toBe('upstream_error');
+    expect(res.body!.error).toMatchObject({
+      code: 'upstream_error',
+      details: { source: 'moxfield', status: 500, url: 'https://moxfield.com/decks/abc' },
+    });
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('importa texto sem nome usando o cabeçalho do formato Arena', async () => {
+    asUser(await createTestUser(testState.db!));
+    stubExternalApis();
+    const res = await call(decks.POST, {
+      method: 'POST',
+      body: { kind: 'text', text: 'About\nName Do Arena\n\nDeck\n1 Sol Ring' },
+    });
+    expect(res.status).toBe(201);
+    expect(res.body!.deck.name).toBe('Do Arena');
   });
 });

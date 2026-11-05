@@ -7,6 +7,8 @@ const schema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   VERCEL_URL: z.string().optional(),
+  /** User-Agent autorizado pelo Moxfield (opcional; sem ele a API costuma recusar). */
+  MOXFIELD_USER_AGENT: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -27,6 +29,7 @@ export function getEnv(): Env {
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? 'missing',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? 'missing',
       VERCEL_URL: process.env.VERCEL_URL,
+      MOXFIELD_USER_AGENT: process.env.MOXFIELD_USER_AGENT,
     };
     return cached;
   }

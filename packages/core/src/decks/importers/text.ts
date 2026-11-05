@@ -1,5 +1,11 @@
 import type { DeckBoard, DeckEntry } from '../types';
 
+/** Nome do deck no cabeçalho do formato MTG Arena ("About" / "Name Meu deck"). */
+export function parseDeckTextName(text: string): string | null {
+  const match = /^\s*About\s*\r?\n\s*Name\s+(.+?)\s*$/im.exec(text);
+  return match?.[1]?.trim() || null;
+}
+
 const SECTION_ALIASES: Record<string, DeckBoard> = {
   commander: 'commander',
   commanders: 'commander',
@@ -12,7 +18,11 @@ const SECTION_ALIASES: Record<string, DeckBoard> = {
   maybeboard: 'maybeboard',
   maybe: 'maybeboard',
   considering: 'maybeboard',
+  companion: 'sideboard',
 };
+
+/** Cabeçalhos que não são cartas nem boards (formato Arena). */
+const IGNORED_HEADERS = /^(about|name\s.+)$/i;
 
 // "1x Sol Ring (CMM) 400 *F* #proxy"
 const LINE_RE =
@@ -52,7 +62,7 @@ export function parseDeckText(text: string): DeckEntry[] {
       explicitSections = true;
       continue;
     }
-    if (line.startsWith('//')) continue;
+    if (line.startsWith('//') || IGNORED_HEADERS.test(line)) continue;
 
     const match = LINE_RE.exec(line);
     if (!match?.groups) continue;

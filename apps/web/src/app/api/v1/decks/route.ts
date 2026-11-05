@@ -9,7 +9,7 @@ const importSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('url'), url: z.url(), name: z.string().trim().max(120).optional() }),
   z.object({
     kind: z.literal('text'),
-    name: z.string().trim().min(1).max(120),
+    name: z.string().trim().max(120).optional(),
     text: z.string().min(1).max(50_000),
   }),
 ]);
