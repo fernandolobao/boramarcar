@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 export function CreateGroupForm() {
   const t = useTranslations('group');
@@ -33,6 +34,7 @@ export function CreateGroupForm() {
         onChange={(e) => setName(e.target.value)}
       />
       <button className="btn-primary" disabled={pending}>
+        <Icon name="add" />
         {t('create')}
       </button>
       <FormError message={error} />
@@ -68,6 +70,7 @@ export function JoinGroupForm() {
         onChange={(e) => setCode(e.target.value)}
       />
       <button className="btn-secondary" disabled={pending}>
+        <Icon name="join" />
         {t('join')}
       </button>
       <FormError message={error} />
@@ -122,6 +125,7 @@ export function LocationForm({ groupId }: { groupId: string }) {
         />
       </div>
       <button className="btn-secondary" disabled={pending}>
+        <Icon name="add" />
         {t('addLocation')}
       </button>
       <FormError message={error} />
@@ -141,6 +145,7 @@ export function SwitchGroupButton({ groupId }: { groupId: string }) {
         void run(() => api('/api/v1/me/active-group', { method: 'PUT', body: { groupId } }))
       }
     >
+      <Icon name="switchGroup" />
       {t('switch')}
     </button>
   );

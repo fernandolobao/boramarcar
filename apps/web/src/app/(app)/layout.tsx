@@ -22,13 +22,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const tc = await getTranslations('common');
 
   const links = [
-    { href: '/painel', label: t('dashboard') },
-    { href: '/disponibilidade', label: t('availability') },
-    { href: '/eventos', label: t('events') },
-    { href: '/ranking', label: t('ranking') },
-    { href: '/decks', label: t('decks') },
-    { href: '/grupo', label: t('group') },
-    { href: '/perfil', label: t('profile') },
+    { href: '/painel', label: t('dashboard'), icon: 'dashboard' as const },
+    { href: '/disponibilidade', label: t('availability'), icon: 'availability' as const },
+    { href: '/eventos', label: t('events'), icon: 'events' as const },
+    { href: '/ranking', label: t('ranking'), icon: 'ranking' as const },
+    { href: '/decks', label: t('decks'), icon: 'decks' as const },
+    { href: '/grupo', label: t('group'), icon: 'group' as const },
+    { href: '/perfil', label: t('profile'), icon: 'profile' as const },
   ];
 
   return (
@@ -38,7 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}
       />
       <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           <Link href="/painel" className="font-semibold">
             {tc('appName')}
             {active && <span className="muted ml-2 font-normal">· {active.name}</span>}

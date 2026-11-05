@@ -4,6 +4,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
+import { Icon } from '@/components/icons';
 
 export const generateMetadata = navMetadata('dashboard');
 
@@ -84,6 +85,7 @@ export default async function DashboardPage() {
             </ul>
           )}
           <Link href="/disponibilidade" className="btn-secondary mt-4">
+            <Icon name="availability" />
             {t('seeAvailability')}
           </Link>
         </section>

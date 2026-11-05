@@ -57,6 +57,13 @@ sem rolagem horizontal em 320px.
 - **Membros**: ações agrupadas com rótulo ("Ações para Bia"), nomes com contexto em texto para leitores de tela, confirmação em dois cliques para remover/transferir/sair, e motivo visível quando "Sair" está desabilitado.
 - **Gráfico da curva de mana**: as barras não apareciam (altura em % sem contêiner com altura definida). Corrigido e coberto por teste E2E que mede a altura renderizada; cada coluna tem nome acessível ("Custo 3: 2 cartas").
 
+### Revisão: ícones (Lucide)
+
+- Ícones são decorativos (`aria-hidden`, `focusable="false"`) e sempre acompanham texto; os nomes acessíveis não mudaram (coberto por teste).
+- Mapa semântico único (`components/icons.tsx`): a mesma ação usa sempre o mesmo ícone.
+- Botão "Sair": a partir de telas `sm` mostra só o ícone (o texto fica `sr-only` e em `title`), para o cabeçalho caber numa linha; no celular mostra ícone + texto.
+- Ícone de link externo junto do aviso "(abre em nova aba)" para leitores de tela.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

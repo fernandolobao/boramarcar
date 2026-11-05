@@ -14,6 +14,7 @@ import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { inviteQrCode, inviteUrl } from '@/server/invite';
 import { navMetadata } from '@/server/metadata';
+import { Icon } from '@/components/icons';
 
 export const generateMetadata = navMetadata('group');
 
@@ -81,6 +82,7 @@ export default async function GroupPage() {
                       href={invite.qr.png}
                       download={`convite-${active.inviteCode}.png`}
                     >
+                      <Icon name="download" />
                       {t('downloadQr')}
                     </a>
                     {active.role !== 'member' && <RegenerateInviteButton groupId={active.id} />}

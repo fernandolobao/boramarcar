@@ -7,6 +7,7 @@ import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { api } from '@/lib/api';
 import { WEEKDAY_ORDER, weekdayNames } from '@/lib/weekdays';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 interface LocationOption {
   id: string;
@@ -85,6 +86,7 @@ export function AvailabilityForm({
             className={frequency === value ? 'btn-primary' : 'btn-secondary'}
             onClick={() => setFrequency(value)}
           >
+            <Icon name={value} />
             {t(value)}
           </button>
         ))}
@@ -218,6 +220,7 @@ export function AvailabilityForm({
         />
       </div>
       <button className="btn-primary" disabled={pending}>
+        <Icon name="add" />
         {t('add')}
       </button>
       <FormError message={localError ?? error} />
@@ -254,6 +257,7 @@ export function DeleteButton({
           )
         }
       >
+        <Icon name="delete" />
         {label ?? tc('delete')}
         {context && <span className="sr-only"> ({context})</span>}
       </button>
@@ -296,6 +300,7 @@ export function CreateEventFromWindowButton(props: {
           )
         }
       >
+        <Icon name="createEvent" />
         {t('createEvent')}
       </button>
       <FormError message={error} />

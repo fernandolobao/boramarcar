@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
+import { Icon } from './icons';
 
 export function SignInButton({ callbackURL = '/painel' }: { callbackURL?: string }) {
   const t = useTranslations('common');
@@ -35,14 +36,17 @@ export function SignOutButton() {
   return (
     <button
       type="button"
-      className="btn-secondary"
+      className="btn-secondary sm:px-3"
+      // A partir de telas "sm" o texto fica só para leitores de tela (o cabeçalho não comporta); a dica aparece no hover.
+      title={t('signOut')}
       onClick={async () => {
         await authClient.signOut();
         router.push('/');
         router.refresh();
       }}
     >
-      {t('signOut')}
+      <Icon name="signOut" />
+      <span className="sm:sr-only">{t('signOut')}</span>
     </button>
   );
 }

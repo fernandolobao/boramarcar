@@ -5,6 +5,7 @@ import { useMemo, useState, useSyncExternalStore } from 'react';
 import { LOCALES, type Locale } from '@/i18n/config';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 function listTimeZones(current: string): string[] {
   const zones =
@@ -89,6 +90,7 @@ export function ProfileForm() {
       </div>
       <div className="flex items-center gap-3">
         <button className="btn-primary" disabled={pending}>
+          <Icon name="save" />
           {tc('save')}
         </button>
         {saved && !error && (

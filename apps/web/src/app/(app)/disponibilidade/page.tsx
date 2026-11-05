@@ -20,6 +20,7 @@ import { weekdayNames } from '@/lib/weekdays';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
+import { Icon } from '@/components/icons';
 
 export const generateMetadata = navMetadata('availability');
 
@@ -138,7 +139,8 @@ export default async function AvailabilityPage({ searchParams }: Props) {
           </h2>
           <nav aria-label={t('gridTitle')} className="flex flex-wrap gap-2">
             <Link className="btn-secondary" href={weekLink(addDays(weekStart, -7))}>
-              ← {t('previousWeek')}
+              <Icon name="previous" />
+              {t('previousWeek')}
             </Link>
             {weekStart !== currentWeek && (
               <Link className="btn-secondary" href="/disponibilidade">
@@ -146,7 +148,8 @@ export default async function AvailabilityPage({ searchParams }: Props) {
               </Link>
             )}
             <Link className="btn-secondary" href={weekLink(addDays(weekStart, 7))}>
-              {t('nextWeek')} →
+              {t('nextWeek')}
+              <Icon name="next" />
             </Link>
           </nav>
         </div>
@@ -209,6 +212,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
                           label={t('unskipLabel', { date: localDate(date) })}
                           className="btn min-h-8 px-2 text-brand-700 underline dark:text-brand-100"
                         >
+                          <Icon name="undo" className="size-3.5" />
                           {t('unskip')}
                         </ApiActionButton>
                       </span>
@@ -255,6 +259,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
                       body={{ date: slot.date, skip: true }}
                       label={`${t('skipDate')}: ${t('skipDateLabel', { date: localDate(slot.date) })}`}
                     >
+                      <Icon name="skipDate" />
                       {t('skipDate')}
                     </ApiActionButton>
                   ) : (

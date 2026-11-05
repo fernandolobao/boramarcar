@@ -7,6 +7,7 @@ import type { GameResult } from '@boramarcar/core';
 import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 export function NewEventForm({
   groupId,
@@ -87,6 +88,7 @@ export function NewEventForm({
         </select>
       </div>
       <button className="btn-primary" disabled={pending}>
+        <Icon name="add" />
         {t('new')}
       </button>
       <FormError message={error} />
@@ -119,6 +121,7 @@ export function RsvpButtons({
             )
           }
         >
+          <Icon name={value === 'yes' ? 'rsvpYes' : value === 'maybe' ? 'rsvpMaybe' : 'rsvpNo'} />
           {t(value)}
         </button>
       ))}
@@ -259,6 +262,7 @@ export function RecordGameForm({ eventId, players }: { eventId: string; players:
         className="btn-primary"
         disabled={pending || playing.length < 2 || (!isDraw && !winner)}
       >
+        <Icon name="add" />
         {t('recordGame')}
       </button>
       <FormError message={error} />

@@ -4,6 +4,7 @@ import { getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
+import { Icon } from '@/components/icons';
 import {
   ColorPips,
   DeckScore,
@@ -51,6 +52,7 @@ export default async function DeckPage({ params }: Props) {
                 {' · '}
                 <a href={deck.sourceUrl} target="_blank" rel="noreferrer" className="underline">
                   {deck.source}
+                  <Icon name="externalLink" className="ml-0.5 inline size-3.5 align-[-2px]" />
                   <span className="sr-only"> {tc('newTab')}</span>
                 </a>
               </>

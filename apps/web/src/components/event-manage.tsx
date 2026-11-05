@@ -5,6 +5,7 @@ import { useTimeZone, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
+import { Icon } from './icons';
 
 type Status = 'scheduled' | 'cancelled' | 'finished';
 
@@ -118,6 +119,7 @@ export function EventManage(props: Props) {
         </div>
         <div className="flex items-center gap-3 sm:col-span-2">
           <button className="btn-primary" disabled={pending}>
+            <Icon name="save" />
             {tc('save')}
           </button>
           {saved && !error && (
@@ -137,6 +139,7 @@ export function EventManage(props: Props) {
               disabled={pending}
               onClick={() => void patch({ status: 'finished' })}
             >
+              <Icon name="finish" />
               {t('finish')}
             </button>
             <button
@@ -154,6 +157,7 @@ export function EventManage(props: Props) {
                 void patch({ status: 'cancelled' });
               }}
             >
+              <Icon name="cancel" />
               {confirmCancel ? t('cancelConfirm') : t('cancelEvent')}
             </button>
           </>
@@ -165,6 +169,7 @@ export function EventManage(props: Props) {
             disabled={pending}
             onClick={() => void patch({ status: 'scheduled' })}
           >
+            <Icon name="reopen" />
             {t('reopen')}
           </button>
         )}

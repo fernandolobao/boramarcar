@@ -3,6 +3,7 @@
 import { whatsappShareUrl } from '@boramarcar/core/calendar';
 import { useTranslations } from 'next-intl';
 import { useState, useSyncExternalStore } from 'react';
+import { Icon } from './icons';
 
 const noopSubscribe = () => () => {};
 /** Valor que só existe no navegador (no servidor usa `serverValue`), sem setState em efeito. */
@@ -34,6 +35,7 @@ export function ShareButtons({
         target="_blank"
         rel="noreferrer"
       >
+        <Icon name="whatsapp" />
         {t('whatsapp')}
         <span className="sr-only"> {tc('newTab')}</span>
       </a>
@@ -43,6 +45,7 @@ export function ShareButtons({
           className="btn-secondary"
           onClick={() => navigator.share({ title, text, url }).catch(() => {})}
         >
+          <Icon name="share" />
           {t('native')}
         </button>
       )}
@@ -55,10 +58,12 @@ export function ShareButtons({
           setTimeout(() => setCopied(false), 2000);
         }}
       >
+        <Icon name={copied ? 'copied' : 'copy'} />
         <span aria-live="polite">{copied ? t('copied') : t('copyLink')}</span>
       </button>
       {icsHref && (
         <a className="btn-secondary" href={icsHref} download>
+          <Icon name="addToCalendar" />
           {t('addToCalendar')}
         </a>
       )}

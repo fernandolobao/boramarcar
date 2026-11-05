@@ -42,6 +42,7 @@ Hoje é uma aplicação web (Next.js na Vercel). Os apps Android e iOS estão pl
 | Auth      | Better Auth (Google OAuth)                                        | Sessões no próprio banco; tem plugin para Expo (mobile)                           |
 | i18n      | next-intl                                                         | pt-BR padrão, inglês incluído                                                     |
 | Estilo    | Tailwind CSS v4                                                   |                                                                                   |
+| Ícones    | Lucide (`lucide-react`)                                           | ~1.600 ícones consistentes (traço 2px), MIT, importados um a um (tree-shaking)    |
 | Validação | Zod 4                                                             | Entrada da API e respostas de APIs externas                                       |
 | Testes    | Vitest, PGlite (Postgres em memória), Testing Library, Playwright | Testes de integração com Postgres real sem Docker                                 |
 | CI        | GitHub Actions                                                    | Lint, formatação, tipos, testes, cobertura, migrations, build e E2E em cada PR    |
