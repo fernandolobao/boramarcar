@@ -26,7 +26,7 @@ jobs:
       - name: Secret ausente
         if: env.DATABASE_URL == ''
         run: echo "::warning::Secret DATABASE_URL não configurado no environment production; nada a fazer."
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: env.DATABASE_URL != ''
       - uses: pnpm/action-setup@v5
         if: env.DATABASE_URL != ''
