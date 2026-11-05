@@ -37,6 +37,12 @@ const archidektPayload = {
     },
     { quantity: 1, categories: ['Ideias'], card: { oracleCard: { name: 'Harmonize' } } },
     { quantity: 30, categories: null, card: { oracleCard: { name: 'Forest' } } },
+    {
+      quantity: 1,
+      categories: ['Ramp'],
+      deletedAt: '2026-01-01T00:00:00Z',
+      card: { oracleCard: { name: 'Carta Removida' } },
+    },
   ],
 };
 

@@ -8,23 +8,36 @@ export function ManaCurve({ curve }: { curve: Record<ManaCurveBucket, number> })
   return (
     <figure>
       <figcaption className="section-title">{t('manaCurve')}</figcaption>
-      <ol className="flex h-40 items-end gap-2" aria-label={t('manaCurve')}>
+      {/*
+        As barras precisam de um contêiner com altura definida: altura em % dentro de um
+        item flex sem altura própria resolve para "auto" e a barra some (bug anterior).
+      */}
+      <ol className="flex items-end gap-2" aria-label={t('manaCurve')}>
         {MANA_CURVE_BUCKETS.map((bucket) => (
           <li
             key={bucket}
             className="flex flex-1 flex-col items-center gap-1"
-            aria-label={`${bucket}: ${curve[bucket]}`}
+            aria-label={t('curveBucket', { bucket, count: curve[bucket] })}
           >
-            <span className="text-xs tabular-nums text-zinc-500">{curve[bucket]}</span>
-            <div
-              data-testid={`curve-bar-${bucket}`}
-              className="w-full rounded-t-md bg-brand-500"
-              style={{
-                height: `${(curve[bucket] / max) * 100}%`,
-                minHeight: curve[bucket] ? 4 : 0,
-              }}
-            />
-            <span className="text-xs font-medium">{bucket}</span>
+            <span
+              className="text-xs tabular-nums text-zinc-600 dark:text-zinc-400"
+              aria-hidden="true"
+            >
+              {curve[bucket]}
+            </span>
+            <div className="flex h-32 w-full items-end" aria-hidden="true">
+              <div
+                data-testid={`curve-bar-${bucket}`}
+                className="w-full rounded-t-md bg-brand-500"
+                style={{
+                  height: `${(curve[bucket] / max) * 100}%`,
+                  minHeight: curve[bucket] ? 4 : 0,
+                }}
+              />
+            </div>
+            <span className="text-xs font-medium" aria-hidden="true">
+              {bucket}
+            </span>
           </li>
         ))}
       </ol>

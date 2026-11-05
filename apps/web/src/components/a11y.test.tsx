@@ -16,6 +16,9 @@ import { NewEventForm, RecordGameForm, RsvpButtons } from './event-forms';
 import { CreateGroupForm, JoinGroupForm, LocationForm, SwitchGroupButton } from './group-forms';
 import { JoinInviteButton, RegenerateInviteButton } from './invite';
 import { NavLinks } from './nav-links';
+import { AvailabilityGrid } from './availability-grid';
+import { MemberActions } from './member-actions';
+import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ShareButtons } from './share-buttons';
 
@@ -44,7 +47,64 @@ async function audit(ui: ReactElement) {
 
 const locations = [{ id: 'l1', name: 'Casa da Ana' }];
 
+const grid = buildWeekGrid({
+  weekStart: '2026-11-09',
+  timeZone: 'America/Sao_Paulo',
+  currentUserId: 'a',
+  hours: [19, 20],
+  slots: [
+    {
+      userId: 'a',
+      start: new Date('2026-11-12T22:00:00Z'),
+      end: new Date('2026-11-13T00:00:00Z'),
+      kind: 'once',
+    },
+    {
+      userId: 'b',
+      start: new Date('2026-11-12T22:00:00Z'),
+      end: new Date('2026-11-13T00:00:00Z'),
+      kind: 'weekly',
+    },
+  ],
+});
+const member = { userId: 'b', name: 'Bia', role: 'member' as const };
+
 const cases: [string, ReactElement][] = [
+  [
+    'AvailabilityGrid',
+    <AvailabilityGrid
+      key="grid"
+      groupId="g"
+      grid={grid}
+      members={[
+        { userId: 'a', name: 'Ana' },
+        { userId: 'b', name: 'Bia' },
+      ]}
+      minPlayers={4}
+    />,
+  ],
+  [
+    'MemberActions (dono vendo membro)',
+    <MemberActions
+      key="ma1"
+      groupId="g"
+      actorId="a"
+      actorRole="owner"
+      member={member}
+      memberCount={3}
+    />,
+  ],
+  [
+    'MemberActions (dono saindo)',
+    <MemberActions
+      key="ma2"
+      groupId="g"
+      actorId="a"
+      actorRole="owner"
+      member={{ userId: 'a', name: 'Ana', role: 'owner' }}
+      memberCount={3}
+    />,
+  ],
   ['AvailabilityForm', <AvailabilityForm key="a" groupId="g" locations={locations} />],
   ['DeleteButton', <DeleteButton key="b" path="/x" label="Remover disponibilidade de sábado" />],
   [

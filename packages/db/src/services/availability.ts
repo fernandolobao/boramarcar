@@ -6,8 +6,9 @@ import {
 } from '@boramarcar/core';
 import { and, asc, eq, gt, inArray, lt } from 'drizzle-orm';
 import type { Database } from '../client';
-import { availabilitySlotLocations, availabilitySlots, locations, user } from '../schema';
+import { availabilitySlotLocations, availabilitySlots, user } from '../schema';
 import { listLocations, listMembers, requireMembership } from './groups';
+import { assertGroupLocations, loadRuleOccurrences } from './recurring';
 
 export interface AddAvailabilityInput {
   groupId: string;
@@ -23,15 +24,7 @@ export async function addAvailability(db: Database, input: AddAvailabilityInput)
   await requireMembership(db, input.groupId, input.userId);
   const locationIds = [...new Set(input.locationIds ?? [])];
 
-  if (locationIds.length) {
-    const found = await db
-      .select({ id: locations.id })
-      .from(locations)
-      .where(and(eq(locations.groupId, input.groupId), inArray(locations.id, locationIds)));
-    if (found.length !== locationIds.length) {
-      throw new DomainError('invalid_input', 'Local inválido para este grupo');
-    }
-  }
+  await assertGroupLocations(db, input.groupId, locationIds);
 
   return db.transaction(async (tx) => {
     const [slot] = await tx
@@ -89,7 +82,26 @@ export async function listAvailability(
   for (const link of links) {
     bySlot.set(link.slotId, [...(bySlot.get(link.slotId) ?? []), link.locationId]);
   }
-  return rows.map((row) => ({ ...row, locationIds: bySlot.get(row.id) ?? [] }));
+  const oneOff = rows.map((row) => ({
+    ...row,
+    kind: 'once' as const,
+    ruleId: null as string | null,
+    date: null as string | null,
+    locationIds: bySlot.get(row.id) ?? [],
+  }));
+  const weekly = (await loadRuleOccurrences(db, input)).map((o) => ({
+    id: `${o.ruleId}:${o.date}`,
+    userId: o.userId,
+    userName: o.userName,
+    startsAt: o.start,
+    endsAt: o.end,
+    note: o.note,
+    kind: 'weekly' as const,
+    ruleId: o.ruleId as string | null,
+    date: o.date as string | null,
+    locationIds: [...o.locationIds],
+  }));
+  return [...oneOff, ...weekly].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
 }
 
 export async function deleteAvailability(db: Database, input: { slotId: string; userId: string }) {

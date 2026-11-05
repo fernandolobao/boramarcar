@@ -8,11 +8,15 @@ import {
   getInvitePreview,
   isMember,
   joinGroup,
+  leaveGroup,
   listGroupsForUser,
   listLocations,
   listMembers,
   regenerateInviteCode,
+  removeMember,
   requireMembership,
+  setMemberRole,
+  transferOwnership,
 } from './groups';
 
 let db: Database;
@@ -126,6 +130,110 @@ describe('grupos', () => {
     await expect(
       joinGroup(db, { inviteCode: group.inviteCode, userId: outsider.id }),
     ).rejects.toMatchObject({
+      code: 'not_found',
+    });
+  });
+});
+
+describe('gestão de membros', () => {
+  it('promove, rebaixa, remove, transfere e sai respeitando papéis', async () => {
+    const [dona, adm, ana, bia] = await Promise.all(
+      ['Dona', 'Adm', 'Ana', 'Bia'].map((name) => createTestUser(db, { name })),
+    );
+    const group = await createGroup(db, { name: 'Gestão', userId: dona!.id });
+    for (const u of [adm!, ana!, bia!])
+      await joinGroup(db, { inviteCode: group.inviteCode, userId: u.id });
+    const role = async (id: string) =>
+      (await listMembers(db, group.id)).find((m) => m.userId === id)?.role;
+
+    // Membro comum não muda papéis; dono promove
+    await expect(
+      setMemberRole(db, {
+        groupId: group.id,
+        actorId: ana!.id,
+        targetUserId: bia!.id,
+        role: 'admin',
+      }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await setMemberRole(db, {
+      groupId: group.id,
+      actorId: dona!.id,
+      targetUserId: adm!.id,
+      role: 'admin',
+    });
+    expect(await role(adm!.id)).toBe('admin');
+
+    // Admin promove membro, mas não rebaixa admin nem mexe no dono
+    await setMemberRole(db, {
+      groupId: group.id,
+      actorId: adm!.id,
+      targetUserId: ana!.id,
+      role: 'admin',
+    });
+    await expect(
+      setMemberRole(db, {
+        groupId: group.id,
+        actorId: adm!.id,
+        targetUserId: ana!.id,
+        role: 'member',
+      }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await expect(
+      setMemberRole(db, {
+        groupId: group.id,
+        actorId: adm!.id,
+        targetUserId: dona!.id,
+        role: 'member',
+      }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await setMemberRole(db, {
+      groupId: group.id,
+      actorId: dona!.id,
+      targetUserId: ana!.id,
+      role: 'member',
+    });
+    await expect(
+      setMemberRole(db, {
+        groupId: group.id,
+        actorId: dona!.id,
+        targetUserId: 'nope',
+        role: 'admin',
+      }),
+    ).rejects.toMatchObject({ code: 'not_found' });
+
+    // Admin remove membro comum, não remove outro admin; dono remove qualquer um
+    await expect(
+      removeMember(db, { groupId: group.id, actorId: ana!.id, targetUserId: bia!.id }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await removeMember(db, { groupId: group.id, actorId: adm!.id, targetUserId: bia!.id });
+    expect(await isMember(db, group.id, bia!.id)).toBe(false);
+
+    // Dono não sai sem transferir; transfere e vira admin
+    await expect(leaveGroup(db, { groupId: group.id, userId: dona!.id })).rejects.toMatchObject({
+      code: 'conflict',
+    });
+    await expect(
+      transferOwnership(db, { groupId: group.id, ownerId: adm!.id, newOwnerId: ana!.id }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await expect(
+      transferOwnership(db, { groupId: group.id, ownerId: dona!.id, newOwnerId: dona!.id }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await transferOwnership(db, { groupId: group.id, ownerId: dona!.id, newOwnerId: ana!.id });
+    expect(await role(ana!.id)).toBe('owner');
+    expect(await role(dona!.id)).toBe('admin');
+
+    // Sair (inclusive via removeMember em si mesmo)
+    expect(
+      await removeMember(db, { groupId: group.id, actorId: dona!.id, targetUserId: dona!.id }),
+    ).toEqual({ groupDeleted: false });
+    expect(await leaveGroup(db, { groupId: group.id, userId: adm!.id })).toEqual({
+      groupDeleted: false,
+    });
+    // Última pessoa (dona) sai: grupo apagado
+    expect(await leaveGroup(db, { groupId: group.id, userId: ana!.id })).toEqual({
+      groupDeleted: true,
+    });
+    await expect(requireMembership(db, group.id, ana!.id)).rejects.toMatchObject({
       code: 'not_found',
     });
   });

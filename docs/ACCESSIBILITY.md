@@ -50,6 +50,13 @@ sem rolagem horizontal em 320px.
 | Placeholder com contraste baixo                                                                       | 1.4.3 (boa prática) | `placeholder:text-zinc-500` / `zinc-400` no escuro                                   |
 | Falha do Moxfield mostrava só um erro genérico                                                        | 3.3.3 (AA)          | Passo a passo em `role="alert"`, troca para "Colar lista" e foco no campo de texto   |
 
+### Revisão: agenda madura (grade semanal, regras semanais, membros)
+
+- **Grade semanal**: padrão ARIA _grid_ — uma parada de Tab, setas, Home/End, PageUp/PageDown; cada célula tem nome completo ("quinta-feira, 12 de novembro, 19h: 3 pessoas disponíveis (…). Você está disponível."), `aria-pressed` para o próprio horário e `aria-disabled` quando o horário vem de regra semanal. A cor (mesa fechada) sempre acompanha o número e a legenda; o próprio horário tem contorno, e a regra semanal tem o símbolo ↻.
+- **Formulário**: escolha "Uma vez / Toda semana" com `aria-pressed`, dias em `<fieldset>/<legend>`, dica do horário que atravessa a meia-noite ligada por `aria-describedby`.
+- **Membros**: ações agrupadas com rótulo ("Ações para Bia"), nomes com contexto em texto para leitores de tela, confirmação em dois cliques para remover/transferir/sair, e motivo visível quando "Sair" está desabilitado.
+- **Gráfico da curva de mana**: as barras não apareciam (altura em % sem contêiner com altura definida). Corrigido e coberto por teste E2E que mede a altura renderizada; cada coluna tem nome acessível ("Custo 3: 2 cartas").
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

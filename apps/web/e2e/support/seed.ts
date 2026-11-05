@@ -83,6 +83,29 @@ export async function seedE2E(databaseUrl: string) {
       .insert(s.availabilitySlotLocations)
       .values({ slotId: 'e2e-slot-0', locationId: 'e2e-loc' });
 
+    // Regras semanais: Bia às quintas (19h–23h) e Ana aos sábados (14h–18h)
+    await db.insert(s.availabilityRules).values([
+      {
+        id: 'e2e-rule-bia',
+        groupId: E2E_IDS.group,
+        userId: 'e2e-bia',
+        weekday: 4,
+        startTime: '19:00',
+        endTime: '23:00',
+        timeZone: 'America/Sao_Paulo',
+      },
+      {
+        id: 'e2e-rule-ana',
+        groupId: E2E_IDS.group,
+        userId: 'e2e-ana',
+        weekday: 6,
+        startTime: '14:00',
+        endTime: '18:00',
+        timeZone: 'America/Sao_Paulo',
+        note: 'Depois do almoço',
+      },
+    ]);
+
     await db.insert(s.events).values([
       {
         id: E2E_IDS.upcomingEvent,

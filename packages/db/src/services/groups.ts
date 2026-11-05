@@ -1,7 +1,14 @@
 import { DomainError } from '@boramarcar/core';
 import { and, asc, count, eq } from 'drizzle-orm';
 import type { Database } from '../client';
-import { groupMembers, groups, locations, user } from '../schema';
+import {
+  availabilityRules,
+  availabilitySlots,
+  groupMembers,
+  groups,
+  locations,
+  user,
+} from '../schema';
 
 const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -155,4 +162,122 @@ export async function regenerateInviteCode(
     .where(eq(groups.id, input.groupId))
     .returning();
   return group!;
+}
+
+/* ---------- Gestão de membros ---------- */
+
+async function getRole(db: Database, groupId: string, userId: string) {
+  const [row] = await db
+    .select({ role: groupMembers.role })
+    .from(groupMembers)
+    .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
+    .limit(1);
+  return row?.role ?? null;
+}
+
+/**
+ * Promove um membro a admin ou rebaixa um admin a membro.
+ * Regras: dono e admins promovem membros; só o dono rebaixa admins; ninguém muda o dono.
+ */
+export async function setMemberRole(
+  db: Database,
+  input: { groupId: string; actorId: string; targetUserId: string; role: 'admin' | 'member' },
+) {
+  const actor = await requireMembership(db, input.groupId, input.actorId);
+  const targetRole = await getRole(db, input.groupId, input.targetUserId);
+  if (!targetRole) throw new DomainError('not_found', 'Membro não encontrado');
+  if (targetRole === 'owner')
+    throw new DomainError('forbidden', 'Para mudar o dono, transfira a posse do grupo');
+  if (actor.role === 'member')
+    throw new DomainError('forbidden', 'Só o dono ou um admin pode mudar papéis');
+  if (targetRole === 'admin' && input.role === 'member' && actor.role !== 'owner') {
+    throw new DomainError('forbidden', 'Só o dono pode rebaixar um admin');
+  }
+  await db
+    .update(groupMembers)
+    .set({ role: input.role })
+    .where(
+      and(eq(groupMembers.groupId, input.groupId), eq(groupMembers.userId, input.targetUserId)),
+    );
+}
+
+/** Tira a pessoa do grupo e apaga as disponibilidades dela no grupo (o histórico de partidas fica). */
+async function removeMembership(db: Database, groupId: string, userId: string) {
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(availabilitySlots)
+      .where(and(eq(availabilitySlots.groupId, groupId), eq(availabilitySlots.userId, userId)));
+    await tx
+      .delete(availabilityRules)
+      .where(and(eq(availabilityRules.groupId, groupId), eq(availabilityRules.userId, userId)));
+    await tx
+      .delete(groupMembers)
+      .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)));
+  });
+}
+
+/**
+ * Remove um membro. Dono remove qualquer um; admin remove apenas membros comuns.
+ * Para sair do próprio grupo use `leaveGroup`.
+ */
+export async function removeMember(
+  db: Database,
+  input: { groupId: string; actorId: string; targetUserId: string },
+) {
+  if (input.actorId === input.targetUserId)
+    return leaveGroup(db, { groupId: input.groupId, userId: input.actorId });
+  const actor = await requireMembership(db, input.groupId, input.actorId);
+  const targetRole = await getRole(db, input.groupId, input.targetUserId);
+  if (!targetRole) throw new DomainError('not_found', 'Membro não encontrado');
+  const allowed = actor.role === 'owner' || (actor.role === 'admin' && targetRole === 'member');
+  if (!allowed) throw new DomainError('forbidden', 'Você não pode remover esta pessoa');
+  await removeMembership(db, input.groupId, input.targetUserId);
+  return { groupDeleted: false };
+}
+
+/**
+ * Sai do grupo. O dono precisa transferir a posse antes, a menos que seja o último membro —
+ * nesse caso o grupo é apagado.
+ */
+export async function leaveGroup(db: Database, input: { groupId: string; userId: string }) {
+  const membership = await requireMembership(db, input.groupId, input.userId);
+  const [{ value: memberCount } = { value: 0 }] = await db
+    .select({ value: count() })
+    .from(groupMembers)
+    .where(eq(groupMembers.groupId, input.groupId));
+  if (membership.role === 'owner') {
+    if (memberCount > 1) {
+      throw new DomainError('conflict', 'Transfira a posse do grupo antes de sair');
+    }
+    await db.delete(groups).where(eq(groups.id, input.groupId));
+    return { groupDeleted: true };
+  }
+  await removeMembership(db, input.groupId, input.userId);
+  return { groupDeleted: false };
+}
+
+/** Passa a posse do grupo para outro membro; o dono anterior vira admin. */
+export async function transferOwnership(
+  db: Database,
+  input: { groupId: string; ownerId: string; newOwnerId: string },
+) {
+  const actor = await requireMembership(db, input.groupId, input.ownerId);
+  if (actor.role !== 'owner')
+    throw new DomainError('forbidden', 'Só o dono pode transferir a posse');
+  if (input.newOwnerId === input.ownerId)
+    throw new DomainError('invalid_input', 'Escolha outro membro');
+  const targetRole = await getRole(db, input.groupId, input.newOwnerId);
+  if (!targetRole) throw new DomainError('not_found', 'Membro não encontrado');
+  await db.transaction(async (tx) => {
+    await tx
+      .update(groupMembers)
+      .set({ role: 'admin' })
+      .where(and(eq(groupMembers.groupId, input.groupId), eq(groupMembers.userId, input.ownerId)));
+    await tx
+      .update(groupMembers)
+      .set({ role: 'owner' })
+      .where(
+        and(eq(groupMembers.groupId, input.groupId), eq(groupMembers.userId, input.newOwnerId)),
+      );
+  });
 }

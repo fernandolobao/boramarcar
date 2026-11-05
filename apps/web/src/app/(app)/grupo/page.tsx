@@ -7,6 +7,7 @@ import {
   SwitchGroupButton,
 } from '@/components/group-forms';
 import { RegenerateInviteButton } from '@/components/invite';
+import { MemberActions } from '@/components/member-actions';
 import { ShareButtons } from '@/components/share-buttons';
 import { getActiveGroup } from '@/server/active-group';
 import { requireUser } from '@/server/current-user';
@@ -88,13 +89,26 @@ export default async function GroupPage() {
               </div>
             )}
           </section>
-          <section className="card">
+          <section className="card md:col-span-2">
             <h2 className="section-title">{t('members')}</h2>
-            <ul className="space-y-1">
+            <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {members.map((m) => (
-                <li key={m.userId} className="flex justify-between text-sm">
-                  <span>{m.name}</span>
-                  <span className="muted">{t(`roles.${m.role}`)}</span>
+                <li
+                  key={m.userId}
+                  className="flex flex-wrap items-start justify-between gap-2 py-2 text-sm"
+                >
+                  <span>
+                    <span className="font-medium">{m.name}</span>
+                    {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
+                    <span className="muted block">{t(`roles.${m.role}`)}</span>
+                  </span>
+                  <MemberActions
+                    groupId={active.id}
+                    actorId={user.id}
+                    actorRole={active.role}
+                    member={{ userId: m.userId, name: m.name, role: m.role }}
+                    memberCount={members.length}
+                  />
                 </li>
               ))}
             </ul>

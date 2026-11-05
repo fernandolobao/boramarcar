@@ -111,6 +111,56 @@ export const availabilitySlotLocations = pgTable(
   (t) => [primaryKey({ columns: [t.slotId, t.locationId] })],
 );
 
+/** Disponibilidade recorrente: "toda quinta, das 19h às 23h". */
+export const availabilityRules = pgTable(
+  'availability_rules',
+  {
+    id: id(),
+    groupId: text('group_id')
+      .notNull()
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    /** 0 = domingo … 6 = sábado */
+    weekday: integer('weekday').notNull(),
+    /** "HH:MM"; fim ≤ início significa que termina no dia seguinte. */
+    startTime: text('start_time').notNull(),
+    endTime: text('end_time').notNull(),
+    /** Fuso em que os horários foram definidos. */
+    timeZone: text('time_zone').notNull(),
+    note: text('note'),
+    createdAt: createdAt(),
+  },
+  (t) => [index('availability_rules_group_idx').on(t.groupId)],
+);
+
+export const availabilityRuleLocations = pgTable(
+  'availability_rule_locations',
+  {
+    ruleId: text('rule_id')
+      .notNull()
+      .references(() => availabilityRules.id, { onDelete: 'cascade' }),
+    locationId: text('location_id')
+      .notNull()
+      .references(() => locations.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.ruleId, t.locationId] })],
+);
+
+/** Datas em que uma regra recorrente não vale ("nesta quinta não posso"). */
+export const availabilityRuleExceptions = pgTable(
+  'availability_rule_exceptions',
+  {
+    ruleId: text('rule_id')
+      .notNull()
+      .references(() => availabilityRules.id, { onDelete: 'cascade' }),
+    /** Data local "AAAA-MM-DD" no fuso da regra. */
+    date: text('date').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.ruleId, t.date] })],
+);
+
 /* ---------- Eventos e partidas ---------- */
 
 export const events = pgTable(

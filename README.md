@@ -15,6 +15,8 @@ Hoje é uma aplicação web (Next.js na Vercel). Os apps Android e iOS estão pl
 | Login com Google                                                                                                                           | ✅                            |
 | Grupos com **link e QR Code de convite** e locais de jogo                                                                                  | ✅                            |
 | Disponibilidade por dia/horário/local e **sugestão automática de horários** para a mesa                                                    | ✅                            |
+| Disponibilidade **semanal recorrente** (com datas puladas) e **grade da semana** editável pelo teclado                                     | ✅                            |
+| Gestão de membros: admins, remover, sair, transferir posse                                                                                 | ✅                            |
 | Encontros com confirmação de presença, edição, cancelamento e finalização                                                                  | ✅                            |
 | Compartilhar encontro no **WhatsApp** e adicionar à agenda (`.ics`)                                                                        | ✅                            |
 | Fuso horário por usuário (detectado no navegador) e escolha de idioma                                                                      | ✅                            |
@@ -140,6 +142,8 @@ Em cada pull request (`.github/workflows/ci.yml`):
 
 Recomendado: em _Settings → Branches_, proteger a `main` exigindo esses checks antes do merge.
 
+O workflow `contract.yml` roda toda segunda-feira chamando Scryfall, Archidekt e Moxfield de verdade (os testes de PR usam respostas simuladas) e abre uma issue se alguma integração quebrar.
+
 O workflow `migrate.yml` aplica as migrations no banco de produção quando elas mudam na `main` (requer o secret `DATABASE_URL` no environment `production`).
 
 ## Deploy na Vercel
@@ -158,30 +162,36 @@ O workflow `migrate.yml` aplica as migrations no banco de produção quando elas
 
 Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token — planejado) e respondem JSON. Erros seguem o formato `{ "error": { "code": "invalid_input" | "unauthorized" | "forbidden" | "not_found" | "conflict" | "upstream_error", "message": "..." } }`.
 
-| Método       | Rota                                           | Descrição                                                                |
-| ------------ | ---------------------------------------------- | ------------------------------------------------------------------------ |
-| `GET/POST`   | `/api/v1/groups`                               | Listar / criar grupos                                                    |
-| `POST`       | `/api/v1/groups/join`                          | Entrar com código de convite                                             |
-| `POST`       | `/api/v1/groups/:groupId/invite`               | Gerar novo código de convite (dono/admin)                                |
-| `GET`        | `/api/v1/groups/:groupId/members`              | Membros                                                                  |
-| `GET/POST`   | `/api/v1/groups/:groupId/locations`            | Locais de jogo                                                           |
-| `GET/POST`   | `/api/v1/groups/:groupId/availability`         | Disponibilidade (`?from&to`)                                             |
-| `GET`        | `/api/v1/groups/:groupId/availability/windows` | Janelas sugeridas (`?minPlayers=4&minDurationMinutes=120`)               |
-| `DELETE`     | `/api/v1/availability/:slotId`                 | Remover disponibilidade própria                                          |
-| `GET/POST`   | `/api/v1/groups/:groupId/events`               | Encontros (`?when=upcoming\|past`)                                       |
-| `GET`        | `/api/v1/events/:eventId`                      | Encontro com participantes e partidas                                    |
-| `PATCH`      | `/api/v1/events/:eventId`                      | Editar encontro ou mudar status (`scheduled`, `cancelled`, `finished`)   |
-| `GET`        | `/api/v1/events/:eventId/ics`                  | Arquivo iCalendar do encontro                                            |
-| `PUT`        | `/api/v1/events/:eventId/rsvp`                 | Confirmar presença                                                       |
-| `POST`       | `/api/v1/events/:eventId/games`                | Registrar partida                                                        |
-| `DELETE`     | `/api/v1/games/:gameId`                        | Remover partida                                                          |
-| `GET`        | `/api/v1/groups/:groupId/ranking`              | Ranking (`?from&to`)                                                     |
-| `GET/POST`   | `/api/v1/decks`                                | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
-| `GET/DELETE` | `/api/v1/decks/:deckId`                        | Deck com análise / remover                                               |
-| `PATCH`      | `/api/v1/decks/:deckId/cards/:cardId`          | Marcar proxy (`{isProxy}`)                                               |
-| `PUT`        | `/api/v1/me/active-group`                      | Trocar grupo ativo                                                       |
-| `GET/PUT`    | `/api/v1/me/preferences`                       | Fuso horário e idioma (`{timeZone, locale}`)                             |
-| `GET`        | `/api/health`                                  | Health check                                                             |
+| Método         | Rota                                            | Descrição                                                                |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------ |
+| `GET/POST`     | `/api/v1/groups`                                | Listar / criar grupos                                                    |
+| `POST`         | `/api/v1/groups/join`                           | Entrar com código de convite                                             |
+| `POST`         | `/api/v1/groups/:groupId/invite`                | Gerar novo código de convite (dono/admin)                                |
+| `GET`          | `/api/v1/groups/:groupId/members`               | Membros                                                                  |
+| `PATCH/DELETE` | `/api/v1/groups/:groupId/members/:userId`       | Mudar papel / remover membro (ou sair, se for você)                      |
+| `POST`         | `/api/v1/groups/:groupId/transfer`              | Transferir a posse do grupo                                              |
+| `GET/POST`     | `/api/v1/groups/:groupId/locations`             | Locais de jogo                                                           |
+| `GET/POST`     | `/api/v1/groups/:groupId/availability`          | Disponibilidade (`?from&to`)                                             |
+| `GET`          | `/api/v1/groups/:groupId/availability/windows`  | Janelas sugeridas (`?minPlayers=4&minDurationMinutes=120`)               |
+| `DELETE`       | `/api/v1/availability/:slotId`                  | Remover disponibilidade própria                                          |
+| `PUT`          | `/api/v1/groups/:groupId/availability/range`    | Marcar/desmarcar um intervalo (grade semanal)                            |
+| `GET/POST`     | `/api/v1/groups/:groupId/availability-rules`    | Disponibilidade semanal (`{weekdays, startTime, endTime, timeZone}`)     |
+| `DELETE`       | `/api/v1/availability-rules/:ruleId`            | Remover regra semanal própria                                            |
+| `PUT`          | `/api/v1/availability-rules/:ruleId/exceptions` | Pular/voltar uma data (`{date, skip}`)                                   |
+| `GET/POST`     | `/api/v1/groups/:groupId/events`                | Encontros (`?when=upcoming\|past`)                                       |
+| `GET`          | `/api/v1/events/:eventId`                       | Encontro com participantes e partidas                                    |
+| `PATCH`        | `/api/v1/events/:eventId`                       | Editar encontro ou mudar status (`scheduled`, `cancelled`, `finished`)   |
+| `GET`          | `/api/v1/events/:eventId/ics`                   | Arquivo iCalendar do encontro                                            |
+| `PUT`          | `/api/v1/events/:eventId/rsvp`                  | Confirmar presença                                                       |
+| `POST`         | `/api/v1/events/:eventId/games`                 | Registrar partida                                                        |
+| `DELETE`       | `/api/v1/games/:gameId`                         | Remover partida                                                          |
+| `GET`          | `/api/v1/groups/:groupId/ranking`               | Ranking (`?from&to`)                                                     |
+| `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
+| `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                               |
+| `PATCH`        | `/api/v1/decks/:deckId/cards/:cardId`           | Marcar proxy (`{isProxy}`)                                               |
+| `PUT`          | `/api/v1/me/active-group`                       | Trocar grupo ativo                                                       |
+| `GET/PUT`      | `/api/v1/me/preferences`                        | Fuso horário e idioma (`{timeZone, locale}`)                             |
+| `GET`          | `/api/health`                                   | Health check                                                             |
 
 ## Contribuindo
 
