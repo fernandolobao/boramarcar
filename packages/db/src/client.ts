@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type { PgDatabase, PgQueryResultHKT } from 'drizzle-orm/pg-core';
 import { Pool } from 'pg';
+import { normalizeConnectionString } from './connection';
 import * as schema from './schema';
 
 /** Tipo comum a todos os drivers usados (node-postgres em produção, PGlite nos testes). */
@@ -16,7 +17,10 @@ export interface CreateDbOptions {
  * Postgres local (Docker) e qualquer Postgres compatível.
  */
 export function createDb(connectionString: string, options: CreateDbOptions = {}) {
-  const pool = new Pool({ connectionString, max: options.max ?? 5 });
+  const pool = new Pool({
+    connectionString: normalizeConnectionString(connectionString),
+    max: options.max ?? 5,
+  });
   const db = drizzle(pool, { schema });
   return { db: db as unknown as Database, pool };
 }

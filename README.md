@@ -144,7 +144,7 @@ O workflow `migrate.yml` aplica as migrations no banco de produção quando elas
    - Origem autorizada: `https://SEU-DOMINIO`
    - URI de redirecionamento: `https://SEU-DOMINIO/api/auth/callback/google` (e `http://localhost:3000/api/auth/callback/google` para desenvolvimento)
 4. **Variáveis** na Vercel: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
-5. **Migrations**: adicione o secret `DATABASE_URL` (URL direta do Neon) no environment `production` do GitHub, ou rode `pnpm db:migrate` localmente apontando para o Neon.
+5. **Migrations**: rodam automaticamente no build de produção (`apps/web/scripts/vercel-build.sh`), usando `DATABASE_URL_UNPOOLED` (criada pela integração do Neon) ou `DATABASE_URL`. Se a migration falhar, o deploy falha e a versão anterior continua no ar. Em previews, só migram com `MIGRATE_ON_BUILD=1` (use apenas com um branch do Neon por preview).
 
 > Deploys de preview usam URLs diferentes a cada PR; o login do Google só funciona nas URLs cadastradas. Veja o item correspondente no roadmap.
 
