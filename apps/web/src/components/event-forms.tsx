@@ -74,7 +74,7 @@ export function NewEventForm({
         </label>
         <select
           id="event-location"
-          className="input"
+          className="select"
           value={locationId}
           onChange={(e) => setLocationId(e.target.value)}
         >
@@ -102,9 +102,10 @@ export function RsvpButtons({
   current: 'yes' | 'maybe' | 'no' | null;
 }) {
   const t = useTranslations('events.rsvp');
+  const te = useTranslations('events');
   const { run, pending } = useApiAction();
   return (
-    <div className="flex gap-2" role="group">
+    <div className="flex flex-wrap gap-2" role="group" aria-label={te('rsvpLabel')}>
       {(['yes', 'maybe', 'no'] as const).map((value) => (
         <button
           key={value}
@@ -171,11 +172,17 @@ export function RecordGameForm({ eventId, players }: { eventId: string; players:
       }}
     >
       <table className="w-full text-sm">
-        <thead className="text-left text-zinc-500">
+        <thead className="text-left text-zinc-600 dark:text-zinc-400">
           <tr>
-            <th className="py-1">{t('playing')}</th>
-            <th className="py-1">{t('result.win')}</th>
-            <th className="py-1">{t('deck')}</th>
+            <th scope="col" className="py-1">
+              {t('playing')}
+            </th>
+            <th scope="col" className="py-1">
+              {t('result.win')}
+            </th>
+            <th scope="col" className="py-1">
+              {t('deck')}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -211,7 +218,7 @@ export function RecordGameForm({ eventId, players }: { eventId: string; players:
                 </td>
                 <td className="py-2">
                   <select
-                    className="input"
+                    className="select"
                     aria-label={`${t('deck')}: ${player.name}`}
                     disabled={!isPlaying || player.decks.length === 0}
                     value={deckByPlayer[player.userId] ?? ''}

@@ -101,7 +101,10 @@ export default async function AvailabilityPage() {
                   </p>
                 </div>
                 {slot.userId === user.id && (
-                  <DeleteButton path={`/api/v1/availability/${slot.id}`} />
+                  <DeleteButton
+                    path={`/api/v1/availability/${slot.id}`}
+                    label={t('removeSlot', { when: range(slot.startsAt, slot.endsAt) })}
+                  />
                 )}
               </li>
             ))}

@@ -12,7 +12,9 @@
     "anyLocation": "Qualquer local",
     "locationTbd": "Local a definir",
     "players": "{count, plural, =1 {1 jogador} other {# jogadores}}",
-    "minutes": "{count} min"
+    "minutes": "{count} min",
+    "skipToContent": "Pular para o conteúdo",
+    "newTab": "(abre em nova aba)"
   },
   "nav": {
     "dashboard": "Painel",
@@ -21,7 +23,8 @@
     "ranking": "Ranking",
     "decks": "Decks",
     "group": "Grupo",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "label": "Navegação principal"
   },
   "landing": {
     "title": "Chega de enquete no grupo do WhatsApp.",
@@ -38,7 +41,8 @@
     "noEvents": "Nenhum encontro marcado ainda.",
     "bestWindows": "Melhores horários para jogar",
     "noWindows": "Ainda não há horário em que a mesa feche. Marque sua disponibilidade!",
-    "topPlayers": "Topo do ranking"
+    "topPlayers": "Topo do ranking",
+    "seeAvailability": "Marcar minha disponibilidade"
   },
   "group": {
     "title": "Seu grupo",
@@ -79,7 +83,8 @@
     "empty": "Ninguém marcou disponibilidade para os próximos dias.",
     "windows": "Horários em que a mesa fecha",
     "createEvent": "Marcar encontro",
-    "locationsHint": "Nenhum marcado = qualquer local."
+    "locationsHint": "Nenhum marcado = qualquer local.",
+    "removeSlot": "Remover disponibilidade de {when}"
   },
   "events": {
     "title": "Encontros",
@@ -125,7 +130,9 @@
     "reopen": "Reabrir encontro",
     "cancelledNotice": "Este encontro foi cancelado.",
     "share": "Compartilhar",
-    "saved": "Encontro atualizado."
+    "saved": "Encontro atualizado.",
+    "removeGame": "Remover partida {number}",
+    "rsvpLabel": "Sua presença"
   },
   "ranking": {
     "title": "Ranking",
@@ -139,7 +146,8 @@
     "points": "Pts",
     "winRate": "% Vit.",
     "pointsRule": "Vitória vale 3 pontos e empate vale 1.",
-    "totalGames": "{count, plural, =0 {Nenhuma partida} =1 {1 partida} other {# partidas}}"
+    "totalGames": "{count, plural, =0 {Nenhuma partida} =1 {1 partida} other {# partidas}}",
+    "caption": "Classificação do grupo {group}"
   },
   "decks": {
     "title": "Meus decks",
@@ -160,7 +168,9 @@
       "mainboard": "Deck",
       "sideboard": "Sideboard",
       "maybeboard": "Talvez"
-    }
+    },
+    "importMode": "Forma de importação",
+    "deleteDeck": "Remover deck {name}"
   },
   "analysis": {
     "title": "Análise",

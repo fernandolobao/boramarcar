@@ -47,8 +47,9 @@ export function ColorPips({ pips }: { pips: Record<ColorSymbol, number> }) {
   if (!total) return null;
   return (
     <div>
-      <p className="section-title">{t('colorPips')}</p>
-      <div className="flex h-3 overflow-hidden rounded-full">
+      <h3 className="section-title">{t('colorPips')}</h3>
+      {/* Barra decorativa: a mesma informação está no texto abaixo. */}
+      <div className="flex h-3 overflow-hidden rounded-full" aria-hidden="true">
         {(Object.keys(pips) as ColorSymbol[])
           .filter((c) => pips[c] > 0)
           .map((color) => (
@@ -56,7 +57,6 @@ export function ColorPips({ pips }: { pips: Record<ColorSymbol, number> }) {
               key={color}
               className={PIP_CLASS[color]}
               style={{ width: `${(pips[color] / total) * 100}%` }}
-              title={`${color}: ${pips[color]}`}
             />
           ))}
       </div>
@@ -92,7 +92,7 @@ export function DeckScore({ analysis }: { analysis: DeckAnalysis }) {
                 {component.score}/{component.max}
               </span>
             </div>
-            <div className="mt-1 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800">
+            <div className="mt-1 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800" aria-hidden="true">
               <div
                 className="h-2 rounded-full bg-brand-500"
                 style={{ width: `${(component.score / component.max) * 100}%` }}
@@ -110,7 +110,7 @@ export function DeckValidation({ analysis }: { analysis: DeckAnalysis }) {
   const t = useTranslations('analysis');
   return (
     <div>
-      <p className="section-title">{t('validationTitle')}</p>
+      <h2 className="section-title">{t('validationTitle')}</h2>
       {analysis.validation.length === 0 ? (
         <p className="text-sm text-green-700 dark:text-green-400">{t('valid')}</p>
       ) : (
@@ -131,10 +131,11 @@ export function DeckValidation({ analysis }: { analysis: DeckAnalysis }) {
 
 export function DeckSuggestions({ analysis }: { analysis: DeckAnalysis }) {
   const t = useTranslations('analysis');
+  const tc = useTranslations('common');
   if (!analysis.suggestions.length) return null;
   return (
     <div>
-      <p className="section-title">{t('suggestionsTitle')}</p>
+      <h2 className="section-title">{t('suggestionsTitle')}</h2>
       <ul className="space-y-2 text-sm">
         {analysis.suggestions.map((s, index) => (
           <li key={index}>
@@ -148,6 +149,11 @@ export function DeckSuggestions({ analysis }: { analysis: DeckAnalysis }) {
                   rel="noreferrer"
                 >
                   {t('searchScryfall')}
+                  {/* Contexto extra para leitores de tela, mantendo o texto visível no nome (WCAG 2.5.3). */}
+                  <span className="sr-only">
+                    {' '}
+                    ({t(`roles.${s.role}`)}) {tc('newTab')}
+                  </span>
                 </a>
               </>
             ) : s.code === 'more_lands' ? (

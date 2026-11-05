@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getUserPreferences } from '@boramarcar/db';
@@ -42,23 +43,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             {tc('appName')}
             {active && <span className="muted ml-2 font-normal">· {active.name}</span>}
           </Link>
-          <nav className="order-last flex w-full gap-1 overflow-x-auto text-sm sm:order-none sm:w-auto">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-lg px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          <NavLinks label={t('label')} links={links} />
           <div className="ml-auto">
             <SignOutButton />
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">{children}</main>
+      <main
+        id="conteudo"
+        tabIndex={-1}
+        className="mx-auto max-w-5xl space-y-6 px-4 py-8 focus:outline-none"
+      >
+        {children}
+      </main>
     </div>
   );
 }

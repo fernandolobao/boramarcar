@@ -46,7 +46,7 @@ export function ProfileForm() {
         </label>
         <select
           id="profile-tz"
-          className="input"
+          className="select"
           value={timeZone}
           onChange={(e) => setTimeZone(e.target.value)}
         >
@@ -76,7 +76,7 @@ export function ProfileForm() {
         </label>
         <select
           id="profile-locale"
-          className="input"
+          className="select"
           value={locale}
           onChange={(e) => setLocale(e.target.value as Locale)}
         >

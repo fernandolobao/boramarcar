@@ -125,6 +125,10 @@ pnpm dev
 - **Componentes**: Testing Library (jsdom) para a análise de deck.
 - **E2E** (`apps/web/e2e`): Playwright contra o build de produção — página inicial, redirecionamentos de rotas protegidas, API sem sessão e idioma.
 
+## Acessibilidade
+
+A interface segue **WCAG 2.2 AA**. O lint (`jsx-a11y`), os testes de componentes (axe-core) e os testes E2E (axe em todas as telas, claro/escuro, desktop/mobile) bloqueiam regressões na CI. Regras e histórico de auditorias em [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) e [CLAUDE.md](CLAUDE.md).
+
 ## Integração contínua
 
 Em cada pull request (`.github/workflows/ci.yml`):
@@ -132,7 +136,7 @@ Em cada pull request (`.github/workflows/ci.yml`):
 1. **Qualidade** — Prettier, ESLint e TypeScript.
 2. **Testes** — Vitest com cobertura (falha abaixo dos limites) e resumo no PR.
 3. **Migrations** — verifica se a migration foi gerada para o schema atual e aplica tudo em um Postgres 17 real.
-4. **Build e E2E** — `next build` e Playwright.
+4. **Build e E2E** — `next build` e Playwright com Postgres real: smoke e auditoria de acessibilidade (axe) em todas as telas.
 
 Recomendado: em _Settings → Branches_, proteger a `main` exigindo esses checks antes do merge.
 

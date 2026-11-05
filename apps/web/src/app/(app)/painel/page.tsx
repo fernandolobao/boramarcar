@@ -31,7 +31,6 @@ export default async function DashboardPage() {
   ]);
   const t = await getTranslations('dashboard');
   const tc = await getTranslations('common');
-  const tn = await getTranslations('nav');
   const tr = await getTranslations('ranking');
   const format = await getFormatter();
 
@@ -85,7 +84,7 @@ export default async function DashboardPage() {
             </ul>
           )}
           <Link href="/disponibilidade" className="btn-secondary mt-4">
-            {tn('availability')}
+            {t('seeAvailability')}
           </Link>
         </section>
         <section className="card md:col-span-2">

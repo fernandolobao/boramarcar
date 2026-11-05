@@ -25,16 +25,33 @@ export default async function RankingPage() {
           <p className="muted">{t('empty')}</p>
         ) : (
           <table className="w-full text-sm">
+            <caption className="sr-only">{t('caption', { group: group.name })}</caption>
             <thead>
-              <tr className="text-left text-zinc-500">
-                <th className="py-2 pr-2">{t('position')}</th>
-                <th className="py-2 pr-2">{t('player')}</th>
-                <th className="py-2 pr-2 text-right">{t('games')}</th>
-                <th className="py-2 pr-2 text-right">{t('wins')}</th>
-                <th className="py-2 pr-2 text-right">{t('losses')}</th>
-                <th className="py-2 pr-2 text-right">{t('draws')}</th>
-                <th className="py-2 pr-2 text-right">{t('winRate')}</th>
-                <th className="py-2 text-right">{t('points')}</th>
+              <tr className="text-left text-zinc-600 dark:text-zinc-400">
+                <th scope="col" className="py-2 pr-2">
+                  {t('position')}
+                </th>
+                <th scope="col" className="py-2 pr-2">
+                  {t('player')}
+                </th>
+                <th scope="col" className="py-2 pr-2 text-right">
+                  {t('games')}
+                </th>
+                <th scope="col" className="py-2 pr-2 text-right">
+                  {t('wins')}
+                </th>
+                <th scope="col" className="py-2 pr-2 text-right">
+                  {t('losses')}
+                </th>
+                <th scope="col" className="py-2 pr-2 text-right">
+                  {t('draws')}
+                </th>
+                <th scope="col" className="py-2 pr-2 text-right">
+                  {t('winRate')}
+                </th>
+                <th scope="col" className="py-2 text-right">
+                  {t('points')}
+                </th>
               </tr>
             </thead>
             <tbody className="tabular-nums">

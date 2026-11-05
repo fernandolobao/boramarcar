@@ -70,7 +70,7 @@ describe('DeckScore / DeckValidation / DeckSuggestions', () => {
     expect(screen.getByTestId('deck-score')).toHaveTextContent(String(analysis.score));
     expect(screen.getByText('O deck tem 4 cartas (esperado: 100).')).toBeInTheDocument();
     expect(screen.getByText('Big aparece 2 vezes.')).toBeInTheDocument();
-    const links = screen.getAllByRole('link', { name: 'Buscar substitutos no Scryfall' });
+    const links = screen.getAllByRole('link', { name: /^Buscar substitutos no Scryfall/ });
     expect(links[0]).toHaveAttribute(
       'href',
       expect.stringContaining('https://scryfall.com/search?q=id%3C%3Dc%20otag%3Aramp'),

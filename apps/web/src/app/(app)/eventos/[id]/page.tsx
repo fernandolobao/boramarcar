@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { getEventDetail, listDecksForUsers, listLocations, listMembers } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -10,7 +11,17 @@ import { getDb } from '@/server/db';
 import { buildEventShareText, eventUrl } from '@/server/event-share';
 import { isDomainError } from '@boramarcar/core';
 
-export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
+type Props = { params: Promise<{ id: string }> };
+
+/** Título da aba com o nome do encontro (WCAG 2.4.2). */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const user = await requireUser();
+  const event = await getEventDetail(getDb(), { eventId: id, userId: user.id }).catch(() => null);
+  return { title: event?.title ?? (await getTranslations('nav'))('events') };
+}
+
+export default async function EventPage({ params }: Props) {
   const { id } = await params;
   const user = await requireUser();
   const db = getDb();
@@ -111,7 +122,10 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                     {t('game', { number: game.number })} ·{' '}
                     {game.winner ? t('winner', { name: game.winner.name }) : t('draw')}
                   </p>
-                  <DeleteButton path={`/api/v1/games/${game.id}`} />
+                  <DeleteButton
+                    path={`/api/v1/games/${game.id}`}
+                    label={t('removeGame', { number: game.number })}
+                  />
                 </div>
                 <ul className="mt-2 grid gap-1 text-sm sm:grid-cols-2">
                   {game.players.map((p) => (
