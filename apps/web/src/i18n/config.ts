@@ -2,8 +2,9 @@ export const LOCALES = ['pt-BR', 'en'] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = 'pt-BR';
 export const LOCALE_COOKIE = 'NEXT_LOCALE';
-/** Fuso padrão enquanto não há preferência por usuário (ver roadmap). */
-export const DEFAULT_TIME_ZONE = 'America/Sao_Paulo';
+export { DEFAULT_TIME_ZONE } from '@boramarcar/core/time';
+/** Cookie com o fuso do usuário (espelho do campo `user.time_zone`, lido a cada requisição). */
+export const TIME_ZONE_COOKIE = 'bm_tz';
 
 export const isLocale = (value: unknown): value is Locale =>
   typeof value === 'string' && (LOCALES as readonly string[]).includes(value);

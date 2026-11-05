@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 
-export function SignInButton() {
+export function SignInButton({ callbackURL = '/painel' }: { callbackURL?: string }) {
   const t = useTranslations('common');
   const [pending, setPending] = useState(false);
   return (
@@ -15,7 +15,7 @@ export function SignInButton() {
       disabled={pending}
       onClick={async () => {
         setPending(true);
-        await authClient.signIn.social({ provider: 'google', callbackURL: '/painel' });
+        await authClient.signIn.social({ provider: 'google', callbackURL });
       }}
     >
       <svg aria-hidden viewBox="0 0 24 24" className="size-5">

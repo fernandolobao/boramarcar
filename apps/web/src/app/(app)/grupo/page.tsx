@@ -6,9 +6,12 @@ import {
   LocationForm,
   SwitchGroupButton,
 } from '@/components/group-forms';
+import { RegenerateInviteButton } from '@/components/invite';
+import { ShareButtons } from '@/components/share-buttons';
 import { getActiveGroup } from '@/server/active-group';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
+import { inviteQrCode, inviteUrl } from '@/server/invite';
 import { navMetadata } from '@/server/metadata';
 
 export const generateMetadata = navMetadata('group');
@@ -21,6 +24,17 @@ export default async function GroupPage() {
   const [members, locations] = active
     ? await Promise.all([listMembers(db, active.id), listLocations(db, active.id)])
     : [[], []];
+  const ts = await getTranslations('share');
+  const invite = active
+    ? await (async () => {
+        const url = inviteUrl(active.inviteCode);
+        return {
+          url,
+          qr: await inviteQrCode(url),
+          text: ts('inviteText', { group: active.name, url }),
+        };
+      })()
+    : null;
 
   return (
     <>
@@ -29,13 +43,50 @@ export default async function GroupPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <section className="card md:col-span-2">
             <h2 className="text-xl font-semibold">{active.name}</h2>
-            <p className="muted mt-1">{t('inviteHint', { code: active.inviteCode })}</p>
-            <p
-              className="mt-3 inline-block rounded-xl bg-zinc-100 px-4 py-2 font-mono text-lg tracking-widest dark:bg-zinc-800"
-              data-testid="invite-code"
-            >
-              {active.inviteCode}
-            </p>
+            <h3 className="section-title mt-4">{t('inviteTitle')}</h3>
+            {invite && (
+              <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
+                <figure className="mx-auto w-56 sm:mx-0">
+                  <div
+                    role="img"
+                    aria-label={t('qrCode', { group: active.name })}
+                    data-testid="invite-qr"
+                    className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-2 dark:border-zinc-700 [&>svg]:h-auto [&>svg]:w-full"
+                    // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
+                    dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
+                  />
+                  <figcaption className="muted mt-2 text-center">{t('qrHint')}</figcaption>
+                </figure>
+                <div className="min-w-0 space-y-4">
+                  <div>
+                    <p className="label">{t('inviteLink')}</p>
+                    <p
+                      className="break-all rounded-xl bg-zinc-100 px-3 py-2 font-mono text-sm dark:bg-zinc-800"
+                      data-testid="invite-url"
+                    >
+                      {invite.url}
+                    </p>
+                    <p className="muted mt-2">
+                      {t('inviteCode')}:{' '}
+                      <span className="font-mono tracking-widest" data-testid="invite-code">
+                        {active.inviteCode}
+                      </span>
+                    </p>
+                  </div>
+                  <ShareButtons text={invite.text} url={invite.url} title={active.name} />
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      className="btn-secondary"
+                      href={invite.qr.png}
+                      download={`convite-${active.inviteCode}.png`}
+                    >
+                      {t('downloadQr')}
+                    </a>
+                    {active.role !== 'member' && <RegenerateInviteButton groupId={active.id} />}
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
           <section className="card">
             <h2 className="section-title">{t('members')}</h2>

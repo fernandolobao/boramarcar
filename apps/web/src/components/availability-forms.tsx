@@ -1,9 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTimeZone, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api, localInputToIso } from '@/lib/api';
+import { zonedLocalToUtc } from '@boramarcar/core/time';
+import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 
 interface LocationOption {
@@ -20,6 +21,7 @@ export function AvailabilityForm({
 }) {
   const t = useTranslations('availability');
   const tc = useTranslations('common');
+  const timeZone = useTimeZone() ?? 'America/Sao_Paulo';
   const { run, error, pending } = useApiAction();
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
@@ -36,8 +38,8 @@ export function AvailabilityForm({
             api(`/api/v1/groups/${groupId}/availability`, {
               method: 'POST',
               body: {
-                startsAt: localInputToIso(startsAt),
-                endsAt: localInputToIso(endsAt),
+                startsAt: zonedLocalToUtc(startsAt, timeZone).toISOString(),
+                endsAt: zonedLocalToUtc(endsAt, timeZone).toISOString(),
                 locationIds: selected,
                 note: note || null,
               },

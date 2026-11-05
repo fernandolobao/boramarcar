@@ -20,7 +20,8 @@
     "events": "Encontros",
     "ranking": "Ranking",
     "decks": "Decks",
-    "group": "Grupo"
+    "group": "Grupo",
+    "profile": "Perfil"
   },
   "landing": {
     "title": "Chega de enquete no grupo do WhatsApp.",
@@ -46,7 +47,6 @@
     "name": "Nome do grupo",
     "join": "Entrar em um grupo",
     "inviteCode": "Código de convite",
-    "inviteHint": "Compartilhe o código {code} com os amigos.",
     "members": "Membros",
     "locations": "Locais",
     "addLocation": "Adicionar local",
@@ -58,7 +58,14 @@
       "owner": "Dono",
       "admin": "Admin",
       "member": "Membro"
-    }
+    },
+    "inviteTitle": "Convide a galera",
+    "inviteLink": "Link de convite",
+    "qrCode": "QR Code de convite para o grupo {group}",
+    "qrHint": "Aponte a câmera do celular para entrar no grupo.",
+    "downloadQr": "Baixar QR Code",
+    "regenerate": "Gerar novo convite",
+    "regenerateConfirm": "Confirmar: o link e o QR Code atuais vão parar de funcionar"
   },
   "availability": {
     "title": "Disponibilidade",
@@ -104,7 +111,21 @@
     "playing": "Jogou",
     "deck": "Deck",
     "notes": "Observações",
-    "isDraw": "A partida terminou empatada"
+    "isDraw": "A partida terminou empatada",
+    "status": {
+      "scheduled": "Agendado",
+      "cancelled": "Cancelado",
+      "finished": "Finalizado"
+    },
+    "edit": "Editar encontro",
+    "end": "Término",
+    "cancelEvent": "Cancelar encontro",
+    "cancelConfirm": "Confirmar cancelamento",
+    "finish": "Marcar como finalizado",
+    "reopen": "Reabrir encontro",
+    "cancelledNotice": "Este encontro foi cancelado.",
+    "share": "Compartilhar",
+    "saved": "Encontro atualizado."
   },
   "ranking": {
     "title": "Ranking",
@@ -190,5 +211,42 @@
     "conflict": "Conflito com dados existentes.",
     "upstream_error": "O serviço externo não respondeu como esperado. Tente novamente ou cole a lista em texto.",
     "internal_error": "Algo deu errado. Tente novamente."
+  },
+  "share": {
+    "title": "🃏 {title}",
+    "cancelledPrefix": "❌ CANCELADO: {title}",
+    "when": "📅 {when}",
+    "where": "📍 {where}",
+    "confirmed": "✅ Confirmados ({count}): {names}",
+    "link": "👉 {url}",
+    "whatsapp": "Compartilhar no WhatsApp",
+    "native": "Compartilhar…",
+    "copyLink": "Copiar link",
+    "copied": "Copiado!",
+    "addToCalendar": "Adicionar à agenda (.ics)",
+    "inviteText": "Bora jogar Commander? Entra no grupo {group} no Bora Marcar: {url}"
+  },
+  "invite": {
+    "title": "Convite",
+    "heading": "Você foi convidado para o grupo {group}",
+    "members": "{count, plural, =1 {1 membro} other {# membros}}",
+    "join": "Entrar no grupo",
+    "signInToJoin": "Entre com sua conta Google para participar.",
+    "alreadyMember": "Você já participa deste grupo.",
+    "goToDashboard": "Ir para o painel",
+    "invalid": "Este convite não existe ou foi trocado. Peça um link novo para quem te convidou."
+  },
+  "profile": {
+    "title": "Perfil",
+    "timeZone": "Fuso horário",
+    "timeZoneHint": "Datas e horários do app aparecem neste fuso, e é nele que você digita horários.",
+    "detected": "Fuso do navegador: {timeZone}",
+    "useDetected": "Usar o fuso do navegador",
+    "language": "Idioma",
+    "saved": "Preferências salvas.",
+    "languages": {
+      "pt-BR": "Português (Brasil)",
+      "en": "English"
+    }
   }
 }

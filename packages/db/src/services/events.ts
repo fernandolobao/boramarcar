@@ -1,5 +1,5 @@
 import { DomainError, validateGameResult, type GamePlayerResult } from '@boramarcar/core';
-import { and, asc, desc, eq, gte, inArray, lt, max } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, lt, max, ne } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   decks,
@@ -76,7 +76,13 @@ export async function createEvent(db: Database, input: CreateEventInput) {
 
 export async function listEvents(
   db: Database,
-  input: { groupId: string; userId: string; when?: 'upcoming' | 'past'; now?: Date },
+  input: {
+    groupId: string;
+    userId: string;
+    when?: 'upcoming' | 'past';
+    now?: Date;
+    includeCancelled?: boolean;
+  },
 ) {
   await requireMembership(db, input.groupId, input.userId);
   const now = input.now ?? new Date();
@@ -98,7 +104,13 @@ export async function listEvents(
     })
     .from(events)
     .leftJoin(locations, eq(locations.id, events.locationId))
-    .where(and(eq(events.groupId, input.groupId), timeFilter))
+    .where(
+      and(
+        eq(events.groupId, input.groupId),
+        timeFilter,
+        input.includeCancelled === false ? ne(events.status, 'cancelled') : undefined,
+      ),
+    )
     .orderBy(input.when === 'past' ? desc(events.startsAt) : asc(events.startsAt));
 }
 
@@ -106,11 +118,67 @@ async function requireEvent(db: Database, eventId: string, userId: string) {
   const [event] = await db.select().from(events).where(eq(events.id, eventId)).limit(1);
   if (!event) throw new DomainError('not_found', 'Evento não encontrado');
   const membership = await requireMembership(db, event.groupId, userId);
-  return { event, role: membership.role };
+  return {
+    event,
+    role: membership.role,
+    canManage: event.createdBy === userId || membership.role !== 'member',
+  };
+}
+
+type EventStatus = (typeof events.$inferSelect)['status'];
+
+export interface UpdateEventInput {
+  eventId: string;
+  userId: string;
+  title?: string;
+  startsAt?: Date;
+  endsAt?: Date | null;
+  locationId?: string | null;
+  status?: EventStatus;
+}
+
+/** Edita, cancela, finaliza ou reabre um encontro. Só quem criou ou dono/admin do grupo. */
+export async function updateEvent(db: Database, input: UpdateEventInput) {
+  const { event, canManage } = await requireEvent(db, input.eventId, input.userId);
+  if (!canManage)
+    throw new DomainError('forbidden', 'Só quem criou o encontro ou um admin pode alterá-lo');
+
+  const changes: Partial<typeof events.$inferInsert> = {};
+  if (input.title !== undefined) {
+    const title = input.title.trim();
+    if (!title) throw new DomainError('invalid_input', 'Informe um título');
+    changes.title = title;
+  }
+  if (input.startsAt !== undefined) changes.startsAt = input.startsAt;
+  if (input.endsAt !== undefined) changes.endsAt = input.endsAt;
+  const startsAt = changes.startsAt ?? event.startsAt;
+  const endsAt = changes.endsAt === undefined ? event.endsAt : changes.endsAt;
+  if (endsAt && endsAt <= startsAt)
+    throw new DomainError('invalid_input', 'O fim deve ser depois do início');
+
+  if (input.locationId !== undefined) {
+    if (input.locationId) {
+      const [location] = await db
+        .select({ id: locations.id })
+        .from(locations)
+        .where(and(eq(locations.id, input.locationId), eq(locations.groupId, event.groupId)));
+      if (!location) throw new DomainError('invalid_input', 'Local inválido para este grupo');
+    }
+    changes.locationId = input.locationId;
+  }
+  if (input.status !== undefined) changes.status = input.status;
+  if (Object.keys(changes).length === 0) return event;
+
+  const [updated] = await db
+    .update(events)
+    .set({ ...changes, sequence: event.sequence + 1, updatedAt: new Date() })
+    .where(eq(events.id, event.id))
+    .returning();
+  return updated!;
 }
 
 export async function getEventDetail(db: Database, input: { eventId: string; userId: string }) {
-  const { event } = await requireEvent(db, input.eventId, input.userId);
+  const { event, canManage } = await requireEvent(db, input.eventId, input.userId);
   const [location] = event.locationId
     ? await db.select().from(locations).where(eq(locations.id, event.locationId))
     : [];
@@ -151,6 +219,7 @@ export async function getEventDetail(db: Database, input: { eventId: string; use
 
   return {
     ...event,
+    canManage,
     location: location ?? null,
     participants,
     games: gameRows.map((game) => {

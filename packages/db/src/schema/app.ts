@@ -125,10 +125,13 @@ export const events = pgTable(
     endsAt: timestamp('ends_at', { withTimezone: true }),
     locationId: text('location_id').references(() => locations.id, { onDelete: 'set null' }),
     status: eventStatus('status').notNull().default('scheduled'),
+    /** Incrementado a cada alteração (SEQUENCE do iCalendar). */
+    sequence: integer('sequence').notNull().default(0),
     createdBy: text('created_by')
       .notNull()
       .references(() => user.id),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [index('events_group_time_idx').on(t.groupId, t.startsAt)],
 );

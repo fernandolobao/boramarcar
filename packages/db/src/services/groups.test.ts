@@ -5,10 +5,13 @@ import {
   createGroup,
   createLocation,
   generateInviteCode,
+  getInvitePreview,
+  isMember,
   joinGroup,
   listGroupsForUser,
   listLocations,
   listMembers,
+  regenerateInviteCode,
   requireMembership,
 } from './groups';
 
@@ -93,5 +96,37 @@ describe('grupos', () => {
       ['Casa da Ana', null],
       ['Loja do Zé', 'Rua 1'],
     ]);
+  });
+
+  it('mostra a prévia do convite e regenera o código', async () => {
+    const owner = await createTestUser(db, { name: 'Dona' });
+    const member = await createTestUser(db);
+    const outsider = await createTestUser(db);
+    const group = await createGroup(db, { name: 'Convites', userId: owner.id });
+    await joinGroup(db, { inviteCode: group.inviteCode, userId: member.id });
+
+    expect(await getInvitePreview(db, ` ${group.inviteCode.toLowerCase()} `)).toMatchObject({
+      id: group.id,
+      name: 'Convites',
+      members: 2,
+    });
+    expect(await getInvitePreview(db, 'NAOEXISTE')).toBeNull();
+    expect(await getInvitePreview(db, '  ')).toBeNull();
+    expect(await isMember(db, group.id, member.id)).toBe(true);
+    expect(await isMember(db, group.id, outsider.id)).toBe(false);
+
+    await expect(
+      regenerateInviteCode(db, { groupId: group.id, userId: member.id }),
+    ).rejects.toMatchObject({
+      code: 'forbidden',
+    });
+    const updated = await regenerateInviteCode(db, { groupId: group.id, userId: owner.id });
+    expect(updated.inviteCode).not.toBe(group.inviteCode);
+    expect(await getInvitePreview(db, group.inviteCode)).toBeNull();
+    await expect(
+      joinGroup(db, { inviteCode: group.inviteCode, userId: outsider.id }),
+    ).rejects.toMatchObject({
+      code: 'not_found',
+    });
   });
 });
