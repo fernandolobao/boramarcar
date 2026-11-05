@@ -28,7 +28,7 @@ jobs:
         run: echo "::warning::Secret DATABASE_URL não configurado no environment production; nada a fazer."
       - uses: actions/checkout@v5
         if: env.DATABASE_URL != ''
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         if: env.DATABASE_URL != ''
       - uses: actions/setup-node@v5
         if: env.DATABASE_URL != ''
