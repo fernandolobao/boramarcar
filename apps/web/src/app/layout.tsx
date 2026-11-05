@@ -21,9 +21,13 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
+  const t = await getTranslations('common');
   return (
     <html lang={locale}>
       <body>
+        <a href="#conteudo" className="skip-link">
+          {t('skipToContent')}
+        </a>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

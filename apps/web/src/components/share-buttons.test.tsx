@@ -29,7 +29,7 @@ describe('ShareButtons', () => {
       />,
     );
 
-    expect(screen.getByRole('link', { name: 'Compartilhar no WhatsApp' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^Compartilhar no WhatsApp/ })).toHaveAttribute(
       'href',
       'https://wa.me/?text=Bora%3F%20https%3A%2F%2Fx.app%2Fe%2F1',
     );

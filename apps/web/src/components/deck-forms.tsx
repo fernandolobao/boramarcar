@@ -39,13 +39,12 @@ export function DeckImportForm() {
         );
       }}
     >
-      <div className="flex gap-2" role="tablist">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('importMode')}>
         {(['url', 'text'] as const).map((value) => (
           <button
             key={value}
             type="button"
-            role="tab"
-            aria-selected={mode === value}
+            aria-pressed={mode === value}
             className={mode === value ? 'btn-primary' : 'btn-secondary'}
             onClick={() => setMode(value)}
           >

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { DECK_BOARDS, isDomainError } from '@boramarcar/core';
 import { getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
@@ -14,7 +15,17 @@ import { ProxyToggle } from '@/components/deck-forms';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 
-export default async function DeckPage({ params }: { params: Promise<{ id: string }> }) {
+type Props = { params: Promise<{ id: string }> };
+
+/** Título da aba com o nome do deck (WCAG 2.4.2). */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const user = await requireUser();
+  const deck = await getDeck(getDb(), { deckId: id, viewerId: user.id }).catch(() => null);
+  return { title: deck?.name ?? (await getTranslations('nav'))('decks') };
+}
+
+export default async function DeckPage({ params }: Props) {
   const { id } = await params;
   const user = await requireUser();
   const deck = await getDeck(getDb(), { deckId: id, viewerId: user.id }).catch((error: unknown) => {
@@ -24,6 +35,7 @@ export default async function DeckPage({ params }: { params: Promise<{ id: strin
   });
   const t = await getTranslations('decks');
   const ta = await getTranslations('analysis');
+  const tc = await getTranslations('common');
   const { analysis } = deck;
 
   return (
@@ -39,12 +51,19 @@ export default async function DeckPage({ params }: { params: Promise<{ id: strin
                 {' · '}
                 <a href={deck.sourceUrl} target="_blank" rel="noreferrer" className="underline">
                   {deck.source}
+                  <span className="sr-only"> {tc('newTab')}</span>
                 </a>
               </>
             )}
           </p>
         </div>
-        {deck.isOwner && <DeleteButton path={`/api/v1/decks/${deck.id}`} redirectTo="/decks" />}
+        {deck.isOwner && (
+          <DeleteButton
+            path={`/api/v1/decks/${deck.id}`}
+            redirectTo="/decks"
+            label={t('deleteDeck', { name: deck.name })}
+          />
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

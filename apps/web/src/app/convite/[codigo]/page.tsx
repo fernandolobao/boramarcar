@@ -34,7 +34,11 @@ export default async function InvitePage({ params }: Props) {
   const member = group && user ? await isMember(db, group.id, user.id) : false;
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center gap-6 px-6 py-16">
+    <main
+      id="conteudo"
+      tabIndex={-1}
+      className="focus:outline-none mx-auto flex min-h-dvh max-w-lg flex-col justify-center gap-6 px-6 py-16"
+    >
       <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
         {tc('appName')}
       </p>

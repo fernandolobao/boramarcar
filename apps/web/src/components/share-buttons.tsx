@@ -22,6 +22,7 @@ export function ShareButtons({
   icsHref?: string;
 }) {
   const t = useTranslations('share');
+  const tc = useTranslations('common');
   const canShare = useClientValue(() => typeof navigator.share === 'function', false);
   const [copied, setCopied] = useState(false);
 
@@ -34,6 +35,7 @@ export function ShareButtons({
         rel="noreferrer"
       >
         {t('whatsapp')}
+        <span className="sr-only"> {tc('newTab')}</span>
       </a>
       {canShare && (
         <button

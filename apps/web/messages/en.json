@@ -12,7 +12,9 @@
     "anyLocation": "Any location",
     "locationTbd": "Location TBD",
     "players": "{count, plural, =1 {1 player} other {# players}}",
-    "minutes": "{count} min"
+    "minutes": "{count} min",
+    "skipToContent": "Skip to content",
+    "newTab": "(opens in a new tab)"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -21,7 +23,8 @@
     "ranking": "Ranking",
     "decks": "Decks",
     "group": "Group",
-    "profile": "Profile"
+    "profile": "Profile",
+    "label": "Main navigation"
   },
   "landing": {
     "title": "No more polls in the group chat.",
@@ -38,7 +41,8 @@
     "noEvents": "No game nights scheduled yet.",
     "bestWindows": "Best times to play",
     "noWindows": "No time slot fits a full pod yet. Add your availability!",
-    "topPlayers": "Top of the ranking"
+    "topPlayers": "Top of the ranking",
+    "seeAvailability": "Add my availability"
   },
   "group": {
     "title": "Your group",
@@ -79,7 +83,8 @@
     "empty": "Nobody has added availability for the next days.",
     "windows": "Times when the pod comes together",
     "createEvent": "Schedule game night",
-    "locationsHint": "None selected = any location."
+    "locationsHint": "None selected = any location.",
+    "removeSlot": "Remove availability for {when}"
   },
   "events": {
     "title": "Game nights",
@@ -125,7 +130,9 @@
     "reopen": "Reopen game night",
     "cancelledNotice": "This game night was cancelled.",
     "share": "Share",
-    "saved": "Game night updated."
+    "saved": "Game night updated.",
+    "removeGame": "Remove game {number}",
+    "rsvpLabel": "Your attendance"
   },
   "ranking": {
     "title": "Ranking",
@@ -139,7 +146,8 @@
     "points": "Pts",
     "winRate": "Win %",
     "pointsRule": "A win is worth 3 points and a draw 1.",
-    "totalGames": "{count, plural, =0 {No games} =1 {1 game} other {# games}}"
+    "totalGames": "{count, plural, =0 {No games} =1 {1 game} other {# games}}",
+    "caption": "Standings for {group}"
   },
   "decks": {
     "title": "My decks",
@@ -160,7 +168,9 @@
       "mainboard": "Deck",
       "sideboard": "Sideboard",
       "maybeboard": "Maybe"
-    }
+    },
+    "importMode": "Import method",
+    "deleteDeck": "Remove deck {name}"
   },
   "analysis": {
     "title": "Analysis",

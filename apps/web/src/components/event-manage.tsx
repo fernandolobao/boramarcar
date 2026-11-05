@@ -104,7 +104,7 @@ export function EventManage(props: Props) {
           </label>
           <select
             id="edit-location"
-            className="input"
+            className="select"
             value={locationId}
             onChange={(e) => setLocationId(e.target.value)}
           >

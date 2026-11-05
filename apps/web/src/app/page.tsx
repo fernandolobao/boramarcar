@@ -11,7 +11,11 @@ export default async function LandingPage() {
   const tc = await getTranslations('common');
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-10 px-6 py-16">
+    <main
+      id="conteudo"
+      tabIndex={-1}
+      className="focus:outline-none mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-10 px-6 py-16"
+    >
       <div className="space-y-6">
         <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
           {tc('appName')}

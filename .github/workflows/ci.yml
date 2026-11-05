@@ -114,9 +114,26 @@ jobs:
         run: pnpm db:migrate
 
   build-e2e:
-    name: Build e testes E2E
+    name: Build e testes E2E (inclui acessibilidade)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: boramarcar
+          POSTGRES_PASSWORD: boramarcar
+          POSTGRES_DB: boramarcar
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U boramarcar"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Banco real: os testes E2E populam dados e auditam todas as telas logadas com axe.
+      SKIP_ENV_VALIDATION: ''
+      E2E_DATABASE_URL: postgres://boramarcar:boramarcar@localhost:5432/boramarcar
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v5
@@ -125,6 +142,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Migrations
+        run: pnpm db:migrate
       - name: Cache do Next.js
         uses: actions/cache@v6
         with:
@@ -135,7 +154,7 @@ jobs:
         run: pnpm build
       - name: Instalar navegadores do Playwright
         run: pnpm --filter @boramarcar/web exec playwright install --with-deps chromium
-      - name: Playwright
+      - name: Playwright (smoke + acessibilidade WCAG 2.2 AA, claro/escuro, desktop/mobile)
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v7
         if: failure()
