@@ -3,7 +3,15 @@ import type { Database } from '../client';
 import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { saveImportedDeck } from './decks';
-import { createEvent, deleteGame, getEventDetail, listEvents, recordGame, setRsvp } from './events';
+import {
+  createEvent,
+  deleteGame,
+  getEventDetail,
+  listEvents,
+  recordGame,
+  setRsvp,
+  updateEvent,
+} from './events';
 import { createLocation } from './groups';
 import { getGroupRanking } from './ranking';
 
@@ -220,5 +228,113 @@ describe('eventos, partidas e ranking', () => {
     await expect(
       createEvent(db, { ...base, title: 'x', participantIds: [outsider.id] }),
     ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+
+  it('edita, cancela, finaliza e reabre encontros com permissões', async () => {
+    const { group, players, owner } = await seedGroup(db, 3);
+    const [, creator, other] = players as [typeof owner, typeof owner, typeof owner];
+    const location = await createLocation(db, {
+      groupId: group.id,
+      userId: owner.id,
+      name: 'Loja',
+    });
+    const event = await createEvent(db, {
+      groupId: group.id,
+      userId: creator.id,
+      title: 'Original',
+      startsAt: new Date('2026-12-01T22:00:00Z'),
+    });
+    expect(event.sequence).toBe(0);
+
+    await expect(
+      updateEvent(db, { eventId: event.id, userId: other.id, title: 'x' }),
+    ).rejects.toMatchObject({
+      code: 'forbidden',
+    });
+    expect((await getEventDetail(db, { eventId: event.id, userId: other.id })).canManage).toBe(
+      false,
+    );
+    expect((await getEventDetail(db, { eventId: event.id, userId: owner.id })).canManage).toBe(
+      true,
+    );
+
+    const edited = await updateEvent(db, {
+      eventId: event.id,
+      userId: creator.id,
+      title: '  Remarcado ',
+      startsAt: new Date('2026-12-02T22:00:00Z'),
+      endsAt: new Date('2026-12-03T02:00:00Z'),
+      locationId: location.id,
+    });
+    expect(edited).toMatchObject({ title: 'Remarcado', locationId: location.id, sequence: 1 });
+
+    await expect(
+      updateEvent(db, {
+        eventId: event.id,
+        userId: creator.id,
+        startsAt: new Date('2026-12-03T03:00:00Z'),
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await expect(
+      updateEvent(db, { eventId: event.id, userId: creator.id, title: ' ' }),
+    ).rejects.toMatchObject({
+      code: 'invalid_input',
+    });
+    await expect(
+      updateEvent(db, { eventId: event.id, userId: creator.id, locationId: 'x' }),
+    ).rejects.toMatchObject({
+      code: 'invalid_input',
+    });
+
+    // Dono do grupo pode cancelar; partidas ficam bloqueadas
+    const cancelled = await updateEvent(db, {
+      eventId: event.id,
+      userId: owner.id,
+      status: 'cancelled',
+    });
+    expect(cancelled).toMatchObject({ status: 'cancelled', sequence: 2 });
+    await expect(
+      recordGame(db, {
+        eventId: event.id,
+        userId: owner.id,
+        players: [
+          { userId: owner.id, result: 'win' },
+          { userId: creator.id, result: 'loss' },
+        ],
+      }),
+    ).rejects.toMatchObject({ code: 'conflict' });
+
+    const now = new Date('2026-11-20T00:00:00Z');
+    expect(
+      await listEvents(db, {
+        groupId: group.id,
+        userId: owner.id,
+        when: 'upcoming',
+        now,
+        includeCancelled: false,
+      }),
+    ).toEqual([]);
+    expect(
+      await listEvents(db, { groupId: group.id, userId: owner.id, when: 'upcoming', now }),
+    ).toHaveLength(1);
+
+    const reopened = await updateEvent(db, {
+      eventId: event.id,
+      userId: creator.id,
+      status: 'scheduled',
+    });
+    expect(reopened.status).toBe('scheduled');
+    const finished = await updateEvent(db, {
+      eventId: event.id,
+      userId: creator.id,
+      status: 'finished',
+      locationId: null,
+    });
+    expect(finished).toMatchObject({ status: 'finished', locationId: null });
+
+    // Sem mudanças não incrementa a sequência
+    expect((await updateEvent(db, { eventId: event.id, userId: creator.id })).sequence).toBe(
+      finished.sequence,
+    );
   });
 });

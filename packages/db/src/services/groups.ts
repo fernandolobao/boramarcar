@@ -1,5 +1,5 @@
 import { DomainError } from '@boramarcar/core';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, count, eq } from 'drizzle-orm';
 import type { Database } from '../client';
 import { groupMembers, groups, locations, user } from '../schema';
 
@@ -109,4 +109,50 @@ export async function listLocations(db: Database, groupId: string) {
     .from(locations)
     .where(eq(locations.groupId, groupId))
     .orderBy(asc(locations.name));
+}
+
+/** Dados públicos de um convite (para a página /convite/:codigo, antes do login). */
+export async function getInvitePreview(db: Database, inviteCode: string) {
+  const code = inviteCode.trim().toUpperCase();
+  if (!code) return null;
+  const [row] = await db
+    .select({
+      id: groups.id,
+      name: groups.name,
+      inviteCode: groups.inviteCode,
+      members: count(groupMembers.userId),
+    })
+    .from(groups)
+    .leftJoin(groupMembers, eq(groupMembers.groupId, groups.id))
+    .where(eq(groups.inviteCode, code))
+    .groupBy(groups.id)
+    .limit(1);
+  return row ?? null;
+}
+
+/** Diz se o usuário já participa do grupo (sem lançar erro). */
+export async function isMember(db: Database, groupId: string, userId: string) {
+  const [row] = await db
+    .select({ role: groupMembers.role })
+    .from(groupMembers)
+    .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
+    .limit(1);
+  return Boolean(row);
+}
+
+/** Gera um novo código de convite (o antigo deixa de funcionar). Só dono/admin. */
+export async function regenerateInviteCode(
+  db: Database,
+  input: { groupId: string; userId: string },
+) {
+  const membership = await requireMembership(db, input.groupId, input.userId);
+  if (membership.role === 'member') {
+    throw new DomainError('forbidden', 'Só o dono ou um admin pode trocar o convite');
+  }
+  const [group] = await db
+    .update(groups)
+    .set({ inviteCode: generateInviteCode() })
+    .where(eq(groups.id, input.groupId))
+    .returning();
+  return group!;
 }

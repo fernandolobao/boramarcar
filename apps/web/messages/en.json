@@ -20,7 +20,8 @@
     "events": "Game nights",
     "ranking": "Ranking",
     "decks": "Decks",
-    "group": "Group"
+    "group": "Group",
+    "profile": "Profile"
   },
   "landing": {
     "title": "No more polls in the group chat.",
@@ -46,7 +47,6 @@
     "name": "Group name",
     "join": "Join a group",
     "inviteCode": "Invite code",
-    "inviteHint": "Share the code {code} with your friends.",
     "members": "Members",
     "locations": "Locations",
     "addLocation": "Add location",
@@ -58,7 +58,14 @@
       "owner": "Owner",
       "admin": "Admin",
       "member": "Member"
-    }
+    },
+    "inviteTitle": "Invite your friends",
+    "inviteLink": "Invite link",
+    "qrCode": "Invite QR code for the group {group}",
+    "qrHint": "Point your phone camera at it to join the group.",
+    "downloadQr": "Download QR code",
+    "regenerate": "Generate new invite",
+    "regenerateConfirm": "Confirm: the current link and QR code will stop working"
   },
   "availability": {
     "title": "Availability",
@@ -104,7 +111,21 @@
     "playing": "Played",
     "deck": "Deck",
     "notes": "Notes",
-    "isDraw": "The game ended in a draw"
+    "isDraw": "The game ended in a draw",
+    "status": {
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "finished": "Finished"
+    },
+    "edit": "Edit game night",
+    "end": "Ends",
+    "cancelEvent": "Cancel game night",
+    "cancelConfirm": "Confirm cancellation",
+    "finish": "Mark as finished",
+    "reopen": "Reopen game night",
+    "cancelledNotice": "This game night was cancelled.",
+    "share": "Share",
+    "saved": "Game night updated."
   },
   "ranking": {
     "title": "Ranking",
@@ -190,5 +211,42 @@
     "conflict": "Conflicts with existing data.",
     "upstream_error": "The external service didn't respond as expected. Try again or paste the list as text.",
     "internal_error": "Something went wrong. Please try again."
+  },
+  "share": {
+    "title": "🃏 {title}",
+    "cancelledPrefix": "❌ CANCELLED: {title}",
+    "when": "📅 {when}",
+    "where": "📍 {where}",
+    "confirmed": "✅ Confirmed ({count}): {names}",
+    "link": "👉 {url}",
+    "whatsapp": "Share on WhatsApp",
+    "native": "Share…",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "addToCalendar": "Add to calendar (.ics)",
+    "inviteText": "Up for some Commander? Join the group {group} on Bora Marcar: {url}"
+  },
+  "invite": {
+    "title": "Invite",
+    "heading": "You've been invited to the group {group}",
+    "members": "{count, plural, =1 {1 member} other {# members}}",
+    "join": "Join group",
+    "signInToJoin": "Sign in with your Google account to join.",
+    "alreadyMember": "You're already in this group.",
+    "goToDashboard": "Go to dashboard",
+    "invalid": "This invite doesn't exist or was replaced. Ask whoever invited you for a new link."
+  },
+  "profile": {
+    "title": "Profile",
+    "timeZone": "Time zone",
+    "timeZoneHint": "Dates and times in the app are shown in this time zone, and you type times in it too.",
+    "detected": "Browser time zone: {timeZone}",
+    "useDetected": "Use browser time zone",
+    "language": "Language",
+    "saved": "Preferences saved.",
+    "languages": {
+      "pt-BR": "Português (Brasil)",
+      "en": "English"
+    }
   }
 }

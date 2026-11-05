@@ -14,7 +14,13 @@ export default async function DashboardPage() {
   const db = getDb();
   const now = new Date();
   const [events, windows, ranking] = await Promise.all([
-    listEvents(db, { groupId: group.id, userId: user.id, when: 'upcoming', now }),
+    listEvents(db, {
+      groupId: group.id,
+      userId: user.id,
+      when: 'upcoming',
+      now,
+      includeCancelled: false,
+    }),
     suggestGameWindows(db, {
       groupId: group.id,
       userId: user.id,

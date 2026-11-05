@@ -1,10 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTimeZone, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import type { GameResult } from '@boramarcar/core';
-import { api, localInputToIso } from '@/lib/api';
+import { zonedLocalToUtc } from '@boramarcar/core/time';
+import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 
 export function NewEventForm({
@@ -17,6 +18,7 @@ export function NewEventForm({
   const t = useTranslations('events');
   const tc = useTranslations('common');
   const router = useRouter();
+  const timeZone = useTimeZone() ?? 'America/Sao_Paulo';
   const { run, error, pending } = useApiAction();
   const [title, setTitle] = useState(t('defaultTitle'));
   const [startsAt, setStartsAt] = useState('');
@@ -31,7 +33,11 @@ export function NewEventForm({
           () =>
             api<{ event: { id: string } }>(`/api/v1/groups/${groupId}/events`, {
               method: 'POST',
-              body: { title, startsAt: localInputToIso(startsAt), locationId: locationId || null },
+              body: {
+                title,
+                startsAt: zonedLocalToUtc(startsAt, timeZone).toISOString(),
+                locationId: locationId || null,
+              },
             }),
           ({ event }) => router.push(`/eventos/${event.id}`),
         );

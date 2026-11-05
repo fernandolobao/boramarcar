@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Regras de domínio puras (sem I/O de banco) compartilhadas entre web e, no futuro, mobile.",
+  "description": "Regras de dom\u00ednio puras (sem I/O de banco) compartilhadas entre web e, no futuro, mobile.",
   "exports": {
     ".": "./src/index.ts",
     "./availability": "./src/availability/index.ts",
     "./ranking": "./src/ranking/index.ts",
     "./decks": "./src/decks/index.ts",
     "./analysis": "./src/analysis/index.ts",
-    "./errors": "./src/errors/index.ts"
+    "./errors": "./src/errors/index.ts",
+    "./time": "./src/time/index.ts",
+    "./calendar": "./src/calendar/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

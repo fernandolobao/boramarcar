@@ -34,6 +34,3 @@ export async function api<T = unknown>(
   }
   return data as T;
 }
-
-/** Converte o valor de um `<input type="datetime-local">` (hora local do navegador) para ISO. */
-export const localInputToIso = (value: string) => new Date(value).toISOString();

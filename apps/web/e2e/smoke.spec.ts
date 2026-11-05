@@ -9,7 +9,7 @@ test.describe('smoke', () => {
   });
 
   test('áreas logadas redirecionam visitantes para a página inicial', async ({ page }) => {
-    for (const path of ['/painel', '/disponibilidade', '/ranking', '/decks']) {
+    for (const path of ['/painel', '/disponibilidade', '/ranking', '/decks', '/perfil']) {
       await page.goto(path);
       await expect(page).toHaveURL(/\/$/);
     }

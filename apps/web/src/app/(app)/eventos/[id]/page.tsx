@@ -1,10 +1,13 @@
-import { getEventDetail, listDecksForUsers, listMembers } from '@boramarcar/db';
+import { getEventDetail, listDecksForUsers, listLocations, listMembers } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
 import { RecordGameForm, RsvpButtons } from '@/components/event-forms';
+import { EventManage, EventStatusBadge } from '@/components/event-manage';
+import { ShareButtons } from '@/components/share-buttons';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
+import { buildEventShareText, eventUrl } from '@/server/event-share';
 import { isDomainError } from '@boramarcar/core';
 
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,7 +21,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       throw error;
     },
   );
-  const members = await listMembers(db, event.groupId);
+  const [members, locations, shareText] = await Promise.all([
+    listMembers(db, event.groupId),
+    listLocations(db, event.groupId),
+    buildEventShareText(event),
+  ]);
   const decks = await listDecksForUsers(
     db,
     members.map((m) => m.userId),
@@ -44,13 +51,34 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   return (
     <>
       <div>
-        <h1 className="page-title">{event.title}</h1>
+        <h1 className="page-title flex flex-wrap items-center gap-3">
+          {event.title} <EventStatusBadge status={event.status} />
+        </h1>
         <p className="muted">
           {format.dateTime(event.startsAt, { dateStyle: 'full', timeStyle: 'short' })} ·{' '}
           {event.location?.name ?? tc('locationTbd')}
           {event.location?.address && ` (${event.location.address})`}
         </p>
       </div>
+
+      {event.status === 'cancelled' && (
+        <p
+          role="status"
+          className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"
+        >
+          {t('cancelledNotice')}
+        </p>
+      )}
+
+      <section className="card space-y-3">
+        <h2 className="section-title">{t('share')}</h2>
+        <ShareButtons
+          text={shareText}
+          url={eventUrl(event.id)}
+          title={event.title}
+          icsHref={`/api/v1/events/${event.id}/ics`}
+        />
+      </section>
 
       <section className="card space-y-4">
         <h2 className="section-title">{t('participants')}</h2>
@@ -103,10 +131,27 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         )}
       </section>
 
-      <section className="card">
-        <h2 className="section-title">{t('recordGame')}</h2>
-        <RecordGameForm eventId={event.id} players={players} />
-      </section>
+      {event.status !== 'cancelled' && (
+        <section className="card">
+          <h2 className="section-title">{t('recordGame')}</h2>
+          <RecordGameForm eventId={event.id} players={players} />
+        </section>
+      )}
+
+      {event.canManage && (
+        <section className="card">
+          <h2 className="section-title">{t('edit')}</h2>
+          <EventManage
+            eventId={event.id}
+            title={event.title}
+            startsAt={event.startsAt.toISOString()}
+            endsAt={event.endsAt?.toISOString() ?? null}
+            locationId={event.locationId}
+            status={event.status}
+            locations={locations.map((l) => ({ id: l.id, name: l.name }))}
+          />
+        </section>
+      )}
     </>
   );
 }

@@ -2,6 +2,7 @@ import { listEvents, listLocations } from '@boramarcar/db';
 import Link from 'next/link';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { NewEventForm } from '@/components/event-forms';
+import { EventStatusBadge } from '@/components/event-manage';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
@@ -29,7 +30,10 @@ export default async function EventsPage() {
         {events.map((event) => (
           <li key={event.id}>
             <Link href={`/eventos/${event.id}`} className="block py-3 hover:opacity-80">
-              <p className="font-medium">{event.title}</p>
+              <p className="flex items-center gap-2 font-medium">
+                {event.title}{' '}
+                {event.status !== 'scheduled' && <EventStatusBadge status={event.status} />}
+              </p>
               <p className="muted">
                 {format.dateTime(event.startsAt, { dateStyle: 'full', timeStyle: 'short' })} ·{' '}
                 {event.locationName ?? tc('locationTbd')}

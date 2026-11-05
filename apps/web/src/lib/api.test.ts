@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { api, ApiError, localInputToIso } from './api';
+import { api, ApiError } from './api';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -44,11 +44,5 @@ describe('api', () => {
       vi.fn(async () => new Response('boom', { status: 500, statusText: 'Server Error' })),
     );
     await expect(api('/x')).rejects.toMatchObject({ code: 'internal_error', status: 500 });
-  });
-});
-
-describe('localInputToIso', () => {
-  it('converte o valor do input datetime-local', () => {
-    expect(localInputToIso('2030-01-02T03:04')).toBe(new Date('2030-01-02T03:04').toISOString());
   });
 });

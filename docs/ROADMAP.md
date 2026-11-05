@@ -33,23 +33,23 @@ Este documento lista tudo o que falta para entregar as funcionalidades planejada
 
 Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
-| #    | Item                                                                                            | Tamanho | Status |
-| ---- | ----------------------------------------------------------------------------------------------- | ------- | ------ |
-| 1.1  | Criar grupo, entrar por código, listar membros                                                  | M       | ✅     |
-| 1.2  | Locais de jogo do grupo                                                                         | P       | ✅     |
-| 1.3  | Disponibilidade por intervalo + locais aceitos                                                  | M       | ✅     |
-| 1.4  | Sugestão de janelas em que ≥ 4 jogadores coincidem (por local)                                  | M       | ✅     |
-| 1.5  | Criar encontro a partir de uma janela; RSVP                                                     | M       | ✅     |
-| 1.6  | **Link de convite** (`/convite/:codigo`) além do código                                         | P       |        |
-| 1.7  | **Disponibilidade recorrente** (ex.: "toda quinta, 19h–23h") com exceções                       | G       |        |
-| 1.8  | Visualização em **grade semanal/calendário** (quem pode em cada dia) e edição de intervalos     | G       |        |
-| 1.9  | Editar/cancelar encontro; marcar como finalizado                                                | P       |        |
-| 1.10 | Gerenciar membros: promover admin, remover, sair do grupo, regenerar convite                    | M       |        |
-| 1.11 | **Fuso horário por usuário** (hoje fixo em America/Sao_Paulo)                                   | P       |        |
-| 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                     | P       |        |
-| 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push) | M       |        |
-| 1.14 | Compartilhar encontro no WhatsApp (link + texto) e exportar `.ics`                              | P       |        |
-| 1.15 | Página de perfil (nome, foto, idioma)                                                           | P       |        |
+| #    | Item                                                                                            | Tamanho | Status                  |
+| ---- | ----------------------------------------------------------------------------------------------- | ------- | ----------------------- |
+| 1.1  | Criar grupo, entrar por código, listar membros                                                  | M       | ✅                      |
+| 1.2  | Locais de jogo do grupo                                                                         | P       | ✅                      |
+| 1.3  | Disponibilidade por intervalo + locais aceitos                                                  | M       | ✅                      |
+| 1.4  | Sugestão de janelas em que ≥ 4 jogadores coincidem (por local)                                  | M       | ✅                      |
+| 1.5  | Criar encontro a partir de uma janela; RSVP                                                     | M       | ✅                      |
+| 1.6  | **Link de convite** (`/convite/:codigo`) e **QR Code**, compartilhamento e troca do código      | P       | ✅                      |
+| 1.7  | **Disponibilidade recorrente** (ex.: "toda quinta, 19h–23h") com exceções                       | G       |                         |
+| 1.8  | Visualização em **grade semanal/calendário** (quem pode em cada dia) e edição de intervalos     | G       |                         |
+| 1.9  | Editar/cancelar encontro; marcar como finalizado; reabrir                                       | P       | ✅                      |
+| 1.10 | Gerenciar membros: promover admin, remover, sair do grupo, regenerar convite                    | M       |                         |
+| 1.11 | **Fuso horário por usuário** (detectado no navegador, editável no perfil)                       | P       | ✅                      |
+| 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                     | P       |                         |
+| 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push) | M       |                         |
+| 1.14 | Compartilhar encontro no WhatsApp (link + texto) e exportar `.ics`                              | P       | ✅                      |
+| 1.15 | Página de perfil (nome, foto, idioma)                                                           | P       | parcial (fuso e idioma) |
 
 ## Fase 2 — Partidas e ranking
 
@@ -132,7 +132,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 ## Plano de execução sugerido
 
-1. **Semana 1–2 — colocar no ar (Fase 0 pendente + 1.6, 1.9, 1.11, 1.14).** Deploy na Vercel, Neon, OAuth; o grupo começa a usar a disponibilidade e o ranking.
+1. ✅ **Semana 1–2 — colocar no ar (Fase 0 pendente + 1.6, 1.9, 1.11, 1.14).** Deploy na Vercel, Neon, OAuth; o grupo começa a usar a disponibilidade e o ranking.
 2. **Semana 3–4 — agenda madura (1.7, 1.8, 1.10, 1.13).** Recorrência e calendário são o que mais reduz atrito.
 3. **Semana 5–6 — partidas ricas (2.4–2.9).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
 4. **Semana 7–9 — decks (3.6–3.11).** Editor, proxies parciais e folha de impressão.
@@ -152,4 +152,3 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 - **"Importar do Scryfall":** o Scryfall não hospeda mais decks; hoje ele é a fonte de dados das cartas (e da busca de substitutos). Se a ideia era importar outra coisa (ex.: uma lista de cartas favoritas/coleção), registrar aqui.
 - **Pontuação do ranking:** 3/1/0 foi um ponto de partida; confirmar com o grupo.
 - **Privacidade dos decks:** hoje qualquer membro de um grupo em comum vê os decks.
-- **Fuso horário:** fixo em `America/Sao_Paulo` até o item 1.11.

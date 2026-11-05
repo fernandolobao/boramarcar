@@ -6,3 +6,4 @@ export * from './services/availability';
 export * from './services/events';
 export * from './services/ranking';
 export * from './services/decks';
+export * from './services/users';

@@ -13,9 +13,11 @@ Hoje é uma aplicação web (Next.js na Vercel). Os apps Android e iOS estão pl
 | Funcionalidade                                                                                                                             | Status                        |
 | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | Login com Google                                                                                                                           | ✅                            |
-| Grupos com código de convite e locais de jogo                                                                                              | ✅                            |
+| Grupos com **link e QR Code de convite** e locais de jogo                                                                                  | ✅                            |
 | Disponibilidade por dia/horário/local e **sugestão automática de horários** para a mesa                                                    | ✅                            |
-| Encontros (eventos) com confirmação de presença                                                                                            | ✅                            |
+| Encontros com confirmação de presença, edição, cancelamento e finalização                                                                  | ✅                            |
+| Compartilhar encontro no **WhatsApp** e adicionar à agenda (`.ics`)                                                                        | ✅                            |
+| Fuso horário por usuário (detectado no navegador) e escolha de idioma                                                                      | ✅                            |
 | Registro de partidas (vencedor, empate, deck usado)                                                                                        | ✅                            |
 | Ranking de vitórias, derrotas, empates e pontos                                                                                            | ✅                            |
 | Importação de decks: Archidekt, Moxfield (experimental) e lista em texto                                                                   | ✅                            |
@@ -156,6 +158,7 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | ------------ | ---------------------------------------------- | ------------------------------------------------------------------------ |
 | `GET/POST`   | `/api/v1/groups`                               | Listar / criar grupos                                                    |
 | `POST`       | `/api/v1/groups/join`                          | Entrar com código de convite                                             |
+| `POST`       | `/api/v1/groups/:groupId/invite`               | Gerar novo código de convite (dono/admin)                                |
 | `GET`        | `/api/v1/groups/:groupId/members`              | Membros                                                                  |
 | `GET/POST`   | `/api/v1/groups/:groupId/locations`            | Locais de jogo                                                           |
 | `GET/POST`   | `/api/v1/groups/:groupId/availability`         | Disponibilidade (`?from&to`)                                             |
@@ -163,6 +166,8 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | `DELETE`     | `/api/v1/availability/:slotId`                 | Remover disponibilidade própria                                          |
 | `GET/POST`   | `/api/v1/groups/:groupId/events`               | Encontros (`?when=upcoming\|past`)                                       |
 | `GET`        | `/api/v1/events/:eventId`                      | Encontro com participantes e partidas                                    |
+| `PATCH`      | `/api/v1/events/:eventId`                      | Editar encontro ou mudar status (`scheduled`, `cancelled`, `finished`)   |
+| `GET`        | `/api/v1/events/:eventId/ics`                  | Arquivo iCalendar do encontro                                            |
 | `PUT`        | `/api/v1/events/:eventId/rsvp`                 | Confirmar presença                                                       |
 | `POST`       | `/api/v1/events/:eventId/games`                | Registrar partida                                                        |
 | `DELETE`     | `/api/v1/games/:gameId`                        | Remover partida                                                          |
@@ -171,6 +176,7 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | `GET/DELETE` | `/api/v1/decks/:deckId`                        | Deck com análise / remover                                               |
 | `PATCH`      | `/api/v1/decks/:deckId/cards/:cardId`          | Marcar proxy (`{isProxy}`)                                               |
 | `PUT`        | `/api/v1/me/active-group`                      | Trocar grupo ativo                                                       |
+| `GET/PUT`    | `/api/v1/me/preferences`                       | Fuso horário e idioma (`{timeZone, locale}`)                             |
 | `GET`        | `/api/health`                                  | Health check                                                             |
 
 ## Contribuindo
