@@ -47,7 +47,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 1.10 | Gerenciar membros: promover/rebaixar admin, remover, sair do grupo, transferir posse                           | M       | ✅ (regenerar convite já feito em 1.6) |
 | 1.11 | **Fuso horário por usuário** (detectado no navegador, editável no perfil)                                      | P       | ✅                                     |
 | 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                                    | P       |                                        |
-| 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push)                | M       |                                        |
+| 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push)                | M       | ✅ (e-mail; push em 5.5)               |
 | 1.14 | Compartilhar encontro no WhatsApp (link + texto) e exportar `.ics`                                             | P       | ✅                                     |
 | 1.15 | Página de perfil (nome, foto, idioma)                                                                          | P       | parcial (fuso e idioma)                |
 
@@ -116,24 +116,25 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 ## Transversal (contínuo)
 
-| Item                                                                                                                                                         | Tamanho |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
-| E2E autenticado (usuário de teste criado direto no banco + cookie de sessão) cobrindo o fluxo completo                                                       | M       |
-| **Previews na Vercel**: branch de banco do Neon por PR (integração Neon ↔ Vercel) e login em preview (domínio fixo de preview ou e-mail/senha só em preview) | M       |
-| Observabilidade: Vercel Analytics/Speed Insights e Sentry                                                                                                    | P       |
-| Rate limiting nas rotas de importação (Upstash Redis free) e timeouts nas chamadas externas                                                                  | P       |
-| Cabeçalhos de segurança (CSP) e revisão de permissões                                                                                                        | P       |
-| Acessibilidade (auditoria WCAG AA) e modo escuro refinado                                                                                                    | M       |
-| LGPD: exportar e excluir conta                                                                                                                               | P       |
-| OpenAPI da API v1 (documentação para o app mobile)                                                                                                           | M       |
-| PWA (instalar na tela inicial) enquanto o app nativo não sai                                                                                                 | P       |
+| Item                                                                                                                                                                             | Tamanho |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| E2E autenticado (usuário de teste criado direto no banco + cookie de sessão) cobrindo o fluxo completo                                                                           | M       |
+| **Previews na Vercel**: branch de banco do Neon por PR (integração Neon ↔ Vercel) e login em preview (domínio fixo de preview ou e-mail/senha só em preview)                     | M       |
+| **Domínio próprio no Resend**: verificar um domínio (registros DNS SPF/DKIM) e definir `EMAIL_FROM`; até lá, o remetente de testes só entrega para o e-mail dono da conta Resend | P       |
+| Observabilidade: Vercel Analytics/Speed Insights e Sentry                                                                                                                        | P       |
+| Rate limiting nas rotas de importação (Upstash Redis free) e timeouts nas chamadas externas                                                                                      | P       |
+| Cabeçalhos de segurança (CSP) e revisão de permissões                                                                                                                            | P       |
+| Acessibilidade (auditoria WCAG AA) e modo escuro refinado                                                                                                                        | M       |
+| LGPD: exportar e excluir conta                                                                                                                                                   | P       |
+| OpenAPI da API v1 (documentação para o app mobile)                                                                                                                               | M       |
+| PWA (instalar na tela inicial) enquanto o app nativo não sai                                                                                                                     | P       |
 
 ---
 
 ## Plano de execução sugerido
 
 1. ✅ **Semana 1–2 — colocar no ar (Fase 0 pendente + 1.6, 1.9, 1.11, 1.14).** Deploy na Vercel, Neon, OAuth; o grupo começa a usar a disponibilidade e o ranking.
-2. **Semana 3–4 — agenda madura (✅ 1.7, 1.8, 1.10; falta 1.13 — notificações por e-mail com Resend).** Recorrência e calendário são o que mais reduz atrito.
+2. ✅ **Semana 3–4 — agenda madura (1.7, 1.8, 1.10, 1.13).** Recorrência e calendário são o que mais reduz atrito.
 3. **Semana 5–6 — partidas ricas (2.4–2.9).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
 4. **Semana 7–9 — decks (3.6–3.11).** Editor, proxies parciais e folha de impressão.
 5. **Semana 10–13 — análise (4.5–4.9).** Começar pelo Tagger (4.5), que melhora todo o resto.

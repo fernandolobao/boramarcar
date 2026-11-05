@@ -17,11 +17,22 @@ describe('preferências do usuário', () => {
     expect(await getUserPreferences(db, user.id)).toEqual({
       timeZone: 'America/Sao_Paulo',
       timeZoneIsDefault: true,
+      locale: null,
+      emailNotifications: true,
     });
     await updateUserPreferences(db, { userId: user.id, timeZone: 'Europe/Lisbon' });
-    expect(await getUserPreferences(db, user.id)).toEqual({
+    expect(await getUserPreferences(db, user.id)).toMatchObject({
       timeZone: 'Europe/Lisbon',
       timeZoneIsDefault: false,
+    });
+    await updateUserPreferences(db, { userId: user.id, locale: 'en', emailNotifications: false });
+    expect(await getUserPreferences(db, user.id)).toMatchObject({
+      timeZone: 'Europe/Lisbon',
+      locale: 'en',
+      emailNotifications: false,
+    });
+    await expect(updateUserPreferences(db, { userId: user.id })).rejects.toMatchObject({
+      code: 'invalid_input',
     });
   });
 

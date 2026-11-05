@@ -312,6 +312,39 @@
     "languages": {
       "pt-BR": "Português (Brasil)",
       "en": "English"
-    }
+    },
+    "emailNotifications": "Receber avisos por e-mail",
+    "emailNotificationsHint": "Novos encontros, mudanças, cancelamentos, lembretes e quando a mesa fecha."
+  },
+  "email": {
+    "greeting": "Olá, {name}!",
+    "created": {
+      "subject": "Novo encontro: {title}",
+      "intro": "{group} marcou um novo encontro. Confirme se você vai:"
+    },
+    "updated": {
+      "subject": "Encontro alterado: {title}",
+      "intro": "Um encontro de {group} em que você está mudou. Confira os novos detalhes:"
+    },
+    "cancelled": {
+      "subject": "Encontro cancelado: {title}",
+      "intro": "Este encontro de {group} foi cancelado."
+    },
+    "reminder": {
+      "subject": "Lembrete: {title} — {when}",
+      "intro": "Lembrete do seu próximo encontro em {group}:"
+    },
+    "window": {
+      "subject": "A mesa fechou! {when}",
+      "intro": "{count} jogadores de {group} podem jogar no mesmo horário. Que tal marcar o encontro?",
+      "players": "Quem pode: {names}",
+      "cta": "Ver horários e marcar"
+    },
+    "when": "Quando: {when}",
+    "where": "Onde: {where}",
+    "confirmed": "Confirmados ({count}): {names}",
+    "openEvent": "Abrir o encontro",
+    "calendarHint": "O arquivo .ics anexo adiciona (ou atualiza) o encontro na sua agenda.",
+    "footer": "Você recebe este e-mail porque participa de {group} no Bora Marcar. Para não receber mais avisos, desative-os no seu perfil: {url}"
   }
 }

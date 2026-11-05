@@ -312,6 +312,39 @@
     "languages": {
       "pt-BR": "Português (Brasil)",
       "en": "English"
-    }
+    },
+    "emailNotifications": "Get email notices",
+    "emailNotificationsHint": "New game nights, changes, cancellations, reminders and when the table is full."
+  },
+  "email": {
+    "greeting": "Hi, {name}!",
+    "created": {
+      "subject": "New game night: {title}",
+      "intro": "{group} scheduled a new game night. Let them know if you're coming:"
+    },
+    "updated": {
+      "subject": "Game night changed: {title}",
+      "intro": "A {group} game night you're in has changed. Here are the new details:"
+    },
+    "cancelled": {
+      "subject": "Game night cancelled: {title}",
+      "intro": "This {group} game night was cancelled."
+    },
+    "reminder": {
+      "subject": "Reminder: {title} — {when}",
+      "intro": "A reminder of your next game night with {group}:"
+    },
+    "window": {
+      "subject": "The table is full! {when}",
+      "intro": "{count} players from {group} are free at the same time. How about scheduling it?",
+      "players": "Who's free: {names}",
+      "cta": "See times and schedule"
+    },
+    "when": "When: {when}",
+    "where": "Where: {where}",
+    "confirmed": "Confirmed ({count}): {names}",
+    "openEvent": "Open the game night",
+    "calendarHint": "The attached .ics file adds (or updates) the game night in your calendar.",
+    "footer": "You're getting this email because you're in {group} on Bora Marcar. To stop these notices, turn them off in your profile: {url}"
   }
 }

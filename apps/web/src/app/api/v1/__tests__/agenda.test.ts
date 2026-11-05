@@ -142,11 +142,13 @@ describe('encontros: editar, status e .ics', () => {
 });
 
 describe('preferências', () => {
-  it('salva o fuso e o idioma e atualiza os cookies', async () => {
+  it('salva fuso, idioma e avisos por e-mail e atualiza os cookies', async () => {
     asUser(friend);
     expect((await call(preferences.GET)).body!.preferences).toEqual({
       timeZone: 'America/Sao_Paulo',
       timeZoneIsDefault: true,
+      locale: null,
+      emailNotifications: true,
     });
 
     const res = await call(preferences.PUT, {
@@ -160,6 +162,19 @@ describe('preferências', () => {
     expect((await call(preferences.GET)).body!.preferences).toEqual({
       timeZone: 'Europe/Lisbon',
       timeZoneIsDefault: false,
+      locale: 'en',
+      emailNotifications: true,
+    });
+
+    const optOut = await call(preferences.PUT, {
+      method: 'PUT',
+      body: { emailNotifications: false },
+    });
+    expect(optOut.status).toBe(200);
+    expect(optOut.headers.getSetCookie()).toEqual([]);
+    expect((await call(preferences.GET)).body!.preferences).toMatchObject({
+      timeZone: 'Europe/Lisbon',
+      emailNotifications: false,
     });
   });
 

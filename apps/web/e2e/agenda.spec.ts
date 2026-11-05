@@ -46,4 +46,30 @@ test.describe('agenda', () => {
       page.getByText('Como dono(a), passe a posse para outra pessoa antes de sair.'),
     ).toBeVisible();
   });
+
+  test('perfil: avisos por e-mail podem ser desligados e religados pelo teclado', async ({
+    page,
+  }) => {
+    // Muda dados do usuário compartilhado: roda em um projeto só, para não disputar com o outro.
+    test.skip(test.info().project.name !== 'chromium', 'só no desktop');
+    await page.goto('/perfil');
+    const toggle = page.getByRole('checkbox', { name: 'Receber avisos por e-mail' });
+    await expect(toggle).toBeChecked();
+    await expect(toggle).toHaveAccessibleDescription(/Novos encontros/);
+    const save = async () => {
+      await page.getByRole('button', { name: 'Salvar' }).click();
+      await expect(page.getByRole('status')).toHaveText('Preferências salvas.');
+    };
+
+    await toggle.focus();
+    await page.keyboard.press('Space');
+    await save();
+    await page.reload();
+    await expect(toggle).not.toBeChecked();
+
+    await toggle.check();
+    await save();
+    await page.reload();
+    await expect(toggle).toBeChecked();
+  });
 });

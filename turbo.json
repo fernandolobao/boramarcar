@@ -11,6 +11,9 @@
         "BETTER_AUTH_URL",
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
+        "RESEND_API_KEY",
+        "EMAIL_FROM",
+        "CRON_SECRET",
         "SKIP_ENV_VALIDATION"
       ],
       "outputs": [".next/**", "!.next/cache/**"]

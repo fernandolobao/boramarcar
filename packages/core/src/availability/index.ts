@@ -133,3 +133,20 @@ export function findCommonWindows(
 
 export * from './recurring';
 export * from './grid';
+
+/**
+ * Chave para avisar "a mesa fechou!" uma única vez por dia (no fuso do grupo) e local,
+ * mesmo que a janela mude um pouco depois.
+ */
+export function windowNotificationKey(
+  window: Pick<CommonWindow, 'start' | 'locationId'>,
+  timeZone: string,
+) {
+  const date = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(window.start);
+  return `${date}|${window.locationId ?? 'tbd'}`;
+}

@@ -149,7 +149,11 @@ export async function updateEvent(db: Database, input: UpdateEventInput) {
     if (!title) throw new DomainError('invalid_input', 'Informe um título');
     changes.title = title;
   }
-  if (input.startsAt !== undefined) changes.startsAt = input.startsAt;
+  if (input.startsAt !== undefined) {
+    changes.startsAt = input.startsAt;
+    // Remarcado: o lembrete do dia volta a valer para a nova data.
+    if (input.startsAt.getTime() !== event.startsAt.getTime()) changes.reminderSentAt = null;
+  }
   if (input.endsAt !== undefined) changes.endsAt = input.endsAt;
   const startsAt = changes.startsAt ?? event.startsAt;
   const endsAt = changes.endsAt === undefined ? event.endsAt : changes.endsAt;

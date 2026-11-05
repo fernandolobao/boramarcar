@@ -107,3 +107,18 @@ describe('findCommonWindows', () => {
     expect(() => findCommonWindows([slot('a', '18:00', '14:00')])).toThrow(DomainError);
   });
 });
+
+describe('windowNotificationKey', () => {
+  it('agrupa por dia local e local', async () => {
+    const { windowNotificationKey } = await import('./index');
+    expect(
+      windowNotificationKey(
+        { start: new Date('2026-11-15T01:00:00Z'), locationId: null },
+        'America/Sao_Paulo',
+      ),
+    ).toBe('2026-11-14|tbd');
+    expect(
+      windowNotificationKey({ start: new Date('2026-11-15T01:00:00Z'), locationId: 'casa' }, 'UTC'),
+    ).toBe('2026-11-15|casa');
+  });
+});

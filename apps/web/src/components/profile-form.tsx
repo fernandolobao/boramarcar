@@ -13,7 +13,7 @@ function listTimeZones(current: string): string[] {
   return zones.includes(current) ? zones : [current, ...zones];
 }
 
-export function ProfileForm() {
+export function ProfileForm({ emailNotifications = true }: { emailNotifications?: boolean }) {
   const t = useTranslations('profile');
   const tc = useTranslations('common');
   const currentTimeZone = useTimeZone() ?? 'America/Sao_Paulo';
@@ -21,6 +21,7 @@ export function ProfileForm() {
   const { run, error, pending } = useApiAction();
   const [timeZone, setTimeZone] = useState(currentTimeZone);
   const [locale, setLocale] = useState<Locale>(currentLocale);
+  const [notify, setNotify] = useState(emailNotifications);
   const browserTimeZone = useSyncExternalStore(
     () => () => {},
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -36,7 +37,11 @@ export function ProfileForm() {
         e.preventDefault();
         setSaved(false);
         void run(
-          () => api('/api/v1/me/preferences', { method: 'PUT', body: { timeZone, locale } }),
+          () =>
+            api('/api/v1/me/preferences', {
+              method: 'PUT',
+              body: { timeZone, locale, emailNotifications: notify },
+            }),
           () => setSaved(true),
         );
       }}
@@ -87,6 +92,20 @@ export function ProfileForm() {
             </option>
           ))}
         </select>
+      </div>
+      <div>
+        <label className="flex items-center gap-2 font-medium">
+          <input
+            type="checkbox"
+            checked={notify}
+            aria-describedby="profile-email-hint"
+            onChange={(e) => setNotify(e.target.checked)}
+          />
+          {t('emailNotifications')}
+        </label>
+        <p id="profile-email-hint" className="muted mt-1">
+          {t('emailNotificationsHint')}
+        </p>
       </div>
       <div className="flex items-center gap-3">
         <button className="btn-primary" disabled={pending}>

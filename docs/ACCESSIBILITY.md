@@ -64,6 +64,11 @@ sem rolagem horizontal em 320px.
 - Botão "Sair": a partir de telas `sm` mostra só o ícone (o texto fica `sr-only` e em `title`), para o cabeçalho caber numa linha; no celular mostra ícone + texto.
 - Ícone de link externo junto do aviso "(abre em nova aba)" para leitores de tela.
 
+### Revisão: avisos por e-mail
+
+- **Perfil**: a opção "Receber avisos por e-mail" é um checkbox nativo com rótulo clicável e a explicação ligada por `aria-describedby`; testado por teclado (Espaço) em E2E e pelo axe no componente e na página.
+- **E-mails**: `<html lang>` no idioma de quem recebe, `<title>`, texto escapado, versão em texto puro equivalente, link com texto descritivo ("Abrir o encontro"), contraste ≥ 4,5:1 (botão roxo com texto branco, rodapé zinc-600) e informação nunca só em cor. Datas por extenso no fuso de quem recebe.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

@@ -161,6 +161,19 @@ export const availabilityRuleExceptions = pgTable(
   (t) => [primaryKey({ columns: [t.ruleId, t.date] })],
 );
 
+/** Janelas "a mesa fechou!" já avisadas (uma vez por grupo, dia e local). */
+export const windowNotifications = pgTable(
+  'window_notifications',
+  {
+    groupId: text('group_id')
+      .notNull()
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    key: text('key').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.groupId, t.key] })],
+);
+
 /* ---------- Eventos e partidas ---------- */
 
 export const events = pgTable(
@@ -177,6 +190,8 @@ export const events = pgTable(
     status: eventStatus('status').notNull().default('scheduled'),
     /** Incrementado a cada alteração (SEQUENCE do iCalendar). */
     sequence: integer('sequence').notNull().default(0),
+    /** Quando o lembrete do dia foi enviado (evita duplicar). */
+    reminderSentAt: timestamp('reminder_sent_at', { withTimezone: true }),
     createdBy: text('created_by')
       .notNull()
       .references(() => user.id),

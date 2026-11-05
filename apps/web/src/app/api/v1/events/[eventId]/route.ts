@@ -1,6 +1,8 @@
-import { getEventDetail, updateEvent } from '@boramarcar/db';
+import { getEventDetail, getEventSnapshot, updateEvent } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, isoDate, parseJson } from '@/server/http';
+import { eventChangeKind, notifyEvent } from '@/server/notify';
+import { runAfterResponse } from '@/server/background';
 
 export const GET = authed<{ eventId: string }>(async ({ db, user, params }) => ({
   event: await getEventDetail(db, { eventId: params.eventId, userId: user.id }),
@@ -19,5 +21,11 @@ const patchSchema = z
 /** Edita o encontro (título, horário, local) ou muda o status: cancelar, finalizar, reabrir. */
 export const PATCH = authed<{ eventId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, patchSchema);
-  return { event: await updateEvent(db, { ...body, eventId: params.eventId, userId: user.id }) };
+  const before = await getEventSnapshot(db, params.eventId);
+  const event = await updateEvent(db, { ...body, eventId: params.eventId, userId: user.id });
+  const kind = before ? eventChangeKind(before, event) : null;
+  if (kind) {
+    runAfterResponse(() => notifyEvent(db, { eventId: event.id, kind, actorId: user.id }));
+  }
+  return { event };
 });

@@ -12,7 +12,8 @@
     "./analysis": "./src/analysis/index.ts",
     "./errors": "./src/errors/index.ts",
     "./time": "./src/time/index.ts",
-    "./calendar": "./src/calendar/index.ts"
+    "./calendar": "./src/calendar/index.ts",
+    "./email": "./src/email/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p contract",
