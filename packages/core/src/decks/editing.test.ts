@@ -100,3 +100,73 @@ describe('sincronizar com a origem', () => {
     expect(result.removed).toEqual(['Cultivate', 'Mana Crypt']);
   });
 });
+
+describe('edições (impressões) diferentes da mesma carta', () => {
+  const row = (id: string, scryfallId: string | null, quantity: number, isProxy = false) => ({
+    id,
+    name: 'Sol Ring',
+    board: 'mainboard' as const,
+    quantity,
+    isProxy,
+    scryfallId,
+    card: null,
+  });
+
+  it('mantém uma linha por edição, cada uma com seus proxies', () => {
+    const lines = mergeDeckLines([
+      row('1', 'cmm', 1),
+      row('2', 'cmm', 1, true),
+      row('3', 'lea', 1),
+    ]);
+    expect(lines.map((l) => [l.scryfallId, l.quantity, l.proxies])).toEqual([
+      ['cmm', 2, 1],
+      ['lea', 1, 0],
+    ]);
+    expect(lines[0]!.key).not.toBe(lines[1]!.key);
+  });
+
+  it('exporta com a edição e o número de coleção', () => {
+    expect(
+      exportDeckText(
+        [
+          {
+            name: 'Sol Ring',
+            board: 'mainboard',
+            quantity: 2,
+            proxies: 1,
+            setCode: 'cmm',
+            collectorNumber: '400',
+          },
+          {
+            name: 'Sol Ring',
+            board: 'mainboard',
+            quantity: 1,
+            proxies: 0,
+            setCode: 'lea',
+            collectorNumber: '270',
+          },
+          { name: 'Forest', board: 'mainboard', quantity: 3, proxies: 0 },
+        ],
+        'proxies',
+      ),
+    ).toBe(
+      'Deck\n3 Forest\n1 Sol Ring (CMM) 400\n1 Sol Ring (CMM) 400 #proxy\n1 Sol Ring (LEA) 270\n',
+    );
+  });
+
+  it('sincroniza por edição e mantém proxies da carta', () => {
+    const plan = planDeckSync(
+      [{ name: 'Sol Ring', board: 'mainboard', quantity: 2, proxies: 1, scryfallId: 'cmm' }],
+      [
+        { name: 'Sol Ring', board: 'mainboard', quantity: 1, scryfallId: 'cmm' },
+        { name: 'Sol Ring', board: 'mainboard', quantity: 1, scryfallId: 'lea' },
+      ],
+    );
+    expect(plan.rows.map((r) => [r.entry.scryfallId, r.quantity, r.isProxy])).toEqual([
+      ['cmm', 1, true],
+      ['lea', 1, false],
+    ]);
+    expect(plan.added).toEqual(['Sol Ring']);
+    expect(plan.changed).toEqual(['Sol Ring']);
+  });
+});

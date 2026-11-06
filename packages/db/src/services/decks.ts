@@ -19,7 +19,7 @@ import {
   type DeckEntry,
   type ImportedDeck,
 } from '@boramarcar/core';
-import { and, asc, count, desc, eq, inArray, or, sql, sum } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
 import { cards, deckCards, decks, groupMembers, user } from '../schema';
@@ -46,6 +46,9 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         producedMana: c.producedMana ?? null,
         gameChanger: c.gameChanger ?? false,
         edhrecRank: c.edhrecRank ?? null,
+        setCode: c.setCode ?? null,
+        setName: c.setName ?? null,
+        collectorNumber: c.collectorNumber ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -65,6 +68,9 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         producedMana: sql`coalesce(excluded.produced_mana, ${cards.producedMana})`,
         gameChanger: sql`excluded.game_changer`,
         edhrecRank: sql`coalesce(excluded.edhrec_rank, ${cards.edhrecRank})`,
+        setCode: sql`coalesce(excluded.set_code, ${cards.setCode})`,
+        setName: sql`coalesce(excluded.set_name, ${cards.setName})`,
+        collectorNumber: sql`coalesce(excluded.collector_number, ${cards.collectorNumber})`,
         updatedAt: new Date(),
       },
     });
@@ -73,10 +79,25 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
 /** Busca no cache local as cartas de uma lista (por id Scryfall ou nome). */
 export async function findCachedCards(
   db: Database,
-  entries: readonly { name: string; scryfallId?: string }[],
+  entries: readonly {
+    name: string;
+    scryfallId?: string;
+    setCode?: string;
+    collectorNumber?: string;
+  }[],
 ): Promise<CardData[]> {
   const ids = [...new Set(entries.flatMap((e) => (e.scryfallId ? [e.scryfallId] : [])))];
   const names = [...new Set(entries.map((e) => e.name.toLowerCase()))];
+  const prints = entries.flatMap((e) =>
+    !e.scryfallId && e.setCode && e.collectorNumber
+      ? [
+          and(
+            eq(cards.setCode, e.setCode.toLowerCase()),
+            eq(cards.collectorNumber, e.collectorNumber),
+          ),
+        ]
+      : [],
+  );
   if (!ids.length && !names.length) return [];
   const rows = await db
     .select()
@@ -85,6 +106,7 @@ export async function findCachedCards(
       or(
         ids.length ? inArray(cards.scryfallId, ids) : undefined,
         names.length ? inArray(sql`lower(${cards.name})`, names) : undefined,
+        ...prints,
       ),
     );
   return rows.map(toCardData);
@@ -107,6 +129,9 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
     gameChanger: card.gameChanger,
     edhrecRank: card.edhrecRank,
     roles: card.roles,
+    setCode: card.setCode,
+    setName: card.setName,
+    collectorNumber: card.collectorNumber,
   };
 }
 
@@ -120,6 +145,7 @@ export async function deckCardsForEnrichment(db: Database, deckId: string) {
       scryfallId: cards.scryfallId,
       name: cards.name,
       producedMana: cards.producedMana,
+      setCode: cards.setCode,
       rolesCheckedAt: cards.rolesCheckedAt,
       typeLine: cards.typeLine,
     })
@@ -128,7 +154,10 @@ export async function deckCardsForEnrichment(db: Database, deckId: string) {
     .where(eq(deckCards.deckId, deckId));
   const cutoff = Date.now() - ROLES_TTL_MS;
   return {
-    missingMana: rows.filter((r) => r.producedMana === null).map((r) => r.scryfallId),
+    // Cache antigo: sem mana produzida ou sem a edição — relê a carta no Scryfall.
+    missingMana: rows
+      .filter((r) => r.producedMana === null || r.setCode === null)
+      .map((r) => r.scryfallId),
     staleRoles: rows
       .filter((r) => !r.rolesCheckedAt || r.rolesCheckedAt.getTime() < cutoff)
       .map((r) => ({ scryfallId: r.scryfallId, name: r.name })),
@@ -191,8 +220,10 @@ export async function saveImportedDeck(
         sourceUrl: input.deck.sourceUrl ?? null,
       })
       .returning();
-    await tx.insert(deckCards).values(
-      linked.map((entry) => ({
+    // Entradas diferentes podem cair na mesma impressão (ex.: edição não encontrada → padrão).
+    const rows = new Map<string, typeof deckCards.$inferInsert>();
+    for (const entry of linked) {
+      const row = {
         deckId: deck!.id,
         cardName: entry.card?.name ?? entry.name,
         scryfallId: entry.card?.scryfallId ?? null,
@@ -200,8 +231,13 @@ export async function saveImportedDeck(
         board: entry.board,
         isProxy: entry.isProxy ?? false,
         isFoil: entry.isFoil ?? false,
-      })),
-    );
+      };
+      const key = `${row.board}|${row.cardName.toLowerCase()}|${row.scryfallId}|${row.isProxy}`;
+      const existing = rows.get(key);
+      if (existing) existing.quantity = (existing.quantity ?? 0) + row.quantity;
+      else rows.set(key, row);
+    }
+    await tx.insert(deckCards).values([...rows.values()]);
     return deck!;
   });
 }
@@ -284,6 +320,7 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
   const entries = rows.map(({ entry, card }) => ({
     id: entry.id,
     name: entry.cardName,
+    scryfallId: entry.scryfallId,
     quantity: entry.quantity,
     board: entry.board,
     isProxy: entry.isProxy,
@@ -320,6 +357,7 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
       ({ card }) =>
         card &&
         (card.producedMana === null ||
+          card.setCode === null ||
           !card.rolesCheckedAt ||
           card.rolesCheckedAt.getTime() < roleCutoff),
     ) ||
@@ -366,6 +404,7 @@ export async function setDeckCardProxy(
           eq(deckCards.deckId, input.deckId),
           eq(deckCards.board, row.entry.board),
           eq(deckCards.cardName, row.entry.cardName),
+          samePrint(row.entry.scryfallId),
           eq(deckCards.isProxy, input.isProxy),
         ),
       )
@@ -496,6 +535,10 @@ export async function updateDeck(
   return updated!;
 }
 
+/** Filtro "mesma impressão" (id do Scryfall ou linha sem dados). */
+const samePrint = (scryfallId: string | null | undefined) =>
+  scryfallId ? eq(deckCards.scryfallId, scryfallId) : isNull(deckCards.scryfallId);
+
 async function requireOwnedDeck(db: Database, deckId: string, userId: string) {
   const [deck] = await db.select().from(decks).where(eq(decks.id, deckId)).limit(1);
   if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
@@ -517,9 +560,15 @@ export async function setDeckLine(
     quantity: number;
     proxies: number;
     card?: CardData | null;
+    /** Impressão da linha a alterar; sem valor, a linha da carta pela impressão de `card`. */
+    scryfallId?: string | null;
   },
 ) {
   const name = input.card?.name ?? input.name.trim();
+  const print =
+    input.scryfallId !== undefined ? input.scryfallId : (input.card?.scryfallId ?? null);
+  // Sem impressão nem carta (ex.: remover pelo nome): vale para todas as edições da carta.
+  const anyPrint = input.scryfallId === undefined && !input.card;
   if (!name) throw new DomainError('invalid_input', 'Informe a carta');
   const parts = splitLine(input.quantity, input.proxies);
   await requireOwnedDeck(db, input.deckId, input.userId);
@@ -533,6 +582,7 @@ export async function setDeckLine(
           eq(deckCards.deckId, input.deckId),
           eq(deckCards.board, input.board),
           sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
+          anyPrint ? undefined : samePrint(print),
         ),
       );
     if (parts.length) {
@@ -540,7 +590,7 @@ export async function setDeckLine(
         parts.map((p) => ({
           deckId: input.deckId,
           cardName: name,
-          scryfallId: input.card?.scryfallId ?? null,
+          scryfallId: print,
           board: input.board,
           quantity: p.quantity,
           isProxy: p.isProxy,
@@ -549,7 +599,102 @@ export async function setDeckLine(
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
   });
-  return { name, board: input.board, quantity: input.quantity, proxies: input.proxies };
+  return {
+    name,
+    board: input.board,
+    scryfallId: print,
+    quantity: input.quantity,
+    proxies: input.proxies,
+  };
+}
+
+/**
+ * Troca a edição (impressão) de `quantity` cópias de uma linha. Cópias reais vão primeiro; se
+ * faltar, entram as proxy (que continuam proxy). Junta com a linha da nova edição se já existir.
+ */
+export async function moveLinePrint(
+  db: Database,
+  input: {
+    deckId: string;
+    userId: string;
+    board: DeckBoard;
+    name: string;
+    fromScryfallId: string | null;
+    card: CardData;
+    quantity: number;
+  },
+) {
+  await requireOwnedDeck(db, input.deckId, input.userId);
+  if (input.card.name.toLowerCase() !== input.name.trim().toLowerCase()) {
+    throw new DomainError('invalid_input', 'A edição escolhida é de outra carta');
+  }
+  if (!Number.isInteger(input.quantity) || input.quantity < 1) {
+    throw new DomainError('invalid_input', 'Informe quantas cópias mudam de edição');
+  }
+  if (input.fromScryfallId === input.card.scryfallId) return { moved: 0 };
+  await upsertCards(db, [input.card]);
+  return db.transaction(async (tx) => {
+    const rows = await tx
+      .select()
+      .from(deckCards)
+      .where(
+        and(
+          eq(deckCards.deckId, input.deckId),
+          eq(deckCards.board, input.board),
+          sql`lower(${deckCards.cardName}) = ${input.name.trim().toLowerCase()}`,
+          samePrint(input.fromScryfallId),
+        ),
+      );
+    const total = rows.reduce((sum, r) => sum + r.quantity, 0);
+    if (!total) throw new DomainError('not_found', 'Carta não encontrada no deck');
+    if (input.quantity > total) {
+      throw new DomainError('invalid_input', `O deck tem só ${total} cópias desta edição`);
+    }
+    let left = input.quantity;
+    // Reais primeiro, depois proxies.
+    for (const row of [...rows].sort((a, b) => Number(a.isProxy) - Number(b.isProxy))) {
+      if (!left) break;
+      const take = Math.min(left, row.quantity);
+      left -= take;
+      if (take === row.quantity) await tx.delete(deckCards).where(eq(deckCards.id, row.id));
+      else
+        await tx
+          .update(deckCards)
+          .set({ quantity: row.quantity - take })
+          .where(eq(deckCards.id, row.id));
+      const [twin] = await tx
+        .select()
+        .from(deckCards)
+        .where(
+          and(
+            eq(deckCards.deckId, input.deckId),
+            eq(deckCards.board, input.board),
+            eq(deckCards.cardName, input.card.name),
+            eq(deckCards.scryfallId, input.card.scryfallId),
+            eq(deckCards.isProxy, row.isProxy),
+          ),
+        )
+        .limit(1);
+      if (twin) {
+        await tx
+          .update(deckCards)
+          .set({ quantity: twin.quantity + take })
+          .where(eq(deckCards.id, twin.id));
+      } else {
+        await tx.insert(deckCards).values({
+          deckId: input.deckId,
+          cardName: input.card.name,
+          scryfallId: input.card.scryfallId,
+          board: input.board,
+          quantity: take,
+          isProxy: row.isProxy,
+          isFoil: row.isFoil,
+        });
+      }
+    }
+    await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
+    return { moved: input.quantity };
+  });
 }
 
 /**
@@ -562,6 +707,14 @@ export async function syncDeckCards(
 ) {
   await requireOwnedDeck(db, input.deckId, input.userId);
   const current = await db.select().from(deckCards).where(eq(deckCards.deckId, input.deckId));
+  await upsertCards(db, input.cards);
+  const known = [...input.cards, ...(await findCachedCards(db, input.entries))];
+  // Associa antes de planejar: a impressão (scryfallId) faz parte da chave da linha.
+  const incoming = attachCardData(input.entries, known).map(({ card, ...entry }) => ({
+    ...entry,
+    name: card?.name ?? entry.name,
+    ...(card ? { scryfallId: card.scryfallId } : {}),
+  }));
   const plan = planDeckSync(
     mergeDeckLines(
       current.map((r) => ({
@@ -570,25 +723,20 @@ export async function syncDeckCards(
         board: r.board,
         quantity: r.quantity,
         isProxy: r.isProxy,
+        scryfallId: r.scryfallId,
         card: null,
       })),
     ),
-    input.entries,
-  );
-  await upsertCards(db, input.cards);
-  const known = [...input.cards, ...(await findCachedCards(db, input.entries))];
-  const linked = attachCardData(
-    plan.rows.map((r) => r.entry),
-    known,
+    incoming,
   );
   await db.transaction(async (tx) => {
     await tx.delete(deckCards).where(eq(deckCards.deckId, input.deckId));
     if (plan.rows.length) {
       await tx.insert(deckCards).values(
-        plan.rows.map((r, i) => ({
+        plan.rows.map((r) => ({
           deckId: input.deckId,
-          cardName: linked[i]!.card?.name ?? r.name,
-          scryfallId: linked[i]!.card?.scryfallId ?? null,
+          cardName: r.name,
+          scryfallId: r.entry.scryfallId ?? null,
           board: r.board,
           quantity: r.quantity,
           isProxy: r.isProxy,

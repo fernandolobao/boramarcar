@@ -44,7 +44,13 @@ const lines = [
     quantity: 1,
     proxies: 0,
     board: 'commander' as const,
-    card: card('Legendary Creature — Elemental', 'https://cards.scryfall.io/normal/o.jpg', 3),
+    scryfallId: 'o',
+    card: {
+      ...card('Legendary Creature — Elemental', 'https://cards.scryfall.io/normal/o.jpg', 3),
+      setCode: 'cmm',
+      setName: 'Commander Masters',
+      collectorNumber: '42',
+    },
   },
   {
     key: 'mainboard|elvish',
@@ -52,6 +58,7 @@ const lines = [
     quantity: 1,
     proxies: 1,
     board: 'mainboard' as const,
+    scryfallId: 'e',
     card: { ...card('Creature — Elf', 'https://cards.scryfall.io/normal/e.jpg'), priceUsd: '0.50' },
   },
   {
@@ -60,6 +67,7 @@ const lines = [
     quantity: 30,
     proxies: 10,
     board: 'mainboard' as const,
+    scryfallId: 'f',
     card: card('Basic Land — Forest', null, 0),
   },
   {
@@ -68,6 +76,7 @@ const lines = [
     quantity: 1,
     proxies: 0,
     board: 'maybeboard' as const,
+    scryfallId: null,
     card: null,
   },
 ];
@@ -158,7 +167,7 @@ describe('editor de deck', () => {
     expect(calls.at(-1)).toEqual({
       url: '/api/v1/decks/d1/lines',
       method: 'PUT',
-      body: { name: 'Forest', board: 'mainboard', quantity: 30, proxies: 12 },
+      body: { name: 'Forest', board: 'mainboard', quantity: 30, proxies: 12, scryfallId: 'f' },
     });
 
     const qty = screen.getByRole('spinbutton', { name: 'Quantidade de Elvish Mystic' });
@@ -176,6 +185,7 @@ describe('editor de deck', () => {
       board: 'maybeboard',
       quantity: 0,
       proxies: 0,
+      scryfallId: null,
     });
   });
 
@@ -220,8 +230,81 @@ describe('editor de deck', () => {
         board: 'mainboard',
         quantity: 31,
         proxies: 10,
+        scryfallId: 'f',
       }),
     );
+  });
+
+  it('troca a edição de parte das cópias pelo diálogo', async () => {
+    const calls: { url: string; body?: unknown }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        calls.push({ url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
+        if (url.startsWith('/api/v1/cards/prints')) {
+          return Response.json({
+            prints: [
+              {
+                scryfallId: 'f',
+                name: 'Forest',
+                setCode: 'cmm',
+                setName: 'Commander Masters',
+                collectorNumber: '1',
+                imageUri: null,
+                priceUsd: null,
+              },
+              {
+                scryfallId: 'f2',
+                name: 'Forest',
+                setCode: 'lea',
+                setName: 'Limited Edition Alpha',
+                collectorNumber: '294',
+                imageUri: null,
+                priceUsd: '12.00',
+              },
+            ],
+          });
+        }
+        return Response.json({ moved: 5 });
+      }),
+    );
+    // jsdom não implementa showModal/close.
+    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+    const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
+    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    expect(screen.getByRole('button', { name: /Edição: CMM #42/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Escolher edição ?\(Forest\)$/ }));
+    const alpha = await screen.findByRole('radio', { name: /Limited Edition Alpha/ });
+    expect(screen.getByText('2 edições')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Filtrar por edição ou número'), {
+      target: { value: 'alpha' },
+    });
+    expect(screen.getByText('1 edição')).toBeInTheDocument();
+    fireEvent.click(alpha);
+    fireEvent.change(screen.getByLabelText('Cópias com esta edição (de 30)'), {
+      target: { value: '5' },
+    });
+    expect(await audit(container)).toEqual([]);
+    fireEvent.click(screen.getByRole('button', { name: 'Usar esta edição' }));
+    await vi.waitFor(() =>
+      expect(calls.at(-1)).toEqual({
+        url: '/api/v1/decks/d1/lines/print',
+        body: {
+          name: 'Forest',
+          board: 'mainboard',
+          fromScryfallId: 'f',
+          toScryfallId: 'f2',
+          quantity: 5,
+        },
+      }),
+    );
+    expect(calls[0]!.url).toBe('/api/v1/cards/prints?name=Forest');
   });
 });
 

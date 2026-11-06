@@ -29,6 +29,9 @@ const scryfallCardSchema = z.object({
   produced_mana: z.array(z.string()).optional(),
   game_changer: z.boolean().optional(),
   edhrec_rank: z.number().nullable().optional(),
+  set: z.string().optional(),
+  set_name: z.string().optional(),
+  collector_number: z.string().optional(),
 });
 
 const collectionSchema = z.object({
@@ -63,6 +66,9 @@ export function mapScryfallCard(raw: unknown): CardData {
     producedMana: card.produced_mana ?? [],
     gameChanger: card.game_changer ?? false,
     edhrecRank: card.edhrec_rank ?? null,
+    setCode: card.set ?? null,
+    setName: card.set_name ?? null,
+    collectorNumber: card.collector_number ?? null,
   };
 }
 
@@ -85,50 +91,106 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * Usa o id Scryfall quando disponível; caso contrário, o nome.
  */
 export async function fetchScryfallCollection(
-  entries: readonly Pick<DeckEntry, 'name' | 'scryfallId'>[],
+  entries: readonly Pick<DeckEntry, 'name' | 'scryfallId' | 'setCode' | 'collectorNumber'>[],
   { fetch: fetchFn, userAgent = 'BoraMarcar/0.1', delayMs = 100 }: ScryfallClientOptions,
 ): Promise<CollectionResult> {
-  const unique = new Map<string, { id?: string; name?: string }>();
+  type Identifier = { id?: string; name?: string; set?: string; collector_number?: string };
+  const unique = new Map<string, { identifier: Identifier; name: string }>();
   for (const entry of entries) {
-    const key = entry.scryfallId ? `id:${entry.scryfallId}` : `name:${entry.name.toLowerCase()}`;
-    if (!unique.has(key)) {
-      unique.set(key, entry.scryfallId ? { id: entry.scryfallId } : { name: entry.name });
-    }
+    const [key, identifier]: [string, Identifier] = entry.scryfallId
+      ? [`id:${entry.scryfallId}`, { id: entry.scryfallId }]
+      : entry.setCode && entry.collectorNumber
+        ? [
+            `print:${entry.setCode.toLowerCase()}:${entry.collectorNumber}`,
+            { set: entry.setCode.toLowerCase(), collector_number: entry.collectorNumber },
+          ]
+        : [`name:${entry.name.toLowerCase()}`, { name: entry.name }];
+    if (!unique.has(key)) unique.set(key, { identifier, name: entry.name });
   }
-  const identifiers = [...unique.values()];
   const cards: CardData[] = [];
   const notFound: string[] = [];
+  const retryByName: { name: string }[] = [];
 
-  for (let i = 0; i < identifiers.length; i += SCRYFALL_COLLECTION_LIMIT) {
-    if (i > 0 && delayMs > 0) await sleep(delayMs);
-    const batch = identifiers.slice(i, i + SCRYFALL_COLLECTION_LIMIT);
-    const response = await fetchFn(`${SCRYFALL_API}/cards/collection`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
-      },
-      body: JSON.stringify({ identifiers: batch }),
-    });
-    if (!response.ok) {
-      throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  const run = async (identifiers: Identifier[], names: string[], allowRetry: boolean) => {
+    for (let i = 0; i < identifiers.length; i += SCRYFALL_COLLECTION_LIMIT) {
+      if ((i > 0 || !allowRetry) && delayMs > 0) await sleep(delayMs);
+      const batch = identifiers.slice(i, i + SCRYFALL_COLLECTION_LIMIT);
+      const response = await fetchFn(`${SCRYFALL_API}/cards/collection`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent': userAgent,
+        },
+        body: JSON.stringify({ identifiers: batch }),
+      });
+      if (!response.ok) {
+        throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+      }
+      const parsed = collectionSchema.parse(await response.json());
+      cards.push(...parsed.data.map(mapScryfallCard));
+      for (const missing of parsed.not_found) {
+        const set = typeof missing.set === 'string' ? missing.set : null;
+        const number =
+          typeof missing.collector_number === 'string' ? missing.collector_number : null;
+        // Edição/número desconhecidos: tenta de novo pelo nome (uma impressão qualquer).
+        const index =
+          set && number
+            ? identifiers.findIndex((x) => x.set === set && x.collector_number === number)
+            : -1;
+        if (allowRetry && index >= 0) retryByName.push({ name: names[index]! });
+        else notFound.push(String(missing.name ?? missing.id ?? 'desconhecida'));
+      }
     }
-    const parsed = collectionSchema.parse(await response.json());
-    cards.push(...parsed.data.map(mapScryfallCard));
-    for (const missing of parsed.not_found) {
-      notFound.push(String(missing.name ?? missing.id ?? 'desconhecida'));
-    }
+  };
+  const all = [...unique.values()];
+  await run(
+    all.map((u) => u.identifier),
+    all.map((u) => u.name),
+    true,
+  );
+  if (retryByName.length) {
+    await run(
+      retryByName,
+      retryByName.map((r) => r.name),
+      false,
+    );
   }
   return { cards, notFound };
 }
 
-/** Associa cada entrada do deck aos dados da carta (por id e, em seguida, por nome). */
-export function attachCardData<T extends Pick<DeckEntry, 'name' | 'scryfallId'>>(
-  entries: readonly T[],
-  cards: readonly CardData[],
-): (T & { card: CardData | null })[] {
+/**
+ * A carta associada é a impressão pedida? (Sem id nem edição na entrada, qualquer uma serve.)
+ * Usado para decidir o que buscar no Scryfall mesmo havendo a carta no cache.
+ */
+export function isRequestedPrint(
+  entry: Pick<DeckEntry, 'scryfallId' | 'setCode' | 'collectorNumber'>,
+  card: CardData | null,
+): boolean {
+  if (!card) return false;
+  if (entry.scryfallId) return card.scryfallId === entry.scryfallId;
+  if (entry.setCode && entry.collectorNumber) {
+    return (
+      card.setCode?.toLowerCase() === entry.setCode.toLowerCase() &&
+      card.collectorNumber === entry.collectorNumber
+    );
+  }
+  return true;
+}
+
+const printKey = (set: string, number: string) => `${set.toLowerCase()}:${number}`;
+
+/** Associa cada entrada do deck aos dados da carta (por id, edição + número e, por fim, nome). */
+export function attachCardData<
+  T extends Pick<DeckEntry, 'name' | 'scryfallId'> &
+    Partial<Pick<DeckEntry, 'setCode' | 'collectorNumber'>>,
+>(entries: readonly T[], cards: readonly CardData[]): (T & { card: CardData | null })[] {
   const byId = new Map(cards.map((c) => [c.scryfallId, c]));
+  const byPrint = new Map(
+    cards.flatMap((c) =>
+      c.setCode && c.collectorNumber ? [[printKey(c.setCode, c.collectorNumber), c] as const] : [],
+    ),
+  );
   const byName = new Map<string, CardData>();
   for (const card of cards) {
     byName.set(card.name.toLowerCase(), card);
@@ -140,6 +202,9 @@ export function attachCardData<T extends Pick<DeckEntry, 'name' | 'scryfallId'>>
     ...entry,
     card:
       (entry.scryfallId ? byId.get(entry.scryfallId) : undefined) ??
+      (entry.setCode && entry.collectorNumber
+        ? byPrint.get(printKey(entry.setCode, entry.collectorNumber))
+        : undefined) ??
       byName.get(entry.name.toLowerCase()) ??
       null,
   }));
@@ -186,4 +251,64 @@ export async function fetchScryfallSearch(
     throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
   }
   return searchSchema.parse(await response.json()).data.map(mapScryfallCard);
+}
+
+/** Uma impressão da carta, para escolher a edição no editor. */
+export interface CardPrint {
+  scryfallId: string;
+  name: string;
+  setCode: string;
+  setName: string;
+  collectorNumber: string;
+  imageUri: string | null;
+  priceUsd: string | null;
+}
+
+/** Todas as impressões de uma carta (mais novas primeiro), sem variações. Até 175. */
+export async function fetchScryfallPrints(
+  name: string,
+  {
+    fetch: fetchFn,
+    userAgent = 'BoraMarcar/0.1',
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
+): Promise<CardPrint[]> {
+  const q = `!"${name.replace(/"/g, '')}" game:paper`;
+  const response = await fetchFn(
+    `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&unique=prints&order=released&dir=desc`,
+    { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
+  );
+  if (response.status === 404) return [];
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  return searchSchema
+    .parse(await response.json())
+    .data.map(mapScryfallCard)
+    .map((c) => ({
+      scryfallId: c.scryfallId,
+      name: c.name,
+      setCode: c.setCode ?? '',
+      setName: c.setName ?? '',
+      collectorNumber: c.collectorNumber ?? '',
+      imageUri: c.imageUri ?? null,
+      priceUsd: c.priceUsd ?? null,
+    }));
+}
+
+/** Uma carta pelo id do Scryfall; `null` se não existir. */
+export async function fetchScryfallCard(
+  id: string,
+  {
+    fetch: fetchFn,
+    userAgent = 'BoraMarcar/0.1',
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
+): Promise<CardData | null> {
+  const response = await fetchFn(`${SCRYFALL_API}/cards/${encodeURIComponent(id)}`, {
+    headers: { Accept: 'application/json', 'User-Agent': userAgent },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  return mapScryfallCard(await response.json());
 }

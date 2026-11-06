@@ -2,10 +2,14 @@ import 'server-only';
 import {
   attachCardData,
   DomainError,
+  fetchScryfallCard,
   fetchScryfallCollection,
+  fetchScryfallPrints,
   parseDeckText,
   isDomainError,
+  isRequestedPrint,
   resolveDeckImport,
+  type DeckBoard,
   type DeckImportInput,
   type FetchLike,
   type GameFormat,
@@ -13,6 +17,7 @@ import {
 import {
   findCachedCardByName,
   findCachedCards,
+  moveLinePrint,
   getDeck,
   saveImportedDeck,
   syncDeckCards,
@@ -43,7 +48,9 @@ export async function importDeck(
     throw error;
   });
   const cached = await findCachedCards(db, deck.entries);
-  const missing = attachCardData(deck.entries, cached).filter((entry) => !entry.card);
+  const missing = attachCardData(deck.entries, cached).filter(
+    (entry) => !isRequestedPrint(entry, entry.card),
+  );
   const { cards, notFound } = missing.length
     ? await fetchScryfallCollection(missing, { fetch: fetchFn })
     : { cards: [], notFound: [] };
@@ -98,10 +105,55 @@ export async function syncDeck(
     ).entries;
   }
   const cached = await findCachedCards(db, entries);
-  const missing = attachCardData(entries, cached).filter((entry) => !entry.card);
+  const missing = attachCardData(entries, cached).filter(
+    (entry) => !isRequestedPrint(entry, entry.card),
+  );
   const { cards, notFound } = missing.length
     ? await fetchScryfallCollection(missing, { fetch: fetchFn })
     : { cards: [], notFound: [] };
   const result = await syncDeckCards(db, { deckId: deck.id, userId: input.userId, entries, cards });
   return { ...result, notFound };
+}
+
+/** Falha de rede com o Scryfall vira erro de serviço externo (502), não erro interno. */
+async function scryfall<T>(task: () => Promise<T>): Promise<T> {
+  try {
+    return await task();
+  } catch (error) {
+    if (isDomainError(error)) throw error;
+    console.warn('[scryfall] indisponível', error);
+    throw new DomainError('upstream_error', 'Scryfall indisponível');
+  }
+}
+
+/** Uma impressão pelo id: cache local e, senão, o Scryfall. */
+export async function resolveCardById(db: Database, id: string, fetchFn: FetchLike = fetch) {
+  const cached = (await findCachedCards(db, [{ name: '', scryfallId: id }])).find(
+    (c) => c.scryfallId === id,
+  );
+  if (cached) return cached;
+  return scryfall(() => fetchScryfallCard(id, { fetch: fetchFn }));
+}
+
+/** Impressões de uma carta (escolha da edição no editor). */
+export const listCardPrints = (name: string, fetchFn: FetchLike = fetch) =>
+  scryfall(() => fetchScryfallPrints(name, { fetch: fetchFn }));
+
+/** Troca a edição de parte das cópias de uma linha do deck. */
+export async function changeLinePrint(
+  db: Database,
+  input: {
+    deckId: string;
+    userId: string;
+    board: DeckBoard;
+    name: string;
+    fromScryfallId: string | null;
+    toScryfallId: string;
+    quantity: number;
+  },
+  fetchFn: FetchLike = fetch,
+) {
+  const card = await resolveCardById(db, input.toScryfallId, fetchFn);
+  if (!card) throw new DomainError('not_found', 'Edição não encontrada no Scryfall');
+  return moveLinePrint(db, { ...input, card });
 }

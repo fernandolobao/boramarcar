@@ -52,6 +52,10 @@ export interface CardData {
   edhrecRank?: number | null;
   /** Funções pelo Scryfall Tagger (ramp, draw…). `null` = ainda não consultado. */
   roles?: string[] | null;
+  /** Edição desta impressão (ex.: `cmm`, "Commander Masters", `400`). */
+  setCode?: string | null;
+  setName?: string | null;
+  collectorNumber?: string | null;
 }
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;

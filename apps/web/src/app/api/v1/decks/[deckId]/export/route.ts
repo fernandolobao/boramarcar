@@ -12,7 +12,14 @@ const schema = z.object({
 export const GET = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
   const { format, download } = parseQuery(req, schema);
   const deck = await getDeck(db, { deckId: params.deckId, viewerId: user.id });
-  const text = exportDeckText(deck.lines, format);
+  const text = exportDeckText(
+    deck.lines.map((l) => ({
+      ...l,
+      setCode: l.card?.setCode,
+      collectorNumber: l.card?.collectorNumber,
+    })),
+    format,
+  );
   return new Response(text, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',

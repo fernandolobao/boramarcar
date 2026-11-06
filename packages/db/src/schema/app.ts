@@ -352,6 +352,10 @@ export const cards = pgTable(
     /** Funções do Scryfall Tagger (ramp, draw, …); `null` = ainda não consultado. */
     roles: text('roles').array(),
     rolesCheckedAt: timestamp('roles_checked_at', { withTimezone: true }),
+    /** Edição desta impressão. */
+    setCode: text('set_code'),
+    setName: text('set_name'),
+    collectorNumber: text('collector_number'),
     updatedAt: updatedAt(),
   },
   (t) => [index('cards_name_idx').on(sql`lower(${t.name})`)],
@@ -373,6 +377,13 @@ export const deckCards = pgTable(
   },
   (t) => [
     index('deck_cards_deck_idx').on(t.deckId),
-    uniqueIndex('deck_cards_unique_idx').on(t.deckId, t.board, t.cardName, t.isProxy),
+    // Uma linha por carta, edição (impressão) e status de proxy em cada board.
+    uniqueIndex('deck_cards_unique_idx').on(
+      t.deckId,
+      t.board,
+      t.cardName,
+      sql`coalesce(${t.scryfallId}, '')`,
+      t.isProxy,
+    ),
   ],
 );
