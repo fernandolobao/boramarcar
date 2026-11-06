@@ -1,3 +1,4 @@
+import { isGameFormat } from '@boramarcar/core';
 import { listLocations, listMembers } from '@boramarcar/db';
 import { getTranslations } from 'next-intl/server';
 import {
@@ -6,6 +7,7 @@ import {
   LocationForm,
   SwitchGroupButton,
 } from '@/components/group-forms';
+import { GroupSettingsForm } from '@/components/group-settings-form';
 import { RegenerateInviteButton } from '@/components/invite';
 import { MemberActions } from '@/components/member-actions';
 import { ShareButtons } from '@/components/share-buttons';
@@ -22,6 +24,7 @@ export default async function GroupPage() {
   const user = await requireUser();
   const { active, groups } = await getActiveGroup(user.id);
   const t = await getTranslations('group');
+  const tg = await getTranslations('groupSettings');
   const db = getDb();
   const [members, locations] = active
     ? await Promise.all([listMembers(db, active.id), listLocations(db, active.id)])
@@ -126,6 +129,25 @@ export default async function GroupPage() {
               ))}
             </ul>
             <LocationForm groupId={active.id} />
+          </section>
+          <section className="card md:col-span-2" aria-labelledby="group-settings-title">
+            <h2 id="group-settings-title" className="section-title">
+              {tg('title')}
+            </h2>
+            <GroupSettingsForm
+              groupId={active.id}
+              canEdit={active.role !== 'member'}
+              settings={{
+                tableSize: active.tableSize,
+                minDurationMinutes: active.minDurationMinutes,
+                pointsWin: active.pointsWin,
+                pointsDraw: active.pointsDraw,
+                pointsLoss: active.pointsLoss,
+                defaultFormat: isGameFormat(active.defaultFormat)
+                  ? active.defaultFormat
+                  : 'commander',
+              }}
+            />
           </section>
         </div>
       ) : (

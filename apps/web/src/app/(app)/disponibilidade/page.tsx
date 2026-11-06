@@ -1,4 +1,4 @@
-import { buildWeekGrid, DEFAULT_MIN_PLAYERS, weekStartFor } from '@boramarcar/core/availability';
+import { buildWeekGrid, weekStartFor } from '@boramarcar/core/availability';
 import { zonedLocalToUtc } from '@boramarcar/core/time';
 import {
   listAvailability,
@@ -157,7 +157,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
           groupId={group.id}
           grid={grid}
           members={members.map((m) => ({ userId: m.userId, name: m.name }))}
-          minPlayers={DEFAULT_MIN_PLAYERS}
+          minPlayers={group.tableSize}
         />
       </section>
 

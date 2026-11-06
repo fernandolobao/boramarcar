@@ -46,25 +46,26 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 1.9  | Editar/cancelar encontro; marcar como finalizado; reabrir                                                      | P       | ✅                                     |
 | 1.10 | Gerenciar membros: promover/rebaixar admin, remover, sair do grupo, transferir posse                           | M       | ✅ (regenerar convite já feito em 1.6) |
 | 1.11 | **Fuso horário por usuário** (detectado no navegador, editável no perfil)                                      | P       | ✅                                     |
-| 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                                    | P       |                                        |
+| 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                                    | P       | ✅ (2–8 jogadores)                     |
 | 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push)                | M       | ✅ (e-mail; push em 5.5)               |
 | 1.14 | Compartilhar encontro no WhatsApp (link + texto) e exportar `.ics`                                             | P       | ✅                                     |
 | 1.15 | Página de perfil (nome, foto, idioma)                                                                          | P       | parcial (fuso e idioma)                |
 
 ## Fase 2 — Partidas e ranking
 
-| #    | Item                                                                                                                      | Tamanho | Status                         |
-| ---- | ------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------ |
-| 2.1  | Registrar partidas do encontro (vencedor/empate, assento, deck)                                                           | M       | ✅                             |
-| 2.2  | Ranking do grupo (V/D/E, pontos, % vitórias)                                                                              | M       | ✅                             |
-| 2.3  | Visualizar partidas do encontro com vencedor                                                                              | P       | ✅                             |
-| 2.4  | **Mostrar o deck usado** por cada jogador na partida (UI de destaque, imagem do comandante)                               | P       | parcial (registro e nome)      |
-| 2.5  | Editar partida (hoje: remover e registrar de novo)                                                                        | P       |                                |
-| 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                     | M       | parcial (API aceita `from/to`) |
-| 2.7  | Tabela de pontos configurável por grupo                                                                                   | P       |                                |
-| 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória" | G       |                                |
-| 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                            | M       |                                |
-| 2.10 | Histórico de encontros com busca                                                                                          | P       |                                |
+| #    | Item                                                                                                                                                                                                                        | Tamanho | Status                         |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------ |
+| 2.1  | Registrar partidas do encontro (vencedor/empate, assento, deck)                                                                                                                                                             | M       | ✅                             |
+| 2.2  | Ranking do grupo (V/D/E, pontos, % vitórias)                                                                                                                                                                                | M       | ✅                             |
+| 2.3  | Visualizar partidas do encontro com vencedor                                                                                                                                                                                | P       | ✅                             |
+| 2.4  | **Mostrar o deck usado** por cada jogador na partida (UI de destaque, imagem do comandante)                                                                                                                                 | P       | ✅                             |
+| 2.5  | Editar partida (hoje: remover e registrar de novo)                                                                                                                                                                          | P       | ✅                             |
+| 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                                                                                                                       | M       | parcial (API aceita `from/to`) |
+| 2.7  | Tabela de pontos configurável por grupo                                                                                                                                                                                     | P       | ✅                             |
+| 2.11 | **Tipo de jogo por partida** (Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado, Outro): regras de jogadores, times e vencedor; ranking filtrável por tipo | M       | ✅                             |
+| 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       |                                |
+| 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       |                                |
+| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |                                |
 
 ## Fase 3 — Decks e coleção
 

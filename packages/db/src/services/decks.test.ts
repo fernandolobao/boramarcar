@@ -157,7 +157,7 @@ describe('decks', () => {
     const saved = await saveImportedDeck(db, { ownerId: owner!.id, deck, cards: cardsData });
 
     expect(await listDecksForUsers(db, [owner!.id, friend!.id])).toEqual([
-      { id: saved.id, name: 'Omnath Ramp', ownerId: owner!.id },
+      { id: saved.id, name: 'Omnath Ramp', ownerId: owner!.id, format: 'commander' },
     ]);
     expect(await listDecksForUsers(db, [])).toEqual([]);
     await expect(getDeck(db, { deckId: saved.id, viewerId: friend!.id })).resolves.toMatchObject({

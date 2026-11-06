@@ -1,9 +1,19 @@
 import type { Metadata } from 'next';
-import { getEventDetail, listDecksForUsers, listLocations, listMembers } from '@boramarcar/db';
+import {
+  getEventDetail,
+  getGroupSettings,
+  listDecksForUsers,
+  listLocations,
+  listMembers,
+} from '@boramarcar/db';
+import { formatRules, isGameFormat } from '@boramarcar/core';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
-import { RecordGameForm, RsvpButtons } from '@/components/event-forms';
+import { RsvpButtons } from '@/components/event-forms';
+import { GameEditor } from '@/components/game-editor';
+import { GameForm } from '@/components/game-form';
+import { GamePlayers } from '@/components/game-players';
 import { EventManage, EventStatusBadge } from '@/components/event-manage';
 import { ShareButtons } from '@/components/share-buttons';
 import { requireUser } from '@/server/current-user';
@@ -32,10 +42,11 @@ export default async function EventPage({ params }: Props) {
       throw error;
     },
   );
-  const [members, locations, shareText] = await Promise.all([
+  const [members, locations, shareText, settings] = await Promise.all([
     listMembers(db, event.groupId),
     listLocations(db, event.groupId),
     buildEventShareText(event),
+    getGroupSettings(db, { groupId: event.groupId, userId: user.id }),
   ]);
   const decks = await listDecksForUsers(
     db,
@@ -43,6 +54,7 @@ export default async function EventPage({ params }: Props) {
   );
   const t = await getTranslations('events');
   const tc = await getTranslations('common');
+  const tf = await getTranslations('formats');
   const format = await getFormatter();
 
   const me = event.participants.find((p) => p.userId === user.id);
@@ -112,35 +124,71 @@ export default async function EventPage({ params }: Props) {
           <p className="muted">{t('noGames')}</p>
         ) : (
           <ol className="space-y-4">
-            {event.games.map((game) => (
-              <li
-                key={game.id}
-                className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="font-medium">
-                    {t('game', { number: game.number })} ·{' '}
-                    {game.winner ? t('winner', { name: game.winner.name }) : t('draw')}
-                  </p>
-                  <DeleteButton
-                    path={`/api/v1/games/${game.id}`}
-                    label={t('removeGame', { number: game.number })}
+            {event.games.map((game) => {
+              const format = isGameFormat(game.format) ? game.format : 'other';
+              const summary = [
+                game.firstPlayerName && t('firstSummary', { name: game.firstPlayerName }),
+                game.winningTurn && t('turnSummary', { turn: game.winningTurn }),
+                game.durationMinutes && t('durationSummary', { minutes: game.durationMinutes }),
+              ].filter(Boolean);
+              return (
+                <li
+                  key={game.id}
+                  className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold">
+                        {t('game', { number: game.number })}{' '}
+                        <span className="ms-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                          {tf(format)}
+                        </span>
+                      </h3>
+                      <p className="mt-0.5 text-sm">
+                        {game.isDraw
+                          ? t('draw')
+                          : game.winners.length === 1
+                            ? t('winner', { name: game.winners[0]!.name })
+                            : t('winners', { names: game.winners.map((w) => w.name).join(', ') })}
+                      </p>
+                      {summary.length > 0 && <p className="muted text-sm">{summary.join(' · ')}</p>}
+                    </div>
+                    {game.canEdit && (
+                      <DeleteButton
+                        path={`/api/v1/games/${game.id}`}
+                        label={t('removeGame', { number: game.number })}
+                      />
+                    )}
+                  </div>
+                  <GamePlayers
+                    players={game.players}
+                    showTeams={formatRules(format).structure === 'teams'}
                   />
-                </div>
-                <ul className="mt-2 grid gap-1 text-sm sm:grid-cols-2">
-                  {game.players.map((p) => (
-                    <li key={p.userId}>
-                      <span className={p.result === 'win' ? 'font-semibold' : ''}>{p.name}</span>{' '}
-                      <span className="muted">
-                        · {t(`result.${p.result}`)}
-                        {p.deckName && ` · ${p.deckName}`}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                {game.notes && <p className="muted mt-2">{game.notes}</p>}
-              </li>
-            ))}
+                  {game.notes && <p className="muted mt-2 text-sm">{game.notes}</p>}
+                  {game.canEdit && (
+                    <GameEditor
+                      gameId={game.id}
+                      number={game.number}
+                      players={players}
+                      initial={{
+                        format,
+                        firstPlayerId: game.firstPlayerId,
+                        winningTurn: game.winningTurn,
+                        durationMinutes: game.durationMinutes,
+                        notes: game.notes,
+                        players: game.players.map((p) => ({
+                          userId: p.userId,
+                          result: p.result,
+                          deckId: p.deckId,
+                          team: p.team,
+                          eliminatedOrder: p.eliminatedOrder,
+                        })),
+                      }}
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ol>
         )}
       </section>
@@ -148,7 +196,7 @@ export default async function EventPage({ params }: Props) {
       {event.status !== 'cancelled' && (
         <section className="card">
           <h2 className="section-title">{t('recordGame')}</h2>
-          <RecordGameForm eventId={event.id} players={players} />
+          <GameForm eventId={event.id} players={players} defaultFormat={settings.defaultFormat} />
         </section>
       )}
 

@@ -7,13 +7,14 @@ const DAY = 24 * 60 * 60 * 1000;
 const schema = z.object({
   from: isoDate.optional(),
   to: isoDate.optional(),
-  minPlayers: z.coerce.number().int().min(2).max(8).default(4),
+  // Sem valores, vale a configuração do grupo.
+  minPlayers: z.coerce.number().int().min(2).max(8).optional(),
   minDurationMinutes: z.coerce
     .number()
     .int()
     .min(30)
     .max(24 * 60)
-    .default(120),
+    .optional(),
 });
 
 export const GET = authed<{ groupId: string }>(async ({ req, db, user, params }) => {
