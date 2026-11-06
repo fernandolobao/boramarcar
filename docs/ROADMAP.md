@@ -49,7 +49,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                                    | P       | ✅ (2–8 jogadores)                     |
 | 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push)                | M       | ✅ (e-mail; push em 5.5)               |
 | 1.14 | Compartilhar encontro no WhatsApp (link + texto) e exportar `.ics`                                             | P       | ✅                                     |
-| 1.15 | Página de perfil (nome, foto, idioma)                                                                          | P       | parcial (fuso e idioma)                |
+| 1.15 | Página de perfil (nome, foto, idioma)                                                                          | P       | ✅ (perfil + configurações)            |
 
 ## Fase 2 — Partidas e ranking
 
@@ -63,6 +63,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                                                                                                                       | M       | ✅     |
 | 2.7  | Tabela de pontos configurável por grupo                                                                                                                                                                                     | P       | ✅     |
 | 2.11 | **Tipo de jogo por partida** (Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado, Outro): regras de jogadores, times e vencedor; ranking filtrável por tipo | M       | ✅     |
+| 2.12 | **Conquistas**: selos no perfil (primeira vitória, sequências, deck favorito, "rei da mesa" na temporada…)                                                                                                                  | M       |        |
 | 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       | ✅     |
 | 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       | ✅     |
 | 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |        |

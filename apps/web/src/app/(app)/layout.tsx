@@ -4,8 +4,8 @@ import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getUserPreferences } from '@boramarcar/db';
 import { cookies } from 'next/headers';
-import { SignOutButton } from '@/components/auth-buttons';
 import { TimeZoneSync } from '@/components/time-zone-sync';
+import { UserMenu } from '@/components/user-menu';
 import { TIME_ZONE_COOKIE } from '@/i18n/config';
 import { getActiveGroup } from '@/server/active-group';
 import { requireUser } from '@/server/current-user';
@@ -28,7 +28,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     { href: '/ranking', label: t('ranking'), icon: 'ranking' as const },
     { href: '/decks', label: t('decks'), icon: 'decks' as const },
     { href: '/grupo', label: t('group'), icon: 'group' as const },
-    { href: '/perfil', label: t('profile'), icon: 'profile' as const },
   ];
 
   return (
@@ -38,15 +37,21 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}
       />
       <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-          <Link href="/painel" className="font-semibold">
-            {tc('appName')}
-            {active && <span className="muted ml-2 font-normal">· {active.name}</span>}
+        {/* Linha 1: marca + grupo ativo e menu da conta. Linha 2: navegação (rola no celular).
+            Assim nada quebra com nomes de grupo longos nem com idiomas de rótulos maiores. */}
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 pt-3">
+          <Link href="/painel" className="min-w-0 rounded-lg leading-tight">
+            <span className="block font-semibold">{tc('appName')}</span>
+            {active && (
+              <span className="muted block max-w-[60vw] truncate text-sm sm:max-w-md">
+                {active.name}
+              </span>
+            )}
           </Link>
+          <UserMenu name={user.name} email={user.email} image={user.image ?? null} />
+        </div>
+        <div className="mx-auto max-w-5xl px-4 pt-2 pb-1">
           <NavLinks label={t('label')} links={links} />
-          <div className="ml-auto">
-            <SignOutButton />
-          </div>
         </div>
       </header>
       <main

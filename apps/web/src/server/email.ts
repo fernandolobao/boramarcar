@@ -96,7 +96,7 @@ function render(layout: Layout): Pick<EmailMessage, 'subject' | 'html' | 'text'>
   return { subject: layout.subject, html, text };
 }
 
-const profileUrl = () => `${getBaseUrl()}/perfil`;
+const profileUrl = () => `${getBaseUrl()}/configuracoes`;
 
 /** E-mail de encontro (novo, alterado, cancelado ou lembrete) no idioma e fuso de quem recebe. */
 export function buildEventEmail(recipient: EmailRecipient, data: EventEmailData): EmailMessage {

@@ -24,7 +24,10 @@
     "decks": "Decks",
     "group": "Grupo",
     "profile": "Perfil",
-    "label": "Navegação principal"
+    "label": "Navegação principal",
+    "settings": "Configurações",
+    "userMenu": "Menu da conta",
+    "signedInAs": "Conectado como"
   },
   "landing": {
     "title": "Chega de enquete no grupo do WhatsApp.",
@@ -81,7 +84,8 @@
     "leaveOwnerHint": "Como dono(a), passe a posse para outra pessoa antes de sair.",
     "leaveLastHint": "Você é a única pessoa no grupo: sair apaga o grupo.",
     "you": "você",
-    "memberActions": "Ações para {name}"
+    "memberActions": "Ações para {name}",
+    "manage": "Gerenciar"
   },
   "availability": {
     "title": "Disponibilidade",
@@ -474,7 +478,7 @@
     "confirmed": "Confirmados ({count}): {names}",
     "openEvent": "Abrir o encontro",
     "calendarHint": "O arquivo .ics anexo adiciona (ou atualiza) o encontro na sua agenda.",
-    "footer": "Você recebe este e-mail porque participa de {group} no Bora Marcar. Para não receber mais avisos, desative-os no seu perfil: {url}"
+    "footer": "Você recebe este e-mail porque participa de {group} no Bora Marcar. Para não receber mais avisos, desative-os nas configurações: {url}"
   },
   "formats": {
     "commander": "Commander",
@@ -504,5 +508,22 @@
     "pointsDraw": "Empate",
     "pointsLoss": "Derrota",
     "saved": "Configurações salvas."
+  },
+  "settings": {
+    "title": "Configurações",
+    "intro": "Fuso horário, idioma e avisos por e-mail."
+  },
+  "profilePage": {
+    "title": "Perfil",
+    "memberSince": "No Bora Marcar desde {date}",
+    "groups": "{count, plural, =1 {1 grupo} other {# grupos}}",
+    "summary": "Resumo",
+    "games": "Partidas",
+    "wins": "Vitórias",
+    "winRate": "% de vitórias",
+    "decks": "Decks",
+    "achievements": "Conquistas",
+    "achievementsSoon": "Em breve: selos por conquistas como primeira vitória, sequências e decks favoritos.",
+    "editSettings": "Abrir configurações"
   }
 }

@@ -110,7 +110,7 @@ describe('e-mails de encontros', () => {
     expect(toCaio!.html).toContain('Mesa &lt;Commander&gt;');
     expect(toCaio!.html).not.toContain('<Commander>');
     expect(toCaio!.html).toContain('<html lang="pt-BR">');
-    expect(toCaio!.text).toContain('/perfil');
+    expect(toCaio!.text).toContain('/configuracoes');
     const ics = Buffer.from(toCaio!.attachments![0]!.content, 'base64').toString('utf8');
     expect(toCaio!.attachments![0]!.filename).toBe('commander-pizza.ics');
     expect(ics).toContain(`UID:${eventId}@boramarcar`);

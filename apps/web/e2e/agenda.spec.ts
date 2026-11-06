@@ -40,19 +40,27 @@ test.describe('agenda', () => {
 
   test('membros: dono vê ações e não pode sair sem transferir', async ({ page }) => {
     await page.goto('/grupo');
+    // Ações ficam recolhidas atrás de "Gerenciar", abaixo do nome.
+    const manageBia = page.getByRole('button', { name: 'Gerenciar (Bia)' });
+    await expect(manageBia).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.getByRole('group', { name: 'Ações para Bia' })).toBeHidden();
+    await manageBia.click();
+    await expect(manageBia).toHaveAttribute('aria-expanded', 'true');
     await expect(page.getByRole('group', { name: 'Ações para Bia' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Gerenciar (Ana Teste)' }).click();
     await expect(page.getByRole('button', { name: 'Sair do grupo (Ana Teste)' })).toBeDisabled();
     await expect(
       page.getByText('Como dono(a), passe a posse para outra pessoa antes de sair.'),
     ).toBeVisible();
   });
 
-  test('perfil: avisos por e-mail podem ser desligados e religados pelo teclado', async ({
+  test('configurações: avisos por e-mail podem ser desligados e religados pelo teclado', async ({
     page,
   }) => {
     // Muda dados do usuário compartilhado: roda em um projeto só, para não disputar com o outro.
     test.skip(test.info().project.name !== 'chromium', 'só no desktop');
-    await page.goto('/perfil');
+    await page.goto('/configuracoes');
     const toggle = page.getByRole('checkbox', { name: 'Receber avisos por e-mail' });
     await expect(toggle).toBeChecked();
     await expect(toggle).toHaveAccessibleDescription(/Novos encontros/);

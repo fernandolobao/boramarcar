@@ -1,7 +1,7 @@
 import { assertTimeZone, DEFAULT_TIME_ZONE, DomainError } from '@boramarcar/core';
-import { eq } from 'drizzle-orm';
+import { asc, count, eq, sql } from 'drizzle-orm';
 import type { Database } from '../client';
-import { user } from '../schema';
+import { decks, gamePlayers, groupMembers, groups, user } from '../schema';
 
 export async function getUserPreferences(db: Database, userId: string) {
   const [row] = await db
@@ -46,4 +46,40 @@ export async function updateUserPreferences(
     });
   if (!row) throw new DomainError('not_found', 'Usuário não encontrado');
   return row;
+}
+
+/** Resumo do perfil: desde quando usa o app, grupos, partidas, vitórias e decks (em todos os grupos). */
+export async function getUserSummary(db: Database, userId: string) {
+  const [row] = await db
+    .select({ createdAt: user.createdAt })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+  if (!row) throw new DomainError('not_found', 'Usuário não encontrado');
+  const [[games], [deckCount], userGroups] = await Promise.all([
+    db
+      .select({
+        games: count(),
+        wins: sql<number>`count(*) filter (where ${gamePlayers.result} = 'win')`.mapWith(Number),
+      })
+      .from(gamePlayers)
+      .where(eq(gamePlayers.userId, userId)),
+    db.select({ value: count() }).from(decks).where(eq(decks.ownerId, userId)),
+    db
+      .select({ id: groups.id, name: groups.name, role: groupMembers.role })
+      .from(groupMembers)
+      .innerJoin(groups, eq(groups.id, groupMembers.groupId))
+      .where(eq(groupMembers.userId, userId))
+      .orderBy(asc(groups.name)),
+  ]);
+  const played = games?.games ?? 0;
+  const wins = games?.wins ?? 0;
+  return {
+    memberSince: row.createdAt,
+    games: played,
+    wins,
+    winRate: played ? wins / played : 0,
+    decks: deckCount?.value ?? 0,
+    groups: userGroups,
+  };
 }

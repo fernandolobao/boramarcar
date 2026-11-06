@@ -92,6 +92,13 @@ sem rolagem horizontal em 320px.
 - **Modo visual**: cada carta é um botão "Ampliar {carta}" que abre `<dialog>` nativo (`showModal`: foco preso, Esc fecha, foco volta ao botão). Selos de quantidade e proxy ficam fora do botão para o nome acessível bater com o conteúdo (axe `label-content-name-mismatch`, WCAG 2.5.3) e a informação também aparece em texto abaixo da imagem.
 - **Responsivo**: 2 colunas no celular, 3–4 no iPad, até 6 no desktop; sem rolagem horizontal em 320px. Animações de hover com `motion-reduce:`.
 
+### Revisão: cabeçalho, menu da conta e membros
+
+- **Cabeçalho em duas linhas**: marca com o grupo ativo embaixo (truncado com reticências) e menu da conta na primeira; navegação na segunda (rola horizontalmente no celular). Não quebra com nomes de grupo longos nem com rótulos maiores em inglês (testado em E2E).
+- **Menu da conta**: padrão _disclosure_ de navegação (botão com `aria-expanded`/`aria-controls` e lista de links), não `role="menu"`, porque os itens são links comuns. Esc fecha e devolve o foco ao botão; clique fora e troca de página também fecham. Nome do botão começa pelo texto visível ("Ana (Menu da conta)").
+- **Perfil x Configurações**: "Perfil" mostra dados e resumo do usuário (e futuramente conquistas); fuso, idioma e avisos por e-mail ficam em "Configurações". O link de descadastro dos e-mails aponta para Configurações.
+- **Membros do grupo**: ações recolhidas atrás de "Gerenciar (Nome)" (disclosure), abertas numa faixa própria abaixo do nome — os botões não disputam espaço com o nome nem desalinham a lista.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

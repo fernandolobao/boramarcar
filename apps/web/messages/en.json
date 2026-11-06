@@ -24,7 +24,10 @@
     "decks": "Decks",
     "group": "Group",
     "profile": "Profile",
-    "label": "Main navigation"
+    "label": "Main navigation",
+    "settings": "Settings",
+    "userMenu": "Account menu",
+    "signedInAs": "Signed in as"
   },
   "landing": {
     "title": "No more polls in the group chat.",
@@ -81,7 +84,8 @@
     "leaveOwnerHint": "As the owner, transfer ownership to someone else before leaving.",
     "leaveLastHint": "You are the only member: leaving deletes the group.",
     "you": "you",
-    "memberActions": "Actions for {name}"
+    "memberActions": "Actions for {name}",
+    "manage": "Manage"
   },
   "availability": {
     "title": "Availability",
@@ -474,7 +478,7 @@
     "confirmed": "Confirmed ({count}): {names}",
     "openEvent": "Open the game night",
     "calendarHint": "The attached .ics file adds (or updates) the game night in your calendar.",
-    "footer": "You're getting this email because you're in {group} on Bora Marcar. To stop these notices, turn them off in your profile: {url}"
+    "footer": "You're getting this email because you're in {group} on Bora Marcar. To stop these notices, turn them off in your settings: {url}"
   },
   "formats": {
     "commander": "Commander",
@@ -504,5 +508,22 @@
     "pointsDraw": "Draw",
     "pointsLoss": "Loss",
     "saved": "Settings saved."
+  },
+  "settings": {
+    "title": "Settings",
+    "intro": "Time zone, language and email notices."
+  },
+  "profilePage": {
+    "title": "Profile",
+    "memberSince": "On Bora Marcar since {date}",
+    "groups": "{count, plural, =1 {1 group} other {# groups}}",
+    "summary": "Summary",
+    "games": "Games",
+    "wins": "Wins",
+    "winRate": "Win rate",
+    "decks": "Decks",
+    "achievements": "Achievements",
+    "achievementsSoon": "Coming soon: badges for achievements like first win, streaks and favorite decks.",
+    "editSettings": "Open settings"
   }
 }
