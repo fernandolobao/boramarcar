@@ -106,6 +106,12 @@ sem rolagem horizontal em 320px.
 - Os seletores do Mana Font foram prefixados com `.ms` (ex.: `.ms.ms-1`) porque `ms-1`, `ms-2`… também são utilitários do Tailwind (margem): sem isso, um `ms-1` comum ganhava um glifo e mudava o nome acessível de títulos — pego pelo teste E2E.
 - A barra de símbolos agora usa `flex-grow` proporcional (antes, larguras em % podiam esconder a última cor).
 
+### Revisão: editor de deck
+
+- **Busca de cartas**: padrão ARIA 1.2 _combobox_ com `listbox` (`aria-expanded`, `aria-controls`, `aria-activedescendant`); setas navegam, Enter escolhe, Esc fecha; instrução em `aria-describedby` e quantidade de sugestões anunciada numa região `aria-live`. Clique na sugestão usa `mousedown` para não perder a escolha no `blur`.
+- **Modo Editar** (só o dono, terceiro botão com `aria-pressed`): tabela com cabeçalhos visíveis; cada campo tem nome com contexto ("Quantidade de Forest", "Proxies de Forest"); salva ao sair do campo ou com Enter e confirma numa região `role="status"` sempre presente. Remover usa confirmação em dois cliques; no celular o botão mostra só o ícone, com o texto para leitores de tela.
+- **Exportar/atualizar**: botões com texto, resultado em `role="status"`, lista colada num `<details>` com instrução ligada ao campo.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

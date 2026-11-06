@@ -195,6 +195,10 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | `GET/POST`     | `/api/v1/groups/:groupId/seasons`               | Temporadas do ranking (criar: dono/admin)                                |
 | `DELETE`       | `/api/v1/seasons/:seasonId`                     | Remover temporada                                                        |
 | `PATCH`        | `/api/v1/decks/:deckId`                         | Renomear deck ou mudar o tipo de jogo (dono)                             |
+| `PUT`          | `/api/v1/decks/:deckId/lines`                   | Editor: quantidade e proxies de uma carta num board (0 remove)           |
+| `POST`         | `/api/v1/decks/:deckId/sync`                    | Atualizar pela origem ou por lista colada (`{text?}`), mantendo proxies  |
+| `GET`          | `/api/v1/decks/:deckId/export`                  | Lista em texto (`?format=plain\|proxies&download=1`)                     |
+| `GET`          | `/api/v1/cards/autocomplete`                    | Sugestões de nomes de carta (Scryfall, `?q=`)                            |
 | `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
 | `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                               |
 | `PATCH`        | `/api/v1/decks/:deckId/cards/:cardId`           | Marcar proxy (`{isProxy}`)                                               |

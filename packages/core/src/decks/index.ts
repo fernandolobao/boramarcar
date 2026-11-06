@@ -6,3 +6,4 @@ export * from './importers/moxfield';
 export * from './scryfall';
 export * from './import';
 export * from './presentation';
+export * from './editing';

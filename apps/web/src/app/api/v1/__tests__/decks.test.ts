@@ -8,6 +8,10 @@ vi.mock('@/server/db', () => dbMock);
 const decks = await import('../decks/route');
 const deck = await import('../decks/[deckId]/route');
 const deckCard = await import('../decks/[deckId]/cards/[cardId]/route');
+const lines = await import('../decks/[deckId]/lines/route');
+const sync = await import('../decks/[deckId]/sync/route');
+const exportRoute = await import('../decks/[deckId]/export/route');
+const autocomplete = await import('../cards/autocomplete/route');
 
 let close: () => Promise<void>;
 
@@ -71,6 +75,9 @@ function stubExternalApis() {
           ),
         not_found: identifiers.filter((i) => i.name === 'Carta Fantasma'),
       });
+    }
+    if (url.startsWith('https://api.scryfall.com/cards/autocomplete')) {
+      return Response.json({ data: ['Sol Ring', 'Solemn Simulacrum'] });
     }
     return new Response('not found', { status: 404 });
   });
@@ -193,5 +200,80 @@ describe('API v1 — decks', () => {
     });
     expect(res.status).toBe(201);
     expect(res.body!.deck.name).toBe('Do Arena');
+  });
+
+  it('edita cartas, exporta, sincroniza com a origem e sugere nomes', async () => {
+    const owner = await createTestUser(testState.db!, { name: 'Editor' });
+    asUser(owner);
+    stubExternalApis();
+    const imported = await call(decks.POST, {
+      method: 'POST',
+      body: { kind: 'url', url: 'https://archidekt.com/decks/42/omnath' },
+    });
+    const deckId = imported.body!.deck.id as string;
+
+    const put = (body: unknown) => call(lines.PUT, { method: 'PUT', params: { deckId }, body });
+    expect(
+      (await put({ name: 'Forest', board: 'mainboard', quantity: 30, proxies: 4 })).body,
+    ).toMatchObject({
+      found: true,
+    });
+    const ghost = await put({
+      name: 'Carta Fantasma',
+      board: 'sideboard',
+      quantity: 1,
+      proxies: 0,
+    });
+    expect(ghost.body).toMatchObject({ found: false, line: { name: 'Carta Fantasma' } });
+    expect(
+      (await put({ name: 'Sol Ring', board: 'mainboard', quantity: 2, proxies: 3 })).status,
+    ).toBe(400);
+
+    const plain = await exportRoute.GET(new Request('http://localhost/'), {
+      params: Promise.resolve({ deckId }),
+    });
+    expect(plain.headers.get('content-type')).toContain('text/plain');
+    expect(plain.headers.get('content-disposition')).toBeNull();
+    expect(await plain.text()).toContain('30 Forest');
+    const exported = await exportRoute.GET(
+      new Request(`http://localhost/?format=proxies&download=1`),
+      { params: Promise.resolve({ deckId }) },
+    );
+    expect(exported.headers.get('content-disposition')).toBe(
+      'attachment; filename="omnath-ramp.txt"',
+    );
+    expect(await exported.text()).toBe(
+      'Commander\n1 Omnath, Locus of Mana\n\nDeck\n26 Forest\n4 Forest #proxy\n1 Sol Ring\n\nSideboard\n1 Carta Fantasma\n',
+    );
+
+    // Sincroniza pela origem (Archidekt): Carta Fantasma sai; proxies de Forest ficam.
+    const synced = await call(sync.POST, { method: 'POST', params: { deckId }, body: {} });
+    expect(synced.body).toMatchObject({ removed: ['Carta Fantasma'], added: [], changed: [] });
+    const detail = await call(deck.GET, { params: { deckId } });
+    expect(
+      detail.body!.deck.lines.find((l: { name: string }) => l.name === 'Forest'),
+    ).toMatchObject({ quantity: 30, proxies: 4 });
+
+    // Lista colada (ex.: Moxfield bloqueado).
+    const pasted = await call(sync.POST, {
+      method: 'POST',
+      params: { deckId },
+      body: { text: 'Commander\n1 Omnath, Locus of Mana\n\nDeck\n10 Forest' },
+    });
+    expect(pasted.body).toMatchObject({ removed: ['Sol Ring'], changed: ['Forest'] });
+
+    const outsider = await createTestUser(testState.db!, { name: 'Fora' });
+    asUser(outsider);
+    expect(
+      (await put({ name: 'Forest', board: 'mainboard', quantity: 1, proxies: 0 })).status,
+    ).toBe(403);
+    expect((await call(sync.POST, { method: 'POST', params: { deckId }, body: {} })).status).toBe(
+      403,
+    );
+
+    asUser(owner);
+    const suggestions = await call(autocomplete.GET, { path: '/?q=sol' });
+    expect(suggestions.body).toEqual({ names: ['Sol Ring', 'Solemn Simulacrum'] });
+    expect((await call(autocomplete.GET, { path: '/?q=s' })).body).toEqual({ names: [] });
   });
 });

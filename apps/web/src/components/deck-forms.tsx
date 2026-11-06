@@ -167,33 +167,3 @@ export function DeckImportForm() {
     </form>
   );
 }
-
-export function ProxyToggle({
-  deckId,
-  cardId,
-  isProxy,
-  label,
-}: {
-  deckId: string;
-  cardId: string;
-  isProxy: boolean;
-  label: string;
-}) {
-  const { run, pending } = useApiAction();
-  return (
-    <input
-      type="checkbox"
-      aria-label={label}
-      checked={isProxy}
-      disabled={pending}
-      onChange={(e) =>
-        void run(() =>
-          api(`/api/v1/decks/${deckId}/cards/${cardId}`, {
-            method: 'PATCH',
-            body: { isProxy: e.target.checked },
-          }),
-        )
-      }
-    />
-  );
-}

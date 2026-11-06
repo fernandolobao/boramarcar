@@ -225,3 +225,116 @@ describe('editar deck', () => {
     expect((await listDecks(db, owner.id))[0]).toMatchObject({ name: 'Omnath 2', format: 'brawl' });
   });
 });
+
+describe('editor e sincronização', () => {
+  it('define quantidades e proxies por carta, remove com 0 e só o dono edita', async () => {
+    const { setDeckLine, findCachedCardByName } = await import('./decks');
+    const owner = await createTestUser(db);
+    const other = await createTestUser(db);
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'forest',
+      quantity: 10,
+      proxies: 3,
+      card: cardsData[2],
+    });
+    let detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.lines.find((l) => l.name === 'Forest')).toMatchObject({
+      quantity: 10,
+      proxies: 3,
+    });
+    expect(
+      detail.entries.filter((e) => e.name === 'Forest').map((e) => [e.quantity, e.isProxy]),
+    ).toEqual(
+      expect.arrayContaining([
+        [7, false],
+        [3, true],
+      ]),
+    );
+
+    // Carta nova pelo nome (sem dados do Scryfall) e remoção com quantidade 0.
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'sideboard',
+      name: 'Nova',
+      quantity: 2,
+      proxies: 0,
+    });
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      quantity: 0,
+      proxies: 0,
+    });
+    detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.lines.map((l) => `${l.board}:${l.name}:${l.quantity}`).sort()).toEqual(
+      [
+        'commander:Omnath, Locus of Mana:1',
+        'mainboard:Forest:10',
+        'mainboard:Carta Inventada:1',
+        'sideboard:Nova:2',
+      ].sort(),
+    );
+
+    await expect(
+      setDeckLine(db, {
+        deckId: saved.id,
+        userId: other.id,
+        board: 'mainboard',
+        name: 'X',
+        quantity: 1,
+        proxies: 0,
+      }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await expect(
+      setDeckLine(db, {
+        deckId: saved.id,
+        userId: owner.id,
+        board: 'mainboard',
+        name: 'X',
+        quantity: 1,
+        proxies: 2,
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    expect(await findCachedCardByName(db, 'SOL RING')).toMatchObject({ scryfallId: 'sol' });
+    expect(await findCachedCardByName(db, 'nada')).toBeNull();
+  });
+
+  it('sincroniza com a lista nova mantendo proxies', async () => {
+    const { syncDeckCards } = await import('./decks');
+    const owner = await createTestUser(db);
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+    const result = await syncDeckCards(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      cards: [],
+      entries: [
+        { name: 'Omnath, Locus of Mana', quantity: 1, board: 'commander' },
+        { name: 'Forest', quantity: 20, board: 'mainboard' },
+        { name: 'Carta Inventada', quantity: 2, board: 'mainboard' },
+      ],
+    });
+    expect(result).toEqual({
+      added: [],
+      removed: ['Sol Ring'],
+      changed: ['Forest', 'Carta Inventada'],
+    });
+    const detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.lines.map((l) => [l.name, l.board, l.quantity, l.proxies])).toEqual(
+      expect.arrayContaining([
+        ['Forest', 'mainboard', 20, 0],
+        ['Carta Inventada', 'mainboard', 2, 1],
+      ]),
+    );
+    expect(detail.lines.find((l) => l.name === 'Forest')!.card).toMatchObject({
+      scryfallId: 'forest',
+    });
+  });
+});

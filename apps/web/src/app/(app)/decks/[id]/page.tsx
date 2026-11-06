@@ -13,7 +13,9 @@ import {
   DeckValidation,
   ManaCurve,
 } from '@/components/deck-analysis';
-import { ColorIdentity, DeckCards, DeckSettingsForm } from '@/components/deck-visual';
+import { DeckCards } from '@/components/deck-cards';
+import { DeckTools } from '@/components/deck-tools';
+import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 
@@ -161,7 +163,16 @@ export default async function DeckPage({ params }: Props) {
         </section>
       </div>
 
-      <DeckCards deckId={deck.id} entries={deck.entries} isOwner={deck.isOwner} />
+      <DeckCards deckId={deck.id} lines={deck.lines} isOwner={deck.isOwner} />
+
+      <DeckTools
+        deckId={deck.id}
+        isOwner={deck.isOwner}
+        source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
+        hasSourceUrl={
+          Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
+        }
+      />
     </>
   );
 }

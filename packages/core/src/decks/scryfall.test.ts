@@ -90,3 +90,24 @@ describe('attachCardData', () => {
     ]);
   });
 });
+
+describe('fetchScryfallAutocomplete', () => {
+  it('consulta o autocomplete e ignora buscas curtas', async () => {
+    const { fetchScryfallAutocomplete } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json({ object: 'catalog', data: ['Sol Ring', 'Solemn Simulacrum'] }),
+    );
+    expect(await fetchScryfallAutocomplete('sol r', { fetch: fetchMock })).toEqual([
+      'Sol Ring',
+      'Solemn Simulacrum',
+    ]);
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://api.scryfall.com/cards/autocomplete?q=sol%20r',
+    );
+    expect(await fetchScryfallAutocomplete(' s ', { fetch: fetchMock })).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await expect(
+      fetchScryfallAutocomplete('sol', { fetch: async () => new Response('x', { status: 503 }) }),
+    ).rejects.toMatchObject({ code: 'upstream_error' });
+  });
+});
