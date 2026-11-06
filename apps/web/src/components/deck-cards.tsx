@@ -186,7 +186,25 @@ export function DeckCards({
               ))}
             </ul>
           ) : (
-            <table className={`w-full text-sm ${view === 'edit' ? 'table-fixed' : ''}`}>
+            // table-fixed + <colgroup>: cada grupo é uma tabela, e as larguras fixas deixam as
+            // colunas alinhadas entre todos os grupos.
+            <table className="w-full table-fixed text-sm">
+              {view === 'edit' ? (
+                <colgroup>
+                  <col className="w-20" />
+                  <col />
+                  <col className="w-20" />
+                  <col className="w-14 sm:w-36" />
+                </colgroup>
+              ) : (
+                <colgroup>
+                  <col className="w-10" />
+                  <col />
+                  <col className="w-28 sm:w-40" />
+                  <col className="w-0 sm:w-[30%]" />
+                  <col className="w-20 sm:w-24" />
+                </colgroup>
+              )}
               <thead
                 className={
                   view === 'edit' ? 'text-left text-xs text-zinc-600 dark:text-zinc-400' : 'sr-only'
@@ -226,8 +244,8 @@ export function DeckCards({
                     <EditableLine key={line.key} deckId={deckId} line={line} />
                   ) : (
                     <tr key={line.key} className="border-t border-zinc-200 dark:border-zinc-800">
-                      <td className="w-10 py-1.5 tabular-nums">{line.quantity}</td>
-                      <td className="py-1.5">
+                      <td className="py-1.5 tabular-nums">{line.quantity}</td>
+                      <td className="py-1.5 pe-2 break-words">
                         <button
                           type="button"
                           className="text-left underline-offset-2 hover:underline"
@@ -238,10 +256,13 @@ export function DeckCards({
                         </button>
                         {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
                       </td>
-                      <td className="py-1.5 pe-2 text-right whitespace-nowrap sm:text-left">
+                      <td className="py-1.5 pe-2">
                         <ManaCost cost={line.card?.manaCost} className="text-sm" />
                       </td>
-                      <td className="muted hidden py-1.5 sm:table-cell">{line.card?.typeLine}</td>
+                      <td className="muted truncate py-1.5 sm:pe-2">
+                        {/* No celular a coluna tem largura 0: o tipo fica só no diálogo da carta. */}
+                        <span className="hidden sm:inline">{line.card?.typeLine}</span>
+                      </td>
                       <td className="py-1.5 text-right">
                         <ProxyBadge line={line} />
                       </td>

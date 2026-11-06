@@ -82,4 +82,21 @@ test.describe('deck', () => {
     expect(response.headers()['content-type']).toBe('application/pdf');
     expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
   });
+
+  test('modo lista: colunas alinhadas entre os grupos', async ({ page }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    await page.getByRole('button', { name: 'Lista', exact: true }).click();
+    const lefts = await page
+      .locator('table tbody tr')
+      .evaluateAll((rows) =>
+        rows.map((r) =>
+          [...r.querySelectorAll('td')].map((td) => Math.round(td.getBoundingClientRect().left)),
+        ),
+      );
+    expect(lefts.length).toBeGreaterThan(3);
+    for (const row of lefts) expect(row).toEqual(lefts[0]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      page.viewportSize()!.width,
+    );
+  });
 });
