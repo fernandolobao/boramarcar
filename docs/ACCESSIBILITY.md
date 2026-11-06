@@ -127,6 +127,10 @@ sem rolagem horizontal em 320px.
 - **Base de mana e mão inicial**: tabelas com `th scope="col"`/`scope="row"` e `caption`; situação com ícone **e** texto ("Suficiente"/"Poucas fontes"); barras de probabilidade decorativas, com o valor em texto ao lado.
 - **Atualizar análise**: resultado em `role="status"`; o ícone girando respeita `motion-reduce`.
 
+### Revisão: folha de proxies no navegador
+
+- Página `/decks/:id/imprimir` com pré-visualização em milímetros reais, numa região rolável focável; cada página tem nome ("Página 1 de 5") e cada carta usa `alt` com o nome. Botão "Imprimir / salvar como PDF" com texto; instruções de impressão em texto. Na impressão, cabeçalho e instruções somem (`print:hidden`).
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

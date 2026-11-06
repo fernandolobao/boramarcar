@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 import { api } from '@/lib/api';
@@ -137,13 +138,20 @@ export function DeckTools({
               <option value="letter">{t('letter')}</option>
             </select>
           </div>
-          <a
+          <Link
             className="btn-primary"
+            href={`/decks/${deckId}/imprimir?which=${which}&page=${paper}`}
+          >
+            <Icon name="print" />
+            {t('printOpen')}
+          </Link>
+          <a
+            className="btn-secondary"
             href={`/api/v1/decks/${deckId}/proxies?which=${which}&page=${paper}`}
             download
           >
-            <Icon name="print" />
-            {t('printDownload')}
+            <Icon name="download" />
+            {t('printPdfServer')}
           </a>
         </div>
         {proxyCount === 0 && <p className="muted text-sm">{t('printNoProxies')}</p>}

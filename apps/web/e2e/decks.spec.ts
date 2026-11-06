@@ -104,7 +104,7 @@ test.describe('deck', () => {
 
   test('folha de proxies em PDF', async ({ page }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    const link = page.getByRole('link', { name: 'Baixar PDF' });
+    const link = page.getByRole('link', { name: 'Baixar PDF pronto' });
     await expect(link).toHaveAttribute('href', /which=proxies&page=a4/);
     const response = await page.request.get((await link.getAttribute('href'))!);
     expect(response.status()).toBe(200);
@@ -127,5 +127,24 @@ test.describe('deck', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       page.viewportSize()!.width,
     );
+  });
+
+  test('folha para imprimir pelo navegador: cartas em tamanho real com imagem', async ({
+    page,
+  }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    await page.getByLabel('O deck todo').check();
+    await page.getByRole('link', { name: 'Abrir folha para imprimir' }).click();
+    await expect(page).toHaveURL(/imprimir\?which=all&page=a4/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Imprimir proxies' })).toBeVisible();
+    const sheet = page.getByRole('region', { name: 'Página 1 de 5' });
+    await expect(sheet).toBeVisible();
+    const card = sheet.getByRole('img', { name: 'Omnath, Locus of Mana' });
+    await expect(card).toHaveAttribute('src', /cards\.scryfall\.io\/large\//);
+    // 63 mm na tela (96 dpi): ~238 px.
+    const box = (await card.locator('..').boundingBox())!;
+    expect(box.width).toBeCloseTo((63 / 25.4) * 96, 0);
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.getByRole('navigation', { name: 'Navegação principal' })).toBeHidden();
   });
 });

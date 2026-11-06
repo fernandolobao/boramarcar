@@ -16,9 +16,9 @@ const schema = z.object({
 export const GET = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
   const { which, page } = parseQuery(req, schema);
   const deck = await getDeck(db, { deckId: params.deckId, viewerId: user.id });
-  const { pdf, cards } = await buildProxySheet({
+  const { pdf, cards, missingImages } = await buildProxySheet({
     deckName: deck.name,
-    lines: deck.lines,
+    lines: deck.lines.filter((l) => l.board !== 'maybeboard'),
     which,
     page,
   });
@@ -33,6 +33,8 @@ export const GET = authed<{ deckId: string }>(async ({ req, db, user, params }) 
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="proxies-${slugify(deck.name, 'deck')}.pdf"`,
       'Cache-Control': 'private, no-store',
+      // Diagnóstico: cartas que saíram sem imagem (só com o nome).
+      'X-Missing-Images': String(missingImages),
     },
   });
 });

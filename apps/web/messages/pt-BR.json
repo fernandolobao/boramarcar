@@ -419,7 +419,14 @@
     "cardPrice": "Preço: {usd}",
     "cardPriceBrl": "Preço: {usd} ≈ {brl}",
     "formatAuto": "Detectar automaticamente",
-    "formatHint": "Usa o formato informado pelo Archidekt ou Moxfield; numa lista colada, Commander se houver comandante. Dá para mudar depois nas configurações do deck."
+    "formatHint": "Usa o formato informado pelo Archidekt ou Moxfield; numa lista colada, Commander se houver comandante. Dá para mudar depois nas configurações do deck.",
+    "printNow": "Imprimir / salvar como PDF",
+    "printBrowserHint": "{count, plural, =1 {1 carta} other {# cartas}} em {pages, plural, =1 {1 página} other {# páginas}}. Na janela de impressão, use escala 100% (\"tamanho real\"), sem margens, e ative \"gráficos de fundo\" se as marcas de corte não aparecerem. Para guardar o arquivo, escolha \"Salvar como PDF\".",
+    "printPreview": "Pré-visualização da folha de proxies",
+    "printPage": "Página {page} de {total}",
+    "printEmpty": "O deck está vazio.",
+    "printOpen": "Abrir folha para imprimir",
+    "printPdfServer": "Baixar PDF pronto"
   },
   "analysis": {
     "title": "Análise",

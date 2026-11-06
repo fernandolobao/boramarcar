@@ -65,10 +65,13 @@ describe('DeckTools', () => {
 
   it('folha de proxies: escolhe cartas e papel', () => {
     wrap(<DeckTools deckId="d1" isOwner source="Archidekt" hasSourceUrl={false} proxyCount={3} />);
-    const link = screen.getByRole('link', { name: 'Baixar PDF' });
+    const open = screen.getByRole('link', { name: 'Abrir folha para imprimir' });
+    const link = screen.getByRole('link', { name: 'Baixar PDF pronto' });
+    expect(open).toHaveAttribute('href', '/decks/d1/imprimir?which=proxies&page=a4');
     expect(link).toHaveAttribute('href', '/api/v1/decks/d1/proxies?which=proxies&page=a4');
     fireEvent.click(screen.getByLabelText('O deck todo'));
     fireEvent.change(screen.getByLabelText('Papel'), { target: { value: 'letter' } });
+    expect(open).toHaveAttribute('href', '/decks/d1/imprimir?which=all&page=letter');
     expect(link).toHaveAttribute('href', '/api/v1/decks/d1/proxies?which=all&page=letter');
     expect(screen.getByLabelText('Só os proxies (3 cartas)')).not.toBeChecked();
   });
@@ -76,7 +79,7 @@ describe('DeckTools', () => {
   it('sem proxies, imprime o deck todo e explica', () => {
     wrap(<DeckTools deckId="d1" isOwner={false} source="Archidekt" hasSourceUrl={false} />);
     expect(screen.getByLabelText('Proxies (nenhuma marcada)')).toBeDisabled();
-    expect(screen.getByRole('link', { name: 'Baixar PDF' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Baixar PDF pronto' })).toHaveAttribute(
       'href',
       '/api/v1/decks/d1/proxies?which=all&page=a4',
     );
