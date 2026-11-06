@@ -29,6 +29,13 @@
       "when": 1793916790775,
       "tag": "0003_notificacoes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793927403626,
+      "tag": "0004_formatos_partidas",
+      "breakpoints": true
     }
   ]
 }

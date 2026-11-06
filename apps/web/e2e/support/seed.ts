@@ -146,6 +146,7 @@ export async function seedE2E(databaseUrl: string) {
         typeLine: 'Legendary Creature — Elemental',
         colorIdentity: ['G'],
         colors: ['G'],
+        imageUri: 'https://cards.scryfall.io/normal/front/e/2/e2e-omnath.jpg',
       },
       {
         scryfallId: 'e2e-sol',
@@ -206,6 +207,17 @@ export async function seedE2E(databaseUrl: string) {
         number: 2,
         createdBy: 'e2e-bia',
       },
+      {
+        id: 'e2e-game-3',
+        eventId: E2E_IDS.pastEvent,
+        groupId: E2E_IDS.group,
+        number: 3,
+        format: 'two_headed_giant',
+        firstPlayerId: 'e2e-ana',
+        winningTurn: 8,
+        durationMinutes: 75,
+        createdBy: 'e2e-ana',
+      },
     ]);
     await db.insert(s.gamePlayers).values([
       ...users.map((u, i) => ({
@@ -216,6 +228,13 @@ export async function seedE2E(databaseUrl: string) {
         seat: i + 1,
       })),
       ...users.map((u) => ({ gameId: 'e2e-game-2', userId: u.id, result: 'draw' as const })),
+      ...users.slice(0, 4).map((u, i) => ({
+        gameId: 'e2e-game-3',
+        userId: u.id,
+        team: (i % 2) + 1,
+        result: i % 2 === 0 ? ('win' as const) : ('loss' as const),
+        deckId: i === 0 ? E2E_IDS.deck : null,
+      })),
     ]);
   } finally {
     await pool.end();

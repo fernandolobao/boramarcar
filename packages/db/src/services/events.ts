@@ -1,4 +1,11 @@
-import { DomainError, validateGameResult, type GamePlayerResult } from '@boramarcar/core';
+import {
+  DomainError,
+  formatRules,
+  isGameFormat,
+  validateGame,
+  type GameFormat,
+  type GamePlayerInput,
+} from '@boramarcar/core';
 import { and, asc, desc, eq, gte, inArray, lt, max, ne } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
@@ -11,6 +18,7 @@ import {
   locations,
   user,
 } from '../schema';
+import { getDeckCovers } from './decks';
 import { requireMembership } from './groups';
 
 type RsvpStatus = (typeof eventParticipants.$inferSelect)['rsvp'];
@@ -207,6 +215,8 @@ export async function getEventDetail(db: Database, input: { eventId: string; use
           name: user.name,
           result: gamePlayers.result,
           seat: gamePlayers.seat,
+          team: gamePlayers.team,
+          eliminatedOrder: gamePlayers.eliminatedOrder,
           deckId: gamePlayers.deckId,
           deckName: decks.name,
         })
@@ -221,6 +231,12 @@ export async function getEventDetail(db: Database, input: { eventId: string; use
         )
     : [];
 
+  const covers = await getDeckCovers(
+    db,
+    playerRows.flatMap((p) => (p.deckId ? [p.deckId] : [])),
+  );
+  const membership = await requireMembership(db, event.groupId, input.userId);
+
   return {
     ...event,
     canManage,
@@ -229,12 +245,23 @@ export async function getEventDetail(db: Database, input: { eventId: string; use
     games: gameRows.map((game) => {
       const players = playerRows
         .filter((p) => p.gameId === game.id)
-        .sort((a, b) => (a.seat ?? 99) - (b.seat ?? 99) || a.name.localeCompare(b.name));
+        .map((p) => ({ ...p, deck: p.deckId ? (covers.get(p.deckId) ?? null) : null }))
+        .sort(
+          (a, b) =>
+            (a.team ?? 0) - (b.team ?? 0) ||
+            (a.seat ?? 99) - (b.seat ?? 99) ||
+            a.name.localeCompare(b.name),
+        );
+      const winners = players.filter((p) => p.result === 'win');
       return {
         ...game,
         players,
-        winner: players.find((p) => p.result === 'win') ?? null,
-        isDraw: players.every((p) => p.result !== 'win'),
+        winners,
+        /** Compatibilidade: o vencedor quando há um só. */
+        winner: winners.length === 1 ? winners[0]! : null,
+        isDraw: winners.length === 0,
+        firstPlayerName: players.find((p) => p.userId === game.firstPlayerId)?.name ?? null,
+        canEdit: game.createdBy === input.userId || membership.role !== 'member',
       };
     }),
   };
@@ -254,25 +281,38 @@ export async function setRsvp(
     });
 }
 
-export interface RecordGameInput {
-  eventId: string;
-  userId: string;
-  players: (GamePlayerResult & { seat?: number | null })[];
+export interface GameInput {
+  players: GamePlayerInput[];
+  /** Sem formato, vale o padrão do grupo. */
+  format?: GameFormat;
+  firstPlayerId?: string | null;
+  winningTurn?: number | null;
+  durationMinutes?: number | null;
   playedAt?: Date;
   notes?: string | null;
 }
 
-export async function recordGame(db: Database, input: RecordGameInput) {
-  validateGameResult(input.players);
-  const { event } = await requireEvent(db, input.eventId, input.userId);
-  if (event.status === 'cancelled') throw new DomainError('conflict', 'Evento cancelado');
+export interface RecordGameInput extends GameInput {
+  eventId: string;
+  userId: string;
+}
+
+/** Valida regras do formato, participação no grupo e dono de cada deck. */
+async function prepareGame(db: Database, groupId: string, defaultFormat: string, input: GameInput) {
+  const format = input.format ?? (isGameFormat(defaultFormat) ? defaultFormat : 'commander');
+  const rules = formatRules(format);
+  const players = input.players.map((p) => ({
+    ...p,
+    team: rules.structure === 'teams' ? (p.team ?? null) : null,
+  }));
+  validateGame({ ...input, format, players });
   await assertAllMembers(
     db,
-    event.groupId,
-    input.players.map((p) => p.userId),
+    groupId,
+    players.map((p) => p.userId),
   );
 
-  const deckChecks = input.players.filter((p) => p.deckId);
+  const deckChecks = players.filter((p) => p.deckId);
   if (deckChecks.length) {
     const owned = await db
       .select({ id: decks.id, ownerId: decks.ownerId })
@@ -291,6 +331,31 @@ export async function recordGame(db: Database, input: RecordGameInput) {
     }
   }
 
+  return {
+    game: {
+      format,
+      firstPlayerId: input.firstPlayerId ?? null,
+      winningTurn: input.winningTurn ?? null,
+      durationMinutes: input.durationMinutes ?? null,
+      notes: input.notes?.trim() || null,
+    },
+    players: players.map((p) => ({
+      userId: p.userId,
+      result: p.result,
+      deckId: p.deckId ?? null,
+      seat: p.seat ?? null,
+      team: p.team,
+      eliminatedOrder: p.eliminatedOrder ?? null,
+    })),
+  };
+}
+
+export async function recordGame(db: Database, input: RecordGameInput) {
+  const { event } = await requireEvent(db, input.eventId, input.userId);
+  if (event.status === 'cancelled') throw new DomainError('conflict', 'Evento cancelado');
+  const group = await requireMembership(db, event.groupId, input.userId);
+  const prepared = await prepareGame(db, event.groupId, group.defaultFormat, input);
+
   return db.transaction(async (tx) => {
     const [{ value: lastNumber } = { value: 0 }] = await tx
       .select({ value: max(games.number) })
@@ -299,33 +364,57 @@ export async function recordGame(db: Database, input: RecordGameInput) {
     const [game] = await tx
       .insert(games)
       .values({
+        ...prepared.game,
         eventId: event.id,
         groupId: event.groupId,
         number: (lastNumber ?? 0) + 1,
         playedAt: input.playedAt ?? new Date(),
-        notes: input.notes?.trim() || null,
         createdBy: input.userId,
       })
       .returning();
-    await tx.insert(gamePlayers).values(
-      input.players.map((p) => ({
-        gameId: game!.id,
-        userId: p.userId,
-        result: p.result,
-        deckId: p.deckId ?? null,
-        seat: p.seat ?? null,
-      })),
-    );
+    await tx.insert(gamePlayers).values(prepared.players.map((p) => ({ ...p, gameId: game!.id })));
     return game!;
   });
 }
 
-export async function deleteGame(db: Database, input: { gameId: string; userId: string }) {
-  const [game] = await db.select().from(games).where(eq(games.id, input.gameId)).limit(1);
+async function requireGameEditor(db: Database, gameId: string, userId: string) {
+  const [game] = await db.select().from(games).where(eq(games.id, gameId)).limit(1);
   if (!game) throw new DomainError('not_found', 'Partida não encontrada');
-  const membership = await requireMembership(db, game.groupId, input.userId);
-  if (game.createdBy !== input.userId && membership.role === 'member') {
-    throw new DomainError('forbidden', 'Só quem registrou ou um admin pode remover a partida');
+  const membership = await requireMembership(db, game.groupId, userId);
+  if (game.createdBy !== userId && membership.role === 'member') {
+    throw new DomainError('forbidden', 'Só quem registrou ou um admin pode alterar a partida');
   }
+  return { game, group: membership };
+}
+
+/** Edita a partida (2.5): troca jogadores, resultado, decks e detalhes de uma vez. */
+export async function updateGame(
+  db: Database,
+  input: GameInput & { gameId: string; userId: string },
+) {
+  const { game, group } = await requireGameEditor(db, input.gameId, input.userId);
+  const prepared = await prepareGame(
+    db,
+    game.groupId,
+    input.format ?? game.format ?? group.defaultFormat,
+    {
+      ...input,
+      format: input.format ?? (isGameFormat(game.format) ? game.format : undefined),
+    },
+  );
+  return db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(games)
+      .set({ ...prepared.game, playedAt: input.playedAt ?? game.playedAt })
+      .where(eq(games.id, game.id))
+      .returning();
+    await tx.delete(gamePlayers).where(eq(gamePlayers.gameId, game.id));
+    await tx.insert(gamePlayers).values(prepared.players.map((p) => ({ ...p, gameId: game.id })));
+    return updated!;
+  });
+}
+
+export async function deleteGame(db: Database, input: { gameId: string; userId: string }) {
+  const { game } = await requireGameEditor(db, input.gameId, input.userId);
   await db.delete(games).where(eq(games.id, game.id));
 }

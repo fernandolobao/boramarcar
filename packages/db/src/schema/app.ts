@@ -38,6 +38,15 @@ export const groups = pgTable('groups', {
   id: id(),
   name: text('name').notNull(),
   inviteCode: text('invite_code').notNull().unique(),
+  /** Jogadores que fecham a mesa nas sugestões de horário (1.12). */
+  tableSize: integer('table_size').notNull().default(4),
+  minDurationMinutes: integer('min_duration_minutes').notNull().default(120),
+  /** Pontos do ranking (2.7). */
+  pointsWin: integer('points_win').notNull().default(3),
+  pointsDraw: integer('points_draw').notNull().default(1),
+  pointsLoss: integer('points_loss').notNull().default(0),
+  /** Tipo de jogo pré-selecionado ao registrar partidas (ver `GAME_FORMATS`). */
+  defaultFormat: text('default_format').notNull().default('commander'),
   createdBy: text('created_by')
     .notNull()
     .references(() => user.id),
@@ -228,6 +237,12 @@ export const games = pgTable(
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
     number: integer('number').notNull(),
+    /** Tipo de jogo (ver `GAME_FORMATS`); define as regras de jogadores, times e vencedor. */
+    format: text('format').notNull().default('commander'),
+    /** Detalhes opcionais para estatísticas. */
+    firstPlayerId: text('first_player_id').references(() => user.id, { onDelete: 'set null' }),
+    winningTurn: integer('winning_turn'),
+    durationMinutes: integer('duration_minutes'),
     playedAt: timestamp('played_at', { withTimezone: true }).notNull().defaultNow(),
     notes: text('notes'),
     createdBy: text('created_by')
@@ -274,6 +289,10 @@ export const gamePlayers = pgTable(
     deckId: text('deck_id').references(() => decks.id, { onDelete: 'set null' }),
     result: gameResult('result').notNull(),
     seat: integer('seat'),
+    /** Time (1, 2, …) em formatos como Two-Headed Giant. */
+    team: integer('team'),
+    /** 1 = primeiro a ser eliminado. */
+    eliminatedOrder: integer('eliminated_order'),
   },
   (t) => [
     primaryKey({ columns: [t.gameId, t.userId] }),

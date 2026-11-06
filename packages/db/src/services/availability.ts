@@ -7,7 +7,7 @@ import {
 import { and, asc, eq, gt, inArray, lt } from 'drizzle-orm';
 import type { Database } from '../client';
 import { availabilitySlotLocations, availabilitySlots, user } from '../schema';
-import { listLocations, listMembers, requireMembership } from './groups';
+import { getGroupSettings, listLocations, listMembers, requireMembership } from './groups';
 import { assertGroupLocations, loadRuleOccurrences } from './recurring';
 
 export interface AddAvailabilityInput {
@@ -117,7 +117,7 @@ export async function deleteAvailability(db: Database, input: { slotId: string; 
   await db.delete(availabilitySlots).where(eq(availabilitySlots.id, input.slotId));
 }
 
-/** Sugere janelas em que jogadores suficientes podem jogar no mesmo local. */
+/** Sugere janelas em que jogadores suficientes (padrão: mesa do grupo) podem jogar no mesmo local. */
 export async function suggestGameWindows(
   db: Database,
   input: { groupId: string; userId: string; from: Date; to: Date } & Pick<
@@ -125,10 +125,11 @@ export async function suggestGameWindows(
     'minPlayers' | 'minDurationMinutes'
   >,
 ) {
-  const [slots, groupLocations, members] = await Promise.all([
+  const [slots, groupLocations, members, settings] = await Promise.all([
     listAvailability(db, input),
     listLocations(db, input.groupId),
     listMembers(db, input.groupId),
+    getGroupSettings(db, input),
   ]);
   const windows = findCommonWindows(
     slots.map((s) => ({
@@ -138,8 +139,9 @@ export async function suggestGameWindows(
       locationIds: s.locationIds,
     })),
     {
-      minPlayers: input.minPlayers,
-      minDurationMinutes: input.minDurationMinutes,
+      // Sem valores explícitos, vale a configuração do grupo (1.12).
+      minPlayers: input.minPlayers ?? settings.tableSize,
+      minDurationMinutes: input.minDurationMinutes ?? settings.minDurationMinutes,
       locationIds: groupLocations.map((l) => l.id),
     },
   );

@@ -187,9 +187,10 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | `PATCH`        | `/api/v1/events/:eventId`                       | Editar encontro ou mudar status (`scheduled`, `cancelled`, `finished`)   |
 | `GET`          | `/api/v1/events/:eventId/ics`                   | Arquivo iCalendar do encontro                                            |
 | `PUT`          | `/api/v1/events/:eventId/rsvp`                  | Confirmar presença                                                       |
-| `POST`         | `/api/v1/events/:eventId/games`                 | Registrar partida                                                        |
-| `DELETE`       | `/api/v1/games/:gameId`                         | Remover partida                                                          |
-| `GET`          | `/api/v1/groups/:groupId/ranking`               | Ranking (`?from&to`)                                                     |
+| `POST`         | `/api/v1/events/:eventId/games`                 | Registrar partida (`format`, times, detalhes opcionais)                  |
+| `PUT/DELETE`   | `/api/v1/games/:gameId`                         | Editar / remover partida                                                 |
+| `GET/PATCH`    | `/api/v1/groups/:groupId/settings`              | Configurações do grupo (mesa, duração, pontos, tipo padrão)              |
+| `GET`          | `/api/v1/groups/:groupId/ranking`               | Ranking (`?from&to&format`)                                              |
 | `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
 | `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                               |
 | `PATCH`        | `/api/v1/decks/:deckId/cards/:cardId`           | Marcar proxy (`{isProxy}`)                                               |

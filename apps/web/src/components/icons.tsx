@@ -23,6 +23,8 @@ import {
   Download,
   ExternalLink,
   Layers,
+  Medal,
+  Settings,
   LayoutDashboard,
   Link2,
   LogIn,
@@ -65,6 +67,8 @@ export const Icons = {
   share: Share2,
   externalLink: ExternalLink,
   refresh: RefreshCw,
+  settings: Settings,
+  close: X,
   // Navegação
   dashboard: LayoutDashboard,
   availability: Clock,
@@ -89,6 +93,7 @@ export const Icons = {
   rsvpYes: Check,
   rsvpMaybe: CircleHelp,
   rsvpNo: X,
+  winner: Medal,
   whatsapp: MessageCircle,
   // Grupo
   join: UserPlus,

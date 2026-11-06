@@ -12,7 +12,11 @@ import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { DeckImportForm, ProxyToggle } from './deck-forms';
 import { EventManage, EventStatusBadge } from './event-manage';
-import { NewEventForm, RecordGameForm, RsvpButtons } from './event-forms';
+import { NewEventForm, RsvpButtons } from './event-forms';
+import { GameEditor } from './game-editor';
+import { GameForm } from './game-form';
+import { GamePlayers } from './game-players';
+import { GroupSettingsForm } from './group-settings-form';
 import { CreateGroupForm, JoinGroupForm, LocationForm, SwitchGroupButton } from './group-forms';
 import { JoinInviteButton, RegenerateInviteButton } from './invite';
 import { NavLinks } from './nav-links';
@@ -68,6 +72,13 @@ const grid = buildWeekGrid({
   ],
 });
 const member = { userId: 'b', name: 'Bia', role: 'member' as const };
+
+const gamePlayers = [
+  { userId: 'a', name: 'Ana', decks: [{ id: 'd', name: 'Omnath' }] },
+  { userId: 'b', name: 'Bia', decks: [] },
+  { userId: 'c', name: 'Caio', decks: [] },
+  { userId: 'd', name: 'Dani', decks: [] },
+];
 
 const cases: [string, ReactElement][] = [
   [
@@ -140,14 +151,93 @@ const cases: [string, ReactElement][] = [
   ['EventStatusBadge', <EventStatusBadge key="g" status="finished" />],
   ['NewEventForm', <NewEventForm key="h" groupId="g" locations={locations} />],
   [
-    'RecordGameForm',
-    <RecordGameForm
-      key="i"
-      eventId="e"
+    'GameForm (commander)',
+    <GameForm key="i" eventId="e" defaultFormat="commander" players={gamePlayers} />,
+  ],
+  [
+    'GameForm (2HG, edição)',
+    <GameForm
+      key="i2"
+      gameId="g"
+      defaultFormat="commander"
+      players={gamePlayers}
+      initial={{
+        format: 'two_headed_giant',
+        firstPlayerId: 'a',
+        winningTurn: 7,
+        durationMinutes: 60,
+        notes: null,
+        players: gamePlayers.map((p, i) => ({
+          userId: p.userId,
+          result: i % 2 === 0 ? 'win' : 'loss',
+          deckId: null,
+          team: (i % 2) + 1,
+          eliminatedOrder: null,
+        })),
+      }}
+    />,
+  ],
+  [
+    'GameEditor',
+    <GameEditor
+      key="i3"
+      gameId="g"
+      number={2}
+      players={gamePlayers}
+      initial={{
+        format: 'standard',
+        firstPlayerId: null,
+        winningTurn: null,
+        durationMinutes: null,
+        notes: null,
+        players: [
+          { userId: 'a', result: 'win', deckId: 'd', team: null, eliminatedOrder: null },
+          { userId: 'b', result: 'loss', deckId: null, team: null, eliminatedOrder: null },
+        ],
+      }}
+    />,
+  ],
+  [
+    'GamePlayers',
+    <GamePlayers
+      key="i4"
+      showTeams
       players={[
-        { userId: 'a', name: 'Ana', decks: [{ id: 'd', name: 'Omnath' }] },
-        { userId: 'b', name: 'Bia', decks: [] },
+        {
+          userId: 'a',
+          name: 'Ana',
+          result: 'win',
+          team: 1,
+          eliminatedOrder: null,
+          deckName: 'Omnath',
+          deck: { artUri: 'https://cards.scryfall.io/art_crop/x.jpg', cards: [{ name: 'Omnath' }] },
+        },
+        {
+          userId: 'b',
+          name: 'Bia',
+          result: 'loss',
+          team: 2,
+          eliminatedOrder: 1,
+          deckName: null,
+          deck: null,
+        },
       ]}
+    />,
+  ],
+  [
+    'GroupSettingsForm',
+    <GroupSettingsForm
+      key="i5"
+      groupId="g"
+      canEdit
+      settings={{
+        tableSize: 4,
+        minDurationMinutes: 120,
+        pointsWin: 3,
+        pointsDraw: 1,
+        pointsLoss: 0,
+        defaultFormat: 'commander',
+      }}
     />,
   ],
   ['RsvpButtons', <RsvpButtons key="j" eventId="e" current="yes" />],

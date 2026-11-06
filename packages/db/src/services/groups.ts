@@ -1,4 +1,4 @@
-import { DomainError } from '@boramarcar/core';
+import { DomainError, validateGroupSettings, type GroupSettings } from '@boramarcar/core';
 import { and, asc, count, eq } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
@@ -53,6 +53,12 @@ export async function listGroupsForUser(db: Database, userId: string) {
       name: groups.name,
       inviteCode: groups.inviteCode,
       role: groupMembers.role,
+      tableSize: groups.tableSize,
+      minDurationMinutes: groups.minDurationMinutes,
+      pointsWin: groups.pointsWin,
+      pointsDraw: groups.pointsDraw,
+      pointsLoss: groups.pointsLoss,
+      defaultFormat: groups.defaultFormat,
     })
     .from(groupMembers)
     .innerJoin(groups, eq(groups.id, groupMembers.groupId))
@@ -280,4 +286,36 @@ export async function transferOwnership(
         and(eq(groupMembers.groupId, input.groupId), eq(groupMembers.userId, input.newOwnerId)),
       );
   });
+}
+
+const settingsOf = (group: typeof groups.$inferSelect): GroupSettings => ({
+  tableSize: group.tableSize,
+  minDurationMinutes: group.minDurationMinutes,
+  pointsWin: group.pointsWin,
+  pointsDraw: group.pointsDraw,
+  pointsLoss: group.pointsLoss,
+  defaultFormat: group.defaultFormat as GroupSettings['defaultFormat'],
+});
+
+/** Configurações do grupo (mesa, duração mínima, pontos e tipo de jogo padrão). */
+export async function getGroupSettings(db: Database, input: { groupId: string; userId: string }) {
+  return settingsOf(await requireMembership(db, input.groupId, input.userId));
+}
+
+/** Altera as configurações (dono/admin). Campos omitidos mantêm o valor atual. */
+export async function updateGroupSettings(
+  db: Database,
+  input: { groupId: string; userId: string } & Partial<GroupSettings>,
+) {
+  const group = await requireMembership(db, input.groupId, input.userId);
+  if (group.role === 'member') {
+    throw new DomainError('forbidden', 'Só o dono ou um admin pode alterar as configurações');
+  }
+  const { groupId: _g, userId: _u, ...changes } = input;
+  const next = validateGroupSettings({
+    ...settingsOf(group),
+    ...Object.fromEntries(Object.entries(changes).filter(([, v]) => v !== undefined)),
+  });
+  await db.update(groups).set(next).where(eq(groups.id, input.groupId));
+  return next;
 }

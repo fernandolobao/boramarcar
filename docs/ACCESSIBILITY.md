@@ -69,6 +69,14 @@ sem rolagem horizontal em 320px.
 - **Perfil**: a opção "Receber avisos por e-mail" é um checkbox nativo com rótulo clicável e a explicação ligada por `aria-describedby`; testado por teclado (Espaço) em E2E e pelo axe no componente e na página.
 - **E-mails**: `<html lang>` no idioma de quem recebe, `<title>`, texto escapado, versão em texto puro equivalente, link com texto descritivo ("Abrir o encontro"), contraste ≥ 4,5:1 (botão roxo com texto branco, rodapé zinc-600) e informação nunca só em cor. Datas por extenso no fuso de quem recebe.
 
+### Revisão: tipos de jogo e partidas
+
+- **Formulário de partida**: jogadores em lista (não tabela), para caber em 320px; "Jogou" dentro de `<fieldset>/<legend>` com a contagem exigida pelo tipo de jogo ligada por `aria-describedby` e anunciada em texto (não só pelo botão desabilitado). O radio "Venceu" tem nome com contexto ("Venceu: Bia") que começa pelo texto visível (WCAG 2.5.3). Em Two-Headed Giant, cada jogador tem um select "Time de …" e o vencedor é escolhido por time em outro `<fieldset>`.
+- **Detalhes opcionais** num `<details>/<summary>` nativo (teclado e leitor de tela sem ARIA extra).
+- **Editar partida**: botão de disclosure com `aria-expanded`/`aria-controls`; o nome não muda ao abrir. Ao salvar, o formulário fecha e o foco volta para o botão (testado em unidade e E2E).
+- **Partidas**: cada partida tem `<h3>` com o tipo de jogo; vencedor indicado por texto ("Venceu"), ícone e fundo (cor não é a única pista). A arte do comandante é decorativa (`alt=""`): o nome do deck e do comandante estão em texto. Corrigida rolagem horizontal em 320px (itens do grid sem `min-w-0`).
+- **Configurações do grupo**: campos numéricos com `<label>`, regras dos pontos explicadas em texto ligado aos campos; membros comuns veem os valores desabilitados com o motivo.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.
