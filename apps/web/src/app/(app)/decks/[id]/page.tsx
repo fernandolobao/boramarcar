@@ -3,6 +3,8 @@ import {
   artCropUrl,
   DECK_VISIBILITIES,
   deckFormatProfile,
+  edhrecCommanderUrl,
+  leastPopularCards,
   deckPrice,
   usdToBrl,
   isDomainError,
@@ -11,7 +13,7 @@ import {
 } from '@boramarcar/core';
 import Link from 'next/link';
 import { VisibilityBadge } from '@/components/deck-grid';
-import { getDeck } from '@boramarcar/db';
+import { compareWithCommanderDecks, getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -28,6 +30,7 @@ import {
   ManaCurve,
 } from '@/components/deck-analysis';
 import { DeckCards } from '@/components/deck-cards';
+import { DeckComparisonCard } from '@/components/deck-comparison';
 import { DeckRoles, RefreshAnalysis } from '@/components/deck-roles';
 import { DeckTools } from '@/components/deck-tools';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
@@ -78,6 +81,15 @@ export default async function DeckPage({ params }: Props) {
   const rate = price.total > 0 ? await getUsdBrlRate() : null;
   const background = artCropUrl(hero?.card?.imageUri);
   const profile = deckFormatProfile(format);
+  const comparison = analysis.commanders.length
+    ? await compareWithCommanderDecks(getDb(), {
+        deckId: deck.id,
+        viewerId: user.id,
+        format,
+        commanders: analysis.commanders,
+        entries: deck.entries,
+      })
+    : null;
   const formatName = tf(format);
   // Dados do Tagger/Spellbook faltando: busca depois de responder (a próxima visita já vê).
   if (deck.analysisStale) {
@@ -243,6 +255,16 @@ export default async function DeckPage({ params }: Props) {
         <section className="card md:col-span-2">
           <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
         </section>
+        {analysis.commanders.length > 0 && (
+          <section className="card md:col-span-2">
+            <DeckComparisonCard
+              commanders={analysis.commanders}
+              comparison={comparison}
+              edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
+              leastPopular={leastPopularCards(deck.entries)}
+            />
+          </section>
+        )}
         {analysis.handOdds && (
           <section className="card md:col-span-2">
             <HandOdds odds={analysis.handOdds} />

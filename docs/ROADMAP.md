@@ -94,20 +94,20 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 ## Fase 4 — Análise de deck (estilo mythic.tools)
 
-| #    | Item                                                                                                                                                                        | Tamanho | Status |
-| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ |
-| 4.1  | Curva de mana, símbolos por cor, contagem de terrenos                                                                                                                       | M       | ✅     |
-| 4.2  | Funções por heurística (ramp, compra, remoção, wipe) e **nota 0–100**                                                                                                       | M       | ✅     |
-| 4.3  | Validação de Commander (100 cartas, singleton, identidade de cor)                                                                                                           | P       | ✅     |
-| 4.4  | Sugestões com busca pronta no Scryfall                                                                                                                                      | P       | ✅     |
-| 4.4b | **Formato do deck** escolhido na importação (ou detectado no Archidekt/Moxfield) e validação/análise por formato (Commander, Brawl, Oathbreaker, construídos, limitados)    | M       | ✅     |
-| 4.5  | Classificação por **Scryfall Tagger** (`otag:`) em vez de regex — mais precisão e mais funções (tutores, proteção, recursão, wincons)                                       | G       | ✅     |
-| 4.6  | **Substituições sugeridas**: para cartas fracas/caras, buscar alternativas da mesma função, identidade de cor e CMC menor, ordenadas por popularidade (EDHREC rank) e preço | G       | ✅     |
-| 4.7  | Estimativa de **bracket/power level** (lista oficial de _Game Changers_, tutores, combos de 2 cartas, mana rápida, turnos extras)                                           | G       | ✅     |
-| 4.8  | Fontes de mana vs. símbolos por cor (recomendação de base de mana)                                                                                                          | M       | ✅     |
-| 4.9  | Simulação de mão inicial / probabilidade de jogar terreno no turno N (hipergeométrica)                                                                                      | M       | ✅     |
-| 4.10 | Comparação com a média de decks do mesmo comandante (dados do EDHREC, respeitando os termos de uso)                                                                         | G       |        |
-| 4.11 | Gráficos interativos e explicação de cada componente da nota                                                                                                                | M       | ✅     |
+| #    | Item                                                                                                                                                                        | Tamanho | Status                                                           |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------- |
+| 4.1  | Curva de mana, símbolos por cor, contagem de terrenos                                                                                                                       | M       | ✅                                                               |
+| 4.2  | Funções por heurística (ramp, compra, remoção, wipe) e **nota 0–100**                                                                                                       | M       | ✅                                                               |
+| 4.3  | Validação de Commander (100 cartas, singleton, identidade de cor)                                                                                                           | P       | ✅                                                               |
+| 4.4  | Sugestões com busca pronta no Scryfall                                                                                                                                      | P       | ✅                                                               |
+| 4.4b | **Formato do deck** escolhido na importação (ou detectado no Archidekt/Moxfield) e validação/análise por formato (Commander, Brawl, Oathbreaker, construídos, limitados)    | M       | ✅                                                               |
+| 4.5  | Classificação por **Scryfall Tagger** (`otag:`) em vez de regex — mais precisão e mais funções (tutores, proteção, recursão, wincons)                                       | G       | ✅                                                               |
+| 4.6  | **Substituições sugeridas**: para cartas fracas/caras, buscar alternativas da mesma função, identidade de cor e CMC menor, ordenadas por popularidade (EDHREC rank) e preço | G       | ✅                                                               |
+| 4.7  | Estimativa de **bracket/power level** (lista oficial de _Game Changers_, tutores, combos de 2 cartas, mana rápida, turnos extras)                                           | G       | ✅                                                               |
+| 4.8  | Fontes de mana vs. símbolos por cor (recomendação de base de mana)                                                                                                          | M       | ✅                                                               |
+| 4.9  | Simulação de mão inicial / probabilidade de jogar terreno no turno N (hipergeométrica)                                                                                      | M       | ✅                                                               |
+| 4.10 | Comparação com a média de decks do mesmo comandante (dados do EDHREC, respeitando os termos de uso)                                                                         | G       | ✅ (decks do app + popularidade do Scryfall; EDHREC só por link) |
+| 4.11 | Gráficos interativos e explicação de cada componente da nota                                                                                                                | M       | ✅                                                               |
 
 ## Fase 5 — Apps Android e iOS
 

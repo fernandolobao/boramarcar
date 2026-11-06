@@ -13,6 +13,7 @@ import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './a
 import { DeckImportForm } from './deck-forms';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
 import { DeckRoles, RefreshAnalysis } from './deck-roles';
+import { DeckComparisonCard } from './deck-comparison';
 import { openingHandOdds } from '@boramarcar/core';
 import { EventManage, EventStatusBadge } from './event-manage';
 import { NewEventForm, RsvpButtons } from './event-forms';
@@ -308,6 +309,25 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['HandOdds', <HandOdds key="ho" odds={openingHandOdds({ library: 99, lands: 37, ramp: 10 })} />],
+  [
+    'DeckComparisonCard',
+    <DeckComparisonCard
+      key="cmp"
+      commanders={['Omnath, Locus of Mana']}
+      edhrecUrl="https://edhrec.com/commanders/omnath-locus-of-mana"
+      leastPopular={[{ name: 'Rara', rank: 20000 }]}
+      comparison={{
+        decks: 2,
+        metrics: [
+          { key: 'score', value: 60, average: 75 },
+          { key: 'lands', value: 36, average: 36 },
+          { key: 'averageCmc', value: null, average: 3 },
+        ],
+        commonMissing: [{ name: 'Arcane Signet', share: 1 }],
+        unique: ['Minha Carta'],
+      }}
+    />,
+  ],
   ['RefreshAnalysis', <RefreshAnalysis key="ra" deckId="d" stale />],
   [
     'DeckRoles',

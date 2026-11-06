@@ -1,5 +1,8 @@
 import {
   analyzeDeck,
+  comparableCards,
+  compareWithDecks,
+  type AnalyzableCard,
   deckFormatProfile,
   deckListHash,
   estimateBracket,
@@ -792,4 +795,120 @@ export async function touchCards(db: Database, ids: readonly string[]) {
     .update(cards)
     .set({ updatedAt: new Date() })
     .where(inArray(cards.scryfallId, [...ids]));
+}
+
+/** Ids de quem divide algum grupo com a pessoa (incluindo ela mesma). */
+async function groupMatesOf(db: Database, userId: string) {
+  const mine = alias(groupMembers, 'mine');
+  const rows = await db
+    .selectDistinct({ userId: groupMembers.userId })
+    .from(groupMembers)
+    .innerJoin(mine, eq(mine.groupId, groupMembers.groupId))
+    .where(eq(mine.userId, userId));
+  return new Set([userId, ...rows.map((r) => r.userId)]);
+}
+
+/** Máximo de decks na média, para a consulta continuar leve. */
+export const COMPARISON_MAX_DECKS = 50;
+
+/**
+ * Comparação (4.10) com outros decks do **mesmo comandante** (mesmo conjunto de comandantes)
+ * cadastrados no app que a pessoa pode ver: os próprios, os públicos e os de grupo de quem divide
+ * grupo com ela. O EDHREC não permite consultas automáticas, então a base é a do próprio app.
+ */
+export async function compareWithCommanderDecks(
+  db: Database,
+  input: {
+    deckId: string;
+    viewerId: string;
+    format: string;
+    commanders: readonly string[];
+    entries: readonly AnalyzableCard[];
+  },
+) {
+  const wanted = [...new Set(input.commanders.map((c) => c.toLowerCase()))].sort();
+  if (!wanted.length) return null;
+  const candidates = await db
+    .select({ deckId: deckCards.deckId, name: deckCards.cardName })
+    .from(deckCards)
+    .where(
+      and(
+        eq(deckCards.board, 'commander'),
+        inArray(
+          deckCards.deckId,
+          db
+            .select({ id: deckCards.deckId })
+            .from(deckCards)
+            .where(
+              and(
+                eq(deckCards.board, 'commander'),
+                sql`lower(${deckCards.cardName}) = ${wanted[0]}`,
+              ),
+            ),
+        ),
+      ),
+    );
+  const byDeck = new Map<string, Set<string>>();
+  for (const c of candidates) {
+    if (c.deckId === input.deckId) continue;
+    const set = byDeck.get(c.deckId) ?? new Set<string>();
+    set.add(c.name.toLowerCase());
+    byDeck.set(c.deckId, set);
+  }
+  const sameCommanders = [...byDeck]
+    .filter(([, names]) => [...names].sort().join('|') === wanted.join('|'))
+    .map(([id]) => id);
+
+  const mates = await groupMatesOf(db, input.viewerId);
+  const visible = sameCommanders.length
+    ? (
+        await db
+          .select({
+            id: decks.id,
+            ownerId: decks.ownerId,
+            visibility: decks.visibility,
+            format: decks.format,
+          })
+          .from(decks)
+          .where(inArray(decks.id, sameCommanders))
+          .orderBy(desc(decks.updatedAt))
+      )
+        .filter(
+          (d) =>
+            d.ownerId === input.viewerId ||
+            d.visibility === 'public' ||
+            (d.visibility === 'group' && mates.has(d.ownerId)),
+        )
+        .slice(0, COMPARISON_MAX_DECKS)
+    : [];
+
+  const rows = visible.length
+    ? await db
+        .select({ entry: deckCards, card: cards })
+        .from(deckCards)
+        .leftJoin(cards, eq(cards.scryfallId, deckCards.scryfallId))
+        .where(
+          inArray(
+            deckCards.deckId,
+            visible.map((d) => d.id),
+          ),
+        )
+    : [];
+  const others = visible.map((d) => {
+    const entries: AnalyzableCard[] = rows
+      .filter((r) => r.entry.deckId === d.id)
+      .map(({ entry, card }) => ({
+        name: entry.cardName,
+        quantity: entry.quantity,
+        board: entry.board,
+        isProxy: entry.isProxy,
+        card: card ? toCardData(card) : null,
+      }));
+    return { analysis: analyzeDeck(entries, d.format), cards: comparableCards(entries) };
+  });
+  const target = {
+    analysis: analyzeDeck(input.entries, input.format),
+    cards: comparableCards(input.entries),
+  };
+  return compareWithDecks(target, others);
 }
