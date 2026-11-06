@@ -7,6 +7,7 @@
  */
 import {
   Award,
+  FlipHorizontal2,
   Monitor,
   Moon,
   Sun,
@@ -155,6 +156,7 @@ export const Icons = {
   alternatives: Shuffle,
   bracket: Gauge,
   openingHand: Hand,
+  flip: FlipHorizontal2,
   // Tema
   themeSystem: Monitor,
   themeLight: Sun,

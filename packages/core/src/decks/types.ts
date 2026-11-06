@@ -56,6 +56,9 @@ export interface CardData {
   setCode?: string | null;
   setName?: string | null;
   collectorNumber?: string | null;
+  /** Verso de cartas de duas faces (transformar, MDFC…); `null` = carta de uma face só. */
+  backImageUri?: string | null;
+  backName?: string | null;
 }
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;

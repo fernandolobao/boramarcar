@@ -439,7 +439,11 @@
     "printInUse": "Em uso",
     "printSave": "Usar esta edição",
     "printCopiesInvalid": "Informe um número de cópias válido.",
-    "printOf": "Edição: {set} ({print})"
+    "printOf": "Edição: {set} ({print})",
+    "flip": "Virar",
+    "faces": "Faces da carta",
+    "faceFront": "Frente",
+    "faceBack": "Verso"
   },
   "analysis": {
     "title": "Análise",

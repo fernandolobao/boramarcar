@@ -34,6 +34,8 @@ export interface DeckLineView {
     setCode?: string | null;
     setName?: string | null;
     collectorNumber?: string | null;
+    backImageUri?: string | null;
+    backName?: string | null;
   } | null;
 }
 
@@ -71,6 +73,17 @@ export function DeckCards({
   const format = useFormatter();
   const [view, setView] = useState<View>('visual');
   const [zoomed, setZoomed] = useState<DeckLineView | null>(null);
+  /** Cartas de duas faces mostrando o verso (na grade e no diálogo). */
+  const [flipped, setFlipped] = useState<ReadonlySet<string>>(new Set());
+  const toggleFlip = (key: string) =>
+    setFlipped((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  const imageOf = (line: DeckLineView) =>
+    flipped.has(line.key) && line.card?.backImageUri ? line.card.backImageUri : line.card?.imageUri;
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const titleId = useId();
@@ -151,9 +164,9 @@ export function DeckCards({
                       aria-haspopup="dialog"
                       onClick={(e) => openZoom(line, e.currentTarget)}
                     >
-                      {line.card?.imageUri ? (
+                      {imageOf(line) ? (
                         <Image
-                          src={line.card.imageUri}
+                          src={imageOf(line)!}
                           alt=""
                           fill
                           unoptimized
@@ -166,6 +179,18 @@ export function DeckCards({
                         </span>
                       )}
                     </button>
+                    {line.card?.backImageUri && (
+                      <button
+                        type="button"
+                        className="absolute right-1.5 bottom-[6%] inline-flex items-center gap-1 rounded-md bg-zinc-950/85 px-1.5 py-1 text-xs font-medium text-white hover:bg-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                        aria-pressed={flipped.has(line.key)}
+                        onClick={() => toggleFlip(line.key)}
+                      >
+                        <Icon name="flip" className="size-3.5 shrink-0" />
+                        {t('flip')}
+                        <span className="sr-only"> ({line.name})</span>
+                      </button>
+                    )}
                     {/* Selos fora do botão: o nome acessível fica só "Ampliar …" (WCAG 2.5.3). */}
                     {line.quantity > 1 && (
                       <span
@@ -326,11 +351,36 @@ export function DeckCards({
                 {t('close')}
               </button>
             </div>
-            {zoomed.card?.imageUri ? (
+            {zoomed.card?.backImageUri && (
+              <div role="group" aria-label={t('faces')} className="flex gap-2">
+                {(['front', 'back'] as const).map((face) => {
+                  const showingBack = flipped.has(zoomed.key);
+                  const pressed = face === 'back' ? showingBack : !showingBack;
+                  return (
+                    <button
+                      key={face}
+                      type="button"
+                      className={pressed ? 'btn-primary' : 'btn-secondary'}
+                      aria-pressed={pressed}
+                      onClick={() => {
+                        if (!pressed) toggleFlip(zoomed.key);
+                      }}
+                    >
+                      {t(face === 'front' ? 'faceFront' : 'faceBack')}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {imageOf(zoomed) ? (
               <div className="relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%]">
                 <Image
-                  src={zoomed.card.imageUri}
-                  alt={zoomed.name}
+                  src={imageOf(zoomed)!}
+                  alt={
+                    flipped.has(zoomed.key) && zoomed.card?.backName
+                      ? zoomed.card.backName
+                      : zoomed.name
+                  }
                   fill
                   unoptimized
                   sizes="26rem"

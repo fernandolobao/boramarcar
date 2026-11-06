@@ -89,6 +89,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 3.13 | Atualização periódica do cache Scryfall (bulk data diário via Vercel Cron)                                                                                                                                             | M       | ✅ (cartas dos decks via `/cards/collection`)  |
 | 3.14 | **Gestão de decks visual e responsiva**: grade de decks com arte do comandante, identidade de cor e tipo de jogo; deck em modo visual (imagens por tipo, ampliar em diálogo) ou lista; renomear e mudar o tipo de jogo | M       | ✅                                             |
 | 3.15 | **Edições (impressões)**: a mesma carta em várias edições no deck; importação mantém a edição (id, ou `(SET) número` na lista colada); trocar a edição de parte das cópias no editor; exportação com `(SET) número`    | M       | ✅                                             |
+| 3.16 | **Cartas de duas faces** (transformar, MDFC): virar na grade, frente/verso no diálogo e as duas faces na folha de proxies                                                                                              | P       | ✅                                             |
 
 \* A API do Moxfield não é pública e costuma exigir um _User-Agent_ aprovado. Ação: pedir acesso ao Moxfield; enquanto isso, a importação por texto ("Export → Copy for MTGA/Plain text") funciona sempre.
 

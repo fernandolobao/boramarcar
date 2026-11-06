@@ -165,6 +165,10 @@ Cada linha de `deck_cards` aponta para uma impressão (`scryfall_id`); o índice
 - **Exportação**: `1 Sol Ring (CMM) 400`, aceito por Moxfield, Archidekt e Arena — e reimportável aqui com a mesma edição.
 - A validação de cópias (singleton, 4 cópias) soma todas as edições pelo nome; a folha de proxies e o preço usam a imagem e o preço de cada edição.
 
+## Cartas de duas faces
+
+Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e com uma imagem por face em `card_faces`; guardamos a frente em `image_uri` e o verso em `back_image_uri`/`back_name` (cartas divididas e aventuras têm uma imagem só e ficam sem verso). Na grade, o botão "Virar" troca a imagem; no diálogo, "Frente"/"Verso". Na folha de proxies, cada cópia sai com as duas faces lado a lado. Cartas que já estavam no cache ganham o verso na atualização diária (cron) ou ao atualizar a análise.
+
 ## Atualização do cache de cartas (cron)
 
 `/api/cron/scryfall` roda todo dia às 06:43 UTC (`vercel.json`, protegido por `CRON_SECRET`, como o cron de lembretes). Em vez do _bulk data_ do Scryfall (centenas de MB, pesado demais para uma função serverless), relê pelo `/cards/collection` só as cartas que estão em algum deck e não foram atualizadas nas últimas 20 h, das mais antigas para as mais novas, até 1 500 por execução (20 lotes de 75, 100 ms entre lotes). Assim preços, Game Changers, imagens e edições ficam em dia; cartas que sumiram do Scryfall são marcadas como verificadas para não repetir a consulta.

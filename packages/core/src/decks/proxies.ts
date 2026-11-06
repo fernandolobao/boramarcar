@@ -52,19 +52,32 @@ export interface PrintableLine {
   name: string;
   quantity: number;
   proxies: number;
-  card: { imageUri?: string | null } | null;
+  card: {
+    imageUri?: string | null;
+    backImageUri?: string | null;
+    backName?: string | null;
+  } | null;
 }
 
-/** Uma entrada por cópia a imprimir: só proxies (padrão) ou o deck todo. */
+/**
+ * Uma entrada por cópia a imprimir: só proxies (padrão) ou o deck todo. Cartas de duas faces
+ * entram com a frente e o verso lado a lado (para colar frente com verso ou usar no sleeve).
+ */
 export function expandPrintList(
   lines: readonly PrintableLine[],
   which: 'proxies' | 'all' = 'proxies',
 ) {
   return lines.flatMap((line) =>
-    Array.from({ length: which === 'proxies' ? line.proxies : line.quantity }, () => ({
-      name: line.name,
-      imageUri: line.card?.imageUri ? printImageUrl(line.card.imageUri) : null,
-    })),
+    Array.from({ length: which === 'proxies' ? line.proxies : line.quantity }, () => {
+      const front = {
+        name: line.name,
+        imageUri: line.card?.imageUri ? printImageUrl(line.card.imageUri) : null,
+      };
+      const back = line.card?.backImageUri;
+      return back
+        ? [front, { name: line.card?.backName ?? line.name, imageUri: printImageUrl(back) }]
+        : [front];
+    }).flat(),
   );
 }
 
