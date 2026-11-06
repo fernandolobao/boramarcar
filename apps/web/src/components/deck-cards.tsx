@@ -1,8 +1,14 @@
 'use client';
 
-import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@boramarcar/core';
+import {
+  DECK_BOARDS,
+  groupEntriesByType,
+  ligaMagicCardUrl,
+  MAX_COPIES,
+  type DeckBoard,
+} from '@boramarcar/core';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { CardSearch } from './card-search';
@@ -21,6 +27,7 @@ export interface DeckLineView {
     cmc: number;
     manaCost?: string | null;
     imageUri?: string | null;
+    priceUsd?: string | null;
   } | null;
 }
 
@@ -45,12 +52,17 @@ export function DeckCards({
   deckId,
   lines,
   isOwner,
+  usdBrl = null,
 }: {
   deckId: string;
   lines: DeckLineView[];
   isOwner: boolean;
+  /** Cotação do dólar para mostrar o preço da carta também em reais. */
+  usdBrl?: number | null;
 }) {
   const t = useTranslations('decks');
+  const tc = useTranslations('common');
+  const format = useFormatter();
   const [view, setView] = useState<View>('visual');
   const [zoomed, setZoomed] = useState<DeckLineView | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -320,6 +332,37 @@ export function DeckCards({
               </p>
             )}
             <ProxyBadge line={zoomed} />
+            {zoomed.card?.priceUsd && (
+              <p className="text-sm">
+                {usdBrl
+                  ? t('cardPriceBrl', {
+                      usd: format.number(Number(zoomed.card.priceUsd), {
+                        style: 'currency',
+                        currency: 'USD',
+                      }),
+                      brl: format.number(Number(zoomed.card.priceUsd) * usdBrl, {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }),
+                    })
+                  : t('cardPrice', {
+                      usd: format.number(Number(zoomed.card.priceUsd), {
+                        style: 'currency',
+                        currency: 'USD',
+                      }),
+                    })}
+              </p>
+            )}
+            <a
+              href={ligaMagicCardUrl(zoomed.name)}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-secondary w-full"
+            >
+              <Icon name="externalLink" />
+              {t('ligaMagic')}
+              <span className="sr-only"> {tc('newTab')}</span>
+            </a>
           </div>
         )}
       </dialog>

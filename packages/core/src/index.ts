@@ -9,3 +9,4 @@ export * from './email';
 export * from './games';
 export * from './stats';
 export * from './achievements';
+export * from './currency';

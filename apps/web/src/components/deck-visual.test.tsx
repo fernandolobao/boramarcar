@@ -52,7 +52,7 @@ const lines = [
     quantity: 1,
     proxies: 1,
     board: 'mainboard' as const,
-    card: card('Creature — Elf', 'https://cards.scryfall.io/normal/e.jpg'),
+    card: { ...card('Creature — Elf', 'https://cards.scryfall.io/normal/e.jpg'), priceUsd: '0.50' },
   },
   {
     key: 'mainboard|forest',
@@ -81,7 +81,7 @@ const audit = async (container: HTMLElement) =>
 
 describe('DeckCards', () => {
   it('modo visual agrupa por tipo, amplia a carta em diálogo e devolve o foco', async () => {
-    const { container } = wrap(<DeckCards deckId="d" lines={lines} isOwner />);
+    const { container } = wrap(<DeckCards deckId="d" lines={lines} isOwner usdBrl={5.4} />);
     expect(screen.getByRole('button', { name: 'Visual' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
       'Comandante (1)',
@@ -102,6 +102,11 @@ describe('DeckCards', () => {
     expect(
       within(dialog).getByRole('img', { name: 'Custo de mana: 1, verde' }),
     ).toBeInTheDocument();
+    expect(within(dialog).getByText(/Preço: US\$\s?0,50 ≈ R\$\s?2,70/)).toBeInTheDocument();
+    expect(within(dialog).getByRole('link', { name: /Ver preço na LigaMagic/ })).toHaveAttribute(
+      'href',
+      'https://www.ligamagic.com.br/?view=cards/card&card=Elvish%20Mystic',
+    );
     fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(zoom).toHaveFocus();

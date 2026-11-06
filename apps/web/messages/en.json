@@ -412,7 +412,12 @@
       "group": "People in a group with you can see the deck (default).",
       "public": "Anyone with a Bora Marcar account and the link can see the deck."
     },
-    "visibilityLabel": "Who can see this deck"
+    "visibilityLabel": "Who can see this deck",
+    "priceBrl": "≈ {total} (proxies: {proxies})",
+    "priceHintBrl": "Scryfall prices in US dollars, updated on import; in reais, converted using the Central Bank of Brazil PTAX rate ({rate} on {date}). These aren't Brazilian store prices — check each card on LigaMagic.",
+    "ligaMagic": "See price on LigaMagic",
+    "cardPrice": "Price: {usd}",
+    "cardPriceBrl": "Price: {usd} ≈ {brl}"
   },
   "analysis": {
     "title": "Analysis",

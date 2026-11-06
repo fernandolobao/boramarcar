@@ -412,7 +412,12 @@
       "group": "Quem participa de um grupo com você vê o deck (padrão).",
       "public": "Qualquer pessoa com conta no Bora Marcar e o link vê o deck."
     },
-    "visibilityLabel": "Quem vê este deck"
+    "visibilityLabel": "Quem vê este deck",
+    "priceBrl": "≈ {total} (proxies: {proxies})",
+    "priceHintBrl": "Preços do Scryfall em dólar, atualizados na importação; em reais, convertidos pelo dólar PTAX do Banco Central ({rate} em {date}). Não são os preços das lojas brasileiras — veja cada carta na LigaMagic.",
+    "ligaMagic": "Ver preço na LigaMagic",
+    "cardPrice": "Preço: {usd}",
+    "cardPriceBrl": "Preço: {usd} ≈ {brl}"
   },
   "analysis": {
     "title": "Análise",

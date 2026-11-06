@@ -3,6 +3,7 @@ import {
   artCropUrl,
   DECK_VISIBILITIES,
   deckPrice,
+  usdToBrl,
   isDomainError,
   isGameFormat,
   type DeckVisibility,
@@ -26,6 +27,7 @@ import { DeckCards } from '@/components/deck-cards';
 import { DeckTools } from '@/components/deck-tools';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
 import { requireUser } from '@/server/current-user';
+import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
 
 type Props = { params: Promise<{ id: string }> };
@@ -65,6 +67,8 @@ export default async function DeckPage({ params }: Props) {
   ];
   const price = deckPrice(deck.entries.filter((e) => e.board !== 'maybeboard'));
   const usd = (value: number) => fmt.number(value, { style: 'currency', currency: 'USD' });
+  const brl = (value: number) => fmt.number(value, { style: 'currency', currency: 'BRL' });
+  const rate = price.total > 0 ? await getUsdBrlRate() : null;
   const background = artCropUrl(hero?.card?.imageUri);
 
   return (
@@ -132,10 +136,28 @@ export default async function DeckPage({ params }: Props) {
               <p className="text-sm">
                 <span className="font-medium">{t('price')}:</span>{' '}
                 {t('priceValue', { total: usd(price.total), proxies: usd(price.proxies) })}
+                {rate && (
+                  <>
+                    {' · '}
+                    {t('priceBrl', {
+                      total: brl(usdToBrl(price.total, rate.rate)),
+                      proxies: brl(usdToBrl(price.proxies, rate.rate)),
+                    })}
+                  </>
+                )}
                 {price.missing > 0 && (
                   <span className="muted"> · {t('priceMissing', { count: price.missing })}</span>
                 )}
-                <span className="muted block text-xs">{t('priceHint')}</span>
+                <span className="muted block text-xs">
+                  {rate
+                    ? t('priceHintBrl', {
+                        rate: brl(rate.rate),
+                        date: fmt.dateTime(new Date(`${rate.date}T12:00:00Z`), {
+                          dateStyle: 'short',
+                        }),
+                      })
+                    : t('priceHint')}
+                </span>
               </p>
             )}
             {deck.isOwner && (
@@ -190,7 +212,12 @@ export default async function DeckPage({ params }: Props) {
         </section>
       </div>
 
-      <DeckCards deckId={deck.id} lines={deck.lines} isOwner={deck.isOwner} />
+      <DeckCards
+        deckId={deck.id}
+        lines={deck.lines}
+        isOwner={deck.isOwner}
+        usdBrl={rate?.rate ?? null}
+      />
 
       <DeckTools
         deckId={deck.id}
