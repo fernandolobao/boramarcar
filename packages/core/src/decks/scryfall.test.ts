@@ -110,4 +110,21 @@ describe('fetchScryfallAutocomplete', () => {
       fetchScryfallAutocomplete('sol', { fetch: async () => new Response('x', { status: 503 }) }),
     ).rejects.toMatchObject({ code: 'upstream_error' });
   });
+
+  it('busca cartas e trata "sem resultados"', async () => {
+    const { fetchScryfallSearch } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json({
+        data: [scryCard('Arcane Signet', { produced_mana: ['C'], game_changer: false })],
+      }),
+    );
+    const found = await fetchScryfallSearch('otag:ramp id<=g', { fetch: fetchMock });
+    expect(found.map((c) => [c.name, c.producedMana])).toEqual([['Arcane Signet', ['C']]]);
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://api.scryfall.com/cards/search?q=otag%3Aramp%20id%3C%3Dg&order=edhrec&unique=cards',
+    );
+    expect(
+      await fetchScryfallSearch('x', { fetch: async () => new Response('{}', { status: 404 }) }),
+    ).toEqual([]);
+  });
 });

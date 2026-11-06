@@ -7,6 +7,10 @@
  */
 import {
   Award,
+  Gauge,
+  Hand,
+  Shuffle,
+  TriangleAlert,
   Footprints,
   Gem,
   Heart,
@@ -142,6 +146,12 @@ export const Icons = {
   fromText: ClipboardPaste,
   gallery: LayoutGrid,
   list: List,
+  // Análise de deck
+  ok: CircleCheck,
+  warning: TriangleAlert,
+  alternatives: Shuffle,
+  bracket: Gauge,
+  openingHand: Hand,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof Icons;

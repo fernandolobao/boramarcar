@@ -26,6 +26,9 @@ const scryfallCardSchema = z.object({
   image_uris: z.object({ normal: z.string() }).partial().optional(),
   card_faces: z.array(faceSchema).optional(),
   prices: z.object({ usd: z.string().nullable().optional() }).optional(),
+  produced_mana: z.array(z.string()).optional(),
+  game_changer: z.boolean().optional(),
+  edhrec_rank: z.number().nullable().optional(),
 });
 
 const collectionSchema = z.object({
@@ -57,6 +60,9 @@ export function mapScryfallCard(raw: unknown): CardData {
     colorIdentity: card.color_identity,
     imageUri: card.image_uris?.normal ?? front?.image_uris?.normal ?? null,
     priceUsd: card.prices?.usd ?? null,
+    producedMana: card.produced_mana ?? [],
+    gameChanger: card.game_changer ?? false,
+    edhrecRank: card.edhrec_rank ?? null,
   };
 }
 
@@ -158,4 +164,26 @@ export async function fetchScryfallAutocomplete(
     throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
   }
   return autocompleteSchema.parse(await response.json()).data;
+}
+
+const searchSchema = z.object({ data: z.array(z.unknown()) });
+
+/** Primeira página de uma busca do Scryfall (`/cards/search`); sem resultados = lista vazia. */
+export async function fetchScryfallSearch(
+  q: string,
+  {
+    fetch: fetchFn,
+    userAgent = 'BoraMarcar/0.1',
+    order = 'edhrec',
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'> & { order?: string },
+): Promise<CardData[]> {
+  const response = await fetchFn(
+    `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&order=${order}&unique=cards`,
+    { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
+  );
+  if (response.status === 404) return [];
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  return searchSchema.parse(await response.json()).data.map(mapScryfallCard);
 }

@@ -50,6 +50,13 @@
       "when": 1793974664395,
       "tag": "0006_visibilidade_decks",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793991945972,
+      "tag": "0007_analise_deck",
+      "breakpoints": true
     }
   ]
 }

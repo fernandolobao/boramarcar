@@ -1,5 +1,11 @@
 import {
   analyzeDeck,
+  deckFormatProfile,
+  deckListHash,
+  estimateBracket,
+  parseBracketSignals,
+  spellbookDeck,
+  type BracketSignals,
   artCropUrl,
   DECK_VISIBILITIES,
   isGameFormat,
@@ -37,6 +43,9 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         colorIdentity: c.colorIdentity,
         imageUri: c.imageUri ?? null,
         priceUsd: c.priceUsd ?? null,
+        producedMana: c.producedMana ?? null,
+        gameChanger: c.gameChanger ?? false,
+        edhrecRank: c.edhrecRank ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -52,6 +61,10 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         colorIdentity: sql`excluded.color_identity`,
         imageUri: sql`excluded.image_uri`,
         priceUsd: sql`excluded.price_usd`,
+        // Dados novos não apagam os já conhecidos (ex.: carta vinda de um cache antigo).
+        producedMana: sql`coalesce(excluded.produced_mana, ${cards.producedMana})`,
+        gameChanger: sql`excluded.game_changer`,
+        edhrecRank: sql`coalesce(excluded.edhrec_rank, ${cards.edhrecRank})`,
         updatedAt: new Date(),
       },
     });
@@ -90,14 +103,75 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
     colorIdentity: card.colorIdentity,
     imageUri: card.imageUri,
     priceUsd: card.priceUsd,
+    producedMana: card.producedMana,
+    gameChanger: card.gameChanger,
+    edhrecRank: card.edhrecRank,
+    roles: card.roles,
   };
+}
+
+/** Funções do Tagger valem por 30 dias. */
+export const ROLES_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+/** Cartas de um deck que precisam de dados novos (mana produzida ou funções do Tagger). */
+export async function deckCardsForEnrichment(db: Database, deckId: string) {
+  const rows = await db
+    .selectDistinct({
+      scryfallId: cards.scryfallId,
+      name: cards.name,
+      producedMana: cards.producedMana,
+      rolesCheckedAt: cards.rolesCheckedAt,
+      typeLine: cards.typeLine,
+    })
+    .from(deckCards)
+    .innerJoin(cards, eq(cards.scryfallId, deckCards.scryfallId))
+    .where(eq(deckCards.deckId, deckId));
+  const cutoff = Date.now() - ROLES_TTL_MS;
+  return {
+    missingMana: rows.filter((r) => r.producedMana === null).map((r) => r.scryfallId),
+    staleRoles: rows
+      .filter((r) => !r.rolesCheckedAt || r.rolesCheckedAt.getTime() < cutoff)
+      .map((r) => ({ scryfallId: r.scryfallId, name: r.name })),
+  };
+}
+
+/** Grava as funções do Tagger (lista vazia = consultada e sem funções). */
+export async function saveCardRoles(
+  db: Database,
+  items: readonly { scryfallId: string; roles: readonly string[] }[],
+) {
+  const now = new Date();
+  for (const item of items) {
+    await db
+      .update(cards)
+      .set({ roles: [...item.roles], rolesCheckedAt: now })
+      .where(eq(cards.scryfallId, item.scryfallId));
+  }
+}
+
+/** Guarda os sinais do Commander Spellbook para a lista atual do deck. */
+export async function saveBracketSignals(
+  db: Database,
+  input: { deckId: string; hash: string; signals: BracketSignals },
+) {
+  await db
+    .update(decks)
+    // Mantém `updated_at`: é um cache, não uma edição do dono.
+    .set({
+      bracketSignals: input.signals,
+      bracketHash: input.hash,
+      updatedAt: sql`${decks.updatedAt}`,
+    })
+    .where(eq(decks.id, input.deckId));
 }
 
 /** Salva um deck importado junto com o cache das cartas encontradas no Scryfall. */
 export async function saveImportedDeck(
   db: Database,
-  input: { ownerId: string; deck: ImportedDeck; cards: readonly CardData[] },
+  input: { ownerId: string; deck: ImportedDeck; cards: readonly CardData[]; format?: string },
 ) {
+  const format = input.format ?? 'commander';
+  if (!isGameFormat(format)) throw new DomainError('invalid_input', 'Formato inválido');
   const name = input.deck.name.trim();
   if (!name) throw new DomainError('invalid_input', 'Informe o nome do deck');
   if (!input.deck.entries.length) throw new DomainError('invalid_input', 'O deck está vazio');
@@ -111,6 +185,7 @@ export async function saveImportedDeck(
       .values({
         ownerId: input.ownerId,
         name,
+        format,
         source: input.deck.source,
         sourceId: input.deck.sourceId ?? null,
         sourceUrl: input.deck.sourceUrl ?? null,
@@ -221,14 +296,45 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
     .from(user)
     .where(eq(user.id, deck.ownerId))
     .limit(1);
+  const analysis = analyzeDeck(entries, deck.format);
+  const profile = deckFormatProfile(deck.format);
+  const hash = deckListHash(spellbookDeck(entries));
+  const stored = deck.bracketHash === hash ? parseBracketSignals(deck.bracketSignals) : null;
+  const bracket = profile.brackets
+    ? {
+        ...estimateBracket(
+          stored ?? {
+            gameChangers: analysis.gameChangers,
+            massLandDenial: [],
+            extraTurns: [],
+            combos: [],
+          },
+        ),
+        /** `spellbook` = combos e cartas conferidos; `local` = só os Game Changers. */
+        source: stored ? ('spellbook' as const) : ('local' as const),
+      }
+    : null;
+  const roleCutoff = Date.now() - ROLES_TTL_MS;
+  const analysisStale =
+    rows.some(
+      ({ card }) =>
+        card &&
+        (card.producedMana === null ||
+          !card.rolesCheckedAt ||
+          card.rolesCheckedAt.getTime() < roleCutoff),
+    ) ||
+    (profile.brackets && !stored);
+  const { bracketSignals: _signals, bracketHash: _hash, ...deckFields } = deck;
   return {
-    ...deck,
+    ...deckFields,
     ownerName: owner?.name ?? '',
     isOwner: deck.ownerId === input.viewerId,
     entries,
     /** Uma linha por carta/board, com total e quantas cópias são proxy (3.6). */
     lines: mergeDeckLines(entries),
-    analysis: analyzeDeck(entries),
+    analysis,
+    bracket,
+    analysisStale,
   };
 }
 

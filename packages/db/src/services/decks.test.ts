@@ -4,6 +4,9 @@ import type { Database } from '../client';
 import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import {
+  deckCardsForEnrichment,
+  saveBracketSignals,
+  saveCardRoles,
   deleteDeck,
   getDeck,
   listDecks,
@@ -336,5 +339,62 @@ describe('editor e sincronização', () => {
     expect(detail.lines.find((l) => l.name === 'Forest')!.card).toMatchObject({
       scryfallId: 'forest',
     });
+  });
+});
+
+describe('análise (formato, Tagger e bracket)', () => {
+  it('guarda o formato da importação e analisa conforme ele', async () => {
+    const owner = await createTestUser(db, { name: 'Formato' });
+    const saved = await saveImportedDeck(db, {
+      ownerId: owner.id,
+      deck: { ...deck, name: 'Mono-G Modern' },
+      cards: cardsData,
+      format: 'modern',
+    });
+    expect(saved.format).toBe('modern');
+    const detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.analysis.kind).toBe('constructed');
+    expect(detail.analysis.score).toBeNull();
+    expect(detail.bracket).toBeNull();
+    await expect(
+      saveImportedDeck(db, { ownerId: owner.id, deck, cards: [], format: 'xadrez' }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+
+  it('lista cartas a enriquecer, grava funções e sinais de bracket', async () => {
+    const owner = await createTestUser(db, { name: 'Bracket' });
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+    let detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.analysisStale).toBe(true);
+    expect(detail.bracket).toMatchObject({ minimum: 2, source: 'local' });
+    expect('bracketSignals' in detail).toBe(false);
+
+    const pending = await deckCardsForEnrichment(db, saved.id);
+    expect(pending.missingMana).toEqual([]);
+    expect(pending.staleRoles.map((c) => c.name).sort()).toEqual([
+      'Forest',
+      'Omnath, Locus of Mana',
+      'Sol Ring',
+    ]);
+    await saveCardRoles(
+      db,
+      pending.staleRoles.map((c) => ({
+        scryfallId: c.scryfallId,
+        roles: c.name === 'Sol Ring' ? ['ramp'] : [],
+      })),
+    );
+    const { deckListHash, spellbookDeck } = await import('@boramarcar/core');
+    const before = detail.updatedAt;
+    await saveBracketSignals(db, {
+      deckId: saved.id,
+      hash: deckListHash(spellbookDeck(detail.entries)),
+      signals: { gameChangers: [], massLandDenial: ['Armageddon'], extraTurns: [], combos: [] },
+    });
+    detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.analysisStale).toBe(false);
+    expect(detail.updatedAt).toEqual(before);
+    expect(detail.bracket).toMatchObject({ minimum: 4, source: 'spellbook' });
+    expect(detail.analysis.rolesTagged).toEqual({ tagged: 2, total: 2 });
+    expect((await deckCardsForEnrichment(db, saved.id)).staleRoles).toEqual([]);
   });
 });

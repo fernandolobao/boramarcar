@@ -11,6 +11,8 @@ import { fetchMoxfieldDeck } from '../src/decks/importers/moxfield';
 import { parseDeckUrl } from '../src/decks/importers/url';
 import { fetchScryfallAutocomplete, fetchScryfallCollection } from '../src/decks/scryfall';
 import { fetchUsdBrlRate } from '../src/currency';
+import { fetchCardRoles } from '../src/analysis/tagger';
+import { fetchSpellbookSignals } from '../src/analysis/brackets';
 import decks from './decks.json';
 
 const summary = (line: string) => {
@@ -80,5 +82,37 @@ describe('contrato com serviços externos', () => {
       }
       throw error;
     }
+  });
+
+  it('Scryfall Tagger: as tags usadas ainda classificam cartas conhecidas', async () => {
+    const roles = await fetchCardRoles(
+      ['Sol Ring', 'Rhystic Study', 'Swords to Plowshares', 'Wrath of God', 'Demonic Tutor'],
+      { fetch },
+    );
+    expect(roles.get('sol ring')).toContain('ramp');
+    expect(roles.get('rhystic study')).toContain('draw');
+    expect(roles.get('swords to plowshares')).toContain('removal');
+    expect(roles.get('wrath of god')).toContain('wipe');
+    expect(roles.get('demonic tutor')).toContain('tutor');
+    summary('✅ Scryfall Tagger OK');
+  });
+
+  it('Commander Spellbook: estimate-bracket acha um combo conhecido', async () => {
+    const signals = await fetchSpellbookSignals(
+      {
+        commanders: ['Kenrith, the Returned King'],
+        main: [
+          { name: "Thassa's Oracle", quantity: 1 },
+          { name: 'Demonic Consultation', quantity: 1 },
+          { name: 'Armageddon', quantity: 1 },
+          { name: 'Rhystic Study', quantity: 1 },
+        ],
+      },
+      fetch,
+    );
+    expect(signals.gameChangers).toContain('Rhystic Study');
+    expect(signals.massLandDenial).toContain('Armageddon');
+    expect(signals.combos.some((c) => c.cards.includes("Thassa's Oracle"))).toBe(true);
+    summary(`✅ Commander Spellbook OK (${signals.combos.length} combos)`);
   });
 });

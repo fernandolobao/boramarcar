@@ -8,6 +8,7 @@ import {
   resolveDeckImport,
   type DeckImportInput,
   type FetchLike,
+  type GameFormat,
 } from '@boramarcar/core';
 import {
   findCachedCardByName,
@@ -28,6 +29,8 @@ export async function importDeck(
   ownerId: string,
   input: DeckImportInput,
   fetchFn: FetchLike = fetch,
+  /** Formato escolhido; sem escolha, o detectado na origem ou Commander. */
+  format?: GameFormat,
 ) {
   const deck = await resolveDeckImport(input, {
     fetch: fetchFn,
@@ -44,7 +47,15 @@ export async function importDeck(
   const { cards, notFound } = missing.length
     ? await fetchScryfallCollection(missing, { fetch: fetchFn })
     : { cards: [], notFound: [] };
-  const saved = await saveImportedDeck(db, { ownerId, deck, cards });
+  const saved = await saveImportedDeck(db, {
+    ownerId,
+    deck,
+    cards,
+    format:
+      format ??
+      deck.format ??
+      (deck.entries.some((e) => e.board === 'commander') ? 'commander' : 'other'),
+  });
   return { deck: saved, notFound };
 }
 

@@ -115,13 +115,26 @@ Cada partida tem um `format` (texto, para poder adicionar tipos sem migration) c
 
 ### Análise de deck (`core/analysis`)
 
-1. Classificação de cada carta por **expressões regulares no texto de regras** (ramp, compra, remoção, wipes).
-2. Curva de mana (mainboard, sem terrenos), símbolos de mana por cor, CMC médio.
-3. Nota de 0 a 100 comparando com metas comuns de Commander: 36–38 terrenos (25 pts), 10 ramp (20), 10 compra (20), 8 remoções (15), 2 wipes (10), CMC médio ≤ 3 (10).
-4. Validação de Commander: 100 cartas, 1–2 comandantes, singleton (exceto básicos e "any number"), identidade de cor.
-5. Sugestões com uma busca pronta no Scryfall (`id<=<cores> otag:<função> f:commander cmc<=3`).
+A análise depende do **formato do deck** (`decks.format`, escolhido na importação ou detectado no Archidekt/Moxfield; `formats.ts` tem o perfil de cada um):
 
-É deliberadamente simples: a fase 4 do [roadmap](ROADMAP.md) troca as regex pelas tags do Scryfall Tagger e adiciona substituições reais.
+| Perfil     | Formatos                                                                                  | Regras verificadas                                          | Nota |
+| ---------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---- |
+| Comandante | Commander (100, 1–2 comandantes), Brawl (100, 1), Oathbreaker (60, planeswalker + mágica) | tamanho exato, singleton, identidade de cor                 | sim  |
+| Construído | Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Two-Headed Giant                      | mínimo 60, até 4 cópias (principal + reserva), reserva ≤ 15 | não  |
+| Limitado   | Draft, Selado                                                                             | mínimo 40                                                   | não  |
+| Livre      | Outro                                                                                     | só cartas desconhecidas                                     | não  |
+
+A lista de banidas não é conferida.
+
+1. **Funções** (4.5): as do **Scryfall Tagger** (`otag:ramp`, `card-advantage`, `removal`, `sweeper`, `tutor`, `protection`, `recursion`, `counterspell`), guardadas em `cards.roles` por 30 dias; enquanto a carta não foi consultada, vale a heurística por regex no texto. A tela mostra quantas cartas vieram do Tagger.
+2. Curva de mana (principal, sem terrenos), símbolos por cor, CMC médio.
+3. **Nota 0–100** só nos formatos com comandante: terrenos (25), ramp (20), compra (20), remoção (15), wipes (10), curva (10), com metas do perfil (Oathbreaker tem metas menores).
+4. **Alternativas** (4.6): `GET /api/v1/decks/:id/alternatives?role&maxCmc` busca no Scryfall `id<=<cores> otag:<função> f:<formato> cmc<=N` ordenado por EDHREC e tira as cartas que já estão no deck.
+5. **Bracket** (4.7, só Commander): `estimateBracket` aplica as regras objetivas dos brackets oficiais (Game Changers: nenhum até o 2, até 3 no 3; destruição em massa de terrenos e turnos extras encadeados → 4+; combo de duas cartas → 4+, "talvez de duas" → 3+). Os sinais vêm do endpoint `estimate-bracket` do **Commander Spellbook** e ficam em `decks.bracket_signals` com o hash da lista (`bracket_hash`); se a lista mudou, a tela usa só os Game Changers do Scryfall até a próxima consulta. O resultado é um mínimo — intenção e velocidade ficam com a mesa.
+6. **Base de mana** (4.8): terrenos que geram cada cor (`cards.produced_mana`) contra uma meta proporcional aos símbolos, com mínimo de 10 (Commander) ou 7 (60 cartas) para splash.
+7. **Mão inicial** (4.9): hipergeométrica — distribuição de terrenos na mão de 7, chance de 2–4 terrenos, jogada de terreno em todos os turnos até o 2–5 (jogando primeiro/depois) e ramp até o turno 2–3.
+
+**Atualização dos dados externos** (`server/deck-analysis.ts`): depois de importar ou sincronizar (e ao abrir um deck com dados velhos), `refreshDeckAnalysis` roda após a resposta (`after`) e, em etapas independentes, completa a mana produzida de cartas de cache antigo, consulta o Tagger (~8 funções × 2–3 buscas de até 1000 caracteres, 100 ms entre elas) e o Spellbook. O botão "Atualizar análise" chama `POST /api/v1/decks/:id/analysis`.
 
 ## Notificações por e-mail
 

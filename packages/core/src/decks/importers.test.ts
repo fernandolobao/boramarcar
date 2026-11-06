@@ -12,6 +12,7 @@ const json = (body: unknown, status = 200) =>
 const archidektPayload = {
   id: 123,
   name: 'Omnath Ramp',
+  deckFormat: 3,
   categories: [
     { name: 'Commander', includedInDeck: true, isPremier: true },
     { name: 'Ramp', includedInDeck: true },
@@ -49,6 +50,7 @@ const archidektPayload = {
 const moxfieldPayload = {
   publicId: 'abc-123',
   name: 'Omnath Mox',
+  format: 'modern',
   boards: {
     commanders: {
       cards: {
@@ -84,7 +86,13 @@ describe('parseDeckUrl', () => {
 describe('Archidekt', () => {
   it('mapeia comandante, mainboard, maybeboard e foil', () => {
     const deck = mapArchidektDeck(archidektPayload);
-    expect(deck).toMatchObject({ name: 'Omnath Ramp', source: 'archidekt', sourceId: '123' });
+    expect(deck).toMatchObject({
+      name: 'Omnath Ramp',
+      source: 'archidekt',
+      sourceId: '123',
+      format: 'commander',
+    });
+    expect(mapArchidektDeck({ ...archidektPayload, deckFormat: 7 }).format).toBeUndefined();
     expect(deck.entries).toEqual([
       { name: 'Omnath, Locus of Mana', quantity: 1, board: 'commander', scryfallId: 'omnath-id' },
       {
@@ -122,6 +130,8 @@ describe('Moxfield', () => {
   it('mapeia boards', () => {
     const deck = mapMoxfieldDeck(moxfieldPayload);
     expect(deck.sourceUrl).toBe('https://moxfield.com/decks/abc-123');
+    expect(deck.format).toBe('modern');
+    expect(mapMoxfieldDeck({ ...moxfieldPayload, format: 'canlander' }).format).toBeUndefined();
     expect(deck.entries.map((e) => [e.name, e.board, e.quantity])).toEqual([
       ['Omnath, Locus of Mana', 'commander', 1],
       ['Sol Ring', 'mainboard', 1],

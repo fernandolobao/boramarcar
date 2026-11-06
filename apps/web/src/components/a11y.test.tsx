@@ -11,6 +11,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { DeckImportForm } from './deck-forms';
+import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
+import { DeckRoles, RefreshAnalysis } from './deck-roles';
+import { openingHandOdds } from '@boramarcar/core';
 import { EventManage, EventStatusBadge } from './event-manage';
 import { NewEventForm, RsvpButtons } from './event-forms';
 import { GameEditor } from './game-editor';
@@ -257,6 +260,82 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  [
+    'BracketCard',
+    <BracketCard
+      key="br"
+      bracket={{
+        minimum: 4,
+        source: 'spellbook',
+        reasons: [
+          { code: 'game_changers', count: 1, cards: ['Rhystic Study'] },
+          {
+            code: 'two_card_combo',
+            cards: ["Thassa's Oracle", 'Demonic Consultation'],
+            produces: ['Win the game'],
+          },
+        ],
+      }}
+    />,
+  ],
+  [
+    'ManaBaseTable',
+    <ManaBaseTable
+      key="mb"
+      missing={2}
+      rows={[
+        {
+          color: 'W',
+          pips: 30,
+          share: 0.75,
+          landSources: 28,
+          otherSources: 0,
+          recommended: 27,
+          status: 'ok',
+        },
+        {
+          color: 'U',
+          pips: 10,
+          share: 0.25,
+          landSources: 6,
+          otherSources: 1,
+          recommended: 10,
+          status: 'low',
+        },
+      ]}
+    />,
+  ],
+  ['HandOdds', <HandOdds key="ho" odds={openingHandOdds({ library: 99, lands: 37, ramp: 10 })} />],
+  ['RefreshAnalysis', <RefreshAnalysis key="ra" deckId="d" stale />],
+  [
+    'DeckRoles',
+    <DeckRoles
+      key="dr"
+      deckId="d"
+      roles={{
+        ramp: 2,
+        draw: 0,
+        removal: 1,
+        wipe: 0,
+        tutor: 0,
+        protection: 0,
+        recursion: 0,
+        counterspell: 0,
+      }}
+      cardsByRole={{
+        ramp: ['Sol Ring', 'Cultivate'],
+        draw: [],
+        removal: ['Beast Within'],
+        wipe: [],
+        tutor: [],
+        protection: [],
+        recursion: [],
+        counterspell: [],
+      }}
+      targets={{ ramp: 10, draw: 10, removal: 8, wipe: 2 }}
+      tagged={{ tagged: 2, total: 3 }}
+    />,
+  ],
   ['UserMenu', <UserMenu key="um" name="Ana Teste" email="ana@x.com" image={null} />],
   ['SeasonForm', <SeasonForm key="r2" groupId="g" />],
   [

@@ -417,7 +417,9 @@
     "priceHintBrl": "Preços do Scryfall em dólar, atualizados na importação; em reais, convertidos pelo dólar PTAX do Banco Central ({rate} em {date}). Não são os preços das lojas brasileiras — veja cada carta na LigaMagic.",
     "ligaMagic": "Ver preço na LigaMagic",
     "cardPrice": "Preço: {usd}",
-    "cardPriceBrl": "Preço: {usd} ≈ {brl}"
+    "cardPriceBrl": "Preço: {usd} ≈ {brl}",
+    "formatAuto": "Detectar automaticamente",
+    "formatHint": "Usa o formato informado pelo Archidekt ou Moxfield; numa lista colada, Commander se houver comandante. Dá para mudar depois nas configurações do deck."
   },
   "analysis": {
     "title": "Análise",
@@ -430,7 +432,11 @@
       "ramp": "Ramp",
       "draw": "Compra",
       "removal": "Remoção",
-      "wipe": "Board wipe"
+      "wipe": "Board wipe",
+      "tutor": "Tutor",
+      "protection": "Proteção",
+      "recursion": "Recursão",
+      "counterspell": "Contramágica"
     },
     "components": {
       "lands": "Terrenos",
@@ -440,15 +446,19 @@
       "wipe": "Board wipes",
       "curve": "Curva"
     },
-    "validationTitle": "Validação de Commander",
-    "valid": "Deck válido para Commander.",
+    "validationTitle": "Validação · {format}",
+    "valid": "Deck válido para {format}.",
     "validation": {
       "deck_size": "O deck tem {actual} cartas (esperado: {expected}).",
       "no_commander": "Nenhum comandante definido.",
-      "too_many_commanders": "Comandantes demais ({actual}).",
+      "too_many_commanders": "Comandantes demais ({actual}; máximo {max}).",
       "not_singleton": "{name} aparece {quantity} vezes.",
       "color_identity": "{name} está fora da identidade de cor do comandante.",
-      "unknown_card": "{name} não foi encontrada no Scryfall."
+      "unknown_card": "{name} não foi encontrada no Scryfall.",
+      "deck_size_min": "O deck tem {actual} cartas (mínimo: {min}).",
+      "too_many_copies": "{name} aparece {quantity} vezes (máximo: {max} cópias).",
+      "sideboard_size": "A reserva tem {actual} cartas (máximo: {max}).",
+      "invalid_partners": "{names} não podem ser comandantes juntos: os dois precisam de Partner, um \"Partner with\" que nomeie o outro, o mesmo \"Partner—…\" (ex.: Character select), Background ou Doctor's companion."
     },
     "suggestionsTitle": "Sugestões",
     "suggestions": {
@@ -458,8 +468,75 @@
       "lower_curve": "A curva está alta (CMC médio {averageCmc}). Troque algumas cartas caras por mais baratas."
     },
     "searchScryfall": "Buscar substitutos no Scryfall",
-    "disclaimer": "Heurística inicial baseada no texto das cartas — veja o roadmap para as próximas melhorias.",
-    "curveBucket": "Custo {bucket}: {count, plural, =0 {nenhuma carta} =1 {1 carta} other {# cartas}}"
+    "disclaimer": "Nota pelas metas de referência de {format}. É um guia, não uma regra.",
+    "curveBucket": "Custo {bucket}: {count, plural, =0 {nenhuma carta} =1 {1 carta} other {# cartas}}",
+    "validationNote": "Não confere a lista de cartas banidas do formato.",
+    "noScore": "A nota por funções vale para formatos com comandante. Para {format}, use a validação, a base de mana e as chances da mão inicial.",
+    "rolesSource": "{tagged} de {total} cartas com funções do Scryfall Tagger; as demais pela leitura do texto da carta.",
+    "refresh": "Atualizar análise",
+    "refreshing": "Atualizando…",
+    "refreshed": "Análise atualizada.",
+    "refreshPartial": "Atualizada em parte: {services} não respondeu. Tente de novo mais tarde.",
+    "stale": "Buscando dados no Scryfall Tagger e no Commander Spellbook em segundo plano. Atualize a análise em alguns segundos para ver o resultado completo.",
+    "rolesTitle": "Funções das cartas",
+    "rolesHint": "Uma carta pode ter mais de uma função. A meta é uma referência para o formato.",
+    "roleCount": "{count, plural, =0 {nenhuma carta} =1 {1 carta} other {# cartas}}",
+    "roleTarget": "meta: {target}",
+    "roleCards": "Ver cartas",
+    "alternatives": "Ver alternativas",
+    "hideAlternatives": "Ocultar alternativas",
+    "maxCmc": "Custo até",
+    "loadingAlternatives": "Buscando alternativas…",
+    "alternativesTitle": "Alternativas de {role} com custo até {maxCmc}",
+    "noAlternatives": "Nenhuma alternativa encontrada.",
+    "moreOnScryfall": "Ver todas no Scryfall",
+    "alternativesHint": "Cartas com a mesma função no Scryfall Tagger, dentro da identidade de cor e do formato, das mais usadas para as menos (EDHREC).",
+    "bracketTitle": "Bracket estimado",
+    "bracketValue": {
+      "2": "1–2 · Exhibition ou Core",
+      "3": "3 · Upgraded",
+      "4": "4–5 · Optimized ou cEDH"
+    },
+    "bracketHint": "Mínimo pelas regras objetivas dos brackets oficiais (Game Changers, destruição em massa de terrenos, turnos extras e combos de duas cartas). A intenção e a velocidade do deck ficam para a conversa com a mesa.",
+    "bracketSourceSpellbook": "Combos conferidos no Commander Spellbook.",
+    "bracketSourceLocal": "Por enquanto só os Game Changers: os combos ainda não foram conferidos no Commander Spellbook.",
+    "bracketReasons": {
+      "game_changers": "{count, plural, =1 {1 Game Changer} other {# Game Changers}}: {cards}.",
+      "mass_land_denial": "Destruição em massa de terrenos: {cards}.",
+      "extra_turns": "Turnos extras: {cards}.",
+      "extra_turns_chained": "Turnos extras em quantidade (dá para encadear): {cards}.",
+      "two_card_combo": "Combo de duas cartas: {cards} ({produces}).",
+      "arguable_combo": "Combo que pode contar como de duas cartas: {cards} ({produces}).",
+      "clean": "Nada na lista exige bracket 3 ou acima."
+    },
+    "manaBaseTitle": "Base de mana",
+    "manaBaseHint": "Terrenos que geram cada cor comparados a uma meta proporcional aos símbolos de mana, com um mínimo para cores de splash.",
+    "manaCols": {
+      "color": "Cor",
+      "pips": "Símbolos",
+      "lands": "Terrenos que geram",
+      "other": "Outras fontes",
+      "recommended": "Meta",
+      "status": "Situação"
+    },
+    "manaOk": "Suficiente",
+    "manaLow": "Poucas fontes",
+    "manaMissing": "{count, plural, =1 {1 carta ainda está} other {# cartas ainda estão}} sem o dado de mana produzida: atualize a análise.",
+    "manaEmpty": "O deck não tem símbolos de mana colorida.",
+    "handTitle": "Mão inicial",
+    "handHint": "Chances com {library} cartas no grimório e {lands} terrenos, sem mulligan.",
+    "handExpected": "Terrenos esperados na mão: {value}",
+    "handKeepable": "Mão com 2 a 4 terrenos: {value}",
+    "handDistribution": "Terrenos na mão de 7",
+    "handColLands": "Terrenos",
+    "handColChance": "Chance",
+    "handDrops": "Ter terreno para jogar em todos os turnos",
+    "handColTurn": "Até o turno",
+    "handOnPlay": "Jogando primeiro",
+    "handOnDraw": "Jogando depois",
+    "handRamp": "Ao menos 1 carta de ramp até o turno {turn} (jogando depois): {value}",
+    "alternativesError": "O Scryfall não respondeu. Tente de novo em instantes.",
+    "manaUnknown": "Sem dados ainda"
   },
   "errors": {
     "invalid_input": "Confira os dados informados.",

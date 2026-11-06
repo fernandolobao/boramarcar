@@ -62,8 +62,8 @@ describe('DeckScore / DeckValidation / DeckSuggestions', () => {
   it('mostra a nota, problemas e links de busca no Scryfall', () => {
     wrap(
       <>
-        <DeckScore analysis={analysis} />
-        <DeckValidation analysis={analysis} />
+        <DeckScore analysis={analysis} formatName="Commander" />
+        <DeckValidation analysis={analysis} formatName="Commander" />
         <DeckSuggestions analysis={analysis} />
       </>,
     );
@@ -75,5 +75,26 @@ describe('DeckScore / DeckValidation / DeckSuggestions', () => {
       'href',
       expect.stringContaining('https://scryfall.com/search?q=id%3C%3Dc%20otag%3Aramp'),
     );
+  });
+});
+
+describe('formatos sem nota', () => {
+  it('explica que a nota vale para formatos com comandante', () => {
+    const modern = analyzeDeck(
+      [{ name: 'Big', quantity: 4, board: 'mainboard', card: card('Big', 3, 'Creature') }],
+      'modern',
+    );
+    wrap(
+      <>
+        <DeckScore analysis={modern} formatName="Modern" />
+        <DeckValidation analysis={modern} formatName="Modern" />
+      </>,
+    );
+    expect(screen.queryByTestId('deck-score')).toBeNull();
+    expect(
+      screen.getByText(/A nota por funções vale para formatos com comandante/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Validação · Modern' })).toBeInTheDocument();
+    expect(screen.getByText('O deck tem 4 cartas (mínimo: 60).')).toBeInTheDocument();
   });
 });
