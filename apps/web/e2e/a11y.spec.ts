@@ -27,6 +27,7 @@ const AUTH_PAGES = [
   '/ranking',
   '/decks',
   `/decks/${E2E_IDS.deck}`,
+  `/decks/${E2E_IDS.deck}/imprimir?which=all`,
   '/decks/importar',
   '/grupo',
   '/perfil',

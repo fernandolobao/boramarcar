@@ -10,21 +10,59 @@ import {
 } from '@boramarcar/core';
 import { PDFDocument, rgb, StandardFonts, type PDFImage } from 'pdf-lib';
 
-/** Baixa as imagens com no máximo `limit` pedidos ao mesmo tempo (educação com o Scryfall). */
+const IMAGE_HEADERS = {
+  // O Scryfall pede User-Agent e Accept identificáveis; sem eles o CDN pode recusar.
+  'User-Agent': 'BoraMarcar/1.0 (+https://github.com/fernandolobao/boramarcar)',
+  Accept: 'image/jpeg,image/png;q=0.9,*/*;q=0.5',
+};
+
+const isJpeg = (b: Uint8Array) => b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+const isPng = (b: Uint8Array) =>
+  b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
+
+/** Tamanhos a tentar: "large" para impressão e, se falhar, "normal". */
+const candidates = (url: string) =>
+  [url, url.replace('/large/', '/normal/')].filter((u, i, all) => all.indexOf(u) === i);
+
+/**
+ * Baixa as imagens com no máximo `limit` pedidos ao mesmo tempo (educação com o Scryfall).
+ * Aceita só JPEG/PNG de verdade (confere os bytes), tenta o tamanho "normal" se o "large" falhar
+ * e registra no log o motivo de cada falha.
+ */
 async function fetchImages(urls: string[], fetchFn: typeof fetch, limit = 6) {
   const result = new Map<string, Uint8Array | null>();
   const queue = [...new Set(urls)];
+  const failures: string[] = [];
   const worker = async () => {
     for (let url = queue.shift(); url; url = queue.shift()) {
-      try {
-        const response = await fetchFn(url, { headers: { Accept: 'image/jpeg' } });
-        result.set(url, response.ok ? new Uint8Array(await response.arrayBuffer()) : null);
-      } catch {
-        result.set(url, null);
+      let bytes: Uint8Array | null = null;
+      for (const candidate of candidates(url)) {
+        try {
+          const response = await fetchFn(candidate, {
+            headers: IMAGE_HEADERS,
+            signal: AbortSignal.timeout(15_000),
+          });
+          if (!response.ok) {
+            failures.push(`${response.status} ${candidate}`);
+            continue;
+          }
+          const data = new Uint8Array(await response.arrayBuffer());
+          if (isJpeg(data) || isPng(data)) {
+            bytes = data;
+            break;
+          }
+          failures.push(`formato desconhecido ${candidate}`);
+        } catch (error) {
+          failures.push(`${String(error)} ${candidate}`);
+        }
       }
+      result.set(url, bytes);
     }
   };
   await Promise.all(Array.from({ length: Math.min(limit, queue.length) }, worker));
+  if (failures.length) {
+    console.warn(`[proxies] ${failures.length} falha(s) ao baixar imagens`, failures.slice(0, 5));
+  }
   return result;
 }
 
@@ -52,7 +90,17 @@ export async function buildProxySheet(
   );
   const embedded = new Map<string, PDFImage | null>();
   for (const [url, data] of bytes) {
-    embedded.set(url, data ? await pdf.embedJpg(data).catch(() => null) : null);
+    if (!data) {
+      embedded.set(url, null);
+      continue;
+    }
+    const image = await (isPng(data) ? pdf.embedPng(data) : pdf.embedJpg(data)).catch(
+      (error: unknown) => {
+        console.warn('[proxies] imagem inválida', url, error);
+        return null;
+      },
+    );
+    embedded.set(url, image);
   }
 
   const size = PAGE_MM[input.page];
@@ -107,5 +155,6 @@ export async function buildProxySheet(
     }
   }
 
-  return { pdf: await pdf.save(), cards: items.length, pages: pages.length };
+  const missingImages = items.filter((i) => !i.imageUri || !embedded.get(i.imageUri)).length;
+  return { pdf: await pdf.save(), cards: items.length, pages: pages.length, missingImages };
 }

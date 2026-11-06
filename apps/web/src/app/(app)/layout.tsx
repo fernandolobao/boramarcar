@@ -38,7 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       />
       {/* relative + z-30: o cabeçalho (com backdrop-blur, que cria um contexto de empilhamento)
           fica acima do conteúdo, para o menu da conta não passar por trás de imagens. */}
-      <header className="relative z-30 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
+      <header className="relative z-30 border-b print:hidden border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
         {/* Linha 1: marca + grupo ativo e menu da conta. Linha 2: navegação (rola no celular).
             Assim nada quebra com nomes de grupo longos nem com idiomas de rótulos maiores. */}
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 pt-3">
@@ -59,7 +59,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       <main
         id="conteudo"
         tabIndex={-1}
-        className="mx-auto max-w-5xl space-y-6 px-4 py-8 focus:outline-none"
+        className="mx-auto max-w-5xl space-y-6 px-4 py-8 focus:outline-none print:max-w-none print:p-0"
       >
         {children}
       </main>

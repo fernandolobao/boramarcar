@@ -417,7 +417,14 @@
     "priceHintBrl": "Scryfall prices in US dollars, updated on import; in reais, converted using the Central Bank of Brazil PTAX rate ({rate} on {date}). These aren't Brazilian store prices — check each card on LigaMagic.",
     "ligaMagic": "See price on LigaMagic",
     "cardPrice": "Price: {usd}",
-    "cardPriceBrl": "Price: {usd} ≈ {brl}"
+    "cardPriceBrl": "Price: {usd} ≈ {brl}",
+    "printNow": "Print / save as PDF",
+    "printBrowserHint": "{count, plural, =1 {1 card} other {# cards}} on {pages, plural, =1 {1 page} other {# pages}}. In the print dialog, use 100% scale (\"actual size\"), no margins, and turn on \"background graphics\" if the cut marks don't show. To keep a file, choose \"Save as PDF\".",
+    "printPreview": "Proxy sheet preview",
+    "printPage": "Page {page} of {total}",
+    "printEmpty": "The deck is empty.",
+    "printOpen": "Open sheet to print",
+    "printPdfServer": "Download ready-made PDF"
   },
   "analysis": {
     "title": "Analysis",
