@@ -19,4 +19,41 @@ test.describe('deck', () => {
     expect(await height('3')).toBeCloseTo(await height('1'), 0);
     expect(await height('2')).toBe(0);
   });
+
+  test('lista de decks em cartões com capa e um único link por deck', async ({ page }) => {
+    await page.goto('/decks');
+    const deck = page.getByRole('listitem').filter({ hasText: 'Omnath Ramp' });
+    await expect(deck.getByRole('link')).toHaveCount(1);
+    await expect(deck.getByText('Commander', { exact: true })).toBeVisible();
+    await expect(deck.getByText('Omnath, Locus of Mana')).toBeVisible();
+    await expect(deck.getByText('Identidade de cor: Verde')).toBeAttached();
+    // O cartão inteiro é clicável (o link cobre a área com ::after).
+    const box = await deck.boundingBox();
+    await page.mouse.click(box!.x + box!.width / 2, box!.y + 20);
+    await expect(page).toHaveURL(new RegExp(`/decks/${E2E_IDS.deck}$`));
+  });
+
+  test('cartas em modo visual e lista; ampliar abre diálogo que fecha com Esc', async ({
+    page,
+  }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    await expect(page.getByRole('img', { name: 'Omnath, Locus of Mana' })).toBeAttached();
+    await expect(page.getByRole('heading', { name: 'Terrenos (36)' })).toBeVisible();
+
+    const zoom = page.getByRole('button', { name: 'Ampliar Cultivate' });
+    await zoom.focus();
+    await page.keyboard.press('Enter');
+    const dialog = page.getByRole('dialog', { name: 'Cultivate' });
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(zoom).toBeFocused();
+
+    await page.getByRole('button', { name: 'Lista' }).click();
+    await expect(page.getByRole('button', { name: 'Lista' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page.getByRole('button', { name: 'Sol Ring' })).toBeVisible();
+  });
 });

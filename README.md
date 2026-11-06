@@ -191,6 +191,10 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | `PUT/DELETE`   | `/api/v1/games/:gameId`                         | Editar / remover partida                                                 |
 | `GET/PATCH`    | `/api/v1/groups/:groupId/settings`              | Configurações do grupo (mesa, duração, pontos, tipo padrão)              |
 | `GET`          | `/api/v1/groups/:groupId/ranking`               | Ranking (`?from&to&format`)                                              |
+| `GET`          | `/api/v1/groups/:groupId/stats`                 | Estatísticas (`?from&to&format`): sequências, confronto direto, decks    |
+| `GET/POST`     | `/api/v1/groups/:groupId/seasons`               | Temporadas do ranking (criar: dono/admin)                                |
+| `DELETE`       | `/api/v1/seasons/:seasonId`                     | Remover temporada                                                        |
+| `PATCH`        | `/api/v1/decks/:deckId`                         | Renomear deck ou mudar o tipo de jogo (dono)                             |
 | `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
 | `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                               |
 | `PATCH`        | `/api/v1/decks/:deckId/cards/:cardId`           | Marcar proxy (`{isProxy}`)                                               |

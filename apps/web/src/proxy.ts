@@ -20,5 +20,7 @@ export const config = {
     '/eventos/:path*',
     '/ranking/:path*',
     '/decks/:path*',
+    '/perfil/:path*',
+    '/configuracoes/:path*',
   ],
 };

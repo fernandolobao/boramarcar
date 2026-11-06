@@ -30,6 +30,7 @@ const AUTH_PAGES = [
   '/decks/importar',
   '/grupo',
   '/perfil',
+  '/configuracoes',
   `/convite/${E2E_INVITE_CODE}`,
 ];
 

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { DECK_BOARDS, isDomainError } from '@boramarcar/core';
+import { artCropUrl, deckPrice, isDomainError, isGameFormat } from '@boramarcar/core';
 import { getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
 import { Icon } from '@/components/icons';
 import {
@@ -12,7 +13,7 @@ import {
   DeckValidation,
   ManaCurve,
 } from '@/components/deck-analysis';
-import { ProxyToggle } from '@/components/deck-forms';
+import { ColorIdentity, DeckCards, DeckSettingsForm } from '@/components/deck-visual';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 
@@ -37,36 +38,107 @@ export default async function DeckPage({ params }: Props) {
   const t = await getTranslations('decks');
   const ta = await getTranslations('analysis');
   const tc = await getTranslations('common');
+  const tf = await getTranslations('formats');
+  const fmt = await getFormatter();
   const { analysis } = deck;
+  const format = isGameFormat(deck.format) ? deck.format : 'other';
+  const commanderEntries = deck.entries.filter((e) => e.board === 'commander');
+  const hero = commanderEntries.find((e) => e.card?.imageUri) ?? null;
+  const identity = [
+    ...new Set(
+      (commanderEntries.length ? commanderEntries : deck.entries).flatMap(
+        (e) => e.card?.colorIdentity ?? [],
+      ),
+    ),
+  ];
+  const price = deckPrice(deck.entries.filter((e) => e.board !== 'maybeboard'));
+  const usd = (value: number) => fmt.number(value, { style: 'currency', currency: 'USD' });
+  const background = artCropUrl(hero?.card?.imageUri);
 
   return (
     <>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="page-title">{deck.name}</h1>
-          <p className="muted">
-            {analysis.commanders.join(' + ')} · {t('cards', { count: analysis.totalCards })} ·{' '}
-            {t('proxies', { count: analysis.proxies })}
-            {deck.sourceUrl && (
-              <>
-                {' · '}
-                <a href={deck.sourceUrl} target="_blank" rel="noreferrer" className="underline">
-                  {deck.source}
-                  <Icon name="externalLink" className="ml-0.5 inline size-3.5 align-[-2px]" />
-                  <span className="sr-only"> {tc('newTab')}</span>
-                </a>
-              </>
-            )}
-          </p>
-        </div>
-        {deck.isOwner && (
-          <DeleteButton
-            path={`/api/v1/decks/${deck.id}`}
-            redirectTo="/decks"
-            label={t('deleteDeck', { name: deck.name })}
+      <div className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        {background && (
+          // Arte do comandante desfocada como fundo decorativo.
+          <Image
+            src={background}
+            alt=""
+            fill
+            unoptimized
+            sizes="100vw"
+            className="scale-110 object-cover opacity-25 blur-2xl dark:opacity-20"
           />
         )}
+        <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,15rem)_1fr] md:items-start">
+          {hero?.card?.imageUri && (
+            <div className="relative mx-auto aspect-[488/680] w-48 overflow-hidden rounded-[4.5%/3.2%] shadow-xl sm:w-56 md:w-full">
+              <Image
+                src={hero.card.imageUri}
+                alt={hero.name}
+                fill
+                unoptimized
+                priority
+                sizes="(min-width: 768px) 15rem, 14rem"
+                className="object-cover"
+              />
+            </div>
+          )}
+          <div className="min-w-0 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-zinc-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+                {tf(format)}
+              </span>
+              <ColorIdentity colors={identity} />
+            </div>
+            <h1 className="page-title">{deck.name}</h1>
+            {analysis.commanders.length > 0 && (
+              <p className="text-lg font-medium">{analysis.commanders.join(' & ')}</p>
+            )}
+            <p className="muted">
+              {t('cards', { count: analysis.totalCards })} ·{' '}
+              {t('proxies', { count: analysis.proxies })}
+              {deck.sourceUrl && (
+                <>
+                  {' · '}
+                  <a href={deck.sourceUrl} target="_blank" rel="noreferrer" className="underline">
+                    {deck.source}
+                    <Icon name="externalLink" className="ml-0.5 inline size-3.5 align-[-2px]" />
+                    <span className="sr-only"> {tc('newTab')}</span>
+                  </a>
+                </>
+              )}
+            </p>
+            {price.total > 0 && (
+              <p className="text-sm">
+                <span className="font-medium">{t('price')}:</span>{' '}
+                {t('priceValue', { total: usd(price.total), proxies: usd(price.proxies) })}
+                {price.missing > 0 && (
+                  <span className="muted"> · {t('priceMissing', { count: price.missing })}</span>
+                )}
+                <span className="muted block text-xs">{t('priceHint')}</span>
+              </p>
+            )}
+            {deck.isOwner && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                <DeleteButton
+                  path={`/api/v1/decks/${deck.id}`}
+                  redirectTo="/decks"
+                  label={t('deleteDeck', { name: deck.name })}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {deck.isOwner && (
+        <details className="card">
+          <summary className="cursor-pointer font-semibold">{t('settings')}</summary>
+          <div className="mt-4">
+            <DeckSettingsForm deckId={deck.id} name={deck.name} format={format} />
+          </div>
+        </details>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <section className="card">
@@ -89,46 +161,7 @@ export default async function DeckPage({ params }: Props) {
         </section>
       </div>
 
-      {DECK_BOARDS.map((board) => {
-        const entries = deck.entries.filter((e) => e.board === board);
-        if (!entries.length) return null;
-        return (
-          <section key={board} className="card">
-            <h2 className="section-title">
-              {t(`boards.${board}`)} ({entries.reduce((sum, e) => sum + e.quantity, 0)})
-            </h2>
-            <table className="w-full text-sm">
-              <tbody>
-                {entries.map((entry) => (
-                  <tr key={entry.id} className="border-t border-zinc-200 dark:border-zinc-800">
-                    <td className="w-10 py-1.5 tabular-nums">{entry.quantity}</td>
-                    <td className="py-1.5">
-                      {entry.name}
-                      {!entry.card && <span className="muted"> ?</span>}
-                    </td>
-                    <td className="muted hidden py-1.5 sm:table-cell">{entry.card?.typeLine}</td>
-                    <td className="py-1.5 text-right">
-                      {deck.isOwner ? (
-                        <label className="inline-flex items-center gap-1 text-xs">
-                          <ProxyToggle
-                            deckId={deck.id}
-                            cardId={entry.id}
-                            isProxy={entry.isProxy}
-                            label={`${t('proxy')}: ${entry.name}`}
-                          />
-                          {t('proxy')}
-                        </label>
-                      ) : (
-                        entry.isProxy && <span className="text-xs">{t('proxy')}</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        );
-      })}
+      <DeckCards deckId={deck.id} entries={deck.entries} isOwner={deck.isOwner} />
     </>
   );
 }

@@ -14,7 +14,7 @@ export function NavLinks({
 }) {
   const pathname = usePathname();
   return (
-    <nav aria-label={label} className="order-last w-full overflow-x-auto sm:order-none sm:w-auto">
+    <nav aria-label={label} className="-mx-2 overflow-x-auto px-2 pb-2">
       <ul className="flex gap-1 text-sm">
         {links.map((link) => {
           const current = pathname === link.href || pathname.startsWith(`${link.href}/`);

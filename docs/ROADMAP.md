@@ -49,41 +49,43 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 1.12 | Configurar tamanho da mesa (3–6) e duração mínima por grupo                                                    | P       | ✅ (2–8 jogadores)                     |
 | 1.13 | Notificações: novo encontro, lembrete no dia, "a mesa fechou!" (e-mail via Resend; depois push)                | M       | ✅ (e-mail; push em 5.5)               |
 | 1.14 | Compartilhar encontro no WhatsApp (link + texto) e exportar `.ics`                                             | P       | ✅                                     |
-| 1.15 | Página de perfil (nome, foto, idioma)                                                                          | P       | parcial (fuso e idioma)                |
+| 1.15 | Página de perfil (nome, foto, idioma)                                                                          | P       | ✅ (perfil + configurações)            |
 
 ## Fase 2 — Partidas e ranking
 
-| #    | Item                                                                                                                                                                                                                        | Tamanho | Status                         |
-| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------ |
-| 2.1  | Registrar partidas do encontro (vencedor/empate, assento, deck)                                                                                                                                                             | M       | ✅                             |
-| 2.2  | Ranking do grupo (V/D/E, pontos, % vitórias)                                                                                                                                                                                | M       | ✅                             |
-| 2.3  | Visualizar partidas do encontro com vencedor                                                                                                                                                                                | P       | ✅                             |
-| 2.4  | **Mostrar o deck usado** por cada jogador na partida (UI de destaque, imagem do comandante)                                                                                                                                 | P       | ✅                             |
-| 2.5  | Editar partida (hoje: remover e registrar de novo)                                                                                                                                                                          | P       | ✅                             |
-| 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                                                                                                                       | M       | parcial (API aceita `from/to`) |
-| 2.7  | Tabela de pontos configurável por grupo                                                                                                                                                                                     | P       | ✅                             |
-| 2.11 | **Tipo de jogo por partida** (Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado, Outro): regras de jogadores, times e vencedor; ranking filtrável por tipo | M       | ✅                             |
-| 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       |                                |
-| 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       |                                |
-| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |                                |
+| #    | Item                                                                                                                                                                                                                        | Tamanho | Status |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ |
+| 2.1  | Registrar partidas do encontro (vencedor/empate, assento, deck)                                                                                                                                                             | M       | ✅     |
+| 2.2  | Ranking do grupo (V/D/E, pontos, % vitórias)                                                                                                                                                                                | M       | ✅     |
+| 2.3  | Visualizar partidas do encontro com vencedor                                                                                                                                                                                | P       | ✅     |
+| 2.4  | **Mostrar o deck usado** por cada jogador na partida (UI de destaque, imagem do comandante)                                                                                                                                 | P       | ✅     |
+| 2.5  | Editar partida (hoje: remover e registrar de novo)                                                                                                                                                                          | P       | ✅     |
+| 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                                                                                                                       | M       | ✅     |
+| 2.7  | Tabela de pontos configurável por grupo                                                                                                                                                                                     | P       | ✅     |
+| 2.11 | **Tipo de jogo por partida** (Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado, Outro): regras de jogadores, times e vencedor; ranking filtrável por tipo | M       | ✅     |
+| 2.12 | **Conquistas**: selos no perfil (primeira vitória, sequências, deck favorito, "rei da mesa" na temporada…)                                                                                                                  | M       |        |
+| 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       | ✅     |
+| 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       | ✅     |
+| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |        |
 
 ## Fase 3 — Decks e coleção
 
-| #    | Item                                                                                               | Tamanho | Status           |
-| ---- | -------------------------------------------------------------------------------------------------- | ------- | ---------------- |
-| 3.1  | Importar do **Archidekt** por URL                                                                  | M       | ✅               |
-| 3.2  | Importar do **Moxfield** por URL                                                                   | M       | ✅ experimental* |
-| 3.3  | Importar lista em texto (formato Moxfield/Arena/Archidekt, seções, `#proxy`)                       | M       | ✅               |
-| 3.4  | Buscar dados das cartas no **Scryfall** (`/cards/collection`), com cache local                     | M       | ✅               |
-| 3.5  | Marcar carta como **proxy**                                                                        | P       | ✅               |
-| 3.6  | Proxy **parcial** por quantidade (ex.: 3 de 10 Forests)                                            | P       |                  |
-| 3.7  | Editor de deck: adicionar/remover cartas com **busca autocompletar do Scryfall**                   | G       |                  |
-| 3.8  | Sincronizar/reimportar deck da origem mantendo marcações de proxy                                  | M       |                  |
-| 3.9  | Imagens das cartas (hover/preview), preço total do deck (USD e, se possível, BRL)                  | M       |                  |
-| 3.10 | Gerar **folha de impressão de proxies** (PDF 3×3)                                                  | M       |                  |
-| 3.11 | Exportar lista (texto / Moxfield / Archidekt)                                                      | P       |                  |
-| 3.12 | Visibilidade do deck (privado / grupo / público) — hoje: visível para quem divide grupo com o dono | P       |                  |
-| 3.13 | Atualização periódica do cache Scryfall (bulk data diário via Vercel Cron)                         | M       |                  |
+| #    | Item                                                                                                                                                                                                                   | Tamanho | Status                                                      |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------- |
+| 3.1  | Importar do **Archidekt** por URL                                                                                                                                                                                      | M       | ✅                                                          |
+| 3.2  | Importar do **Moxfield** por URL                                                                                                                                                                                       | M       | ✅ experimental*                                            |
+| 3.3  | Importar lista em texto (formato Moxfield/Arena/Archidekt, seções, `#proxy`)                                                                                                                                           | M       | ✅                                                          |
+| 3.4  | Buscar dados das cartas no **Scryfall** (`/cards/collection`), com cache local                                                                                                                                         | M       | ✅                                                          |
+| 3.5  | Marcar carta como **proxy**                                                                                                                                                                                            | P       | ✅                                                          |
+| 3.6  | Proxy **parcial** por quantidade (ex.: 3 de 10 Forests)                                                                                                                                                                | P       |                                                             |
+| 3.7  | Editor de deck: adicionar/remover cartas com **busca autocompletar do Scryfall**                                                                                                                                       | G       |                                                             |
+| 3.8  | Sincronizar/reimportar deck da origem mantendo marcações de proxy                                                                                                                                                      | M       |                                                             |
+| 3.9  | Imagens das cartas (hover/preview), preço total do deck (USD e, se possível, BRL)                                                                                                                                      | M       | parcial (preço em USD e imagens; preview no hover pendente) |
+| 3.10 | Gerar **folha de impressão de proxies** (PDF 3×3)                                                                                                                                                                      | M       |                                                             |
+| 3.11 | Exportar lista (texto / Moxfield / Archidekt)                                                                                                                                                                          | P       |                                                             |
+| 3.12 | Visibilidade do deck (privado / grupo / público) — hoje: visível para quem divide grupo com o dono                                                                                                                     | P       |                                                             |
+| 3.13 | Atualização periódica do cache Scryfall (bulk data diário via Vercel Cron)                                                                                                                                             | M       |                                                             |
+| 3.14 | **Gestão de decks visual e responsiva**: grade de decks com arte do comandante, identidade de cor e tipo de jogo; deck em modo visual (imagens por tipo, ampliar em diálogo) ou lista; renomear e mudar o tipo de jogo | M       | ✅                                                          |
 
 \* A API do Moxfield não é pública e costuma exigir um _User-Agent_ aprovado. Ação: pedir acesso ao Moxfield; enquanto isso, a importação por texto ("Export → Copy for MTGA/Plain text") funciona sempre.
 
@@ -136,7 +138,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 1. ✅ **Semana 1–2 — colocar no ar (Fase 0 pendente + 1.6, 1.9, 1.11, 1.14).** Deploy na Vercel, Neon, OAuth; o grupo começa a usar a disponibilidade e o ranking.
 2. ✅ **Semana 3–4 — agenda madura (1.7, 1.8, 1.10, 1.13).** Recorrência e calendário são o que mais reduz atrito.
-3. **Semana 5–6 — partidas ricas (2.4–2.9).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
+3. ✅ **Semana 5–6 — partidas ricas (2.4–2.9, 2.11).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
 4. **Semana 7–9 — decks (3.6–3.11).** Editor, proxies parciais e folha de impressão.
 5. **Semana 10–13 — análise (4.5–4.9).** Começar pelo Tagger (4.5), que melhora todo o resto.
 6. **Depois — mobile (Fase 5)**, quando a API estiver estável; a PWA cobre o intervalo.

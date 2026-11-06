@@ -77,6 +77,28 @@ sem rolagem horizontal em 320px.
 - **Partidas**: cada partida tem `<h3>` com o tipo de jogo; vencedor indicado por texto ("Venceu"), ícone e fundo (cor não é a única pista). A arte do comandante é decorativa (`alt=""`): o nome do deck e do comandante estão em texto. Corrigida rolagem horizontal em 320px (itens do grid sem `min-w-0`).
 - **Configurações do grupo**: campos numéricos com `<label>`, regras dos pontos explicadas em texto ligado aos campos; membros comuns veem os valores desabilitados com o motivo.
 
+### Revisão: ranking, estatísticas e temporadas
+
+- **Filtros** em `<form method="get">` nativo (funciona sem JavaScript, URL compartilhável); o filtro aplicado é repetido em texto ("Mostrando: …").
+- **Tabelas** com `<caption>` (sr-only), `th scope="col"` e nome do jogador como `th scope="row"`. Tabelas largas ficam numa região rolável com `role="region"`, nome e `tabIndex=0` (WCAG 2.1.1 / axe `scrollable-region-focusable`), sem rolar a página em 320px.
+- **Confronto direto**: matriz com explicação visível ligada por `aria-describedby`; células "2 × 1" com `title` por extenso; diagonal "—" escondida de leitores de tela.
+- **Decks e comandantes**: arte decorativa (`alt=""`), nome e números em texto; link para o deck.
+- **Temporadas**: datas digitadas no fuso do usuário (primeiro e último dia, inclusive); remoção com confirmação em dois cliques e contexto para leitores de tela.
+
+### Revisão: decks visuais
+
+- **Lista de decks**: cartões com um único link (o nome; `::after` cobre o cartão), foco visível no cartão inteiro (`has-[a:focus-visible]`), arte decorativa (`alt=""`). Identidade de cor com letra sobre fundo claro (contraste ≥ 7:1) e nome das cores em `sr-only`.
+- **Deck**: imagem do comandante com `alt` = nome da carta; fundo desfocado decorativo. Modos "Visual/Lista" com `aria-pressed`.
+- **Modo visual**: cada carta é um botão "Ampliar {carta}" que abre `<dialog>` nativo (`showModal`: foco preso, Esc fecha, foco volta ao botão). Selos de quantidade e proxy ficam fora do botão para o nome acessível bater com o conteúdo (axe `label-content-name-mismatch`, WCAG 2.5.3) e a informação também aparece em texto abaixo da imagem.
+- **Responsivo**: 2 colunas no celular, 3–4 no iPad, até 6 no desktop; sem rolagem horizontal em 320px. Animações de hover com `motion-reduce:`.
+
+### Revisão: cabeçalho, menu da conta e membros
+
+- **Cabeçalho em duas linhas**: marca com o grupo ativo embaixo (truncado com reticências) e menu da conta na primeira; navegação na segunda (rola horizontalmente no celular). Não quebra com nomes de grupo longos nem com rótulos maiores em inglês (testado em E2E).
+- **Menu da conta**: padrão _disclosure_ de navegação (botão com `aria-expanded`/`aria-controls` e lista de links), não `role="menu"`, porque os itens são links comuns. Esc fecha e devolve o foco ao botão; clique fora e troca de página também fecham. Nome do botão começa pelo texto visível ("Ana (Menu da conta)").
+- **Perfil x Configurações**: "Perfil" mostra dados e resumo do usuário (e futuramente conquistas); fuso, idioma e avisos por e-mail ficam em "Configurações". O link de descadastro dos e-mails aponta para Configurações.
+- **Membros do grupo**: ações recolhidas atrás de "Gerenciar (Nome)" (disclosure), abertas numa faixa própria abaixo do nome — os botões não disputam espaço com o nome nem desalinham a lista.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

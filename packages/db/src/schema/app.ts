@@ -256,6 +256,24 @@ export const games = pgTable(
   ],
 );
 
+/** Temporadas do ranking (2.6): intervalos nomeados, ex.: "2º semestre 2026". */
+export const seasons = pgTable(
+  'seasons',
+  {
+    id: id(),
+    groupId: text('group_id')
+      .notNull()
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    /** Fim exclusivo. */
+    endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [index('seasons_group_idx').on(t.groupId, t.startsAt)],
+);
+
 /* ---------- Decks e cartas ---------- */
 
 export const decks = pgTable(

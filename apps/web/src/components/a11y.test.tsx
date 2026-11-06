@@ -17,11 +17,13 @@ import { GameEditor } from './game-editor';
 import { GameForm } from './game-form';
 import { GamePlayers } from './game-players';
 import { GroupSettingsForm } from './group-settings-form';
+import { SeasonForm } from './season-form';
 import { CreateGroupForm, JoinGroupForm, LocationForm, SwitchGroupButton } from './group-forms';
 import { JoinInviteButton, RegenerateInviteButton } from './invite';
 import { NavLinks } from './nav-links';
 import { AvailabilityGrid } from './availability-grid';
 import { MemberActions } from './member-actions';
+import { UserMenu } from './user-menu';
 import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ShareButtons } from './share-buttons';
@@ -259,6 +261,8 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  ['UserMenu', <UserMenu key="um" name="Ana Teste" email="ana@x.com" image={null} />],
+  ['SeasonForm', <SeasonForm key="r2" groupId="g" />],
   [
     'ShareButtons',
     <ShareButtons key="s" text="t" url="https://x.app" title="Grupo" icsHref="/x.ics" />,

@@ -11,6 +11,7 @@ import {
   CalendarPlus,
   CalendarX2,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleCheck,
@@ -23,10 +24,13 @@ import {
   Download,
   ExternalLink,
   Layers,
+  LayoutGrid,
+  List,
   Medal,
   Settings,
   LayoutDashboard,
   Link2,
+  ListFilter,
   LogIn,
   LogOut,
   MessageCircle,
@@ -68,6 +72,7 @@ export const Icons = {
   externalLink: ExternalLink,
   refresh: RefreshCw,
   settings: Settings,
+  filter: ListFilter,
   close: X,
   // Navegação
   dashboard: LayoutDashboard,
@@ -78,6 +83,7 @@ export const Icons = {
   group: Users,
   profile: CircleUserRound,
   previous: ChevronLeft,
+  chevronDown: ChevronDown,
   next: ChevronRight,
   signIn: LogIn,
   signOut: LogOut,
@@ -106,6 +112,8 @@ export const Icons = {
   // Decks
   fromUrl: Link2,
   fromText: ClipboardPaste,
+  gallery: LayoutGrid,
+  list: List,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof Icons;

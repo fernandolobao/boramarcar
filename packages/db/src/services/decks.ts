@@ -1,6 +1,7 @@
 import {
   analyzeDeck,
   artCropUrl,
+  isGameFormat,
   attachCardData,
   DomainError,
   type CardData,
@@ -129,6 +130,7 @@ export async function listDecks(db: Database, ownerId: string) {
     .select({
       id: decks.id,
       name: decks.name,
+      format: decks.format,
       source: decks.source,
       sourceUrl: decks.sourceUrl,
       updatedAt: decks.updatedAt,
@@ -307,7 +309,10 @@ export async function getDeckCovers(db: Database, deckIds: readonly string[]) {
               r.imageUri && r.typeLine?.includes('Legendary') && r.typeLine.includes('Creature'),
           ) ?? own.find((r) => r.imageUri),
         ].filter((r): r is (typeof own)[number] => Boolean(r));
-    const identity = new Set(commanders.flatMap((c) => c.colorIdentity ?? []));
+    // Identidade: a do comandante; sem comandante, a união das cartas do deck.
+    const identity = new Set(
+      (commanders.length ? commanders : own).flatMap((c) => c.colorIdentity ?? []),
+    );
     const list = picked.map((r) => ({
       name: r.name,
       imageUri: r.imageUri,
@@ -320,4 +325,32 @@ export async function getDeckCovers(db: Database, deckIds: readonly string[]) {
     });
   }
   return covers;
+}
+
+/** Renomeia o deck ou muda o tipo de jogo dele (só o dono). */
+export async function updateDeck(
+  db: Database,
+  input: { deckId: string; userId: string; name?: string; format?: string },
+) {
+  const [deck] = await db.select().from(decks).where(eq(decks.id, input.deckId)).limit(1);
+  if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
+  if (deck.ownerId !== input.userId) {
+    throw new DomainError('forbidden', 'Só o dono pode alterar o deck');
+  }
+  const changes: Partial<typeof decks.$inferInsert> = {};
+  if (input.name !== undefined) {
+    const name = input.name.trim();
+    if (name.length < 1 || name.length > 120) {
+      throw new DomainError('invalid_input', 'O nome do deck precisa de 1 a 120 caracteres');
+    }
+    changes.name = name;
+  }
+  if (input.format !== undefined) {
+    if (!isGameFormat(input.format))
+      throw new DomainError('invalid_input', 'Tipo de jogo inválido');
+    changes.format = input.format;
+  }
+  if (!Object.keys(changes).length) return deck;
+  const [updated] = await db.update(decks).set(changes).where(eq(decks.id, deck.id)).returning();
+  return updated!;
 }

@@ -24,7 +24,10 @@
     "decks": "Decks",
     "group": "Group",
     "profile": "Profile",
-    "label": "Main navigation"
+    "label": "Main navigation",
+    "settings": "Settings",
+    "userMenu": "Account menu",
+    "signedInAs": "Signed in as"
   },
   "landing": {
     "title": "No more polls in the group chat.",
@@ -81,7 +84,8 @@
     "leaveOwnerHint": "As the owner, transfer ownership to someone else before leaving.",
     "leaveLastHint": "You are the only member: leaving deletes the group.",
     "you": "you",
-    "memberActions": "Actions for {name}"
+    "memberActions": "Actions for {name}",
+    "manage": "Manage"
   },
   "availability": {
     "title": "Availability",
@@ -216,9 +220,66 @@
     "draws": "D",
     "points": "Pts",
     "winRate": "Win %",
-    "pointsRule": "A win is worth 3 points and a draw 1.",
+    "pointsRule": "A win is worth {win}, a draw {draw} and a loss {loss}.",
     "totalGames": "{count, plural, =0 {No games} =1 {1 game} other {# games}}",
-    "caption": "Standings for {group}"
+    "caption": "Standings for {group}",
+    "filters": "Filter ranking and stats",
+    "period": "Period",
+    "periods": {
+      "all": "All games",
+      "last30": "Last 30 days",
+      "thisYear": "This year"
+    },
+    "seasonOption": "Season: {name}",
+    "formatFilter": "Game type",
+    "allFormats": "All types",
+    "apply": "Filter",
+    "showing": "Showing: {period} · {format}",
+    "standings": "Standings",
+    "stats": {
+      "title": "Stats",
+      "empty": "Record games to see stats.",
+      "highlights": "Highlights",
+      "averageTurn": "Average ending turn",
+      "averageDuration": "Average duration",
+      "minutes": "{value} min",
+      "firstWinRate": "Whoever goes first wins",
+      "firstWinRateValue": "{rate} ({count, plural, =1 {1 game} other {# games}})",
+      "noData": "No data",
+      "detailsHint": "Fill in \"More details\" when recording games to see turn, duration and who went first.",
+      "streaks": "Streaks and table",
+      "streaksCaption": "Win streaks, games started and times eliminated first",
+      "currentStreak": "Current streak",
+      "bestStreak": "Best streak",
+      "wentFirst": "Went first (won)",
+      "wentFirstValue": "{games} ({wins})",
+      "firstOut": "Out first",
+      "seats": "Wins by turn order",
+      "seat": "{seat, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} to play",
+      "seatValue": "{wins} of {games}",
+      "headToHead": "Head to head",
+      "headToHeadHint": "Each cell shows wins of the row player × wins of the column opponent, in games both played.",
+      "headToHeadCaption": "Head to head: wins of the row player against the column player",
+      "headToHeadCell": "{wins} × {losses}",
+      "headToHeadCellLabel": "{name} vs {opponent}: {wins} wins, {losses} losses in {games, plural, =1 {1 game} other {# games}}",
+      "decks": "Most played decks",
+      "deckLine": "{owner} · {games, plural, =1 {1 game} other {# games}} · {wins, plural, =1 {1 win} other {# wins}} ({rate})",
+      "commanders": "Group commanders",
+      "commanderLine": "{players} · {games, plural, =1 {1 game} other {# games}} · {rate} win rate",
+      "noDecks": "No games with a registered deck for this filter."
+    },
+    "seasons": {
+      "title": "Seasons",
+      "hint": "Seasons show up in the ranking period filter.",
+      "empty": "No seasons yet.",
+      "name": "Name",
+      "start": "First day",
+      "end": "Last day",
+      "create": "Create season",
+      "range": "{start} to {end}",
+      "remove": "Remove season {name}",
+      "created": "Season created."
+    }
   },
   "decks": {
     "title": "My decks",
@@ -250,7 +311,53 @@
       "step2": "Click “More” → “Export”",
       "step3": "Click “Copy Plain Text” and paste the list in the field below",
       "openDeck": "Open the deck on Moxfield"
-    }
+    },
+    "subtitle": "{count, plural, =0 {No decks} =1 {1 deck} other {# decks}}",
+    "openDeck": "Open {name}",
+    "noCommander": "No commander",
+    "colorIdentity": "Color identity",
+    "colors": {
+      "W": "White",
+      "U": "Blue",
+      "B": "Black",
+      "R": "Red",
+      "G": "Green",
+      "C": "Colorless"
+    },
+    "colorless": "Colorless",
+    "format": "Game type",
+    "settings": "Edit deck",
+    "saved": "Deck saved.",
+    "cardsTitle": "Cards",
+    "view": "View mode",
+    "views": {
+      "visual": "Visual",
+      "list": "List"
+    },
+    "types": {
+      "creature": "Creatures",
+      "planeswalker": "Planeswalkers",
+      "battle": "Battles",
+      "instant": "Instants",
+      "sorcery": "Sorceries",
+      "artifact": "Artifacts",
+      "enchantment": "Enchantments",
+      "land": "Lands",
+      "other": "Other"
+    },
+    "groupTitle": "{name} ({count})",
+    "quantity": "{count}×",
+    "zoom": "Enlarge {name}",
+    "close": "Close",
+    "noImage": "No image",
+    "notFoundCard": "not found on Scryfall",
+    "price": "Estimated price",
+    "priceValue": "{total} (proxies: {proxies})",
+    "priceMissing": "{count, plural, =1 {1 card without price} other {# cards without price}}",
+    "priceHint": "Scryfall prices in US dollars, updated on import.",
+    "manaCost": "Cost",
+    "type": "Type",
+    "quantityHeader": "Qty."
   },
   "analysis": {
     "title": "Analysis",
@@ -371,7 +478,7 @@
     "confirmed": "Confirmed ({count}): {names}",
     "openEvent": "Open the game night",
     "calendarHint": "The attached .ics file adds (or updates) the game night in your calendar.",
-    "footer": "You're getting this email because you're in {group} on Bora Marcar. To stop these notices, turn them off in your profile: {url}"
+    "footer": "You're getting this email because you're in {group} on Bora Marcar. To stop these notices, turn them off in your settings: {url}"
   },
   "formats": {
     "commander": "Commander",
@@ -401,5 +508,22 @@
     "pointsDraw": "Draw",
     "pointsLoss": "Loss",
     "saved": "Settings saved."
+  },
+  "settings": {
+    "title": "Settings",
+    "intro": "Time zone, language and email notices."
+  },
+  "profilePage": {
+    "title": "Profile",
+    "memberSince": "On Bora Marcar since {date}",
+    "groups": "{count, plural, =1 {1 group} other {# groups}}",
+    "summary": "Summary",
+    "games": "Games",
+    "wins": "Wins",
+    "winRate": "Win rate",
+    "decks": "Decks",
+    "achievements": "Achievements",
+    "achievementsSoon": "Coming soon: badges for achievements like first win, streaks and favorite decks.",
+    "editSettings": "Open settings"
   }
 }

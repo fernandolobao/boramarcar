@@ -9,3 +9,4 @@ export * from './services/ranking';
 export * from './services/decks';
 export * from './services/users';
 export * from './services/notifications';
+export * from './services/stats';

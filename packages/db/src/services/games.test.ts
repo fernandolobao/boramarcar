@@ -245,7 +245,7 @@ describe('capas de deck', () => {
         },
       ],
       artUri: 'https://cards.scryfall.io/art_crop/front/b/o/bolt.jpg?1',
-      colorIdentity: [],
+      colorIdentity: ['R'],
     });
     expect(covers.get('inexistente')).toEqual({ cards: [], artUri: null, colorIdentity: [] });
     expect((await getDeckCovers(db, [])).size).toBe(0);

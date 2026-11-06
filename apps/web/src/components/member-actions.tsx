@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon, type IconName } from './icons';
 import { FormError, useApiAction } from './use-api-action';
@@ -144,20 +144,56 @@ export function MemberActions({ groupId, actorId, actorRole, member, memberCount
 
   if (!actions.length) return null;
   return (
-    <div className="flex flex-col items-end gap-1">
+    <ManagePanel name={member.name}>
       <div
-        className="flex flex-wrap justify-end gap-2"
+        className="flex flex-wrap gap-2"
         role="group"
         aria-label={t('memberActions', { name: member.name })}
       >
         {actions}
       </div>
       {isSelf && actorRole === 'owner' && (
-        <p className="muted text-right">
+        <p className="muted mt-2 text-sm">
           {ownerMustTransfer ? t('leaveOwnerHint') : t('leaveLastHint')}
         </p>
       )}
       <FormError message={error} />
-    </div>
+    </ManagePanel>
+  );
+}
+
+/**
+ * "Gerenciar" abre as ações do membro numa linha própria, abaixo do nome — assim os botões
+ * não disputam espaço com o nome em telas estreitas nem em idiomas com textos longos.
+ */
+function ManagePanel({ name, children }: { name: string; children: React.ReactNode }) {
+  const t = useTranslations('group');
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <>
+      <button
+        type="button"
+        className="btn-secondary shrink-0 px-3 py-1.5 text-sm"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <Icon name="settings" />
+        {t('manage')}
+        <span className="sr-only"> ({name})</span>
+        <Icon
+          name="chevronDown"
+          className={`size-4 shrink-0 transition-transform motion-reduce:transition-none ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <div
+        id={id}
+        hidden={!open}
+        className="basis-full rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/60"
+      >
+        {children}
+      </div>
+    </>
   );
 }
