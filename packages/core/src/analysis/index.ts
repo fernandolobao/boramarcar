@@ -18,6 +18,7 @@ export * from './brackets';
 export * from './mana';
 export * from './formats';
 export * from './partners';
+export * from './compare';
 
 export interface AnalyzableCard {
   name: string;

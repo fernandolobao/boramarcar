@@ -819,5 +819,36 @@
     "next": "Next",
     "pageOf": "Page {page} of {pages}",
     "seeAll": "See full history"
+  },
+  "comparison": {
+    "title": "Comparison",
+    "hint": "With other {commander} decks on Bora Marcar (yours, public ones and your group's).",
+    "edhrec": "See the commander on EDHREC",
+    "none": "There are no other {commander} decks on Bora Marcar to compare yet.",
+    "tableCaption": "This deck × average of {count, plural, =1 {1 deck} other {# decks}}",
+    "metric": "Metric",
+    "thisDeck": "This deck",
+    "average": "Average",
+    "difference": "Difference",
+    "same": "same",
+    "metrics": {
+      "score": "Score",
+      "lands": "Lands",
+      "averageCmc": "Average MV",
+      "ramp": "Ramp",
+      "draw": "Card draw",
+      "removal": "Removal",
+      "wipe": "Board wipes"
+    },
+    "commonMissing": "Common in other decks",
+    "commonMissingHint": "Cards in at least half of the other decks that are not in this one.",
+    "noCommonMissing": "None: this deck already has the most common cards.",
+    "inShare": "in {share} of decks",
+    "unique": "Your own picks",
+    "uniqueHint": "Cards in this deck that no other deck of this commander uses (basic lands excluded).",
+    "noUnique": "None.",
+    "leastPopular": "Least played cards",
+    "leastPopularHint": "From the EDHREC popularity rank published by Scryfall: higher numbers = cards used in fewer Commander decks.",
+    "rank": "#{rank}"
   }
 }

@@ -819,5 +819,36 @@
     "next": "Próxima",
     "pageOf": "Página {page} de {pages}",
     "seeAll": "Ver histórico completo"
+  },
+  "comparison": {
+    "title": "Comparação",
+    "hint": "Com outros decks de {commander} cadastrados no Bora Marcar (os seus, os públicos e os do seu grupo).",
+    "edhrec": "Ver o comandante no EDHREC",
+    "none": "Ainda não há outros decks de {commander} no Bora Marcar para comparar.",
+    "tableCaption": "Este deck × média de {count, plural, =1 {1 deck} other {# decks}}",
+    "metric": "Métrica",
+    "thisDeck": "Este deck",
+    "average": "Média",
+    "difference": "Diferença",
+    "same": "igual",
+    "metrics": {
+      "score": "Nota",
+      "lands": "Terrenos",
+      "averageCmc": "CMC médio",
+      "ramp": "Ramp",
+      "draw": "Compra",
+      "removal": "Remoção",
+      "wipe": "Board wipes"
+    },
+    "commonMissing": "Comuns nos outros decks",
+    "commonMissingHint": "Cartas em pelo menos metade dos outros decks que não estão neste.",
+    "noCommonMissing": "Nenhuma: este deck já tem as cartas mais comuns.",
+    "inShare": "em {share} dos decks",
+    "unique": "Escolhas próprias",
+    "uniqueHint": "Cartas deste deck que nenhum outro deck do comandante usa (sem terrenos básicos).",
+    "noUnique": "Nenhuma.",
+    "leastPopular": "Cartas menos jogadas",
+    "leastPopularHint": "Pelo ranking de popularidade do EDHREC publicado pelo Scryfall: números maiores = cartas menos usadas em decks de Commander.",
+    "rank": "nº {rank}"
   }
 }

@@ -529,3 +529,64 @@ describe('edições da mesma carta', () => {
     ]);
   });
 });
+
+describe('comparação com decks do mesmo comandante', () => {
+  it('usa só decks visíveis com o mesmo conjunto de comandantes', async () => {
+    const { compareWithCommanderDecks, updateDeck } = await import('./decks');
+    const { players } = await seedGroup(db, 2);
+    const [ana, bia] = players;
+    const stranger = await createTestUser(db, { name: 'Estranho' });
+    const card = (id: string, name: string, type = 'Artifact') =>
+      mapScryfallCard({ id, name, cmc: 2, type_line: type, color_identity: [] });
+    const cardsList = [
+      card('cmp-omnath', 'Omnath, Locus of Mana', 'Legendary Creature'),
+      card('cmp-signet', 'Arcane Signet'),
+      card('cmp-mine', 'Minha Carta'),
+      card('cmp-other', 'Outra Carta'),
+    ];
+    const save = (ownerId: string, main: string[], name = 'Omnath') =>
+      saveImportedDeck(db, {
+        ownerId,
+        cards: cardsList,
+        deck: {
+          name,
+          source: 'text',
+          entries: [
+            { name: 'Omnath, Locus of Mana', quantity: 1, board: 'commander' },
+            ...main.map((n) => ({ name: n, quantity: 1, board: 'mainboard' as const })),
+          ],
+        },
+      });
+    const mine = await save(ana!.id, ['Minha Carta']);
+    await save(bia!.id, ['Arcane Signet', 'Outra Carta']);
+    const hidden = await save(bia!.id, ['Outra Carta']);
+    await updateDeck(db, { deckId: hidden.id, userId: bia!.id, visibility: 'private' });
+    await save(stranger.id, ['Arcane Signet']); // grupo de quem não divide grupo: não entra
+    const pub = await save(stranger.id, ['Arcane Signet'], 'Público');
+    await updateDeck(db, { deckId: pub.id, userId: stranger.id, visibility: 'public' });
+
+    const detail = await getDeck(db, { deckId: mine.id, viewerId: ana!.id });
+    const result = await compareWithCommanderDecks(db, {
+      deckId: mine.id,
+      viewerId: ana!.id,
+      format: detail.format,
+      commanders: detail.analysis.commanders,
+      entries: detail.entries,
+    });
+    expect(result?.decks).toBe(2);
+    expect(result?.commonMissing).toEqual([
+      { name: 'Arcane Signet', share: 1 },
+      { name: 'Outra Carta', share: 0.5 },
+    ]);
+    expect(result?.unique).toEqual(['Minha Carta']);
+    expect(
+      await compareWithCommanderDecks(db, {
+        deckId: mine.id,
+        viewerId: ana!.id,
+        format: 'commander',
+        commanders: [],
+        entries: [],
+      }),
+    ).toBeNull();
+  });
+});
