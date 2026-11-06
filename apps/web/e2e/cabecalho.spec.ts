@@ -56,4 +56,22 @@ test.describe('cabeçalho', () => {
     const menu = await page.getByRole('button', { name: /Account menu/ }).boundingBox();
     expect(Math.abs(brand!.y + brand!.height / 2 - (menu!.y + menu!.height / 2))).toBeLessThan(12);
   });
+
+  test('o menu da conta fica por cima do conteúdo da página (ex.: imagem do deck)', async ({
+    page,
+  }) => {
+    await page.goto('/decks/e2e-deck');
+    await page.getByRole('button', { name: /Menu da conta/ }).click();
+    const item = page.getByRole('link', { name: 'Configurações' });
+    await expect(item).toBeVisible();
+    // O elemento no ponto central do item precisa ser o próprio item (nada por cima).
+    const box = (await item.boundingBox())!;
+    const onTop = await page.evaluate(
+      ([x, y]) => document.elementFromPoint(x!, y!)?.closest('a')?.getAttribute('href'),
+      [box.x + box.width / 2, box.y + box.height / 2],
+    );
+    expect(onTop).toBe('/configuracoes');
+    await item.click();
+    await expect(page).toHaveURL(/\/configuracoes$/);
+  });
 });
