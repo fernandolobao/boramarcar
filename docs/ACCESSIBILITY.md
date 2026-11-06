@@ -99,6 +99,13 @@ sem rolagem horizontal em 320px.
 - **Perfil x Configurações**: "Perfil" mostra dados e resumo do usuário (e futuramente conquistas); fuso, idioma e avisos por e-mail ficam em "Configurações". O link de descadastro dos e-mails aponta para Configurações.
 - **Membros do grupo**: ações recolhidas atrás de "Gerenciar (Nome)" (disclosure), abertas numa faixa própria abaixo do nome — os botões não disputam espaço com o nome nem desalinham a lista.
 
+### Revisão: símbolos de mana
+
+- Símbolos reais do Mana Font (subconjunto em `src/styles/mana.css`, fonte `public/fonts/mana.woff2`) no lugar das letras W/U/B/R/G/C: identidade de cor, símbolos de mana do deck e custo das cartas.
+- Os glifos são decorativos (`aria-hidden`); o texto vem junto: custos têm `role="img"` com nome por extenso ("Custo de mana: 2, verde", híbridos "branco ou azul", phyrexianos), e identidade/contagem de cores têm o nome da cor em `sr-only`. Cada cor tem um desenho próprio, então a cor não é a única pista.
+- Os seletores do Mana Font foram prefixados com `.ms` (ex.: `.ms.ms-1`) porque `ms-1`, `ms-2`… também são utilitários do Tailwind (margem): sem isso, um `ms-1` comum ganhava um glifo e mudava o nome acessível de títulos — pego pelo teste E2E.
+- A barra de símbolos agora usa `flex-grow` proporcional (antes, larguras em % podiam esconder a última cor).
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

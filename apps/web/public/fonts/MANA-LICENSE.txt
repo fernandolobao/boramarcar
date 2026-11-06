@@ -1,0 +1,10 @@
+mana.woff2 — Mana Font 1.18.0, by Andrew Gioia (https://mana.andrewgioia.com,
+https://github.com/andrewgioia/mana).
+
+The Mana font is licensed under the SIL Open Font License 1.1
+(https://openfontlicense.org). The CSS subset in src/styles/mana.css is derived
+from the project's CSS, licensed under the MIT License.
+
+All mana symbol images are copyright Wizards of the Coast. Bora Marcar is
+unofficial Fan Content permitted under the Wizards of the Coast Fan Content
+Policy and is not approved or endorsed by Wizards.

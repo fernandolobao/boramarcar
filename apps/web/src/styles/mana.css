@@ -1,0 +1,596 @@
+/*
+ * Símbolos de mana — subconjunto do Mana Font (https://mana.andrewgioia.com).
+ * Fonte: SIL OFL 1.1; CSS: MIT. Símbolos © Wizards of the Coast.
+ * Gerado de mana-font@1.18.0 (só custos de mana: cores, números, híbridos, phyrexianos, neve,
+ * virar). Licenças em public/fonts/MANA-LICENSE.txt.
+ * Seletores sempre com `.ms` junto (ex.: `.ms.ms-1`) para não colidir com utilitários do
+ * Tailwind de mesmo nome (`ms-1` = margin-inline-start).
+ */
+@font-face {
+  font-family: 'Mana';
+  src: url('/fonts/mana.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.ms {
+  display: inline-block;
+  font: normal normal normal 14px Mana;
+  font-size: inherit;
+  line-height: 1em;
+  text-rendering: auto;
+  transform: translate(0, 0);
+  speak: none;
+  text-transform: none;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --ms-mana-b: #a7999e;
+  --ms-mana-c: #d0c6bb;
+  --ms-mana-g: #9fcba6;
+  --ms-mana-r: #f19b79;
+  --ms-mana-u: #bcdaf7;
+  --ms-mana-w: #fdfbce;
+}
+.ms.ms-w::before {
+  content: '\e600';
+}
+.ms.ms-u::before {
+  content: '\e601';
+}
+.ms.ms-b::before {
+  content: '\e602';
+}
+.ms.ms-r::before {
+  content: '\e603';
+}
+.ms.ms-g::before {
+  content: '\e604';
+}
+.ms.ms-0::before {
+  content: '\e605';
+}
+.ms.ms-1::before {
+  content: '\e606';
+}
+.ms.ms-2 {
+  margin-left: inherit !important;
+}
+.ms.ms-2::before {
+  content: '\e607';
+}
+.ms.ms-3::before {
+  content: '\e608';
+}
+.ms.ms-4::before {
+  content: '\e609';
+}
+.ms.ms-5::before {
+  content: '\e60a';
+}
+.ms.ms-6::before {
+  content: '\e60b';
+}
+.ms.ms-7::before {
+  content: '\e60c';
+}
+.ms.ms-8::before {
+  content: '\e60d';
+}
+.ms.ms-9::before {
+  content: '\e60e';
+}
+.ms.ms-10::before {
+  content: '\e60f';
+}
+.ms.ms-11::before {
+  content: '\e610';
+}
+.ms.ms-12::before {
+  content: '\e611';
+}
+.ms.ms-13::before {
+  content: '\e612';
+}
+.ms.ms-14::before {
+  content: '\e613';
+}
+.ms.ms-15::before {
+  content: '\e614';
+}
+.ms.ms-16::before {
+  content: '\e62a';
+}
+.ms.ms-17::before {
+  content: '\e62b';
+}
+.ms.ms-18::before {
+  content: '\e62c';
+}
+.ms.ms-19::before {
+  content: '\e62d';
+}
+.ms.ms-20::before {
+  content: '\e62e';
+}
+.ms.ms-x::before {
+  content: '\e615';
+}
+.ms.ms-y::before {
+  content: '\e616';
+}
+.ms.ms-z::before {
+  content: '\e617';
+}
+.ms.ms-s::before {
+  content: '\e619';
+}
+.ms.ms-c::before {
+  content: '\e904';
+}
+.ms.ms-e::before {
+  content: '\e907';
+}
+.ms.ms-infinity::before {
+  content: '\e903';
+}
+.ms.ms-h::before {
+  content: '\e618';
+}
+.ms.ms-p::before {
+  content: '\e618';
+}
+.ms.ms-tap::before {
+  content: '\e61a';
+}
+.ms.ms-untap::before {
+  content: '\e61b';
+}
+.ms.ms-chaos::before {
+  content: '\e61d';
+}
+.ms.ms-wu::before,
+.ms.ms-wb::before,
+.ms.ms-rw::after,
+.ms.ms-gw::after,
+.ms.ms-2w::after,
+.ms.ms-cw::after {
+  content: '\e600';
+}
+.ms.ms-ub::before,
+.ms.ms-ur::before,
+.ms.ms-wu::after,
+.ms.ms-gu::after,
+.ms.ms-2u::after,
+.ms.ms-cu::after {
+  content: '\e601';
+}
+.ms.ms-br::before,
+.ms.ms-bg::before,
+.ms.ms-wb::after,
+.ms.ms-ub::after,
+.ms.ms-2b::after,
+.ms.ms-cb::after {
+  content: '\e602';
+}
+.ms.ms-rw::before,
+.ms.ms-rg::before,
+.ms.ms-ur::after,
+.ms.ms-br::after,
+.ms.ms-2r::after,
+.ms.ms-cr::after {
+  content: '\e603';
+}
+.ms.ms-gw::before,
+.ms.ms-gu::before,
+.ms.ms-bg::after,
+.ms.ms-rg::after,
+.ms.ms-2g::after,
+.ms.ms-cg::after {
+  content: '\e604';
+}
+.ms.ms-2w::before,
+.ms.ms-2u::before,
+.ms.ms-2b::before,
+.ms.ms-2r::before,
+.ms.ms-2g::before {
+  content: '\e607';
+}
+.ms.ms-cw::before,
+.ms.ms-cu::before,
+.ms.ms-cb::before,
+.ms.ms-cr::before,
+.ms.ms-cg::before {
+  content: '\e904';
+}
+.ms.ms-wp::before,
+.ms.ms-up::before,
+.ms.ms-bp::before,
+.ms.ms-rp::before,
+.ms.ms-gp::before,
+.ms.ms-wup::before,
+.ms.ms-wup::after,
+.ms.ms-wbp::before,
+.ms.ms-wbp::after,
+.ms.ms-ubp::before,
+.ms.ms-ubp::after,
+.ms.ms-urp::before,
+.ms.ms-urp::after,
+.ms.ms-brp::before,
+.ms.ms-brp::after,
+.ms.ms-bgp::before,
+.ms.ms-bgp::after,
+.ms.ms-rwp::before,
+.ms.ms-rwp::after,
+.ms.ms-rgp::before,
+.ms.ms-rgp::after,
+.ms.ms-gwp::before,
+.ms.ms-gwp::after,
+.ms.ms-gup::before,
+.ms.ms-gup::after {
+  content: '\e618';
+}
+.ms.ms-cost {
+  background-color: #beb9b2;
+  border-radius: 1em;
+  color: #111;
+  font-size: 0.95em;
+  width: 1.3em;
+  height: 1.3em;
+  line-height: 1.35em;
+  text-align: center;
+}
+.ms.ms-cost.ms-w,
+.ms.ms-cost.ms-wp {
+  background-color: #f0f2c0;
+}
+.ms.ms-cost.ms-u,
+.ms.ms-cost.ms-up {
+  background-color: #b5cde3;
+}
+.ms.ms-cost.ms-b,
+.ms.ms-cost.ms-bp {
+  background-color: #aca29a;
+}
+.ms.ms-cost.ms-r,
+.ms.ms-cost.ms-rp {
+  background-color: #db8664;
+}
+.ms.ms-cost.ms-g,
+.ms.ms-cost.ms-gp {
+  background-color: #93b483;
+}
+.ms.ms-cost.ms-wu,
+.ms.ms-cost.ms-wb,
+.ms.ms-cost.ms-ub,
+.ms.ms-cost.ms-ur,
+.ms.ms-cost.ms-br,
+.ms.ms-cost.ms-bg,
+.ms.ms-cost.ms-rw,
+.ms.ms-cost.ms-rg,
+.ms.ms-cost.ms-gw,
+.ms.ms-cost.ms-gu,
+.ms.ms-cost.ms-2w,
+.ms.ms-cost.ms-2u,
+.ms.ms-cost.ms-2b,
+.ms.ms-cost.ms-2r,
+.ms.ms-cost.ms-2g,
+.ms.ms-cost.ms-cw,
+.ms.ms-cost.ms-cu,
+.ms.ms-cost.ms-cb,
+.ms.ms-cost.ms-cr,
+.ms.ms-cost.ms-cg,
+.ms.ms-cost.ms-wup,
+.ms.ms-cost.ms-wbp,
+.ms.ms-cost.ms-ubp,
+.ms.ms-cost.ms-urp,
+.ms.ms-cost.ms-brp,
+.ms.ms-cost.ms-bgp,
+.ms.ms-cost.ms-rwp,
+.ms.ms-cost.ms-rgp,
+.ms.ms-cost.ms-gwp,
+.ms.ms-cost.ms-gup {
+  --ms-split-top: var(--ms-mana-c);
+  --ms-split-bottom: var(--ms-mana-u);
+  background: var(--ms-split-top);
+  background: -moz-linear-gradient(
+    135deg,
+    var(--ms-split-top) 0%,
+    var(--ms-split-top) 50%,
+    var(--ms-split-bottom) 50%,
+    var(--ms-split-bottom) 100%
+  );
+  background: -webkit-linear-gradient(
+    135deg,
+    var(--ms-split-top) 0%,
+    var(--ms-split-top) 50%,
+    var(--ms-split-bottom) 50%,
+    var(--ms-split-bottom) 100%
+  );
+  background: linear-gradient(
+    135deg,
+    var(--ms-split-top) 0%,
+    var(--ms-split-top) 50%,
+    var(--ms-split-bottom) 50%,
+    var(--ms-split-bottom) 100%
+  );
+  position: relative;
+  width: 1.3em;
+  height: 1.3em;
+}
+.ms.ms-cost.ms-wu::before,
+.ms.ms-cost.ms-wu::after,
+.ms.ms-cost.ms-wb::before,
+.ms.ms-cost.ms-wb::after,
+.ms.ms-cost.ms-ub::before,
+.ms.ms-cost.ms-ub::after,
+.ms.ms-cost.ms-ur::before,
+.ms.ms-cost.ms-ur::after,
+.ms.ms-cost.ms-br::before,
+.ms.ms-cost.ms-br::after,
+.ms.ms-cost.ms-bg::before,
+.ms.ms-cost.ms-bg::after,
+.ms.ms-cost.ms-rw::before,
+.ms.ms-cost.ms-rw::after,
+.ms.ms-cost.ms-rg::before,
+.ms.ms-cost.ms-rg::after,
+.ms.ms-cost.ms-gw::before,
+.ms.ms-cost.ms-gw::after,
+.ms.ms-cost.ms-gu::before,
+.ms.ms-cost.ms-gu::after,
+.ms.ms-cost.ms-2w::before,
+.ms.ms-cost.ms-2w::after,
+.ms.ms-cost.ms-2u::before,
+.ms.ms-cost.ms-2u::after,
+.ms.ms-cost.ms-2b::before,
+.ms.ms-cost.ms-2b::after,
+.ms.ms-cost.ms-2r::before,
+.ms.ms-cost.ms-2r::after,
+.ms.ms-cost.ms-2g::before,
+.ms.ms-cost.ms-2g::after,
+.ms.ms-cost.ms-cw::before,
+.ms.ms-cost.ms-cw::after,
+.ms.ms-cost.ms-cu::before,
+.ms.ms-cost.ms-cu::after,
+.ms.ms-cost.ms-cb::before,
+.ms.ms-cost.ms-cb::after,
+.ms.ms-cost.ms-cr::before,
+.ms.ms-cost.ms-cr::after,
+.ms.ms-cost.ms-cg::before,
+.ms.ms-cost.ms-cg::after,
+.ms.ms-cost.ms-wup::before,
+.ms.ms-cost.ms-wup::after,
+.ms.ms-cost.ms-wbp::before,
+.ms.ms-cost.ms-wbp::after,
+.ms.ms-cost.ms-ubp::before,
+.ms.ms-cost.ms-ubp::after,
+.ms.ms-cost.ms-urp::before,
+.ms.ms-cost.ms-urp::after,
+.ms.ms-cost.ms-brp::before,
+.ms.ms-cost.ms-brp::after,
+.ms.ms-cost.ms-bgp::before,
+.ms.ms-cost.ms-bgp::after,
+.ms.ms-cost.ms-rwp::before,
+.ms.ms-cost.ms-rwp::after,
+.ms.ms-cost.ms-rgp::before,
+.ms.ms-cost.ms-rgp::after,
+.ms.ms-cost.ms-gwp::before,
+.ms.ms-cost.ms-gwp::after,
+.ms.ms-cost.ms-gup::before,
+.ms.ms-cost.ms-gup::after {
+  font-size: 0.55em !important;
+  position: absolute;
+}
+.ms.ms-cost.ms-wu::before,
+.ms.ms-cost.ms-wb::before,
+.ms.ms-cost.ms-ub::before,
+.ms.ms-cost.ms-ur::before,
+.ms.ms-cost.ms-br::before,
+.ms.ms-cost.ms-bg::before,
+.ms.ms-cost.ms-rw::before,
+.ms.ms-cost.ms-rg::before,
+.ms.ms-cost.ms-gw::before,
+.ms.ms-cost.ms-gu::before,
+.ms.ms-cost.ms-2w::before,
+.ms.ms-cost.ms-2u::before,
+.ms.ms-cost.ms-2b::before,
+.ms.ms-cost.ms-2r::before,
+.ms.ms-cost.ms-2g::before,
+.ms.ms-cost.ms-cw::before,
+.ms.ms-cost.ms-cu::before,
+.ms.ms-cost.ms-cb::before,
+.ms.ms-cost.ms-cr::before,
+.ms.ms-cost.ms-cg::before,
+.ms.ms-cost.ms-wup::before,
+.ms.ms-cost.ms-wbp::before,
+.ms.ms-cost.ms-ubp::before,
+.ms.ms-cost.ms-urp::before,
+.ms.ms-cost.ms-brp::before,
+.ms.ms-cost.ms-bgp::before,
+.ms.ms-cost.ms-rwp::before,
+.ms.ms-cost.ms-rgp::before,
+.ms.ms-cost.ms-gwp::before,
+.ms.ms-cost.ms-gup::before {
+  top: -0.38em;
+  left: 0.28em;
+}
+.ms.ms-cost.ms-wu::after,
+.ms.ms-cost.ms-wb::after,
+.ms.ms-cost.ms-ub::after,
+.ms.ms-cost.ms-ur::after,
+.ms.ms-cost.ms-br::after,
+.ms.ms-cost.ms-bg::after,
+.ms.ms-cost.ms-rw::after,
+.ms.ms-cost.ms-rg::after,
+.ms.ms-cost.ms-gw::after,
+.ms.ms-cost.ms-gu::after,
+.ms.ms-cost.ms-2w::after,
+.ms.ms-cost.ms-2u::after,
+.ms.ms-cost.ms-2b::after,
+.ms.ms-cost.ms-2r::after,
+.ms.ms-cost.ms-2g::after,
+.ms.ms-cost.ms-cw::after,
+.ms.ms-cost.ms-cu::after,
+.ms.ms-cost.ms-cb::after,
+.ms.ms-cost.ms-cr::after,
+.ms.ms-cost.ms-cg::after,
+.ms.ms-cost.ms-wup::after,
+.ms.ms-cost.ms-wbp::after,
+.ms.ms-cost.ms-ubp::after,
+.ms.ms-cost.ms-urp::after,
+.ms.ms-cost.ms-brp::after,
+.ms.ms-cost.ms-bgp::after,
+.ms.ms-cost.ms-rwp::after,
+.ms.ms-cost.ms-rgp::after,
+.ms.ms-cost.ms-gwp::after,
+.ms.ms-cost.ms-gup::after {
+  top: 0.5em;
+  left: 1em;
+}
+.ms.ms-cost.ms-wu,
+.ms.ms-cost.ms-wup {
+  --ms-split-top: var(--ms-mana-w);
+}
+.ms.ms-cost.ms-wb,
+.ms.ms-cost.ms-wbp {
+  --ms-split-top: var(--ms-mana-w);
+  --ms-split-bottom: var(--ms-mana-b);
+}
+.ms.ms-cost.ms-ub,
+.ms.ms-cost.ms-ubp {
+  --ms-split-top: var(--ms-mana-u);
+  --ms-split-bottom: var(--ms-mana-b);
+}
+.ms.ms-cost.ms-ur,
+.ms.ms-cost.ms-urp {
+  --ms-split-top: var(--ms-mana-u);
+  --ms-split-bottom: var(--ms-mana-r);
+}
+.ms.ms-cost.ms-br,
+.ms.ms-cost.ms-brp {
+  --ms-split-top: var(--ms-mana-b);
+  --ms-split-bottom: var(--ms-mana-r);
+}
+.ms.ms-cost.ms-bg,
+.ms.ms-cost.ms-bgp {
+  --ms-split-top: var(--ms-mana-b);
+  --ms-split-bottom: var(--ms-mana-g);
+}
+.ms.ms-cost.ms-rw,
+.ms.ms-cost.ms-rwp {
+  --ms-split-top: var(--ms-mana-r);
+  --ms-split-bottom: var(--ms-mana-w);
+}
+.ms.ms-cost.ms-rg,
+.ms.ms-cost.ms-rgp {
+  --ms-split-top: var(--ms-mana-r);
+  --ms-split-bottom: var(--ms-mana-g);
+}
+.ms.ms-cost.ms-gw,
+.ms.ms-cost.ms-gwp {
+  --ms-split-top: var(--ms-mana-g);
+  --ms-split-bottom: var(--ms-mana-w);
+}
+.ms.ms-cost.ms-gu,
+.ms.ms-cost.ms-gup {
+  --ms-split-top: var(--ms-mana-g);
+}
+.ms.ms-cost.ms-2w,
+.ms.ms-cost.ms-cw {
+  --ms-split-bottom: var(--ms-mana-w);
+}
+.ms.ms-cost.ms-2b,
+.ms.ms-cost.ms-cb {
+  --ms-split-bottom: var(--ms-mana-b);
+}
+.ms.ms-cost.ms-2r,
+.ms.ms-cost.ms-cr {
+  --ms-split-bottom: var(--ms-mana-r);
+}
+.ms.ms-cost.ms-2g,
+.ms.ms-cost.ms-cg {
+  --ms-split-bottom: var(--ms-mana-g);
+}
+.ms.ms-cost.ms-p::before {
+  display: inline-block;
+  -moz-transform: scale(1.2, 1.2);
+  -webkit-transform: scale(1.2, 1.2);
+  transform: scale(1.2, 1.2);
+}
+.ms.ms-cost.ms-wp::before,
+.ms.ms-cost.ms-up::before,
+.ms.ms-cost.ms-bp::before,
+.ms.ms-cost.ms-rp::before,
+.ms.ms-cost.ms-gp::before,
+.ms.ms-cost.ms-cw::before,
+.ms.ms-cost.ms-cu::before,
+.ms.ms-cost.ms-cb::before,
+.ms.ms-cost.ms-cr::before,
+.ms.ms-cost.ms-cg::before,
+.ms.ms-cost.ms-wup::before,
+.ms.ms-cost.ms-wbp::before,
+.ms.ms-cost.ms-ubp::before,
+.ms.ms-cost.ms-urp::before,
+.ms.ms-cost.ms-brp::before,
+.ms.ms-cost.ms-bgp::before,
+.ms.ms-cost.ms-rwp::before,
+.ms.ms-cost.ms-rgp::before,
+.ms.ms-cost.ms-gwp::before,
+.ms.ms-cost.ms-gup::before,
+.ms.ms-cost.ms-wup::after,
+.ms.ms-cost.ms-wbp::after,
+.ms.ms-cost.ms-ubp::after,
+.ms.ms-cost.ms-urp::after,
+.ms.ms-cost.ms-brp::after,
+.ms.ms-cost.ms-bgp::after,
+.ms.ms-cost.ms-rwp::after,
+.ms.ms-cost.ms-rgp::after,
+.ms.ms-cost.ms-gwp::after,
+.ms.ms-cost.ms-gup::after {
+  display: inline-block;
+  transform: scale(1.2) translateX(0.01rem) translateY(-0.03rem);
+}
+.ms.ms-cost.ms-s::before {
+  color: #fff;
+  -webkit-text-stroke: 2px #fff;
+  font-size: 0.85em;
+  top: -0.05em;
+  position: relative;
+  display: inline-block;
+}
+.ms.ms-cost.ms-s::after {
+  content: '\e619';
+  position: absolute;
+  color: #333;
+  margin-left: -0.9em;
+  font-size: 1.1em;
+}
+.ms.ms-cost.ms-untap {
+  background-color: #111;
+  color: #fff;
+}
+.ms.ms-cost.ms-shadow {
+  box-shadow:
+    -0.06em 0.07em 0 #111,
+    0 0.06em 0 #111;
+}
+.ms.ms-cost.ms-shadow.ms-untap {
+  box-shadow:
+    -0.06em 0.07em 0 #fff,
+    0 0.06em 0 #fff;
+}
+span.ms-half {
+  width: 0.675em;
+  overflow: hidden;
+  display: inline-block;
+  margin-left: 0.675em;
+}
+.ms.ms-half {
+  width: 0.675em;
+  margin-left: 0.675em;
+  overflow: hidden;
+  border-radius: 0 1em 1em 0;
+}
+.ms.ms-half::before {
+  margin-left: -0.65em;
+}

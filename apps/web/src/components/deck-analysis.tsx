@@ -2,6 +2,7 @@ import type { ColorSymbol, DeckAnalysis, ManaCurveBucket } from '@boramarcar/cor
 import { MANA_CURVE_BUCKETS } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { Icon } from './icons';
+import { ManaSymbol } from './mana';
 
 export function ManaCurve({ curve }: { curve: Record<ManaCurveBucket, number> }) {
   const t = useTranslations('analysis');
@@ -46,40 +47,47 @@ export function ManaCurve({ curve }: { curve: Record<ManaCurveBucket, number> })
   );
 }
 
-const PIP_CLASS: Record<ColorSymbol, string> = {
-  W: 'bg-mana-w',
-  U: 'bg-mana-u',
-  B: 'bg-mana-b',
-  R: 'bg-mana-r',
-  G: 'bg-mana-g',
-  C: 'bg-mana-c',
+/** Cores das barras: as mesmas dos símbolos de mana. */
+const PIP_COLOR: Record<ColorSymbol, string> = {
+  W: '#f0f2c0',
+  U: '#b5cde3',
+  B: '#aca29a',
+  R: '#db8664',
+  G: '#93b483',
+  C: '#ccc2c0',
 };
 
 export function ColorPips({ pips }: { pips: Record<ColorSymbol, number> }) {
   const t = useTranslations('analysis');
-  const total = Object.values(pips).reduce((a, b) => a + b, 0);
+  const tm = useTranslations('mana');
+  const colors = (Object.keys(pips) as ColorSymbol[]).filter((c) => pips[c] > 0);
+  const total = colors.reduce((sum, c) => sum + pips[c], 0);
   if (!total) return null;
   return (
     <div>
       <h3 className="section-title">{t('colorPips')}</h3>
-      {/* Barra decorativa: a mesma informação está no texto abaixo. */}
-      <div className="flex h-3 overflow-hidden rounded-full" aria-hidden="true">
-        {(Object.keys(pips) as ColorSymbol[])
-          .filter((c) => pips[c] > 0)
-          .map((color) => (
-            <div
-              key={color}
-              className={PIP_CLASS[color]}
-              style={{ width: `${(pips[color] / total) * 100}%` }}
-            />
-          ))}
+      {/* Barra decorativa: a mesma informação está na lista abaixo. */}
+      <div
+        className="flex h-3 overflow-hidden rounded-full ring-1 ring-zinc-900/15 dark:ring-white/15"
+        aria-hidden="true"
+      >
+        {colors.map((color) => (
+          <div
+            key={color}
+            className="h-full"
+            style={{ flexGrow: pips[color], flexBasis: 0, backgroundColor: PIP_COLOR[color] }}
+          />
+        ))}
       </div>
-      <p className="muted mt-2">
-        {(Object.keys(pips) as ColorSymbol[])
-          .filter((c) => pips[c] > 0)
-          .map((c) => `${c} ${pips[c]}`)
-          .join(' · ')}
-      </p>
+      <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        {colors.map((c) => (
+          <li key={c} className="flex items-center gap-1.5">
+            <ManaSymbol symbol={c} className="text-base" />
+            <span className="font-medium tabular-nums">{pips[c]}</span>
+            <span className="sr-only">{tm(`colors.${c.toLowerCase() as 'w'}`)}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

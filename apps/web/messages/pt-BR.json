@@ -525,5 +525,21 @@
     "achievements": "Conquistas",
     "achievementsSoon": "Em breve: selos por conquistas como primeira vitória, sequências e decks favoritos.",
     "editSettings": "Abrir configurações"
+  },
+  "mana": {
+    "cost": "Custo de mana: {symbols}",
+    "or": "ou",
+    "snow": "neve",
+    "tap": "virar",
+    "phyrexian": "{name} phyrexiano",
+    "colors": {
+      "w": "branco",
+      "u": "azul",
+      "b": "preto",
+      "r": "vermelho",
+      "g": "verde",
+      "c": "incolor"
+    },
+    "pips": "{count} {color}"
   }
 }
