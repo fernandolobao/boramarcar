@@ -1,0 +1,1 @@
+ALTER TABLE "decks" ADD COLUMN "visibility" text DEFAULT 'group' NOT NULL;

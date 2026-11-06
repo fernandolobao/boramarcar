@@ -112,6 +112,12 @@ sem rolagem horizontal em 320px.
 - **Modo Editar** (só o dono, terceiro botão com `aria-pressed`): tabela com cabeçalhos visíveis; cada campo tem nome com contexto ("Quantidade de Forest", "Proxies de Forest"); salva ao sair do campo ou com Enter e confirma numa região `role="status"` sempre presente. Remover usa confirmação em dois cliques; no celular o botão mostra só o ícone, com o texto para leitores de tela.
 - **Exportar/atualizar**: botões com texto, resultado em `role="status"`, lista colada num `<details>` com instrução ligada ao campo.
 
+### Revisão: perfis, conquistas e visibilidade
+
+- **Conquistas**: lista de selos; desbloqueada com ícone próprio, fundo e a data em texto; bloqueada com cadeado, "Bloqueada" para leitores de tela e o progresso em texto ("3 de 10") — a barra é decorativa.
+- **Perfil de outro jogador**: links a partir do grupo e do ranking; título da aba com o nome; sem e-mail.
+- **Visibilidade do deck**: três opções em `fieldset/legend` com rótulo, ícone e explicação clicáveis; o selo de visibilidade usa texto + ícone.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

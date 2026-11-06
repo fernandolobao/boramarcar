@@ -401,7 +401,18 @@
     "paper": "Paper",
     "letter": "Letter",
     "printDownload": "Download PDF",
-    "printNoProxies": "No card is marked as proxy. Mark them in Edit mode or print the whole deck."
+    "printNoProxies": "No card is marked as proxy. Mark them in Edit mode or print the whole deck.",
+    "visibility": {
+      "private": "Private",
+      "group": "Group",
+      "public": "Public"
+    },
+    "visibilityHint": {
+      "private": "Only you can see the deck.",
+      "group": "People in a group with you can see the deck (default).",
+      "public": "Anyone with a Bora Marcar account and the link can see the deck."
+    },
+    "visibilityLabel": "Who can see this deck"
   },
   "analysis": {
     "title": "Analysis",
@@ -585,5 +596,80 @@
       "c": "colorless"
     },
     "pips": "{count} {color}"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "unlocked": "{count} of {total} unlocked",
+    "locked": "Locked",
+    "unlockedOn": "Unlocked on {date}",
+    "progress": "Progress: {current} of {target}",
+    "times": "{count, plural, =1 {once} other {# times}}",
+    "items": {
+      "first_game": {
+        "name": "Debut",
+        "description": "Play your first game."
+      },
+      "first_win": {
+        "name": "First win",
+        "description": "Win a game."
+      },
+      "games_10": {
+        "name": "Regular",
+        "description": "Play 10 games."
+      },
+      "games_50": {
+        "name": "Veteran",
+        "description": "Play 50 games."
+      },
+      "wins_10": {
+        "name": "Ten wins",
+        "description": "Win 10 games."
+      },
+      "streak_3": {
+        "name": "On fire",
+        "description": "Win 3 games in a row."
+      },
+      "streak_5": {
+        "name": "Unstoppable",
+        "description": "Win 5 games in a row."
+      },
+      "fast_win": {
+        "name": "Lightning win",
+        "description": "Win by turn 6."
+      },
+      "first_player_win": {
+        "name": "Head start",
+        "description": "Win a game you started."
+      },
+      "deck_loyal": {
+        "name": "Loyal to the deck",
+        "description": "Play 10 games with the same deck."
+      },
+      "deck_variety": {
+        "name": "Collector",
+        "description": "Win with 3 different decks."
+      },
+      "versatile": {
+        "name": "Versatile",
+        "description": "Play 3 different game types."
+      },
+      "team_win": {
+        "name": "Dynamic duo",
+        "description": "Win a Two-Headed Giant game."
+      },
+      "season_champion": {
+        "name": "Season champion",
+        "description": "Finish a season in 1st place."
+      }
+    }
+  },
+  "player": {
+    "decks": "Decks",
+    "noDecks": "No visible decks.",
+    "ownerOf": "{name}'s deck",
+    "viewProfile": "View {name}'s profile",
+    "seasonTitles": "Titles",
+    "seasonTitle": "{season} — {group}",
+    "sharedGroups": "Groups in common"
   }
 }

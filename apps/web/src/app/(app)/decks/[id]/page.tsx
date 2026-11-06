@@ -1,5 +1,14 @@
 import type { Metadata } from 'next';
-import { artCropUrl, deckPrice, isDomainError, isGameFormat } from '@boramarcar/core';
+import {
+  artCropUrl,
+  DECK_VISIBILITIES,
+  deckPrice,
+  isDomainError,
+  isGameFormat,
+  type DeckVisibility,
+} from '@boramarcar/core';
+import Link from 'next/link';
+import { VisibilityBadge } from '@/components/deck-grid';
 import { getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -41,6 +50,7 @@ export default async function DeckPage({ params }: Props) {
   const ta = await getTranslations('analysis');
   const tc = await getTranslations('common');
   const tf = await getTranslations('formats');
+  const tp = await getTranslations('player');
   const fmt = await getFormatter();
   const { analysis } = deck;
   const format = isGameFormat(deck.format) ? deck.format : 'other';
@@ -91,8 +101,16 @@ export default async function DeckPage({ params }: Props) {
                 {tf(format)}
               </span>
               <ColorIdentity colors={identity} />
+              <VisibilityBadge visibility={deck.visibility} />
             </div>
             <h1 className="page-title">{deck.name}</h1>
+            {!deck.isOwner && (
+              <p className="text-sm">
+                <Link href={`/jogadores/${deck.ownerId}`} className="underline underline-offset-2">
+                  {tp('ownerOf', { name: deck.ownerName })}
+                </Link>
+              </p>
+            )}
             {analysis.commanders.length > 0 && (
               <p className="text-lg font-medium">{analysis.commanders.join(' & ')}</p>
             )}
@@ -137,7 +155,16 @@ export default async function DeckPage({ params }: Props) {
         <details className="card">
           <summary className="cursor-pointer font-semibold">{t('settings')}</summary>
           <div className="mt-4">
-            <DeckSettingsForm deckId={deck.id} name={deck.name} format={format} />
+            <DeckSettingsForm
+              deckId={deck.id}
+              name={deck.name}
+              format={format}
+              visibility={
+                (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
+                  ? (deck.visibility as DeckVisibility)
+                  : 'group'
+              }
+            />
           </div>
         </details>
       )}

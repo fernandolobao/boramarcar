@@ -1,6 +1,11 @@
 'use client';
 
-import { GAME_FORMATS, type GameFormat } from '@boramarcar/core';
+import {
+  DECK_VISIBILITIES,
+  GAME_FORMATS,
+  type DeckVisibility,
+  type GameFormat,
+} from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { api } from '@/lib/api';
@@ -38,16 +43,18 @@ export function DeckSettingsForm({
   deckId,
   name,
   format,
+  visibility = 'group',
 }: {
   deckId: string;
   name: string;
   format: GameFormat;
+  visibility?: DeckVisibility;
 }) {
   const t = useTranslations('decks');
   const tf = useTranslations('formats');
   const tc = useTranslations('common');
   const { run, error, pending } = useApiAction();
-  const [values, setValues] = useState({ name, format });
+  const [values, setValues] = useState({ name, format, visibility });
   const [saved, setSaved] = useState(false);
   return (
     <form
@@ -91,6 +98,32 @@ export function DeckSettingsForm({
           ))}
         </select>
       </div>
+      <fieldset className="sm:col-span-3">
+        <legend className="label">{t('visibilityLabel')}</legend>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {DECK_VISIBILITIES.map((v) => (
+            <label
+              key={v}
+              className="flex items-start gap-2 rounded-xl border border-zinc-300 p-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-zinc-700 dark:has-[:checked]:bg-brand-700/20"
+            >
+              <input
+                type="radio"
+                name="deck-visibility"
+                className="mt-0.5"
+                checked={values.visibility === v}
+                onChange={() => setValues((s) => ({ ...s, visibility: v }))}
+              />
+              <span>
+                <span className="flex items-center gap-1.5 font-medium">
+                  <Icon name={v} />
+                  {t(`visibility.${v}`)}
+                </span>
+                <span className="muted block">{t(`visibilityHint.${v}`)}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <button className="btn-primary" disabled={pending}>
         <Icon name="save" />
         {tc('save')}

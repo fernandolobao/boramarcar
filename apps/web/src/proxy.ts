@@ -21,6 +21,7 @@ export const config = {
     '/ranking/:path*',
     '/decks/:path*',
     '/perfil/:path*',
+    '/jogadores/:path*',
     '/configuracoes/:path*',
   ],
 };

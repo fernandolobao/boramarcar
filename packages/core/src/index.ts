@@ -8,3 +8,4 @@ export * from './calendar';
 export * from './email';
 export * from './games';
 export * from './stats';
+export * from './achievements';

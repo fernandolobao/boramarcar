@@ -232,16 +232,22 @@ describe('ColorIdentity e DeckSettingsForm', () => {
     expect(await audit(container)).toEqual([]);
   });
 
-  it('salva nome e tipo de jogo do deck', async () => {
+  it('salva nome, tipo de jogo e visibilidade do deck', async () => {
     const fetchMock = vi.fn(async () => Response.json({ deck: {} }));
     vi.stubGlobal('fetch', fetchMock);
     const { container } = wrap(<DeckSettingsForm deckId="d1" name="Omnath" format="commander" />);
     expect(await audit(container)).toEqual([]);
     fireEvent.change(screen.getByLabelText('Tipo de jogo'), { target: { value: 'brawl' } });
+    expect(screen.getByRole('radio', { name: /Grupo/ })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: /Privado/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(await screen.findByRole('status')).toHaveTextContent('Deck salvo.');
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('/api/v1/decks/d1');
-    expect(JSON.parse(init.body as string)).toEqual({ name: 'Omnath', format: 'brawl' });
+    expect(JSON.parse(init.body as string)).toEqual({
+      name: 'Omnath',
+      format: 'brawl',
+      visibility: 'private',
+    });
   });
 });

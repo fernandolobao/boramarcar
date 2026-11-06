@@ -1,5 +1,6 @@
 import { isGameFormat } from '@boramarcar/core';
 import { listLocations, listMembers } from '@boramarcar/db';
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import {
   CreateGroupForm,
@@ -103,7 +104,12 @@ export default async function GroupPage() {
                   className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 text-sm"
                 >
                   <span className="min-w-0">
-                    <span className="font-medium">{m.name}</span>
+                    <Link
+                      href={m.userId === user.id ? '/perfil' : `/jogadores/${m.userId}`}
+                      className="font-medium underline-offset-2 hover:underline"
+                    >
+                      {m.name}
+                    </Link>
                     {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
                     <span className="muted block">{t(`roles.${m.role}`)}</span>
                   </span>
