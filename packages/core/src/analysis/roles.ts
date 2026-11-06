@@ -1,7 +1,12 @@
 import type { CardData } from '../decks/types';
+import { TAGGER_ROLES, type TaggerRole } from './tagger';
 
-export const CARD_ROLES = ['ramp', 'draw', 'removal', 'wipe'] as const;
-export type CardRole = (typeof CARD_ROLES)[number];
+/** Todas as funções exibidas (Tagger); as heurísticas locais cobrem só as quatro primeiras. */
+export const CARD_ROLES = TAGGER_ROLES;
+export type CardRole = TaggerRole;
+/** Funções que entram na nota do deck. */
+export const SCORED_ROLES = ['ramp', 'draw', 'removal', 'wipe'] as const;
+export type ScoredRole = (typeof SCORED_ROLES)[number];
 
 const RAMP_PATTERNS = [
   /\badd (?:\{[wubrgc]\}|one mana|two mana|three mana|an amount of|mana)/i,
@@ -42,8 +47,8 @@ export const isBasicLand = (card: Pick<CardData, 'typeLine'>) =>
  * Classifica uma carta em funções comuns de Commander com heurísticas sobre o texto de regras.
  * É uma aproximação: o roadmap prevê usar as tags do Scryfall Tagger para mais precisão.
  */
-export function classifyCard(card: Pick<CardData, 'typeLine' | 'oracleText'>): Set<CardRole> {
-  const roles = new Set<CardRole>();
+export function classifyCard(card: Pick<CardData, 'typeLine' | 'oracleText'>): Set<ScoredRole> {
+  const roles = new Set<ScoredRole>();
   if (isLand(card)) return roles;
   const text = card.oracleText ?? '';
   if (matchesAny(text, RAMP_PATTERNS)) roles.add('ramp');
@@ -51,4 +56,22 @@ export function classifyCard(card: Pick<CardData, 'typeLine' | 'oracleText'>): S
   if (matchesAny(text, WIPE_PATTERNS)) roles.add('wipe');
   else if (matchesAny(text, REMOVAL_PATTERNS)) roles.add('removal');
   return roles;
+}
+
+/**
+ * Funções da carta: as do Scryfall Tagger quando já consultadas (`roles` não nulo) e, senão,
+ * as heurísticas pelo texto. Varredura e remoção pontual não se somam (como nas heurísticas).
+ */
+export function cardRoles(card: Pick<CardData, 'typeLine' | 'oracleText' | 'roles'>): {
+  roles: Set<CardRole>;
+  tagged: boolean;
+} {
+  if (card.roles) {
+    const roles = new Set(
+      card.roles.filter((r): r is CardRole => CARD_ROLES.includes(r as CardRole)),
+    );
+    if (roles.has('wipe')) roles.delete('removal');
+    return { roles, tagged: true };
+  }
+  return { roles: classifyCard(card), tagged: false };
 }

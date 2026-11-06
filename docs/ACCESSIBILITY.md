@@ -118,6 +118,15 @@ sem rolagem horizontal em 320px.
 - **Perfil de outro jogador**: links a partir do grupo e do ranking; título da aba com o nome; sem e-mail.
 - **Visibilidade do deck**: três opções em `fieldset/legend` com rótulo, ícone e explicação clicáveis; o selo de visibilidade usa texto + ícone.
 
+### Revisão: análise de deck (Tagger, bracket, mana, mão inicial)
+
+- **Formato na importação**: `select` com rótulo e dica ligada por `aria-describedby`; "Detectar automaticamente" explica o que acontece.
+- **Funções**: cada função é um `h3` com contagem e meta em texto (meta não atingida tem ícone de alerta **e** a palavra "meta"); "Ver cartas" é `details/summary` com o nome da função para leitores de tela.
+- **Alternativas**: botão com `aria-expanded`/`aria-controls` e nome com contexto ("Ver alternativas (Ramp)", contendo o texto visível — WCAG 2.5.3); a região de resultados é `aria-live="polite"`; imagens decorativas (`alt=""`) porque o nome da carta está em texto; link do Scryfall avisa que abre nova aba.
+- **Bracket**: valor e motivos em texto; a fonte dos dados (Spellbook ou só Game Changers) é dita na tela.
+- **Base de mana e mão inicial**: tabelas com `th scope="col"`/`scope="row"` e `caption`; situação com ícone **e** texto ("Suficiente"/"Poucas fontes"); barras de probabilidade decorativas, com o valor em texto ao lado.
+- **Atualizar análise**: resultado em `role="status"`; o ícone girando respeita `motion-reduce`.
+
 ### Revisão: folha de proxies no navegador
 
 - Página `/decks/:id/imprimir` com pré-visualização em milímetros reais, numa região rolável focável; cada página tem nome ("Página 1 de 5") e cada carta usa `alt` com o nome. Botão "Imprimir / salvar como PDF" com texto; instruções de impressão em texto. Na impressão, cabeçalho e instruções somem (`print:hidden`).

@@ -165,3 +165,59 @@ describe('analyzeDeck', () => {
     expect(ideal.suggestions).toEqual([]);
   });
 });
+
+describe('análise por formato', () => {
+  const bolt = makeCard({
+    name: 'Lightning Bolt',
+    manaCost: '{R}',
+    cmc: 1,
+    typeLine: 'Instant',
+    oracleText: 'Lightning Bolt deals 3 damage to any target.',
+    colorIdentity: ['R'],
+  });
+  const mountain = makeCard({
+    name: 'Mountain',
+    typeLine: 'Basic Land — Mountain',
+    colorIdentity: [],
+    producedMana: ['R'],
+  });
+
+  it('Modern: 60+ cartas, até 4 cópias (contando a reserva), reserva até 15, sem nota', () => {
+    const deck = [entry(bolt, 4), entry(mountain, 20), entry(bolt, 1, 'sideboard')];
+    const analysis = analyzeDeck(deck, 'modern');
+    expect(analysis.kind).toBe('constructed');
+    expect(analysis.score).toBeNull();
+    expect(analysis.validation).toEqual(
+      expect.arrayContaining([
+        { code: 'deck_size_min', min: 60, actual: 24 },
+        { code: 'too_many_copies', name: 'Lightning Bolt', quantity: 5, max: 4 },
+      ]),
+    );
+    expect(analysis.validation.some((i) => i.code === 'no_commander')).toBe(false);
+    expect(analysis.suggestions).toEqual([{ code: 'more_lands', missing: 2 }]);
+    expect(analysis.colorIdentity).toEqual(['R']);
+    expect(analysis.handOdds?.library).toBe(24);
+  });
+
+  it('Draft: 40 cartas, sem limite de cópias', () => {
+    const analysis = analyzeDeck([entry(bolt, 23), entry(mountain, 17)], 'draft');
+    expect(analysis.validation).toEqual([]);
+    expect(analysis.suggestions).toEqual([]);
+  });
+
+  it('usa as funções do Tagger quando existem e conta a cobertura', () => {
+    const tagged = { ...bolt, roles: ['removal', 'wipe'] };
+    const analysis = analyzeDeck([entry(tagged, 1), entry(SOL_RING, 1)]);
+    expect(analysis.roles.wipe).toBe(1);
+    expect(analysis.roles.removal).toBe(0);
+    expect(analysis.rolesTagged).toEqual({ tagged: 1, total: 2 });
+    expect(analysis.score).not.toBeNull();
+  });
+
+  it('busca de substitutos respeita o formato', () => {
+    expect(buildReplacementQuery('removal', ['R'], 2, 'modern')).toBe(
+      'id<=r otag:removal f:modern cmc<=2',
+    );
+    expect(buildReplacementQuery('tutor', ['B'], 3, null)).toBe('id<=b otag:tutor cmc<=3');
+  });
+});

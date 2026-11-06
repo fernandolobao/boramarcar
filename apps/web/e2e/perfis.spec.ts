@@ -37,9 +37,8 @@ test.describe('perfis e conquistas', () => {
     await expect(page.getByText('Deck salvo.')).toBeVisible();
     await expect(page.getByText('Privado', { exact: true }).first()).toBeVisible();
     const api = await page.request.get(`/api/v1/players/e2e-ana`);
-    expect(
-      (await api.json()).player.decks.map((d: { visibility: string }) => d.visibility),
-    ).toEqual(['private']);
+    const decks = (await api.json()).player.decks as { id: string; visibility: string }[];
+    expect(decks.find((d) => d.id === E2E_IDS.deck)?.visibility).toBe('private');
     // Volta ao padrão para não afetar os outros testes.
     await page.getByRole('radio', { name: /Grupo/ }).check();
     await page.getByRole('button', { name: 'Salvar' }).click();

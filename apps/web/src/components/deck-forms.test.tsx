@@ -98,4 +98,24 @@ describe('DeckImportForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Importar deck' }));
     await waitFor(() => expect(push).toHaveBeenCalledWith('/decks/d1'));
   });
+
+  it('envia o formato escolhido (ou deixa detectar)', async () => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
+      Response.json({ deck: { id: 'd1' }, notFound: [] }, { status: 201 }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    renderForm();
+    fireEvent.change(screen.getByLabelText('Link do Archidekt ou Moxfield'), {
+      target: { value: 'https://archidekt.com/decks/1' },
+    });
+    const select = screen.getByLabelText('Tipo de jogo');
+    expect(select).toHaveValue('auto');
+    fireEvent.change(select, { target: { value: 'modern' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Importar deck' }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/decks/d1'));
+    expect(JSON.parse(String(fetchMock.mock.calls[0]![1]!.body))).toMatchObject({
+      kind: 'url',
+      format: 'modern',
+    });
+  });
 });

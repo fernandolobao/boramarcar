@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import {
   artCropUrl,
   DECK_VISIBILITIES,
+  deckFormatProfile,
   deckPrice,
   usdToBrl,
   isDomainError,
@@ -17,16 +18,22 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
 import { Icon } from '@/components/icons';
 import {
+  BracketCard,
   ColorPips,
   DeckScore,
+  HandOdds,
+  ManaBaseTable,
   DeckSuggestions,
   DeckValidation,
   ManaCurve,
 } from '@/components/deck-analysis';
 import { DeckCards } from '@/components/deck-cards';
+import { DeckRoles, RefreshAnalysis } from '@/components/deck-roles';
 import { DeckTools } from '@/components/deck-tools';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
+import { runAfterResponse } from '@/server/background';
 import { requireUser } from '@/server/current-user';
+import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
 
@@ -70,6 +77,12 @@ export default async function DeckPage({ params }: Props) {
   const brl = (value: number) => fmt.number(value, { style: 'currency', currency: 'BRL' });
   const rate = price.total > 0 ? await getUsdBrlRate() : null;
   const background = artCropUrl(hero?.card?.imageUri);
+  const profile = deckFormatProfile(format);
+  const formatName = tf(format);
+  // Dados do Tagger/Spellbook faltando: busca depois de responder (a próxima visita já vê).
+  if (deck.analysisStale) {
+    runAfterResponse(() => refreshDeckAnalysis(getDb(), { deckId: deck.id, viewerId: user.id }));
+  }
 
   return (
     <>
@@ -191,10 +204,11 @@ export default async function DeckPage({ params }: Props) {
         </details>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <section className="card">
-          <h2 className="section-title">{ta('title')}</h2>
-          <DeckScore analysis={analysis} />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <section className="card space-y-4">
+          <h2 className="section-title mb-0">{ta('title')}</h2>
+          <DeckScore analysis={analysis} formatName={formatName} />
+          <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
         </section>
         <section className="card space-y-6">
           <ManaCurve curve={analysis.manaCurve} />
@@ -205,11 +219,35 @@ export default async function DeckPage({ params }: Props) {
           <ColorPips pips={analysis.colorPips} />
         </section>
         <section className="card">
-          <DeckValidation analysis={analysis} />
+          <DeckValidation analysis={analysis} formatName={formatName} />
         </section>
-        <section className="card">
-          <DeckSuggestions analysis={analysis} />
+        {analysis.suggestions.length > 0 && (
+          <section className="card">
+            <DeckSuggestions analysis={analysis} />
+          </section>
+        )}
+        {deck.bracket && (
+          <section className="card md:col-span-2">
+            <BracketCard bracket={deck.bracket} />
+          </section>
+        )}
+        <section className="card md:col-span-2">
+          <DeckRoles
+            deckId={deck.id}
+            roles={analysis.roles}
+            cardsByRole={analysis.cardsByRole}
+            targets={profile.roleTargets}
+            tagged={analysis.rolesTagged}
+          />
         </section>
+        <section className="card md:col-span-2">
+          <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
+        </section>
+        {analysis.handOdds && (
+          <section className="card md:col-span-2">
+            <HandOdds odds={analysis.handOdds} />
+          </section>
+        )}
       </div>
 
       <DeckCards

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DomainError } from '../../errors';
+import type { GameFormat } from '../../games';
 import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
 import { mergeDuplicates } from './text';
 
@@ -28,6 +29,7 @@ const boardSchema = z
 const moxfieldDeckSchema = z.object({
   publicId: z.string(),
   name: z.string(),
+  format: z.string().nullish(),
   boards: z.object({
     commanders: boardSchema,
     mainboard: boardSchema,
@@ -35,6 +37,20 @@ const moxfieldDeckSchema = z.object({
     maybeboard: boardSchema,
   }),
 });
+
+/** Formatos do Moxfield que têm equivalente aqui. */
+const MOXFIELD_FORMATS: Record<string, GameFormat> = {
+  commander: 'commander',
+  brawl: 'brawl',
+  historicBrawl: 'brawl',
+  oathbreaker: 'oathbreaker',
+  standard: 'standard',
+  pioneer: 'pioneer',
+  modern: 'modern',
+  legacy: 'legacy',
+  vintage: 'vintage',
+  pauper: 'pauper',
+};
 
 const BOARD_MAP: Record<string, DeckBoard> = {
   commanders: 'commander',
@@ -74,6 +90,9 @@ export function mapMoxfieldDeck(payload: unknown): ImportedDeck {
     source: 'moxfield',
     sourceId: deck.publicId,
     sourceUrl: `https://moxfield.com/decks/${deck.publicId}`,
+    ...(deck.format && MOXFIELD_FORMATS[deck.format]
+      ? { format: MOXFIELD_FORMATS[deck.format] }
+      : {}),
     entries: mergeDuplicates(entries),
   };
 }

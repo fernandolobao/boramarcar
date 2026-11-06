@@ -73,6 +73,35 @@ test.describe('deck', () => {
     expect(await exported.text()).toContain('31 Forest\n5 Forest #proxy');
   });
 
+  test('análise: funções, bracket, base de mana e mão inicial', async ({ page }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Ramp/ })).toContainText('meta: 10');
+    await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toBeVisible();
+    await expect(page.getByTestId('deck-bracket')).toHaveText('1–2 · Exhibition ou Core');
+    await expect(page.getByRole('heading', { name: 'Base de mana' })).toBeVisible();
+    const drops = page.getByRole('table', { name: 'Ter terreno para jogar em todos os turnos' });
+    await expect(drops.getByRole('row')).toHaveCount(5);
+    await expect(page.getByRole('button', { name: 'Atualizar análise' })).toBeVisible();
+  });
+
+  test('importa lista colada como Modern e valida pelas regras do formato', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'cria dados: só no desktop');
+    await page.goto('/decks/importar');
+    await page.getByRole('button', { name: 'Colar lista' }).click();
+    await page.getByLabel('Lista de cartas').fill('4 Sol Ring\n20 Forest');
+    await page.getByLabel('Nome do deck').fill('Teste Modern');
+    await page.getByLabel('Tipo de jogo').selectOption('modern');
+    await page.getByRole('button', { name: 'Importar deck' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Teste Modern' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Validação · Modern' })).toBeVisible();
+    await expect(page.getByText('O deck tem 24 cartas (mínimo: 60).')).toBeVisible();
+    await expect(
+      page.getByText(/A nota por funções vale para formatos com comandante/),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toHaveCount(0);
+  });
+
   test('folha de proxies em PDF', async ({ page }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
     const link = page.getByRole('link', { name: 'Baixar PDF pronto' });
@@ -87,7 +116,7 @@ test.describe('deck', () => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
     await page.getByRole('button', { name: 'Lista', exact: true }).click();
     const lefts = await page
-      .locator('table tbody tr')
+      .locator('section[aria-labelledby="deck-cards-title"] table tbody tr')
       .evaluateAll((rows) =>
         rows.map((r) =>
           [...r.querySelectorAll('td')].map((td) => Math.round(td.getBoundingClientRect().left)),

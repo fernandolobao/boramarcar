@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { DomainError } from '../../errors';
+import type { GameFormat } from '../../games';
 import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
 import { mergeDuplicates } from './text';
 
 const archidektDeckSchema = z.object({
   id: z.number(),
   name: z.string(),
+  deckFormat: z.number().nullish(),
   categories: z
     .array(
       z.object({
@@ -31,6 +33,19 @@ const archidektDeckSchema = z.object({
     }),
   ),
 });
+
+/** Códigos de `deckFormat` do Archidekt que têm equivalente aqui. */
+const ARCHIDEKT_FORMATS: Record<number, GameFormat> = {
+  1: 'standard',
+  2: 'modern',
+  3: 'commander',
+  4: 'legacy',
+  5: 'vintage',
+  6: 'pauper',
+  13: 'brawl',
+  14: 'oathbreaker',
+  15: 'pioneer',
+};
 
 export type ArchidektDeckResponse = z.input<typeof archidektDeckSchema>;
 
@@ -76,6 +91,9 @@ export function mapArchidektDeck(payload: unknown): ImportedDeck {
     source: 'archidekt',
     sourceId: String(deck.id),
     sourceUrl: `https://archidekt.com/decks/${deck.id}`,
+    ...(deck.deckFormat && ARCHIDEKT_FORMATS[deck.deckFormat]
+      ? { format: ARCHIDEKT_FORMATS[deck.deckFormat] }
+      : {}),
     entries: mergeDuplicates(entries),
   };
 }

@@ -4,6 +4,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -291,6 +292,9 @@ export const decks = pgTable(
     sourceId: text('source_id'),
     sourceUrl: text('source_url'),
     description: text('description'),
+    /** Sinais do Commander Spellbook (bracket) e o hash da lista que os gerou. */
+    bracketSignals: jsonb('bracket_signals'),
+    bracketHash: text('bracket_hash'),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -341,6 +345,13 @@ export const cards = pgTable(
       .default(sql`'{}'::text[]`),
     imageUri: text('image_uri'),
     priceUsd: text('price_usd'),
+    /** Cores de mana que a carta produz (Scryfall `produced_mana`). */
+    producedMana: text('produced_mana').array(),
+    gameChanger: boolean('game_changer').notNull().default(false),
+    edhrecRank: integer('edhrec_rank'),
+    /** Funções do Scryfall Tagger (ramp, draw, …); `null` = ainda não consultado. */
+    roles: text('roles').array(),
+    rolesCheckedAt: timestamp('roles_checked_at', { withTimezone: true }),
     updatedAt: updatedAt(),
   },
   (t) => [index('cards_name_idx').on(sql`lower(${t.name})`)],

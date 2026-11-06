@@ -1,5 +1,6 @@
 'use client';
 
+import { GAME_FORMATS, type GameFormat } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -21,7 +22,9 @@ function moxfieldBlockedFrom(error: unknown): MoxfieldBlocked | null {
 export function DeckImportForm() {
   const t = useTranslations('decks');
   const tc = useTranslations('common');
+  const tf = useTranslations('formats');
   const router = useRouter();
+  const [format, setFormat] = useState<GameFormat | 'auto'>('auto');
   const { run, error, pending } = useApiAction();
   const [mode, setMode] = useState<'url' | 'text'>('url');
   const [url, setUrl] = useState('');
@@ -42,10 +45,11 @@ export function DeckImportForm() {
       onSubmit={(e) => {
         e.preventDefault();
         setNotFound([]);
+        const chosen = format === 'auto' ? undefined : format;
         const body =
           mode === 'url'
-            ? { kind: 'url', url, name: name || undefined }
-            : { kind: 'text', name: name || undefined, text };
+            ? { kind: 'url', url, name: name || undefined, format: chosen }
+            : { kind: 'text', name: name || undefined, text, format: chosen };
         void run(
           async () => {
             try {
@@ -153,6 +157,29 @@ export function DeckImportForm() {
         />
         <p id="deck-name-hint" className="muted mt-1">
           {t('nameHint')}
+        </p>
+      </div>
+
+      <div>
+        <label className="label" htmlFor="deck-import-format">
+          {t('format')}
+        </label>
+        <select
+          id="deck-import-format"
+          className="select"
+          aria-describedby="deck-import-format-hint"
+          value={format}
+          onChange={(e) => setFormat(e.target.value as GameFormat | 'auto')}
+        >
+          <option value="auto">{t('formatAuto')}</option>
+          {GAME_FORMATS.map((f) => (
+            <option key={f} value={f}>
+              {tf(f)}
+            </option>
+          ))}
+        </select>
+        <p id="deck-import-format-hint" className="muted mt-1">
+          {t('formatHint')}
         </p>
       </div>
 

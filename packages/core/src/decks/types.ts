@@ -1,3 +1,4 @@
+import type { GameFormat } from '../games';
 export const DECK_BOARDS = ['commander', 'mainboard', 'sideboard', 'maybeboard'] as const;
 export type DeckBoard = (typeof DECK_BOARDS)[number];
 
@@ -25,6 +26,8 @@ export interface ImportedDeck {
   source: DeckSource;
   sourceId?: string;
   sourceUrl?: string;
+  /** Formato informado pela origem (Archidekt/Moxfield), quando reconhecido. */
+  format?: GameFormat;
   entries: DeckEntry[];
 }
 
@@ -41,6 +44,14 @@ export interface CardData {
   colorIdentity: string[];
   imageUri?: string | null;
   priceUsd?: string | null;
+  /** Cores de mana que a carta produz (`produced_mana` do Scryfall). `null` = ainda não lido. */
+  producedMana?: string[] | null;
+  /** Está na lista oficial de Game Changers do Commander. */
+  gameChanger?: boolean;
+  /** Popularidade no EDHREC (menor = mais jogada). */
+  edhrecRank?: number | null;
+  /** Funções pelo Scryfall Tagger (ramp, draw…). `null` = ainda não consultado. */
+  roles?: string[] | null;
 }
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
