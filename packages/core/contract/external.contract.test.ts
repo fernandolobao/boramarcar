@@ -9,7 +9,8 @@ import { isDomainError } from '../src/errors';
 import { fetchArchidektDeck } from '../src/decks/importers/archidekt';
 import { fetchMoxfieldDeck } from '../src/decks/importers/moxfield';
 import { parseDeckUrl } from '../src/decks/importers/url';
-import { fetchScryfallCollection } from '../src/decks/scryfall';
+import { fetchScryfallAutocomplete, fetchScryfallCollection } from '../src/decks/scryfall';
+import { fetchUsdBrlRate } from '../src/currency';
 import decks from './decks.json';
 
 const summary = (line: string) => {
@@ -18,6 +19,18 @@ const summary = (line: string) => {
 };
 
 describe('contrato com serviços externos', () => {
+  it('Banco Central: PTAX do dólar responde com uma cotação plausível', async () => {
+    const rate = await fetchUsdBrlRate(fetch);
+    expect(rate.rate).toBeGreaterThan(1);
+    expect(rate.rate).toBeLessThan(20);
+    expect(rate.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    summary(`PTAX: R$ ${rate.rate} (${rate.date})`);
+  });
+
+  it('Scryfall: autocomplete sugere nomes', async () => {
+    expect(await fetchScryfallAutocomplete('sol ri', { fetch })).toContain('Sol Ring');
+  });
+
   it('Scryfall: /cards/collection devolve os dados que a análise usa', async () => {
     const result = await fetchScryfallCollection(
       [{ name: 'Sol Ring' }, { name: 'Command Tower' }, { name: 'Carta Que Não Existe 123' }],

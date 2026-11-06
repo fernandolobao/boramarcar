@@ -285,6 +285,8 @@ export const decks = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     format: text('format').notNull().default('commander'),
+    /** `private` | `group` | `public` (ver `DECK_VISIBILITIES`). */
+    visibility: text('visibility').notNull().default('group'),
     source: deckSource('source').notNull().default('manual'),
     sourceId: text('source_id'),
     sourceUrl: text('source_url'),

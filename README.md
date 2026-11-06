@@ -166,46 +166,47 @@ O workflow `migrate.yml` aplica as migrations no banco de produção quando elas
 
 Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token — planejado) e respondem JSON. Erros seguem o formato `{ "error": { "code": "invalid_input" | "unauthorized" | "forbidden" | "not_found" | "conflict" | "upstream_error", "message": "..." } }`.
 
-| Método         | Rota                                            | Descrição                                                                |
-| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------ |
-| `GET/POST`     | `/api/v1/groups`                                | Listar / criar grupos                                                    |
-| `POST`         | `/api/v1/groups/join`                           | Entrar com código de convite                                             |
-| `POST`         | `/api/v1/groups/:groupId/invite`                | Gerar novo código de convite (dono/admin)                                |
-| `GET`          | `/api/v1/groups/:groupId/members`               | Membros                                                                  |
-| `PATCH/DELETE` | `/api/v1/groups/:groupId/members/:userId`       | Mudar papel / remover membro (ou sair, se for você)                      |
-| `POST`         | `/api/v1/groups/:groupId/transfer`              | Transferir a posse do grupo                                              |
-| `GET/POST`     | `/api/v1/groups/:groupId/locations`             | Locais de jogo                                                           |
-| `GET/POST`     | `/api/v1/groups/:groupId/availability`          | Disponibilidade (`?from&to`)                                             |
-| `GET`          | `/api/v1/groups/:groupId/availability/windows`  | Janelas sugeridas (`?minPlayers=4&minDurationMinutes=120`)               |
-| `DELETE`       | `/api/v1/availability/:slotId`                  | Remover disponibilidade própria                                          |
-| `PUT`          | `/api/v1/groups/:groupId/availability/range`    | Marcar/desmarcar um intervalo (grade semanal)                            |
-| `GET/POST`     | `/api/v1/groups/:groupId/availability-rules`    | Disponibilidade semanal (`{weekdays, startTime, endTime, timeZone}`)     |
-| `DELETE`       | `/api/v1/availability-rules/:ruleId`            | Remover regra semanal própria                                            |
-| `PUT`          | `/api/v1/availability-rules/:ruleId/exceptions` | Pular/voltar uma data (`{date, skip}`)                                   |
-| `GET/POST`     | `/api/v1/groups/:groupId/events`                | Encontros (`?when=upcoming\|past`)                                       |
-| `GET`          | `/api/v1/events/:eventId`                       | Encontro com participantes e partidas                                    |
-| `PATCH`        | `/api/v1/events/:eventId`                       | Editar encontro ou mudar status (`scheduled`, `cancelled`, `finished`)   |
-| `GET`          | `/api/v1/events/:eventId/ics`                   | Arquivo iCalendar do encontro                                            |
-| `PUT`          | `/api/v1/events/:eventId/rsvp`                  | Confirmar presença                                                       |
-| `POST`         | `/api/v1/events/:eventId/games`                 | Registrar partida (`format`, times, detalhes opcionais)                  |
-| `PUT/DELETE`   | `/api/v1/games/:gameId`                         | Editar / remover partida                                                 |
-| `GET/PATCH`    | `/api/v1/groups/:groupId/settings`              | Configurações do grupo (mesa, duração, pontos, tipo padrão)              |
-| `GET`          | `/api/v1/groups/:groupId/ranking`               | Ranking (`?from&to&format`)                                              |
-| `GET`          | `/api/v1/groups/:groupId/stats`                 | Estatísticas (`?from&to&format`): sequências, confronto direto, decks    |
-| `GET/POST`     | `/api/v1/groups/:groupId/seasons`               | Temporadas do ranking (criar: dono/admin)                                |
-| `DELETE`       | `/api/v1/seasons/:seasonId`                     | Remover temporada                                                        |
-| `PATCH`        | `/api/v1/decks/:deckId`                         | Renomear deck ou mudar o tipo de jogo (dono)                             |
-| `PUT`          | `/api/v1/decks/:deckId/lines`                   | Editor: quantidade e proxies de uma carta num board (0 remove)           |
-| `POST`         | `/api/v1/decks/:deckId/sync`                    | Atualizar pela origem ou por lista colada (`{text?}`), mantendo proxies  |
-| `GET`          | `/api/v1/decks/:deckId/export`                  | Lista em texto (`?format=plain\|proxies&download=1`)                     |
-| `GET`          | `/api/v1/decks/:deckId/proxies`                 | PDF para imprimir proxies (`?which=proxies\|all&page=a4\|letter`)        |
-| `GET`          | `/api/v1/cards/autocomplete`                    | Sugestões de nomes de carta (Scryfall, `?q=`)                            |
-| `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
-| `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                               |
-| `PATCH`        | `/api/v1/decks/:deckId/cards/:cardId`           | Marcar proxy (`{isProxy}`)                                               |
-| `PUT`          | `/api/v1/me/active-group`                       | Trocar grupo ativo                                                       |
-| `GET/PUT`      | `/api/v1/me/preferences`                        | Fuso horário e idioma (`{timeZone, locale}`)                             |
-| `GET`          | `/api/health`                                   | Health check                                                             |
+| Método         | Rota                                            | Descrição                                                                 |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
+| `GET/POST`     | `/api/v1/groups`                                | Listar / criar grupos                                                     |
+| `POST`         | `/api/v1/groups/join`                           | Entrar com código de convite                                              |
+| `POST`         | `/api/v1/groups/:groupId/invite`                | Gerar novo código de convite (dono/admin)                                 |
+| `GET`          | `/api/v1/groups/:groupId/members`               | Membros                                                                   |
+| `PATCH/DELETE` | `/api/v1/groups/:groupId/members/:userId`       | Mudar papel / remover membro (ou sair, se for você)                       |
+| `POST`         | `/api/v1/groups/:groupId/transfer`              | Transferir a posse do grupo                                               |
+| `GET/POST`     | `/api/v1/groups/:groupId/locations`             | Locais de jogo                                                            |
+| `GET/POST`     | `/api/v1/groups/:groupId/availability`          | Disponibilidade (`?from&to`)                                              |
+| `GET`          | `/api/v1/groups/:groupId/availability/windows`  | Janelas sugeridas (`?minPlayers=4&minDurationMinutes=120`)                |
+| `DELETE`       | `/api/v1/availability/:slotId`                  | Remover disponibilidade própria                                           |
+| `PUT`          | `/api/v1/groups/:groupId/availability/range`    | Marcar/desmarcar um intervalo (grade semanal)                             |
+| `GET/POST`     | `/api/v1/groups/:groupId/availability-rules`    | Disponibilidade semanal (`{weekdays, startTime, endTime, timeZone}`)      |
+| `DELETE`       | `/api/v1/availability-rules/:ruleId`            | Remover regra semanal própria                                             |
+| `PUT`          | `/api/v1/availability-rules/:ruleId/exceptions` | Pular/voltar uma data (`{date, skip}`)                                    |
+| `GET/POST`     | `/api/v1/groups/:groupId/events`                | Encontros (`?when=upcoming\|past`)                                        |
+| `GET`          | `/api/v1/events/:eventId`                       | Encontro com participantes e partidas                                     |
+| `PATCH`        | `/api/v1/events/:eventId`                       | Editar encontro ou mudar status (`scheduled`, `cancelled`, `finished`)    |
+| `GET`          | `/api/v1/events/:eventId/ics`                   | Arquivo iCalendar do encontro                                             |
+| `PUT`          | `/api/v1/events/:eventId/rsvp`                  | Confirmar presença                                                        |
+| `POST`         | `/api/v1/events/:eventId/games`                 | Registrar partida (`format`, times, detalhes opcionais)                   |
+| `PUT/DELETE`   | `/api/v1/games/:gameId`                         | Editar / remover partida                                                  |
+| `GET/PATCH`    | `/api/v1/groups/:groupId/settings`              | Configurações do grupo (mesa, duração, pontos, tipo padrão)               |
+| `GET`          | `/api/v1/groups/:groupId/ranking`               | Ranking (`?from&to&format`)                                               |
+| `GET`          | `/api/v1/groups/:groupId/stats`                 | Estatísticas (`?from&to&format`): sequências, confronto direto, decks     |
+| `GET/POST`     | `/api/v1/groups/:groupId/seasons`               | Temporadas do ranking (criar: dono/admin)                                 |
+| `DELETE`       | `/api/v1/seasons/:seasonId`                     | Remover temporada                                                         |
+| `PATCH`        | `/api/v1/decks/:deckId`                         | Renomear, mudar tipo de jogo ou visibilidade (`private\|group\|public`)   |
+| `PUT`          | `/api/v1/decks/:deckId/lines`                   | Editor: quantidade e proxies de uma carta num board (0 remove)            |
+| `POST`         | `/api/v1/decks/:deckId/sync`                    | Atualizar pela origem ou por lista colada (`{text?}`), mantendo proxies   |
+| `GET`          | `/api/v1/decks/:deckId/export`                  | Lista em texto (`?format=plain\|proxies&download=1`)                      |
+| `GET`          | `/api/v1/decks/:deckId/proxies`                 | PDF para imprimir proxies (`?which=proxies\|all&page=a4\|letter`)         |
+| `GET`          | `/api/v1/players/:userId`                       | Perfil do jogador (quem divide grupo): resumo, conquistas, decks visíveis |
+| `GET`          | `/api/v1/cards/autocomplete`                    | Sugestões de nomes de carta (Scryfall, `?q=`)                             |
+| `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`)  |
+| `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                                |
+| `PATCH`        | `/api/v1/decks/:deckId/cards/:cardId`           | Marcar proxy (`{isProxy}`)                                                |
+| `PUT`          | `/api/v1/me/active-group`                       | Trocar grupo ativo                                                        |
+| `GET/PUT`      | `/api/v1/me/preferences`                        | Fuso horário e idioma (`{timeZone, locale}`)                              |
+| `GET`          | `/api/health`                                   | Health check                                                              |
 
 ## Contribuindo
 

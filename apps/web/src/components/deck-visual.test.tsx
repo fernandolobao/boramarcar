@@ -52,7 +52,7 @@ const lines = [
     quantity: 1,
     proxies: 1,
     board: 'mainboard' as const,
-    card: card('Creature — Elf', 'https://cards.scryfall.io/normal/e.jpg'),
+    card: { ...card('Creature — Elf', 'https://cards.scryfall.io/normal/e.jpg'), priceUsd: '0.50' },
   },
   {
     key: 'mainboard|forest',
@@ -81,7 +81,7 @@ const audit = async (container: HTMLElement) =>
 
 describe('DeckCards', () => {
   it('modo visual agrupa por tipo, amplia a carta em diálogo e devolve o foco', async () => {
-    const { container } = wrap(<DeckCards deckId="d" lines={lines} isOwner />);
+    const { container } = wrap(<DeckCards deckId="d" lines={lines} isOwner usdBrl={5.4} />);
     expect(screen.getByRole('button', { name: 'Visual' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
       'Comandante (1)',
@@ -102,6 +102,11 @@ describe('DeckCards', () => {
     expect(
       within(dialog).getByRole('img', { name: 'Custo de mana: 1, verde' }),
     ).toBeInTheDocument();
+    expect(within(dialog).getByText(/Preço: US\$\s?0,50 ≈ R\$\s?2,70/)).toBeInTheDocument();
+    expect(within(dialog).getByRole('link', { name: /Ver preço na LigaMagic/ })).toHaveAttribute(
+      'href',
+      'https://www.ligamagic.com.br/?view=cards/card&card=Elvish%20Mystic',
+    );
     fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(zoom).toHaveFocus();
@@ -232,16 +237,22 @@ describe('ColorIdentity e DeckSettingsForm', () => {
     expect(await audit(container)).toEqual([]);
   });
 
-  it('salva nome e tipo de jogo do deck', async () => {
+  it('salva nome, tipo de jogo e visibilidade do deck', async () => {
     const fetchMock = vi.fn(async () => Response.json({ deck: {} }));
     vi.stubGlobal('fetch', fetchMock);
     const { container } = wrap(<DeckSettingsForm deckId="d1" name="Omnath" format="commander" />);
     expect(await audit(container)).toEqual([]);
     fireEvent.change(screen.getByLabelText('Tipo de jogo'), { target: { value: 'brawl' } });
+    expect(screen.getByRole('radio', { name: /Grupo/ })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: /Privado/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(await screen.findByRole('status')).toHaveTextContent('Deck salvo.');
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('/api/v1/decks/d1');
-    expect(JSON.parse(init.body as string)).toEqual({ name: 'Omnath', format: 'brawl' });
+    expect(JSON.parse(init.body as string)).toEqual({
+      name: 'Omnath',
+      format: 'brawl',
+      visibility: 'private',
+    });
   });
 });

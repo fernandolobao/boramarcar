@@ -1,8 +1,14 @@
 'use client';
 
-import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@boramarcar/core';
+import {
+  DECK_BOARDS,
+  groupEntriesByType,
+  ligaMagicCardUrl,
+  MAX_COPIES,
+  type DeckBoard,
+} from '@boramarcar/core';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { CardSearch } from './card-search';
@@ -21,6 +27,7 @@ export interface DeckLineView {
     cmc: number;
     manaCost?: string | null;
     imageUri?: string | null;
+    priceUsd?: string | null;
   } | null;
 }
 
@@ -45,12 +52,17 @@ export function DeckCards({
   deckId,
   lines,
   isOwner,
+  usdBrl = null,
 }: {
   deckId: string;
   lines: DeckLineView[];
   isOwner: boolean;
+  /** Cotação do dólar para mostrar o preço da carta também em reais. */
+  usdBrl?: number | null;
 }) {
   const t = useTranslations('decks');
+  const tc = useTranslations('common');
+  const format = useFormatter();
   const [view, setView] = useState<View>('visual');
   const [zoomed, setZoomed] = useState<DeckLineView | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -186,7 +198,25 @@ export function DeckCards({
               ))}
             </ul>
           ) : (
-            <table className={`w-full text-sm ${view === 'edit' ? 'table-fixed' : ''}`}>
+            // table-fixed + <colgroup>: cada grupo é uma tabela, e as larguras fixas deixam as
+            // colunas alinhadas entre todos os grupos.
+            <table className="w-full table-fixed text-sm">
+              {view === 'edit' ? (
+                <colgroup>
+                  <col className="w-20" />
+                  <col />
+                  <col className="w-20" />
+                  <col className="w-14 sm:w-36" />
+                </colgroup>
+              ) : (
+                <colgroup>
+                  <col className="w-10" />
+                  <col />
+                  <col className="w-28 sm:w-40" />
+                  <col className="w-0 sm:w-[30%]" />
+                  <col className="w-20 sm:w-24" />
+                </colgroup>
+              )}
               <thead
                 className={
                   view === 'edit' ? 'text-left text-xs text-zinc-600 dark:text-zinc-400' : 'sr-only'
@@ -226,8 +256,8 @@ export function DeckCards({
                     <EditableLine key={line.key} deckId={deckId} line={line} />
                   ) : (
                     <tr key={line.key} className="border-t border-zinc-200 dark:border-zinc-800">
-                      <td className="w-10 py-1.5 tabular-nums">{line.quantity}</td>
-                      <td className="py-1.5">
+                      <td className="py-1.5 tabular-nums">{line.quantity}</td>
+                      <td className="py-1.5 pe-2 break-words">
                         <button
                           type="button"
                           className="text-left underline-offset-2 hover:underline"
@@ -238,10 +268,13 @@ export function DeckCards({
                         </button>
                         {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
                       </td>
-                      <td className="py-1.5 pe-2 text-right whitespace-nowrap sm:text-left">
+                      <td className="py-1.5 pe-2">
                         <ManaCost cost={line.card?.manaCost} className="text-sm" />
                       </td>
-                      <td className="muted hidden py-1.5 sm:table-cell">{line.card?.typeLine}</td>
+                      <td className="muted truncate py-1.5 sm:pe-2">
+                        {/* No celular a coluna tem largura 0: o tipo fica só no diálogo da carta. */}
+                        <span className="hidden sm:inline">{line.card?.typeLine}</span>
+                      </td>
                       <td className="py-1.5 text-right">
                         <ProxyBadge line={line} />
                       </td>
@@ -299,6 +332,37 @@ export function DeckCards({
               </p>
             )}
             <ProxyBadge line={zoomed} />
+            {zoomed.card?.priceUsd && (
+              <p className="text-sm">
+                {usdBrl
+                  ? t('cardPriceBrl', {
+                      usd: format.number(Number(zoomed.card.priceUsd), {
+                        style: 'currency',
+                        currency: 'USD',
+                      }),
+                      brl: format.number(Number(zoomed.card.priceUsd) * usdBrl, {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }),
+                    })
+                  : t('cardPrice', {
+                      usd: format.number(Number(zoomed.card.priceUsd), {
+                        style: 'currency',
+                        currency: 'USD',
+                      }),
+                    })}
+              </p>
+            )}
+            <a
+              href={ligaMagicCardUrl(zoomed.name)}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-secondary w-full"
+            >
+              <Icon name="externalLink" />
+              {t('ligaMagic')}
+              <span className="sr-only"> {tc('newTab')}</span>
+            </a>
           </div>
         )}
       </dialog>

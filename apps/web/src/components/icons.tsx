@@ -6,6 +6,17 @@
  * visível. Botão só com ícone precisa de `aria-label` (e de preferência um texto `sr-only`).
  */
 import {
+  Award,
+  Footprints,
+  Gem,
+  Heart,
+  Shapes,
+  Star,
+  Swords,
+  Zap,
+  Flame,
+  Globe,
+  Lock,
   Ban,
   CalendarDays,
   CalendarPlus,
@@ -111,6 +122,21 @@ export const Icons = {
   transfer: Crown,
   removeMember: UserMinus,
   leave: LogOut,
+  // Visibilidade
+  private: Lock,
+  public: Globe,
+  // Conquistas
+  achievement: Award,
+  firstGame: Footprints,
+  streak: Flame,
+  fastWin: Zap,
+  firstPlayer: Swords,
+  loyal: Heart,
+  variety: Gem,
+  versatile: Shapes,
+  team: Users,
+  champion: Crown,
+  veteran: Star,
   // Decks
   fromUrl: Link2,
   fromText: ClipboardPaste,

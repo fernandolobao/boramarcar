@@ -1,4 +1,4 @@
-import { GAME_FORMATS } from '@boramarcar/core';
+import { DECK_VISIBILITIES, GAME_FORMATS } from '@boramarcar/core';
 import { deleteDeck, getDeck, updateDeck } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
@@ -11,6 +11,7 @@ const patchSchema = z
   .object({
     name: z.string().trim().min(1).max(120).optional(),
     format: z.enum(GAME_FORMATS).optional(),
+    visibility: z.enum(DECK_VISIBILITIES).optional(),
   })
   .strict();
 

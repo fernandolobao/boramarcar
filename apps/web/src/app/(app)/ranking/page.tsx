@@ -169,7 +169,12 @@ export default async function RankingPage({ searchParams }: Props) {
                   >
                     <td className="py-2 pr-2">{s.position}</td>
                     <th scope="row" className="py-2 pr-2 text-left font-[inherit]">
-                      {s.name}
+                      <Link
+                        href={s.userId === user.id ? '/perfil' : `/jogadores/${s.userId}`}
+                        className="underline-offset-2 hover:underline"
+                      >
+                        {s.name}
+                      </Link>
                     </th>
                     <td className="py-2 pr-2 text-right">{s.games}</td>
                     <td className="py-2 pr-2 text-right">{s.wins}</td>

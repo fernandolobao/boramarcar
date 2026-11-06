@@ -401,7 +401,23 @@
     "paper": "Papel",
     "letter": "Carta (Letter)",
     "printDownload": "Baixar PDF",
-    "printNoProxies": "Nenhuma carta está marcada como proxy. Marque no modo Editar ou imprima o deck todo."
+    "printNoProxies": "Nenhuma carta está marcada como proxy. Marque no modo Editar ou imprima o deck todo.",
+    "visibility": {
+      "private": "Privado",
+      "group": "Grupo",
+      "public": "Público"
+    },
+    "visibilityHint": {
+      "private": "Só você vê o deck.",
+      "group": "Quem participa de um grupo com você vê o deck (padrão).",
+      "public": "Qualquer pessoa com conta no Bora Marcar e o link vê o deck."
+    },
+    "visibilityLabel": "Quem vê este deck",
+    "priceBrl": "≈ {total} (proxies: {proxies})",
+    "priceHintBrl": "Preços do Scryfall em dólar, atualizados na importação; em reais, convertidos pelo dólar PTAX do Banco Central ({rate} em {date}). Não são os preços das lojas brasileiras — veja cada carta na LigaMagic.",
+    "ligaMagic": "Ver preço na LigaMagic",
+    "cardPrice": "Preço: {usd}",
+    "cardPriceBrl": "Preço: {usd} ≈ {brl}"
   },
   "analysis": {
     "title": "Análise",
@@ -585,5 +601,80 @@
       "c": "incolor"
     },
     "pips": "{count} {color}"
+  },
+  "achievements": {
+    "title": "Conquistas",
+    "unlocked": "{count} de {total} conquistadas",
+    "locked": "Bloqueada",
+    "unlockedOn": "Conquistada em {date}",
+    "progress": "Progresso: {current} de {target}",
+    "times": "{count, plural, =1 {1 vez} other {# vezes}}",
+    "items": {
+      "first_game": {
+        "name": "Estreia",
+        "description": "Jogar a primeira partida."
+      },
+      "first_win": {
+        "name": "Primeira vitória",
+        "description": "Vencer uma partida."
+      },
+      "games_10": {
+        "name": "Frequentador",
+        "description": "Jogar 10 partidas."
+      },
+      "games_50": {
+        "name": "Veterano",
+        "description": "Jogar 50 partidas."
+      },
+      "wins_10": {
+        "name": "Dez vitórias",
+        "description": "Vencer 10 partidas."
+      },
+      "streak_3": {
+        "name": "Embalado",
+        "description": "Vencer 3 partidas seguidas."
+      },
+      "streak_5": {
+        "name": "Imparável",
+        "description": "Vencer 5 partidas seguidas."
+      },
+      "fast_win": {
+        "name": "Vitória relâmpago",
+        "description": "Vencer até o turno 6."
+      },
+      "first_player_win": {
+        "name": "Saiu na frente",
+        "description": "Vencer uma partida em que você começou."
+      },
+      "deck_loyal": {
+        "name": "Fiel ao deck",
+        "description": "Jogar 10 partidas com o mesmo deck."
+      },
+      "deck_variety": {
+        "name": "Colecionador",
+        "description": "Vencer com 3 decks diferentes."
+      },
+      "versatile": {
+        "name": "Versátil",
+        "description": "Jogar 3 tipos de jogo diferentes."
+      },
+      "team_win": {
+        "name": "Dupla dinâmica",
+        "description": "Vencer uma partida de Two-Headed Giant."
+      },
+      "season_champion": {
+        "name": "Campeão da temporada",
+        "description": "Terminar uma temporada em 1º lugar."
+      }
+    }
+  },
+  "player": {
+    "decks": "Decks",
+    "noDecks": "Nenhum deck visível.",
+    "ownerOf": "Deck de {name}",
+    "viewProfile": "Ver perfil de {name}",
+    "seasonTitles": "Títulos",
+    "seasonTitle": "{season} — {group}",
+    "sharedGroups": "Grupos em comum"
   }
 }

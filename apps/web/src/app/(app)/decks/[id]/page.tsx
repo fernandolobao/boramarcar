@@ -1,5 +1,15 @@
 import type { Metadata } from 'next';
-import { artCropUrl, deckPrice, isDomainError, isGameFormat } from '@boramarcar/core';
+import {
+  artCropUrl,
+  DECK_VISIBILITIES,
+  deckPrice,
+  usdToBrl,
+  isDomainError,
+  isGameFormat,
+  type DeckVisibility,
+} from '@boramarcar/core';
+import Link from 'next/link';
+import { VisibilityBadge } from '@/components/deck-grid';
 import { getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -17,6 +27,7 @@ import { DeckCards } from '@/components/deck-cards';
 import { DeckTools } from '@/components/deck-tools';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
 import { requireUser } from '@/server/current-user';
+import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
 
 type Props = { params: Promise<{ id: string }> };
@@ -41,6 +52,7 @@ export default async function DeckPage({ params }: Props) {
   const ta = await getTranslations('analysis');
   const tc = await getTranslations('common');
   const tf = await getTranslations('formats');
+  const tp = await getTranslations('player');
   const fmt = await getFormatter();
   const { analysis } = deck;
   const format = isGameFormat(deck.format) ? deck.format : 'other';
@@ -55,6 +67,8 @@ export default async function DeckPage({ params }: Props) {
   ];
   const price = deckPrice(deck.entries.filter((e) => e.board !== 'maybeboard'));
   const usd = (value: number) => fmt.number(value, { style: 'currency', currency: 'USD' });
+  const brl = (value: number) => fmt.number(value, { style: 'currency', currency: 'BRL' });
+  const rate = price.total > 0 ? await getUsdBrlRate() : null;
   const background = artCropUrl(hero?.card?.imageUri);
 
   return (
@@ -91,8 +105,16 @@ export default async function DeckPage({ params }: Props) {
                 {tf(format)}
               </span>
               <ColorIdentity colors={identity} />
+              <VisibilityBadge visibility={deck.visibility} />
             </div>
             <h1 className="page-title">{deck.name}</h1>
+            {!deck.isOwner && (
+              <p className="text-sm">
+                <Link href={`/jogadores/${deck.ownerId}`} className="underline underline-offset-2">
+                  {tp('ownerOf', { name: deck.ownerName })}
+                </Link>
+              </p>
+            )}
             {analysis.commanders.length > 0 && (
               <p className="text-lg font-medium">{analysis.commanders.join(' & ')}</p>
             )}
@@ -114,10 +136,28 @@ export default async function DeckPage({ params }: Props) {
               <p className="text-sm">
                 <span className="font-medium">{t('price')}:</span>{' '}
                 {t('priceValue', { total: usd(price.total), proxies: usd(price.proxies) })}
+                {rate && (
+                  <>
+                    {' · '}
+                    {t('priceBrl', {
+                      total: brl(usdToBrl(price.total, rate.rate)),
+                      proxies: brl(usdToBrl(price.proxies, rate.rate)),
+                    })}
+                  </>
+                )}
                 {price.missing > 0 && (
                   <span className="muted"> · {t('priceMissing', { count: price.missing })}</span>
                 )}
-                <span className="muted block text-xs">{t('priceHint')}</span>
+                <span className="muted block text-xs">
+                  {rate
+                    ? t('priceHintBrl', {
+                        rate: brl(rate.rate),
+                        date: fmt.dateTime(new Date(`${rate.date}T12:00:00Z`), {
+                          dateStyle: 'short',
+                        }),
+                      })
+                    : t('priceHint')}
+                </span>
               </p>
             )}
             {deck.isOwner && (
@@ -137,7 +177,16 @@ export default async function DeckPage({ params }: Props) {
         <details className="card">
           <summary className="cursor-pointer font-semibold">{t('settings')}</summary>
           <div className="mt-4">
-            <DeckSettingsForm deckId={deck.id} name={deck.name} format={format} />
+            <DeckSettingsForm
+              deckId={deck.id}
+              name={deck.name}
+              format={format}
+              visibility={
+                (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
+                  ? (deck.visibility as DeckVisibility)
+                  : 'group'
+              }
+            />
           </div>
         </details>
       )}
@@ -163,7 +212,12 @@ export default async function DeckPage({ params }: Props) {
         </section>
       </div>
 
-      <DeckCards deckId={deck.id} lines={deck.lines} isOwner={deck.isOwner} />
+      <DeckCards
+        deckId={deck.id}
+        lines={deck.lines}
+        isOwner={deck.isOwner}
+        usdBrl={rate?.rate ?? null}
+      />
 
       <DeckTools
         deckId={deck.id}

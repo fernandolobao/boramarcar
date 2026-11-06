@@ -1,6 +1,7 @@
 import {
   analyzeDeck,
   artCropUrl,
+  DECK_VISIBILITIES,
   isGameFormat,
   attachCardData,
   DomainError,
@@ -15,7 +16,7 @@ import {
 import { and, asc, count, desc, eq, inArray, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
-import { cards, deckCards, decks, groupMembers } from '../schema';
+import { cards, deckCards, decks, groupMembers, user } from '../schema';
 
 /** Insere ou atualiza o cache de cartas do Scryfall. */
 export async function upsertCards(db: Database, data: readonly CardData[]) {
@@ -136,6 +137,7 @@ export async function listDecks(db: Database, ownerId: string) {
       id: decks.id,
       name: decks.name,
       format: decks.format,
+      visibility: decks.visibility,
       source: decks.source,
       sourceUrl: decks.sourceUrl,
       updatedAt: decks.updatedAt,
@@ -163,24 +165,38 @@ export async function listDecksForUsers(db: Database, userIds: readonly string[]
     .orderBy(asc(decks.name));
 }
 
-/** Dono do deck ou alguém que divide um grupo com o dono pode visualizar. */
-async function canView(db: Database, ownerId: string, viewerId: string) {
-  if (ownerId === viewerId) return true;
-  const a = alias(groupMembers, 'owner_membership');
-  const b = alias(groupMembers, 'viewer_membership');
+/** Os dois usuários participam de algum grupo em comum? */
+export async function sharesGroup(db: Database, a: string, b: string) {
+  if (a === b) return true;
+  const ga = alias(groupMembers, 'a_membership');
+  const gb = alias(groupMembers, 'b_membership');
   const [shared] = await db
-    .select({ groupId: a.groupId })
-    .from(a)
-    .innerJoin(b, eq(a.groupId, b.groupId))
-    .where(and(eq(a.userId, ownerId), eq(b.userId, viewerId)))
+    .select({ groupId: ga.groupId })
+    .from(ga)
+    .innerJoin(gb, eq(ga.groupId, gb.groupId))
+    .where(and(eq(ga.userId, a), eq(gb.userId, b)))
     .limit(1);
   return Boolean(shared);
+}
+
+/**
+ * Visibilidade do deck (3.12): o dono sempre vê; `public` = qualquer pessoa com conta;
+ * `group` = quem divide grupo com o dono; `private` = só o dono.
+ */
+async function canView(
+  db: Database,
+  deck: { ownerId: string; visibility: string },
+  viewerId: string,
+) {
+  if (deck.ownerId === viewerId || deck.visibility === 'public') return true;
+  if (deck.visibility === 'private') return false;
+  return sharesGroup(db, deck.ownerId, viewerId);
 }
 
 export async function getDeck(db: Database, input: { deckId: string; viewerId: string }) {
   const [deck] = await db.select().from(decks).where(eq(decks.id, input.deckId)).limit(1);
   if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
-  if (!(await canView(db, deck.ownerId, input.viewerId))) {
+  if (!(await canView(db, deck, input.viewerId))) {
     throw new DomainError('forbidden', 'Você não pode ver este deck');
   }
   const rows = await db
@@ -200,8 +216,14 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
     card: card ? toCardData(card) : null,
   }));
 
+  const [owner] = await db
+    .select({ name: user.name })
+    .from(user)
+    .where(eq(user.id, deck.ownerId))
+    .limit(1);
   return {
     ...deck,
+    ownerName: owner?.name ?? '',
     isOwner: deck.ownerId === input.viewerId,
     entries,
     /** Uma linha por carta/board, com total e quantas cópias são proxy (3.6). */
@@ -334,10 +356,10 @@ export async function getDeckCovers(db: Database, deckIds: readonly string[]) {
   return covers;
 }
 
-/** Renomeia o deck ou muda o tipo de jogo dele (só o dono). */
+/** Renomeia o deck, muda o tipo de jogo ou a visibilidade (só o dono). */
 export async function updateDeck(
   db: Database,
-  input: { deckId: string; userId: string; name?: string; format?: string },
+  input: { deckId: string; userId: string; name?: string; format?: string; visibility?: string },
 ) {
   const [deck] = await db.select().from(decks).where(eq(decks.id, input.deckId)).limit(1);
   if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
@@ -356,6 +378,12 @@ export async function updateDeck(
     if (!isGameFormat(input.format))
       throw new DomainError('invalid_input', 'Tipo de jogo inválido');
     changes.format = input.format;
+  }
+  if (input.visibility !== undefined) {
+    if (!(DECK_VISIBILITIES as readonly string[]).includes(input.visibility)) {
+      throw new DomainError('invalid_input', 'Visibilidade inválida');
+    }
+    changes.visibility = input.visibility;
   }
   if (!Object.keys(changes).length) return deck;
   const [updated] = await db.update(decks).set(changes).where(eq(decks.id, deck.id)).returning();
@@ -475,4 +503,15 @@ export async function findCachedCardByName(db: Database, name: string) {
     .where(sql`lower(${cards.name}) = ${name.trim().toLowerCase()}`)
     .limit(1);
   return row ? toCardData(row) : null;
+}
+
+/** Decks de um jogador que quem está vendo pode ver (perfil do jogador). */
+export async function listDecksVisibleTo(
+  db: Database,
+  input: { ownerId: string; viewerId: string },
+) {
+  const all = await listDecks(db, input.ownerId);
+  if (input.ownerId === input.viewerId) return all;
+  const shared = await sharesGroup(db, input.ownerId, input.viewerId);
+  return all.filter((d) => d.visibility === 'public' || (d.visibility === 'group' && shared));
 }

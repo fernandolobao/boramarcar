@@ -31,6 +31,7 @@ const AUTH_PAGES = [
   '/grupo',
   '/perfil',
   '/configuracoes',
+  '/jogadores/e2e-bia',
   `/convite/${E2E_INVITE_CODE}`,
 ];
 

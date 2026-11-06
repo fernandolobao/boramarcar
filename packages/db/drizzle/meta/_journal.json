@@ -43,6 +43,13 @@
       "when": 1793928705133,
       "tag": "0005_temporadas",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793974664395,
+      "tag": "0006_visibilidade_decks",
+      "breakpoints": true
     }
   ]
 }
