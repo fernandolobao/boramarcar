@@ -96,7 +96,10 @@ describe('DeckCards', () => {
     fireEvent.click(zoom);
     const dialog = screen.getByRole('dialog', { name: 'Elvish Mystic' });
     expect(within(dialog).getByRole('img', { name: 'Elvish Mystic' })).toBeInTheDocument();
-    expect(within(dialog).getByText('Creature — Elf · {1}{G}')).toBeInTheDocument();
+    expect(within(dialog).getByText('Creature — Elf')).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('img', { name: 'Custo de mana: 1, verde' }),
+    ).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(zoom).toHaveFocus();
@@ -115,10 +118,14 @@ describe('DeckCards', () => {
 });
 
 describe('ColorIdentity e DeckSettingsForm', () => {
-  it('identidade de cor tem texto para leitores de tela e letras visíveis', async () => {
+  it('identidade de cor usa os símbolos de mana e tem texto para leitores de tela', async () => {
     const { container } = wrap(<ColorIdentity colors={['G', 'U']} />);
     expect(screen.getByText('Identidade de cor: Azul, Verde')).toHaveClass('sr-only');
-    expect(container.textContent).toContain('UG');
+    expect([...container.querySelectorAll('i.ms')].map((i) => i.className)).toEqual([
+      'ms ms-cost ms-shadow ms-u ',
+      'ms ms-cost ms-shadow ms-g ',
+    ]);
+    expect(container.querySelector('i.ms')).toHaveAttribute('aria-hidden', 'true');
     expect(await audit(container)).toEqual([]);
   });
 

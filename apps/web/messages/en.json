@@ -525,5 +525,21 @@
     "achievements": "Achievements",
     "achievementsSoon": "Coming soon: badges for achievements like first win, streaks and favorite decks.",
     "editSettings": "Open settings"
+  },
+  "mana": {
+    "cost": "Mana cost: {symbols}",
+    "or": "or",
+    "snow": "snow",
+    "tap": "tap",
+    "phyrexian": "Phyrexian {name}",
+    "colors": {
+      "w": "white",
+      "u": "blue",
+      "b": "black",
+      "r": "red",
+      "g": "green",
+      "c": "colorless"
+    },
+    "pips": "{count} {color}"
   }
 }

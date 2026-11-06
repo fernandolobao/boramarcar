@@ -8,38 +8,27 @@ import { api } from '@/lib/api';
 import { ProxyToggle } from './deck-forms';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { ManaCost, ManaSymbol } from './mana';
 
 const COLOR_ORDER = ['W', 'U', 'B', 'R', 'G'] as const;
-/** Fundos claros com letra escura: contraste ≥ 7:1 em qualquer tema. */
-const PIP_STYLE: Record<string, string> = {
-  W: 'bg-[#f8e7b9] text-zinc-900',
-  U: 'bg-[#a9d3f5] text-[#0b2440]',
-  B: 'bg-[#c9c2bf] text-zinc-950',
-  R: 'bg-[#f6b39b] text-[#3f0d02]',
-  G: 'bg-[#9bd3ae] text-[#05301a]',
-  C: 'bg-[#dcd9d6] text-zinc-900',
-};
 
-/** Identidade de cor como símbolos com letra (cor não é a única pista) e nome para leitores de tela. */
+/**
+ * Identidade de cor com os símbolos de mana reais (cada cor tem um desenho próprio, então a cor
+ * não é a única pista) e os nomes em texto para leitores de tela.
+ */
 export function ColorIdentity({ colors, size = 'md' }: { colors: string[]; size?: 'sm' | 'md' }) {
   const t = useTranslations('decks');
   const list = COLOR_ORDER.filter((c) => colors.includes(c));
   const shown = list.length ? list : (['C'] as const);
   const names = shown.map((c) => t(`colors.${c}`)).join(', ');
-  const dim = size === 'sm' ? 'size-5 text-[0.65rem]' : 'size-6 text-xs';
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className={`inline-flex items-center gap-1 ${size === 'sm' ? 'text-sm' : 'text-base'}`}>
       <span className="sr-only">
         {t('colorIdentity')}: {names}
       </span>
       {shown.map((c) => (
-        <span
-          key={c}
-          aria-hidden="true"
-          title={t(`colors.${c}`)}
-          className={`inline-grid ${dim} place-items-center rounded-full border border-zinc-900/30 font-bold shadow-sm ${PIP_STYLE[c]}`}
-        >
-          {c}
+        <span key={c} title={t(`colors.${c}`)} className="inline-flex">
+          <ManaSymbol symbol={c} />
         </span>
       ))}
     </span>
@@ -227,6 +216,7 @@ export function DeckCards({
                   <tr>
                     <th scope="col">{t('quantityHeader')}</th>
                     <th scope="col">{t('name')}</th>
+                    <th scope="col">{t('manaCost')}</th>
                     <th scope="col">{t('type')}</th>
                     <th scope="col">{t('proxy')}</th>
                   </tr>
@@ -248,6 +238,9 @@ export function DeckCards({
                           {entry.name}
                         </button>
                         {!entry.card && <span className="muted"> ({t('notFoundCard')})</span>}
+                      </td>
+                      <td className="py-1.5 pe-2 text-right whitespace-nowrap sm:text-left">
+                        <ManaCost cost={entry.card?.manaCost} className="text-sm" />
                       </td>
                       <td className="muted hidden py-1.5 sm:table-cell">{entry.card?.typeLine}</td>
                       <td className="py-1.5 text-right">{proxy(entry)}</td>
@@ -299,9 +292,9 @@ export function DeckCards({
               <p className="muted">{t('noImage')}</p>
             )}
             {zoomed.card && (
-              <p className="muted text-sm">
+              <p className="muted flex flex-wrap items-center gap-2 text-sm">
                 {zoomed.card.typeLine}
-                {zoomed.card.manaCost && ` · ${zoomed.card.manaCost}`}
+                <ManaCost cost={zoomed.card.manaCost} />
               </p>
             )}
             {zoomed.isProxy && <p className="text-sm font-medium">{t('proxy')}</p>}
