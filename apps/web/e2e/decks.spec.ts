@@ -49,11 +49,27 @@ test.describe('deck', () => {
     await expect(dialog).toBeHidden();
     await expect(zoom).toBeFocused();
 
-    await page.getByRole('button', { name: 'Lista' }).click();
-    await expect(page.getByRole('button', { name: 'Lista' })).toHaveAttribute(
+    await page.getByRole('button', { name: 'Lista', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Lista', exact: true })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
     await expect(page.getByRole('button', { name: 'Sol Ring' })).toBeVisible();
+  });
+
+  test('editor: proxies parciais e lista exportada', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    await page.getByRole('button', { name: 'Editar', exact: true }).click();
+    const proxies = page.getByRole('spinbutton', { name: 'Proxies de Forest' });
+    await proxies.fill('5');
+    await proxies.press('Enter');
+    await expect(page.getByText('Forest salva.')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Visual', exact: true }).click();
+    await expect(page.getByText('5 proxies', { exact: true })).toBeVisible();
+
+    const exported = await page.request.get(`/api/v1/decks/${E2E_IDS.deck}/export?format=proxies`);
+    expect(await exported.text()).toContain('31 Forest\n5 Forest #proxy');
   });
 });

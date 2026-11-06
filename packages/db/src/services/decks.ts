@@ -4,7 +4,12 @@ import {
   isGameFormat,
   attachCardData,
   DomainError,
+  mergeDeckLines,
+  planDeckSync,
+  splitLine,
   type CardData,
+  type DeckBoard,
+  type DeckEntry,
   type ImportedDeck,
 } from '@boramarcar/core';
 import { and, asc, count, desc, eq, inArray, or, sql, sum } from 'drizzle-orm';
@@ -199,6 +204,8 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
     ...deck,
     isOwner: deck.ownerId === input.viewerId,
     entries,
+    /** Uma linha por carta/board, com total e quantas cópias são proxy (3.6). */
+    lines: mergeDeckLines(entries),
     analysis: analyzeDeck(entries),
   };
 }
@@ -353,4 +360,119 @@ export async function updateDeck(
   if (!Object.keys(changes).length) return deck;
   const [updated] = await db.update(decks).set(changes).where(eq(decks.id, deck.id)).returning();
   return updated!;
+}
+
+async function requireOwnedDeck(db: Database, deckId: string, userId: string) {
+  const [deck] = await db.select().from(decks).where(eq(decks.id, deckId)).limit(1);
+  if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
+  if (deck.ownerId !== userId) throw new DomainError('forbidden', 'Apenas o dono edita o deck');
+  return deck;
+}
+
+/**
+ * Editor de deck (3.6/3.7): define quantas cópias de uma carta há num board e quantas são
+ * proxy. Quantidade 0 remove a carta. `card` vem do Scryfall/cache (pode faltar: fica sem dados).
+ */
+export async function setDeckLine(
+  db: Database,
+  input: {
+    deckId: string;
+    userId: string;
+    board: DeckBoard;
+    name: string;
+    quantity: number;
+    proxies: number;
+    card?: CardData | null;
+  },
+) {
+  const name = input.card?.name ?? input.name.trim();
+  if (!name) throw new DomainError('invalid_input', 'Informe a carta');
+  const parts = splitLine(input.quantity, input.proxies);
+  await requireOwnedDeck(db, input.deckId, input.userId);
+  if (input.card) await upsertCards(db, [input.card]);
+
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(deckCards)
+      .where(
+        and(
+          eq(deckCards.deckId, input.deckId),
+          eq(deckCards.board, input.board),
+          sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
+        ),
+      );
+    if (parts.length) {
+      await tx.insert(deckCards).values(
+        parts.map((p) => ({
+          deckId: input.deckId,
+          cardName: name,
+          scryfallId: input.card?.scryfallId ?? null,
+          board: input.board,
+          quantity: p.quantity,
+          isProxy: p.isProxy,
+        })),
+      );
+    }
+    await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
+  });
+  return { name, board: input.board, quantity: input.quantity, proxies: input.proxies };
+}
+
+/**
+ * Sincroniza o deck com a lista nova da origem (3.8): quantidades da origem, proxies mantidos.
+ * Retorna o que entrou, saiu e mudou.
+ */
+export async function syncDeckCards(
+  db: Database,
+  input: { deckId: string; userId: string; entries: DeckEntry[]; cards: readonly CardData[] },
+) {
+  await requireOwnedDeck(db, input.deckId, input.userId);
+  const current = await db.select().from(deckCards).where(eq(deckCards.deckId, input.deckId));
+  const plan = planDeckSync(
+    mergeDeckLines(
+      current.map((r) => ({
+        id: r.id,
+        name: r.cardName,
+        board: r.board,
+        quantity: r.quantity,
+        isProxy: r.isProxy,
+        card: null,
+      })),
+    ),
+    input.entries,
+  );
+  await upsertCards(db, input.cards);
+  const known = [...input.cards, ...(await findCachedCards(db, input.entries))];
+  const linked = attachCardData(
+    plan.rows.map((r) => r.entry),
+    known,
+  );
+  await db.transaction(async (tx) => {
+    await tx.delete(deckCards).where(eq(deckCards.deckId, input.deckId));
+    if (plan.rows.length) {
+      await tx.insert(deckCards).values(
+        plan.rows.map((r, i) => ({
+          deckId: input.deckId,
+          cardName: linked[i]!.card?.name ?? r.name,
+          scryfallId: linked[i]!.card?.scryfallId ?? null,
+          board: r.board,
+          quantity: r.quantity,
+          isProxy: r.isProxy,
+          isFoil: r.entry.isFoil ?? false,
+        })),
+      );
+    }
+    await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
+  });
+  return { added: plan.added, removed: plan.removed, changed: plan.changed };
+}
+
+/** Busca no cache uma carta pelo nome exato (sem diferenciar maiúsculas). */
+export async function findCachedCardByName(db: Database, name: string) {
+  const [row] = await db
+    .select()
+    .from(cards)
+    .where(sql`lower(${cards.name}) = ${name.trim().toLowerCase()}`)
+    .limit(1);
+  return row ? toCardData(row) : null;
 }

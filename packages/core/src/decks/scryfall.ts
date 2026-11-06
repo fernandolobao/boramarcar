@@ -138,3 +138,24 @@ export function attachCardData<T extends Pick<DeckEntry, 'name' | 'scryfallId'>>
       null,
   }));
 }
+
+const autocompleteSchema = z.object({ data: z.array(z.string()) });
+
+/** Sugestões de nomes de carta (`/cards/autocomplete`, até 20). Menos de 2 letras: nada. */
+export async function fetchScryfallAutocomplete(
+  query: string,
+  {
+    fetch: fetchFn,
+    userAgent = 'BoraMarcar/0.1',
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
+): Promise<string[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+  const response = await fetchFn(`${SCRYFALL_API}/cards/autocomplete?q=${encodeURIComponent(q)}`, {
+    headers: { Accept: 'application/json', 'User-Agent': userAgent },
+  });
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  return autocompleteSchema.parse(await response.json()).data;
+}

@@ -10,7 +10,7 @@ import type { ReactElement } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
-import { DeckImportForm, ProxyToggle } from './deck-forms';
+import { DeckImportForm } from './deck-forms';
 import { EventManage, EventStatusBadge } from './event-manage';
 import { NewEventForm, RsvpButtons } from './event-forms';
 import { GameEditor } from './game-editor';
@@ -133,10 +133,6 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['DeckImportForm', <DeckImportForm key="d" />],
-  [
-    'ProxyToggle',
-    <ProxyToggle key="e" deckId="d" cardId="c" isProxy={false} label="Proxy: Sol Ring" />,
-  ],
   [
     'EventManage',
     <EventManage
