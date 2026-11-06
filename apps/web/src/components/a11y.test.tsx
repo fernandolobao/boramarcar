@@ -29,6 +29,7 @@ import { MemberActions } from './member-actions';
 import { UserMenu } from './user-menu';
 import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
+import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
 
 vi.mock('next/navigation', () => ({
@@ -260,6 +261,7 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  ['ThemePicker', <ThemePicker key="tp" />],
   [
     'BracketCard',
     <BracketCard

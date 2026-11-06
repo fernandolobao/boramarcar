@@ -6,7 +6,7 @@ import {
   type GameFormat,
   type GamePlayerInput,
 } from '@boramarcar/core';
-import { and, asc, desc, eq, gte, inArray, lt, max, ne } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, lt, max, ne, or, sql } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   decks,
@@ -417,4 +417,86 @@ export async function updateGame(
 export async function deleteGame(db: Database, input: { gameId: string; userId: string }) {
   const { game } = await requireGameEditor(db, input.gameId, input.userId);
   await db.delete(games).where(eq(games.id, game.id));
+}
+
+export const EVENT_HISTORY_PAGE_SIZE = 20;
+
+export interface EventHistoryFilters {
+  /** Texto no título ou no nome do local. */
+  q?: string;
+  status?: 'scheduled' | 'finished' | 'cancelled';
+  /** Encontros em que a pessoa confirmou presença ou jogou. */
+  playerId?: string;
+  page?: number;
+}
+
+/**
+ * Histórico de encontros (2.10): encontros passados do grupo com busca por texto, situação e
+ * jogador, paginados (mais recentes primeiro), com número de partidas, presenças e vencedores.
+ */
+export async function searchEventHistory(
+  db: Database,
+  input: EventHistoryFilters & { groupId: string; userId: string; now?: Date },
+) {
+  await requireMembership(db, input.groupId, input.userId);
+  const now = input.now ?? new Date();
+  const page = Math.max(1, Math.floor(input.page ?? 1));
+  const q = input.q?.trim();
+  const like = q ? `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%` : null;
+  const gamesCount = sql<number>`(select count(*)::int from ${games} where ${games.eventId} = ${events.id})`;
+  const attendees = sql<number>`(select count(*)::int from ${eventParticipants} where ${eventParticipants.eventId} = ${events.id} and ${eventParticipants.rsvp} = 'yes')`;
+  const rows = await db
+    .select({
+      id: events.id,
+      title: events.title,
+      startsAt: events.startsAt,
+      status: events.status,
+      locationName: locations.name,
+      games: gamesCount,
+      attendees,
+      total: sql<number>`count(*) over ()::int`,
+    })
+    .from(events)
+    .leftJoin(locations, eq(locations.id, events.locationId))
+    .where(
+      and(
+        eq(events.groupId, input.groupId),
+        lt(events.startsAt, now),
+        like ? or(ilike(events.title, like), ilike(locations.name, like)) : undefined,
+        input.status ? eq(events.status, input.status) : undefined,
+        input.playerId
+          ? or(
+              sql`exists (select 1 from ${eventParticipants} where ${eventParticipants.eventId} = ${events.id} and ${eventParticipants.userId} = ${input.playerId} and ${eventParticipants.rsvp} = 'yes')`,
+              sql`exists (select 1 from ${gamePlayers} join ${games} on ${games.id} = ${gamePlayers.gameId} where ${games.eventId} = ${events.id} and ${gamePlayers.userId} = ${input.playerId})`,
+            )
+          : undefined,
+      ),
+    )
+    .orderBy(desc(events.startsAt))
+    .limit(EVENT_HISTORY_PAGE_SIZE)
+    .offset((page - 1) * EVENT_HISTORY_PAGE_SIZE);
+
+  const ids = rows.map((r) => r.id);
+  const winners = ids.length
+    ? await db
+        .selectDistinct({ eventId: games.eventId, name: user.name })
+        .from(gamePlayers)
+        .innerJoin(games, eq(games.id, gamePlayers.gameId))
+        .innerJoin(user, eq(user.id, gamePlayers.userId))
+        .where(and(inArray(games.eventId, ids), eq(gamePlayers.result, 'win')))
+    : [];
+  const total = rows[0]?.total ?? 0;
+  return {
+    page,
+    pageSize: EVENT_HISTORY_PAGE_SIZE,
+    total,
+    pages: Math.max(1, Math.ceil(total / EVENT_HISTORY_PAGE_SIZE)),
+    items: rows.map(({ total: _total, ...row }) => ({
+      ...row,
+      winners: winners
+        .filter((w) => w.eventId === row.id)
+        .map((w) => w.name)
+        .sort((a, b) => a.localeCompare(b)),
+    })),
+  };
 }

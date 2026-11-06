@@ -75,3 +75,25 @@ test.describe('cabeçalho', () => {
     await expect(page).toHaveURL(/\/configuracoes$/);
   });
 });
+
+test.describe('tema', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE, colorScheme: 'light' });
+
+  test('escolher Escuro em Configurações vale em todas as páginas e após recarregar', async ({
+    page,
+  }) => {
+    await page.goto('/configuracoes');
+    const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const light = await bg();
+    await page.getByRole('radio', { name: 'Escuro' }).check();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    expect(await bg()).not.toBe(light);
+    await page.goto('/painel');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.goto('/configuracoes');
+    await expect(page.getByRole('radio', { name: 'Escuro' })).toBeChecked();
+    await page.getByRole('radio', { name: 'Automático' }).check();
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.+/);
+  });
+});

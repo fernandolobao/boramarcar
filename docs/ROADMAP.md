@@ -67,7 +67,8 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 2.13 | **Perfil do jogador** visível para quem divide grupo: resumo, títulos de temporada, conquistas e decks visíveis                                                                                                             | P       | ✅                 |
 | 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       | ✅                 |
 | 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       | ✅                 |
-| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |                    |
+| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       | ✅                 |
+| 2.14 | **Gestão de endereços e locais**: cadastrar, editar e remover locais do grupo com **autocomplete de endereço** e **mapa** (ver no mapa, abrir rotas no Google Maps/Apple Maps/Waze); mapa no encontro                       | M       |                    |
 
 ## Fase 3 — Decks e coleção
 
@@ -85,7 +86,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 3.10 | Gerar **folha de impressão de proxies** (PDF 3×3)                                                                                                                                                                      | M       | ✅ (A4 ou Carta)                               |
 | 3.11 | Exportar lista (texto / Moxfield / Archidekt)                                                                                                                                                                          | P       | ✅                                             |
 | 3.12 | Visibilidade do deck (privado / grupo / público) — hoje: visível para quem divide grupo com o dono                                                                                                                     | P       | ✅ (privado, grupo, público)                   |
-| 3.13 | Atualização periódica do cache Scryfall (bulk data diário via Vercel Cron)                                                                                                                                             | M       |                                                |
+| 3.13 | Atualização periódica do cache Scryfall (bulk data diário via Vercel Cron)                                                                                                                                             | M       | ✅ (cartas dos decks via `/cards/collection`)  |
 | 3.14 | **Gestão de decks visual e responsiva**: grade de decks com arte do comandante, identidade de cor e tipo de jogo; deck em modo visual (imagens por tipo, ampliar em diálogo) ou lista; renomear e mudar o tipo de jogo | M       | ✅                                             |
 | 3.15 | **Edições (impressões)**: a mesma carta em várias edições no deck; importação mantém a edição (id, ou `(SET) número` na lista colada); trocar a edição de parte das cópias no editor; exportação com `(SET) número`    | M       | ✅                                             |
 

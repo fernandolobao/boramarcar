@@ -1,4 +1,5 @@
 import { listEvents, listLocations } from '@boramarcar/db';
+import { Icon } from '@/components/icons';
 import Link from 'next/link';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { NewEventForm } from '@/components/event-forms';
@@ -19,6 +20,7 @@ export default async function EventsPage() {
     listLocations(db, group.id),
   ]);
   const t = await getTranslations('events');
+  const th = await getTranslations('history');
   const tc = await getTranslations('common');
   const format = await getFormatter();
 
@@ -60,7 +62,13 @@ export default async function EventsPage() {
       </section>
       <section className="card">
         <h2 className="section-title">{t('past')}</h2>
-        {list(past)}
+        {list(past.slice(0, 5))}
+        <p className="mt-3">
+          <Link href="/eventos/historico" className="inline-flex items-center gap-1 underline">
+            {th('seeAll')}
+            <Icon name="next" />
+          </Link>
+        </p>
       </section>
     </>
   );

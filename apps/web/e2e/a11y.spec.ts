@@ -24,6 +24,7 @@ const AUTH_PAGES = [
   '/eventos',
   `/eventos/${E2E_IDS.upcomingEvent}`,
   `/eventos/${E2E_IDS.pastEvent}`,
+  '/eventos/historico',
   '/ranking',
   '/decks',
   `/decks/${E2E_IDS.deck}`,
