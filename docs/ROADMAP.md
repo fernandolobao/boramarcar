@@ -53,19 +53,19 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 ## Fase 2 — Partidas e ranking
 
-| #    | Item                                                                                                                                                                                                                        | Tamanho | Status                         |
-| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------ |
-| 2.1  | Registrar partidas do encontro (vencedor/empate, assento, deck)                                                                                                                                                             | M       | ✅                             |
-| 2.2  | Ranking do grupo (V/D/E, pontos, % vitórias)                                                                                                                                                                                | M       | ✅                             |
-| 2.3  | Visualizar partidas do encontro com vencedor                                                                                                                                                                                | P       | ✅                             |
-| 2.4  | **Mostrar o deck usado** por cada jogador na partida (UI de destaque, imagem do comandante)                                                                                                                                 | P       | ✅                             |
-| 2.5  | Editar partida (hoje: remover e registrar de novo)                                                                                                                                                                          | P       | ✅                             |
-| 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                                                                                                                       | M       | parcial (API aceita `from/to`) |
-| 2.7  | Tabela de pontos configurável por grupo                                                                                                                                                                                     | P       | ✅                             |
-| 2.11 | **Tipo de jogo por partida** (Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado, Outro): regras de jogadores, times e vencedor; ranking filtrável por tipo | M       | ✅                             |
-| 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       |                                |
-| 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       |                                |
-| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |                                |
+| #    | Item                                                                                                                                                                                                                        | Tamanho | Status |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ |
+| 2.1  | Registrar partidas do encontro (vencedor/empate, assento, deck)                                                                                                                                                             | M       | ✅     |
+| 2.2  | Ranking do grupo (V/D/E, pontos, % vitórias)                                                                                                                                                                                | M       | ✅     |
+| 2.3  | Visualizar partidas do encontro com vencedor                                                                                                                                                                                | P       | ✅     |
+| 2.4  | **Mostrar o deck usado** por cada jogador na partida (UI de destaque, imagem do comandante)                                                                                                                                 | P       | ✅     |
+| 2.5  | Editar partida (hoje: remover e registrar de novo)                                                                                                                                                                          | P       | ✅     |
+| 2.6  | Filtros do ranking por período na UI e **temporadas** (ex.: semestre)                                                                                                                                                       | M       | ✅     |
+| 2.7  | Tabela de pontos configurável por grupo                                                                                                                                                                                     | P       | ✅     |
+| 2.11 | **Tipo de jogo por partida** (Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado, Outro): regras de jogadores, times e vencedor; ranking filtrável por tipo | M       | ✅     |
+| 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       | ✅     |
+| 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       | ✅     |
+| 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       |        |
 
 ## Fase 3 — Decks e coleção
 
@@ -136,7 +136,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 1. ✅ **Semana 1–2 — colocar no ar (Fase 0 pendente + 1.6, 1.9, 1.11, 1.14).** Deploy na Vercel, Neon, OAuth; o grupo começa a usar a disponibilidade e o ranking.
 2. ✅ **Semana 3–4 — agenda madura (1.7, 1.8, 1.10, 1.13).** Recorrência e calendário são o que mais reduz atrito.
-3. **Semana 5–6 — partidas ricas (2.4–2.9).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
+3. ✅ **Semana 5–6 — partidas ricas (2.4–2.9, 2.11).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
 4. **Semana 7–9 — decks (3.6–3.11).** Editor, proxies parciais e folha de impressão.
 5. **Semana 10–13 — análise (4.5–4.9).** Começar pelo Tagger (4.5), que melhora todo o resto.
 6. **Depois — mobile (Fase 5)**, quando a API estiver estável; a PWA cobre o intervalo.

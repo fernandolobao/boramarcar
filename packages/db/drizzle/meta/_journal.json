@@ -36,6 +36,13 @@
       "when": 1793927403626,
       "tag": "0004_formatos_partidas",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793928705133,
+      "tag": "0005_temporadas",
+      "breakpoints": true
     }
   ]
 }
