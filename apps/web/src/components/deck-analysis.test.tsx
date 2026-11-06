@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { analyzeDeck, type AnalyzableCard } from '@boramarcar/core';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import axe from 'axe-core';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -96,5 +97,47 @@ describe('formatos sem nota', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Validação · Modern' })).toBeInTheDocument();
     expect(screen.getByText('O deck tem 4 cartas (mínimo: 60).')).toBeInTheDocument();
+  });
+});
+
+describe('gráficos interativos (4.11)', () => {
+  const audit = async (container: HTMLElement) =>
+    (
+      await axe.run(container, {
+        rules: { 'color-contrast': { enabled: false }, region: { enabled: false } },
+      })
+    ).violations.map((v) => v.id);
+
+  it('curva: cada barra mostra as cartas daquele custo', async () => {
+    const { container } = wrap(
+      <ManaCurve curve={analysis.manaCurve} cardsByCurve={analysis.cardsByCurve} />,
+    );
+    expect(
+      screen.getByText('Toque numa barra para ver as cartas desse custo.'),
+    ).toBeInTheDocument();
+    const seven = screen.getByRole('button', { name: 'Custo 7+: 2 cartas' });
+    fireEvent.click(seven);
+    expect(seven).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Custo 7+ (2 cartas):')).toBeInTheDocument();
+    expect(screen.getByText('Big', { exact: false })).toBeInTheDocument();
+    fireEvent.click(seven);
+    expect(seven).toHaveAttribute('aria-pressed', 'false');
+    expect(await audit(container)).toEqual([]);
+  });
+
+  it('nota: cada componente explica o cálculo e lista as cartas', async () => {
+    const { container } = wrap(<DeckScore analysis={analysis} formatName="Commander" />);
+    const ramp = screen.getByRole('button', { name: /Ramp \(1\)/ });
+    expect(ramp).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(ramp);
+    expect(ramp).toHaveAttribute('aria-expanded', 'true');
+    const panel = within(document.getElementById(ramp.getAttribute('aria-controls')!)!);
+    expect(panel.getByText(/Abaixo da meta · meta: 10/)).toBeVisible();
+    expect(panel.getByText(/A meta é ter 10 cartas de Ramp/)).toBeVisible();
+    expect(panel.getByText('Sol Ring', { exact: false })).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: /Terrenos \(0\)/ }));
+    expect(ramp).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText(/A faixa recomendada é de 36 a 38 terrenos/)).toBeInTheDocument();
+    expect(await audit(container)).toEqual([]);
   });
 });

@@ -66,6 +66,8 @@ export interface ScoreComponent {
   score: number;
   max: number;
   value: number;
+  /** Meta usada no cálculo: faixa de terrenos, número de cartas da função ou CMC ideal/máximo. */
+  target: { min: number; max: number } | { count: number } | { ideal: number; max: number };
 }
 
 export interface DeckAnalysis {
@@ -78,6 +80,8 @@ export interface DeckAnalysis {
   nonLands: number;
   averageCmc: number;
   manaCurve: Record<ManaCurveBucket, number>;
+  /** Cartas (não terrenos do principal) em cada faixa de custo, para o gráfico interativo. */
+  cardsByCurve: Record<ManaCurveBucket, string[]>;
   colorPips: Record<ColorSymbol, number>;
   roles: Record<CardRole, number>;
   cardsByRole: Record<CardRole, string[]>;
@@ -239,6 +243,14 @@ export function validateDeck(
 export const validateCommanderDeck = (cards: readonly AnalyzableCard[]) =>
   validateDeck(cards, deckFormatProfile('commander'));
 
+/** Pontos máximos de cada função na nota (somam 65 com terrenos 25 e curva 10). */
+export const ROLE_POINTS: Record<ScoredRole, number> = {
+  ramp: 20,
+  draw: 20,
+  removal: 15,
+  wipe: 10,
+};
+
 const ratio = (value: number, target: number) => Math.min(1, target > 0 ? value / target : 1);
 
 /**
@@ -255,6 +267,9 @@ export function analyzeDeck(
     ManaCurveBucket,
     number
   >;
+  const cardsByCurve = Object.fromEntries(
+    MANA_CURVE_BUCKETS.map((b) => [b, [] as string[]]),
+  ) as Record<ManaCurveBucket, string[]>;
   const colorPips: Record<ColorSymbol, number> = { W: 0, U: 0, B: 0, R: 0, G: 0, C: 0 };
   const roles = Object.fromEntries(CARD_ROLES.map((r) => [r, 0])) as Record<CardRole, number>;
   const cardsByRole = Object.fromEntries(CARD_ROLES.map((r) => [r, [] as string[]])) as Record<
@@ -286,6 +301,7 @@ export function analyzeDeck(
     nonLands += entry.quantity;
     if (entry.board === 'mainboard') {
       manaCurve[curveBucket(card.cmc)] += entry.quantity;
+      cardsByCurve[curveBucket(card.cmc)].push(entry.name);
       cmcSum += card.cmc * entry.quantity;
     }
     const pips = countPips(card.manaCost);
@@ -335,17 +351,27 @@ export function analyzeDeck(
     scoreBreakdown.push(
       ...(
         [
-          { key: 'lands', max: 25, value: lands, score: Math.max(0, 25 - landDistance * 3) },
-          { key: 'ramp', max: 20, value: roles.ramp, score: 20 * ratio(roles.ramp, targets.ramp) },
-          { key: 'draw', max: 20, value: roles.draw, score: 20 * ratio(roles.draw, targets.draw) },
           {
-            key: 'removal',
-            max: 15,
-            value: roles.removal,
-            score: 15 * ratio(roles.removal, targets.removal),
+            key: 'lands',
+            max: 25,
+            value: lands,
+            score: Math.max(0, 25 - landDistance * 3),
+            target: { min: landTarget.min, max: landTarget.max },
           },
-          { key: 'wipe', max: 10, value: roles.wipe, score: 10 * ratio(roles.wipe, targets.wipe) },
-          { key: 'curve', max: 10, value: averageCmc, score: 10 * curveScore },
+          ...SCORED_ROLES.map((role) => ({
+            key: role,
+            max: ROLE_POINTS[role],
+            value: roles[role],
+            score: ROLE_POINTS[role] * ratio(roles[role], targets[role]),
+            target: { count: targets[role] },
+          })),
+          {
+            key: 'curve',
+            max: 10,
+            value: averageCmc,
+            score: 10 * curveScore,
+            target: { ideal: cmc.ideal, max: cmc.max },
+          },
         ] as ScoreComponent[]
       ).map((c) => ({ ...c, score: Math.round(c.score * 10) / 10 })),
     );
@@ -382,6 +408,7 @@ export function analyzeDeck(
     nonLands,
     averageCmc,
     manaCurve,
+    cardsByCurve,
     colorPips,
     roles,
     cardsByRole,

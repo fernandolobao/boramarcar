@@ -556,7 +556,24 @@
     "handOnDraw": "Jogando depois",
     "handRamp": "Ao menos 1 carta de ramp até o turno {turn} (jogando depois): {value}",
     "alternativesError": "O Scryfall não respondeu. Tente de novo em instantes.",
-    "manaUnknown": "Sem dados ainda"
+    "manaUnknown": "Sem dados ainda",
+    "curveHint": "Toque numa barra para ver as cartas desse custo.",
+    "curveSelected": "Custo {bucket} ({count, plural, =1 {1 carta} other {# cartas}}):",
+    "scoreHint": "Toque num item para ver como ele é calculado e quais cartas contam.",
+    "countedCards": "Cartas que contam:",
+    "targetRange": "meta: {min} a {max}",
+    "targetCount": "meta: {count}",
+    "targetCmc": "meta: até {ideal}",
+    "targetStatus": {
+      "ok": "Dentro da meta",
+      "below": "Abaixo da meta",
+      "above": "Acima da meta"
+    },
+    "explain": {
+      "lands": "A faixa recomendada é de {min} a {max} terrenos. Cada terreno fora dela tira 3 pontos. Com {value}, o deck soma {points} de {maxPoints} pontos.",
+      "role": "A meta é ter {target} cartas de {role}. Os pontos crescem proporcionalmente até a meta: com {value}, o deck soma {points} de {maxPoints} pontos.",
+      "curve": "Um CMC médio de até {ideal} vale os {maxPoints} pontos; acima disso os pontos caem até zero em {limit}. Com {value}, o deck soma {points} pontos."
+    }
   },
   "errors": {
     "invalid_input": "Confira os dados informados.",

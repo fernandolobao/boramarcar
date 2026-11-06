@@ -556,7 +556,24 @@
     "handOnDraw": "On the draw",
     "handRamp": "At least 1 ramp card by turn {turn} (on the draw): {value}",
     "alternativesError": "Scryfall did not respond. Try again in a moment.",
-    "manaUnknown": "No data yet"
+    "manaUnknown": "No data yet",
+    "curveHint": "Tap a bar to see the cards at that mana value.",
+    "curveSelected": "Mana value {bucket} ({count, plural, =1 {1 card} other {# cards}}):",
+    "scoreHint": "Tap an item to see how it is calculated and which cards count.",
+    "countedCards": "Cards counted:",
+    "targetRange": "target: {min} to {max}",
+    "targetCount": "target: {count}",
+    "targetCmc": "target: up to {ideal}",
+    "targetStatus": {
+      "ok": "On target",
+      "below": "Below target",
+      "above": "Above target"
+    },
+    "explain": {
+      "lands": "The recommended range is {min} to {max} lands. Each land outside it costs 3 points. With {value}, the deck scores {points} of {maxPoints} points.",
+      "role": "The target is {target} {role} cards. Points grow proportionally up to the target: with {value}, the deck scores {points} of {maxPoints} points.",
+      "curve": "An average mana value up to {ideal} earns all {maxPoints} points; above that, points drop to zero at {limit}. With {value}, the deck scores {points} points."
+    }
   },
   "errors": {
     "invalid_input": "Please check the data you entered.",

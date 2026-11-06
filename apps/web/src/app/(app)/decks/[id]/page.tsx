@@ -211,7 +211,7 @@ export default async function DeckPage({ params }: Props) {
           <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
         </section>
         <section className="card space-y-6">
-          <ManaCurve curve={analysis.manaCurve} />
+          <ManaCurve curve={analysis.manaCurve} cardsByCurve={analysis.cardsByCurve} />
           <p className="text-sm">
             {ta('averageCmc')}: <strong>{analysis.averageCmc}</strong> · {ta('lands')}:{' '}
             <strong>{analysis.lands}</strong>

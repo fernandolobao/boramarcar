@@ -148,6 +148,11 @@ sem rolagem horizontal em 320px.
 - Em Configurações, "Tema" é um `fieldset/legend` com três `radio` nativos (Automático, Claro, Escuro), com ícone **e** texto; a dica está ligada ao grupo.
 - O tema salvo é aplicado por um script no `<head>` antes da primeira pintura (sem piscar) e define `color-scheme`, então controles nativos e barras de rolagem acompanham. Os testes de axe continuam rodando nos dois temas.
 
+### Revisão: gráficos interativos da análise
+
+- **Curva de mana**: cada barra é um `button` com `aria-pressed` e nome com o custo e a contagem ("Custo 3: 5 cartas"); o número fica visível acima da barra. As cartas do custo escolhido aparecem numa região `aria-live` logo abaixo, e a barra escolhida muda de cor **e** o rótulo fica em negrito sublinhado.
+- **Nota**: cada componente é um disclosure (`aria-expanded`/`aria-controls`) com a pontuação em texto; o painel diz se está dentro, abaixo ou acima da meta (ícone **e** texto), explica o cálculo e lista as cartas que contam. As barras continuam decorativas.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.
