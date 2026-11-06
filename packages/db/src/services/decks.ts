@@ -144,6 +144,9 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
   };
 }
 
+/** Data a partir da qual o cache guarda o verso das cartas de duas faces (migration 0009). */
+const TWO_FACED_BACKFILL = new Date('2026-11-07T00:00:00Z');
+
 /** Funções do Tagger valem por 30 dias. */
 export const ROLES_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -155,6 +158,8 @@ export async function deckCardsForEnrichment(db: Database, deckId: string) {
       name: cards.name,
       producedMana: cards.producedMana,
       setCode: cards.setCode,
+      backImageUri: cards.backImageUri,
+      cardUpdatedAt: cards.updatedAt,
       rolesCheckedAt: cards.rolesCheckedAt,
       typeLine: cards.typeLine,
     })
@@ -165,7 +170,15 @@ export async function deckCardsForEnrichment(db: Database, deckId: string) {
   return {
     // Cache antigo: sem mana produzida ou sem a edição — relê a carta no Scryfall.
     missingMana: rows
-      .filter((r) => r.producedMana === null || r.setCode === null)
+      .filter(
+        (r) =>
+          r.producedMana === null ||
+          r.setCode === null ||
+          // Cache anterior ao verso das cartas de duas faces: relê uma vez.
+          (r.name.includes(' // ') &&
+            r.backImageUri === null &&
+            r.cardUpdatedAt < TWO_FACED_BACKFILL),
+      )
       .map((r) => r.scryfallId),
     staleRoles: rows
       .filter((r) => !r.rolesCheckedAt || r.rolesCheckedAt.getTime() < cutoff)
@@ -367,6 +380,9 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
         card &&
         (card.producedMana === null ||
           card.setCode === null ||
+          (card.name.includes(' // ') &&
+            card.backImageUri === null &&
+            card.updatedAt < TWO_FACED_BACKFILL) ||
           !card.rolesCheckedAt ||
           card.rolesCheckedAt.getTime() < roleCutoff),
     ) ||
