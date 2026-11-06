@@ -439,7 +439,11 @@
     "printInUse": "In use",
     "printSave": "Use this printing",
     "printCopiesInvalid": "Enter a valid number of copies.",
-    "printOf": "Printing: {set} ({print})"
+    "printOf": "Printing: {set} ({print})",
+    "flip": "Flip",
+    "faces": "Card faces",
+    "faceFront": "Front",
+    "faceBack": "Back"
   },
   "analysis": {
     "title": "Analysis",

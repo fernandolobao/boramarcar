@@ -42,3 +42,28 @@ describe('folha de proxies', () => {
     expect(toWinAnsi('Lim-Dûl’s Vault 日本')).toBe('Lim-Dûl?s Vault ??');
   });
 });
+
+describe('cartas de duas faces', () => {
+  it('imprime frente e verso de cada cópia', () => {
+    expect(
+      expandPrintList([
+        {
+          name: 'Delver of Secrets // Insectile Aberration',
+          quantity: 2,
+          proxies: 1,
+          card: {
+            imageUri: 'https://cards.scryfall.io/normal/front/d.jpg',
+            backImageUri: 'https://cards.scryfall.io/normal/back/d.jpg',
+            backName: 'Insectile Aberration',
+          },
+        },
+      ]),
+    ).toEqual([
+      {
+        name: 'Delver of Secrets // Insectile Aberration',
+        imageUri: 'https://cards.scryfall.io/large/front/d.jpg',
+      },
+      { name: 'Insectile Aberration', imageUri: 'https://cards.scryfall.io/large/back/d.jpg' },
+    ]);
+  });
+});

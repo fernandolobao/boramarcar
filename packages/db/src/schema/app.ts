@@ -356,6 +356,9 @@ export const cards = pgTable(
     setCode: text('set_code'),
     setName: text('set_name'),
     collectorNumber: text('collector_number'),
+    /** Verso de cartas de duas faces. */
+    backImageUri: text('back_image_uri'),
+    backName: text('back_name'),
     updatedAt: updatedAt(),
   },
   (t) => [index('cards_name_idx').on(sql`lower(${t.name})`)],

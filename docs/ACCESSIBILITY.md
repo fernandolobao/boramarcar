@@ -158,6 +158,11 @@ sem rolagem horizontal em 320px.
 - Tabela com `caption` ("Este deck × média de N decks"), `th scope="col"`/`scope="row"`; a diferença é texto com sinal ("+1,5", "−15", "igual"), sem depender de cor.
 - Link "Ver o comandante no EDHREC" avisa que abre em nova aba; listas de cartas em texto.
 
+### Revisão: cartas de duas faces
+
+- "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
+- No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

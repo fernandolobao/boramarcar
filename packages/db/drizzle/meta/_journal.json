@@ -64,6 +64,13 @@
       "when": 1793995587059,
       "tag": "0008_edicoes",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794005489677,
+      "tag": "0009_dupla_face",
+      "breakpoints": true
     }
   ]
 }

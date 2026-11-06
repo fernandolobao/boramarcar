@@ -205,4 +205,27 @@ describe('fetchScryfallAutocomplete', () => {
       '!"Sol Ring" game:paper&unique=prints',
     );
   });
+
+  it('guarda o verso de cartas de duas faces (e não de cartas divididas)', () => {
+    const dfc = mapScryfallCard(
+      scryCard('Delver of Secrets // Insectile Aberration', {
+        card_faces: [
+          { name: 'Delver of Secrets', image_uris: { normal: 'https://x/front.jpg' } },
+          { name: 'Insectile Aberration', image_uris: { normal: 'https://x/back.jpg' } },
+        ],
+      }),
+    );
+    expect(dfc).toMatchObject({
+      imageUri: 'https://x/front.jpg',
+      backImageUri: 'https://x/back.jpg',
+      backName: 'Insectile Aberration',
+    });
+    const split = mapScryfallCard(
+      scryCard('Fire // Ice', {
+        image_uris: { normal: 'https://x/split.jpg' },
+        card_faces: [{ name: 'Fire' }, { name: 'Ice' }],
+      }),
+    );
+    expect(split).toMatchObject({ imageUri: 'https://x/split.jpg', backImageUri: null });
+  });
 });

@@ -308,6 +308,52 @@ describe('editor de deck', () => {
   });
 });
 
+describe('cartas de duas faces', () => {
+  it('vira na grade e escolhe a face no diálogo', async () => {
+    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+    const dfc = {
+      key: 'mainboard|delver',
+      name: 'Delver of Secrets // Insectile Aberration',
+      quantity: 1,
+      proxies: 0,
+      board: 'mainboard' as const,
+      scryfallId: 'd',
+      card: {
+        ...card(
+          'Creature — Human Wizard // Creature — Human Insect',
+          'https://cards.scryfall.io/normal/front/d.jpg',
+        ),
+        backImageUri: 'https://cards.scryfall.io/normal/back/d.jpg',
+        backName: 'Insectile Aberration',
+      },
+    };
+    const { container } = wrap(<DeckCards deckId="d" lines={[dfc]} isOwner={false} />);
+    const img = () => container.querySelector('li img')!.getAttribute('src');
+    expect(img()).toContain('/front/');
+    const flip = screen.getByRole('button', { name: /^Virar ?\(Delver of Secrets/ });
+    fireEvent.click(flip);
+    expect(flip).toHaveAttribute('aria-pressed', 'true');
+    expect(img()).toContain('/back/');
+    expect(await audit(container)).toEqual([]);
+
+    fireEvent.click(screen.getByRole('button', { name: /Ampliar Delver/ }));
+    const back = screen.getByRole('button', { name: 'Verso' });
+    expect(back).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('img', { name: 'Insectile Aberration' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Frente' }));
+    expect(
+      screen.getByRole('img', { name: 'Delver of Secrets // Insectile Aberration' }),
+    ).toBeInTheDocument();
+    expect(img()).toContain('/front/');
+  });
+});
+
 describe('ColorIdentity e DeckSettingsForm', () => {
   it('identidade de cor usa os símbolos de mana e tem texto para leitores de tela', async () => {
     const { container } = wrap(<ColorIdentity colors={['G', 'U']} />);

@@ -7,6 +7,7 @@ export const SCRYFALL_API = 'https://api.scryfall.com';
 export const SCRYFALL_COLLECTION_LIMIT = 75;
 
 const faceSchema = z.object({
+  name: z.string().optional(),
   mana_cost: z.string().optional(),
   type_line: z.string().optional(),
   oracle_text: z.string().optional(),
@@ -41,6 +42,14 @@ const collectionSchema = z.object({
 
 export type ScryfallCard = z.input<typeof scryfallCardSchema>;
 
+function twoSided(card: z.infer<typeof scryfallCardSchema>) {
+  const back = card.card_faces?.[1];
+  const backImage = !card.image_uris?.normal ? back?.image_uris?.normal : undefined;
+  return backImage
+    ? { backImageUri: backImage, backName: back?.name ?? null }
+    : { backImageUri: null, backName: null };
+}
+
 export function mapScryfallCard(raw: unknown): CardData {
   const card = scryfallCardSchema.parse(raw);
   const front = card.card_faces?.[0];
@@ -69,6 +78,9 @@ export function mapScryfallCard(raw: unknown): CardData {
     setCode: card.set ?? null,
     setName: card.set_name ?? null,
     collectorNumber: card.collector_number ?? null,
+    // Duas faces de verdade (cada uma com imagem própria): transformar, MDFC, meld etc.
+    // Cartas divididas/aventura têm `card_faces`, mas uma imagem só (`image_uris` no topo).
+    ...twoSided(card),
   };
 }
 

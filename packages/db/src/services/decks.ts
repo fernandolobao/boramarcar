@@ -52,6 +52,8 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         setCode: c.setCode ?? null,
         setName: c.setName ?? null,
         collectorNumber: c.collectorNumber ?? null,
+        backImageUri: c.backImageUri ?? null,
+        backName: c.backName ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -74,6 +76,8 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         setCode: sql`coalesce(excluded.set_code, ${cards.setCode})`,
         setName: sql`coalesce(excluded.set_name, ${cards.setName})`,
         collectorNumber: sql`coalesce(excluded.collector_number, ${cards.collectorNumber})`,
+        backImageUri: sql`excluded.back_image_uri`,
+        backName: sql`excluded.back_name`,
         updatedAt: new Date(),
       },
     });
@@ -135,6 +139,8 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
     setCode: card.setCode,
     setName: card.setName,
     collectorNumber: card.collectorNumber,
+    backImageUri: card.backImageUri,
+    backName: card.backName,
   };
 }
 
