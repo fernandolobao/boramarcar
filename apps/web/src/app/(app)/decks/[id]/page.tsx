@@ -169,6 +169,7 @@ export default async function DeckPage({ params }: Props) {
         deckId={deck.id}
         isOwner={deck.isOwner}
         source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
+        proxyCount={deck.lines.reduce((sum, l) => sum + l.proxies, 0)}
         hasSourceUrl={
           Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
         }

@@ -198,6 +198,7 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 | `PUT`          | `/api/v1/decks/:deckId/lines`                   | Editor: quantidade e proxies de uma carta num board (0 remove)           |
 | `POST`         | `/api/v1/decks/:deckId/sync`                    | Atualizar pela origem ou por lista colada (`{text?}`), mantendo proxies  |
 | `GET`          | `/api/v1/decks/:deckId/export`                  | Lista em texto (`?format=plain\|proxies&download=1`)                     |
+| `GET`          | `/api/v1/decks/:deckId/proxies`                 | PDF para imprimir proxies (`?which=proxies\|all&page=a4\|letter`)        |
 | `GET`          | `/api/v1/cards/autocomplete`                    | Sugestões de nomes de carta (Scryfall, `?q=`)                            |
 | `GET/POST`     | `/api/v1/decks`                                 | Listar / importar deck (`{kind:"url",url}` ou `{kind:"text",name,text}`) |
 | `GET/DELETE`   | `/api/v1/decks/:deckId`                         | Deck com análise / remover                                               |

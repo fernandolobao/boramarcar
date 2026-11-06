@@ -12,11 +12,14 @@ export function DeckTools({
   isOwner,
   source,
   hasSourceUrl,
+  proxyCount = 0,
 }: {
   deckId: string;
   isOwner: boolean;
   source: string;
   hasSourceUrl: boolean;
+  /** Cópias marcadas como proxy (para a folha de impressão). */
+  proxyCount?: number;
 }) {
   const t = useTranslations('decks');
   const id = useId();
@@ -25,6 +28,8 @@ export function DeckTools({
   const [text, setText] = useState('');
   const [result, setResult] = useState('');
   const sync = useApiAction();
+  const [which, setWhich] = useState<'proxies' | 'all'>(proxyCount > 0 ? 'proxies' : 'all');
+  const [paper, setPaper] = useState<'a4' | 'letter'>('a4');
 
   const copy = async (format: 'plain' | 'proxies') => {
     setCopied('');
@@ -88,6 +93,60 @@ export function DeckTools({
           {copied}
         </p>
         <FormError message={copyError ? t('copyFailed') : null} />
+      </div>
+
+      <div className="space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <h3 className="font-semibold">{t('print')}</h3>
+        <p className="muted text-sm">{t('printHint')}</p>
+        <div className="flex flex-wrap items-end gap-4">
+          <fieldset>
+            <legend className="label">{t('printWhich')}</legend>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex min-h-6 items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name={`${id}-which`}
+                  checked={which === 'proxies'}
+                  disabled={proxyCount === 0}
+                  onChange={() => setWhich('proxies')}
+                />
+                {t('printProxies', { count: proxyCount })}
+              </label>
+              <label className="flex min-h-6 items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name={`${id}-which`}
+                  checked={which === 'all'}
+                  onChange={() => setWhich('all')}
+                />
+                {t('printAll')}
+              </label>
+            </div>
+          </fieldset>
+          <div>
+            <label className="label" htmlFor={`${id}-paper`}>
+              {t('paper')}
+            </label>
+            <select
+              id={`${id}-paper`}
+              className="select"
+              value={paper}
+              onChange={(e) => setPaper(e.target.value as 'a4' | 'letter')}
+            >
+              <option value="a4">A4</option>
+              <option value="letter">{t('letter')}</option>
+            </select>
+          </div>
+          <a
+            className="btn-primary"
+            href={`/api/v1/decks/${deckId}/proxies?which=${which}&page=${paper}`}
+            download
+          >
+            <Icon name="print" />
+            {t('printDownload')}
+          </a>
+        </div>
+        {proxyCount === 0 && <p className="muted text-sm">{t('printNoProxies')}</p>}
       </div>
 
       {isOwner && (

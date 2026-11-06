@@ -7,3 +7,4 @@ export * from './scryfall';
 export * from './import';
 export * from './presentation';
 export * from './editing';
+export * from './proxies';

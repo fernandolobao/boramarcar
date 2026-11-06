@@ -392,7 +392,16 @@
     "syncResult": "Deck updated: {added, plural, =0 {no new cards} =1 {1 new card} other {# new cards}}, {removed, plural, =0 {none removed} =1 {1 removed} other {# removed}}, {changed, plural, =0 {no quantity changes} =1 {1 quantity changed} other {# quantities changed}}.",
     "syncHint": "Fetches the list again from the source. Quantities come from the source; your proxy marks are kept.",
     "copyFailed": "Could not copy. Use \"Download .txt\".",
-    "copies": "Copies"
+    "copies": "Copies",
+    "print": "Print proxies",
+    "printHint": "PDF with cards at actual size (63 × 88 mm), 3 × 3 per page with cut marks. Print at 100% scale (\"actual size\").",
+    "printWhich": "Which cards",
+    "printProxies": "{count, plural, =0 {Proxies (none marked)} =1 {Just the proxy (1 card)} other {Just the proxies (# cards)}}",
+    "printAll": "The whole deck",
+    "paper": "Paper",
+    "letter": "Letter",
+    "printDownload": "Download PDF",
+    "printNoProxies": "No card is marked as proxy. Mark them in Edit mode or print the whole deck."
   },
   "analysis": {
     "title": "Analysis",
