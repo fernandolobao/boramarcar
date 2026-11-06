@@ -68,6 +68,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 2.8  | Estatísticas: confronto direto, sequência de vitórias, primeiro a jogar, duração, ordem de eliminação, "turno da vitória"                                                                                                   | G       | ✅                 |
 | 2.9  | Estatísticas por deck: % de vitórias, decks mais jogados, comandantes do grupo                                                                                                                                              | M       | ✅                 |
 | 2.10 | Histórico de encontros com busca                                                                                                                                                                                            | P       | ✅                 |
+| 2.14 | **Gestão de endereços e locais**: cadastrar, editar e remover locais do grupo com **autocomplete de endereço** e **mapa** (ver no mapa, abrir rotas no Google Maps/Apple Maps/Waze); mapa no encontro                       | M       |                    |
 
 ## Fase 3 — Decks e coleção
 
