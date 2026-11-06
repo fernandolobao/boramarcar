@@ -6,3 +6,4 @@ coverage
 packages/db/drizzle/meta
 playwright-report
 test-results
+.expo

@@ -163,6 +163,14 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: app mobile (primeira versão)
+
+- Botões com alvo mínimo de 44 pt, `accessibilityRole="button"` e estado (`disabled`, `selected`/`checked`); escolhas únicas (presença, grupo ativo) como `radiogroup`/`radio`.
+- Títulos de tela e de seção com `accessibilityRole="header"`; itens de lista com um rótulo completo (encontro: título, data, local e situação; ranking: posição, nome, pontos e vitórias).
+- Erros e confirmações em regiões vivas (`accessibilityRole="alert"`, `accessibilityLiveRegion`); carregamento com rótulo.
+- Cores com contraste AA nos temas claro e escuro (segue o tema do aparelho); texto escala com o tamanho de fonte do sistema (até 2×).
+- Pendente: passada manual com TalkBack e VoiceOver, e testes automatizados de acessibilidade no app.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

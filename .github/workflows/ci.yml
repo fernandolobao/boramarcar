@@ -44,6 +44,25 @@ jobs:
       - name: TypeScript
         run: pnpm typecheck
 
+  mobile:
+    name: App mobile (bundle Android e iOS)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Expo export (Metro empacota o app sem erros)
+        working-directory: apps/mobile
+        env:
+          CI: '1'
+          EXPO_OFFLINE: '1'
+        run: npx expo export --platform android --platform ios --output-dir dist
+
   test:
     name: Testes unitários e de integração
     runs-on: ubuntu-latest

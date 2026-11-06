@@ -20,6 +20,8 @@ export default tseslint.config(
       '**/playwright-report/**',
       '**/test-results/**',
       'packages/db/drizzle/**',
+      '**/.expo/**',
+      '**/expo-env.d.ts',
     ],
   },
   js.configs.recommended,

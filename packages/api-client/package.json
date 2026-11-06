@@ -1,0 +1,21 @@
+{
+  "name": "@boramarcar/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cliente tipado da API v1 do Bora Marcar (app mobile e, no futuro, web), com validação das respostas por Zod.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3",
+    "vitest": "5.1.0"
+  }
+}
