@@ -417,7 +417,14 @@
     "priceHintBrl": "Preços do Scryfall em dólar, atualizados na importação; em reais, convertidos pelo dólar PTAX do Banco Central ({rate} em {date}). Não são os preços das lojas brasileiras — veja cada carta na LigaMagic.",
     "ligaMagic": "Ver preço na LigaMagic",
     "cardPrice": "Preço: {usd}",
-    "cardPriceBrl": "Preço: {usd} ≈ {brl}"
+    "cardPriceBrl": "Preço: {usd} ≈ {brl}",
+    "printNow": "Imprimir / salvar como PDF",
+    "printBrowserHint": "{count, plural, =1 {1 carta} other {# cartas}} em {pages, plural, =1 {1 página} other {# páginas}}. Na janela de impressão, use escala 100% (\"tamanho real\"), sem margens, e ative \"gráficos de fundo\" se as marcas de corte não aparecerem. Para guardar o arquivo, escolha \"Salvar como PDF\".",
+    "printPreview": "Pré-visualização da folha de proxies",
+    "printPage": "Página {page} de {total}",
+    "printEmpty": "O deck está vazio.",
+    "printOpen": "Abrir folha para imprimir",
+    "printPdfServer": "Baixar PDF pronto"
   },
   "analysis": {
     "title": "Análise",

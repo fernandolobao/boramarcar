@@ -118,6 +118,10 @@ sem rolagem horizontal em 320px.
 - **Perfil de outro jogador**: links a partir do grupo e do ranking; título da aba com o nome; sem e-mail.
 - **Visibilidade do deck**: três opções em `fieldset/legend` com rótulo, ícone e explicação clicáveis; o selo de visibilidade usa texto + ícone.
 
+### Revisão: folha de proxies no navegador
+
+- Página `/decks/:id/imprimir` com pré-visualização em milímetros reais, numa região rolável focável; cada página tem nome ("Página 1 de 5") e cada carta usa `alt` com o nome. Botão "Imprimir / salvar como PDF" com texto; instruções de impressão em texto. Na impressão, cabeçalho e instruções somem (`print:hidden`).
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

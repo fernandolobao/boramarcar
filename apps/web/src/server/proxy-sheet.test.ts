@@ -43,10 +43,11 @@ describe('folha de proxies em PDF', () => {
     );
     expect(cards).toBe(10);
     expect(pages).toBe(2);
-    // Cada imagem é baixada uma vez só, no tamanho "large".
+    // Cada imagem é baixada uma vez só, no tamanho "large"; se falhar, tenta "normal".
     expect(fetchMock.mock.calls.map((c) => c[0]).sort()).toEqual([
       'https://cards.scryfall.io/large/front/broken.jpg',
       'https://cards.scryfall.io/large/front/f.jpg',
+      'https://cards.scryfall.io/normal/front/broken.jpg',
     ]);
     const doc = await PDFDocument.load(pdf);
     expect(doc.getPageCount()).toBe(2);
@@ -68,5 +69,46 @@ describe('folha de proxies em PDF', () => {
     );
     expect([cards, pages]).toEqual([9, 1]);
     expect((await PDFDocument.load(pdf)).getPage(0).getSize().width).toBeCloseTo(612, 0);
+  });
+
+  it('identifica-se ao Scryfall, cai para o tamanho "normal" e ignora o que não é imagem', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      url.includes('/large/front/a')
+        ? new Response('blocked', { status: 403 })
+        : url.includes('/b.')
+          ? new Response('<html>captcha</html>')
+          : new Response(JPEG),
+    );
+    const { missingImages, cards } = await buildProxySheet(
+      {
+        deckName: 'X',
+        which: 'all',
+        page: 'a4',
+        lines: [
+          {
+            name: 'A',
+            quantity: 1,
+            proxies: 0,
+            card: { imageUri: 'https://cards.scryfall.io/normal/front/a.jpg' },
+          },
+          {
+            name: 'B',
+            quantity: 1,
+            proxies: 0,
+            card: { imageUri: 'https://cards.scryfall.io/normal/front/b.jpg' },
+          },
+        ],
+      },
+      fetchMock as unknown as typeof fetch,
+    );
+    expect([cards, missingImages]).toEqual([2, 1]);
+    const calls = fetchMock.mock.calls.map((c) => c[0]);
+    expect(calls).toContain('https://cards.scryfall.io/normal/front/a.jpg');
+    const headers = fetchMock.mock.calls[0]![1]!.headers as Record<string, string>;
+    expect(headers['User-Agent']).toMatch(/^BoraMarcar\//);
+    expect(headers.Accept).toContain('image/jpeg');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('falha(s)'), expect.anything());
+    warn.mockRestore();
   });
 });
