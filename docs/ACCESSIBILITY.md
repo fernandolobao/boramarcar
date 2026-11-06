@@ -77,6 +77,14 @@ sem rolagem horizontal em 320px.
 - **Partidas**: cada partida tem `<h3>` com o tipo de jogo; vencedor indicado por texto ("Venceu"), ícone e fundo (cor não é a única pista). A arte do comandante é decorativa (`alt=""`): o nome do deck e do comandante estão em texto. Corrigida rolagem horizontal em 320px (itens do grid sem `min-w-0`).
 - **Configurações do grupo**: campos numéricos com `<label>`, regras dos pontos explicadas em texto ligado aos campos; membros comuns veem os valores desabilitados com o motivo.
 
+### Revisão: ranking, estatísticas e temporadas
+
+- **Filtros** em `<form method="get">` nativo (funciona sem JavaScript, URL compartilhável); o filtro aplicado é repetido em texto ("Mostrando: …").
+- **Tabelas** com `<caption>` (sr-only), `th scope="col"` e nome do jogador como `th scope="row"`. Tabelas largas ficam numa região rolável com `role="region"`, nome e `tabIndex=0` (WCAG 2.1.1 / axe `scrollable-region-focusable`), sem rolar a página em 320px.
+- **Confronto direto**: matriz com explicação visível ligada por `aria-describedby`; células "2 × 1" com `title` por extenso; diagonal "—" escondida de leitores de tela.
+- **Decks e comandantes**: arte decorativa (`alt=""`), nome e números em texto; link para o deck.
+- **Temporadas**: datas digitadas no fuso do usuário (primeiro e último dia, inclusive); remoção com confirmação em dois cliques e contexto para leitores de tela.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

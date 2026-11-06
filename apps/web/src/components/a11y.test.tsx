@@ -17,6 +17,7 @@ import { GameEditor } from './game-editor';
 import { GameForm } from './game-form';
 import { GamePlayers } from './game-players';
 import { GroupSettingsForm } from './group-settings-form';
+import { SeasonForm } from './season-form';
 import { CreateGroupForm, JoinGroupForm, LocationForm, SwitchGroupButton } from './group-forms';
 import { JoinInviteButton, RegenerateInviteButton } from './invite';
 import { NavLinks } from './nav-links';
@@ -259,6 +260,7 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  ['SeasonForm', <SeasonForm key="r2" groupId="g" />],
   [
     'ShareButtons',
     <ShareButtons key="s" text="t" url="https://x.app" title="Grupo" icsHref="/x.ics" />,

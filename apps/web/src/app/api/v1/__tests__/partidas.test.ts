@@ -152,3 +152,56 @@ describe('partidas por tipo de jogo (API)', () => {
     );
   });
 });
+
+const seasons = await import('../groups/[groupId]/seasons/route');
+const season = await import('../seasons/[seasonId]/route');
+const stats = await import('../groups/[groupId]/stats/route');
+
+describe('temporadas e estatísticas (API)', () => {
+  it('cria/lista/remove temporadas e devolve estatísticas filtradas', async () => {
+    asUser(bia);
+    const body = {
+      name: '2026',
+      startsAt: '2026-01-01T03:00:00.000Z',
+      endsAt: '2027-01-01T03:00:00.000Z',
+    };
+    expect((await call(seasons.POST, { method: 'POST', params: { groupId }, body })).status).toBe(
+      403,
+    );
+    asUser(ana);
+    expect(
+      (
+        await call(seasons.POST, {
+          method: 'POST',
+          params: { groupId },
+          body: { ...body, name: '' },
+        })
+      ).status,
+    ).toBe(400);
+    const created = await call(seasons.POST, { method: 'POST', params: { groupId }, body });
+    expect(created.status).toBe(201);
+    asUser(bia);
+    expect((await call(seasons.GET, { params: { groupId } })).body!.seasons).toHaveLength(1);
+
+    const all = await call(stats.GET, { params: { groupId } });
+    expect(all.status).toBe(200);
+    expect(all.body!.stats.totalGames).toBe(2);
+    expect(all.body!.stats.formats).toEqual(['standard', 'two_headed_giant']);
+    const standard = await call(stats.GET, { path: '/?format=standard', params: { groupId } });
+    expect(standard.body!.stats.totalGames).toBe(1);
+    expect(
+      (
+        await call(stats.GET, {
+          path: '/?from=2000-01-01T00:00:00Z&to=2000-02-01T00:00:00Z',
+          params: { groupId },
+        })
+      ).body!.stats.totalGames,
+    ).toBe(0);
+
+    asUser(ana);
+    const id = created.body!.season.id as string;
+    expect((await call(season.DELETE, { method: 'DELETE', params: { seasonId: id } })).status).toBe(
+      204,
+    );
+  });
+});

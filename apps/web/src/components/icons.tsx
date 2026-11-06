@@ -27,6 +27,7 @@ import {
   Settings,
   LayoutDashboard,
   Link2,
+  ListFilter,
   LogIn,
   LogOut,
   MessageCircle,
@@ -68,6 +69,7 @@ export const Icons = {
   externalLink: ExternalLink,
   refresh: RefreshCw,
   settings: Settings,
+  filter: ListFilter,
   close: X,
   // Navegação
   dashboard: LayoutDashboard,

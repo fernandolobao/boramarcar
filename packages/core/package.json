@@ -14,7 +14,8 @@
     "./time": "./src/time/index.ts",
     "./calendar": "./src/calendar/index.ts",
     "./email": "./src/email/index.ts",
-    "./games": "./src/games/index.ts"
+    "./games": "./src/games/index.ts",
+    "./stats": "./src/stats/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p contract",
