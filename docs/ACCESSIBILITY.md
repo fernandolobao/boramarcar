@@ -85,6 +85,13 @@ sem rolagem horizontal em 320px.
 - **Decks e comandantes**: arte decorativa (`alt=""`), nome e números em texto; link para o deck.
 - **Temporadas**: datas digitadas no fuso do usuário (primeiro e último dia, inclusive); remoção com confirmação em dois cliques e contexto para leitores de tela.
 
+### Revisão: decks visuais
+
+- **Lista de decks**: cartões com um único link (o nome; `::after` cobre o cartão), foco visível no cartão inteiro (`has-[a:focus-visible]`), arte decorativa (`alt=""`). Identidade de cor com letra sobre fundo claro (contraste ≥ 7:1) e nome das cores em `sr-only`.
+- **Deck**: imagem do comandante com `alt` = nome da carta; fundo desfocado decorativo. Modos "Visual/Lista" com `aria-pressed`.
+- **Modo visual**: cada carta é um botão "Ampliar {carta}" que abre `<dialog>` nativo (`showModal`: foco preso, Esc fecha, foco volta ao botão). Selos de quantidade e proxy ficam fora do botão para o nome acessível bater com o conteúdo (axe `label-content-name-mismatch`, WCAG 2.5.3) e a informação também aparece em texto abaixo da imagem.
+- **Responsivo**: 2 colunas no celular, 3–4 no iPad, até 6 no desktop; sem rolagem horizontal em 320px. Animações de hover com `motion-reduce:`.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

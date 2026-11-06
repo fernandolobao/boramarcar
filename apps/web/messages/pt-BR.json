@@ -307,7 +307,53 @@
       "step2": "Clique em “More” → “Export”",
       "step3": "Clique em “Copy Plain Text” e cole a lista no campo abaixo",
       "openDeck": "Abrir o deck no Moxfield"
-    }
+    },
+    "subtitle": "{count, plural, =0 {Nenhum deck} =1 {1 deck} other {# decks}}",
+    "openDeck": "Abrir {name}",
+    "noCommander": "Sem comandante",
+    "colorIdentity": "Identidade de cor",
+    "colors": {
+      "W": "Branco",
+      "U": "Azul",
+      "B": "Preto",
+      "R": "Vermelho",
+      "G": "Verde",
+      "C": "Incolor"
+    },
+    "colorless": "Incolor",
+    "format": "Tipo de jogo",
+    "settings": "Editar deck",
+    "saved": "Deck salvo.",
+    "cardsTitle": "Cartas",
+    "view": "Modo de exibição",
+    "views": {
+      "visual": "Visual",
+      "list": "Lista"
+    },
+    "types": {
+      "creature": "Criaturas",
+      "planeswalker": "Planeswalkers",
+      "battle": "Batalhas",
+      "instant": "Mágicas instantâneas",
+      "sorcery": "Feitiços",
+      "artifact": "Artefatos",
+      "enchantment": "Encantamentos",
+      "land": "Terrenos",
+      "other": "Outras"
+    },
+    "groupTitle": "{name} ({count})",
+    "quantity": "{count}×",
+    "zoom": "Ampliar {name}",
+    "close": "Fechar",
+    "noImage": "Sem imagem",
+    "notFoundCard": "não encontrada no Scryfall",
+    "price": "Preço estimado",
+    "priceValue": "{total} (proxies: {proxies})",
+    "priceMissing": "{count, plural, =1 {1 carta sem preço} other {# cartas sem preço}}",
+    "priceHint": "Preços do Scryfall em dólar, atualizados na importação.",
+    "manaCost": "Custo",
+    "type": "Tipo",
+    "quantityHeader": "Qtd."
   },
   "analysis": {
     "title": "Análise",

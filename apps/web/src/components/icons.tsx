@@ -23,6 +23,8 @@ import {
   Download,
   ExternalLink,
   Layers,
+  LayoutGrid,
+  List,
   Medal,
   Settings,
   LayoutDashboard,
@@ -108,6 +110,8 @@ export const Icons = {
   // Decks
   fromUrl: Link2,
   fromText: ClipboardPaste,
+  gallery: LayoutGrid,
+  list: List,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof Icons;

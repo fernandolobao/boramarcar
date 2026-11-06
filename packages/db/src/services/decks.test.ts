@@ -195,3 +195,33 @@ describe('decks', () => {
     ).rejects.toMatchObject({ code: 'invalid_input' });
   });
 });
+
+describe('editar deck', () => {
+  it('só o dono renomeia e muda o tipo de jogo; valida os dados', async () => {
+    const { updateDeck } = await import('./decks');
+    const owner = await createTestUser(db);
+    const other = await createTestUser(db);
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+    await expect(
+      updateDeck(db, { deckId: saved.id, userId: other.id, name: 'X' }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    await expect(
+      updateDeck(db, { deckId: saved.id, userId: owner.id, format: 'banana' }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await expect(
+      updateDeck(db, { deckId: saved.id, userId: owner.id, name: '  ' }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await expect(updateDeck(db, { deckId: 'nope', userId: owner.id })).rejects.toMatchObject({
+      code: 'not_found',
+    });
+    expect(
+      await updateDeck(db, {
+        deckId: saved.id,
+        userId: owner.id,
+        name: ' Omnath 2 ',
+        format: 'brawl',
+      }),
+    ).toMatchObject({ name: 'Omnath 2', format: 'brawl' });
+    expect((await listDecks(db, owner.id))[0]).toMatchObject({ name: 'Omnath 2', format: 'brawl' });
+  });
+});

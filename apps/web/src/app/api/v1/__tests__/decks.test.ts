@@ -118,6 +118,24 @@ describe('API v1 — decks', () => {
     });
     expect(fetchMock).not.toHaveBeenCalled();
 
+    const renamed = await call(deck.PATCH, {
+      method: 'PATCH',
+      params: { deckId },
+      body: { name: 'Omnath Brawl', format: 'brawl' },
+    });
+    expect(renamed.body!.deck).toMatchObject({ name: 'Omnath Brawl', format: 'brawl' });
+    expect(
+      (await call(deck.PATCH, { method: 'PATCH', params: { deckId }, body: { format: 'xyz' } }))
+        .status,
+    ).toBe(400);
+    const stranger = await createTestUser(testState.db!, { name: 'Outro' });
+    asUser(stranger);
+    expect(
+      (await call(deck.PATCH, { method: 'PATCH', params: { deckId }, body: { name: 'Meu' } }))
+        .status,
+    ).toBe(403);
+    asUser(owner);
+
     expect((await call(deck.DELETE, { method: 'DELETE', params: { deckId } })).status).toBe(204);
     expect((await call(deck.GET, { params: { deckId } })).status).toBe(404);
   });
