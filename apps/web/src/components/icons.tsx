@@ -7,6 +7,9 @@
  */
 import {
   Award,
+  Monitor,
+  Moon,
+  Sun,
   Gauge,
   Hand,
   Shuffle,
@@ -152,6 +155,10 @@ export const Icons = {
   alternatives: Shuffle,
   bracket: Gauge,
   openingHand: Hand,
+  // Tema
+  themeSystem: Monitor,
+  themeLight: Sun,
+  themeDark: Moon,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof Icons;

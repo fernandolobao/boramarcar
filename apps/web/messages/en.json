@@ -668,7 +668,14 @@
   },
   "settings": {
     "title": "Settings",
-    "intro": "Time zone, language and email notices."
+    "intro": "Time zone, language and email notices.",
+    "theme": "Theme",
+    "themeHint": "Applies to this browser. \"Automatic\" follows your device.",
+    "themes": {
+      "system": "Automatic",
+      "light": "Light",
+      "dark": "Dark"
+    }
   },
   "profilePage": {
     "title": "Profile",
@@ -773,5 +780,27 @@
     "seasonTitles": "Titles",
     "seasonTitle": "{season} — {group}",
     "sharedGroups": "Groups in common"
+  },
+  "history": {
+    "title": "Meetup history",
+    "filters": "Filter history",
+    "search": "Search",
+    "searchHint": "Meetup title or location name.",
+    "status": "Status",
+    "allStatuses": "All",
+    "player": "Player",
+    "allPlayers": "Everyone",
+    "apply": "Filter",
+    "clear": "Clear filters",
+    "results": "{count, plural, =0 {No meetups} =1 {1 meetup} other {# meetups}}",
+    "noResults": "No meetups match these filters.",
+    "empty": "No past meetups yet.",
+    "summary": "{games, plural, =0 {No games} =1 {1 game} other {# games}} · {attendees, plural, =0 {no one confirmed} =1 {1 attendee} other {# attendees}}",
+    "winners": "{count, plural, =1 {Winner} other {Winners}}: {names}",
+    "pagination": "History pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}",
+    "seeAll": "See full history"
   }
 }

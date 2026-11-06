@@ -1,5 +1,20 @@
 @import 'tailwindcss';
 
+/*
+ * Tema escuro: segue o sistema, a menos que a pessoa escolha "Claro" ou "Escuro" em Configurações
+ * (atributo `data-theme` no <html>, aplicado antes da pintura por um script no layout).
+ */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
 @theme {
   --color-brand-50: #f5f3ff;
   --color-brand-100: #ede9fe;
@@ -20,6 +35,12 @@
 
 :root {
   color-scheme: light dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {

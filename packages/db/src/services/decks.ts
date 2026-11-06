@@ -769,3 +769,27 @@ export async function listDecksVisibleTo(
   const shared = await sharesGroup(db, input.ownerId, input.viewerId);
   return all.filter((d) => d.visibility === 'public' || (d.visibility === 'group' && shared));
 }
+
+/** Cartas usadas em algum deck com cache mais antigo que `olderThan` (mais antigas primeiro). */
+export async function staleDeckCards(db: Database, input: { olderThan: Date; limit: number }) {
+  return db
+    .select({ scryfallId: cards.scryfallId, name: cards.name })
+    .from(cards)
+    .where(
+      and(
+        sql`${cards.updatedAt} < ${input.olderThan}`,
+        sql`exists (select 1 from ${deckCards} where ${deckCards.scryfallId} = ${cards.scryfallId})`,
+      ),
+    )
+    .orderBy(asc(cards.updatedAt))
+    .limit(input.limit);
+}
+
+/** Marca cartas como verificadas agora (sem mudar os dados). */
+export async function touchCards(db: Database, ids: readonly string[]) {
+  if (!ids.length) return;
+  await db
+    .update(cards)
+    .set({ updatedAt: new Date() })
+    .where(inArray(cards.scryfallId, [...ids]));
+}

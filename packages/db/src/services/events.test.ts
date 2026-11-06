@@ -338,3 +338,62 @@ describe('eventos, partidas e ranking', () => {
     );
   });
 });
+
+describe('histórico de encontros', () => {
+  it('busca por texto, situação e jogador, com vencedores e paginação', async () => {
+    const { searchEventHistory, EVENT_HISTORY_PAGE_SIZE, updateEvent } = await import('./events');
+    const { group, players } = await seedGroup(db, 3);
+    const [p1, p2, p3] = players.map((p) => p.id) as [string, string, string];
+    const casa = await createLocation(db, { groupId: group.id, userId: p1, name: 'Casa da Ana' });
+    const make = (title: string, day: number, extra: Record<string, unknown> = {}) =>
+      createEvent(db, {
+        groupId: group.id,
+        userId: p1,
+        title,
+        startsAt: new Date(Date.UTC(2026, 0, day, 22)),
+        participantIds: [],
+        ...extra,
+      });
+    const ana = await make('Commander na casa', 3, { locationId: casa.id });
+    await make('Liga 100% na loja', 10);
+    const cancelado = await make('Cancelado', 17);
+    await updateEvent(db, { eventId: cancelado.id, userId: p1, status: 'cancelled' });
+    await make('Futuro', 28, { startsAt: new Date('2099-01-01T00:00:00Z') });
+    await recordGame(db, {
+      eventId: ana.id,
+      userId: p1,
+      players: [
+        { userId: p2, result: 'win' },
+        { userId: p3, result: 'loss' },
+      ],
+    });
+    const now = new Date('2026-06-01T00:00:00Z');
+    const search = (
+      filters: Parameters<typeof searchEventHistory>[1] extends infer T ? Partial<T> : never,
+    ) => searchEventHistory(db, { groupId: group.id, userId: p1, now, ...filters });
+
+    const all = await search({});
+    expect(all.items.map((e) => e.title)).toEqual([
+      'Cancelado',
+      'Liga 100% na loja',
+      'Commander na casa',
+    ]);
+    expect(all).toMatchObject({ total: 3, pages: 1, page: 1 });
+    expect(all.items[2]).toMatchObject({ games: 1, winners: ['P2'], locationName: 'Casa da Ana' });
+
+    expect((await search({ q: 'ana' })).items.map((e) => e.title)).toEqual(['Commander na casa']);
+    expect((await search({ q: '100%' })).items.map((e) => e.title)).toEqual(['Liga 100% na loja']);
+    expect((await search({ status: 'cancelled' })).total).toBe(1);
+    expect((await search({ playerId: p3 })).items.map((e) => e.title)).toEqual([
+      'Commander na casa',
+    ]);
+    const empty = await search({ q: 'nada disso', page: 3 });
+    expect(empty).toMatchObject({ total: 0, pages: 1, items: [] });
+    expect(EVENT_HISTORY_PAGE_SIZE).toBe(20);
+
+    const outsider = await createTestUser(db);
+    await expect(
+      searchEventHistory(db, { groupId: group.id, userId: outsider.id }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+  });
+});

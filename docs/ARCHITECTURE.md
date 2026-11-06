@@ -163,6 +163,18 @@ Cada linha de `deck_cards` aponta para uma impressão (`scryfall_id`); o índice
 - **Exportação**: `1 Sol Ring (CMM) 400`, aceito por Moxfield, Archidekt e Arena — e reimportável aqui com a mesma edição.
 - A validação de cópias (singleton, 4 cópias) soma todas as edições pelo nome; a folha de proxies e o preço usam a imagem e o preço de cada edição.
 
+## Atualização do cache de cartas (cron)
+
+`/api/cron/scryfall` roda todo dia às 06:43 UTC (`vercel.json`, protegido por `CRON_SECRET`, como o cron de lembretes). Em vez do _bulk data_ do Scryfall (centenas de MB, pesado demais para uma função serverless), relê pelo `/cards/collection` só as cartas que estão em algum deck e não foram atualizadas nas últimas 20 h, das mais antigas para as mais novas, até 1 500 por execução (20 lotes de 75, 100 ms entre lotes). Assim preços, Game Changers, imagens e edições ficam em dia; cartas que sumiram do Scryfall são marcadas como verificadas para não repetir a consulta.
+
+## Tema claro/escuro
+
+Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pessoa pode fixar Claro ou Escuro: a escolha fica no `localStorage` (`bm-theme`) e vira `data-theme` no `<html>`, aplicado por um script inline antes da pintura. A variante `dark:` do Tailwind (`@custom-variant` em `globals.css`) vale com `data-theme="dark"` ou com o sistema escuro quando não há `data-theme="light"`.
+
+## Histórico de encontros
+
+`/eventos/historico` lista os encontros passados do grupo, 20 por página, com busca no título e no local, filtro por situação e por jogador (presença confirmada ou partida jogada), número de partidas, presenças e vencedores (`searchEventHistory`). Os filtros ficam na URL (`?q=&situacao=&jogador=&pagina=`), então dá para compartilhar uma busca.
+
 ## Folha de proxies (PDF)
 
 `core/decks/proxies` calcula a grade (3×3 cartas de 63×88 mm centralizadas em A4 ou Carta) e a lista de cópias a imprimir; `server/proxy-sheet.ts` monta o PDF com `pdf-lib`, baixando as imagens "large" do Scryfall (no máximo 6 por vez, uma vez por carta) e desenhando marcas de corte. Carta sem imagem vira um retângulo com o nome. O PDF do servidor depende de o servidor conseguir baixar as imagens do Scryfall (com `User-Agent`/`Accept` próprios, caindo para o tamanho `normal`; o header `X-Missing-Images` informa quantas faltaram). Por isso o caminho principal é a página `/decks/:id/imprimir`: o próprio navegador carrega as imagens e o usuário imprime ou salva como PDF, com CSS em milímetros e `@page` sem margens.

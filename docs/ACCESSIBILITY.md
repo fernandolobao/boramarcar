@@ -137,6 +137,17 @@ sem rolagem horizontal em 320px.
 - As edições são um grupo de `radio` nativo (`fieldset/legend`), com nome da edição, código e número em texto; a imagem é decorativa. A edição selecionada tem borda **e** fundo; a edição em uso diz "Em uso" em texto. O número de resultados do filtro é anunciado (`role="status"`).
 - Campos de quantidade/proxies e "Remover" incluem a edição no nome acessível quando conhecida ("Quantidade de Sol Ring (CMM #400)"), para distinguir linhas da mesma carta.
 
+### Revisão: histórico de encontros
+
+- Formulário com `role="search"` e nome, campos com `label` (a dica da busca ligada por `aria-describedby`); funciona sem JavaScript (GET).
+- Resultado com título que diz quantos encontros foram encontrados; situação com selo em texto.
+- Paginação em `<nav>` com nome, links "Anterior"/"Próxima" com texto e a página atual com `aria-current="page"`.
+
+### Revisão: escolha de tema
+
+- Em Configurações, "Tema" é um `fieldset/legend` com três `radio` nativos (Automático, Claro, Escuro), com ícone **e** texto; a dica está ligada ao grupo.
+- O tema salvo é aplicado por um script no `<head>` antes da primeira pintura (sem piscar) e define `color-scheme`, então controles nativos e barras de rolagem acompanham. Os testes de axe continuam rodando nos dois temas.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

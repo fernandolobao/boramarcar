@@ -81,3 +81,30 @@ test.describe('agenda', () => {
     await expect(toggle).toBeChecked();
   });
 });
+
+test.describe('histórico de encontros', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('busca e filtra pela URL, com link a partir dos encontros', async ({ page }) => {
+    await page.goto('/eventos');
+    await page.getByRole('link', { name: 'Ver histórico completo' }).click();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Histórico de encontros' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: /Commander da semana passada/ })).toBeVisible();
+
+    const search = page.getByRole('search', { name: 'Filtrar histórico' });
+    await search.getByLabel('Buscar').fill('semana passada');
+    await search.getByLabel('Situação').selectOption('finished');
+    await search.getByRole('button', { name: 'Filtrar' }).click();
+    await expect(page).toHaveURL(/q=semana\+passada.*situacao=finished/);
+    await expect(page.getByRole('heading', { name: '1 encontro' })).toBeVisible();
+
+    await search.getByLabel('Buscar').fill('não existe');
+    await search.getByRole('button', { name: 'Filtrar' }).click();
+    await expect(page.getByText('Nenhum encontro com esses filtros.')).toBeVisible();
+    await page.getByRole('link', { name: 'Limpar filtros' }).click();
+    await expect(page).toHaveURL(/\/eventos\/historico$/);
+  });
+});
