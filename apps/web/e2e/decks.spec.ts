@@ -72,4 +72,14 @@ test.describe('deck', () => {
     const exported = await page.request.get(`/api/v1/decks/${E2E_IDS.deck}/export?format=proxies`);
     expect(await exported.text()).toContain('31 Forest\n5 Forest #proxy');
   });
+
+  test('folha de proxies em PDF', async ({ page }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    const link = page.getByRole('link', { name: 'Baixar PDF' });
+    await expect(link).toHaveAttribute('href', /which=proxies&page=a4/);
+    const response = await page.request.get((await link.getAttribute('href'))!);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toBe('application/pdf');
+    expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
+  });
 });

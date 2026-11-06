@@ -12,6 +12,7 @@ const lines = await import('../decks/[deckId]/lines/route');
 const sync = await import('../decks/[deckId]/sync/route');
 const exportRoute = await import('../decks/[deckId]/export/route');
 const autocomplete = await import('../cards/autocomplete/route');
+const proxiesPdf = await import('../decks/[deckId]/proxies/route');
 
 let close: () => Promise<void>;
 
@@ -272,6 +273,17 @@ describe('API v1 — decks', () => {
     );
 
     asUser(owner);
+    // Sem nenhuma carta proxy, a folha só de proxies fica vazia (400); a do deck todo sai.
+    await put({ name: 'Forest', board: 'mainboard', quantity: 10, proxies: 0 });
+    const noProxies = await call(proxiesPdf.GET, { params: { deckId } });
+    expect(noProxies.status).toBe(400);
+    const allCards = await proxiesPdf.GET(new Request('http://localhost/?which=all&page=letter'), {
+      params: Promise.resolve({ deckId }),
+    });
+    expect(allCards.headers.get('content-type')).toBe('application/pdf');
+    expect(allCards.headers.get('content-disposition')).toBe(
+      'attachment; filename="proxies-omnath-ramp.pdf"',
+    );
     const suggestions = await call(autocomplete.GET, { path: '/?q=sol' });
     expect(suggestions.body).toEqual({ names: ['Sol Ring', 'Solemn Simulacrum'] });
     expect((await call(autocomplete.GET, { path: '/?q=s' })).body).toEqual({ names: [] });
