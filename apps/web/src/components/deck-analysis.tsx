@@ -2,57 +2,15 @@ import type {
   BracketEstimate,
   ColorSymbol,
   DeckAnalysis,
-  ManaCurveBucket,
   OpeningHandOdds,
   ColorSourceRow,
 } from '@boramarcar/core';
-import { MANA_CURVE_BUCKETS } from '@boramarcar/core';
+import { ScoreBreakdown } from './analysis-charts';
+
+export { ManaCurve } from './analysis-charts';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Icon } from './icons';
 import { ManaSymbol } from './mana';
-
-export function ManaCurve({ curve }: { curve: Record<ManaCurveBucket, number> }) {
-  const t = useTranslations('analysis');
-  const max = Math.max(1, ...Object.values(curve));
-  return (
-    <figure>
-      <figcaption className="section-title">{t('manaCurve')}</figcaption>
-      {/*
-        As barras precisam de um contêiner com altura definida: altura em % dentro de um
-        item flex sem altura própria resolve para "auto" e a barra some (bug anterior).
-      */}
-      <ol className="flex items-end gap-2" aria-label={t('manaCurve')}>
-        {MANA_CURVE_BUCKETS.map((bucket) => (
-          <li
-            key={bucket}
-            className="flex flex-1 flex-col items-center gap-1"
-            aria-label={t('curveBucket', { bucket, count: curve[bucket] })}
-          >
-            <span
-              className="text-xs tabular-nums text-zinc-600 dark:text-zinc-400"
-              aria-hidden="true"
-            >
-              {curve[bucket]}
-            </span>
-            <div className="flex h-32 w-full items-end" aria-hidden="true">
-              <div
-                data-testid={`curve-bar-${bucket}`}
-                className="w-full rounded-t-md bg-brand-500"
-                style={{
-                  height: `${(curve[bucket] / max) * 100}%`,
-                  minHeight: curve[bucket] ? 4 : 0,
-                }}
-              />
-            </div>
-            <span className="text-xs font-medium" aria-hidden="true">
-              {bucket}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </figure>
-  );
-}
 
 /** Cores das barras: as mesmas dos símbolos de mana. */
 const PIP_COLOR: Record<ColorSymbol, string> = {
@@ -116,27 +74,8 @@ export function DeckScore({
         </span>
         <span className="muted">/ 100 · {t('score')}</span>
       </div>
-      <ul className="space-y-2">
-        {analysis.scoreBreakdown.map((component) => (
-          <li key={component.key}>
-            <div className="flex justify-between text-sm">
-              <span>
-                {t(`components.${component.key}`)}{' '}
-                <span className="muted">({component.value})</span>
-              </span>
-              <span className="tabular-nums">
-                {component.score}/{component.max}
-              </span>
-            </div>
-            <div className="mt-1 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800" aria-hidden="true">
-              <div
-                className="h-2 rounded-full bg-brand-500"
-                style={{ width: `${(component.score / component.max) * 100}%` }}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
+      <ScoreBreakdown components={analysis.scoreBreakdown} cardsByRole={analysis.cardsByRole} />
+      <p className="muted text-sm">{t('scoreHint')}</p>
       <p className="muted">{t('disclaimer', { format: formatName })}</p>
     </div>
   );

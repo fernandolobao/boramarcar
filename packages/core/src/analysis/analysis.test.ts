@@ -133,6 +133,21 @@ describe('analyzeDeck', () => {
     });
     expect(analysis.averageCmc).toBeCloseTo((1 + 3 + 4 + 3 + 8) / 5);
     expect(analysis.colorPips.G).toBe(1 + 1 + 2 + 1 + 2);
+    expect(analysis.cardsByCurve['3'].sort()).toEqual(['Beast Within', 'Cultivate']);
+    expect(analysis.cardsByCurve['7+']).toEqual(['Big Thing']);
+    expect(analysis.cardsByCurve['0']).toEqual([]);
+  });
+
+  it('cada componente da nota traz a meta usada no cálculo', () => {
+    expect(analysis.scoreBreakdown.map((c) => [c.key, c.max, c.target])).toEqual([
+      ['lands', 25, { min: 36, max: 38 }],
+      ['ramp', 20, { count: 10 }],
+      ['draw', 20, { count: 10 }],
+      ['removal', 15, { count: 8 }],
+      ['wipe', 10, { count: 2 }],
+      ['curve', 10, { ideal: 3, max: 4.5 }],
+    ]);
+    expect(analysis.scoreBreakdown.reduce((s, c) => s + c.max, 0)).toBe(100);
   });
 
   it('dá nota e sugestões', () => {

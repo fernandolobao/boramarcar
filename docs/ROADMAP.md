@@ -107,7 +107,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 4.8  | Fontes de mana vs. símbolos por cor (recomendação de base de mana)                                                                                                          | M       | ✅     |
 | 4.9  | Simulação de mão inicial / probabilidade de jogar terreno no turno N (hipergeométrica)                                                                                      | M       | ✅     |
 | 4.10 | Comparação com a média de decks do mesmo comandante (dados do EDHREC, respeitando os termos de uso)                                                                         | G       |        |
-| 4.11 | Gráficos interativos e explicação de cada componente da nota                                                                                                                | M       |        |
+| 4.11 | Gráficos interativos e explicação de cada componente da nota                                                                                                                | M       | ✅     |
 
 ## Fase 5 — Apps Android e iOS
 
