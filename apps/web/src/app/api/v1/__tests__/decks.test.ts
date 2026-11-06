@@ -13,6 +13,8 @@ const sync = await import('../decks/[deckId]/sync/route');
 const exportRoute = await import('../decks/[deckId]/export/route');
 const autocomplete = await import('../cards/autocomplete/route');
 const proxiesPdf = await import('../decks/[deckId]/proxies/route');
+const linePrint = await import('../decks/[deckId]/lines/print/route');
+const prints = await import('../cards/prints/route');
 
 let close: () => Promise<void>;
 
@@ -287,5 +289,94 @@ describe('API v1 — decks', () => {
     const suggestions = await call(autocomplete.GET, { path: '/?q=sol' });
     expect(suggestions.body).toEqual({ names: ['Sol Ring', 'Solemn Simulacrum'] });
     expect((await call(autocomplete.GET, { path: '/?q=s' })).body).toEqual({ names: [] });
+  });
+
+  it('lista edições e troca a edição de cópias de uma carta', async () => {
+    const owner = await createTestUser(testState.db!, { name: 'Edições API' });
+    asUser(owner);
+    stubExternalApis();
+    const imported = await call(decks.POST, {
+      method: 'POST',
+      body: { kind: 'text', name: 'Prints', text: '3 Sol Ring' },
+    });
+    const deckId = imported.body!.deck.id as string;
+    const alpha = scryfall('Sol Ring', {
+      id: 'sol-lea',
+      set: 'lea',
+      set_name: 'Limited Edition Alpha',
+      collector_number: '270',
+    });
+    const base = vi.mocked(fetch);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+        const url = String(input);
+        if (url.startsWith('https://api.scryfall.com/cards/search')) {
+          return Response.json({ data: [alpha] });
+        }
+        if (url === 'https://api.scryfall.com/cards/sol-lea') return Response.json(alpha);
+        if (url === 'https://api.scryfall.com/cards/nope') return new Response('', { status: 404 });
+        return base(input, init);
+      }),
+    );
+
+    const list = await call(prints.GET, { path: '/?name=Sol%20Ring' });
+    expect(list.body).toEqual({
+      prints: [
+        {
+          scryfallId: 'sol-lea',
+          name: 'Sol Ring',
+          setCode: 'lea',
+          setName: 'Limited Edition Alpha',
+          collectorNumber: '270',
+          imageUri: null,
+          priceUsd: null,
+        },
+      ],
+    });
+
+    const move = (body: Record<string, unknown>) =>
+      call(linePrint.POST, {
+        method: 'POST',
+        params: { deckId },
+        body: { name: 'Sol Ring', board: 'mainboard', fromScryfallId: 'sol-ring-id', ...body },
+      });
+    expect((await move({ toScryfallId: 'sol-lea', quantity: 1 })).status).toBe(200);
+    expect((await move({ toScryfallId: 'nope', quantity: 1 })).status).toBe(404);
+    expect((await move({ toScryfallId: 'sol-lea', quantity: 0 })).status).toBe(400);
+
+    const detail = await call(deck.GET, { params: { deckId } });
+    expect(
+      detail.body!.deck.lines.map((l: { scryfallId: string; quantity: number }) => [
+        l.scryfallId,
+        l.quantity,
+      ]),
+    ).toEqual(
+      expect.arrayContaining([
+        ['sol-ring-id', 2],
+        ['sol-lea', 1],
+      ]),
+    );
+    const text = await exportRoute.GET(new Request('http://localhost/'), {
+      params: Promise.resolve({ deckId }),
+    });
+    expect(await text.text()).toContain('1 Sol Ring (LEA) 270');
+
+    // Mudar a quantidade de uma edição não mexe na outra.
+    await call(lines.PUT, {
+      method: 'PUT',
+      params: { deckId },
+      body: {
+        name: 'Sol Ring',
+        board: 'mainboard',
+        quantity: 0,
+        proxies: 0,
+        scryfallId: 'sol-ring-id',
+      },
+    });
+    const after = await call(deck.GET, { params: { deckId } });
+    expect(after.body!.deck.lines.map((l: { scryfallId: string }) => l.scryfallId)).toEqual([
+      'sol-lea',
+    ]);
   });
 });

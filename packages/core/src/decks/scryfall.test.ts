@@ -127,4 +127,82 @@ describe('fetchScryfallAutocomplete', () => {
       await fetchScryfallSearch('x', { fetch: async () => new Response('{}', { status: 404 }) }),
     ).toEqual([]);
   });
+
+  it('busca por edição + número e, se não existir, pelo nome', async () => {
+    const bodies: unknown[] = [];
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as { identifiers: Record<string, string>[] };
+      bodies.push(body.identifiers);
+      if (bodies.length === 1) {
+        return Response.json({
+          data: [
+            scryCard('Sol Ring', {
+              id: 'cmm-sol',
+              set: 'cmm',
+              set_name: 'Commander Masters',
+              collector_number: '400',
+            }),
+          ],
+          not_found: [{ set: 'xyz', collector_number: '1' }],
+        });
+      }
+      return Response.json({ data: [scryCard('Arcane Signet', { id: 'signet' })], not_found: [] });
+    });
+    const result = await fetchScryfallCollection(
+      [
+        { name: 'Sol Ring', setCode: 'CMM', collectorNumber: '400' },
+        { name: 'Arcane Signet', setCode: 'xyz', collectorNumber: '1' },
+      ],
+      { fetch: fetchMock, delayMs: 0 },
+    );
+    expect(bodies).toEqual([
+      [
+        { set: 'cmm', collector_number: '400' },
+        { set: 'xyz', collector_number: '1' },
+      ],
+      [{ name: 'Arcane Signet' }],
+    ]);
+    expect(result.notFound).toEqual([]);
+    expect(result.cards[0]).toMatchObject({
+      setCode: 'cmm',
+      setName: 'Commander Masters',
+      collectorNumber: '400',
+    });
+    const linked = attachCardData(
+      [{ name: 'Sol Ring', setCode: 'cmm', collectorNumber: '400' }, { name: 'Sol Ring' }],
+      [mapScryfallCard(scryCard('Sol Ring', { id: 'other' })), ...result.cards],
+    );
+    expect(linked.map((l) => l.card?.scryfallId)).toEqual(['cmm-sol', 'cmm-sol']);
+  });
+
+  it('lista as impressões de uma carta', async () => {
+    const { fetchScryfallPrints } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json({
+        data: [
+          scryCard('Sol Ring', {
+            id: 'a',
+            set: 'cmm',
+            set_name: 'Commander Masters',
+            collector_number: '400',
+            prices: { usd: '1.50' },
+          }),
+        ],
+      }),
+    );
+    expect(await fetchScryfallPrints('Sol Ring', { fetch: fetchMock })).toEqual([
+      {
+        scryfallId: 'a',
+        name: 'Sol Ring',
+        setCode: 'cmm',
+        setName: 'Commander Masters',
+        collectorNumber: '400',
+        imageUri: null,
+        priceUsd: '1.50',
+      },
+    ]);
+    expect(decodeURIComponent(fetchMock.mock.calls[0]![0])).toContain(
+      '!"Sol Ring" game:paper&unique=prints',
+    );
+  });
 });

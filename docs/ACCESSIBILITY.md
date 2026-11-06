@@ -131,6 +131,12 @@ sem rolagem horizontal em 320px.
 
 - Página `/decks/:id/imprimir` com pré-visualização em milímetros reais, numa região rolável focável; cada página tem nome ("Página 1 de 5") e cada carta usa `alt` com o nome. Botão "Imprimir / salvar como PDF" com texto; instruções de impressão em texto. Na impressão, cabeçalho e instruções somem (`print:hidden`).
 
+### Revisão: edições das cartas
+
+- **Escolher edição**: botão com texto visível ("Edição: CMM #400" ou "Escolher edição") e o nome da carta para leitores de tela; abre um `<dialog>` modal com título, que fecha com Esc e devolve o foco ao botão.
+- As edições são um grupo de `radio` nativo (`fieldset/legend`), com nome da edição, código e número em texto; a imagem é decorativa. A edição selecionada tem borda **e** fundo; a edição em uso diz "Em uso" em texto. O número de resultados do filtro é anunciado (`role="status"`).
+- Campos de quantidade/proxies e "Remover" incluem a edição no nome acessível quando conhecida ("Quantidade de Sol Ring (CMM #400)"), para distinguir linhas da mesma carta.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

@@ -32,6 +32,8 @@ const cardsData = [
     mana_cost: '{2}{G}',
     type_line: 'Legendary Creature — Elemental',
     color_identity: ['G'],
+    set: 'tst',
+    collector_number: '1',
   }),
   mapScryfallCard({
     id: 'sol',
@@ -41,6 +43,8 @@ const cardsData = [
     type_line: 'Artifact',
     oracle_text: '{T}: Add {C}{C}.',
     color_identity: [],
+    set: 'tst',
+    collector_number: '2',
   }),
   mapScryfallCard({
     id: 'forest',
@@ -48,6 +52,8 @@ const cardsData = [
     cmc: 0,
     type_line: 'Basic Land — Forest',
     color_identity: ['G'],
+    set: 'tst',
+    collector_number: '3',
   }),
 ];
 
@@ -396,5 +402,130 @@ describe('análise (formato, Tagger e bracket)', () => {
     expect(detail.bracket).toMatchObject({ minimum: 4, source: 'spellbook' });
     expect(detail.analysis.rolesTagged).toEqual({ tagged: 2, total: 2 });
     expect((await deckCardsForEnrichment(db, saved.id)).staleRoles).toEqual([]);
+  });
+});
+
+describe('edições da mesma carta', () => {
+  const sol = (id: string, set: string, number: string) =>
+    mapScryfallCard({
+      id,
+      name: 'Sol Ring',
+      cmc: 1,
+      mana_cost: '{1}',
+      type_line: 'Artifact',
+      color_identity: [],
+      set,
+      set_name: set.toUpperCase(),
+      collector_number: number,
+    });
+
+  it('importa, mostra e troca a edição de parte das cópias', async () => {
+    const { moveLinePrint, setDeckLine } = await import('./decks');
+    const owner = await createTestUser(db, { name: 'Edições' });
+    const cmm = sol('sol-cmm', 'cmm', '400');
+    const lea = sol('sol-lea', 'lea', '270');
+    const saved = await saveImportedDeck(db, {
+      ownerId: owner.id,
+      deck: {
+        name: 'Prints',
+        source: 'text',
+        entries: [
+          {
+            name: 'Sol Ring',
+            quantity: 2,
+            board: 'mainboard',
+            setCode: 'cmm',
+            collectorNumber: '400',
+          },
+          {
+            name: 'Sol Ring',
+            quantity: 1,
+            board: 'mainboard',
+            isProxy: true,
+            setCode: 'cmm',
+            collectorNumber: '400',
+          },
+          {
+            name: 'Sol Ring',
+            quantity: 1,
+            board: 'mainboard',
+            setCode: 'lea',
+            collectorNumber: '270',
+          },
+        ],
+      },
+      cards: [cmm, lea],
+      format: 'other',
+    });
+    const lines = async () =>
+      (await getDeck(db, { deckId: saved.id, viewerId: owner.id })).lines.map((l) => [
+        l.scryfallId,
+        l.quantity,
+        l.proxies,
+      ]);
+    expect(await lines()).toEqual([
+      ['sol-cmm', 3, 1],
+      ['sol-lea', 1, 0],
+    ]);
+
+    // Move 3 cópias da CMM (2 reais + 1 proxy) para a LEA.
+    await moveLinePrint(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      fromScryfallId: 'sol-cmm',
+      card: lea,
+      quantity: 3,
+    });
+    expect(await lines()).toEqual([['sol-lea', 4, 1]]);
+
+    await expect(
+      moveLinePrint(db, {
+        deckId: saved.id,
+        userId: owner.id,
+        board: 'mainboard',
+        name: 'Sol Ring',
+        fromScryfallId: 'sol-lea',
+        card: cmm,
+        quantity: 9,
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await expect(
+      moveLinePrint(db, {
+        deckId: saved.id,
+        userId: owner.id,
+        board: 'mainboard',
+        name: 'Arcane Signet',
+        fromScryfallId: 'sol-lea',
+        card: cmm,
+        quantity: 1,
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+
+    // Editar a quantidade de uma edição não mexe nas outras.
+    await moveLinePrint(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      fromScryfallId: 'sol-lea',
+      card: cmm,
+      quantity: 1,
+    });
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      quantity: 2,
+      proxies: 0,
+      card: lea,
+      scryfallId: 'sol-lea',
+    });
+    expect(await lines()).toEqual([
+      ['sol-cmm', 1, 0],
+      ['sol-lea', 2, 0],
+    ]);
   });
 });

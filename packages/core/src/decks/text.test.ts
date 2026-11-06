@@ -110,3 +110,16 @@ describe('mergeDuplicates', () => {
     expect(merged).toHaveLength(2);
   });
 });
+
+describe('mergeDuplicates com edições', () => {
+  it('não junta edições diferentes', () => {
+    const merged = mergeDuplicates(
+      parseDeckText('1 Sol Ring (CMM) 400\n1 Sol Ring (CMM) 400\n1 Sol Ring (LEA) 270\n1 Sol Ring'),
+    );
+    expect(merged.map((e) => [e.setCode ?? null, e.quantity])).toEqual([
+      ['cmm', 2],
+      ['lea', 1],
+      [null, 1],
+    ]);
+  });
+});

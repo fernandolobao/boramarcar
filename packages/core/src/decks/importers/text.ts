@@ -99,11 +99,13 @@ export function parseDeckText(text: string): DeckEntry[] {
   return mergeDuplicates(entries);
 }
 
-/** Junta linhas repetidas da mesma carta no mesmo board e mesmo status de proxy. */
+/** Junta linhas repetidas da mesma carta, edição, board e status de proxy. */
 export function mergeDuplicates(entries: readonly DeckEntry[]): DeckEntry[] {
   const merged = new Map<string, DeckEntry>();
   for (const entry of entries) {
-    const key = `${entry.board}|${entry.name.toLowerCase()}|${entry.isProxy ? 1 : 0}`;
+    // Edições diferentes da mesma carta ficam em linhas separadas.
+    const print = entry.scryfallId ?? `${entry.setCode ?? ''}:${entry.collectorNumber ?? ''}`;
+    const key = `${entry.board}|${entry.name.toLowerCase()}|${print}|${entry.isProxy ? 1 : 0}`;
     const existing = merged.get(key);
     if (existing) existing.quantity += entry.quantity;
     else merged.set(key, { ...entry });

@@ -8,6 +8,8 @@ export interface StoredDeckRow<C = unknown> {
   board: DeckBoard;
   quantity: number;
   isProxy: boolean;
+  /** Impressão escolhida (edição); `null` = carta sem dados do Scryfall. */
+  scryfallId?: string | null;
   card: C | null;
 }
 
@@ -18,23 +20,28 @@ export interface DeckLine<C = unknown> {
   board: DeckBoard;
   quantity: number;
   proxies: number;
+  /** Impressão (edição) desta linha: a mesma carta pode aparecer em várias edições. */
+  scryfallId: string | null;
   card: C | null;
   ids: string[];
 }
 
-export const lineKey = (board: DeckBoard, name: string) => `${board}|${name.trim().toLowerCase()}`;
+/** Chave de uma linha: board + carta + impressão. */
+export const lineKey = (board: DeckBoard, name: string, scryfallId?: string | null) =>
+  `${board}|${name.trim().toLowerCase()}|${scryfallId ?? ''}`;
 
-/** Junta as linhas reais e proxy da mesma carta no mesmo board. */
+/** Junta as linhas reais e proxy da mesma carta e da mesma edição no mesmo board. */
 export function mergeDeckLines<C>(rows: readonly StoredDeckRow<C>[]): DeckLine<C>[] {
   const lines = new Map<string, DeckLine<C>>();
   for (const row of rows) {
-    const key = lineKey(row.board, row.name);
+    const key = lineKey(row.board, row.name, row.scryfallId);
     const line = lines.get(key) ?? {
       key,
       name: row.name,
       board: row.board,
       quantity: 0,
       proxies: 0,
+      scryfallId: row.scryfallId ?? null,
       card: row.card,
       ids: [],
     };
@@ -83,21 +90,29 @@ export type ExportFormat = 'plain' | 'proxies';
  * `#proxy` (reimportável aqui); `plain` não marca nada (para outros sites).
  */
 export function exportDeckText(
-  lines: readonly Pick<DeckLine, 'name' | 'board' | 'quantity' | 'proxies'>[],
+  lines: readonly (Pick<DeckLine, 'name' | 'board' | 'quantity' | 'proxies'> & {
+    setCode?: string | null;
+    collectorNumber?: string | null;
+  })[],
   format: ExportFormat = 'plain',
 ) {
+  // Edição no padrão aceito por Moxfield/Archidekt/Arena: "1 Sol Ring (CMM) 400".
+  const label = (l: (typeof lines)[number]) =>
+    l.setCode && l.collectorNumber
+      ? `${l.name} (${l.setCode.toUpperCase()}) ${l.collectorNumber}`
+      : l.name;
   const sections = DECK_BOARDS.map((board) => {
     const own = lines
       .filter((l) => l.board === board && l.quantity > 0)
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .sort((a, b) => a.name.localeCompare(b.name) || label(a).localeCompare(label(b)));
     if (!own.length) return null;
     const rows = own.flatMap((l) =>
       format === 'proxies' && l.proxies > 0
         ? [
-            ...(l.quantity > l.proxies ? [`${l.quantity - l.proxies} ${l.name}`] : []),
-            `${l.proxies} ${l.name} #proxy`,
+            ...(l.quantity > l.proxies ? [`${l.quantity - l.proxies} ${label(l)}`] : []),
+            `${l.proxies} ${label(l)} #proxy`,
           ]
-        : [`${l.quantity} ${l.name}`],
+        : [`${l.quantity} ${label(l)}`],
     );
     return [SECTION_TITLE[board], ...rows].join('\n');
   }).filter(Boolean);
@@ -116,17 +131,20 @@ export interface SyncResult {
  * mantidas (no mesmo board, ou em outro se a carta mudou de board), limitadas à nova quantidade.
  */
 export function planDeckSync(
-  current: readonly Pick<DeckLine, 'name' | 'board' | 'quantity' | 'proxies'>[],
+  current: readonly (Pick<DeckLine, 'name' | 'board' | 'quantity' | 'proxies'> & {
+    scryfallId?: string | null;
+  })[],
   incoming: readonly DeckEntry[],
 ): SyncResult {
+  // Entradas já associadas às cartas: `scryfallId` é a impressão (edição).
   const merged = new Map<string, { entry: DeckEntry; quantity: number }>();
   for (const entry of incoming) {
-    const key = lineKey(entry.board, entry.name);
+    const key = lineKey(entry.board, entry.name, entry.scryfallId);
     const existing = merged.get(key);
     if (existing) existing.quantity += entry.quantity;
     else merged.set(key, { entry, quantity: entry.quantity });
   }
-  const before = new Map(current.map((l) => [lineKey(l.board, l.name), l]));
+  const before = new Map(current.map((l) => [lineKey(l.board, l.name, l.scryfallId), l]));
   const proxiesByName = new Map<string, number>();
   for (const l of current) {
     const name = l.name.toLowerCase();
@@ -148,6 +166,8 @@ export function planDeckSync(
     if (!old) added.push(entry.name);
     else if (old.quantity !== quantity) changed.push(entry.name);
   }
-  const removed = current.filter((l) => !merged.has(lineKey(l.board, l.name))).map((l) => l.name);
+  const removed = current
+    .filter((l) => !merged.has(lineKey(l.board, l.name, l.scryfallId)))
+    .map((l) => l.name);
   return { rows, added, removed, changed };
 }

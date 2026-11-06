@@ -57,6 +57,13 @@
       "when": 1793991945972,
       "tag": "0007_analise_deck",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793995587059,
+      "tag": "0008_edicoes",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ import { api } from '@/lib/api';
 import { CardSearch } from './card-search';
 import { Icon } from './icons';
 import { ManaCost } from './mana';
+import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 
 export interface DeckLineView {
@@ -22,12 +23,17 @@ export interface DeckLineView {
   board: DeckBoard;
   quantity: number;
   proxies: number;
+  /** Edição (impressão) da linha. */
+  scryfallId: string | null;
   card: {
     typeLine: string;
     cmc: number;
     manaCost?: string | null;
     imageUri?: string | null;
     priceUsd?: string | null;
+    setCode?: string | null;
+    setName?: string | null;
+    collectorNumber?: string | null;
   } | null;
 }
 
@@ -180,9 +186,15 @@ export function DeckCards({
                       </span>
                     )}
                   </div>
-                  <p className="truncate text-xs font-medium" title={line.name}>
+                  <p
+                    className="truncate text-xs font-medium"
+                    title={[line.name, printLabel(line.card)].filter(Boolean).join(' · ')}
+                  >
                     {line.quantity > 1 && `${line.quantity}× `}
                     {line.name}
+                    {printLabel(line.card) && (
+                      <span className="muted font-normal"> · {printLabel(line.card)}</span>
+                    )}
                     {line.proxies > 0 && (
                       <span className="sr-only">
                         {' '}
@@ -266,6 +278,9 @@ export function DeckCards({
                         >
                           {line.name}
                         </button>
+                        {printLabel(line.card) && (
+                          <span className="muted text-xs"> · {printLabel(line.card)}</span>
+                        )}
                         {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
                       </td>
                       <td className="py-1.5 pe-2">
@@ -331,6 +346,14 @@ export function DeckCards({
                 <ManaCost cost={zoomed.card.manaCost} />
               </p>
             )}
+            {zoomed.card?.setName && (
+              <p className="text-sm">
+                {t('printOf', {
+                  set: zoomed.card.setName,
+                  print: printLabel(zoomed.card) ?? '',
+                })}
+              </p>
+            )}
             <ProxyBadge line={zoomed} />
             {zoomed.card?.priceUsd && (
               <p className="text-sm">
@@ -378,6 +401,9 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
   const [proxies, setProxies] = useState(String(line.proxies));
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState('');
+  // Nome com a edição: distingue linhas da mesma carta para leitores de tela.
+  const print = printLabel(line.card);
+  const label = print ? `${line.name} (${print})` : line.name;
 
   const save = (q: number, p: number) => {
     if (q === line.quantity && p === line.proxies) return;
@@ -390,7 +416,13 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
       () =>
         api(`/api/v1/decks/${deckId}/lines`, {
           method: 'PUT',
-          body: { name: line.name, board: line.board, quantity: q, proxies: p },
+          body: {
+            name: line.name,
+            board: line.board,
+            quantity: q,
+            proxies: p,
+            scryfallId: line.scryfallId,
+          },
         }),
       () => setStatus(t('lineSaved', { name: line.name })),
     );
@@ -412,7 +444,7 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
           min={0}
           max={MAX_COPIES}
           className="input w-full px-2"
-          aria-label={t('quantityOf', { name: line.name })}
+          aria-label={t('quantityOf', { name: label })}
           value={quantity}
           disabled={pending}
           onChange={(e) => setQuantity(e.target.value)}
@@ -421,7 +453,8 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
         />
       </td>
       <td className="py-1.5 pe-2">
-        <span className="font-medium">{line.name}</span>
+        <span className="block font-medium">{line.name}</span>
+        {line.card && <PrintPicker deckId={deckId} line={line} />}
         {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
         <span
           role="status"
@@ -437,7 +470,7 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
           min={0}
           max={Number(quantity) || 0}
           className="input w-full px-2"
-          aria-label={t('proxiesOf', { name: line.name })}
+          aria-label={t('proxiesOf', { name: label })}
           value={proxies}
           disabled={pending}
           onChange={(e) => setProxies(e.target.value)}
@@ -466,7 +499,7 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
           <span className="sr-only sm:hidden">
             {confirming ? t('confirmRemoveCard') : t('removeCard')}
           </span>
-          <span className="sr-only"> ({line.name})</span>
+          <span className="sr-only"> ({label})</span>
         </button>
       </td>
     </tr>
@@ -505,6 +538,8 @@ function AddCardForm({ deckId, lines }: { deckId: string; lines: DeckLineView[] 
                 board,
                 quantity: (existing?.quantity ?? 0) + add,
                 proxies: (existing?.proxies ?? 0) + (proxy ? add : 0),
+                // Soma na edição que já está no deck (a primeira, se houver várias).
+                ...(existing ? { scryfallId: existing.scryfallId } : {}),
               },
             }),
           (result) => {
