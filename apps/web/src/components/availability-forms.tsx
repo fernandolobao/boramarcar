@@ -130,7 +130,7 @@ export function AvailabilityForm({
               {WEEKDAY_ORDER.map((day) => (
                 <label
                   key={day}
-                  className="flex items-center gap-2 rounded-xl border border-zinc-500 px-3 py-2 text-sm"
+                  className="flex items-center gap-2 rounded-xl border border-ink-500 px-3 py-2 text-sm"
                 >
                   <input
                     type="checkbox"
@@ -188,7 +188,7 @@ export function AvailabilityForm({
             {locations.map((location) => (
               <label
                 key={location.id}
-                className="flex items-center gap-2 rounded-xl border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700"
+                className="flex items-center gap-2 rounded-xl border border-ink-300 px-3 py-2 text-sm dark:border-ink-700"
               >
                 <input
                   type="checkbox"

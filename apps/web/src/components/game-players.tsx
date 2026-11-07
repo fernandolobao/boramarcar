@@ -50,11 +50,11 @@ export function GamePlayers({
                   className={`flex min-w-0 items-center gap-3 rounded-lg p-2 ${
                     p.result === 'win'
                       ? 'bg-emerald-50 ring-1 ring-emerald-700/40 dark:bg-emerald-950/50 dark:ring-emerald-400/40'
-                      : 'bg-zinc-50 dark:bg-zinc-900'
+                      : 'bg-ink-50 dark:bg-ink-900'
                   }`}
                 >
                   {p.deck?.artUri && (
-                    <div className="relative h-11 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-200 dark:bg-zinc-800">
+                    <div className="relative h-11 w-16 shrink-0 overflow-hidden rounded-md bg-ink-200 dark:bg-ink-800">
                       <Image
                         src={p.deck.artUri}
                         alt=""

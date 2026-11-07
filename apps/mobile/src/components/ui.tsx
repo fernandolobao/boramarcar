@@ -46,7 +46,7 @@ export function Card({ style, ...props }: ViewProps) {
   return (
     <View
       {...props}
-      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }, style]}
+      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }, style]}
     />
   );
 }

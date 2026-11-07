@@ -1,7 +1,7 @@
 import { getLocales } from 'expo-localization';
 
 const pt = {
-  appName: 'Bora Marcar',
+  appName: 'ArcanaKin',
   signInTitle: 'Organize os encontros de Magic do seu grupo',
   signInGoogle: 'Entrar com Google',
   signingIn: 'Entrando…',
@@ -192,7 +192,7 @@ const pt = {
 type Messages = Record<keyof typeof pt, string>;
 
 const en: Messages = {
-  appName: 'Bora Marcar',
+  appName: 'ArcanaKin',
   signInTitle: "Organize your group's Magic meetups",
   signInGoogle: 'Sign in with Google',
   signingIn: 'Signing in…',

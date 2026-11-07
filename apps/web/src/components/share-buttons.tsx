@@ -30,7 +30,7 @@ export function ShareButtons({
   return (
     <div className="flex flex-wrap gap-2">
       <a
-        className="btn-primary bg-[#25D366] text-zinc-950 hover:bg-[#1ebe5b]"
+        className="btn-primary bg-[#25D366] text-ink-950 hover:bg-[#1ebe5b]"
         href={whatsappShareUrl(text)}
         target="_blank"
         rel="noreferrer"

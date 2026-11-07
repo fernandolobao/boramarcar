@@ -12,7 +12,7 @@ import { PDFDocument, rgb, StandardFonts, type PDFImage } from 'pdf-lib';
 
 const IMAGE_HEADERS = {
   // O Scryfall pede User-Agent e Accept identificáveis; sem eles o CDN pode recusar.
-  'User-Agent': 'BoraMarcar/1.0 (+https://github.com/fernandolobao/boramarcar)',
+  'User-Agent': 'ArcanaKin/1.0 (+https://github.com/fernandolobao/boramarcar)',
   Accept: 'image/jpeg,image/png;q=0.9,*/*;q=0.5',
 };
 
@@ -82,7 +82,7 @@ export async function buildProxySheet(
   const items = expandPrintList(input.lines, input.which);
   const pdf = await PDFDocument.create();
   pdf.setTitle(`Proxies — ${input.deckName}`);
-  pdf.setCreator('Bora Marcar');
+  pdf.setCreator('ArcanaKin');
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bytes = await fetchImages(
     items.flatMap((i) => (i.imageUri ? [i.imageUri] : [])),

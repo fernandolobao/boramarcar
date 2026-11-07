@@ -1,28 +1,29 @@
+import { themes } from '@boramarcar/tokens';
 import { useColorScheme } from 'react-native';
 
-/** Cores do app (mesma marca do site), com contraste AA nos dois temas. */
-const light = {
-  background: '#fafafa',
-  surface: '#ffffff',
-  border: '#d4d4d8',
-  text: '#18181b',
-  muted: '#52525b',
-  brand: '#6d28d9',
-  brandText: '#ffffff',
-  danger: '#b91c1c',
-  success: '#15803d',
-};
-const dark: typeof light = {
-  background: '#09090b',
-  surface: '#18181b',
-  border: '#3f3f46',
-  text: '#f4f4f5',
-  muted: '#a1a1aa',
-  brand: '#a78bfa',
-  brandText: '#18181b',
-  danger: '#f87171',
-  success: '#4ade80',
-};
+/** Cores do app a partir dos design tokens do ArcanaKin (os mesmos do site, contraste AA testado). */
+const fromTokens = (t: (typeof themes)['light']) => ({
+  /** Fundo da tela (Pergaminho no claro, Noite no escuro). */
+  background: t.canvas,
+  surface: t.surface,
+  surfaceMuted: t.surfaceMuted,
+  /** Bordas de campos e botões secundários (≥ 3:1). */
+  border: t.lineStrong,
+  /** Bordas decorativas (cartões). */
+  line: t.line,
+  text: t.fg,
+  muted: t.fgMuted,
+  brand: t.primary,
+  brandText: t.onPrimary,
+  link: t.link,
+  accent: t.accent,
+  onAccent: t.onAccent,
+  danger: t.danger,
+  success: t.success,
+});
+
+const light = fromTokens(themes.light);
+const dark = fromTokens(themes.dark);
 export type Colors = typeof light;
 
 export function useColors(): Colors {

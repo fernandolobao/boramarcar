@@ -130,7 +130,7 @@ export function EventManage(props: Props) {
         </div>
       </form>
 
-      <div className="flex flex-wrap gap-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+      <div className="flex flex-wrap gap-2 border-t border-ink-200 pt-4 dark:border-ink-800">
         {props.status === 'scheduled' && (
           <>
             <button
@@ -184,7 +184,7 @@ export function EventStatusBadge({ status }: { status: Status }) {
   const styles: Record<Status, string> = {
     scheduled: 'bg-brand-100 text-brand-700 dark:bg-brand-700/30 dark:text-brand-100',
     cancelled: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
-    finished: 'bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
+    finished: 'bg-ink-200 text-ink-700 dark:bg-ink-800 dark:text-ink-300',
   };
   return (
     <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status]}`}>

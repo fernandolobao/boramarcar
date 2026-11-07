@@ -190,7 +190,7 @@ function ManagePanel({ name, children }: { name: string; children: React.ReactNo
       <div
         id={id}
         hidden={!open}
-        className="basis-full rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/60"
+        className="basis-full rounded-xl bg-ink-50 p-3 dark:bg-ink-800/60"
       >
         {children}
       </div>

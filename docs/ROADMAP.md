@@ -125,18 +125,18 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 5.8 | Deck no app: ver o deck (cartas, edições, curva e nota da análise) sem abrir o site; editar continua no site                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | M       |                                                                                                                                       |
 | 5.9 | **Scan de cartas pela câmera**: aponta o celular para uma ou várias cartas e elas entram no deck (ou numa lista para importar), como nos apps de coleção. Lê o nome e, nas cartas modernas, o código da edição e o número de colecionador no rodapé, para achar a impressão exata no Scryfall (`/cards/:set/:número`; sem isso, busca aproximada pelo nome). Modo contínuo com som/vibração a cada carta, lista para conferir e corrigir antes de salvar, quantidade e idioma. Reconhecimento de texto no aparelho (sem enviar imagens a terceiros), o que exige build próprio, fora do Expo Go | G       |                                                                                                                                       |
 
-## Fase 6 — Rebranding
+## Fase 6 — Rebranding para ArcanaKin
 
-Nova marca no futuro (nome e identidade ainda a definir). Fazer **antes da publicação nas lojas (5.7)**, porque nome, ícone e identificador do app ficam gravados lá.
+O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publicação nas lojas (5.7)**, porque nome, ícone e identificador do app ficam gravados lá.
 
-| #   | Item                                                                                                                                                            | Tamanho |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| 6.1 | Definir nome, voz e identidade visual (logo, cores, tipografia); conferir disponibilidade do nome, domínio e perfis                                             | M       |
-| 6.2 | Tokens de design compartilhados entre site e app (cores claro/escuro com contraste AA, tipografia), trocando as cores fixas atuais                              | M       |
-| 6.3 | Site: logo, favicon, imagens de compartilhamento (Open Graph), página inicial e vídeo do topo, e-mails; textos com o nome novo em `pt-BR`/`en`                  | M       |
-| 6.4 | App: nome, ícone, splash, esquema de link (`boramarcar://`) e identificador (`app.boramarcar`), com o servidor aceitando o esquema antigo e o novo por um tempo | M       |
-| 6.5 | Domínio novo com redirecionamento do antigo; URLs de retorno do Google OAuth, `BETTER_AUTH_URL`, links do calendário (`.ics`) e dos e-mails                     | P       |
-| 6.6 | Repositório, pacotes (`@boramarcar/*`), documentação e o aviso aos grupos sobre a mudança                                                                       | P       |
+| #   | Item                                                                                                                                                                             | Tamanho | Status                                                                                    |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| 6.1 | Nome, logotipo e paleta de cores                                                                                                                                                 | M       | ✅ nome, logotipo e paleta; falta o **símbolo** (ícone)                                   |
+| 6.2 | Design tokens compartilhados entre site e app (`packages/tokens`): paleta, escalas, cores por função nos temas claro/escuro, contraste AA testado                                | M       | ✅                                                                                        |
+| 6.3 | Site: logotipo, página inicial (textos, cores e vídeo do topo), e-mails, PDF e calendário com o nome novo em `pt-BR`/`en`                                                        | M       | ✅; falta **favicon** e imagens de compartilhamento (Open Graph), que dependem do símbolo |
+| 6.4 | App: nome, cores, logotipo, link `arcanakin://` e identificador `app.arcanakin` (o servidor aceita também `boramarcar://` por um tempo)                                          | M       | ✅; falta **ícone** e **splash**, que dependem do símbolo                                 |
+| 6.5 | Domínio **www.arcanakin.com.br**, com redirecionamento do endereço atual; URLs de retorno do Google OAuth, `BETTER_AUTH_URL`, endereço no app, links do calendário e dos e-mails | P       | aguardando a compra do domínio                                                            |
+| 6.6 | Nomes internos: repositório, pacotes (`@boramarcar/*`), chaves salvas no navegador e no app (com migração), e o aviso aos grupos sobre a mudança                                 | P       |                                                                                           |
 
 ## Transversal (contínuo)
 
@@ -177,7 +177,7 @@ Nova marca no futuro (nome e identidade ainda a definir). Fazer **antes da publi
 
 - **Scan de cartas (5.9):** escolher a biblioteca de reconhecimento de texto no aparelho (ex.: ML Kit) e decidir se o scan também alimenta uma coleção (3.x) ou só decks; avaliar uma versão no site com a câmera do navegador.
 
-- **Rebranding:** nome e identidade novos ainda não definidos; enquanto isso, evitar espalhar "Bora Marcar" em lugares novos fora das mensagens de i18n e da configuração do app.
+- **Rebranding:** o nome ArcanaKin e a paleta estão aplicados; o símbolo e o favicon ainda estão em criação. Não usar "Bora Marcar" em lugares novos (os nomes internos `boramarcar` só mudam no item 6.6).
 
 - **"Importar do Scryfall":** o Scryfall não hospeda mais decks; hoje ele é a fonte de dados das cartas (e da busca de substitutos). Se a ideia era importar outra coisa (ex.: uma lista de cartas favoritas/coleção), registrar aqui.
 - **Pontuação do ranking:** 3/1/0 foi um ponto de partida; confirmar com o grupo.

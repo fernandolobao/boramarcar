@@ -96,7 +96,7 @@ export default async function PrintProxiesPage({ params, searchParams }: Props) 
             {cards.map((card, i) => (
               <div
                 key={i}
-                className="absolute overflow-hidden bg-zinc-100"
+                className="absolute overflow-hidden bg-ink-100"
                 style={{
                   left: `${left + (i % COLS) * CARD_MM.width}mm`,
                   top: `${top + Math.floor(i / COLS) * CARD_MM.height}mm`,
@@ -108,7 +108,7 @@ export default async function PrintProxiesPage({ params, searchParams }: Props) 
                   // eslint-disable-next-line @next/next/no-img-element -- impressão: imagem original, sem otimização
                   <img src={card.imageUri} alt={card.name} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="block border border-zinc-500 p-2 text-xs text-black">
+                  <span className="block border border-ink-500 p-2 text-xs text-black">
                     {card.name}
                   </span>
                 )}
@@ -118,11 +118,11 @@ export default async function PrintProxiesPage({ params, searchParams }: Props) 
             {Array.from({ length: COLS + 1 }, (_, c) => left + c * CARD_MM.width).map((x) => (
               <div key={`x${x}`} aria-hidden="true">
                 <span
-                  className="absolute w-px bg-zinc-500"
+                  className="absolute w-px bg-ink-500"
                   style={{ left: `${x}mm`, top: `${top - MARK_MM - 1}mm`, height: `${MARK_MM}mm` }}
                 />
                 <span
-                  className="absolute w-px bg-zinc-500"
+                  className="absolute w-px bg-ink-500"
                   style={{ left: `${x}mm`, top: `${top + gridH + 1}mm`, height: `${MARK_MM}mm` }}
                 />
               </div>
@@ -130,11 +130,11 @@ export default async function PrintProxiesPage({ params, searchParams }: Props) 
             {Array.from({ length: ROWS + 1 }, (_, r) => top + r * CARD_MM.height).map((y) => (
               <div key={`y${y}`} aria-hidden="true">
                 <span
-                  className="absolute h-px bg-zinc-500"
+                  className="absolute h-px bg-ink-500"
                   style={{ top: `${y}mm`, left: `${left - MARK_MM - 1}mm`, width: `${MARK_MM}mm` }}
                 />
                 <span
-                  className="absolute h-px bg-zinc-500"
+                  className="absolute h-px bg-ink-500"
                   style={{ top: `${y}mm`, left: `${left + gridW + 1}mm`, width: `${MARK_MM}mm` }}
                 />
               </div>

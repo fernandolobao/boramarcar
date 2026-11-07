@@ -34,7 +34,7 @@ export function ColorPips({ pips }: { pips: Record<ColorSymbol, number> }) {
       <h3 className="section-title">{t('colorPips')}</h3>
       {/* Barra decorativa: a mesma informação está na lista abaixo. */}
       <div
-        className="flex h-3 overflow-hidden rounded-full ring-1 ring-zinc-900/15 dark:ring-white/15"
+        className="flex h-3 overflow-hidden rounded-full ring-1 ring-ink-900/15 dark:ring-white/15"
         aria-hidden="true"
       >
         {colors.map((color) => (
@@ -254,7 +254,7 @@ export function ManaBaseTable({
         >
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800">
+              <tr className="border-b border-ink-200 dark:border-ink-800">
                 <th scope="col" className="py-2 pe-3 font-medium">
                   {t('manaCols.color')}
                 </th>
@@ -277,7 +277,7 @@ export function ManaBaseTable({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.color} className="border-b border-zinc-100 dark:border-zinc-800/60">
+                <tr key={row.color} className="border-b border-ink-100 dark:border-ink-800/60">
                   <th scope="row" className="py-2 pe-3 font-normal">
                     <span className="flex items-center gap-1.5 capitalize">
                       <ManaSymbol symbol={row.color} className="text-base" />
@@ -345,7 +345,7 @@ export function HandOdds({ odds }: { odds: OpeningHandOdds }) {
         <table className="w-full text-left text-sm">
           <caption className="mb-2 text-left font-semibold">{t('handDistribution')}</caption>
           <thead>
-            <tr className="border-b border-zinc-200 dark:border-zinc-800">
+            <tr className="border-b border-ink-200 dark:border-ink-800">
               <th scope="col" className="py-1.5 pe-3 font-medium">
                 {t('handColLands')}
               </th>
@@ -356,7 +356,7 @@ export function HandOdds({ odds }: { odds: OpeningHandOdds }) {
           </thead>
           <tbody>
             {odds.distribution.map((p, lands) => (
-              <tr key={lands} className="border-b border-zinc-100 dark:border-zinc-800/60">
+              <tr key={lands} className="border-b border-ink-100 dark:border-ink-800/60">
                 <th scope="row" className="py-1.5 pe-3 font-normal tabular-nums">
                   {lands}
                 </th>
@@ -377,7 +377,7 @@ export function HandOdds({ odds }: { odds: OpeningHandOdds }) {
         <table className="w-full text-left text-sm">
           <caption className="mb-2 text-left font-semibold">{t('handDrops')}</caption>
           <thead>
-            <tr className="border-b border-zinc-200 dark:border-zinc-800">
+            <tr className="border-b border-ink-200 dark:border-ink-800">
               <th scope="col" className="py-1.5 pe-3 font-medium">
                 {t('handColTurn')}
               </th>
@@ -391,7 +391,7 @@ export function HandOdds({ odds }: { odds: OpeningHandOdds }) {
           </thead>
           <tbody>
             {odds.landDrops.map((d) => (
-              <tr key={d.turn} className="border-b border-zinc-100 dark:border-zinc-800/60">
+              <tr key={d.turn} className="border-b border-ink-100 dark:border-ink-800/60">
                 <th scope="row" className="py-1.5 pe-3 font-normal tabular-nums">
                   {d.turn}
                 </th>

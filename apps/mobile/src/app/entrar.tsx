@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Logo } from '@/components/logo';
 import { AppText, Button, styles } from '@/components/ui';
 import { authClient } from '@/lib/auth';
 import { API_URL, REQUEST_TIMEOUT_MS } from '@/lib/config';
@@ -70,9 +71,10 @@ export default function SignIn() {
   return (
     <SafeAreaView style={[styles.center, { backgroundColor: colors.background }]}>
       <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
-        <AppText accessibilityRole="header" style={{ fontSize: 32, fontWeight: '800' }}>
-          {t('appName')}
-        </AppText>
+        {/* Logotipo como título da tela (nome lido pelo leitor de tela). */}
+        <View accessible accessibilityRole="header" accessibilityLabel={t('appName')}>
+          <Logo height={44} color={colors.text} decorative />
+        </View>
         <AppText muted style={{ textAlign: 'center' }}>
           {t('signInTitle')}
         </AppText>

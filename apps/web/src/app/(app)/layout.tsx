@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { getUserPreferences } from '@boramarcar/db';
 import { cookies } from 'next/headers';
 import { TimeZoneSync } from '@/components/time-zone-sync';
+import { Logo } from '@/components/logo';
 import { UserMenu } from '@/components/user-menu';
 import { TIME_ZONE_COOKIE } from '@/i18n/config';
 import { getActiveGroup } from '@/server/active-group';
@@ -38,12 +39,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       />
       {/* relative + z-30: o cabeçalho (com backdrop-blur, que cria um contexto de empilhamento)
           fica acima do conteúdo, para o menu da conta não passar por trás de imagens. */}
-      <header className="relative z-30 border-b print:hidden border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
+      <header className="relative z-30 border-b print:hidden border-line bg-surface/85 backdrop-blur">
         {/* Linha 1: marca + grupo ativo e menu da conta. Linha 2: navegação (rola no celular).
             Assim nada quebra com nomes de grupo longos nem com idiomas de rótulos maiores. */}
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 pt-3">
           <Link href="/painel" className="min-w-0 rounded-lg leading-tight">
-            <span className="block font-semibold">{tc('appName')}</span>
+            <Logo title={tc('appName')} className="h-5 w-auto text-arcano dark:text-ink-100" />
             {active && (
               <span className="muted block max-w-[60vw] truncate text-sm sm:max-w-md">
                 {active.name}

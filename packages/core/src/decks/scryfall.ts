@@ -106,7 +106,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 export async function fetchScryfallCollection(
   entries: readonly Pick<DeckEntry, 'name' | 'scryfallId' | 'setCode' | 'collectorNumber'>[],
-  { fetch: fetchFn, userAgent = 'BoraMarcar/0.1', delayMs = 100 }: ScryfallClientOptions,
+  { fetch: fetchFn, userAgent = 'ArcanaKin/0.1', delayMs = 100 }: ScryfallClientOptions,
 ): Promise<CollectionResult> {
   type Identifier = { id?: string; name?: string; set?: string; collector_number?: string };
   const unique = new Map<string, { identifier: Identifier; name: string }>();
@@ -231,7 +231,7 @@ export async function fetchScryfallAutocomplete(
   query: string,
   {
     fetch: fetchFn,
-    userAgent = 'BoraMarcar/0.1',
+    userAgent = 'ArcanaKin/0.1',
   }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
 ): Promise<string[]> {
   const q = query.trim();
@@ -252,7 +252,7 @@ export async function fetchScryfallSearch(
   q: string,
   {
     fetch: fetchFn,
-    userAgent = 'BoraMarcar/0.1',
+    userAgent = 'ArcanaKin/0.1',
     order = 'edhrec',
   }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'> & { order?: string },
 ): Promise<CardData[]> {
@@ -283,7 +283,7 @@ export async function fetchScryfallPrints(
   name: string,
   {
     fetch: fetchFn,
-    userAgent = 'BoraMarcar/0.1',
+    userAgent = 'ArcanaKin/0.1',
   }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
 ): Promise<CardPrint[]> {
   const q = `!"${name.replace(/"/g, '')}" game:paper`;
@@ -314,7 +314,7 @@ export async function fetchScryfallCard(
   id: string,
   {
     fetch: fetchFn,
-    userAgent = 'BoraMarcar/0.1',
+    userAgent = 'ArcanaKin/0.1',
   }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
 ): Promise<CardData | null> {
   const response = await fetchFn(`${SCRYFALL_API}/cards/${encodeURIComponent(id)}`, {

@@ -9,7 +9,7 @@ test.describe('cabeçalho', () => {
     page,
   }) => {
     await page.goto('/painel');
-    const brand = page.getByRole('link', { name: /Bora Marcar.*Mesa de Quinta/ });
+    const brand = page.getByRole('link', { name: /ArcanaKin.*Mesa de Quinta/ });
     await expect(brand).toBeVisible();
     // Sem rolagem horizontal da página, em qualquer largura do projeto.
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
@@ -50,7 +50,7 @@ test.describe('cabeçalho', () => {
     );
     // A linha da marca e o menu ficam na mesma altura (nada empurrado para baixo).
     const brand = await page
-      .getByRole('link', { name: /Bora Marcar/ })
+      .getByRole('link', { name: /ArcanaKin/ })
       .first()
       .boundingBox();
     const menu = await page.getByRole('button', { name: /Account menu/ }).boundingBox();

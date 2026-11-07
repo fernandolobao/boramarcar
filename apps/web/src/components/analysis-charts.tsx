@@ -40,7 +40,7 @@ export function ManaCurve({
           const bar = (
             <>
               <span
-                className="text-xs tabular-nums text-zinc-600 dark:text-zinc-400"
+                className="text-xs tabular-nums text-ink-600 dark:text-ink-400"
                 aria-hidden="true"
               >
                 {curve[bucket]}
@@ -70,7 +70,7 @@ export function ManaCurve({
               {interactive ? (
                 <button
                   type="button"
-                  className="flex w-full flex-col items-center gap-1 rounded-md px-0.5 pb-0.5 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-brand-500 dark:hover:bg-zinc-800"
+                  className="flex w-full flex-col items-center gap-1 rounded-md px-0.5 pb-0.5 hover:bg-ink-100 focus-visible:outline-2 focus-visible:outline-brand-500 dark:hover:bg-ink-800"
                   aria-pressed={pressed}
                   aria-controls={`${id}-cards`}
                   onClick={() => setSelected(pressed ? null : bucket)}
@@ -165,7 +165,7 @@ export function ScoreBreakdown({
           <li key={c.key}>
             <button
               type="button"
-              className="w-full rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-brand-500 dark:hover:bg-zinc-800"
+              className="w-full rounded-lg px-2 py-1.5 text-left hover:bg-ink-100 focus-visible:outline-2 focus-visible:outline-brand-500 dark:hover:bg-ink-800"
               aria-expanded={expanded}
               aria-controls={`${id}-${c.key}`}
               onClick={() => setOpen(expanded ? null : c.key)}
@@ -183,7 +183,7 @@ export function ScoreBreakdown({
                 </span>
               </span>
               <span
-                className="mt-1 block h-2 rounded-full bg-zinc-200 dark:bg-zinc-800"
+                className="mt-1 block h-2 rounded-full bg-ink-200 dark:bg-ink-800"
                 aria-hidden="true"
               >
                 <span
@@ -195,7 +195,7 @@ export function ScoreBreakdown({
             <div
               id={`${id}-${c.key}`}
               hidden={!expanded}
-              className="mx-2 mt-1 mb-2 space-y-2 rounded-lg bg-zinc-50 p-3 text-sm dark:bg-zinc-800/60"
+              className="mx-2 mt-1 mb-2 space-y-2 rounded-lg bg-ink-50 p-3 text-sm dark:bg-ink-800/60"
             >
               <p
                 className={`flex items-center gap-1.5 font-medium ${

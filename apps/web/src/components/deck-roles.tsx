@@ -141,7 +141,7 @@ function RoleAlternatives({ deckId, role }: { deckId: string; role: CardRole }) 
                 {state.cards.map((card) => (
                   <li key={card.name} className="space-y-1">
                     {card.imageUri && (
-                      <div className="relative aspect-[488/680] overflow-hidden rounded-[4.5%/3.2%] bg-zinc-200 dark:bg-zinc-800">
+                      <div className="relative aspect-[488/680] overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 dark:bg-ink-800">
                         <Image
                           src={card.imageUri}
                           alt=""
@@ -213,7 +213,7 @@ export function DeckRoles({
           return (
             <li
               key={role}
-              className="space-y-2 border-t border-zinc-200 py-3 lg:has-[[aria-expanded=true]]:col-span-2 dark:border-zinc-800"
+              className="space-y-2 border-t border-ink-200 py-3 lg:has-[[aria-expanded=true]]:col-span-2 dark:border-ink-800"
             >
               <h3 className="flex flex-wrap items-baseline gap-x-2 font-semibold">
                 {t(`roles.${role}`)}

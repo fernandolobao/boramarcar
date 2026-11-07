@@ -53,7 +53,7 @@ export default async function GroupPage() {
                     role="img"
                     aria-label={t('qrCode', { group: active.name })}
                     data-testid="invite-qr"
-                    className="overflow-hidden rounded-2xl border border-zinc-200 bg-white p-2 dark:border-zinc-700 [&>svg]:h-auto [&>svg]:w-full"
+                    className="overflow-hidden rounded-2xl border border-ink-200 bg-white p-2 dark:border-ink-700 [&>svg]:h-auto [&>svg]:w-full"
                     // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
                     dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
                   />
@@ -63,7 +63,7 @@ export default async function GroupPage() {
                   <div>
                     <p className="label">{t('inviteLink')}</p>
                     <p
-                      className="break-all rounded-xl bg-zinc-100 px-3 py-2 font-mono text-sm dark:bg-zinc-800"
+                      className="break-all rounded-xl bg-ink-100 px-3 py-2 font-mono text-sm dark:bg-ink-800"
                       data-testid="invite-url"
                     >
                       {invite.url}
@@ -93,7 +93,7 @@ export default async function GroupPage() {
           </section>
           <section className="card md:col-span-2">
             <h2 className="section-title">{t('members')}</h2>
-            <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <ul className="divide-y divide-ink-200 dark:divide-ink-800">
               {members.map((m) => (
                 <li
                   key={m.userId}

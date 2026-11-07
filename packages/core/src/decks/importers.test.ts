@@ -182,10 +182,10 @@ describe('Moxfield', () => {
     const fetchFn = vi.fn().mockResolvedValue(json(moxfieldPayload));
     await resolveDeckImport(
       { kind: 'url', url: 'https://moxfield.com/decks/abc-123' },
-      { fetch: fetchFn, moxfieldUserAgent: 'BoraMarcar/1.0 (contato)' },
+      { fetch: fetchFn, moxfieldUserAgent: 'ArcanaKin/1.0 (contato)' },
     );
     expect(fetchFn.mock.calls[0]?.[1]?.headers).toMatchObject({
-      'User-Agent': 'BoraMarcar/1.0 (contato)',
+      'User-Agent': 'ArcanaKin/1.0 (contato)',
     });
   });
 });

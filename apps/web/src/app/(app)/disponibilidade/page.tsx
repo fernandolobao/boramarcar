@@ -105,7 +105,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
         {windows.length === 0 ? (
           <p className="muted">{t('empty')}</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
             {windows.map((w) => (
               <li
                 key={`${w.start.toISOString()}-${w.locationId}`}
@@ -178,7 +178,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
         {myRules.length === 0 ? (
           <p className="muted">{t('noRules')}</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
             {myRules.map((rule) => (
               <li key={rule.id} className="space-y-2 py-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -202,7 +202,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
                     {rule.exceptions.map((date) => (
                       <span
                         key={date}
-                        className="flex items-center gap-1 rounded-full bg-zinc-100 py-0.5 pr-1 pl-3 dark:bg-zinc-800"
+                        className="flex items-center gap-1 rounded-full bg-ink-100 py-0.5 pr-1 pl-3 dark:bg-ink-800"
                       >
                         {localDate(date)}
                         <ApiActionButton
@@ -232,14 +232,14 @@ export default async function AvailabilityPage({ searchParams }: Props) {
         {slots.length === 0 ? (
           <p className="muted">{t('empty')}</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
             {slots.map((slot) => (
               <li key={slot.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
                 <div>
                   <p className="font-medium">
                     {slot.userName} · {range(slot.startsAt, slot.endsAt)}
                     {slot.kind === 'weekly' && (
-                      <span className="ml-2 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-normal dark:bg-zinc-800">
+                      <span className="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-normal dark:bg-ink-800">
                         ↻ {t('weeklyTag')}
                       </span>
                     )}

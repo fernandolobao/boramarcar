@@ -169,7 +169,7 @@ function Setup({
           <ul className="grid gap-2 sm:grid-cols-2">
             {players.map((p) => (
               <li key={p.userId}>
-                <label className="flex min-h-11 items-center gap-2 rounded-xl border border-zinc-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-zinc-700 dark:has-[:checked]:bg-brand-700/20">
+                <label className="flex min-h-11 items-center gap-2 rounded-xl border border-ink-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20">
                   <input
                     type="checkbox"
                     checked={seats.includes(p.userId)}
@@ -196,7 +196,7 @@ function Setup({
                 return (
                   <li
                     key={userId}
-                    className="grid gap-2 rounded-xl border border-zinc-200 p-3 sm:grid-cols-[1fr_auto] sm:items-end dark:border-zinc-800"
+                    className="grid gap-2 rounded-xl border border-ink-200 p-3 sm:grid-cols-[1fr_auto] sm:items-end dark:border-ink-800"
                   >
                     <div>
                       <label className="label" htmlFor={`${id}-deck-${userId}`}>
@@ -314,7 +314,7 @@ function Finish({
           <ul className="space-y-2">
             {state.players.map((p) => (
               <li key={p.userId}>
-                <label className="flex min-h-11 items-center gap-2 rounded-xl border border-zinc-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-zinc-700 dark:has-[:checked]:bg-brand-700/20">
+                <label className="flex min-h-11 items-center gap-2 rounded-xl border border-ink-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20">
                   <input
                     type="radio"
                     name={`${id}-winner`}
@@ -331,7 +331,7 @@ function Finish({
               </li>
             ))}
             <li>
-              <label className="flex min-h-11 items-center gap-2 rounded-xl border border-zinc-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-zinc-700 dark:has-[:checked]:bg-brand-700/20">
+              <label className="flex min-h-11 items-center gap-2 rounded-xl border border-ink-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20">
                 <input
                   type="radio"
                   name={`${id}-winner`}

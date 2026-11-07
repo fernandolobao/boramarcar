@@ -104,7 +104,7 @@ export function DeckSettingsForm({
           {DECK_VISIBILITIES.map((v) => (
             <label
               key={v}
-              className="flex items-start gap-2 rounded-xl border border-zinc-300 p-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-zinc-700 dark:has-[:checked]:bg-brand-700/20"
+              className="flex items-start gap-2 rounded-xl border border-ink-300 p-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20"
             >
               <input
                 type="radio"

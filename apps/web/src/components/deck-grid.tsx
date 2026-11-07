@@ -22,7 +22,7 @@ export async function VisibilityBadge({ visibility }: { visibility: string }) {
   const t = await getTranslations('decks.visibility');
   const key = (['private', 'group', 'public'] as const).find((v) => v === visibility) ?? 'group';
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+    <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
       <Icon name={VISIBILITY_ICON[key]} className="size-3.5 shrink-0" />
       {t(key)}
     </span>
@@ -55,9 +55,9 @@ export async function DeckGrid({
         return (
           <li
             key={deck.id}
-            className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-500 motion-reduce:transition-none dark:border-zinc-800 dark:bg-zinc-900"
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-ink-200 bg-surface shadow-sm transition-shadow hover:shadow-md has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-500 motion-reduce:transition-none dark:border-ink-800 dark:bg-ink-900"
           >
-            <div className="relative aspect-[16/10] bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-700">
+            <div className="relative aspect-[16/10] bg-gradient-to-br from-ink-200 to-ink-300 dark:from-ink-800 dark:to-ink-700">
               {cover?.artUri && (
                 <Image
                   src={cover.artUri}
@@ -68,7 +68,7 @@ export async function DeckGrid({
                   className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
               )}
-              <span className="absolute top-2 left-2 rounded-full bg-zinc-950/80 px-2.5 py-1 text-xs font-medium text-white">
+              <span className="absolute top-2 left-2 rounded-full bg-ink-950/80 px-2.5 py-1 text-xs font-medium text-white">
                 {tf(format)}
               </span>
             </div>

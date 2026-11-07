@@ -66,7 +66,7 @@ export function UserMenu({
 
   const firstName = name.trim().split(/\s+/)[0] ?? name;
   const itemClass =
-    'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-brand-500 aria-[current=page]:font-semibold dark:hover:bg-zinc-800';
+    'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-ink-100 focus-visible:outline-2 focus-visible:outline-brand-500 aria-[current=page]:font-semibold dark:hover:bg-ink-800';
 
   return (
     <div ref={root} className="relative shrink-0">
@@ -95,9 +95,9 @@ export function UserMenu({
       <div
         id={id}
         hidden={!open}
-        className="absolute end-0 z-20 mt-2 w-64 rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+        className="absolute end-0 z-20 mt-2 w-64 rounded-2xl border border-ink-200 bg-surface p-2 shadow-xl dark:border-ink-700 dark:bg-ink-900"
       >
-        <p className="border-b border-zinc-200 px-3 pt-1 pb-2 text-sm dark:border-zinc-700">
+        <p className="border-b border-ink-200 px-3 pt-1 pb-2 text-sm dark:border-ink-700">
           <span className="muted block text-xs">{t('signedInAs')}</span>
           <span className="block truncate font-medium">{name}</span>
           <span className="muted block truncate text-xs">{email}</span>
@@ -123,7 +123,7 @@ export function UserMenu({
               {t('settings')}
             </Link>
           </li>
-          <li className="mt-1 border-t border-zinc-200 pt-1 dark:border-zinc-700">
+          <li className="mt-1 border-t border-ink-200 pt-1 dark:border-ink-700">
             <button
               type="button"
               className={itemClass}

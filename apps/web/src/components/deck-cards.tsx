@@ -159,7 +159,7 @@ export function DeckCards({
                   <div className="relative transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
                     <button
                       type="button"
-                      className="relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-zinc-200 shadow-sm ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-zinc-800"
+                      className="relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 shadow-sm ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-ink-800"
                       aria-label={t('zoom', { name: line.name })}
                       aria-haspopup="dialog"
                       onClick={(e) => openZoom(line, e.currentTarget)}
@@ -182,7 +182,7 @@ export function DeckCards({
                     {line.card?.backImageUri && (
                       <button
                         type="button"
-                        className="absolute right-1.5 bottom-[6%] inline-flex items-center gap-1 rounded-md bg-zinc-950/85 px-1.5 py-1 text-xs font-medium text-white hover:bg-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                        className="absolute right-1.5 bottom-[6%] inline-flex items-center gap-1 rounded-md bg-ink-950/85 px-1.5 py-1 text-xs font-medium text-white hover:bg-ink-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
                         aria-pressed={flipped.has(line.key)}
                         onClick={() => toggleFlip(line.key)}
                       >
@@ -195,7 +195,7 @@ export function DeckCards({
                     {line.quantity > 1 && (
                       <span
                         aria-hidden="true"
-                        className="pointer-events-none absolute top-[8%] left-1.5 rounded-md bg-zinc-950/85 px-1.5 py-0.5 text-xs font-bold text-white"
+                        className="pointer-events-none absolute top-[8%] left-1.5 rounded-md bg-ink-950/85 px-1.5 py-0.5 text-xs font-bold text-white"
                       >
                         {t('quantity', { count: line.quantity })}
                       </span>
@@ -256,7 +256,7 @@ export function DeckCards({
               )}
               <thead
                 className={
-                  view === 'edit' ? 'text-left text-xs text-zinc-600 dark:text-zinc-400' : 'sr-only'
+                  view === 'edit' ? 'text-left text-xs text-ink-600 dark:text-ink-400' : 'sr-only'
                 }
               >
                 <tr>
@@ -292,7 +292,7 @@ export function DeckCards({
                   view === 'edit' ? (
                     <EditableLine key={line.key} deckId={deckId} line={line} />
                   ) : (
-                    <tr key={line.key} className="border-t border-zinc-200 dark:border-zinc-800">
+                    <tr key={line.key} className="border-t border-ink-200 dark:border-ink-800">
                       <td className="py-1.5 tabular-nums">{line.quantity}</td>
                       <td className="py-1.5 pe-2 break-words">
                         <button
@@ -330,7 +330,7 @@ export function DeckCards({
       <dialog
         ref={dialog}
         aria-labelledby={`${titleId}-zoom`}
-        className="m-auto w-[min(92vw,26rem)] rounded-2xl bg-white p-4 text-zinc-900 shadow-2xl backdrop:bg-zinc-950/70 dark:bg-zinc-900 dark:text-zinc-100"
+        className="m-auto w-[min(92vw,26rem)] rounded-2xl bg-surface p-4 text-ink-900 shadow-2xl backdrop:bg-ink-950/70 dark:bg-ink-900 dark:text-ink-100"
         onClose={() => {
           setZoomed(null);
           opener.current?.focus();
@@ -486,7 +486,7 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
   };
 
   return (
-    <tr className="border-t border-zinc-200 align-middle dark:border-zinc-800">
+    <tr className="border-t border-ink-200 align-middle dark:border-ink-800">
       <td className="py-1.5 pe-2">
         <input
           type="number"
@@ -569,7 +569,7 @@ function AddCardForm({ deckId, lines }: { deckId: string; lines: DeckLineView[] 
 
   return (
     <form
-      className="grid gap-3 rounded-xl bg-zinc-50 p-4 sm:grid-cols-[2fr_1fr_6rem] lg:grid-cols-[2fr_1fr_6rem_auto_auto] lg:items-end dark:bg-zinc-800/60"
+      className="grid gap-3 rounded-xl bg-ink-50 p-4 sm:grid-cols-[2fr_1fr_6rem] lg:grid-cols-[2fr_1fr_6rem_auto_auto] lg:items-end dark:bg-ink-800/60"
       aria-labelledby={`${id}-title`}
       onSubmit={(e) => {
         e.preventDefault();

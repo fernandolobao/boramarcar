@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server';
 import { SignInButton } from '@/components/auth-buttons';
 import { HeroVideo } from '@/components/home/hero-video';
 import { Icon, type IconName } from '@/components/icons';
+import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
 
 const CONTACT = 'fernando@fernandocamilotti.com';
@@ -52,8 +53,18 @@ const SCORE_PARTS = [
   ['wipe', ROLE_POINTS.wipe],
   ['curve', 10],
 ] as const;
-/** Cores das 5 manas + roxo da marca, só como detalhe visual (o texto carrega a informação). */
-const ACCENTS = ['#d6b85a', '#2f7fd8', '#8b5cf6', '#e0413a', '#1fa363', '#7c3aed'];
+/**
+ * Cores da paleta ArcanaKin (tokens), só como detalhe visual (o texto carrega a informação).
+ * Todas com ícone branco ≥ 3:1 por cima.
+ */
+const ACCENTS = [
+  'var(--color-eter)',
+  'var(--color-teal-700)',
+  'var(--color-gold-700)',
+  'var(--color-arcano)',
+  'var(--color-brand-700)',
+  'var(--color-teal-800)',
+];
 
 function SectionHeading({
   id,
@@ -68,10 +79,7 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-10 max-w-2xl space-y-3">
-      <p
-        className="font-mono text-sm font-semibold text-brand-700 dark:text-brand-400"
-        aria-hidden="true"
-      >
+      <p className="font-mono text-sm font-semibold text-link" aria-hidden="true">
         {index}
       </p>
       <h2 id={id} className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
@@ -83,7 +91,7 @@ function SectionHeading({
 }
 
 /**
- * Página inicial (pública, igual para quem entrou ou não): apresenta o Bora Marcar, as
+ * Página inicial (pública, igual para quem entrou ou não): apresenta o ArcanaKin, as
  * funcionalidades, as fontes de dados, a metodologia da análise, os valores e o convite aos testes.
  */
 export default async function HomePage() {
@@ -108,19 +116,16 @@ export default async function HomePage() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-950/85">
+      <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" className="text-lg font-extrabold tracking-tight">
-            {tc('appName')}
+          <Link href="/" className="rounded-lg py-1">
+            <Logo title={tc('appName')} className="h-6 w-auto text-arcano dark:text-pergaminho" />
           </Link>
           <nav aria-label={t('nav.label')} className="hidden lg:block">
             <ul className="flex gap-1 text-sm">
               {sections.map((s) => (
                 <li key={s}>
-                  <a
-                    href={`#${s}`}
-                    className="rounded-lg px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  >
+                  <a href={`#${s}`} className="rounded-lg px-3 py-2 hover:bg-surface-muted">
                     {t(`nav.${s}`)}
                   </a>
                 </li>
@@ -135,20 +140,22 @@ export default async function HomePage() {
         {/* Hero com vídeo abstrato; o texto fica sobre uma camada escura (contraste AA). */}
         <section
           aria-labelledby="home-title"
-          className="relative isolate flex min-h-[72svh] items-center overflow-hidden bg-zinc-950 text-white"
+          className="relative isolate flex min-h-[72svh] items-center overflow-hidden bg-noite text-pergaminho"
         >
           <HeroVideo />
           <div
-            className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-zinc-950/10"
+            className="absolute inset-0 bg-gradient-to-r from-noite/90 via-noite/55 to-noite/10"
             aria-hidden="true"
           />
           <div
-            className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-zinc-950/80 to-transparent"
+            className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-noite/80 to-transparent"
             aria-hidden="true"
           />
           <div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6">
+            {/* O nome em texto está no título da página e no cabeçalho; aqui o logotipo é a marca. */}
+            <Logo className="mb-8 h-10 w-auto text-pergaminho sm:h-14" />
             <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium ring-1 ring-white/25 backdrop-blur">
-              <span className="size-2 rounded-full bg-emerald-400" aria-hidden="true" />
+              <span className="size-2 rounded-full bg-mana" aria-hidden="true" />
               {t('hero.eyebrow')}
             </p>
             <h1
@@ -157,12 +164,12 @@ export default async function HomePage() {
             >
               {t('hero.title')}
             </h1>
-            <p className="mt-6 max-w-2xl text-lg text-zinc-200 sm:text-xl">{t('hero.subtitle')}</p>
+            <p className="mt-6 max-w-2xl text-lg text-ink-200 sm:text-xl">{t('hero.subtitle')}</p>
             <div className="mt-10 flex flex-wrap gap-3">
               {dashboardButton('lg')}
               <a
                 href="#join"
-                className="btn inline-flex border border-white/40 bg-white/10 px-6 text-base text-white backdrop-blur hover:bg-white/20"
+                className="btn inline-flex bg-accent px-6 text-base text-on-accent hover:bg-gold-300"
               >
                 <Icon name="email" />
                 {t('hero.join')}
@@ -178,6 +185,7 @@ export default async function HomePage() {
                 {t('intro.title')}
               </h2>
               <p className="muted text-lg">{t('intro.body')}</p>
+              <p className="muted text-lg">{t('intro.name')}</p>
             </div>
             <dl className="grid grid-cols-3 gap-4">
               {(
@@ -200,7 +208,7 @@ export default async function HomePage() {
 
         <section
           aria-labelledby="features"
-          className="scroll-mt-20 border-y border-zinc-200 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-900"
+          className="scroll-mt-20 border-y border-line bg-surface py-20"
         >
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <SectionHeading
@@ -211,10 +219,7 @@ export default async function HomePage() {
             />
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map(([key, icon], i) => (
-                <li
-                  key={key}
-                  className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-950"
-                >
+                <li key={key} className="rounded-2xl border border-line bg-canvas p-6">
                   <span
                     className="mb-4 inline-flex size-11 items-center justify-center rounded-xl text-white"
                     style={{ backgroundColor: ACCENTS[i % ACCENTS.length] }}
@@ -240,7 +245,7 @@ export default async function HomePage() {
             />
             <dl className="grid gap-x-10 gap-y-8 md:grid-cols-2">
               {SOURCES.map(([key, url]) => (
-                <div key={key} className="border-s-4 border-brand-500 ps-5">
+                <div key={key} className="border-s-4 border-accent ps-5">
                   <dt className="text-lg font-semibold">
                     {url ? (
                       <a
@@ -265,7 +270,7 @@ export default async function HomePage() {
 
         <section
           aria-labelledby="method"
-          className="scroll-mt-20 border-y border-zinc-200 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-900"
+          className="scroll-mt-20 border-y border-line bg-surface py-20"
         >
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <SectionHeading
@@ -304,10 +309,7 @@ export default async function HomePage() {
             </figure>
             <ol className="grid gap-6 md:grid-cols-2">
               {STEPS.map((key) => (
-                <li
-                  key={key}
-                  className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800"
-                >
+                <li key={key} className="rounded-2xl border border-line p-6">
                   <h3 className="mb-2 text-lg font-semibold">{t(`method.steps.${key}.title`)}</h3>
                   <p className="muted">{t(`method.steps.${key}.body`)}</p>
                 </li>
@@ -323,7 +325,7 @@ export default async function HomePage() {
               {(['accessible', 'privacy'] as const).map((key) => (
                 <li key={key} className="card flex gap-4 p-6">
                   <span
-                    className="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-700/30 dark:text-brand-400"
+                    className="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300"
                     aria-hidden="true"
                   >
                     <Icon name={key} className="size-6" />
@@ -339,40 +341,40 @@ export default async function HomePage() {
         </section>
 
         <section aria-labelledby="join" className="scroll-mt-20 px-4 pb-20 sm:px-6">
-          <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-3xl bg-zinc-950 px-6 py-16 text-white sm:px-12">
+          <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-3xl bg-noite px-6 py-16 text-pergaminho sm:px-12">
             <div
               className="absolute -inset-20 -z-10 opacity-90 blur-3xl"
               style={{
                 background:
-                  'radial-gradient(closest-side at 15% 20%, #7c3aed, transparent), radial-gradient(closest-side at 85% 90%, #1fa363, transparent), radial-gradient(closest-side at 90% 10%, #2f7fd8, transparent), radial-gradient(closest-side at 50% 110%, #e0413a, transparent)',
+                  'radial-gradient(closest-side at 15% 20%, var(--color-eter), transparent), radial-gradient(closest-side at 85% 90%, var(--color-teal-800), transparent), radial-gradient(closest-side at 90% 10%, var(--color-arcano), transparent), radial-gradient(closest-side at 50% 110%, var(--color-gold-800), transparent)',
               }}
               aria-hidden="true"
             />
-            <p className="font-mono text-sm font-semibold text-violet-200" aria-hidden="true">
+            <p className="font-mono text-sm font-semibold text-gold-300" aria-hidden="true">
               05
             </p>
             <h2 id="join" className="mt-3 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">
               {t('join.title')}
             </h2>
-            <p className="mt-5 max-w-2xl text-lg text-zinc-200">{t('join.body')}</p>
+            <p className="mt-5 max-w-2xl text-lg text-ink-200">{t('join.body')}</p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
                 href={mailto}
-                className="btn inline-flex bg-white px-6 text-base text-zinc-950 hover:bg-zinc-200"
+                className="btn inline-flex bg-accent px-6 text-base text-on-accent hover:bg-gold-300"
               >
                 <Icon name="email" />
                 {t('join.email')}
               </a>
-              <span className="text-zinc-200">{t('join.or')}</span>
+              <span className="text-ink-200">{t('join.or')}</span>
               {dashboardButton('lg')}
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-zinc-200 py-10 text-sm dark:border-zinc-800">
+      <footer className="border-t border-line py-10 text-sm">
         <div className="mx-auto max-w-6xl space-y-2 px-4 sm:px-6">
-          <p className="font-semibold">{tc('appName')}</p>
+          <Logo title={tc('appName')} className="h-5 w-auto text-arcano dark:text-pergaminho" />
           <p className="muted">{t('footer.credits')}</p>
           <p className="muted">{t('footer.disclaimer')}</p>
           <p>

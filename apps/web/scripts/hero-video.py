@@ -1,5 +1,5 @@
 """
-Gera os quadros do vídeo abstrato do topo da página inicial (cores de mana em movimento, loop
+Gera os quadros do vídeo abstrato do topo da página inicial (cores da paleta ArcanaKin em movimento, loop
 perfeito de 12 s a 24 fps). Uso:
 
     python3 hero-video.py /tmp/frames
@@ -17,9 +17,9 @@ only=int(sys.argv[2]) if len(sys.argv)>2 else None
 y,x=np.mgrid[0:H,0:W].astype(np.float32)
 x=(x-W/2)/H; y=(y-H/2)/H
 hexc=lambda h: np.array([int(h[i:i+2],16)/255 for i in (1,3,5)],np.float32)
-# mana: W U B R G + brand purple
-cols=[hexc('#f3e3b0'),hexc('#2f7fd8'),hexc('#8b5cf6'),hexc('#e0413a'),hexc('#1fa363'),hexc('#7c3aed')]
-bg=hexc('#07050d')
+# Paleta ArcanaKin (packages/tokens): Dourado, Mana, Éter, violeta claro, Arcano (clareado) e verde-água claro
+cols=[hexc('#f6b944'),hexc('#14b8a6'),hexc('#7c3aed'),hexc('#a78bfa'),hexc('#5b21b6'),hexc('#4cd0be')]
+bg=hexc('#0b0716')  # Noite
 rng=np.random.default_rng(7)
 blobs=[]
 for i in range(11):
@@ -45,7 +45,7 @@ for f in frames:
         acc+=(ring*mod*0.35)[...,None]*cols[ci]
     # faixas de luz suaves
     band=np.exp(-((y+0.25*np.sin(2.2*x+w)+0.05*np.sin(5*x-2*w))**2)/0.004)*0.25
-    acc+=band[...,None]*hexc('#c4b5fd')
+    acc+=band[...,None]*hexc('#ffde9b')  # dourado claro
     img=1-np.exp(-acc*1.05)
     vign=np.clip(1.15-0.55*r,0,1)[...,None]
     img=bg+(1-bg)*img*vign

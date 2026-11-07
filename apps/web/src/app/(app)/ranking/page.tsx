@@ -26,7 +26,7 @@ function ScrollTable({ label, children }: { label: string; children: ReactNode }
 }
 
 const Art = ({ src }: { src: string | null }) => (
-  <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-200 dark:bg-zinc-800">
+  <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-ink-200 dark:bg-ink-800">
     {src && <Image src={src} alt="" fill sizes="64px" unoptimized className="object-cover" />}
   </div>
 );
@@ -134,7 +134,7 @@ export default async function RankingPage({ searchParams }: Props) {
             <table className="w-full text-sm">
               <caption className="sr-only">{t('caption', { group: group.name })}</caption>
               <thead>
-                <tr className="text-left text-zinc-600 dark:text-zinc-400">
+                <tr className="text-left text-ink-600 dark:text-ink-400">
                   <th scope="col" className="py-2 pr-2">
                     {t('position')}
                   </th>
@@ -165,7 +165,7 @@ export default async function RankingPage({ searchParams }: Props) {
                 {ranking.standings.map((s) => (
                   <tr
                     key={s.userId}
-                    className={`border-t border-zinc-200 dark:border-zinc-800 ${s.userId === user.id ? 'font-semibold' : ''}`}
+                    className={`border-t border-ink-200 dark:border-ink-800 ${s.userId === user.id ? 'font-semibold' : ''}`}
                   >
                     <td className="py-2 pr-2">{s.position}</td>
                     <th scope="row" className="py-2 pr-2 text-left font-[inherit]">
@@ -224,7 +224,7 @@ export default async function RankingPage({ searchParams }: Props) {
                         }),
                   ],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900">
+                  <div key={label} className="rounded-xl bg-ink-50 p-3 dark:bg-ink-900">
                     <dt className="muted text-sm">{label}</dt>
                     <dd className="text-lg font-semibold tabular-nums">{value}</dd>
                   </div>
@@ -254,7 +254,7 @@ export default async function RankingPage({ searchParams }: Props) {
                 <table className="mt-2 w-full text-sm">
                   <caption className="sr-only">{ts('streaksCaption')}</caption>
                   <thead>
-                    <tr className="text-left text-zinc-600 dark:text-zinc-400">
+                    <tr className="text-left text-ink-600 dark:text-ink-400">
                       <th scope="col" className="py-2 pr-2">
                         {t('player')}
                       </th>
@@ -274,7 +274,7 @@ export default async function RankingPage({ searchParams }: Props) {
                   </thead>
                   <tbody className="tabular-nums">
                     {stats.players.map((p) => (
-                      <tr key={p.userId} className="border-t border-zinc-200 dark:border-zinc-800">
+                      <tr key={p.userId} className="border-t border-ink-200 dark:border-ink-800">
                         <th scope="row" className="py-2 pr-2 text-left font-medium">
                           {p.name}
                         </th>
@@ -301,7 +301,7 @@ export default async function RankingPage({ searchParams }: Props) {
                   <table className="mt-2 text-sm" aria-describedby="h2h-hint">
                     <caption className="sr-only">{ts('headToHeadCaption')}</caption>
                     <thead>
-                      <tr className="text-zinc-600 dark:text-zinc-400">
+                      <tr className="text-ink-600 dark:text-ink-400">
                         <td />
                         {people.map((o) => (
                           <th key={o.userId} scope="col" className="px-2 py-2 text-center">
@@ -312,10 +312,7 @@ export default async function RankingPage({ searchParams }: Props) {
                     </thead>
                     <tbody className="tabular-nums">
                       {people.map((p) => (
-                        <tr
-                          key={p.userId}
-                          className="border-t border-zinc-200 dark:border-zinc-800"
-                        >
+                        <tr key={p.userId} className="border-t border-ink-200 dark:border-ink-800">
                           <th
                             scope="row"
                             className="py-2 pr-3 text-left font-medium whitespace-nowrap"
@@ -425,7 +422,7 @@ export default async function RankingPage({ searchParams }: Props) {
         {seasons.length === 0 ? (
           <p className="muted text-sm">{tsn('empty')}</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <ul className="divide-y divide-ink-200 text-sm dark:divide-ink-800">
             {seasons.map((s) => (
               <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
                 <span>

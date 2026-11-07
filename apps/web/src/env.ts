@@ -12,7 +12,7 @@ const schema = z.object({
   /** Chave da API do Resend (opcional; sem ela os e-mails são apenas registrados no log). */
   RESEND_API_KEY: z.string().min(1).optional(),
   /** Remetente dos e-mails. Sem domínio verificado no Resend, use o de testes. */
-  EMAIL_FROM: z.string().min(3).default('Bora Marcar <onboarding@resend.dev>'),
+  EMAIL_FROM: z.string().min(3).default('ArcanaKin <onboarding@resend.dev>'),
   /** Segredo que a Vercel envia no header Authorization ao chamar os cron jobs. */
   CRON_SECRET: z.string().min(16).optional(),
 });
@@ -37,7 +37,7 @@ export function getEnv(): Env {
       VERCEL_URL: process.env.VERCEL_URL,
       MOXFIELD_USER_AGENT: process.env.MOXFIELD_USER_AGENT,
       RESEND_API_KEY: process.env.RESEND_API_KEY,
-      EMAIL_FROM: process.env.EMAIL_FROM ?? 'Bora Marcar <onboarding@resend.dev>',
+      EMAIL_FROM: process.env.EMAIL_FROM ?? 'ArcanaKin <onboarding@resend.dev>',
       CRON_SECRET: process.env.CRON_SECRET,
     };
     return cached;

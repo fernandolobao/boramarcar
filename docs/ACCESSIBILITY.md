@@ -163,6 +163,13 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: rebranding ArcanaKin (cores e logotipo)
+
+- Cores vêm dos design tokens (`packages/tokens`), com testes de contraste para todos os pares usados: texto ≥ 4,5:1 (inclusive o secundário sobre o Pergaminho, as superfícies e o hover), bordas de campos e anel de foco ≥ 3:1, nos temas claro e escuro.
+- O Dourado só aparece como preenchimento com texto Noite por cima (11:1) ou como texto em versões escuras (`accentText`); o Mana como texto usa tons escuros no claro e claros no escuro.
+- O logotipo é SVG com a cor do texto: com nome ("ArcanaKin") quando sozinho num link ou como título da tela de entrada do app; decorativo (`aria-hidden`) quando o nome já está na página.
+- O vídeo do topo continua decorativo, com botão de pausar e o texto sobre camadas escuras.
+
 ### Revisão: trocar lugares no modo mesa
 
 - No modo de troca, cada área vira um botão com nome ("Escolher Ana para trocar de lugar") e estado (`aria-pressed`/`selected`); o botão central vira "Pronto" com texto visível; a troca é anunciada numa região viva ("Ana e Bia trocaram de lugar.") e "Desfazer" volta a ordem.
