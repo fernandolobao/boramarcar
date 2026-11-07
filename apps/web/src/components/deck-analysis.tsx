@@ -12,6 +12,7 @@ export { ManaCurve } from './analysis-charts';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Icon } from './icons';
 import { ManaSymbol } from './mana';
+import { CardName, CardNames } from './card-dialog';
 
 /** Cores das barras: as mesmas dos símbolos de mana. */
 const PIP_COLOR: Record<ColorSymbol, string> = {
@@ -94,7 +95,7 @@ export function DeckValidation({
     <div>
       <h2 className="section-title">{t('validationTitle', { format: formatName })}</h2>
       {analysis.validation.length === 0 ? (
-        <p className="flex items-center gap-1.5 text-sm text-green-700 dark:text-green-400">
+        <p className="flex items-center gap-1.5 text-sm text-success">
           <Icon name="ok" />
           {t('valid', { format: formatName })}
         </p>
@@ -104,7 +105,17 @@ export function DeckValidation({
             const { code, ...params } = issue;
             return (
               <li key={index}>
-                {t(`validation.${code}`, params as Record<string, string | number>)}
+                {t.rich(`validation.${code}`, {
+                  ...(params as Record<string, string | number>),
+                  // Nomes de carta abrem a carta.
+                  card: () => <CardName name={String((params as { name?: string }).name ?? '')} />,
+                  cards: () => (
+                    <CardNames
+                      names={String((params as { names?: string }).names ?? '').split(' & ')}
+                      separator=" & "
+                    />
+                  ),
+                })}
               </li>
             );
           })}
@@ -195,23 +206,25 @@ export function BracketCard({
         {bracket.reasons.map((reason, index) => (
           <li key={index}>
             {reason.code === 'game_changers'
-              ? t('bracketReasons.game_changers', {
+              ? t.rich('bracketReasons.game_changers', {
                   count: reason.count,
-                  cards: join(reason.cards),
+                  cards: () => <CardNames names={reason.cards} />,
                 })
               : reason.code === 'mass_land_denial'
-                ? t('bracketReasons.mass_land_denial', { cards: join(reason.cards) })
+                ? t.rich('bracketReasons.mass_land_denial', {
+                    cards: () => <CardNames names={reason.cards} />,
+                  })
                 : reason.code === 'extra_turns'
-                  ? t(
+                  ? t.rich(
                       reason.chained
                         ? 'bracketReasons.extra_turns_chained'
                         : 'bracketReasons.extra_turns',
-                      { cards: join(reason.cards) },
+                      { cards: () => <CardNames names={reason.cards} /> },
                     )
                   : reason.code === 'clean'
                     ? t('bracketReasons.clean')
-                    : t(`bracketReasons.${reason.code}`, {
-                        cards: reason.cards.join(' + '),
+                    : t.rich(`bracketReasons.${reason.code}`, {
+                        cards: () => <CardNames names={reason.cards} separator=" + " />,
                         produces: join(reason.produces),
                       })}
           </li>

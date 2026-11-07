@@ -1,4 +1,4 @@
-import { computeGroupStats, DomainError, type StatsGame } from '@boramarcar/core';
+import { computeGroupStats, DomainError, gamesByMonth, type StatsGame } from '@boramarcar/core';
 import { and, asc, eq, gte, inArray, lt } from 'drizzle-orm';
 import type { Database } from '../client';
 import { decks, gamePlayers, games, seasons, user } from '../schema';
@@ -69,7 +69,16 @@ export async function deleteSeason(db: Database, input: { seasonId: string; user
  */
 export async function getGroupStats(
   db: Database,
-  input: { groupId: string; userId: string; from?: Date; to?: Date; format?: string },
+  input: {
+    groupId: string;
+    userId: string;
+    from?: Date;
+    to?: Date;
+    format?: string;
+    /** Para a atividade por mês (painel): referência e fuso. */
+    now?: Date;
+    timeZone?: string;
+  },
 ) {
   await requireMembership(db, input.groupId, input.userId);
   const gameRows = await db
@@ -144,7 +153,14 @@ export async function getGroupStats(
   // Comandantes do grupo: soma os decks que têm o mesmo comandante (ou dupla de comandantes).
   const commanders = new Map<
     string,
-    { name: string; artUri: string | null; games: number; wins: number; players: Set<string> }
+    {
+      name: string;
+      artUri: string | null;
+      games: number;
+      wins: number;
+      /** Quem joga com esse comandante (id → nome). */
+      players: Map<string, string>;
+    }
   >();
   for (const deck of deckStats) {
     const cards = deck.cover?.cards ?? [];
@@ -155,16 +171,18 @@ export async function getGroupStats(
       artUri: deck.cover?.artUri ?? null,
       games: 0,
       wins: 0,
-      players: new Set<string>(),
+      players: new Map<string, string>(),
     };
     row.games += deck.games;
     row.wins += deck.wins;
-    row.players.add(deck.ownerName);
+    row.players.set(deck.userId, deck.ownerName);
     commanders.set(key, row);
   }
 
   return {
     ...stats,
+    /** Partidas por mês nos últimos 6 meses (painel). */
+    activity: gamesByMonth(gameRows, { months: 6, now: input.now, timeZone: input.timeZone }),
     players: stats.players.map((p) => ({ ...p, name: nameOf(p.userId) })),
     headToHead: stats.headToHead.map((h) => ({
       ...h,
@@ -175,7 +193,9 @@ export async function getGroupStats(
     commanders: [...commanders.values()]
       .map((c) => ({
         ...c,
-        players: [...c.players].sort(),
+        players: [...c.players]
+          .map(([userId, name]) => ({ userId, name }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
         winRate: c.games ? c.wins / c.games : 0,
       }))
       .sort((a, b) => b.games - a.games || b.winRate - a.winRate || a.name.localeCompare(b.name)),

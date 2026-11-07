@@ -593,6 +593,8 @@ export async function setDeckLine(
     card?: CardData | null;
     /** Impressão da linha a alterar; sem valor, a linha da carta pela impressão de `card`. */
     scryfallId?: string | null;
+    /** Cópias foil; sem valor, mantém o que a linha já tinha (mudar a quantidade não perde o foil). */
+    foil?: boolean;
   },
 ) {
   const name = input.card?.name ?? input.name.trim();
@@ -605,17 +607,19 @@ export async function setDeckLine(
   await requireOwnedDeck(db, input.deckId, input.userId);
   if (input.card) await upsertCards(db, [input.card]);
 
+  let foil = input.foil ?? false;
   await db.transaction(async (tx) => {
-    await tx
-      .delete(deckCards)
-      .where(
-        and(
-          eq(deckCards.deckId, input.deckId),
-          eq(deckCards.board, input.board),
-          sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
-          anyPrint ? undefined : samePrint(print),
-        ),
-      );
+    const sameLine = and(
+      eq(deckCards.deckId, input.deckId),
+      eq(deckCards.board, input.board),
+      sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
+      anyPrint ? undefined : samePrint(print),
+    );
+    if (input.foil === undefined) {
+      const current = await tx.select({ isFoil: deckCards.isFoil }).from(deckCards).where(sameLine);
+      foil = current.length > 0 && current.every((r) => r.isFoil);
+    }
+    await tx.delete(deckCards).where(sameLine);
     if (parts.length) {
       await tx.insert(deckCards).values(
         parts.map((p) => ({
@@ -625,6 +629,7 @@ export async function setDeckLine(
           board: input.board,
           quantity: p.quantity,
           isProxy: p.isProxy,
+          isFoil: foil,
         })),
       );
     }
@@ -636,6 +641,7 @@ export async function setDeckLine(
     scryfallId: print,
     quantity: input.quantity,
     proxies: input.proxies,
+    foil,
   };
 }
 

@@ -167,8 +167,20 @@ describe('editor de deck', () => {
     expect(calls.at(-1)).toEqual({
       url: '/api/v1/decks/d1/lines',
       method: 'PUT',
-      body: { name: 'Forest', board: 'mainboard', quantity: 30, proxies: 12, scryfallId: 'f' },
+      body: {
+        name: 'Forest',
+        board: 'mainboard',
+        quantity: 30,
+        proxies: 12,
+        scryfallId: 'f',
+        foil: false,
+      },
     });
+
+    // Foil: a caixa salva na hora, para todas as cópias da linha.
+    fireEvent.click(screen.getByLabelText(/^Foil \(Forest/));
+    await screen.findByText('Forest: foil marcado.');
+    expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foil: true });
 
     const qty = screen.getByRole('spinbutton', { name: 'Quantidade de Elvish Mystic' });
     fireEvent.change(qty, { target: { value: '0' } });
@@ -186,6 +198,7 @@ describe('editor de deck', () => {
       quantity: 0,
       proxies: 0,
       scryfallId: null,
+      foil: false,
     });
   });
 

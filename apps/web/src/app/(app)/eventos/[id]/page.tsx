@@ -24,6 +24,7 @@ import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { buildEventShareText, eventUrl } from '@/server/event-share';
 import { isDomainError } from '@boramarcar/core';
+import { PlayerLink, PlayerLinks } from '@/components/player-link';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -143,7 +144,8 @@ export default async function EventPage({ params }: Props) {
               key={p.userId}
               className="rounded-full bg-ink-100 px-3 py-1 text-sm dark:bg-ink-800"
             >
-              {p.name} · <span className="muted">{t(`rsvp.${p.rsvp}`)}</span>
+              <PlayerLink userId={p.userId} name={p.name} /> ·{' '}
+              <span className="muted">{t(`rsvp.${p.rsvp}`)}</span>
             </li>
           ))}
         </ul>
@@ -176,11 +178,14 @@ export default async function EventPage({ params }: Props) {
                         </span>
                       </h3>
                       <p className="mt-0.5 text-sm">
-                        {game.isDraw
-                          ? t('draw')
-                          : game.winners.length === 1
-                            ? t('winner', { name: game.winners[0]!.name })
-                            : t('winners', { names: game.winners.map((w) => w.name).join(', ') })}
+                        {game.isDraw ? (
+                          t('draw')
+                        ) : (
+                          <>
+                            {t('winnersLabel', { count: game.winners.length })}{' '}
+                            <PlayerLinks players={game.winners} />
+                          </>
+                        )}
                       </p>
                       {summary.length > 0 && <p className="muted text-sm">{summary.join(' · ')}</p>}
                     </div>

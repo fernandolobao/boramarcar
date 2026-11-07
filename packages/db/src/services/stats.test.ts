@@ -121,7 +121,7 @@ describe('estatísticas do grupo', () => {
         artUri: null,
         games: 1,
         wins: 1,
-        players: ['P1'],
+        players: [{ userId: a, name: 'P1' }],
         winRate: 1,
       },
     ]);

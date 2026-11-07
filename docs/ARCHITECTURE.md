@@ -197,6 +197,19 @@ Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e 
 
 `/api/cron/scryfall` roda todo dia às 06:43 UTC (`vercel.json`, protegido por `CRON_SECRET`, como o cron de lembretes). Em vez do _bulk data_ do Scryfall (centenas de MB, pesado demais para uma função serverless), relê pelo `/cards/collection` só as cartas que estão em algum deck e não foram atualizadas nas últimas 20 h, das mais antigas para as mais novas, até 1 500 por execução (20 lotes de 75, 100 ms entre lotes). Assim preços, Game Changers, imagens e edições ficam em dia; cartas que sumiram do Scryfall são marcadas como verificadas para não repetir a consulta.
 
+## Painel
+
+`/painel` junta o que importa ao abrir o app: o **próximo encontro** em destaque (contagem regressiva, quem confirmou e a sua resposta), **os seus números** (posição, pontos, aproveitamento com anel, vitórias seguidas), a **forma** (últimos 10 resultados, `PlayerStats.recent`), o **pódio**, a **atividade do grupo** (partidas por mês nos últimos 6 meses, `gamesByMonth` no fuso do grupo, com tabela para leitores de tela, turno médio e duração média), os **melhores horários** (com "Marcar encontro") e os **comandantes em alta**.
+
+## Nomes clicáveis
+
+- **Jogadores**: `<PlayerLink>`/`<PlayerLinks>` levam a `/jogadores/:id` (o próprio vai para `/perfil`) em encontros, partidas, ranking, estatísticas, disponibilidade e painel. Em frases traduzidas, o nome entra por `t.rich` com uma tag (ex.: `<owner>{ownerName}</owner>`).
+- **Cartas**: `<CardName>`/`<CardNames>` abrem o mesmo diálogo da carta do deck (`<CardDialog>`), buscando por nome em `GET /api/v1/cards/named?name=` (cache local; senão, Scryfall, e grava no cache). Usado na análise (funções, curva, nota, bracket, validação), na comparação, nas estatísticas, nas partidas e no painel. O diálogo é criado no primeiro clique e vai para o `<body>` por portal — um `<dialog>` dentro de um `<p>` quebra o HTML e a hidratação.
+
+## Foil
+
+`deck_cards.is_foil` (que já vinha das importações) agora aparece e é editável: a linha do deck é foil quando todas as cópias são (`DeckLine.foil`). No editor, a caixa "Foil" salva na hora (`PUT …/lines` com `foil`); mudar quantidade ou proxies sem mandar `foil` mantém o que estava. Na grade, a carta foil tem um brilho decorativo (parado com "reduzir movimento") e o selo "✦ Foil"; a exportação marca `*F*`.
+
 ## Marca e design tokens (ArcanaKin)
 
 `packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):
