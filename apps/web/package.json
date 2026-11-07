@@ -12,6 +12,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@better-auth/expo": "1.7.18",
     "@boramarcar/core": "workspace:*",
     "@boramarcar/db": "workspace:*",
     "@vercel/analytics": "^2.0.1",

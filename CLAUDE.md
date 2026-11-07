@@ -7,7 +7,8 @@ Leia também o [README](README.md), a [arquitetura](docs/ARCHITECTURE.md) e o [r
 
 - TypeScript strict. Regras de negócio em `packages/core` (puras e testadas); acesso a dados em `packages/db/src/services`; rotas da API finas (auth + Zod + serviço).
 - Mudou o schema? `pnpm db:generate` e commit da migration.
-- Todo texto de interface vai em `apps/web/messages/pt-BR.json` **e** `en.json` (há teste de paridade).
+- Todo texto de interface vai em `apps/web/messages/pt-BR.json` **e** `en.json` (há teste de paridade). No app mobile, em `apps/mobile/src/lib/i18n.ts` (português e inglês; o TypeScript exige as mesmas chaves).
+- App mobile (`apps/mobile`): Expo + Expo Router; dependências com `npx expo install` (versões do SDK); fala com o servidor só pelo `@boramarcar/api-client`. Leia `apps/mobile/AGENTS.md`.
 - Horários digitados pelo usuário são convertidos com `zonedLocalToUtc` no fuso do usuário (`useTimeZone()`), nunca com `new Date(valorDoInput)`.
 - Antes de abrir PR: `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test` e, quando mexer em UI, os testes E2E (ver abaixo).
 

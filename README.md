@@ -52,6 +52,7 @@ Hoje é uma aplicação web (Next.js na Vercel). Os apps Android e iOS estão pl
 ```
 boramarcar/
 ├── apps/
+│   ├── mobile/               # app Android/iOS (Expo + Expo Router), usa a API v1
 │   └── web/                  # Next.js: páginas, API REST (/api/v1), auth, i18n
 │       ├── messages/         # traduções (pt-BR.json, en.json)
 │       ├── e2e/              # testes Playwright
@@ -62,6 +63,7 @@ boramarcar/
 │           ├── lib/          # código de cliente (fetch da API, auth client)
 │           └── server/       # auth, db, sessão, helpers HTTP (somente servidor)
 ├── packages/
+│   ├── api-client/           # cliente tipado da API v1 (Zod), usado pelo app mobile
 │   ├── core/                 # regras de domínio puras (sem banco): disponibilidade,
 │   │                         # ranking, importadores de deck, Scryfall, análise de deck
 │   └── db/                   # schema Drizzle, migrations e serviços de dados
@@ -123,6 +125,23 @@ pnpm dev
 | `pnpm db:migrate`                              | Aplica migrations no `DATABASE_URL`                         |
 | `pnpm db:studio`                               | Abre o Drizzle Studio                                       |
 
+## App mobile (Expo)
+
+O app fica em `apps/mobile` (Expo SDK 58 + Expo Router) e conversa com a mesma API v1 do site, pelo cliente tipado de `packages/api-client`. O login com Google usa o plugin Expo do Better Auth: o navegador do sistema abre o login e volta ao app pelo esquema `boramarcar://`; a sessão fica no SecureStore.
+
+```bash
+pnpm install
+pnpm --filter @boramarcar/mobile start   # usa o site em produção
+```
+
+- **Testar no celular com o Expo Go** (sem build próprio), contra a produção:
+  1. Na Vercel, adicione a variável `EXPO_GO_LOGIN=lan` (produção) e faça um novo deploy. Ela deixa o login do Google voltar para o Expo Go **só** em endereços de rede local (`exp://192.168…`, `10.…`, `172.16–31.…`); tire-a quando não estiver testando.
+  2. `pnpm --filter @boramarcar/mobile start` e leia o QR code com a câmera (iPhone) ou com o Expo Go (Android), com o celular no mesmo Wi-Fi do computador.
+  3. O app usa `https://boramarcar-zeta.vercel.app`; para outro servidor, `EXPO_PUBLIC_API_URL=https://…` (um IP da rede local não serve: o Google não volta para ele). A tela de entrada mostra o servidor e avisa se ele não responder.
+- Sem `EXPO_GO_LOGIN`, a produção só aceita `boramarcar://`, que é o app instalado (_development build_ com `npx expo run:android|ios` ou `eas build --profile development`).
+- Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
+- Textos em `apps/mobile/src/lib/i18n.ts` (português e inglês, pelo idioma do aparelho).
+
 ## Testes
 
 - **Unitários** (`packages/core`): algoritmo de janelas de disponibilidade, ranking e validação de partidas, parser de listas, importadores Archidekt/Moxfield, cliente Scryfall (com `fetch` simulado) e análise de deck.
@@ -142,7 +161,8 @@ Em cada pull request (`.github/workflows/ci.yml`):
 1. **Qualidade** — Prettier, ESLint e TypeScript.
 2. **Testes** — Vitest com cobertura (falha abaixo dos limites) e resumo no PR.
 3. **Migrations** — verifica se a migration foi gerada para o schema atual e aplica tudo em um Postgres 17 real.
-4. **Build e E2E** — `next build` e Playwright com Postgres real: smoke e auditoria de acessibilidade (axe) em todas as telas.
+4. **App mobile** — `expo export` empacota o app para Android e iOS (garante que o Metro resolve tudo no monorepo).
+5. **Build e E2E** — `next build` e Playwright com Postgres real: smoke e auditoria de acessibilidade (axe) em todas as telas.
 
 Recomendado: em _Settings → Branches_, proteger a `main` exigindo esses checks antes do merge.
 

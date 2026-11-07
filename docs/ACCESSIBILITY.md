@@ -163,6 +163,14 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: app mobile (primeira versão)
+
+- Botões com alvo mínimo de 44 pt, `accessibilityRole="button"` e estado (`disabled`, `selected`/`checked`); escolhas únicas (presença, grupo ativo) como `radiogroup`/`radio`.
+- Títulos de tela e de seção com `accessibilityRole="header"`; itens de lista com um rótulo completo (encontro: título, data, local e situação; ranking: posição, nome, pontos e vitórias).
+- Erros e confirmações em regiões vivas (`accessibilityRole="alert"`, `accessibilityLiveRegion`); carregamento com rótulo.
+- Cores com contraste AA nos temas claro e escuro (segue o tema do aparelho); texto escala com o tamanho de fonte do sistema (até 2×).
+- Pendente: passada manual com TalkBack e VoiceOver, e testes automatizados de acessibilidade no app.
+
 ### Revisão: página inicial
 
 - Vídeo do topo decorativo (`aria-hidden`, sem som) com botão de pausar/reproduzir com nome (WCAG 2.2.2); com "reduzir movimento" ele não toca sozinho. O texto fica sobre camadas escuras para manter o contraste em qualquer quadro do vídeo.
