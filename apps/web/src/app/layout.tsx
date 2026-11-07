@@ -12,6 +12,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: t('appName'), template: `%s · ${t('appName')}` },
     description: t('tagline'),
+    // O Safari/Chrome do iPhone transformava nomes ("Monteiro" é uma cidade), datas e números
+    // em links de mapa, agenda e telefone. Endereços e datas reais já têm os nossos links.
+    formatDetection: { telephone: false, date: false, address: false, email: false, url: false },
   };
 }
 
