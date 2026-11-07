@@ -120,7 +120,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 5.3 | Cliente da API tipado e compartilhado (`packages/api-client`, gerado a partir de schemas Zod/OpenAPI) | M       | ✅ (Zod, escrito à mão)                           |
 | 5.4 | Telas: disponibilidade, encontros, registrar partida, ranking, decks                                  | G       | em andamento: encontros, presença, ranking, decks |
 | 5.5 | **Push notifications** (Expo Notifications) para encontros e lembretes                                | M       |                                                   |
-| 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)             | G       |                                                   |
+| 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)             | G       | ✅ no site (`/mesa/:encontro`); app em seguida    |
 | 5.7 | Publicação nas lojas (EAS Build/Submit), ícones, splash, política de privacidade                      | M       |                                                   |
 
 ## Transversal (contínuo)
