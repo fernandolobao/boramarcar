@@ -86,7 +86,7 @@ export type ExportFormat = 'plain' | 'proxies';
 
 /**
  * Lista em texto com seções (Commander/Deck/Sideboard/Maybeboard), aceita por Moxfield,
- * Archidekt, MTG Arena e pelo próprio Bora Marcar. `proxies` marca as cópias proxy com
+ * Archidekt, MTG Arena e pelo próprio ArcanaKin. `proxies` marca as cópias proxy com
  * `#proxy` (reimportável aqui); `plain` não marca nada (para outros sites).
  */
 export function exportDeckText(

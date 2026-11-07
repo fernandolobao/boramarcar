@@ -144,7 +144,7 @@ export default async function EventHistoryPage({ searchParams }: Props) {
         {result.items.length === 0 ? (
           <p className="muted">{filtered ? t('noResults') : t('empty')}</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
             {result.items.map((event) => (
               <li key={event.id}>
                 <Link href={`/eventos/${event.id}`} className="block py-3 hover:opacity-80">

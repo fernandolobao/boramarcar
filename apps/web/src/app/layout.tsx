@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { themes } from '@boramarcar/tokens';
 import { Analytics } from '@vercel/analytics/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -20,8 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
+    { media: '(prefers-color-scheme: light)', color: themes.light.canvas },
+    { media: '(prefers-color-scheme: dark)', color: themes.dark.canvas },
   ],
 };
 

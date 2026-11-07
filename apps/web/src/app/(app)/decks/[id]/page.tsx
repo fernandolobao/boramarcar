@@ -98,7 +98,7 @@ export default async function DeckPage({ params }: Props) {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="relative overflow-hidden rounded-3xl border border-ink-200 bg-surface dark:border-ink-800 dark:bg-ink-900">
         {background && (
           // Arte do comandante desfocada como fundo decorativo.
           <Image
@@ -126,7 +126,7 @@ export default async function DeckPage({ params }: Props) {
           )}
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-zinc-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+              <span className="rounded-full bg-ink-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-ink-100 dark:text-ink-900">
                 {tf(format)}
               </span>
               <ColorIdentity colors={identity} />

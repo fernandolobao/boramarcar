@@ -77,7 +77,7 @@ export async function fetchCardRoles(
         {
           headers: {
             Accept: 'application/json',
-            'User-Agent': options.userAgent ?? 'BoraMarcar/1.0',
+            'User-Agent': options.userAgent ?? 'ArcanaKin/1.0',
           },
         },
       );

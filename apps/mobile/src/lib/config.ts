@@ -2,7 +2,7 @@
 export const PRODUCTION_URL = 'https://boramarcar-zeta.vercel.app';
 
 /**
- * Servidor do Bora Marcar (API e login): a produção, ou `EXPO_PUBLIC_API_URL` para outro
+ * Servidor do ArcanaKin (API e login): a produção, ou `EXPO_PUBLIC_API_URL` para outro
  * (ex.: um túnel https para o `pnpm dev`; o Google não aceita voltar para um IP da rede local).
  */
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL?.trim() || PRODUCTION_URL).replace(

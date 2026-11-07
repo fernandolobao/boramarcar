@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Cliente tipado da API v1 do Bora Marcar (app mobile e, no futuro, web), com validação das respostas por Zod.",
+  "description": "Cliente tipado da API v1 do ArcanaKin (app mobile e, no futuro, web), com validação das respostas por Zod.",
   "exports": {
     ".": "./src/index.ts"
   },

@@ -109,7 +109,7 @@ export function CardSearch({
         role="listbox"
         aria-label={label}
         hidden={!visible}
-        className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-xl border border-zinc-300 bg-white p-1 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+        className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-xl border border-ink-300 bg-surface p-1 shadow-xl dark:border-ink-700 dark:bg-ink-900"
       >
         {options.map((name, i) => (
           <div
@@ -118,7 +118,7 @@ export function CardSearch({
             role="option"
             tabIndex={-1}
             aria-selected={i === active}
-            className="cursor-pointer rounded-lg px-3 py-2 text-sm aria-selected:bg-brand-100 aria-selected:text-brand-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:aria-selected:bg-brand-700 dark:aria-selected:text-white"
+            className="cursor-pointer rounded-lg px-3 py-2 text-sm aria-selected:bg-brand-100 aria-selected:text-brand-700 hover:bg-ink-100 dark:hover:bg-ink-800 dark:aria-selected:bg-brand-700 dark:aria-selected:text-white"
             // mousedown (antes do blur do campo) para escolher sem fechar a lista primeiro.
             onMouseDown={(e) => {
               e.preventDefault();

@@ -279,7 +279,7 @@ function Dialog({
       ref={ref}
       aria-label={title}
       onClose={onClose}
-      className="m-auto max-h-[90dvh] w-[min(94vw,28rem)] overflow-y-auto rounded-2xl bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-zinc-950/70 dark:bg-zinc-900 dark:text-zinc-100"
+      className="m-auto max-h-[90dvh] w-[min(94vw,28rem)] overflow-y-auto rounded-2xl bg-surface p-5 text-ink-900 shadow-2xl backdrop:bg-ink-950/70 dark:bg-ink-900 dark:text-ink-100"
     >
       {open && (
         <div className="space-y-4">
@@ -344,7 +344,7 @@ export function TableBoard({
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-zinc-950">
+    <div className="fixed inset-0 z-40 bg-ink-950">
       <h1 className="sr-only">{t('title')}</h1>
       <div
         className="grid h-full w-full gap-1 p-1"
@@ -383,7 +383,7 @@ export function TableBoard({
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          className="absolute top-1/2 left-1/2 z-10 inline-flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-xl ring-4 ring-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          className="absolute top-1/2 left-1/2 z-10 inline-flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink-950 shadow-xl ring-4 ring-ink-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
           aria-label={t('menu')}
         >
           <Icon name="dashboard" className="size-6" />
@@ -392,7 +392,7 @@ export function TableBoard({
         <button
           type="button"
           onClick={() => setSwapping(null)}
-          className="absolute top-1/2 left-1/2 z-20 inline-flex min-h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-white px-5 font-semibold text-zinc-950 shadow-xl ring-4 ring-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          className="absolute top-1/2 left-1/2 z-20 inline-flex min-h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-white px-5 font-semibold text-ink-950 shadow-xl ring-4 ring-ink-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
           <Icon name="done" />
           {t('swapDone')}
@@ -545,7 +545,7 @@ export function TableBoard({
         <p role="status" className="min-h-6 text-center text-lg font-semibold">
           {roll}
         </p>
-        <div className="flex flex-wrap gap-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="flex flex-wrap gap-2 border-t border-ink-200 pt-4 dark:border-ink-800">
           <button type="button" className="btn-primary" onClick={onFinish}>
             <Icon name="finish" />
             {t('finish')}

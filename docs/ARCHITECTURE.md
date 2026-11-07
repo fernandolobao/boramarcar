@@ -197,6 +197,16 @@ Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e 
 
 `/api/cron/scryfall` roda todo dia às 06:43 UTC (`vercel.json`, protegido por `CRON_SECRET`, como o cron de lembretes). Em vez do _bulk data_ do Scryfall (centenas de MB, pesado demais para uma função serverless), relê pelo `/cards/collection` só as cartas que estão em algum deck e não foram atualizadas nas últimas 20 h, das mais antigas para as mais novas, até 1 500 por execução (20 lotes de 75, 100 ms entre lotes). Assim preços, Game Changers, imagens e edições ficam em dia; cartas que sumiram do Scryfall são marcadas como verificadas para não repetir a consulta.
 
+## Marca e design tokens (ArcanaKin)
+
+`packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):
+
+1. **Paleta** (`palette`): as seis cores do design, conferidas contra `palette.json` num teste — Arcano `#3B0D6B` (primária), Éter `#7C3AED` (secundária, ações), Dourado `#F6B944` e Mana `#14B8A6` (destaques), Noite `#0B0716` (fundo escuro) e Pergaminho `#F4EBDB` (fundo claro).
+2. **Escalas** (`scales`): `brand` (600 = Éter, 900 = Arcano), `ink` (neutros do Pergaminho, 100, à Noite, 950, interpolados em OKLab), `gold` (400 = Dourado) e `teal` (500 = Mana). Viram classes do Tailwind (`bg-ink-200`, `text-gold-800`…).
+3. **Cores por função** (`themes.light`/`themes.dark`): `canvas`, `surface`, `surfaceMuted`, `fg`, `fgMuted`, `line`, `lineStrong`, `primary`, `primaryHover`, `onPrimary`, `link`, `focus`, `accent`, `onAccent`, `accentText`, `manaText`, `success`, `danger`. No site são variáveis CSS (`--ak-*`) que trocam com o tema e viram classes (`bg-canvas`, `text-fg-muted`, `outline-focus`…); no app, `useColors()`.
+
+Os testes verificam contraste AA (texto ≥ 4,5:1, bordas de campo e foco ≥ 3:1) em todos os pares usados nos dois temas, e que o `tokens.css` gerado está atualizado. E-mails usam o tema claro dos tokens; o QR do convite, a Noite. O vídeo do topo da página inicial é gerado com as cores da paleta (`apps/web/scripts/hero-video.py`).
+
 ## Tema claro/escuro
 
 Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pessoa pode fixar Claro ou Escuro: a escolha fica no `localStorage` (`bm-theme`) e vira `data-theme` no `<html>`, aplicado por um script inline antes da pintura. A variante `dark:` do Tailwind (`@custom-variant` em `globals.css`) vale com `data-theme="dark"` ou com o sistema escuro quando não há `data-theme="light"`.
@@ -217,7 +227,7 @@ Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pesso
 
 `apps/mobile` é um app Expo (SDK 58) com Expo Router (`src/app`): uma pilha raiz com `Stack.Protected` separa a tela de entrada das abas (Encontros, Ranking, Decks, Conta) e do detalhe do encontro. Ele não acessa o banco: fala só com a API v1 pelo `@boramarcar/api-client`, que valida as respostas com Zod (datas viram `Date`) e transforma erros em `ApiError` com o código do domínio (`network_error` quando não há conexão).
 
-**Login**: o servidor usa o plugin `expo()` do Better Auth e confia em `boramarcar://`; o Expo Go (`exp://`) é aceito em desenvolvimento e, em produção, só com `EXPO_GO_LOGIN=lan` e só em IPs de rede local (`server/trusted-origins.ts`): um `exp://` público, de túnel, poderia levar a sessão para outro projeto. No app, `expoClient` guarda o cookie da sessão no SecureStore; o cliente da API manda esse cookie no cabeçalho `Cookie` com `credentials: 'omit'`. As rotas da API não mudaram: `getSession` lê o cookie do cabeçalho como no site.
+**Login**: o servidor usa o plugin `expo()` do Better Auth e confia em `arcanakin://` (e em `boramarcar://`, o esquema anterior ao rebranding, por um tempo); o Expo Go (`exp://`) é aceito em desenvolvimento e, em produção, só com `EXPO_GO_LOGIN=lan` e só em IPs de rede local (`server/trusted-origins.ts`): um `exp://` público, de túnel, poderia levar a sessão para outro projeto. No app, `expoClient` guarda o cookie da sessão no SecureStore; o cliente da API manda esse cookie no cabeçalho `Cookie` com `credentials: 'omit'`. As rotas da API não mudaram: `getSession` lê o cookie do cabeçalho como no site.
 
 **Grupo ativo**: no site é um cookie; no app fica no SecureStore do aparelho (`GroupProvider`).
 

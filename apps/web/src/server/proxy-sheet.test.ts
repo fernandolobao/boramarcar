@@ -106,7 +106,7 @@ describe('folha de proxies em PDF', () => {
     const calls = fetchMock.mock.calls.map((c) => c[0]);
     expect(calls).toContain('https://cards.scryfall.io/normal/front/a.jpg');
     const headers = fetchMock.mock.calls[0]![1]!.headers as Record<string, string>;
-    expect(headers['User-Agent']).toMatch(/^BoraMarcar\//);
+    expect(headers['User-Agent']).toMatch(/^ArcanaKin\//);
     expect(headers.Accept).toContain('image/jpeg');
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('falha(s)'), expect.anything());
     warn.mockRestore();

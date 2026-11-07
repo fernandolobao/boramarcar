@@ -1,0 +1,32 @@
+[
+  {
+    "nome": "Arcano",
+    "hex": "#3B0D6B",
+    "slug": "primary"
+  },
+  {
+    "nome": "Éter",
+    "hex": "#7C3AED",
+    "slug": "secondary"
+  },
+  {
+    "nome": "Dourado",
+    "hex": "#F6B944",
+    "slug": "accent1"
+  },
+  {
+    "nome": "Mana",
+    "hex": "#14B8A6",
+    "slug": "accent2"
+  },
+  {
+    "nome": "Noite",
+    "hex": "#0B0716",
+    "slug": "dark"
+  },
+  {
+    "nome": "Pergaminho",
+    "hex": "#F4EBDB",
+    "slug": "light"
+  }
+]

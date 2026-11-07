@@ -11,7 +11,10 @@ const allowed = (url: string, origins: string[]) =>
 describe('origens confiáveis do login', () => {
   it('produção: só o app, a não ser que o Expo Go na rede local seja liberado', () => {
     const prod = authTrustedOrigins({ NODE_ENV: 'production' });
+    expect(allowed('arcanakin:///', prod)).toBe(true);
+    // Esquema anterior ao rebranding, aceito por um tempo.
     expect(allowed('boramarcar:///', prod)).toBe(true);
+    expect(allowed('outroapp:///', prod)).toBe(false);
     expect(allowed('exp://192.168.0.12:8081/--/', prod)).toBe(false);
 
     const lan = authTrustedOrigins({ NODE_ENV: 'production', EXPO_GO_LOGIN: 'lan' });

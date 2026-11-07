@@ -1,3 +1,4 @@
+import { palette } from '@boramarcar/tokens';
 import 'server-only';
 import QRCode from 'qrcode';
 import { getBaseUrl } from '@/env';
@@ -8,7 +9,11 @@ export const inviteUrl = (inviteCode: string) => `${getBaseUrl()}/convite/${invi
 export async function inviteQrCode(url: string) {
   const options = { errorCorrectionLevel: 'M' as const, margin: 2 };
   const [svg, png] = await Promise.all([
-    QRCode.toString(url, { ...options, type: 'svg', color: { dark: '#18181b', light: '#ffffff' } }),
+    QRCode.toString(url, {
+      ...options,
+      type: 'svg',
+      color: { dark: palette.noite, light: '#ffffff' },
+    }),
     QRCode.toDataURL(url, { ...options, width: 1024 }),
   ]);
   return { svg, png };

@@ -3,7 +3,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Icon } from './icons';
 
 /**
- * Comparação com outros decks do mesmo comandante no Bora Marcar e popularidade das cartas
+ * Comparação com outros decks do mesmo comandante no ArcanaKin e popularidade das cartas
  * (ranking do EDHREC publicado pelo Scryfall), com link para a página do comandante no EDHREC.
  */
 export function DeckComparisonCard({
@@ -51,7 +51,7 @@ export function DeckComparisonCard({
                 {t('tableCaption', { count: comparison.decks })}
               </caption>
               <thead>
-                <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                <tr className="border-b border-ink-200 dark:border-ink-800">
                   <th scope="col" className="py-1.5 pe-3 font-medium">
                     {t('metric')}
                   </th>
@@ -73,7 +73,7 @@ export function DeckComparisonCard({
                       ? Math.round((m.value - m.average) * 10) / 10
                       : null;
                   return (
-                    <tr key={m.key} className="border-b border-zinc-100 dark:border-zinc-800/60">
+                    <tr key={m.key} className="border-b border-ink-100 dark:border-ink-800/60">
                       <th scope="row" className="py-1.5 pe-3 font-normal">
                         {t(`metrics.${m.key}`)}
                       </th>

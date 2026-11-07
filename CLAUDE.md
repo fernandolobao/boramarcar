@@ -9,6 +9,7 @@ Leia também o [README](README.md), a [arquitetura](docs/ARCHITECTURE.md) e o [r
 - Mudou o schema? `pnpm db:generate` e commit da migration.
 - Todo texto de interface vai em `apps/web/messages/pt-BR.json` **e** `en.json` (há teste de paridade). No app mobile, em `apps/mobile/src/lib/i18n.ts` (português e inglês; o TypeScript exige as mesmas chaves).
 - App mobile (`apps/mobile`): Expo + Expo Router; dependências com `npx expo install` (versões do SDK); fala com o servidor só pelo `@boramarcar/api-client`. Leia `apps/mobile/AGENTS.md`.
+- Marca **ArcanaKin**: cores só pelos design tokens (`packages/tokens`). No site, prefira as classes por função (`bg-canvas`, `bg-surface`, `text-fg`, `text-fg-muted`, `border-line`, `border-line-strong`, `bg-primary`, `text-link`, `bg-accent`/`text-on-accent`) às escalas (`ink-*`, `brand-*`, `gold-*`, `teal-*`); nada de cores fixas (`#…`, `zinc-*`). Mudou os tokens? `pnpm --filter @boramarcar/tokens build:css`. Logotipo: `<Logo>` (site e app).
 - Horários digitados pelo usuário são convertidos com `zonedLocalToUtc` no fuso do usuário (`useTimeZone()`), nunca com `new Date(valorDoInput)`.
 - Antes de abrir PR: `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test` e, quando mexer em UI, os testes E2E (ver abaixo).
 
@@ -23,7 +24,7 @@ A plataforma segue **WCAG 2.2 nível AA**. Toda tela ou componente novo — ou a
 3. **Estado exposto**: `aria-pressed` em toggles, `aria-current="page"` na navegação, `aria-expanded` em disclosures, `role="status"`/`role="alert"` (ou `FormError`) para mensagens.
 4. **Teclado**: tudo operável por teclado, ordem de foco lógica, foco visível (use as classes `btn*`, `input`, `select`, que já têm anel de foco). Nada de `outline: none` sem substituto. Ações destrutivas usam confirmação em dois cliques (padrão do projeto), não `window.confirm`.
 5. **Estrutura**: um `<h1>` por página, títulos sem pular níveis, `generateMetadata` com título descritivo em páginas novas (WCAG 2.4.2), conteúdo dentro de `<main id="conteudo">` (alvo do link "Pular para o conteúdo").
-6. **Contraste**: texto ≥ 4,5:1, bordas de campos e ícones ≥ 3:1, nos temas claro **e** escuro. Texto secundário usa a classe `muted` (zinc-600/zinc-400). Não use `text-zinc-500` ou mais claro para texto.
+6. **Contraste**: texto ≥ 4,5:1, bordas de campos e ícones ≥ 3:1, nos temas claro **e** escuro. Texto secundário usa a classe `muted` (`text-fg-muted`). Não use `text-ink-500` ou mais claro para texto.
 7. **Cor não é a única pista**: informações em cor também aparecem em texto ou ícone; gráficos decorativos com `aria-hidden="true"` quando o dado já está em texto.
 8. **Toque e reflow**: alvos ≥ 24×24px (checkbox/radio já são 20px + rótulo clicável), layout sem rolagem horizontal em 320px.
 9. **Movimento**: animações com `motion-reduce:`.

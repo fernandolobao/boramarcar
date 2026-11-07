@@ -1,12 +1,14 @@
-# Bora Marcar
+<p align="center"><img src="apps/web/public/brand/logotipo.svg" alt="ArcanaKin" width="360"></p>
+
+# ArcanaKin
 
 > Organize os encontros de **Magic: The Gathering — Commander** do seu grupo: quem pode jogar, quando, onde, quem ganhou e com qual deck.
 
 [![CI](https://github.com/fernandolobao/boramarcar/actions/workflows/ci.yml/badge.svg)](https://github.com/fernandolobao/boramarcar/actions/workflows/ci.yml)
 
-O Bora Marcar nasceu para acabar com a enquete no grupo do WhatsApp. Cada jogador marca os dias, horários e locais em que pode jogar; o app encontra as janelas em que uma mesa de 4 fecha, transforma a janela em um encontro, registra as partidas e mantém um ranking. Os jogadores também cadastram seus decks (importando do Archidekt, do Moxfield ou colando a lista), marcam quais cartas são proxies e recebem uma análise do deck.
+O ArcanaKin (antes chamado Bora Marcar) nasceu para acabar com a enquete no grupo do WhatsApp. O nome junta _arcana_, os segredos da magia, e _kin_, a sua gente: é a casa da sua família de Magic. Cada jogador marca os dias, horários e locais em que pode jogar; o app encontra as janelas em que uma mesa de 4 fecha, transforma a janela em um encontro, registra as partidas e mantém um ranking. Os jogadores também cadastram seus decks (importando do Archidekt, do Moxfield ou colando a lista), marcam quais cartas são proxies e recebem uma análise do deck.
 
-Hoje é uma aplicação web (Next.js na Vercel). Os apps Android e iOS estão planejados e vão reaproveitar a mesma API e as mesmas regras de domínio — veja o [roadmap](docs/ROADMAP.md).
+Há a aplicação web (Next.js na Vercel) e o app Android/iOS (Expo), em testes, que reaproveita a mesma API e as mesmas regras de domínio — veja o [roadmap](docs/ROADMAP.md).
 
 ## Funcionalidades
 
@@ -64,6 +66,8 @@ boramarcar/
 │           └── server/       # auth, db, sessão, helpers HTTP (somente servidor)
 ├── packages/
 │   ├── api-client/           # cliente tipado da API v1 (Zod), usado pelo app mobile
+│   ├── tokens/               # design tokens da marca (paleta, escalas, cores por tema,
+│   │                         # logotipo); gera o CSS do site e alimenta o app
 │   ├── core/                 # regras de domínio puras (sem banco): disponibilidade,
 │   │                         # ranking, importadores de deck, Scryfall, análise de deck
 │   └── db/                   # schema Drizzle, migrations e serviços de dados
@@ -107,7 +111,7 @@ pnpm dev
 | `BETTER_AUTH_URL`                           | URL pública do app (ex.: `https://boramarcar.vercel.app`). Se ausente, usa `VERCEL_URL`.                                  |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciais OAuth do Google Cloud.                                                                                        |
 | `RESEND_API_KEY`                            | Opcional. Chave do [Resend](https://resend.com) para os avisos por e-mail. Sem ela, os e-mails só são registrados no log. |
-| `EMAIL_FROM`                                | Opcional. Remetente (padrão: `Bora Marcar <onboarding@resend.dev>`, que só entrega para o dono da conta Resend).          |
+| `EMAIL_FROM`                                | Opcional. Remetente (padrão: `ArcanaKin <onboarding@resend.dev>`, que só entrega para o dono da conta Resend).            |
 | `CRON_SECRET`                               | Segredo (16+ caracteres) que a Vercel envia ao cron de lembretes (`/api/cron/reminders`).                                 |
 | `SKIP_ENV_VALIDATION`                       | `1` para build/testes sem segredos reais (usado na CI).                                                                   |
 
@@ -138,7 +142,7 @@ pnpm --filter @boramarcar/mobile start   # usa o site em produção
   1. Na Vercel, adicione a variável `EXPO_GO_LOGIN=lan` (produção) e faça um novo deploy. Ela deixa o login do Google voltar para o Expo Go **só** em endereços de rede local (`exp://192.168…`, `10.…`, `172.16–31.…`); tire-a quando não estiver testando.
   2. `pnpm --filter @boramarcar/mobile start` e leia o QR code com a câmera (iPhone) ou com o Expo Go (Android), com o celular no mesmo Wi-Fi do computador.
   3. O app usa `https://boramarcar-zeta.vercel.app`; para outro servidor, `EXPO_PUBLIC_API_URL=https://…` (um IP da rede local não serve: o Google não volta para ele). A tela de entrada mostra o servidor e avisa se ele não responder.
-- Sem `EXPO_GO_LOGIN`, a produção só aceita `boramarcar://`, que é o app instalado (_development build_ com `npx expo run:android|ios` ou `eas build --profile development`).
+- Sem `EXPO_GO_LOGIN`, a produção só aceita o link do app instalado (`arcanakin://`; o antigo `boramarcar://` continua aceito por um tempo) (_development build_ com `npx expo run:android|ios` ou `eas build --profile development`).
 - Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), disponibilidade (melhores horários com atalho para marcar o encontro, horários avulsos e semanais, pular uma data), modo mesa (contador de vida no estilo do Lotus que registra a partida no encontro), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
 - Textos em `apps/mobile/src/lib/i18n.ts` (português e inglês, pelo idioma do aparelho).
 
@@ -149,6 +153,14 @@ pnpm --filter @boramarcar/mobile start   # usa o site em produção
 - **Integração da API** (`apps/web`): os route handlers são chamados como o Next faria, com sessão simulada e PGlite, cobrindo o fluxo completo (criar grupo → disponibilidade → sugestão → evento → partida → ranking) e a importação de decks com Archidekt/Scryfall simulados.
 - **Componentes**: Testing Library (jsdom) para a análise de deck.
 - **E2E** (`apps/web/e2e`): Playwright contra o build de produção — página inicial, redirecionamentos de rotas protegidas, API sem sessão e idioma.
+
+## Marca e design tokens
+
+As cores vêm da paleta da marca (`packages/tokens/palette.json`: Arcano, Éter, Dourado, Mana, Noite e Pergaminho) e viram tokens em três camadas: a paleta, escalas derivadas (`brand`, `ink`, `gold`, `teal`) e **cores por função** que mudam com o tema (`canvas`, `surface`, `fg`, `fg-muted`, `line-strong`, `primary`, `accent`…). Os testes do pacote garantem contraste WCAG AA em todos os pares usados.
+
+- **Site**: `apps/web/src/styles/tokens.css` é gerado (`pnpm --filter @boramarcar/tokens build:css`; um teste falha se ficar desatualizado). Use as classes por função (`bg-surface`, `text-fg-muted`, `border-line`) em vez de cores fixas.
+- **App**: `apps/mobile/src/lib/theme.ts` lê os mesmos tokens.
+- **Logotipo**: `apps/web/public/brand/logotipo.svg` (e `logotipo-claro.svg`); nos componentes, `<Logo>` desenha o mesmo traço com a cor do texto. O símbolo e o favicon ainda virão.
 
 ## Acessibilidade
 
@@ -240,4 +252,4 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 
 Dados de cartas fornecidos pela [Scryfall](https://scryfall.com/docs/api). Importação de decks do [Archidekt](https://archidekt.com/) e [Moxfield](https://moxfield.com/). A análise de deck se inspira em ferramentas como o [mythic.tools](https://mythic.tools/).
 
-Bora Marcar é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.
+ArcanaKin é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.

@@ -1,5 +1,6 @@
 import 'server-only';
 import { escapeHtml, sendEmails, type EmailMessage } from '@boramarcar/core/email';
+import { palette, themes } from '@boramarcar/tokens';
 import { createFormatter, createTranslator } from 'next-intl';
 import { getBaseUrl, getEnv } from '@/env';
 import { DEFAULT_LOCALE, isLocale, type Locale } from '@/i18n/config';
@@ -7,6 +8,10 @@ import en from '../../messages/en.json';
 import ptBR from '../../messages/pt-BR.json';
 
 const MESSAGES = { 'pt-BR': ptBR, en } as const;
+
+/** Cores do e-mail: tema claro dos tokens (a maioria dos clientes de e-mail não troca o tema). */
+const colors = themes.light;
+const APP_NAME = ptBR.common.appName;
 
 export interface EmailRecipient {
   name: string;
@@ -68,17 +73,19 @@ function render(layout: Layout): Pick<EmailMessage, 'subject' | 'html' | 'text'>
   const p = (text: string, style = '') =>
     `<p style="margin:0 0 12px;${style}">${escapeHtml(text)}</p>`;
   const html = [
-    `<!doctype html><html lang="${layout.locale}"><head><meta charset="utf-8"><title>${escapeHtml(layout.subject)}</title></head><body style="margin:0;background:#f4f4f5">`,
-    '<div style="max-width:560px;margin:0 auto;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.5;color:#18181b;background:#ffffff">',
+    `<!doctype html><html lang="${layout.locale}"><head><meta charset="utf-8"><title>${escapeHtml(layout.subject)}</title></head><body style="margin:0;background:${colors.canvas}">`,
+    `<div style="max-width:560px;margin:0 auto;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.5;color:${colors.fg};background:${colors.surface}">`,
+    // Nome da marca em texto (imagem e SVG são bloqueados por muitos clientes de e-mail).
+    `<p style="margin:0 0 20px;font-size:20px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:${palette.arcano}">${escapeHtml(APP_NAME)}</p>`,
     p(layout.greeting),
     p(layout.intro),
     ...layout.lines.map((line) => p(line, 'font-weight:600')),
     layout.cta
-      ? `<p style="margin:20px 0"><a href="${escapeHtml(layout.cta.url)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#6d28d9;color:#ffffff;text-decoration:none;font-weight:600">${escapeHtml(layout.cta.label)}</a></p>`
+      ? `<p style="margin:20px 0"><a href="${escapeHtml(layout.cta.url)}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:${colors.primaryHover};color:${colors.onPrimary};text-decoration:none;font-weight:600">${escapeHtml(layout.cta.label)}</a></p>`
       : '',
-    layout.note ? p(layout.note, 'color:#52525b;font-size:14px') : '',
-    `<hr style="border:none;border-top:1px solid #e4e4e7;margin:20px 0">`,
-    p(layout.footer, 'color:#52525b;font-size:13px'),
+    layout.note ? p(layout.note, `color:${colors.fgMuted};font-size:14px`) : '',
+    `<hr style="border:none;border-top:1px solid ${colors.line};margin:20px 0">`,
+    p(layout.footer, `color:${colors.fgMuted};font-size:13px`),
     '</div></body></html>',
   ].join('');
   const text = [

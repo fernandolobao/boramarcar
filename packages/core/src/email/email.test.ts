@@ -27,7 +27,7 @@ describe('sendEmails', () => {
         { to: 'b@x.com', subject: 'Oi', html: '<p>Oi</p>', text: 'Oi' },
         { to: 'c@x.com', subject: 'Oi', html: '<p>Oi</p>', text: 'Oi' },
       ],
-      { apiKey: 're_test', from: 'Bora Marcar <onboarding@resend.dev>', fetch: fetchMock },
+      { apiKey: 're_test', from: 'ArcanaKin <onboarding@resend.dev>', fetch: fetchMock },
     );
     expect(results).toEqual([
       { to: 'a@x.com', ok: true, id: 'e1' },
@@ -43,7 +43,7 @@ describe('sendEmails', () => {
     expect(init.headers).toMatchObject({ Authorization: 'Bearer re_test' });
     const body = JSON.parse(String(init.body));
     expect(body).toMatchObject({
-      from: 'Bora Marcar <onboarding@resend.dev>',
+      from: 'ArcanaKin <onboarding@resend.dev>',
       to: ['a@x.com'],
       subject: 'Oi',
     });

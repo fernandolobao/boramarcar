@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('smoke', () => {
   test('página inicial apresenta o app e o login com Google', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/Bora Marcar/);
+    await expect(page).toHaveTitle(/ArcanaKin/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByRole('button', { name: /Google/ }).first()).toBeVisible();
     // Menu superior leva ao painel (entrando com o Google).

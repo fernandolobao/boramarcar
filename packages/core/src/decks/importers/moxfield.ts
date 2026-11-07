@@ -112,7 +112,7 @@ export interface MoxfieldUpstreamDetails {
 export async function fetchMoxfieldDeck(
   publicId: string,
   fetchFn: FetchLike,
-  userAgent = 'BoraMarcar/0.1',
+  userAgent = 'ArcanaKin/0.1',
 ): Promise<ImportedDeck> {
   const details = (status: number | null): MoxfieldUpstreamDetails => ({
     source: 'moxfield',

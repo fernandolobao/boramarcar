@@ -96,7 +96,7 @@ export function DeckTools({
         <FormError message={copyError ? t('copyFailed') : null} />
       </div>
 
-      <div className="space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+      <div className="space-y-3 border-t border-ink-200 pt-4 dark:border-ink-800">
         <h3 className="font-semibold">{t('print')}</h3>
         <p className="muted text-sm">{t('printHint')}</p>
         <div className="flex flex-wrap items-end gap-4">
@@ -158,7 +158,7 @@ export function DeckTools({
       </div>
 
       {isOwner && (
-        <div className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="space-y-2 border-t border-ink-200 pt-4 dark:border-ink-800">
           <h3 className="font-semibold">{t('sync')}</h3>
           {hasSourceUrl && (
             <>
@@ -174,7 +174,7 @@ export function DeckTools({
               </button>
             </>
           )}
-          <details className="rounded-xl border border-zinc-300 px-3 py-2 dark:border-zinc-700">
+          <details className="rounded-xl border border-ink-300 px-3 py-2 dark:border-ink-700">
             <summary className="cursor-pointer py-1 font-medium">{t('syncPaste')}</summary>
             <form
               className="mt-2 space-y-2"

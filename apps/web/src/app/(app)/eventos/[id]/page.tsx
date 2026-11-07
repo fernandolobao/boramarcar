@@ -141,7 +141,7 @@ export default async function EventPage({ params }: Props) {
           {event.participants.map((p) => (
             <li
               key={p.userId}
-              className="rounded-full bg-zinc-100 px-3 py-1 text-sm dark:bg-zinc-800"
+              className="rounded-full bg-ink-100 px-3 py-1 text-sm dark:bg-ink-800"
             >
               {p.name} · <span className="muted">{t(`rsvp.${p.rsvp}`)}</span>
             </li>
@@ -165,13 +165,13 @@ export default async function EventPage({ params }: Props) {
               return (
                 <li
                   key={game.id}
-                  className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+                  className="rounded-xl border border-ink-200 p-4 dark:border-ink-800"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <h3 className="font-semibold">
                         {t('game', { number: game.number })}{' '}
-                        <span className="ms-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        <span className="ms-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
                           {tf(format)}
                         </span>
                       </h3>

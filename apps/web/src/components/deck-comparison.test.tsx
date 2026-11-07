@@ -56,7 +56,7 @@ describe('DeckComparisonCard', () => {
       />,
     );
     expect(
-      screen.getByText('Ainda não há outros decks de Omnath no Bora Marcar para comparar.'),
+      screen.getByText('Ainda não há outros decks de Omnath no ArcanaKin para comparar.'),
     ).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBeNull();
   });

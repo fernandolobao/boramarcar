@@ -110,7 +110,7 @@ export async function fetchAddressSuggestions(
     headers: {
       Accept: 'application/json',
       'User-Agent':
-        options.userAgent ?? 'BoraMarcar/1.0 (+https://github.com/fernandolobao/boramarcar)',
+        options.userAgent ?? 'ArcanaKin/1.0 (+https://github.com/fernandolobao/boramarcar)',
     },
   });
   if (!response.ok) {
@@ -158,7 +158,7 @@ export async function locateAddress(
     headers: {
       Accept: 'application/json',
       'User-Agent':
-        options.userAgent ?? 'BoraMarcar/1.0 (+https://github.com/fernandolobao/boramarcar)',
+        options.userAgent ?? 'ArcanaKin/1.0 (+https://github.com/fernandolobao/boramarcar)',
     },
   });
   if (!response.ok) {

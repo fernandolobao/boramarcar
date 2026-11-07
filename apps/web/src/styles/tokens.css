@@ -1,0 +1,145 @@
+/*
+ * Design tokens do ArcanaKin. GERADO por packages/tokens — não edite à mão.
+ * Para mudar: edite packages/tokens/src/index.ts e rode `pnpm --filter @boramarcar/tokens build:css`.
+ */
+
+@theme {
+  /* Paleta da marca */
+  --color-arcano: #3b0d6b;
+  --color-eter: #7c3aed;
+  --color-dourado: #f6b944;
+  --color-mana: #14b8a6;
+  --color-noite: #0b0716;
+  --color-pergaminho: #f4ebdb;
+
+  /* Escalas */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #3b0d6b;
+  --color-brand-950: #250847;
+  --color-ink-50: #fffbf3;
+  --color-ink-100: #f4ebdb;
+  --color-ink-200: #e7ded1;
+  --color-ink-300: #d6cec3;
+  --color-ink-400: #a49d99;
+  --color-ink-500: #777174;
+  --color-ink-600: #575259;
+  --color-ink-700: #423d48;
+  --color-ink-800: #292532;
+  --color-ink-900: #181423;
+  --color-ink-950: #0b0716;
+  --color-gold-50: #fff9ea;
+  --color-gold-100: #ffefcc;
+  --color-gold-200: #ffde9b;
+  --color-gold-300: #ffca68;
+  --color-gold-400: #f6b944;
+  --color-gold-500: #d8a02e;
+  --color-gold-600: #b3821c;
+  --color-gold-700: #8d6300;
+  --color-gold-800: #6c4c07;
+  --color-gold-900: #543b05;
+  --color-gold-950: #352200;
+  --color-teal-50: #f0fefb;
+  --color-teal-100: #d6f9f2;
+  --color-teal-200: #aff1e5;
+  --color-teal-300: #7ee3d3;
+  --color-teal-400: #4cd0be;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #009586;
+  --color-teal-700: #00786b;
+  --color-teal-800: #005e53;
+  --color-teal-900: #004b43;
+  --color-teal-950: #002f29;
+
+  /* Cores por função (mudam com o tema) */
+  --color-canvas: var(--ak-canvas);
+  --color-surface: var(--ak-surface);
+  --color-surface-muted: var(--ak-surface-muted);
+  --color-fg: var(--ak-fg);
+  --color-fg-muted: var(--ak-fg-muted);
+  --color-line: var(--ak-line);
+  --color-line-strong: var(--ak-line-strong);
+  --color-primary: var(--ak-primary);
+  --color-primary-hover: var(--ak-primary-hover);
+  --color-on-primary: var(--ak-on-primary);
+  --color-link: var(--ak-link);
+  --color-focus: var(--ak-focus);
+  --color-accent: var(--ak-accent);
+  --color-on-accent: var(--ak-on-accent);
+  --color-accent-text: var(--ak-accent-text);
+  --color-mana-text: var(--ak-mana-text);
+  --color-success: var(--ak-success);
+  --color-danger: var(--ak-danger);
+}
+
+:root {
+  --ak-canvas: #f4ebdb;
+  --ak-surface: #fffbf3;
+  --ak-surface-muted: #e7ded1;
+  --ak-fg: #0b0716;
+  --ak-fg-muted: #575259;
+  --ak-line: #d6cec3;
+  --ak-line-strong: #777174;
+  --ak-primary: #7c3aed;
+  --ak-primary-hover: #6d28d9;
+  --ak-on-primary: #ffffff;
+  --ak-link: #6d28d9;
+  --ak-focus: #7c3aed;
+  --ak-accent: #f6b944;
+  --ak-on-accent: #0b0716;
+  --ak-accent-text: #6c4c07;
+  --ak-mana-text: #005e53;
+  --ak-success: #166534;
+  --ak-danger: #b91c1c;
+}
+
+/* Tema escuro: pelo sistema (sem escolha) ou escolhido em Configurações. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ak-canvas: #0b0716;
+    --ak-surface: #181423;
+    --ak-surface-muted: #292532;
+    --ak-fg: #f4ebdb;
+    --ak-fg-muted: #a49d99;
+    --ak-line: #292532;
+    --ak-line-strong: #777174;
+    --ak-primary: #7c3aed;
+    --ak-primary-hover: #6d28d9;
+    --ak-on-primary: #ffffff;
+    --ak-link: #c4b5fd;
+    --ak-focus: #a78bfa;
+    --ak-accent: #f6b944;
+    --ak-on-accent: #0b0716;
+    --ak-accent-text: #f6b944;
+    --ak-mana-text: #4cd0be;
+    --ak-success: #4ade80;
+    --ak-danger: #f87171;
+  }
+}
+:root[data-theme='dark'] {
+  --ak-canvas: #0b0716;
+  --ak-surface: #181423;
+  --ak-surface-muted: #292532;
+  --ak-fg: #f4ebdb;
+  --ak-fg-muted: #a49d99;
+  --ak-line: #292532;
+  --ak-line-strong: #777174;
+  --ak-primary: #7c3aed;
+  --ak-primary-hover: #6d28d9;
+  --ak-on-primary: #ffffff;
+  --ak-link: #c4b5fd;
+  --ak-focus: #a78bfa;
+  --ak-accent: #f6b944;
+  --ak-on-accent: #0b0716;
+  --ak-accent-text: #f6b944;
+  --ak-mana-text: #4cd0be;
+  --ak-success: #4ade80;
+  --ak-danger: #f87171;
+}

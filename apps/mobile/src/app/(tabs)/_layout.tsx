@@ -2,6 +2,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router/js-tabs';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
+import { Logo } from '@/components/logo';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
@@ -34,7 +35,12 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: t('tabEvents'), tabBarIcon: icon('calendar-month') }}
+        options={{
+          title: t('tabEvents'),
+          tabBarIcon: icon('calendar-month'),
+          // Na aba inicial, o cabeçalho mostra o logotipo (a tela tem o próprio título).
+          headerTitle: () => <Logo height={20} />,
+        }}
       />
       <Tabs.Screen
         name="disponibilidade"

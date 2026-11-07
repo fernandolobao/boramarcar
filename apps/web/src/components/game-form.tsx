@@ -214,7 +214,7 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
         >
           {countHint}
         </p>
-        <ul className="mt-2 divide-y divide-zinc-200 rounded-xl border border-zinc-300 dark:divide-zinc-800 dark:border-zinc-700">
+        <ul className="mt-2 divide-y divide-ink-200 rounded-xl border border-ink-300 dark:divide-ink-800 dark:border-ink-700">
           {players.map((player) => {
             const isPlaying = playing.includes(player.userId);
             return (
@@ -332,7 +332,7 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
       </label>
 
       <details
-        className="rounded-xl border border-zinc-300 px-3 py-2 dark:border-zinc-700"
+        className="rounded-xl border border-ink-300 px-3 py-2 dark:border-ink-700"
         open={Boolean(initial?.winningTurn || initial?.firstPlayerId || initial?.durationMinutes)}
       >
         <summary className="cursor-pointer py-1 font-medium">{t('details')}</summary>

@@ -56,7 +56,7 @@ describe('fetchScryfallCollection', () => {
     expect(result.cards).toHaveLength(78);
     expect(result.notFound).toEqual(['Card 0', 'Card 75']);
     const headers = fetchFn.mock.calls[0]?.[1]?.headers as Record<string, string>;
-    expect(headers['User-Agent']).toMatch(/BoraMarcar/);
+    expect(headers['User-Agent']).toMatch(/ArcanaKin/);
   });
 
   it('propaga erro HTTP', async () => {

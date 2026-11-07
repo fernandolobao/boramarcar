@@ -38,7 +38,7 @@ export function LocationsSection({
       {locations.length === 0 ? (
         <p className="muted">{t('empty')}</p>
       ) : (
-        <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+        <ul className="divide-y divide-ink-200 dark:divide-ink-800">
           {locations.map((l) => (
             <li key={l.id} className="space-y-3 py-4">
               {editing === l.id ? (
@@ -89,7 +89,7 @@ export function LocationsSection({
           ))}
         </ul>
       )}
-      <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
+      <div className="border-t border-ink-200 pt-6 dark:border-ink-800">
         <LocationForm groupId={groupId} members={members} near={near} />
       </div>
     </div>

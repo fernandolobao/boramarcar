@@ -95,7 +95,7 @@ export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine 
       <dialog
         ref={dialog}
         aria-labelledby={`${id}-title`}
-        className="m-auto max-h-[90vh] w-[min(94vw,44rem)] overflow-hidden rounded-2xl bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-zinc-950/70 dark:bg-zinc-900 dark:text-zinc-100"
+        className="m-auto max-h-[90vh] w-[min(94vw,44rem)] overflow-hidden rounded-2xl bg-surface p-0 text-ink-900 shadow-2xl backdrop:bg-ink-950/70 dark:bg-ink-900 dark:text-ink-100"
         onClose={() => {
           setOpen(false);
           opener.current?.focus();
@@ -126,7 +126,7 @@ export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine 
               );
             }}
           >
-            <div className="flex items-start justify-between gap-3 border-b border-zinc-200 p-4 dark:border-zinc-800">
+            <div className="flex items-start justify-between gap-3 border-b border-ink-200 p-4 dark:border-ink-800">
               <div>
                 <h2 id={`${id}-title`} className="text-lg font-semibold">
                   {t('printTitle', { name: line.name })}
@@ -143,7 +143,7 @@ export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine 
               </button>
             </div>
 
-            <div className="grid gap-3 border-b border-zinc-200 p-4 sm:grid-cols-[1fr_auto] dark:border-zinc-800">
+            <div className="grid gap-3 border-b border-ink-200 p-4 sm:grid-cols-[1fr_auto] dark:border-ink-800">
               <div>
                 <label className="label" htmlFor={`${id}-filter`}>
                   {t('printFilter')}
@@ -191,7 +191,7 @@ export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine 
                         key={p.scryfallId}
                         className="flex cursor-pointer flex-col gap-1 rounded-xl border-2 border-transparent p-1.5 text-xs has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500 dark:has-[:checked]:bg-brand-700/20"
                       >
-                        <span className="relative block aspect-[488/680] overflow-hidden rounded-[4.5%/3.2%] bg-zinc-200 dark:bg-zinc-800">
+                        <span className="relative block aspect-[488/680] overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 dark:bg-ink-800">
                           {p.imageUri && (
                             <Image
                               src={p.imageUri}
@@ -231,7 +231,7 @@ export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine 
               )}
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 p-4 dark:border-zinc-800">
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-ink-200 p-4 dark:border-ink-800">
               <div className="me-auto">
                 <FormError message={error ?? (valid ? null : t('printCopiesInvalid'))} />
               </div>

@@ -77,7 +77,7 @@ export function AvailabilityGrid({ groupId, grid, members, minPlayers }: Props) 
         <li className="flex items-center gap-1.5">
           <span
             aria-hidden="true"
-            className="inline-block size-3 rounded ring-2 ring-zinc-900 ring-inset dark:ring-zinc-100"
+            className="inline-block size-3 rounded ring-2 ring-ink-900 ring-inset dark:ring-ink-100"
           />
           {t('legendMine')}
         </li>
@@ -110,10 +110,7 @@ export function AvailabilityGrid({ groupId, grid, members, minPlayers }: Props) 
           </caption>
           <thead>
             <tr>
-              <th
-                scope="col"
-                className="w-10 text-left font-medium text-zinc-600 dark:text-zinc-400"
-              >
+              <th scope="col" className="w-10 text-left font-medium text-ink-600 dark:text-ink-400">
                 <span className="sr-only">{t('hour')}</span>
               </th>
               {grid.days.map((day) => (
@@ -121,7 +118,7 @@ export function AvailabilityGrid({ groupId, grid, members, minPlayers }: Props) 
                   <span className="block capitalize">
                     {format.dateTime(dayDate(day), { weekday: 'short', timeZone: 'UTC' })}
                   </span>
-                  <span className="block text-zinc-600 dark:text-zinc-400">
+                  <span className="block text-ink-600 dark:text-ink-400">
                     {format.dateTime(dayDate(day), {
                       day: '2-digit',
                       month: '2-digit',
@@ -137,7 +134,7 @@ export function AvailabilityGrid({ groupId, grid, members, minPlayers }: Props) 
               <tr key={hour}>
                 <th
                   scope="row"
-                  className="pr-1 text-right font-medium tabular-nums text-zinc-600 dark:text-zinc-400"
+                  className="pr-1 text-right font-medium tabular-nums text-ink-600 dark:text-ink-400"
                 >
                   {String(hour).padStart(2, '0')}h
                 </th>
@@ -189,9 +186,9 @@ export function AvailabilityGrid({ groupId, grid, members, minPlayers }: Props) 
                             ? 'bg-brand-600 font-semibold text-white'
                             : count
                               ? 'bg-brand-100 text-brand-700 dark:bg-brand-700/40 dark:text-brand-100'
-                              : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+                              : 'bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400',
                           cell.mine !== 'none'
-                            ? 'ring-2 ring-zinc-900 ring-inset dark:ring-zinc-100'
+                            ? 'ring-2 ring-ink-900 ring-inset dark:ring-ink-100'
                             : '',
                         ].join(' ')}
                       >

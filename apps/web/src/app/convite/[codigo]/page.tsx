@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
+import { Logo } from '@/components/logo';
 import { SignInButton } from '@/components/auth-buttons';
 import { JoinInviteButton } from '@/components/invite';
 import { getDb } from '@/server/db';
@@ -39,13 +40,14 @@ export default async function InvitePage({ params }: Props) {
       tabIndex={-1}
       className="focus:outline-none mx-auto flex min-h-dvh max-w-lg flex-col justify-center gap-6 px-6 py-16"
     >
-      <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
-        {tc('appName')}
-      </p>
+      <Logo
+        title={tc('appName')}
+        className="h-7 w-auto self-start text-arcano dark:text-pergaminho"
+      />
       {!group ? (
         <>
           <h1 className="text-2xl font-semibold">{t('title')}</h1>
-          <p className="text-zinc-600 dark:text-zinc-400" data-testid="invite-invalid">
+          <p className="text-fg-muted" data-testid="invite-invalid">
             {t('invalid')}
           </p>
         </>
@@ -70,7 +72,7 @@ export default async function InvitePage({ params }: Props) {
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-zinc-600 dark:text-zinc-400">{t('signInToJoin')}</p>
+              <p className="text-fg-muted">{t('signInToJoin')}</p>
               <SignInButton callbackURL={`/convite/${group.inviteCode}`} />
             </div>
           )}

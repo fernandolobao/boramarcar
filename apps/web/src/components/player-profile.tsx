@@ -47,14 +47,14 @@ export async function Achievements({ achievements }: { achievements: Profile['ac
             className={`flex items-start gap-3 rounded-xl border p-3 ${
               a.unlocked
                 ? 'border-brand-400/60 bg-brand-50 dark:border-brand-400/40 dark:bg-brand-700/20'
-                : 'border-zinc-200 dark:border-zinc-800'
+                : 'border-ink-200 dark:border-ink-800'
             }`}
           >
             <span
               className={`grid size-11 shrink-0 place-items-center rounded-full ${
                 a.unlocked
                   ? 'bg-brand-600 text-white'
-                  : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                  : 'bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400'
               }`}
             >
               <Icon name={a.unlocked ? ACHIEVEMENT_ICON[a.id] : 'private'} className="size-5" />
@@ -81,7 +81,7 @@ export async function Achievements({ achievements }: { achievements: Profile['ac
                   </p>
                   {a.target > 1 && (
                     <div
-                      className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+                      className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-200 dark:bg-ink-800"
                       aria-hidden="true"
                     >
                       <div
@@ -164,7 +164,7 @@ export async function PlayerProfile({
             [t('winRate'), format.number(profile.winRate, { style: 'percent' })],
             [t('decks'), format.number(profile.decks.length)],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900">
+            <div key={label} className="rounded-xl bg-ink-50 p-3 dark:bg-ink-900">
               <dt className="muted text-sm">{label}</dt>
               <dd className="text-2xl font-semibold tabular-nums">{value}</dd>
             </div>
@@ -193,7 +193,7 @@ export async function PlayerProfile({
             </h3>
             <ul className="mt-2 flex flex-wrap gap-2 text-sm">
               {profile.groups.map((g) => (
-                <li key={g.id} className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+                <li key={g.id} className="rounded-full bg-ink-100 px-3 py-1 dark:bg-ink-800">
                   {g.name} · <span className="muted">{tg(`roles.${g.role}`)}</span>
                 </li>
               ))}

@@ -49,7 +49,7 @@ export default async function DashboardPage() {
                 <li key={event.id}>
                   <Link
                     href={`/eventos/${event.id}`}
-                    className="block rounded-xl p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    className="block rounded-xl p-2 hover:bg-ink-100 dark:hover:bg-ink-800"
                   >
                     <p className="font-medium">{event.title}</p>
                     <p className="muted">
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
           <h2 className="section-title">{t('topPlayers')}</h2>
           <ol className="grid gap-2 sm:grid-cols-3">
             {ranking.standings.slice(0, 3).map((s) => (
-              <li key={s.userId} className="rounded-xl bg-zinc-100 p-3 dark:bg-zinc-800">
+              <li key={s.userId} className="rounded-xl bg-ink-100 p-3 dark:bg-ink-800">
                 <span className="text-2xl font-bold">{s.position}º</span>{' '}
                 <span className="font-medium">{s.name}</span>
                 <p className="muted">

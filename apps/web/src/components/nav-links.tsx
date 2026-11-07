@@ -23,7 +23,7 @@ export function NavLinks({
               <Link
                 href={link.href}
                 aria-current={current ? 'page' : undefined}
-                className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 whitespace-nowrap hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-brand-500 aria-[current=page]:bg-zinc-100 aria-[current=page]:font-semibold dark:hover:bg-zinc-800 dark:aria-[current=page]:bg-zinc-800"
+                className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 whitespace-nowrap hover:bg-ink-100 focus-visible:outline-2 focus-visible:outline-brand-500 aria-[current=page]:bg-ink-100 aria-[current=page]:font-semibold dark:hover:bg-ink-800 dark:aria-[current=page]:bg-ink-800"
               >
                 {link.icon && <Icon name={link.icon} />}
                 {link.label}

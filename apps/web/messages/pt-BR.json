@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Bora Marcar",
+    "appName": "ArcanaKin",
     "tagline": "Marque o próximo Commander com a sua mesa.",
     "save": "Salvar",
     "cancel": "Cancelar",
@@ -401,7 +401,7 @@
     "visibilityHint": {
       "private": "Só você vê o deck.",
       "group": "Quem participa de um grupo com você vê o deck (padrão).",
-      "public": "Qualquer pessoa com conta no Bora Marcar e o link vê o deck."
+      "public": "Qualquer pessoa com conta no ArcanaKin e o link vê o deck."
     },
     "visibilityLabel": "Quem vê este deck",
     "priceBrl": "≈ {total} (proxies: {proxies})",
@@ -596,7 +596,7 @@
     "copyLink": "Copiar link",
     "copied": "Copiado!",
     "addToCalendar": "Adicionar à agenda (.ics)",
-    "inviteText": "Bora jogar Commander? Entra no grupo {group} no Bora Marcar: {url}"
+    "inviteText": "Bora jogar Commander? Entra no grupo {group} no ArcanaKin: {url}"
   },
   "invite": {
     "title": "Convite",
@@ -652,7 +652,7 @@
     "confirmed": "Confirmados ({count}): {names}",
     "openEvent": "Abrir o encontro",
     "calendarHint": "O arquivo .ics anexo adiciona (ou atualiza) o encontro na sua agenda.",
-    "footer": "Você recebe este e-mail porque participa de {group} no Bora Marcar. Para não receber mais avisos, desative-os nas configurações: {url}"
+    "footer": "Você recebe este e-mail porque participa de {group} no ArcanaKin. Para não receber mais avisos, desative-os nas configurações: {url}"
   },
   "formats": {
     "commander": "Commander",
@@ -696,7 +696,7 @@
   },
   "profilePage": {
     "title": "Perfil",
-    "memberSince": "No Bora Marcar desde {date}",
+    "memberSince": "No ArcanaKin desde {date}",
     "groups": "{count, plural, =1 {1 grupo} other {# grupos}}",
     "summary": "Resumo",
     "games": "Partidas",
@@ -822,9 +822,9 @@
   },
   "comparison": {
     "title": "Comparação",
-    "hint": "Com outros decks de {commander} cadastrados no Bora Marcar (os seus, os públicos e os do seu grupo).",
+    "hint": "Com outros decks de {commander} cadastrados no ArcanaKin (os seus, os públicos e os do seu grupo).",
     "edhrec": "Ver o comandante no EDHREC",
-    "none": "Ainda não há outros decks de {commander} no Bora Marcar para comparar.",
+    "none": "Ainda não há outros decks de {commander} no ArcanaKin para comparar.",
     "tableCaption": "Este deck × média de {count, plural, =1 {1 deck} other {# decks}}",
     "metric": "Métrica",
     "thisDeck": "Este deck",
@@ -852,7 +852,7 @@
     "rank": "nº {rank}"
   },
   "home": {
-    "metaTitle": "Bora Marcar — encontros, ranking e decks para o seu grupo de Magic",
+    "metaTitle": "ArcanaKin — encontros, ranking e decks para o seu grupo de Magic",
     "metaDescription": "Marque o próximo Commander com a sua mesa: disponibilidade, encontros, partidas, ranking, decks com análise e folha de proxies.",
     "nav": {
       "label": "Seções da página",
@@ -866,20 +866,21 @@
     "signInToDashboard": "Entrar no painel",
     "hero": {
       "eyebrow": "Em testes com grupos de Commander",
-      "title": "A mesa fecha. O Bora Marcar cuida do resto.",
+      "title": "A mesa fecha. O ArcanaKin cuida do resto.",
       "subtitle": "Cada um marca quando e onde pode jogar. O app encontra o horário em que a mesa fecha, registra as partidas, mantém o ranking e ajuda a melhorar os seus decks.",
       "join": "Participar dos testes",
       "pause": "Pausar animação de fundo",
       "play": "Reproduzir animação de fundo"
     },
     "intro": {
-      "title": "O que é o Bora Marcar",
+      "title": "O que é o ArcanaKin",
       "body": "Um lugar para o seu grupo de Magic organizar a vida fora da mesa: chega de enquete no grupo de mensagens, de ranking em planilha e de lista de deck perdida. Ele nasceu numa mesa de Commander de quatro amigos e está crescendo com a ajuda de quem joga.",
       "stats": {
         "formats": "formatos de jogo",
         "roles": "funções de carta analisadas",
         "languages": "idiomas (português e inglês)"
-      }
+      },
+      "name": "O nome junta arcana, os segredos da magia, e kin, a sua gente: é a casa da sua família de Magic."
     },
     "features": {
       "title": "Funcionalidades",
@@ -983,7 +984,7 @@
         },
         "compare": {
           "title": "7. Comparação",
-          "body": "Mostra a média dos decks do mesmo comandante cadastrados no Bora Marcar que você pode ver, as cartas comuns que faltam e as suas escolhas próprias."
+          "body": "Mostra a média dos decks do mesmo comandante cadastrados no ArcanaKin que você pode ver, as cartas comuns que faltam e as suas escolhas próprias."
         },
         "group": {
           "title": "E no grupo",
@@ -1016,14 +1017,14 @@
     },
     "join": {
       "title": "Participe dos testes",
-      "body": "O Bora Marcar está em testes com grupos de Commander. Use com a sua mesa, conte o que funcionou, o que faltou e o que deu errado: cada mensagem vira melhoria.",
+      "body": "O ArcanaKin está em testes com grupos de Commander. Use com a sua mesa, conte o que funcionou, o que faltou e o que deu errado: cada mensagem vira melhoria.",
       "email": "Enviar feedback por e-mail",
-      "emailSubject": "Bora Marcar — testes",
+      "emailSubject": "ArcanaKin — testes",
       "or": "ou comece agora:"
     },
     "footer": {
       "credits": "Dados de cartas pelo Scryfall; combos pelo Commander Spellbook; cotação do dólar pelo Banco Central do Brasil.",
-      "disclaimer": "Bora Marcar é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
+      "disclaimer": "ArcanaKin é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
       "contact": "Contato"
     }
   },

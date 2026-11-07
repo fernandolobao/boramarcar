@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   // Os pacotes do monorepo são consumidos direto do código-fonte TypeScript.
-  transpilePackages: ['@boramarcar/core', '@boramarcar/db'],
+  transpilePackages: ['@boramarcar/core', '@boramarcar/db', '@boramarcar/tokens'],
   serverExternalPackages: ['pg'],
   images: {
     remotePatterns: [

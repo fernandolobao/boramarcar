@@ -103,7 +103,7 @@ export function LocationMap({
       role="region"
       aria-label={label}
       title={onPick ? t('mapPickHint') : undefined}
-      className={`z-0 w-full overflow-hidden rounded-xl border border-zinc-300 dark:border-zinc-700 ${className}`}
+      className={`z-0 w-full overflow-hidden rounded-xl border border-ink-300 dark:border-ink-700 ${className}`}
     />
   );
 }
