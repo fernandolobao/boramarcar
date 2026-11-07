@@ -72,3 +72,16 @@ export function tableLayout(count: number): TableLayout {
 
 /** Cores das áreas (texto branco com contraste AA em todas). */
 export const SEAT_COLORS = ['#5b21b6', '#1d4ed8', '#047857', '#b91c1c', '#b45309', '#0e7490'];
+
+/**
+ * A mesma disposição em linhas, para telas sem grade CSS (app): cada linha lista os índices dos
+ * jogadores da esquerda para a direita.
+ */
+export function tableRows(count: number): number[][] {
+  const layout = tableLayout(count);
+  return [...layout.areas.matchAll(/"([^"]*)"/g)].map((match) =>
+    [...new Set(match[1]!.trim().split(/\s+/))].map((area) =>
+      layout.seats.findIndex((s) => s.area === area),
+    ),
+  );
+}

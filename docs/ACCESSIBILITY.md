@@ -169,6 +169,7 @@ sem rolagem horizontal em 320px.
 - Títulos de tela e de seção com `accessibilityRole="header"`; itens de lista com um rótulo completo (encontro: título, data, local e situação; ranking: posição, nome, pontos e vitórias).
 - Erros e confirmações em regiões vivas (`accessibilityRole="alert"`, `accessibilityLiveRegion`); carregamento com rótulo.
 - Cores com contraste AA nos temas claro e escuro (segue o tema do aparelho); texto escala com o tamanho de fonte do sistema (até 2×).
+- Modo mesa no app: cada metade da área é um botão com nome e vida atual ("Tirar 1 de vida de Ana (vida 38)"), a vida é anunciada numa região viva, segurar (ou tocar duas vezes e segurar, com leitor de tela) soma 10; nome do jogador abre a folha com marcadores em botões −/+ com nome e valor; monarca e desistir como `switch`; escolhas (tipo de jogo, jogadores, decks, vencedor) como `radio`/`checkbox`. Texto branco sobre as cores das áreas com contraste AA (mesmas cores do site).
 - Pendente: passada manual com TalkBack e VoiceOver, e testes automatizados de acessibilidade no app.
 
 ### Revisão: página inicial

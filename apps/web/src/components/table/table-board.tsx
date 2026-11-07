@@ -4,6 +4,8 @@ import {
   defeatReason,
   formatRules,
   rollDie,
+  SEAT_COLORS,
+  tableLayout,
   TABLE_COUNTERS,
   tableResult,
   type TableAction,
@@ -14,7 +16,6 @@ import {
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../icons';
-import { SEAT_COLORS, tableLayout } from './layout';
 
 /** Toque = ±1; segurar = ±10 a cada 0,6 s (como nos contadores de mesa). */
 function useHold(onStep: (delta: number) => void, sign: 1 | -1) {

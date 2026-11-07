@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../../messages/pt-BR.json';
-import { tableLayout } from './layout';
+import { tableLayout } from '@boramarcar/core';
 import { TableMode } from './table-mode';
 
 const push = vi.fn();

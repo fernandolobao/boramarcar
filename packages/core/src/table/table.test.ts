@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  tableRows,
   alivePlayers,
   createTable,
   defeatReason,
@@ -115,5 +116,22 @@ describe('modo mesa', () => {
     expect(rollDie(20, () => 0)).toBe(1);
     expect(rollDie(20, () => 0.999)).toBe(20);
     expect(run(t, { type: 'first', userId: 'c' }).firstPlayerId).toBe('c');
+  });
+});
+
+describe('disposição em linhas (app)', () => {
+  it('segue a mesma grade do site, em sentido horário', () => {
+    expect(tableRows(2)).toEqual([[0], [1]]);
+    expect(tableRows(3)).toEqual([[0, 1], [2]]);
+    expect(tableRows(4)).toEqual([
+      [0, 1],
+      [3, 2],
+    ]);
+    expect(tableRows(5)).toEqual([[0, 1], [4, 2], [3]]);
+    expect(tableRows(6)).toEqual([
+      [0, 1],
+      [5, 2],
+      [4, 3],
+    ]);
   });
 });

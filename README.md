@@ -136,7 +136,7 @@ EXPO_PUBLIC_API_URL=http://192.168.0.10:3000 pnpm --filter @boramarcar/mobile st
 ```
 
 - Com o site em desenvolvimento (`pnpm dev`), o servidor aceita o retorno do login no Expo Go (`exp://`). Em produção só `boramarcar://` é aceito, então o login contra a produção precisa de um _development build_ (`npx expo run:android|ios` ou `eas build --profile development`).
-- Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
+- Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), modo mesa (contador de vida no estilo do Lotus que registra a partida no encontro), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
 - Textos em `apps/mobile/src/lib/i18n.ts` (português e inglês, pelo idioma do aparelho).
 
 ## Testes

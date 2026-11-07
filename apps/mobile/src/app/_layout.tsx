@@ -23,6 +23,7 @@ export default function RootLayout() {
       <Stack.Protected guard={signedIn}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: t('appName') }} />
         <Stack.Screen name="encontros/[id]" options={{ title: t('tabEvents') }} />
+        <Stack.Screen name="mesa/[id]" options={{ title: t('tableTitle') }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="entrar" options={{ headerShown: false }} />

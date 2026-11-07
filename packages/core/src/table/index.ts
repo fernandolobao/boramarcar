@@ -209,3 +209,5 @@ export const tableDurationMinutes = (state: TableState, now = new Date()) =>
 /** Sorteio (dados, moeda, quem começa) com fonte de aleatoriedade injetável para testes. */
 export const rollDie = (sides: number, random: () => number = Math.random) =>
   1 + Math.floor(random() * sides);
+
+export * from './layout';

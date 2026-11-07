@@ -155,6 +155,7 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - A partida fica no `localStorage` do aparelho (continua depois de recarregar ou bloquear a tela) e a tela fica acesa com a Wake Lock API quando o navegador permite.
 - Ao encerrar, o resultado sugerido (último vivo vence; os demais na ordem em que caíram) é conferido e salvo com `POST /api/v1/events/:id/games` (formato, quem começou, turno, duração).
 - Formatos de time (Two-Headed Giant) continuam no formulário do encontro.
+- **No app** (`apps/mobile/src/app/mesa/[id].tsx`): o mesmo reducer e a mesma disposição (`tableLayout`/`tableRows` do core; cada área é girada com `transform`), com toque ±1 e segurar ±10 (`onLongPress` repete a cada 0,6 s), vibração leve (`expo-haptics`), tela acesa (`expo-keep-awake`) e a partida salva num arquivo por encontro (`expo-file-system`). Os dados da mesa vêm de `GET /api/v1/events/:id/table` (jogadores do grupo, confirmados primeiro, com os decks de cada um, e o formato padrão), o mesmo `getTableSetup` da página do site.
 
 ## Página inicial
 

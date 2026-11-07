@@ -122,4 +122,37 @@ describe('cliente da API', () => {
     const event = await api.events.get('e1');
     expect(event.games[0]!.winners[0]!.name).toBe('Ana');
   });
+
+  it('modo mesa: dados da mesa e registro da partida', async () => {
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      url.endsWith('/table')
+        ? json({
+            table: {
+              eventId: 'e1',
+              title: 'Commander',
+              status: 'scheduled',
+              defaultFormat: 'commander',
+              players: [{ userId: 'u1', name: 'Ana', confirmed: true, decks: [] }],
+            },
+          })
+        : json({ game: { id: 'g1', number: 1 } }, 201),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://x.dev',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const table = await api.table.get('e1');
+    expect(table.players[0]).toMatchObject({ name: 'Ana', confirmed: true });
+    const game = await api.games.record('e1', {
+      format: 'commander',
+      players: [
+        { userId: 'u1', result: 'win' },
+        { userId: 'u2', result: 'loss', eliminatedOrder: 1 },
+      ],
+    });
+    expect(game.id).toBe('g1');
+    expect(fetchMock.mock.calls[1]![0]).toBe('https://x.dev/api/v1/events/e1/games');
+    expect(fetchMock.mock.calls[1]![1]!.method).toBe('POST');
+    expect(JSON.parse(String(fetchMock.mock.calls[1]![1]!.body)).players).toHaveLength(2);
+  });
 });

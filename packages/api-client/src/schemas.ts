@@ -107,6 +107,41 @@ export const deckSummarySchema = z
   .loose();
 export type DeckSummary = z.infer<typeof deckSummarySchema>;
 
+export const tableSetupSchema = z
+  .object({
+    eventId: z.string(),
+    title: z.string(),
+    status: eventStatusSchema,
+    defaultFormat: z.string(),
+    players: z.array(
+      z.object({
+        userId: z.string(),
+        name: z.string(),
+        confirmed: z.boolean(),
+        decks: z.array(z.object({ id: z.string(), name: z.string() })),
+      }),
+    ),
+  })
+  .loose();
+export type TableSetup = z.infer<typeof tableSetupSchema>;
+
+/** Corpo de registrar partida (o servidor valida as regras do formato). */
+export interface GameInput {
+  format?: string;
+  firstPlayerId?: string | null;
+  winningTurn?: number | null;
+  durationMinutes?: number | null;
+  notes?: string | null;
+  players: {
+    userId: string;
+    result: 'win' | 'loss' | 'draw';
+    deckId?: string | null;
+    seat?: number | null;
+    team?: number | null;
+    eliminatedOrder?: number | null;
+  }[];
+}
+
 export const errorBodySchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), details: z.unknown().optional() }),
 });

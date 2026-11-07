@@ -7,6 +7,8 @@ import {
   groupSchema,
   rankingSchema,
   rsvpSchema,
+  tableSetupSchema,
+  type GameInput,
   type Rsvp,
 } from './schemas';
 
@@ -120,6 +122,29 @@ export function createApiClient(options: ApiClientOptions) {
             { rsvp },
           )
         ).rsvp,
+    },
+    games: {
+      /** Registra uma partida no encontro. */
+      record: async (eventId: string, game: GameInput) =>
+        (
+          await request(
+            'POST',
+            `/events/${encodeURIComponent(eventId)}/games`,
+            z.object({ game: z.object({ id: z.string() }).loose() }),
+            game,
+          )
+        ).game,
+    },
+    table: {
+      /** Jogadores, decks e formato padrão para o modo mesa. */
+      get: async (eventId: string) =>
+        (
+          await request(
+            'GET',
+            `/events/${encodeURIComponent(eventId)}/table`,
+            z.object({ table: tableSetupSchema }),
+          )
+        ).table,
     },
     ranking: {
       get: (groupId: string, filters: { from?: Date; to?: Date; format?: string } = {}) =>
