@@ -34,6 +34,7 @@ const cardsData = [
     color_identity: ['G'],
     set: 'tst',
     collector_number: '1',
+    legalities: { commander: 'legal' },
   }),
   mapScryfallCard({
     id: 'sol',
@@ -45,6 +46,7 @@ const cardsData = [
     color_identity: [],
     set: 'tst',
     collector_number: '2',
+    legalities: { commander: 'legal' },
   }),
   mapScryfallCard({
     id: 'forest',
@@ -54,6 +56,7 @@ const cardsData = [
     color_identity: ['G'],
     set: 'tst',
     collector_number: '3',
+    legalities: { commander: 'legal' },
   }),
 ];
 

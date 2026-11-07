@@ -367,6 +367,8 @@ export const cards = pgTable(
     /** Verso de cartas de duas faces. */
     backImageUri: text('back_image_uri'),
     backName: text('back_name'),
+    /** Legalidade por formato (Scryfall): lista de banidas e restritas. */
+    legalities: jsonb('legalities').$type<Record<string, string>>(),
     updatedAt: updatedAt(),
   },
   (t) => [index('cards_name_idx').on(sql`lower(${t.name})`)],

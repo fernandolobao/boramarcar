@@ -124,7 +124,7 @@ A análise depende do **formato do deck** (`decks.format`, escolhido na importa�
 | Limitado   | Draft, Selado                                                                             | mínimo 40                                                   | não  |
 | Livre      | Outro                                                                                     | só cartas desconhecidas                                     | não  |
 
-A lista de banidas não é conferida.
+Banidas, restritas (1 cópia) e cartas fora do formato são conferidas pelo campo `legalities` do Scryfall (guardado em `cards.legalities`, atualizado pelo cron diário); básicos não são apontados. Formatos sem lista (limitados, Two-Headed Giant, Outro) não conferem.
 
 1. **Funções** (4.5): as do **Scryfall Tagger** (`otag:ramp`, `card-advantage`, `removal`, `sweeper`, `tutor`, `protection`, `recursion`, `counterspell`), guardadas em `cards.roles` por 30 dias; enquanto a carta não foi consultada, vale a heurística por regex no texto. A tela mostra quantas cartas vieram do Tagger.
 2. Curva de mana (principal, sem terrenos), símbolos por cor, CMC médio.

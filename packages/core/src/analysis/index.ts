@@ -54,6 +54,9 @@ export type ValidationIssue =
   | { code: 'too_many_copies'; name: string; quantity: number; max: number }
   | { code: 'sideboard_size'; max: number; actual: number }
   | { code: 'color_identity'; name: string }
+  | { code: 'banned'; name: string }
+  | { code: 'restricted'; name: string; quantity: number }
+  | { code: 'not_legal'; name: string }
   | { code: 'unknown_card'; name: string };
 
 export type Suggestion =
@@ -97,6 +100,8 @@ export interface DeckAnalysis {
   scoreBreakdown: ScoreComponent[];
   suggestions: Suggestion[];
   manaBase: ColorSourceRow[];
+  /** Cartas sem os dados de legalidade (cache antigo): a lista de banidas não foi conferida nelas. */
+  legalityMissing: number;
   /** Cartas que ainda não têm a informação de mana produzida (cache antigo). */
   manaDataMissing: number;
   handOdds: OpeningHandOdds | null;
@@ -236,6 +241,14 @@ export function validateDeck(
     ) {
       issues.push({ code: 'color_identity', name });
     }
+    // Lista de banidas/restritas do formato, pelos dados de legalidade do Scryfall.
+    const legality = profile.scryfallFormat ? card.legalities?.[profile.scryfallFormat] : undefined;
+    if (legality === 'banned') issues.push({ code: 'banned', name });
+    else if (legality === 'restricted' && quantity > 1) {
+      issues.push({ code: 'restricted', name, quantity });
+    } else if (legality === 'not_legal' && !isBasicLand(card)) {
+      issues.push({ code: 'not_legal', name });
+    }
   }
   return issues;
 }
@@ -286,6 +299,7 @@ export function analyzeDeck(
   let tagged = 0;
   let analyzed = 0;
   let manaDataMissing = 0;
+  let legalityMissing = 0;
   const gameChangers: string[] = [];
 
   for (const entry of inDeck) {
@@ -295,6 +309,7 @@ export function analyzeDeck(
     if (!card) continue;
     if (card.gameChanger && !gameChangers.includes(card.name)) gameChangers.push(card.name);
     if (card.producedMana == null) manaDataMissing += 1;
+    if (card.legalities == null) legalityMissing += 1;
     if (isLand(card)) {
       lands += entry.quantity;
       continue;
@@ -432,6 +447,7 @@ export function analyzeDeck(
         })),
     }),
     manaDataMissing,
+    legalityMissing,
     handOdds:
       library >= 7 ? openingHandOdds({ library, lands: libraryLands, ramp: roles.ramp }) : null,
   };
