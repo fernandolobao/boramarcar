@@ -139,7 +139,6 @@ pnpm --filter @boramarcar/mobile start   # usa o site em produção
   2. `pnpm --filter @boramarcar/mobile start` e leia o QR code com a câmera (iPhone) ou com o Expo Go (Android), com o celular no mesmo Wi-Fi do computador.
   3. O app usa `https://boramarcar-zeta.vercel.app`; para outro servidor, `EXPO_PUBLIC_API_URL=https://…` (um IP da rede local não serve: o Google não volta para ele). A tela de entrada mostra o servidor e avisa se ele não responder.
 - Sem `EXPO_GO_LOGIN`, a produção só aceita `boramarcar://`, que é o app instalado (_development build_ com `npx expo run:android|ios` ou `eas build --profile development`).
-- Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
 - Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), modo mesa (contador de vida no estilo do Lotus que registra a partida no encontro), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
 - Textos em `apps/mobile/src/lib/i18n.ts` (português e inglês, pelo idioma do aparelho).
 
