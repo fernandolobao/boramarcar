@@ -236,3 +236,55 @@ describe('análise por formato', () => {
     expect(buildReplacementQuery('tutor', ['B'], 3, null)).toBe('id<=b otag:tutor cmc<=3');
   });
 });
+
+describe('lista de banidas e restritas (Scryfall)', () => {
+  const legal = (formats: Record<string, string>) =>
+    Object.fromEntries(
+      ['commander', 'modern', 'vintage', 'standard'].map((f) => [f, formats[f] ?? 'legal']),
+    );
+  const card = (name: string, legalities: Record<string, string> | null) =>
+    makeCard({ name, typeLine: 'Sorcery', legalities });
+  const forest = makeCard({
+    name: 'Forest',
+    typeLine: 'Basic Land — Forest',
+    legalities: legal({ standard: 'not_legal' }),
+  });
+
+  it('aponta banidas, restritas com mais de uma cópia e cartas fora do formato', () => {
+    const deck = [
+      entry(card('Primeval Titan', legal({ commander: 'banned' }))),
+      entry(
+        card(
+          'Black Lotus',
+          legal({ commander: 'banned', vintage: 'restricted', modern: 'not_legal' }),
+        ),
+        2,
+      ),
+      entry(card('Sem Dados', null)),
+      entry(forest, 30),
+    ];
+    const commander = analyzeDeck(deck, 'commander');
+    expect(
+      commander.validation.filter((i) => ['banned', 'restricted', 'not_legal'].includes(i.code)),
+    ).toEqual([
+      { code: 'banned', name: 'Primeval Titan' },
+      { code: 'banned', name: 'Black Lotus' },
+    ]);
+    expect(commander.legalityMissing).toBe(1);
+    const vintage = analyzeDeck(deck, 'vintage');
+    expect(vintage.validation).toContainEqual({
+      code: 'restricted',
+      name: 'Black Lotus',
+      quantity: 2,
+    });
+    const modern = analyzeDeck(deck, 'modern');
+    expect(modern.validation).toContainEqual({ code: 'not_legal', name: 'Black Lotus' });
+    // Básico fora do Standard não é apontado; formato sem lista (draft) não confere.
+    expect(
+      analyzeDeck(deck, 'standard').validation.some(
+        (i) => i.code === 'not_legal' && i.name === 'Forest',
+      ),
+    ).toBe(false);
+    expect(analyzeDeck(deck, 'draft').validation.some((i) => i.code === 'banned')).toBe(false);
+  });
+});

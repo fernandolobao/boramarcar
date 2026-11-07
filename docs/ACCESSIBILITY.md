@@ -171,6 +171,18 @@ sem rolagem horizontal em 320px.
 - Cores com contraste AA nos temas claro e escuro (segue o tema do aparelho); texto escala com o tamanho de fonte do sistema (até 2×).
 - Pendente: passada manual com TalkBack e VoiceOver, e testes automatizados de acessibilidade no app.
 
+### Revisão: página inicial
+
+- Vídeo do topo decorativo (`aria-hidden`, sem som) com botão de pausar/reproduzir com nome (WCAG 2.2.2); com "reduzir movimento" ele não toca sozinho. O texto fica sobre camadas escuras para manter o contraste em qualquer quadro do vídeo.
+- Um `h1`, seções com `h2` (rótulo de cada seção) e numeração decorativa (`aria-hidden`); navegação por âncoras em `<nav>` com nome; a barra da nota é decorativa e os números estão em texto ao lado.
+- Links externos avisam que abrem em nova aba; o mesmo conteúdo para quem entrou ou não, com "Ir para o painel" ou "Entrar no painel" no menu superior.
+
+### Revisão: locais e mapas
+
+- O mapa é complementar (`role="region"` com nome): endereço, complemento, anfitrião e links de rota ficam sempre em texto; ajustar o pino é opcional e quem não usa mouse escolhe o ponto pelo autocompletar do endereço.
+- Endereço como `combobox` (setas, Enter, Esc) com dica ligada por `aria-describedby` e número de sugestões anunciado; também aceita texto livre.
+- Botões "Editar" e "Remover" com o nome do local para leitores de tela; links de rota avisam que abrem em nova aba e dizem o destino.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

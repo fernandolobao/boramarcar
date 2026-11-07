@@ -124,7 +124,7 @@ A análise depende do **formato do deck** (`decks.format`, escolhido na importa�
 | Limitado   | Draft, Selado                                                                             | mínimo 40                                                   | não  |
 | Livre      | Outro                                                                                     | só cartas desconhecidas                                     | não  |
 
-A lista de banidas não é conferida.
+Banidas, restritas (1 cópia) e cartas fora do formato são conferidas pelo campo `legalities` do Scryfall (guardado em `cards.legalities`, atualizado pelo cron diário); básicos não são apontados. Formatos sem lista (limitados, Two-Headed Giant, Outro) não conferem.
 
 1. **Funções** (4.5): as do **Scryfall Tagger** (`otag:ramp`, `card-advantage`, `removal`, `sweeper`, `tutor`, `protection`, `recursion`, `counterspell`), guardadas em `cards.roles` por 30 dias; enquanto a carta não foi consultada, vale a heurística por regex no texto. A tela mostra quantas cartas vieram do Tagger.
 2. Curva de mana (principal, sem terrenos), símbolos por cor, CMC médio.
@@ -137,6 +137,19 @@ A lista de banidas não é conferida.
 9. **Mão inicial** (4.9): hipergeométrica — distribuição de terrenos na mão de 7, chance de 2–4 terrenos, jogada de terreno em todos os turnos até o 2–5 (jogando primeiro/depois) e ramp até o turno 2–3.
 
 **Atualização dos dados externos** (`server/deck-analysis.ts`): depois de importar ou sincronizar (e ao abrir um deck com dados velhos), `refreshDeckAnalysis` roda após a resposta (`after`) e, em etapas independentes, completa a mana produzida de cartas de cache antigo, consulta o Tagger (~8 funções × 2–3 buscas de até 1000 caracteres, 100 ms entre elas) e o Spellbook. O botão "Atualizar análise" chama `POST /api/v1/decks/:id/analysis`.
+
+## Locais do grupo e mapas
+
+Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`), anfitrião e quem cadastrou. Qualquer membro cadastra; editar e remover cabe a dono/admin, a quem cadastrou e ao anfitrião. Remover um local deixa os encontros com "local a definir".
+
+- **Autocompletar**: `GET /api/v1/places?q=` chama o [Photon](https://photon.komoot.io) (OpenStreetMap), que aceita busca enquanto se digita (o Nominatim não aceita). O servidor guarda as buscas por 24 h em memória e o campo espera 400 ms sem digitação e 3 letras; os resultados priorizam a região do primeiro local do grupo.
+- **Mapa**: Leaflet com os tiles do OpenStreetMap e o crédito exigido; o pino é um `divIcon` em CSS. No formulário, clicar no mapa ou arrastar o pino ajusta as coordenadas.
+- **Rotas**: `directionsLinks` (core) monta os links para Google Maps, Apple Maps, Waze e OpenStreetMap (coordenadas ou, sem elas, o endereço).
+- Na página do encontro aparece o local com mapa e rotas.
+
+## Página inicial
+
+`/` é pública e igual para todos (não redireciona mais quem já entrou): apresentação, funcionalidades, fontes de dados, metodologia da análise (os pontos da nota vêm de `ROLE_POINTS` do core), valores e o convite para os testes (e-mail). O menu superior leva ao painel (ou faz o login com o Google, que volta para `/painel`). O vídeo abstrato do topo (`public/home/hero.webm|mp4` + capa `hero-poster.webp`) é gerado por `apps/web/scripts/hero-video.py` (quadros em Python + ffmpeg, loop de 12 s).
 
 ## Notificações por e-mail
 

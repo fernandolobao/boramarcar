@@ -22,7 +22,8 @@ import { GameForm } from './game-form';
 import { GamePlayers } from './game-players';
 import { GroupSettingsForm } from './group-settings-form';
 import { SeasonForm } from './season-form';
-import { CreateGroupForm, JoinGroupForm, LocationForm, SwitchGroupButton } from './group-forms';
+import { CreateGroupForm, JoinGroupForm, SwitchGroupButton } from './group-forms';
+import { LocationsSection } from './places/locations-section';
 import { JoinInviteButton, RegenerateInviteButton } from './invite';
 import { NavLinks } from './nav-links';
 import { AvailabilityGrid } from './availability-grid';
@@ -32,6 +33,10 @@ import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
+
+vi.mock('./places/location-map', () => ({
+  LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -246,7 +251,40 @@ const cases: [string, ReactElement][] = [
   ['RsvpButtons', <RsvpButtons key="j" eventId="e" current="yes" />],
   ['CreateGroupForm', <CreateGroupForm key="k" />],
   ['JoinGroupForm', <JoinGroupForm key="l" />],
-  ['LocationForm', <LocationForm key="m" groupId="g" />],
+  [
+    'LocationsSection',
+    <LocationsSection
+      key="m"
+      groupId="g"
+      userId="u1"
+      canManageAll={false}
+      members={[{ userId: 'u1', name: 'Ana' }]}
+      locations={[
+        {
+          id: 'l1',
+          name: 'Casa da Ana',
+          address: 'Avenida Ipiranga, 6681, Porto Alegre',
+          details: 'apto 42',
+          lat: -30.05,
+          lng: -51.17,
+          hostUserId: 'u1',
+          hostName: 'Ana',
+          createdBy: 'u1',
+        },
+        {
+          id: 'l2',
+          name: 'Loja',
+          address: null,
+          details: null,
+          lat: null,
+          lng: null,
+          hostUserId: null,
+          hostName: null,
+          createdBy: 'u2',
+        },
+      ]}
+    />,
+  ],
   ['SwitchGroupButton', <SwitchGroupButton key="n" groupId="g" />],
   ['JoinInviteButton', <JoinInviteButton key="o" inviteCode="ABCD2345" />],
   ['RegenerateInviteButton', <RegenerateInviteButton key="p" groupId="g" />],

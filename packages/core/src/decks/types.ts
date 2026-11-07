@@ -59,6 +59,8 @@ export interface CardData {
   /** Verso de cartas de duas faces (transformar, MDFC…); `null` = carta de uma face só. */
   backImageUri?: string | null;
   backName?: string | null;
+  /** Legalidade por formato do Scryfall (`legal`, `not_legal`, `banned`, `restricted`). */
+  legalities?: Record<string, string> | null;
 }
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;

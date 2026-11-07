@@ -1,4 +1,9 @@
-import { DomainError, validateGroupSettings, type GroupSettings } from '@boramarcar/core';
+import {
+  DomainError,
+  validateGroupSettings,
+  validCoordinates,
+  type GroupSettings,
+} from '@boramarcar/core';
 import { and, asc, count, eq } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
@@ -91,35 +96,123 @@ export async function listMembers(db: Database, groupId: string) {
     .orderBy(asc(user.name));
 }
 
+export interface LocationInput {
+  name: string;
+  address?: string | null;
+  details?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  hostUserId?: string | null;
+}
+
+function cleanLocation(input: Partial<LocationInput>) {
+  const out: Partial<typeof locations.$inferInsert> = {};
+  if (input.name !== undefined) {
+    const name = input.name.trim();
+    if (!name) throw new DomainError('invalid_input', 'Informe o nome do local');
+    out.name = name;
+  }
+  if (input.address !== undefined) out.address = input.address?.trim() || null;
+  if (input.details !== undefined) out.details = input.details?.trim() || null;
+  if (input.lat !== undefined || input.lng !== undefined) {
+    if (!validCoordinates(input.lat ?? null, input.lng ?? null)) {
+      throw new DomainError('invalid_input', 'Coordenadas inválidas');
+    }
+    out.lat = input.lat ?? null;
+    out.lng = input.lng ?? null;
+  }
+  if (input.hostUserId !== undefined) out.hostUserId = input.hostUserId || null;
+  return out;
+}
+
+async function requireHostInGroup(db: Database, groupId: string, hostUserId?: string | null) {
+  if (!hostUserId) return;
+  const [row] = await db
+    .select({ userId: groupMembers.userId })
+    .from(groupMembers)
+    .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, hostUserId)))
+    .limit(1);
+  if (!row) throw new DomainError('invalid_input', 'O anfitrião precisa ser do grupo');
+}
+
 export async function createLocation(
   db: Database,
-  input: {
-    groupId: string;
-    userId: string;
-    name: string;
-    address?: string | null;
-    hostUserId?: string | null;
-  },
+  input: LocationInput & { groupId: string; userId: string },
 ) {
   await requireMembership(db, input.groupId, input.userId);
-  const name = input.name.trim();
-  if (!name) throw new DomainError('invalid_input', 'Informe o nome do local');
+  const values = cleanLocation(input);
+  await requireHostInGroup(db, input.groupId, input.hostUserId);
   const [location] = await db
     .insert(locations)
-    .values({
-      groupId: input.groupId,
-      name,
-      address: input.address?.trim() || null,
-      hostUserId: input.hostUserId ?? null,
-    })
+    .values({ ...values, name: values.name!, groupId: input.groupId, createdBy: input.userId })
     .returning();
   return location!;
 }
 
-export async function listLocations(db: Database, groupId: string) {
-  return db
+/** Quem pode editar/remover um local: dono/admin do grupo, quem cadastrou ou o anfitrião. */
+async function requireLocationEditor(
+  db: Database,
+  input: { groupId: string; locationId: string; userId: string },
+) {
+  const membership = await requireMembership(db, input.groupId, input.userId);
+  const [location] = await db
     .select()
     .from(locations)
+    .where(and(eq(locations.id, input.locationId), eq(locations.groupId, input.groupId)))
+    .limit(1);
+  if (!location) throw new DomainError('not_found', 'Local não encontrado');
+  const allowed =
+    membership.role !== 'member' ||
+    location.createdBy === input.userId ||
+    location.hostUserId === input.userId;
+  if (!allowed) {
+    throw new DomainError('forbidden', 'Só quem cadastrou, o anfitrião ou um admin edita o local');
+  }
+  return location;
+}
+
+export async function updateLocation(
+  db: Database,
+  input: Partial<LocationInput> & { groupId: string; locationId: string; userId: string },
+) {
+  await requireLocationEditor(db, input);
+  const values = cleanLocation(input);
+  if (input.hostUserId !== undefined) await requireHostInGroup(db, input.groupId, input.hostUserId);
+  if (!Object.keys(values).length) throw new DomainError('invalid_input', 'Nada para alterar');
+  const [location] = await db
+    .update(locations)
+    .set(values)
+    .where(eq(locations.id, input.locationId))
+    .returning();
+  return location!;
+}
+
+/** Remove o local; encontros que o usavam ficam com "local a definir". */
+export async function deleteLocation(
+  db: Database,
+  input: { groupId: string; locationId: string; userId: string },
+) {
+  await requireLocationEditor(db, input);
+  await db.delete(locations).where(eq(locations.id, input.locationId));
+}
+
+export async function listLocations(db: Database, groupId: string) {
+  return db
+    .select({
+      id: locations.id,
+      groupId: locations.groupId,
+      name: locations.name,
+      address: locations.address,
+      details: locations.details,
+      lat: locations.lat,
+      lng: locations.lng,
+      hostUserId: locations.hostUserId,
+      hostName: user.name,
+      createdBy: locations.createdBy,
+      createdAt: locations.createdAt,
+    })
+    .from(locations)
+    .leftJoin(user, eq(user.id, locations.hostUserId))
     .where(eq(locations.groupId, groupId))
     .orderBy(asc(locations.name));
 }

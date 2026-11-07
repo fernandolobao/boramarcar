@@ -141,3 +141,21 @@ describe('gráficos interativos (4.11)', () => {
     expect(await audit(container)).toEqual([]);
   });
 });
+
+describe('banidas', () => {
+  it('mostra banidas e a origem da conferência', () => {
+    const banned = analyzeDeck([
+      {
+        name: 'Primeval Titan',
+        quantity: 1,
+        board: 'mainboard',
+        card: { ...card('Primeval Titan', 6, 'Creature')!, legalities: { commander: 'banned' } },
+      },
+    ]);
+    wrap(<DeckValidation analysis={banned} formatName="Commander" />);
+    expect(screen.getByText('Primeval Titan é banida neste formato.')).toBeInTheDocument();
+    expect(
+      screen.getByText(/conferidas pelos dados de legalidade do Scryfall/),
+    ).toBeInTheDocument();
+  });
+});

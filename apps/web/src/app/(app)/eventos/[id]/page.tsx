@@ -16,6 +16,8 @@ import { GameForm } from '@/components/game-form';
 import { GamePlayers } from '@/components/game-players';
 import { EventManage, EventStatusBadge } from '@/components/event-manage';
 import { ShareButtons } from '@/components/share-buttons';
+import { DirectionsLinks } from '@/components/places/directions';
+import { LocationMap } from '@/components/places/location-map';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { buildEventShareText, eventUrl } from '@/server/event-share';
@@ -54,6 +56,7 @@ export default async function EventPage({ params }: Props) {
   );
   const t = await getTranslations('events');
   const tc = await getTranslations('common');
+  const tp = await getTranslations('places');
   const tf = await getTranslations('formats');
   const format = await getFormatter();
 
@@ -83,6 +86,31 @@ export default async function EventPage({ params }: Props) {
           {event.location?.address && ` (${event.location.address})`}
         </p>
       </div>
+
+      {event.location && (
+        <section className="card space-y-3" aria-labelledby="event-location-title">
+          <h2 id="event-location-title" className="section-title mb-0">
+            {tp('where')}: {event.location.name}
+          </h2>
+          {event.location.address && <p className="text-sm">{event.location.address}</p>}
+          {event.location.details && <p className="muted text-sm">{event.location.details}</p>}
+          {event.location.lat !== null && event.location.lng !== null && (
+            <LocationMap
+              points={[
+                {
+                  id: event.location.id,
+                  name: event.location.name,
+                  lat: event.location.lat,
+                  lng: event.location.lng,
+                },
+              ]}
+              label={tp('mapOf', { name: event.location.name })}
+              className="h-56"
+            />
+          )}
+          <DirectionsLinks place={event.location} />
+        </section>
+      )}
 
       {event.status === 'cancelled' && (
         <p

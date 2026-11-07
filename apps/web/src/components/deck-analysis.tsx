@@ -5,6 +5,7 @@ import type {
   OpeningHandOdds,
   ColorSourceRow,
 } from '@boramarcar/core';
+import { deckFormatProfile } from '@boramarcar/core';
 import { ScoreBreakdown } from './analysis-charts';
 
 export { ManaCurve } from './analysis-charts';
@@ -109,7 +110,14 @@ export function DeckValidation({
           })}
         </ul>
       )}
-      <p className="muted mt-3 text-xs">{t('validationNote')}</p>
+      <p className="muted mt-3 text-xs">
+        {deckFormatProfile(analysis.format).scryfallFormat
+          ? t('legalityNote')
+          : t('validationNote')}
+        {analysis.legalityMissing > 0 && (
+          <> {t('legalityMissing', { count: analysis.legalityMissing })}</>
+        )}
+      </p>
     </div>
   );
 }

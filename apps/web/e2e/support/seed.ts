@@ -64,6 +64,11 @@ export async function seedE2E(databaseUrl: string) {
       groupId: E2E_IDS.group,
       name: 'Casa da Ana',
       address: 'Rua das Flores, 123',
+      details: 'Apto 42',
+      lat: -30.0346,
+      lng: -51.2177,
+      hostUserId: 'e2e-ana',
+      createdBy: 'e2e-ana',
     });
 
     // Disponibilidade na próxima semana: os 4 coincidem das 19h às 23h (UTC-3)

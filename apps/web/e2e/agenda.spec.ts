@@ -108,3 +108,25 @@ test.describe('histórico de encontros', () => {
     await expect(page).toHaveURL(/\/eventos\/historico$/);
   });
 });
+
+test.describe('locais do grupo (2.14)', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('lista com mapa e rotas; edita o complemento', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
+    await page.goto('/grupo');
+    await expect(page.getByRole('region', { name: 'Mapa dos locais do grupo' })).toBeVisible();
+    const routes = page.getByRole('list', { name: 'Abrir Casa da Ana em apps de mapa' });
+    await expect(routes.getByRole('link', { name: /Google Maps/ })).toHaveAttribute(
+      'href',
+      'https://www.google.com/maps/dir/?api=1&destination=-30.0346,-51.2177',
+    );
+    await expect(page.getByText('Anfitrião: Ana Teste')).toBeVisible();
+    await page.getByRole('button', { name: /^Editar ?\(Casa da Ana\)$/ }).click();
+    const form = page.getByRole('form', { name: 'Editar Casa da Ana' });
+    await form.getByLabel('Complemento').fill('Apto 42, interfone 2');
+    await form.getByRole('button', { name: 'Salvar' }).click();
+    await expect(page.getByText('Apto 42, interfone 2')).toBeVisible();
+  });
+});

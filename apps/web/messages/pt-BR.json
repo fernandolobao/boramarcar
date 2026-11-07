@@ -29,15 +29,6 @@
     "userMenu": "Menu da conta",
     "signedInAs": "Conectado como"
   },
-  "landing": {
-    "title": "Chega de enquete no grupo do WhatsApp.",
-    "subtitle": "Cada um marca quando e onde pode jogar. O Bora Marcar encontra o horário em que a mesa de 4 fecha, registra as partidas e mantém o ranking.",
-    "features": {
-      "schedule": "Disponibilidade e sugestão automática de horários",
-      "ranking": "Ranking com vitórias, derrotas e empates",
-      "decks": "Decks importados do Archidekt, Moxfield ou em texto, com análise e controle de proxies"
-    }
-  },
   "dashboard": {
     "hello": "Olá, {name}!",
     "nextEvents": "Próximos encontros",
@@ -482,7 +473,10 @@
       "deck_size_min": "O deck tem {actual} cartas (mínimo: {min}).",
       "too_many_copies": "{name} aparece {quantity} vezes (máximo: {max} cópias).",
       "sideboard_size": "A reserva tem {actual} cartas (máximo: {max}).",
-      "invalid_partners": "{names} não podem ser comandantes juntos: os dois precisam de Partner, um \"Partner with\" que nomeie o outro, o mesmo \"Partner—…\" (ex.: Character select), Background ou Doctor's companion."
+      "invalid_partners": "{names} não podem ser comandantes juntos: os dois precisam de Partner, um \"Partner with\" que nomeie o outro, o mesmo \"Partner—…\" (ex.: Character select), Background ou Doctor's companion.",
+      "banned": "{name} é banida neste formato.",
+      "restricted": "{name} é restrita: só 1 cópia é permitida (o deck tem {quantity}).",
+      "not_legal": "{name} não é permitida neste formato."
     },
     "suggestionsTitle": "Sugestões",
     "suggestions": {
@@ -494,7 +488,7 @@
     "searchScryfall": "Buscar substitutos no Scryfall",
     "disclaimer": "Nota pelas metas de referência de {format}. É um guia, não uma regra.",
     "curveBucket": "Custo {bucket}: {count, plural, =0 {nenhuma carta} =1 {1 carta} other {# cartas}}",
-    "validationNote": "Não confere a lista de cartas banidas do formato.",
+    "validationNote": "Este formato não tem lista de banidas para conferir.",
     "noScore": "A nota por funções vale para formatos com comandante. Para {format}, use a validação, a base de mana e as chances da mão inicial.",
     "rolesSource": "{tagged} de {total} cartas com funções do Scryfall Tagger; as demais pela leitura do texto da carta.",
     "refresh": "Atualizar análise",
@@ -577,7 +571,9 @@
       "lands": "A faixa recomendada é de {min} a {max} terrenos. Cada terreno fora dela tira 3 pontos. Com {value}, o deck soma {points} de {maxPoints} pontos.",
       "role": "A meta é ter {target} cartas de {role}. Os pontos crescem proporcionalmente até a meta: com {value}, o deck soma {points} de {maxPoints} pontos.",
       "curve": "Um CMC médio de até {ideal} vale os {maxPoints} pontos; acima disso os pontos caem até zero em {limit}. Com {value}, o deck soma {points} pontos."
-    }
+    },
+    "legalityNote": "Banidas e restritas conferidas pelos dados de legalidade do Scryfall, atualizados todos os dias.",
+    "legalityMissing": "{count, plural, =1 {1 carta ainda está} other {# cartas ainda estão}} sem os dados de legalidade: atualize a análise."
   },
   "errors": {
     "invalid_input": "Confira os dados informados.",
@@ -854,5 +850,212 @@
     "leastPopular": "Cartas menos jogadas",
     "leastPopularHint": "Pelo ranking de popularidade do EDHREC publicado pelo Scryfall: números maiores = cartas menos usadas em decks de Commander.",
     "rank": "nº {rank}"
+  },
+  "home": {
+    "metaTitle": "Bora Marcar — encontros, ranking e decks para o seu grupo de Magic",
+    "metaDescription": "Marque o próximo Commander com a sua mesa: disponibilidade, encontros, partidas, ranking, decks com análise e folha de proxies.",
+    "nav": {
+      "label": "Seções da página",
+      "features": "Funcionalidades",
+      "sources": "De onde vêm os dados",
+      "method": "Metodologia",
+      "values": "Valores",
+      "join": "Participe"
+    },
+    "goToDashboard": "Ir para o painel",
+    "signInToDashboard": "Entrar no painel",
+    "hero": {
+      "eyebrow": "Em testes com grupos de Commander",
+      "title": "A mesa fecha. O Bora Marcar cuida do resto.",
+      "subtitle": "Cada um marca quando e onde pode jogar. O app encontra o horário em que a mesa fecha, registra as partidas, mantém o ranking e ajuda a melhorar os seus decks.",
+      "join": "Participar dos testes",
+      "pause": "Pausar animação de fundo",
+      "play": "Reproduzir animação de fundo"
+    },
+    "intro": {
+      "title": "O que é o Bora Marcar",
+      "body": "Um lugar para o seu grupo de Magic organizar a vida fora da mesa: chega de enquete no grupo de mensagens, de ranking em planilha e de lista de deck perdida. Ele nasceu numa mesa de Commander de quatro amigos e está crescendo com a ajuda de quem joga.",
+      "stats": {
+        "formats": "formatos de jogo",
+        "roles": "funções de carta analisadas",
+        "languages": "idiomas (português e inglês)"
+      }
+    },
+    "features": {
+      "title": "Funcionalidades",
+      "subtitle": "Tudo o que o seu grupo precisa, do convite à última partida da noite.",
+      "items": {
+        "availability": {
+          "title": "Disponibilidade e horários",
+          "body": "Cada pessoa marca os horários e locais em que pode jogar, uma vez ou toda semana. O app mostra as janelas em que a mesa fecha e sugere o encontro."
+        },
+        "events": {
+          "title": "Encontros",
+          "body": "Crie o encontro, confirme presença, adicione à agenda (.ics) e compartilhe no WhatsApp. Lembretes e mudanças chegam por e-mail."
+        },
+        "games": {
+          "title": "Partidas em vários formatos",
+          "body": "Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Modern, Draft e outros: vencedor ou empate, times, deck usado, quem começou e ordem de eliminação."
+        },
+        "ranking": {
+          "title": "Ranking, temporadas e estatísticas",
+          "body": "Pontos configuráveis pelo grupo, temporadas, confronto direto, sequências de vitórias, decks e comandantes que mais vencem, e o histórico de encontros com busca."
+        },
+        "profiles": {
+          "title": "Perfis e conquistas",
+          "body": "Cada jogador tem um perfil com resumo, títulos de temporada, selos de conquista e os decks que escolheu mostrar."
+        },
+        "decks": {
+          "title": "Decks com imagens",
+          "body": "Importe do Archidekt, do Moxfield ou de uma lista colada, no formato certo. Escolha a edição de cada carta, veja os dois lados das cartas de duas faces e edite com busca do Scryfall."
+        },
+        "proxies": {
+          "title": "Proxies e preços",
+          "body": "Marque quantas cópias são proxy, imprima a folha 3×3 em tamanho real com marcas de corte e veja o preço do deck em dólar e em reais."
+        },
+        "analysis": {
+          "title": "Análise de deck",
+          "body": "Nota de 0 a 100, funções das cartas, bracket estimado, base de mana, chances da mão inicial, comparação com outros decks do mesmo comandante e sugestões de troca."
+        },
+        "mobile": {
+          "title": "App para Android e iOS",
+          "body": "Em desenvolvimento: encontros, presença, ranking e decks no bolso, com login pelo Google."
+        }
+      }
+    },
+    "sources": {
+      "title": "De onde vêm as informações",
+      "subtitle": "Usamos só fontes que permitem esse uso e damos o crédito. O que é do seu grupo fica no seu grupo.",
+      "items": {
+        "scryfall": {
+          "name": "Scryfall",
+          "body": "Dados e imagens das cartas, edições, preços em dólar, a lista de Game Changers, as funções do Scryfall Tagger e o ranking de popularidade do EDHREC que o Scryfall publica. Atualizado todos os dias."
+        },
+        "spellbook": {
+          "name": "Commander Spellbook",
+          "body": "Combos do deck e as cartas que pesam no bracket (destruição em massa de terrenos, turnos extras)."
+        },
+        "bcb": {
+          "name": "Banco Central do Brasil",
+          "body": "Cotação oficial do dólar (PTAX) para converter os preços em reais."
+        },
+        "importers": {
+          "name": "Archidekt e Moxfield",
+          "body": "Importação das listas públicas que você indicar, com as edições escolhidas."
+        },
+        "links": {
+          "name": "LigaMagic e EDHREC",
+          "body": "Só links para você consultar preços no Brasil e a página do comandante: os termos de uso deles não permitem consultas automáticas."
+        },
+        "group": {
+          "name": "O seu grupo",
+          "body": "Disponibilidade, encontros e partidas são vistos só por quem está no grupo. Cada deck pode ser privado, do grupo ou público."
+        }
+      }
+    },
+    "method": {
+      "title": "Como avaliamos e sugerimos",
+      "subtitle": "Regras simples e explicadas na tela. A análise é um guia para conversar com a mesa, não um veredito.",
+      "steps": {
+        "format": {
+          "title": "1. O formato vem primeiro",
+          "body": "Cada deck tem um formato. A validação segue as regras dele: tamanho do deck, cópias por carta (somando todas as edições), reserva, comandantes e parceiros (Partner, Partner with, Background, Character select…), identidade de cor e a lista de banidas e restritas do formato (dados do Scryfall)."
+        },
+        "roles": {
+          "title": "2. Funções das cartas",
+          "body": "Ramp, compra, remoção, wipe, tutor, proteção, recursão e contramágica vêm do Scryfall Tagger. Carta ainda não consultada é classificada pela leitura do texto de regras, e a tela mostra quantas vieram de cada fonte."
+        },
+        "score": {
+          "title": "3. Nota de 0 a 100",
+          "body": "Nos formatos com comandante, a nota soma seis partes com metas de referência da comunidade. As funções valem pontos proporcionais até a meta; os terrenos perdem 3 pontos por carta fora da faixa; a curva vale tudo até CMC médio 3 e cai até zero em 4,5."
+        },
+        "suggestions": {
+          "title": "4. Sugestões e alternativas",
+          "body": "Faltou terreno ou função? O app diz quantos faltam e busca alternativas da mesma função no Scryfall, dentro da identidade de cor, do formato e do custo escolhido, das mais jogadas para as menos."
+        },
+        "bracket": {
+          "title": "5. Bracket estimado",
+          "body": "Aplica as regras objetivas dos brackets oficiais de Commander: Game Changers (nenhum até o 2, até três no 3), destruição em massa de terrenos, turnos extras encadeados e combos de duas cartas. O resultado é um mínimo: intenção e velocidade ficam com a mesa."
+        },
+        "mana": {
+          "title": "6. Base de mana e mão inicial",
+          "body": "Compara os terrenos que geram cada cor com uma meta proporcional aos símbolos de mana e calcula, pela distribuição hipergeométrica, as chances de 2 a 4 terrenos na mão inicial e de jogar terreno em todos os turnos."
+        },
+        "compare": {
+          "title": "7. Comparação",
+          "body": "Mostra a média dos decks do mesmo comandante cadastrados no Bora Marcar que você pode ver, as cartas comuns que faltam e as suas escolhas próprias."
+        },
+        "group": {
+          "title": "E no grupo",
+          "body": "Os horários sugeridos são as janelas em que pelo menos o tamanho da mesa está livre pelo tempo mínimo do grupo. O ranking soma pontos por vitória, empate e derrota (3, 1 e 0 por padrão, ajustáveis pelo grupo)."
+        }
+      },
+      "scoreCaption": "Como os 100 pontos da nota se dividem",
+      "parts": {
+        "lands": "Terrenos (36 a 38)",
+        "ramp": "Ramp (meta 10)",
+        "draw": "Compra (meta 10)",
+        "removal": "Remoção (meta 8)",
+        "wipe": "Board wipes (meta 2)",
+        "curve": "Curva (CMC médio até 3)"
+      },
+      "points": "{count} pontos"
+    },
+    "values": {
+      "title": "Nossos valores",
+      "items": {
+        "accessible": {
+          "title": "Acessível para todos",
+          "body": "Seguimos as diretrizes WCAG 2.2 nível AA: tudo funciona com teclado e leitor de tela, com contraste adequado, nos temas claro e escuro. Cada tela nova passa por auditoria antes de ir ao ar."
+        },
+        "privacy": {
+          "title": "Privacidade e dados abertos",
+          "body": "Não vendemos dados. Usamos só fontes que permitem o uso, damos o crédito a cada uma e você decide quem vê os seus decks."
+        }
+      }
+    },
+    "join": {
+      "title": "Participe dos testes",
+      "body": "O Bora Marcar está em testes com grupos de Commander. Use com a sua mesa, conte o que funcionou, o que faltou e o que deu errado: cada mensagem vira melhoria.",
+      "email": "Enviar feedback por e-mail",
+      "emailSubject": "Bora Marcar — testes",
+      "or": "ou comece agora:"
+    },
+    "footer": {
+      "credits": "Dados de cartas pelo Scryfall; combos pelo Commander Spellbook; cotação do dólar pelo Banco Central do Brasil.",
+      "disclaimer": "Bora Marcar é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
+      "contact": "Contato"
+    }
+  },
+  "places": {
+    "name": "Nome do local",
+    "address": "Endereço",
+    "addressHint": "Digite pelo menos 3 letras para ver sugestões do OpenStreetMap; você também pode escrever o endereço livremente.",
+    "details": "Complemento",
+    "detailsPlaceholder": "Apartamento, portaria, como chegar…",
+    "host": "Anfitrião",
+    "noHost": "Sem anfitrião",
+    "suggestions": "{count, plural, =1 {1 sugestão} other {# sugestões}} de endereço",
+    "searching": "Buscando endereços…",
+    "searchError": "Não foi possível buscar endereços agora.",
+    "newLocation": "Novo local",
+    "addTitle": "Cadastrar local",
+    "editTitle": "Editar {name}",
+    "add": "Adicionar local",
+    "edit": "Editar",
+    "saved": "{name} salvo.",
+    "mapOf": "Mapa: {name}",
+    "groupMap": "Mapa dos locais do grupo",
+    "mapPickHint": "Arraste o pino ou clique no mapa para ajustar o ponto.",
+    "mapEmptyHint": "Escolha uma sugestão de endereço para marcar o local no mapa, ou clique no mapa.",
+    "removePin": "Remover pino do mapa",
+    "empty": "Nenhum local cadastrado ainda.",
+    "hostedBy": "Anfitrião: {name}",
+    "noPin": "Sem ponto no mapa: as rotas usam o endereço.",
+    "directionsTo": "Abrir {name} em apps de mapa",
+    "routeTo": "rota até {name}",
+    "where": "Onde",
+    "zoomIn": "Aproximar",
+    "zoomOut": "Afastar"
   }
 }

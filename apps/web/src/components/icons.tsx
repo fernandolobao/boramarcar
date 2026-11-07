@@ -7,6 +7,13 @@
  */
 import {
   Award,
+  MapPin,
+  Navigation,
+  Accessibility,
+  Mail,
+  Pause,
+  Play,
+  Smartphone,
   FlipHorizontal2,
   Monitor,
   Moon,
@@ -157,6 +164,16 @@ export const Icons = {
   bracket: Gauge,
   openingHand: Hand,
   flip: FlipHorizontal2,
+  location: MapPin,
+  directions: Navigation,
+  // Página inicial
+  games: Swords,
+  mobile: Smartphone,
+  accessible: Accessibility,
+  privacy: ShieldCheck,
+  email: Mail,
+  pause: Pause,
+  play: Play,
   // Tema
   themeSystem: Monitor,
   themeLight: Sun,

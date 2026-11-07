@@ -2,12 +2,7 @@ import { isGameFormat } from '@boramarcar/core';
 import { listLocations, listMembers } from '@boramarcar/db';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import {
-  CreateGroupForm,
-  JoinGroupForm,
-  LocationForm,
-  SwitchGroupButton,
-} from '@/components/group-forms';
+import { CreateGroupForm, JoinGroupForm, SwitchGroupButton } from '@/components/group-forms';
 import { GroupSettingsForm } from '@/components/group-settings-form';
 import { RegenerateInviteButton } from '@/components/invite';
 import { MemberActions } from '@/components/member-actions';
@@ -18,6 +13,7 @@ import { getDb } from '@/server/db';
 import { inviteQrCode, inviteUrl } from '@/server/invite';
 import { navMetadata } from '@/server/metadata';
 import { Icon } from '@/components/icons';
+import { LocationsSection } from '@/components/places/locations-section';
 
 export const generateMetadata = navMetadata('group');
 
@@ -124,17 +120,17 @@ export default async function GroupPage() {
               ))}
             </ul>
           </section>
-          <section className="card space-y-4 md:col-span-2">
-            <h2 className="section-title">{t('locations')}</h2>
-            <ul className="space-y-1 text-sm">
-              {locations.map((l) => (
-                <li key={l.id}>
-                  <span className="font-medium">{l.name}</span>
-                  {l.address && <span className="muted"> · {l.address}</span>}
-                </li>
-              ))}
-            </ul>
-            <LocationForm groupId={active.id} />
+          <section className="card md:col-span-2" aria-labelledby="group-locations-title">
+            <h2 id="group-locations-title" className="section-title">
+              {t('locations')}
+            </h2>
+            <LocationsSection
+              groupId={active.id}
+              locations={locations}
+              members={members.map((m) => ({ userId: m.userId, name: m.name }))}
+              canManageAll={active.role !== 'member'}
+              userId={user.id}
+            />
           </section>
           <section className="card md:col-span-2" aria-labelledby="group-settings-title">
             <h2 id="group-settings-title" className="section-title">
