@@ -74,4 +74,65 @@ describe('LocationForm', () => {
     // "Remover pino" some quando não há ponto (formulário limpo depois de salvar).
     expect(screen.queryByRole('button', { name: 'Remover pino do mapa' })).toBeNull();
   });
+
+  it('com o número que o mapa só conhece pela rua, procura o número e move o pino', async () => {
+    const urls: string[] = [];
+    let found = true;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        urls.push(url);
+        if (url.startsWith('/api/v1/places/locate')) {
+          return Response.json({ point: found ? { lat: -30.03, lng: -51.2 } : null });
+        }
+        if (url.startsWith('/api/v1/places')) {
+          return Response.json({
+            suggestions: [
+              {
+                label: 'Rua Padre Chagas, 300, Porto Alegre',
+                name: null,
+                lat: -30.02,
+                lng: -51.19,
+                approximate: true,
+              },
+            ],
+          });
+        }
+        return Response.json({ body: init?.body ?? null }, { status: 201 });
+      }),
+    );
+    render(
+      <NextIntlClientProvider locale="pt-BR" messages={messages} timeZone="America/Sao_Paulo">
+        <LocationForm groupId="g1" members={[]} />
+      </NextIntlClientProvider>,
+    );
+    const address = screen.getByRole('combobox', { name: 'Endereço' });
+    const pick = async (value: string) => {
+      fireEvent.change(address, { target: { value } });
+      fireEvent.mouseDown(
+        await screen.findByRole('option', { name: /Padre Chagas/ }, { timeout: 2000 }),
+      );
+    };
+    await pick('padre chagas 300');
+    expect(address).toHaveValue('Rua Padre Chagas, 300, Porto Alegre');
+    expect(
+      await screen.findByText('Número encontrado: o pino está no endereço.'),
+    ).toBeInTheDocument();
+    expect(urls).toContain('/api/v1/places/locate?q=Rua+Padre+Chagas%2C+300%2C+Porto+Alegre');
+
+    fireEvent.change(screen.getByLabelText('Nome do local'), { target: { value: 'Casa' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Adicionar local' }));
+    await waitFor(() => expect(urls.at(-1)).toBe('/api/v1/groups/g1/locations'));
+    const fetchMock = vi.mocked(fetch);
+    const body = JSON.parse(String(fetchMock.mock.calls.at(-1)![1]!.body));
+    expect(body).toMatchObject({
+      address: 'Rua Padre Chagas, 300, Porto Alegre',
+      lat: -30.03,
+      lng: -51.2,
+    });
+
+    found = false;
+    await pick('padre chagas 300 b');
+    expect(await screen.findByText(/ainda não tem esse número/)).toBeInTheDocument();
+  });
 });

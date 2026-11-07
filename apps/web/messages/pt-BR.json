@@ -1056,7 +1056,10 @@
     "routeTo": "rota até {name}",
     "where": "Onde",
     "zoomIn": "Aproximar",
-    "zoomOut": "Afastar"
+    "zoomOut": "Afastar",
+    "locatingNumber": "Procurando o número no mapa…",
+    "numberFound": "Número encontrado: o pino está no endereço.",
+    "numberNotFound": "O OpenStreetMap ainda não tem esse número: o pino está num ponto da rua. Arraste-o (ou clique no mapa) até o local certo; o endereço salvo mantém o número."
   },
   "table": {
     "title": "Modo mesa",
