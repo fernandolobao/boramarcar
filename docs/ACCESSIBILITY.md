@@ -167,6 +167,11 @@ sem rolagem horizontal em 320px.
 
 - No modo de troca, cada área vira um botão com nome ("Escolher Ana para trocar de lugar") e estado (`aria-pressed`/`selected`); o botão central vira "Pronto" com texto visível; a troca é anunciada numa região viva ("Ana e Bia trocaram de lugar.") e "Desfazer" volta a ordem.
 
+### Revisão: disponibilidade no app
+
+- Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
+- Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
+
 ### Revisão: app mobile (primeira versão)
 
 - Botões com alvo mínimo de 44 pt, `accessibilityRole="button"` e estado (`disabled`, `selected`/`checked`); escolhas únicas (presença, grupo ativo) como `radiogroup`/`radio`.

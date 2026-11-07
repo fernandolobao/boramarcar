@@ -170,4 +170,72 @@ describe('cliente da API', () => {
     });
     await expect(api.decks.list()).rejects.toMatchObject({ code: 'network_error' });
   });
+
+  it('disponibilidade: lista, cria, remove, regras, exceções e melhores horários', async () => {
+    const calls: { url: string; init?: RequestInit }[] = [];
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      calls.push({ url, init });
+      if (url.includes('/availability/windows')) {
+        return json({
+          windows: [
+            {
+              start: '2026-11-14T22:00:00.000Z',
+              end: '2026-11-15T02:00:00.000Z',
+              durationMinutes: 240,
+              userIds: ['a', 'b'],
+              locationId: null,
+              locationName: null,
+              players: [
+                { userId: 'a', name: 'Ana' },
+                { userId: 'b', name: 'Bia' },
+              ],
+            },
+          ],
+        });
+      }
+      if (init?.method === 'DELETE') return new Response(null, { status: 204 });
+      if (url.endsWith('/availability-rules') && init?.method === 'POST') {
+        return json({ rules: [{ id: 'r1' }] }, 201);
+      }
+      if (url.endsWith('/exceptions')) return json({ date: '2026-11-19', skip: true });
+      return json({
+        slots: [
+          {
+            id: 'r1:2026-11-19',
+            userId: 'a',
+            userName: 'Ana',
+            startsAt: '2026-11-19T22:00:00.000Z',
+            endsAt: '2026-11-20T02:00:00.000Z',
+            note: null,
+            kind: 'weekly',
+            ruleId: 'r1',
+            date: '2026-11-19',
+            locationIds: [],
+          },
+        ],
+      });
+    });
+    const api = createApiClient({
+      baseUrl: 'https://x.dev',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const slots = await api.availability.list('g1', { from: new Date('2026-11-01T00:00:00Z') });
+    expect(calls[0]!.url).toBe(
+      'https://x.dev/api/v1/groups/g1/availability?from=2026-11-01T00%3A00%3A00.000Z',
+    );
+    expect(slots[0]!.startsAt).toEqual(new Date('2026-11-19T22:00:00.000Z'));
+    const windows = await api.availability.windows('g1');
+    expect(windows[0]!.players.map((p) => p.name)).toEqual(['Ana', 'Bia']);
+    await api.availability.remove('s 1');
+    expect(calls[2]!.url).toBe('https://x.dev/api/v1/availability/s%201');
+    await api.rules.add('g1', {
+      weekdays: [4],
+      startTime: '19:00',
+      endTime: '23:00',
+      timeZone: 'America/Sao_Paulo',
+    });
+    expect(JSON.parse(String(calls[3]!.init!.body))).toMatchObject({ weekdays: [4] });
+    await api.rules.setException('r1', '2026-11-19', true);
+    expect(calls[4]!.init!.method).toBe('PUT');
+  });
 });
