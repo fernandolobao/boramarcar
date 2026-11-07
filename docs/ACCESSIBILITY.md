@@ -169,6 +169,12 @@ sem rolagem horizontal em 320px.
 - Um `h1`, seções com `h2` (rótulo de cada seção) e numeração decorativa (`aria-hidden`); navegação por âncoras em `<nav>` com nome; a barra da nota é decorativa e os números estão em texto ao lado.
 - Links externos avisam que abrem em nova aba; o mesmo conteúdo para quem entrou ou não, com "Ir para o painel" ou "Entrar no painel" no menu superior.
 
+### Revisão: locais e mapas
+
+- O mapa é complementar (`role="region"` com nome): endereço, complemento, anfitrião e links de rota ficam sempre em texto; ajustar o pino é opcional e quem não usa mouse escolhe o ponto pelo autocompletar do endereço.
+- Endereço como `combobox` (setas, Enter, Esc) com dica ligada por `aria-describedby` e número de sugestões anunciado; também aceita texto livre.
+- Botões "Editar" e "Remover" com o nome do local para leitores de tela; links de rota avisam que abrem em nova aba e dizem o destino.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.

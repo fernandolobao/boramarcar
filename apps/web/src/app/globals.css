@@ -116,3 +116,32 @@ input[type='radio'] {
 @utility skip-link {
   @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-2 focus:outline-offset-2 focus:outline-brand-500;
 }
+
+/* Pino dos mapas de locais (Leaflet divIcon): cor da marca + nome ao lado. */
+.bm-marker {
+  position: relative;
+}
+.bm-pin {
+  position: absolute;
+  left: -12px;
+  top: -30px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--color-brand-600);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+}
+.bm-pin-label {
+  position: absolute;
+  left: 16px;
+  top: -30px;
+  white-space: nowrap;
+  font: 600 12px/1.4 var(--font-sans);
+  color: #18181b;
+  background: #fff;
+  border-radius: 6px;
+  padding: 1px 6px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+}

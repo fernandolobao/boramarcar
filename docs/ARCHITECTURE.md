@@ -138,6 +138,15 @@ A lista de banidas não é conferida.
 
 **Atualização dos dados externos** (`server/deck-analysis.ts`): depois de importar ou sincronizar (e ao abrir um deck com dados velhos), `refreshDeckAnalysis` roda após a resposta (`after`) e, em etapas independentes, completa a mana produzida de cartas de cache antigo, consulta o Tagger (~8 funções × 2–3 buscas de até 1000 caracteres, 100 ms entre elas) e o Spellbook. O botão "Atualizar análise" chama `POST /api/v1/decks/:id/analysis`.
 
+## Locais do grupo e mapas
+
+Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`), anfitrião e quem cadastrou. Qualquer membro cadastra; editar e remover cabe a dono/admin, a quem cadastrou e ao anfitrião. Remover um local deixa os encontros com "local a definir".
+
+- **Autocompletar**: `GET /api/v1/places?q=` chama o [Photon](https://photon.komoot.io) (OpenStreetMap), que aceita busca enquanto se digita (o Nominatim não aceita). O servidor guarda as buscas por 24 h em memória e o campo espera 400 ms sem digitação e 3 letras; os resultados priorizam a região do primeiro local do grupo.
+- **Mapa**: Leaflet com os tiles do OpenStreetMap e o crédito exigido; o pino é um `divIcon` em CSS. No formulário, clicar no mapa ou arrastar o pino ajusta as coordenadas.
+- **Rotas**: `directionsLinks` (core) monta os links para Google Maps, Apple Maps, Waze e OpenStreetMap (coordenadas ou, sem elas, o endereço).
+- Na página do encontro aparece o local com mapa e rotas.
+
 ## Página inicial
 
 `/` é pública e igual para todos (não redireciona mais quem já entrou): apresentação, funcionalidades, fontes de dados, metodologia da análise (os pontos da nota vêm de `ROLE_POINTS` do core), valores e o convite para os testes (e-mail). O menu superior leva ao painel (ou faz o login com o Google, que volta para `/painel`). O vídeo abstrato do topo (`public/home/hero.webm|mp4` + capa `hero-poster.webp`) é gerado por `apps/web/scripts/hero-video.py` (quadros em Python + ffmpeg, loop de 12 s).

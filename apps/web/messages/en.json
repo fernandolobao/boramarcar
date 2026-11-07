@@ -1021,5 +1021,36 @@
       "disclaimer": "Bora Marcar is a fan project and is not affiliated with Wizards of the Coast. Magic: The Gathering is a trademark of Wizards of the Coast LLC.",
       "contact": "Contact"
     }
+  },
+  "places": {
+    "name": "Location name",
+    "address": "Address",
+    "addressHint": "Type at least 3 letters to see OpenStreetMap suggestions; you can also type the address freely.",
+    "details": "Details",
+    "detailsPlaceholder": "Apartment, doorman, how to get there…",
+    "host": "Host",
+    "noHost": "No host",
+    "suggestions": "{count, plural, =1 {1 address suggestion} other {# address suggestions}}",
+    "searching": "Searching addresses…",
+    "searchError": "Could not search addresses right now.",
+    "newLocation": "New location",
+    "addTitle": "Add location",
+    "editTitle": "Edit {name}",
+    "add": "Add location",
+    "edit": "Edit",
+    "saved": "{name} saved.",
+    "mapOf": "Map: {name}",
+    "groupMap": "Map of the group's locations",
+    "mapPickHint": "Drag the pin or click the map to adjust the spot.",
+    "mapEmptyHint": "Pick an address suggestion to place the location on the map, or click the map.",
+    "removePin": "Remove map pin",
+    "empty": "No locations yet.",
+    "hostedBy": "Host: {name}",
+    "noPin": "No map point: directions use the address.",
+    "directionsTo": "Open {name} in map apps",
+    "routeTo": "directions to {name}",
+    "where": "Where",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
   }
 }

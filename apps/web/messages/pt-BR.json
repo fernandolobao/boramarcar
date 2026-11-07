@@ -1021,5 +1021,36 @@
       "disclaimer": "Bora Marcar é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
       "contact": "Contato"
     }
+  },
+  "places": {
+    "name": "Nome do local",
+    "address": "Endereço",
+    "addressHint": "Digite pelo menos 3 letras para ver sugestões do OpenStreetMap; você também pode escrever o endereço livremente.",
+    "details": "Complemento",
+    "detailsPlaceholder": "Apartamento, portaria, como chegar…",
+    "host": "Anfitrião",
+    "noHost": "Sem anfitrião",
+    "suggestions": "{count, plural, =1 {1 sugestão} other {# sugestões}} de endereço",
+    "searching": "Buscando endereços…",
+    "searchError": "Não foi possível buscar endereços agora.",
+    "newLocation": "Novo local",
+    "addTitle": "Cadastrar local",
+    "editTitle": "Editar {name}",
+    "add": "Adicionar local",
+    "edit": "Editar",
+    "saved": "{name} salvo.",
+    "mapOf": "Mapa: {name}",
+    "groupMap": "Mapa dos locais do grupo",
+    "mapPickHint": "Arraste o pino ou clique no mapa para ajustar o ponto.",
+    "mapEmptyHint": "Escolha uma sugestão de endereço para marcar o local no mapa, ou clique no mapa.",
+    "removePin": "Remover pino do mapa",
+    "empty": "Nenhum local cadastrado ainda.",
+    "hostedBy": "Anfitrião: {name}",
+    "noPin": "Sem ponto no mapa: as rotas usam o endereço.",
+    "directionsTo": "Abrir {name} em apps de mapa",
+    "routeTo": "rota até {name}",
+    "where": "Onde",
+    "zoomIn": "Aproximar",
+    "zoomOut": "Afastar"
   }
 }
