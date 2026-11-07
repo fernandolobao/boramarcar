@@ -148,6 +148,15 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - **Rotas**: `directionsLinks` (core) monta os links para Google Maps, Apple Maps, Waze e OpenStreetMap (coordenadas ou, sem elas, o endereço).
 - Na página do encontro aparece o local com mapa e rotas.
 
+## Modo mesa (contador de vida)
+
+`/mesa/:encontro` abre em tela cheia (fora do layout do app) para o celular deitado no meio da mesa, no estilo dos contadores de mesa como o Lotus: uma área por jogador (2 a 6), virada para quem senta daquele lado (sentido horário a partir do canto superior esquerdo), toque nas metades para ±1 e segurar para ±10, total recente ("−2") que some em 1,5 s, e um botão central com desfazer, d20, moeda, sorteio de quem começa e encerrar.
+
+- Lógica pura em `core/table` (`tableReducer`): vida, dano de comandante por origem (também tira vida), veneno, energia, experiência, imposto do comandante, monarca, concessão e desfazer. Derrota por vida ≤ 0, 10 de veneno, 21 de um mesmo comandante (só formatos com comandante) ou desistência; a ordem de eliminação vem do passo em que cada um caiu.
+- A partida fica no `localStorage` do aparelho (continua depois de recarregar ou bloquear a tela) e a tela fica acesa com a Wake Lock API quando o navegador permite.
+- Ao encerrar, o resultado sugerido (último vivo vence; os demais na ordem em que caíram) é conferido e salvo com `POST /api/v1/events/:id/games` (formato, quem começou, turno, duração).
+- Formatos de time (Two-Headed Giant) continuam no formulário do encontro.
+
 ## Página inicial
 
 `/` é pública e igual para todos (não redireciona mais quem já entrou): apresentação, funcionalidades, fontes de dados, metodologia da análise (os pontos da nota vêm de `ROLE_POINTS` do core), valores e o convite para os testes (e-mail). O menu superior leva ao painel (ou faz o login com o Google, que volta para `/painel`). O vídeo abstrato do topo (`public/home/hero.webm|mp4` + capa `hero-poster.webp`) é gerado por `apps/web/scripts/hero-video.py` (quadros em Python + ffmpeg, loop de 12 s).

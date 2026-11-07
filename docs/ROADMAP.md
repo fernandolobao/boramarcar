@@ -113,15 +113,15 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 ## Fase 5 — Apps Android e iOS
 
-| #   | Item                                                                                                  | Tamanho |
-| --- | ----------------------------------------------------------------------------------------------------- | ------- |
-| 5.1 | `apps/mobile` com **Expo (React Native) + Expo Router** no mesmo monorepo                             | M       |
-| 5.2 | Login Google no app com o plugin `@better-auth/expo` e sessões via bearer token na API                | M       |
-| 5.3 | Cliente da API tipado e compartilhado (`packages/api-client`, gerado a partir de schemas Zod/OpenAPI) | M       |
-| 5.4 | Telas: disponibilidade, encontros, registrar partida, ranking, decks                                  | G       |
-| 5.5 | **Push notifications** (Expo Notifications) para encontros e lembretes                                | M       |
-| 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)             | G       |
-| 5.7 | Publicação nas lojas (EAS Build/Submit), ícones, splash, política de privacidade                      | M       |
+| #   | Item                                                                                                  | Tamanho                                           |
+| --- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| 5.1 | `apps/mobile` com **Expo (React Native) + Expo Router** no mesmo monorepo                             | M                                                 |
+| 5.2 | Login Google no app com o plugin `@better-auth/expo` e sessões via bearer token na API                | M                                                 |
+| 5.3 | Cliente da API tipado e compartilhado (`packages/api-client`, gerado a partir de schemas Zod/OpenAPI) | M                                                 |
+| 5.4 | Telas: disponibilidade, encontros, registrar partida, ranking, decks                                  | G                                                 |
+| 5.5 | **Push notifications** (Expo Notifications) para encontros e lembretes                                | M                                                 |
+| 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)             | ✅ no site (`/mesa/:encontro`); app depois do #30 |
+| 5.7 | Publicação nas lojas (EAS Build/Submit), ícones, splash, política de privacidade                      | M                                                 |
 
 ## Transversal (contínuo)
 

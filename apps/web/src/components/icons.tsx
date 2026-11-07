@@ -7,6 +7,8 @@
  */
 import {
   Award,
+  Gamepad2,
+  Skull,
   MapPin,
   Navigation,
   Accessibility,
@@ -166,6 +168,10 @@ export const Icons = {
   flip: FlipHorizontal2,
   location: MapPin,
   directions: Navigation,
+  // Modo mesa
+  monarch: Crown,
+  poison: Skull,
+  table: Gamepad2,
   // Página inicial
   games: Swords,
   mobile: Smartphone,
