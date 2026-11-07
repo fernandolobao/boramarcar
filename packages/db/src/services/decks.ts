@@ -54,6 +54,7 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         collectorNumber: c.collectorNumber ?? null,
         backImageUri: c.backImageUri ?? null,
         backName: c.backName ?? null,
+        legalities: c.legalities ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -78,6 +79,7 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         collectorNumber: sql`coalesce(excluded.collector_number, ${cards.collectorNumber})`,
         backImageUri: sql`excluded.back_image_uri`,
         backName: sql`excluded.back_name`,
+        legalities: sql`coalesce(excluded.legalities, ${cards.legalities})`,
         updatedAt: new Date(),
       },
     });
@@ -141,6 +143,7 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
     collectorNumber: card.collectorNumber,
     backImageUri: card.backImageUri,
     backName: card.backName,
+    legalities: card.legalities,
   };
 }
 
@@ -159,6 +162,7 @@ export async function deckCardsForEnrichment(db: Database, deckId: string) {
       producedMana: cards.producedMana,
       setCode: cards.setCode,
       backImageUri: cards.backImageUri,
+      legalities: cards.legalities,
       cardUpdatedAt: cards.updatedAt,
       rolesCheckedAt: cards.rolesCheckedAt,
       typeLine: cards.typeLine,
@@ -174,6 +178,7 @@ export async function deckCardsForEnrichment(db: Database, deckId: string) {
         (r) =>
           r.producedMana === null ||
           r.setCode === null ||
+          r.legalities === null ||
           // Cache anterior ao verso das cartas de duas faces: relê uma vez.
           (r.name.includes(' // ') &&
             r.backImageUri === null &&
@@ -380,6 +385,7 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
         card &&
         (card.producedMana === null ||
           card.setCode === null ||
+          card.legalities === null ||
           (card.name.includes(' // ') &&
             card.backImageUri === null &&
             card.updatedAt < TWO_FACED_BACKFILL) ||

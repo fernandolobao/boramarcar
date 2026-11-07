@@ -473,7 +473,10 @@
       "deck_size_min": "The deck has {actual} cards (minimum {min}).",
       "too_many_copies": "{name} appears {quantity} times (max {max} copies).",
       "sideboard_size": "The sideboard has {actual} cards (max {max}).",
-      "invalid_partners": "{names} cannot be commanders together: both need Partner, a \"Partner with\" naming the other, the same \"Partner—…\" (e.g. Character select), Background or Doctor's companion."
+      "invalid_partners": "{names} cannot be commanders together: both need Partner, a \"Partner with\" naming the other, the same \"Partner—…\" (e.g. Character select), Background or Doctor's companion.",
+      "banned": "{name} is banned in this format.",
+      "restricted": "{name} is restricted: only 1 copy is allowed (the deck has {quantity}).",
+      "not_legal": "{name} is not legal in this format."
     },
     "suggestionsTitle": "Suggestions",
     "suggestions": {
@@ -485,7 +488,7 @@
     "searchScryfall": "Search replacements on Scryfall",
     "disclaimer": "Score based on {format} reference targets. It is a guide, not a rule.",
     "curveBucket": "Mana value {bucket}: {count, plural, =0 {no cards} =1 {1 card} other {# cards}}",
-    "validationNote": "Does not check the format's banned list.",
+    "validationNote": "This format has no banned list to check.",
     "noScore": "The role score applies to commander formats. For {format}, use the validation, mana base and opening hand odds.",
     "rolesSource": "{tagged} of {total} cards with roles from Scryfall Tagger; the rest from reading the card text.",
     "refresh": "Refresh analysis",
@@ -568,7 +571,9 @@
       "lands": "The recommended range is {min} to {max} lands. Each land outside it costs 3 points. With {value}, the deck scores {points} of {maxPoints} points.",
       "role": "The target is {target} {role} cards. Points grow proportionally up to the target: with {value}, the deck scores {points} of {maxPoints} points.",
       "curve": "An average mana value up to {ideal} earns all {maxPoints} points; above that, points drop to zero at {limit}. With {value}, the deck scores {points} points."
-    }
+    },
+    "legalityNote": "Banned and restricted cards checked with Scryfall legality data, updated daily.",
+    "legalityMissing": "{count, plural, =1 {1 card is} other {# cards are}} still missing legality data: refresh the analysis."
   },
   "errors": {
     "invalid_input": "Please check the data you entered.",
@@ -954,7 +959,7 @@
       "steps": {
         "format": {
           "title": "1. Format first",
-          "body": "Every deck has a format. Validation follows its rules: deck size, copies per card (adding up all printings), sideboard, commanders and partners (Partner, Partner with, Background, Character select…) and color identity."
+          "body": "Every deck has a format. Validation follows its rules: deck size, copies per card (adding up all printings), sideboard, commanders and partners (Partner, Partner with, Background, Character select…), color identity and the format's banned and restricted list (Scryfall data)."
         },
         "roles": {
           "title": "2. Card roles",

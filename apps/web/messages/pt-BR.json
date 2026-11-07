@@ -473,7 +473,10 @@
       "deck_size_min": "O deck tem {actual} cartas (mínimo: {min}).",
       "too_many_copies": "{name} aparece {quantity} vezes (máximo: {max} cópias).",
       "sideboard_size": "A reserva tem {actual} cartas (máximo: {max}).",
-      "invalid_partners": "{names} não podem ser comandantes juntos: os dois precisam de Partner, um \"Partner with\" que nomeie o outro, o mesmo \"Partner—…\" (ex.: Character select), Background ou Doctor's companion."
+      "invalid_partners": "{names} não podem ser comandantes juntos: os dois precisam de Partner, um \"Partner with\" que nomeie o outro, o mesmo \"Partner—…\" (ex.: Character select), Background ou Doctor's companion.",
+      "banned": "{name} é banida neste formato.",
+      "restricted": "{name} é restrita: só 1 cópia é permitida (o deck tem {quantity}).",
+      "not_legal": "{name} não é permitida neste formato."
     },
     "suggestionsTitle": "Sugestões",
     "suggestions": {
@@ -485,7 +488,7 @@
     "searchScryfall": "Buscar substitutos no Scryfall",
     "disclaimer": "Nota pelas metas de referência de {format}. É um guia, não uma regra.",
     "curveBucket": "Custo {bucket}: {count, plural, =0 {nenhuma carta} =1 {1 carta} other {# cartas}}",
-    "validationNote": "Não confere a lista de cartas banidas do formato.",
+    "validationNote": "Este formato não tem lista de banidas para conferir.",
     "noScore": "A nota por funções vale para formatos com comandante. Para {format}, use a validação, a base de mana e as chances da mão inicial.",
     "rolesSource": "{tagged} de {total} cartas com funções do Scryfall Tagger; as demais pela leitura do texto da carta.",
     "refresh": "Atualizar análise",
@@ -568,7 +571,9 @@
       "lands": "A faixa recomendada é de {min} a {max} terrenos. Cada terreno fora dela tira 3 pontos. Com {value}, o deck soma {points} de {maxPoints} pontos.",
       "role": "A meta é ter {target} cartas de {role}. Os pontos crescem proporcionalmente até a meta: com {value}, o deck soma {points} de {maxPoints} pontos.",
       "curve": "Um CMC médio de até {ideal} vale os {maxPoints} pontos; acima disso os pontos caem até zero em {limit}. Com {value}, o deck soma {points} pontos."
-    }
+    },
+    "legalityNote": "Banidas e restritas conferidas pelos dados de legalidade do Scryfall, atualizados todos os dias.",
+    "legalityMissing": "{count, plural, =1 {1 carta ainda está} other {# cartas ainda estão}} sem os dados de legalidade: atualize a análise."
   },
   "errors": {
     "invalid_input": "Confira os dados informados.",
@@ -954,7 +959,7 @@
       "steps": {
         "format": {
           "title": "1. O formato vem primeiro",
-          "body": "Cada deck tem um formato. A validação segue as regras dele: tamanho do deck, cópias por carta (somando todas as edições), reserva, comandantes e parceiros (Partner, Partner with, Background, Character select…) e identidade de cor."
+          "body": "Cada deck tem um formato. A validação segue as regras dele: tamanho do deck, cópias por carta (somando todas as edições), reserva, comandantes e parceiros (Partner, Partner with, Background, Character select…), identidade de cor e a lista de banidas e restritas do formato (dados do Scryfall)."
         },
         "roles": {
           "title": "2. Funções das cartas",

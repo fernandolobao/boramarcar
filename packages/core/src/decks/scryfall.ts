@@ -33,6 +33,7 @@ const scryfallCardSchema = z.object({
   set: z.string().optional(),
   set_name: z.string().optional(),
   collector_number: z.string().optional(),
+  legalities: z.record(z.string(), z.string()).optional(),
 });
 
 const collectionSchema = z.object({
@@ -81,6 +82,7 @@ export function mapScryfallCard(raw: unknown): CardData {
     // Duas faces de verdade (cada uma com imagem própria): transformar, MDFC, meld etc.
     // Cartas divididas/aventura têm `card_faces`, mas uma imagem só (`image_uris` no topo).
     ...twoSided(card),
+    legalities: card.legalities ?? null,
   };
 }
 

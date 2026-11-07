@@ -78,6 +78,13 @@
       "when": 1794063060806,
       "tag": "0010_locais",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794063877111,
+      "tag": "0011_legalidade",
+      "breakpoints": true
     }
   ]
 }
