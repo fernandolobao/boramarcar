@@ -7,6 +7,7 @@ import {
   listMembers,
 } from '@boramarcar/db';
 import { formatRules, isGameFormat } from '@boramarcar/core';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
@@ -16,6 +17,7 @@ import { GameForm } from '@/components/game-form';
 import { GamePlayers } from '@/components/game-players';
 import { EventManage, EventStatusBadge } from '@/components/event-manage';
 import { ShareButtons } from '@/components/share-buttons';
+import { Icon } from '@/components/icons';
 import { DirectionsLinks } from '@/components/places/directions';
 import { LocationMap } from '@/components/places/location-map';
 import { requireUser } from '@/server/current-user';
@@ -57,6 +59,7 @@ export default async function EventPage({ params }: Props) {
   const t = await getTranslations('events');
   const tc = await getTranslations('common');
   const tp = await getTranslations('places');
+  const tt = await getTranslations('table');
   const tf = await getTranslations('formats');
   const format = await getFormatter();
 
@@ -224,6 +227,13 @@ export default async function EventPage({ params }: Props) {
       {event.status !== 'cancelled' && (
         <section className="card">
           <h2 className="section-title">{t('recordGame')}</h2>
+          <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl bg-brand-50 p-4 dark:bg-brand-700/20">
+            <Link href={`/mesa/${event.id}`} className="btn-primary">
+              <Icon name="table" />
+              {tt('open')}
+            </Link>
+            <p className="text-sm">{tt('openHint')}</p>
+          </div>
           <GameForm eventId={event.id} players={players} defaultFormat={settings.defaultFormat} />
         </section>
       )}

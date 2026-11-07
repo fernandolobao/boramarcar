@@ -175,6 +175,13 @@ sem rolagem horizontal em 320px.
 - Endereço como `combobox` (setas, Enter, Esc) com dica ligada por `aria-describedby` e número de sugestões anunciado; também aceita texto livre.
 - Botões "Editar" e "Remover" com o nome do local para leitores de tela; links de rota avisam que abrem em nova aba e dizem o destino.
 
+### Revisão: modo mesa
+
+- Cada área é uma `region` com nome; "−" e "+" são botões com nome completo ("Tirar 1 de vida de Ana (vida 38). Segure para tirar 10.") e a vida é anunciada numa região viva, com o motivo da eliminação.
+- O número grande é decorativo (`aria-hidden`) porque está no anúncio e no nome dos botões; segurar tem alternativa (vários toques, ou o diálogo de marcadores).
+- Diálogos nativos (`<dialog>`) com nome, Esc fecha; marcadores com botões "Aumentar/Diminuir {nome}" e valor anunciado.
+- Cores das áreas com texto branco em contraste AA; a eliminação aparece com texto, não só escurecendo a área.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.
