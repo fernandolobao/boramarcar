@@ -27,7 +27,9 @@ async function ping(): Promise<boolean> {
 export default function SignIn() {
   const colors = useColors();
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<'signIn' | 'offline' | null>(null);
+  const [error, setError] = useState<'signIn' | 'offline' | 'expoGo' | null>(null);
+  /** Código do erro do servidor, para quem for investigar ("INVALID_CALLBACK_URL", 403…). */
+  const [detail, setDetail] = useState('');
   const [status, setStatus] = useState<Status>('checking');
 
   const check = async () => {
@@ -43,13 +45,19 @@ export default function SignIn() {
   const signIn = async () => {
     setPending(true);
     setError(null);
+    setDetail('');
     try {
       if (status !== 'online' && !(await check())) {
         setError('offline');
         return;
       }
       const result = await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
-      if (result.error) setError('signIn');
+      if (result.error) {
+        const { code, status, message } = result.error;
+        setDetail([code ?? message, status].filter(Boolean).join(' · '));
+        // O servidor recusou voltar para o Expo Go (exp://): falta liberar no servidor.
+        setError(code === 'INVALID_CALLBACK_URL' ? 'expoGo' : 'signIn');
+      }
     } catch {
       // Sem resposta do servidor (tempo esgotado, outra rede…): mostra o erro em vez de travar.
       setError('offline');
@@ -80,7 +88,12 @@ export default function SignIn() {
           accessibilityRole="alert"
           style={{ color: colors.danger, textAlign: 'center', maxWidth: 360 }}
         >
-          {error === 'offline' ? t('serverUnreachable', { url: API_URL }) : t('signInError')}
+          {error === 'offline'
+            ? t('serverUnreachable', { url: API_URL })
+            : error === 'expoGo'
+              ? t('signInExpoGo')
+              : t('signInError')}
+          {detail ? `\n(${detail})` : ''}
         </AppText>
       )}
       {status === 'offline' && !error && (
