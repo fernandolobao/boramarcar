@@ -18,7 +18,7 @@ const icon =
     />
   );
 
-/** Abas principais (5.4, primeira parte): encontros, ranking, decks e conta. */
+/** Abas principais (5.4): encontros, disponibilidade, ranking, decks e conta. */
 export default function TabsLayout() {
   const colors = useColors();
   return (
@@ -35,6 +35,10 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{ title: t('tabEvents'), tabBarIcon: icon('calendar-month') }}
+      />
+      <Tabs.Screen
+        name="disponibilidade"
+        options={{ title: t('tabAvailability'), tabBarIcon: icon('clock-outline') }}
       />
       <Tabs.Screen
         name="ranking"

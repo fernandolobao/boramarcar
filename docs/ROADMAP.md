@@ -113,15 +113,29 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 ## Fase 5 — Apps Android e iOS
 
-| #   | Item                                                                                                  | Tamanho | Status                                            |
-| --- | ----------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------- |
-| 5.1 | `apps/mobile` com **Expo (React Native) + Expo Router** no mesmo monorepo                             | M       | ✅                                                |
-| 5.2 | Login Google no app com o plugin `@better-auth/expo` e sessões via bearer token na API                | M       | ✅ (sessão por cookie no SecureStore)             |
-| 5.3 | Cliente da API tipado e compartilhado (`packages/api-client`, gerado a partir de schemas Zod/OpenAPI) | M       | ✅ (Zod, escrito à mão)                           |
-| 5.4 | Telas: disponibilidade, encontros, registrar partida, ranking, decks                                  | G       | em andamento: encontros, presença, ranking, decks |
-| 5.5 | **Push notifications** (Expo Notifications) para encontros e lembretes                                | M       |                                                   |
-| 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)             | G       | ✅ no site (`/mesa/:encontro`) e no app           |
-| 5.7 | Publicação nas lojas (EAS Build/Submit), ícones, splash, política de privacidade                      | M       |                                                   |
+| #   | Item                                                                                                         | Tamanho | Status                                                                                                                                |
+| --- | ------------------------------------------------------------------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 5.1 | `apps/mobile` com **Expo (React Native) + Expo Router** no mesmo monorepo                                    | M       | ✅                                                                                                                                    |
+| 5.2 | Login Google no app com o plugin `@better-auth/expo` e sessões via bearer token na API                       | M       | ✅ (sessão por cookie no SecureStore)                                                                                                 |
+| 5.3 | Cliente da API tipado e compartilhado (`packages/api-client`, gerado a partir de schemas Zod/OpenAPI)        | M       | ✅ (Zod, escrito à mão)                                                                                                               |
+| 5.4 | Telas: disponibilidade, encontros, registrar partida, ranking, decks                                         | G       | em andamento: encontros, presença, disponibilidade, ranking, lista de decks; falta registrar partida pelo formulário e criar encontro |
+| 5.5 | **Push notifications** (Expo Notifications) para encontros e lembretes                                       | M       |                                                                                                                                       |
+| 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)                    | G       | ✅ no site (`/mesa/:encontro`) e no app                                                                                               |
+| 5.7 | Publicação nas lojas (EAS Build/Submit), ícones, splash, política de privacidade                             | M       | depois do rebranding (6.x): nome, ícone e identificador do app vão para as lojas                                                      |
+| 5.8 | Deck no app: ver o deck (cartas, edições, curva e nota da análise) sem abrir o site; editar continua no site | M       |                                                                                                                                       |
+
+## Fase 6 — Rebranding
+
+Nova marca no futuro (nome e identidade ainda a definir). Fazer **antes da publicação nas lojas (5.7)**, porque nome, ícone e identificador do app ficam gravados lá.
+
+| #   | Item                                                                                                                                                            | Tamanho |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| 6.1 | Definir nome, voz e identidade visual (logo, cores, tipografia); conferir disponibilidade do nome, domínio e perfis                                             | M       |
+| 6.2 | Tokens de design compartilhados entre site e app (cores claro/escuro com contraste AA, tipografia), trocando as cores fixas atuais                              | M       |
+| 6.3 | Site: logo, favicon, imagens de compartilhamento (Open Graph), página inicial e vídeo do topo, e-mails; textos com o nome novo em `pt-BR`/`en`                  | M       |
+| 6.4 | App: nome, ícone, splash, esquema de link (`boramarcar://`) e identificador (`app.boramarcar`), com o servidor aceitando o esquema antigo e o novo por um tempo | M       |
+| 6.5 | Domínio novo com redirecionamento do antigo; URLs de retorno do Google OAuth, `BETTER_AUTH_URL`, links do calendário (`.ics`) e dos e-mails                     | P       |
+| 6.6 | Repositório, pacotes (`@boramarcar/*`), documentação e o aviso aos grupos sobre a mudança                                                                       | P       |
 
 ## Transversal (contínuo)
 
@@ -147,7 +161,8 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 3. ✅ **Semana 5–6 — partidas ricas (2.4–2.9, 2.11).** Estatísticas aumentam o engajamento depois de algumas semanas de dados.
 4. **Semana 7–9 — decks (3.6–3.11).** Editor, proxies parciais e folha de impressão.
 5. **Semana 10–13 — análise (4.5–4.9).** Começar pelo Tagger (4.5), que melhora todo o resto.
-6. **Depois — mobile (Fase 5)**, quando a API estiver estável; a PWA cobre o intervalo.
+6. ✅ **Mobile (Fase 5), primeira parte:** app com login, encontros, disponibilidade, ranking, decks e modo mesa.
+7. **Depois — rebranding (Fase 6)** e, em seguida, a publicação nas lojas (5.7).
 
 ### Definição de pronto (para cada item)
 
@@ -158,6 +173,8 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 - CI verde e item marcado neste documento.
 
 ## Decisões em aberto
+
+- **Rebranding:** nome e identidade novos ainda não definidos; enquanto isso, evitar espalhar "Bora Marcar" em lugares novos fora das mensagens de i18n e da configuração do app.
 
 - **"Importar do Scryfall":** o Scryfall não hospeda mais decks; hoje ele é a fonte de dados das cartas (e da busca de substitutos). Se a ideia era importar outra coisa (ex.: uma lista de cartas favoritas/coleção), registrar aqui.
 - **Pontuação do ranking:** 3/1/0 foi um ponto de partida; confirmar com o grupo.

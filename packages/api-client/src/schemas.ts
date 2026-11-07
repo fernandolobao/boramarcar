@@ -142,6 +142,58 @@ export interface GameInput {
   }[];
 }
 
+export const availabilitySlotSchema = z
+  .object({
+    id: z.string(),
+    userId: z.string(),
+    userName: z.string(),
+    startsAt: date,
+    endsAt: date,
+    note: z.string().nullable(),
+    /** `once` = avulsa; `weekly` = ocorrência de uma regra semanal. */
+    kind: z.enum(['once', 'weekly']),
+    ruleId: z.string().nullable(),
+    /** Data local da ocorrência (AAAA-MM-DD), só nas semanais. */
+    date: z.string().nullable(),
+    locationIds: z.array(z.string()),
+  })
+  .loose();
+export type AvailabilitySlot = z.infer<typeof availabilitySlotSchema>;
+
+export const availabilityRuleSchema = z
+  .object({
+    id: z.string(),
+    userId: z.string(),
+    userName: z.string(),
+    weekday: z.number(),
+    startTime: z.string(),
+    endTime: z.string(),
+    timeZone: z.string(),
+    note: z.string().nullable(),
+    locationIds: z.array(z.string()),
+    exceptions: z.array(z.string()),
+  })
+  .loose();
+export type AvailabilityRule = z.infer<typeof availabilityRuleSchema>;
+
+export const gameWindowSchema = z
+  .object({
+    start: date,
+    end: date,
+    durationMinutes: z.number(),
+    userIds: z.array(z.string()),
+    locationId: z.string().nullable(),
+    locationName: z.string().nullable(),
+    players: z.array(z.object({ userId: z.string(), name: z.string() })),
+  })
+  .loose();
+export type GameWindow = z.infer<typeof gameWindowSchema>;
+
+export const locationSchema = z
+  .object({ id: z.string(), name: z.string(), address: z.string().nullish() })
+  .loose();
+export type Location = z.infer<typeof locationSchema>;
+
 export const errorBodySchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), details: z.unknown().optional() }),
 });

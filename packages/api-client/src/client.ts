@@ -1,10 +1,14 @@
 import { z } from 'zod';
 import {
+  availabilityRuleSchema,
+  availabilitySlotSchema,
   deckSummarySchema,
   errorBodySchema,
   eventDetailSchema,
   eventSummarySchema,
+  gameWindowSchema,
   groupSchema,
+  locationSchema,
   rankingSchema,
   rsvpSchema,
   tableSetupSchema,
@@ -122,6 +126,28 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ event: eventDetailSchema }),
           )
         ).event,
+      create: async (
+        groupId: string,
+        event: {
+          title: string;
+          startsAt: Date;
+          endsAt?: Date | null;
+          locationId?: string | null;
+          participantIds?: string[];
+        },
+      ) =>
+        (
+          await request(
+            'POST',
+            `/groups/${encodeURIComponent(groupId)}/events`,
+            z.object({ event: z.object({ id: z.string() }).loose() }),
+            {
+              ...event,
+              startsAt: event.startsAt.toISOString(),
+              endsAt: event.endsAt ? event.endsAt.toISOString() : null,
+            },
+          )
+        ).event,
       rsvp: async (eventId: string, rsvp: Rsvp) =>
         (
           await request(
@@ -131,6 +157,92 @@ export function createApiClient(options: ApiClientOptions) {
             { rsvp },
           )
         ).rsvp,
+    },
+    availability: {
+      /** Disponibilidades do grupo no período (avulsas e ocorrências das regras semanais). */
+      list: async (groupId: string, range: { from?: Date; to?: Date } = {}) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/availability${q({
+              from: range.from?.toISOString(),
+              to: range.to?.toISOString(),
+            })}`,
+            z.object({ slots: z.array(availabilitySlotSchema) }),
+          )
+        ).slots,
+      add: (
+        groupId: string,
+        slot: { startsAt: Date; endsAt: Date; locationIds?: string[]; note?: string | null },
+      ) =>
+        request(
+          'POST',
+          `/groups/${encodeURIComponent(groupId)}/availability`,
+          z.object({ slot: z.object({ id: z.string() }).loose() }),
+          {
+            ...slot,
+            startsAt: slot.startsAt.toISOString(),
+            endsAt: slot.endsAt.toISOString(),
+          },
+        ),
+      remove: (slotId: string) =>
+        request('DELETE', `/availability/${encodeURIComponent(slotId)}`, z.unknown()),
+      /** Melhores horários: janelas em que a mesa fecha. */
+      windows: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/availability/windows`,
+            z.object({ windows: z.array(gameWindowSchema) }),
+          )
+        ).windows,
+    },
+    rules: {
+      list: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/availability-rules`,
+            z.object({ rules: z.array(availabilityRuleSchema) }),
+          )
+        ).rules,
+      add: (
+        groupId: string,
+        rule: {
+          weekdays: number[];
+          startTime: string;
+          endTime: string;
+          timeZone: string;
+          locationIds?: string[];
+          note?: string | null;
+        },
+      ) =>
+        request(
+          'POST',
+          `/groups/${encodeURIComponent(groupId)}/availability-rules`,
+          z.object({ rules: z.array(z.object({ id: z.string() }).loose()) }),
+          rule,
+        ),
+      remove: (ruleId: string) =>
+        request('DELETE', `/availability-rules/${encodeURIComponent(ruleId)}`, z.unknown()),
+      /** Pula (ou volta a valer) uma data da regra semanal. */
+      setException: (ruleId: string, date: string, skip: boolean) =>
+        request(
+          'PUT',
+          `/availability-rules/${encodeURIComponent(ruleId)}/exceptions`,
+          z.unknown(),
+          { date, skip },
+        ),
+    },
+    locations: {
+      list: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/locations`,
+            z.object({ locations: z.array(locationSchema) }),
+          )
+        ).locations,
     },
     games: {
       /** Registra uma partida no encontro. */
