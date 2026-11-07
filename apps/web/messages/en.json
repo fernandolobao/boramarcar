@@ -1056,6 +1056,9 @@
     "routeTo": "directions to {name}",
     "where": "Where",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomOut": "Zoom out",
+    "locatingNumber": "Looking up the house number on the map…",
+    "numberFound": "House number found: the pin is at the address.",
+    "numberNotFound": "OpenStreetMap doesn't have this house number yet: the pin is somewhere on the street. Drag it (or click the map) to the right spot; the saved address keeps the number."
   }
 }

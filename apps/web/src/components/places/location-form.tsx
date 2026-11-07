@@ -58,6 +58,8 @@ export function LocationForm({
     lng: number | null;
   }>(initial);
   const [saved, setSaved] = useState('');
+  /** Situação do pino depois de escolher um endereço com número que o mapa só conhece pela rua. */
+  const [precision, setPrecision] = useState<'idle' | 'locating' | 'exact' | 'street'>('idle');
   const set = (patch: Partial<typeof values>) => setValues((v) => ({ ...v, ...patch }));
   const point =
     values.lat !== null && values.lng !== null
@@ -137,14 +139,25 @@ export function LocationForm({
             value={values.address}
             near={near}
             onChange={(address) => set({ address })}
-            onPick={(s) =>
+            onPick={(s) => {
               set({
                 address: s.label,
                 lat: s.lat,
                 lng: s.lng,
                 name: values.name || s.name || values.name,
-              })
-            }
+              });
+              if (!s.approximate) return setPrecision('idle');
+              // Só a rua no autocompletar: tenta achar o número exato (uma busca, no Nominatim).
+              setPrecision('locating');
+              void api<{ point: { lat: number; lng: number } | null }>(
+                `/api/v1/places/locate?${new URLSearchParams({ q: s.label })}`,
+              )
+                .then(({ point }) => {
+                  setValues((v) => (v.address === s.label && point ? { ...v, ...point } : v));
+                  setPrecision(point ? 'exact' : 'street');
+                })
+                .catch(() => setPrecision('street'));
+            }}
           />
         </div>
         <div className="md:col-span-2">
@@ -166,17 +179,33 @@ export function LocationForm({
         <p className="muted text-sm" id={`${id}-map-hint`}>
           {point ? t('mapPickHint') : t('mapEmptyHint')}
         </p>
+        <p role="status" className="text-sm">
+          {precision === 'locating' && t('locatingNumber')}
+          {precision === 'exact' && t('numberFound')}
+          {precision === 'street' && (
+            <span className="inline-flex items-start gap-1.5">
+              <Icon name="warning" />
+              {t('numberNotFound')}
+            </span>
+          )}
+        </p>
         <LocationMap
           points={point ? [point] : []}
           label={t('mapOf', { name: values.name || t('newLocation') })}
           className="h-56"
-          onPick={({ lat, lng }) => set({ lat, lng })}
+          onPick={({ lat, lng }) => {
+            set({ lat, lng });
+            setPrecision('idle');
+          }}
         />
         {point && (
           <button
             type="button"
             className="btn-secondary"
-            onClick={() => set({ lat: null, lng: null })}
+            onClick={() => {
+              set({ lat: null, lng: null });
+              setPrecision('idle');
+            }}
           >
             <Icon name="close" />
             {t('removePin')}
