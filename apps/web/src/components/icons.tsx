@@ -7,6 +7,8 @@
  */
 import {
   Award,
+  MapPin,
+  Navigation,
   Accessibility,
   Mail,
   Pause,
@@ -162,6 +164,8 @@ export const Icons = {
   bracket: Gauge,
   openingHand: Hand,
   flip: FlipHorizontal2,
+  location: MapPin,
+  directions: Navigation,
   // Página inicial
   games: Swords,
   mobile: Smartphone,

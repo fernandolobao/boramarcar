@@ -2,6 +2,7 @@ import { DECK_BOARDS, DECK_SOURCES, GAME_RESULTS } from '@boramarcar/core';
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  doublePrecision,
   index,
   integer,
   jsonb,
@@ -81,8 +82,15 @@ export const locations = pgTable(
       .references(() => groups.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     address: text('address'),
+    /** Complemento: apartamento, portaria, como chegar… */
+    details: text('details'),
+    /** Coordenadas (2.14) do autocompletar ou do pino no mapa. */
+    lat: doublePrecision('lat'),
+    lng: doublePrecision('lng'),
     hostUserId: text('host_user_id').references(() => user.id, { onDelete: 'set null' }),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
     createdAt: createdAt(),
+    updatedAt: updatedAt(),
   },
   (t) => [index('locations_group_idx').on(t.groupId)],
 );

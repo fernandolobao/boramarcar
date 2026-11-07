@@ -238,3 +238,68 @@ describe('gestão de membros', () => {
     });
   });
 });
+
+describe('locais do grupo (2.14)', () => {
+  it('cria com coordenadas e anfitrião, edita e remove com permissões', async () => {
+    const {
+      createLocation,
+      updateLocation,
+      deleteLocation,
+      listLocations,
+      createGroup,
+      joinGroup,
+    } = await import('./groups');
+    const owner = await createTestUser(db, { name: 'Dona' });
+    const ana = await createTestUser(db, { name: 'Ana' });
+    const bia = await createTestUser(db, { name: 'Bia' });
+    const outsider = await createTestUser(db, { name: 'Fora' });
+    const group = await createGroup(db, { name: 'Mesa', userId: owner.id });
+    await joinGroup(db, { inviteCode: group.inviteCode, userId: ana.id });
+    await joinGroup(db, { inviteCode: group.inviteCode, userId: bia.id });
+
+    const casa = await createLocation(db, {
+      groupId: group.id,
+      userId: ana.id,
+      name: ' Casa da Ana ',
+      address: 'Avenida Ipiranga, 6681, Porto Alegre',
+      details: ' apto 42 ',
+      lat: -30.0551712,
+      lng: -51.1735106,
+      hostUserId: ana.id,
+    });
+    expect(casa).toMatchObject({ name: 'Casa da Ana', details: 'apto 42', createdBy: ana.id });
+    await expect(
+      createLocation(db, { groupId: group.id, userId: ana.id, name: 'X', lat: 120, lng: 0 }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await expect(
+      createLocation(db, { groupId: group.id, userId: ana.id, name: 'X', hostUserId: outsider.id }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+
+    const [listed] = await listLocations(db, group.id);
+    expect(listed).toMatchObject({ hostName: 'Ana', lat: -30.0551712 });
+
+    // Bia (membro comum, não cadastrou nem é anfitriã) não edita; a dona do grupo edita.
+    await expect(
+      updateLocation(db, { groupId: group.id, locationId: casa.id, userId: bia.id, name: 'Y' }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
+    const updated = await updateLocation(db, {
+      groupId: group.id,
+      locationId: casa.id,
+      userId: owner.id,
+      lat: null,
+      lng: null,
+      hostUserId: bia.id,
+    });
+    expect(updated).toMatchObject({ lat: null, lng: null, hostUserId: bia.id });
+    await expect(
+      updateLocation(db, { groupId: group.id, locationId: casa.id, userId: owner.id }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+
+    // Agora a Bia é anfitriã: pode remover.
+    await deleteLocation(db, { groupId: group.id, locationId: casa.id, userId: bia.id });
+    expect(await listLocations(db, group.id)).toEqual([]);
+    await expect(
+      deleteLocation(db, { groupId: group.id, locationId: casa.id, userId: owner.id }),
+    ).rejects.toMatchObject({ code: 'not_found' });
+  });
+});
