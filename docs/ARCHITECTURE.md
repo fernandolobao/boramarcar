@@ -206,7 +206,7 @@ Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pesso
 
 `apps/mobile` é um app Expo (SDK 58) com Expo Router (`src/app`): uma pilha raiz com `Stack.Protected` separa a tela de entrada das abas (Encontros, Ranking, Decks, Conta) e do detalhe do encontro. Ele não acessa o banco: fala só com a API v1 pelo `@boramarcar/api-client`, que valida as respostas com Zod (datas viram `Date`) e transforma erros em `ApiError` com o código do domínio (`network_error` quando não há conexão).
 
-**Login**: o servidor usa o plugin `expo()` do Better Auth e confia em `boramarcar://` (e em `exp://` só em desenvolvimento). No app, `expoClient` guarda o cookie da sessão no SecureStore; o cliente da API manda esse cookie no cabeçalho `Cookie` com `credentials: 'omit'`. As rotas da API não mudaram: `getSession` lê o cookie do cabeçalho como no site.
+**Login**: o servidor usa o plugin `expo()` do Better Auth e confia em `boramarcar://`; o Expo Go (`exp://`) é aceito em desenvolvimento e, em produção, só com `EXPO_GO_LOGIN=lan` e só em IPs de rede local (`server/trusted-origins.ts`): um `exp://` público, de túnel, poderia levar a sessão para outro projeto. No app, `expoClient` guarda o cookie da sessão no SecureStore; o cliente da API manda esse cookie no cabeçalho `Cookie` com `credentials: 'omit'`. As rotas da API não mudaram: `getSession` lê o cookie do cabeçalho como no site.
 
 **Grupo ativo**: no site é um cookie; no app fica no SecureStore do aparelho (`GroupProvider`).
 

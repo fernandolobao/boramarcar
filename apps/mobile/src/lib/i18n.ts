@@ -45,6 +45,10 @@ const pt = {
   activeGroup: 'Grupo ativo',
   signOut: 'Sair',
   openWeb: 'Abrir no site',
+  serverLabel: 'Servidor: {url}',
+  serverChecking: 'conectando…',
+  serverUnreachable:
+    'Não foi possível falar com o servidor ({url}). Se o site estiver rodando no seu computador, confira se o pnpm dev está aberto e se o celular está no mesmo Wi-Fi.',
 } as const;
 
 type Messages = Record<keyof typeof pt, string>;
@@ -94,6 +98,10 @@ const en: Messages = {
   activeGroup: 'Active group',
   signOut: 'Sign out',
   openWeb: 'Open website',
+  serverLabel: 'Server: {url}',
+  serverChecking: 'connecting…',
+  serverUnreachable:
+    "Couldn't reach the server ({url}). If the website runs on your computer, check that pnpm dev is running and the phone is on the same Wi-Fi.",
 };
 
 export type MessageKey = keyof typeof pt;

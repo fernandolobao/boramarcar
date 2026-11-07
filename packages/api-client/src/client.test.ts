@@ -122,4 +122,19 @@ describe('cliente da API', () => {
     const event = await api.events.get('e1');
     expect(event.games[0]!.winners[0]!.name).toBe('Ana');
   });
+
+  it('desiste do pedido depois do tempo máximo (erro de conexão)', async () => {
+    const fetchMock = vi.fn(
+      (_url: string, init?: RequestInit) =>
+        new Promise<Response>((_, reject) =>
+          init!.signal!.addEventListener('abort', () => reject(new Error('aborted'))),
+        ),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://x.dev',
+      fetch: fetchMock as unknown as typeof fetch,
+      timeoutMs: 20,
+    });
+    await expect(api.decks.list()).rejects.toMatchObject({ code: 'network_error' });
+  });
 });

@@ -131,11 +131,14 @@ O app fica em `apps/mobile` (Expo SDK 58 + Expo Router) e conversa com a mesma A
 
 ```bash
 pnpm install
-# Contra o servidor local (use o IP da sua máquina na rede, não "localhost"):
-EXPO_PUBLIC_API_URL=http://192.168.0.10:3000 pnpm --filter @boramarcar/mobile start
+pnpm --filter @boramarcar/mobile start   # usa o site em produção
 ```
 
-- Com o site em desenvolvimento (`pnpm dev`), o servidor aceita o retorno do login no Expo Go (`exp://`). Em produção só `boramarcar://` é aceito, então o login contra a produção precisa de um _development build_ (`npx expo run:android|ios` ou `eas build --profile development`).
+- **Testar no celular com o Expo Go** (sem build próprio), contra a produção:
+  1. Na Vercel, adicione a variável `EXPO_GO_LOGIN=lan` (produção) e faça um novo deploy. Ela deixa o login do Google voltar para o Expo Go **só** em endereços de rede local (`exp://192.168…`, `10.…`, `172.16–31.…`); tire-a quando não estiver testando.
+  2. `pnpm --filter @boramarcar/mobile start` e leia o QR code com a câmera (iPhone) ou com o Expo Go (Android), com o celular no mesmo Wi-Fi do computador.
+  3. O app usa `https://boramarcar-zeta.vercel.app`; para outro servidor, `EXPO_PUBLIC_API_URL=https://…` (um IP da rede local não serve: o Google não volta para ele). A tela de entrada mostra o servidor e avisa se ele não responder.
+- Sem `EXPO_GO_LOGIN`, a produção só aceita `boramarcar://`, que é o app instalado (_development build_ com `npx expo run:android|ios` ou `eas build --profile development`).
 - Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), ranking, meus decks (abre o deck no site) e conta (grupo ativo e sair).
 - Textos em `apps/mobile/src/lib/i18n.ts` (português e inglês, pelo idioma do aparelho).
 

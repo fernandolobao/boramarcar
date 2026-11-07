@@ -1,6 +1,7 @@
 import 'server-only';
 import { schema } from '@boramarcar/db';
 import { expo } from '@better-auth/expo';
+import { authTrustedOrigins } from './trusted-origins';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
@@ -33,12 +34,8 @@ function createAuth() {
       updateAge: 60 * 60 * 24,
       cookieCache: { enabled: true, maxAge: 5 * 60 },
     },
-    // App mobile (Expo): o login social volta para o app pelo esquema `boramarcar://`.
-    // Em desenvolvimento, o Expo Go usa `exp://`.
-    trustedOrigins: [
-      'boramarcar://',
-      ...(process.env.NODE_ENV === 'development' ? ['exp://', 'exp://**'] : []),
-    ],
+    // App mobile (Expo): o login social volta para o app (`boramarcar://` ou o Expo Go).
+    trustedOrigins: authTrustedOrigins(process.env),
     // nextCookies precisa ser o último plugin.
     plugins: [expo(), nextCookies()],
   });

@@ -29,6 +29,8 @@ export interface ApiClientOptions {
   /** Cabeçalhos de autenticação a cada pedido (no app: o cookie da sessão do Better Auth). */
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>;
   fetch?: typeof fetch;
+  /** Tempo máximo de cada pedido (ms); depois disso vira `network_error`. */
+  timeoutMs?: number;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -50,6 +52,10 @@ export function createApiClient(options: ApiClientOptions) {
       ...(await options.getHeaders?.()),
     };
     let response: Response;
+    const controller = new AbortController();
+    const timer = options.timeoutMs
+      ? setTimeout(() => controller.abort(), options.timeoutMs)
+      : null;
     try {
       response = await fetchFn(`${base}/api/v1${path}`, {
         method,
@@ -57,9 +63,12 @@ export function createApiClient(options: ApiClientOptions) {
         body: body !== undefined ? JSON.stringify(body) : undefined,
         // O cookie vai no cabeçalho; `include` pode atrapalhar no React Native.
         credentials: 'omit',
+        signal: controller.signal,
       });
     } catch (error) {
       throw new ApiError('network_error', 'Sem conexão com o servidor', 0, error);
+    } finally {
+      if (timer) clearTimeout(timer);
     }
     const json: unknown = await response.json().catch(() => null);
     if (!response.ok) {
