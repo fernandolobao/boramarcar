@@ -135,3 +135,24 @@ describe('disposição em linhas (app)', () => {
     ]);
   });
 });
+
+describe('trocar lugares', () => {
+  it('troca dois jogadores de lugar, mantém tudo de cada um e dá para desfazer', () => {
+    let s = createTable({
+      format: 'commander',
+      players: ['a', 'b', 'c'].map((id) => ({ userId: id, name: id.toUpperCase() })),
+    });
+    s = tableReducer(s, { type: 'life', userId: 'a', delta: -5 });
+    s = tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'c' });
+    expect(s.players.map((p) => p.userId)).toEqual(['c', 'b', 'a']);
+    expect(s.players[2]!.life).toBe(35);
+    expect(tableGamePlayers(s, 'b').map((p) => [p.userId, p.seat])).toEqual([
+      ['c', 1],
+      ['b', 2],
+      ['a', 3],
+    ]);
+    expect(tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'a' })).toBe(s);
+    expect(tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'x' })).toBe(s);
+    expect(tableReducer(s, { type: 'undo' }).players.map((p) => p.userId)).toEqual(['a', 'b', 'c']);
+  });
+});

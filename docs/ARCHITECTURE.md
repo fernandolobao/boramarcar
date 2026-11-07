@@ -149,7 +149,7 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 
 ## Modo mesa (contador de vida)
 
-`/mesa/:encontro` abre em tela cheia (fora do layout do app) para o celular deitado no meio da mesa, no estilo dos contadores de mesa como o Lotus: uma área por jogador (2 a 6), virada para quem senta daquele lado (sentido horário a partir do canto superior esquerdo), toque nas metades para ±1 e segurar para ±10, total recente ("−2") que some em 1,5 s, e um botão central com desfazer, d20, moeda, sorteio de quem começa e encerrar.
+`/mesa/:encontro` abre em tela cheia (fora do layout do app) para o celular deitado no meio da mesa, no estilo dos contadores de mesa como o Lotus: uma área por jogador (2 a 6), virada para quem senta daquele lado (sentido horário a partir do canto superior esquerdo), toque nas metades para ±1 e segurar para ±10, total recente ("−2") que some em 1,5 s, e um botão central com desfazer, d20, moeda, sorteio de quem começa, **trocar lugares** (toca-se em dois jogadores e eles trocam de área, para a tela refletir onde cada um sentou; a ordem vira o `seat` da partida e dá para desfazer) e encerrar.
 
 - Lógica pura em `core/table` (`tableReducer`): vida, dano de comandante por origem (também tira vida), veneno, energia, experiência, imposto do comandante, monarca, concessão e desfazer. Derrota por vida ≤ 0, 10 de veneno, 21 de um mesmo comandante (só formatos com comandante) ou desistência; a ordem de eliminação vem do passo em que cada um caiu.
 - A partida fica no `localStorage` do aparelho (continua depois de recarregar ou bloquear a tela) e a tela fica acesa com a Wake Lock API quando o navegador permite.

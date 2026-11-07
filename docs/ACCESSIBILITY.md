@@ -163,6 +163,10 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: trocar lugares no modo mesa
+
+- No modo de troca, cada área vira um botão com nome ("Escolher Ana para trocar de lugar") e estado (`aria-pressed`/`selected`); o botão central vira "Pronto" com texto visível; a troca é anunciada numa região viva ("Ana e Bia trocaram de lugar.") e "Desfazer" volta a ordem.
+
 ### Revisão: app mobile (primeira versão)
 
 - Botões com alvo mínimo de 44 pt, `accessibilityRole="button"` e estado (`disabled`, `selected`/`checked`); escolhas únicas (presença, grupo ativo) como `radiogroup`/`radio`.

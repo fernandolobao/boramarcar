@@ -56,7 +56,14 @@ function useHold(onStep: (delta: number) => void, sign: 1 | -1) {
 }
 
 /** Área girada para quem senta daquele lado da mesa (90°/270° trocam largura e altura). */
-function Rotated({ rotate, children }: { rotate: number; children: ReactNode }) {
+function Rotated({
+  rotate,
+  children,
+}: {
+  rotate: number;
+  /** Recebe o tamanho da área já girada (largura e altura do ponto de vista do jogador). */
+  children: (size: { w: number; h: number }) => ReactNode;
+}) {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const sideways = rotate === 90 || rotate === 270;
   const w = sideways ? size.h : size.w;
@@ -77,7 +84,7 @@ function Rotated({ rotate, children }: { rotate: number; children: ReactNode }) 
             transform: [{ rotate: `${rotate}deg` }],
           }}
         >
-          {children}
+          {children({ w, h })}
         </View>
       )}
     </View>
@@ -88,12 +95,17 @@ function PlayerPanel({
   player,
   state,
   color,
+  size,
+  swap,
   dispatch,
   onOpen,
 }: {
   player: TablePlayer;
   state: TableState;
   color: string;
+  size: { w: number; h: number };
+  /** Modo "trocar lugares": a área inteira vira um botão para escolher o jogador. */
+  swap: { selected: boolean; onPick: () => void } | null;
   dispatch: (action: TableAction) => void;
   onOpen: () => void;
 }) {
@@ -112,6 +124,8 @@ function PlayerPanel({
       (c) => `${counterLabel(c)} ${player.counters[c]}`,
     ),
   ].filter((b): b is string => Boolean(b));
+  // A vida ocupa o meio da área (metade da largura, até 3 dígitos), em qualquer tamanho de mesa.
+  const lifeSize = Math.round(Math.max(28, Math.min(96, size.h * 0.4, size.w * 0.26)));
 
   return (
     <View
@@ -149,8 +163,8 @@ function PlayerPanel({
           accessibilityLabel={t('tableLifeStatus', { name: player.name, life: player.life })}
         >
           <Text
-            style={board.life}
-            maxFontSizeMultiplier={1.2}
+            style={[board.life, { fontSize: lifeSize, lineHeight: Math.round(lifeSize * 1.1) }]}
+            allowFontScaling={false}
             adjustsFontSizeToFit
             numberOfLines={1}
           >
@@ -174,6 +188,25 @@ function PlayerPanel({
       <Text style={board.badges} numberOfLines={2} maxFontSizeMultiplier={1.5}>
         {reason ? defeatLabel(reason) : badges.join(' · ') || ' '}
       </Text>
+      {swap && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: swap.selected }}
+          accessibilityLabel={t(swap.selected ? 'tableSwapSelected' : 'tableSwapPick', {
+            name: player.name,
+          })}
+          onPress={swap.onPick}
+          style={[
+            StyleSheet.absoluteFill,
+            board.swap,
+            swap.selected && { borderColor: '#ffffff', backgroundColor: 'rgba(0,0,0,0.4)' },
+          ]}
+        >
+          <Text style={board.swapText} maxFontSizeMultiplier={1.5}>
+            {swap.selected ? `✓ ${player.name}` : `⇄ ${player.name}`}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -311,12 +344,14 @@ function PlayerSheet({
 function TableMenu({
   state,
   dispatch,
+  onSwap,
   onFinish,
   onExit,
   onClose,
 }: {
   state: TableState;
   dispatch: (action: TableAction) => void;
+  onSwap: () => void;
   onFinish: () => void;
   onExit: () => void;
   onClose: () => void;
@@ -370,6 +405,12 @@ function TableMenu({
             setResult(t('tableFirstIs', { name: p.name }));
           }}
         />
+        <Button
+          label={t('tableSwap')}
+          variant="secondary"
+          accessibilityHint={t('tableSwapHint')}
+          onPress={onSwap}
+        />
         <Button label={t('tableFinish')} onPress={onFinish} />
         <Button label={t('tableExit')} variant="secondary" onPress={onExit} />
         <AppText muted>{t('tableExitHint')}</AppText>
@@ -393,6 +434,18 @@ export function TableBoard({
 }) {
   const [open, setOpen] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
+  /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
+  const [swapping, setSwapping] = useState<string | null>(null);
+  const [swapMessage, setSwapMessage] = useState('');
+  const pickSwap = (userId: string) => {
+    if (!swapping) return setSwapping(userId);
+    if (swapping === userId) return setSwapping('');
+    const a = state.players.find((p) => p.userId === swapping)!;
+    const b = state.players.find((p) => p.userId === userId)!;
+    dispatch({ type: 'swap', userId: swapping, withUserId: userId });
+    setSwapMessage(t('tableSwapped', { a: a.name, b: b.name }));
+    setSwapping(null);
+  };
   const { winnerId } = tableResult(state);
   // Quando sobra um só na mesa, abre o menu para encerrar (como no site).
   const [lastWinner, setLastWinner] = useState(winnerId);
@@ -415,13 +468,24 @@ export function TableBoard({
               const player = state.players[index]!;
               return (
                 <Rotated key={player.userId} rotate={layout.seats[index]!.rotate}>
-                  <PlayerPanel
-                    player={player}
-                    state={state}
-                    color={SEAT_COLORS[index % SEAT_COLORS.length]!}
-                    dispatch={dispatch}
-                    onOpen={() => setOpen(player.userId)}
-                  />
+                  {(size) => (
+                    <PlayerPanel
+                      player={player}
+                      state={state}
+                      color={SEAT_COLORS[index % SEAT_COLORS.length]!}
+                      size={size}
+                      swap={
+                        swapping === null
+                          ? null
+                          : {
+                              selected: swapping === player.userId,
+                              onPick: () => pickSwap(player.userId),
+                            }
+                      }
+                      dispatch={dispatch}
+                      onOpen={() => setOpen(player.userId)}
+                    />
+                  )}
                 </Rotated>
               );
             })}
@@ -429,17 +493,36 @@ export function TableBoard({
         ))}
       </SafeAreaView>
       <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, board.center]}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('tableMenu')}
-          onPress={() => setMenu(true)}
-          style={board.menuButton}
-        >
-          <Text style={board.menuText} importantForAccessibility="no">
-            ☰
-          </Text>
-        </Pressable>
+        {swapping === null ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('tableMenu')}
+            onPress={() => setMenu(true)}
+            style={board.menuButton}
+          >
+            <Text style={board.menuText} importantForAccessibility="no">
+              ☰
+            </Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setSwapping(null)}
+            style={board.swapDone}
+          >
+            <Text style={board.swapDoneText} maxFontSizeMultiplier={1.5}>
+              {t('tableSwapCancel')}
+            </Text>
+          </Pressable>
+        )}
       </View>
+      <Text
+        style={board.srOnly}
+        accessibilityLiveRegion="polite"
+        accessibilityElementsHidden={!swapMessage}
+      >
+        {swapMessage}
+      </Text>
       <Modal
         visible={Boolean(openPlayer)}
         animationType="slide"
@@ -458,6 +541,11 @@ export function TableBoard({
         <TableMenu
           state={state}
           dispatch={dispatch}
+          onSwap={() => {
+            setMenu(false);
+            setSwapMessage(t('tableSwapHint'));
+            setSwapping('');
+          }}
           onFinish={() => {
             setMenu(false);
             onFinish();
@@ -475,13 +563,14 @@ export function TableBoard({
 
 const board = StyleSheet.create({
   panel: { flex: 1, borderRadius: 18, padding: 8, justifyContent: 'space-between' },
-  name: { minHeight: 44, alignSelf: 'center', justifyContent: 'center', paddingHorizontal: 12 },
+  // Nome no canto (do ponto de vista do jogador), longe do botão central da mesa.
+  name: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center', paddingHorizontal: 12 },
   nameText: { color: '#ffffff', fontSize: 18, fontWeight: '700' },
   lifeRow: { flex: 1, flexDirection: 'row', alignItems: 'stretch' },
   half: { flex: 1, minWidth: 44, alignItems: 'center', justifyContent: 'center' },
   sign: { color: '#ffffff', fontSize: 36, fontWeight: '700', opacity: 0.8 },
   lifeBox: { flex: 2, alignItems: 'center', justifyContent: 'center' },
-  life: { color: '#ffffff', fontSize: 72, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  life: { color: '#ffffff', fontWeight: '800', fontVariant: ['tabular-nums'] },
   delta: { color: '#ffffff', fontSize: 20, fontWeight: '700', minHeight: 26 },
   badges: { color: '#ffffff', fontSize: 14, textAlign: 'center', minHeight: 20 },
   center: { alignItems: 'center', justifyContent: 'center' },
@@ -496,6 +585,26 @@ const board = StyleSheet.create({
     borderColor: '#09090b',
   },
   menuText: { fontSize: 26, color: '#09090b', fontWeight: '700' },
+  swap: {
+    borderRadius: 18,
+    borderWidth: 4,
+    borderColor: 'transparent',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swapText: { color: '#ffffff', fontSize: 22, fontWeight: '800' },
+  swapDone: {
+    minHeight: 48,
+    paddingHorizontal: 18,
+    borderRadius: 24,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#09090b',
+  },
+  swapDoneText: { color: '#09090b', fontSize: 16, fontWeight: '700' },
+  srOnly: { position: 'absolute', width: 1, height: 1, opacity: 0 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   stepButton: { width: 48, paddingHorizontal: 0 },
   stepValue: { minWidth: 32, textAlign: 'center', fontSize: 18, fontWeight: '700' },

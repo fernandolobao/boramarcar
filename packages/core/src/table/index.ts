@@ -41,6 +41,8 @@ export type TableAction =
   | { type: 'concede'; userId: string; conceded: boolean }
   | { type: 'monarch'; userId: string | null }
   | { type: 'first'; userId: string | null }
+  /** Troca dois jogadores de lugar na mesa (as áreas acompanham onde cada um está sentado). */
+  | { type: 'swap'; userId: string; withUserId: string }
   | { type: 'undo' };
 
 /** Vida inicial por formato: 40 em Commander e Brawl, 20 nos demais. */
@@ -163,6 +165,14 @@ export function tableReducer(state: TableState, action: TableAction): TableState
       return { ...base, monarchId: action.userId };
     case 'first':
       return { ...base, firstPlayerId: action.userId };
+    case 'swap': {
+      const a = state.players.findIndex((p) => p.userId === action.userId);
+      const b = state.players.findIndex((p) => p.userId === action.withUserId);
+      if (a < 0 || b < 0 || a === b) return state;
+      const players = [...state.players];
+      [players[a], players[b]] = [players[b]!, players[a]!];
+      return { ...base, players };
+    }
   }
 }
 
