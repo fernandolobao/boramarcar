@@ -6,6 +6,8 @@ const pt = {
   signInGoogle: 'Entrar com Google',
   signingIn: 'Entrando…',
   signInError: 'Não foi possível entrar. Tente de novo.',
+  signInExpoGo:
+    'O servidor não aceita login pelo Expo Go. Na Vercel, defina EXPO_GO_LOGIN=lan em Production e faça um novo deploy (ou use o app instalado).',
   tabEvents: 'Encontros',
   tabRanking: 'Ranking',
   tabDecks: 'Decks',
@@ -155,6 +157,8 @@ const en: Messages = {
   signInGoogle: 'Sign in with Google',
   signingIn: 'Signing in…',
   signInError: 'Could not sign in. Try again.',
+  signInExpoGo:
+    "The server doesn't accept sign-in from Expo Go. On Vercel, set EXPO_GO_LOGIN=lan for Production and redeploy (or use the installed app).",
   tabEvents: 'Meetups',
   tabRanking: 'Ranking',
   tabDecks: 'Decks',
