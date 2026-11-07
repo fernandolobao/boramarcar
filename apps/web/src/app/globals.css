@@ -43,6 +43,13 @@
   color-scheme: dark;
 }
 
+/* Reforço para o iOS: se algum detector de dados ainda criar link, ele não parece nem age como link. */
+a[x-apple-data-detectors] {
+  color: inherit !important;
+  text-decoration: none !important;
+  pointer-events: none;
+}
+
 body {
   @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
 }

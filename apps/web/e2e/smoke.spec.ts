@@ -62,3 +62,13 @@ test.describe('smoke', () => {
     await context.close();
   });
 });
+
+test('desliga a detecção automática de links do iOS (nomes, datas, endereços)', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('meta[name="format-detection"]')).toHaveAttribute(
+    'content',
+    /address=no/,
+  );
+});
