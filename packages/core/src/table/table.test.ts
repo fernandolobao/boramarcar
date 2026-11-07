@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  tableRows,
   alivePlayers,
   createTable,
   defeatReason,
@@ -115,5 +116,43 @@ describe('modo mesa', () => {
     expect(rollDie(20, () => 0)).toBe(1);
     expect(rollDie(20, () => 0.999)).toBe(20);
     expect(run(t, { type: 'first', userId: 'c' }).firstPlayerId).toBe('c');
+  });
+});
+
+describe('disposição em linhas (app)', () => {
+  it('segue a mesma grade do site, em sentido horário', () => {
+    expect(tableRows(2)).toEqual([[0], [1]]);
+    expect(tableRows(3)).toEqual([[0, 1], [2]]);
+    expect(tableRows(4)).toEqual([
+      [0, 1],
+      [3, 2],
+    ]);
+    expect(tableRows(5)).toEqual([[0, 1], [4, 2], [3]]);
+    expect(tableRows(6)).toEqual([
+      [0, 1],
+      [5, 2],
+      [4, 3],
+    ]);
+  });
+});
+
+describe('trocar lugares', () => {
+  it('troca dois jogadores de lugar, mantém tudo de cada um e dá para desfazer', () => {
+    let s = createTable({
+      format: 'commander',
+      players: ['a', 'b', 'c'].map((id) => ({ userId: id, name: id.toUpperCase() })),
+    });
+    s = tableReducer(s, { type: 'life', userId: 'a', delta: -5 });
+    s = tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'c' });
+    expect(s.players.map((p) => p.userId)).toEqual(['c', 'b', 'a']);
+    expect(s.players[2]!.life).toBe(35);
+    expect(tableGamePlayers(s, 'b').map((p) => [p.userId, p.seat])).toEqual([
+      ['c', 1],
+      ['b', 2],
+      ['a', 3],
+    ]);
+    expect(tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'a' })).toBe(s);
+    expect(tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'x' })).toBe(s);
+    expect(tableReducer(s, { type: 'undo' }).players.map((p) => p.userId)).toEqual(['a', 'b', 'c']);
   });
 });

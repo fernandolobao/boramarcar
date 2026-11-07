@@ -1,5 +1,5 @@
 import type { Rsvp } from '@boramarcar/api-client';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
@@ -90,6 +90,19 @@ export default function EventScreen() {
           <AppText muted accessibilityLiveRegion="polite">
             {message}
           </AppText>
+        </Card>
+      )}
+
+      {e.status !== 'cancelled' && (
+        <Card>
+          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+            {t('tableTitle')}
+          </AppText>
+          <AppText muted>{t('tableOpenHint')}</AppText>
+          <Button
+            label={t('tableOpen')}
+            onPress={() => router.push({ pathname: '/mesa/[id]', params: { id: e.id } })}
+          />
         </Card>
       )}
 

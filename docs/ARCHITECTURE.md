@@ -150,12 +150,13 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 
 ## Modo mesa (contador de vida)
 
-`/mesa/:encontro` abre em tela cheia (fora do layout do app) para o celular deitado no meio da mesa, no estilo dos contadores de mesa como o Lotus: uma área por jogador (2 a 6), virada para quem senta daquele lado (sentido horário a partir do canto superior esquerdo), toque nas metades para ±1 e segurar para ±10, total recente ("−2") que some em 1,5 s, e um botão central com desfazer, d20, moeda, sorteio de quem começa e encerrar.
+`/mesa/:encontro` abre em tela cheia (fora do layout do app) para o celular deitado no meio da mesa, no estilo dos contadores de mesa como o Lotus: uma área por jogador (2 a 6), virada para quem senta daquele lado (sentido horário a partir do canto superior esquerdo), toque nas metades para ±1 e segurar para ±10, total recente ("−2") que some em 1,5 s, e um botão central com desfazer, d20, moeda, sorteio de quem começa, **trocar lugares** (toca-se em dois jogadores e eles trocam de área, para a tela refletir onde cada um sentou; a ordem vira o `seat` da partida e dá para desfazer) e encerrar.
 
 - Lógica pura em `core/table` (`tableReducer`): vida, dano de comandante por origem (também tira vida), veneno, energia, experiência, imposto do comandante, monarca, concessão e desfazer. Derrota por vida ≤ 0, 10 de veneno, 21 de um mesmo comandante (só formatos com comandante) ou desistência; a ordem de eliminação vem do passo em que cada um caiu.
 - A partida fica no `localStorage` do aparelho (continua depois de recarregar ou bloquear a tela) e a tela fica acesa com a Wake Lock API quando o navegador permite.
 - Ao encerrar, o resultado sugerido (último vivo vence; os demais na ordem em que caíram) é conferido e salvo com `POST /api/v1/events/:id/games` (formato, quem começou, turno, duração).
 - Formatos de time (Two-Headed Giant) continuam no formulário do encontro.
+- **No app** (`apps/mobile/src/app/mesa/[id].tsx`): o mesmo reducer e a mesma disposição (`tableLayout`/`tableRows` do core; cada área é girada com `transform`), com toque ±1 e segurar ±10 (`onLongPress` repete a cada 0,6 s), vibração leve (`expo-haptics`), tela acesa (`expo-keep-awake`) e a partida salva num arquivo por encontro (`expo-file-system`). Os dados da mesa vêm de `GET /api/v1/events/:id/table` (jogadores do grupo, confirmados primeiro, com os decks de cada um, e o formato padrão), o mesmo `getTableSetup` da página do site.
 
 ## Página inicial
 

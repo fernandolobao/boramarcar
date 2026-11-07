@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../../messages/pt-BR.json';
-import { tableLayout } from './layout';
+import { tableLayout } from '@boramarcar/core';
 import { TableMode } from './table-mode';
 
 const push = vi.fn();
@@ -74,6 +74,30 @@ describe('modo mesa', () => {
     expect(screen.getByLabelText('2. Ana · deck')).toHaveValue('d1');
     expect(await audit(container)).toEqual([]);
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }));
+
+    // Trocar lugares (para refletir onde cada um sentou): escolhe dois e troca; dá para voltar.
+    const swapSeats = (first: string, second: string) => {
+      fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Trocar lugares' }));
+      fireEvent.click(
+        screen.getByRole('button', { name: `Escolher ${first} para trocar de lugar` }),
+      );
+      expect(
+        screen.getByRole('button', { name: new RegExp(`${first} escolhido`) }),
+      ).toHaveAttribute('aria-pressed', 'true');
+      fireEvent.click(
+        screen.getByRole('button', { name: `Escolher ${second} para trocar de lugar` }),
+      );
+    };
+    swapSeats('Bia', 'Ana');
+    expect(screen.getByText('Bia e Ana trocaram de lugar.')).toBeInTheDocument();
+    expect(
+      JSON.parse(localStorage.getItem('bm-mesa:e1')!).players.map(
+        (p: { userId: string }) => p.userId,
+      ),
+    ).toEqual(['a', 'b']);
+    swapSeats('Ana', 'Bia');
+    expect(screen.getByRole('button', { name: 'Menu da mesa' })).toBeInTheDocument();
 
     // Tabuleiro: toque tira 1, segurar tira 10.
     const minus = screen.getByRole('button', { name: /Tirar 1 de vida de Bia \(vida 40\)/ });

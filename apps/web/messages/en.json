@@ -1135,6 +1135,12 @@
     "winningTurn": "Winning turn (optional)",
     "duration": "Duration: {minutes} min (since the table started).",
     "save": "Save game",
-    "backToTable": "Back to the table"
+    "backToTable": "Back to the table",
+    "swap": "Swap seats",
+    "swapHint": "Tap two players to swap their seats.",
+    "swapPick": "Pick {name} to swap seats",
+    "swapSelected": "{name} picked; tap another player to swap",
+    "swapped": "{a} and {b} swapped seats.",
+    "swapDone": "Done"
   }
 }

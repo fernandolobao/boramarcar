@@ -1135,6 +1135,12 @@
     "winningTurn": "Turno da vitória (opcional)",
     "duration": "Duração: {minutes} min (desde o início da mesa).",
     "save": "Salvar partida",
-    "backToTable": "Voltar para a mesa"
+    "backToTable": "Voltar para a mesa",
+    "swap": "Trocar lugares",
+    "swapHint": "Toque em dois jogadores para trocá-los de lugar.",
+    "swapPick": "Escolher {name} para trocar de lugar",
+    "swapSelected": "{name} escolhido; toque em outro jogador para trocar",
+    "swapped": "{a} e {b} trocaram de lugar.",
+    "swapDone": "Pronto"
   }
 }

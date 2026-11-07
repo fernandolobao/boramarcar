@@ -163,12 +163,17 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: trocar lugares no modo mesa
+
+- No modo de troca, cada área vira um botão com nome ("Escolher Ana para trocar de lugar") e estado (`aria-pressed`/`selected`); o botão central vira "Pronto" com texto visível; a troca é anunciada numa região viva ("Ana e Bia trocaram de lugar.") e "Desfazer" volta a ordem.
+
 ### Revisão: app mobile (primeira versão)
 
 - Botões com alvo mínimo de 44 pt, `accessibilityRole="button"` e estado (`disabled`, `selected`/`checked`); escolhas únicas (presença, grupo ativo) como `radiogroup`/`radio`.
 - Títulos de tela e de seção com `accessibilityRole="header"`; itens de lista com um rótulo completo (encontro: título, data, local e situação; ranking: posição, nome, pontos e vitórias).
 - Erros e confirmações em regiões vivas (`accessibilityRole="alert"`, `accessibilityLiveRegion`); carregamento com rótulo.
 - Cores com contraste AA nos temas claro e escuro (segue o tema do aparelho); texto escala com o tamanho de fonte do sistema (até 2×).
+- Modo mesa no app: cada metade da área é um botão com nome e vida atual ("Tirar 1 de vida de Ana (vida 38)"), a vida é anunciada numa região viva, segurar (ou tocar duas vezes e segurar, com leitor de tela) soma 10; nome do jogador abre a folha com marcadores em botões −/+ com nome e valor; monarca e desistir como `switch`; escolhas (tipo de jogo, jogadores, decks, vencedor) como `radio`/`checkbox`. Texto branco sobre as cores das áreas com contraste AA (mesmas cores do site).
 - Pendente: passada manual com TalkBack e VoiceOver, e testes automatizados de acessibilidade no app.
 
 ### Revisão: página inicial

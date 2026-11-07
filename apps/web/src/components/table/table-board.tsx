@@ -4,6 +4,8 @@ import {
   defeatReason,
   formatRules,
   rollDie,
+  SEAT_COLORS,
+  tableLayout,
   TABLE_COUNTERS,
   tableResult,
   type TableAction,
@@ -14,7 +16,6 @@ import {
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../icons';
-import { SEAT_COLORS, tableLayout } from './layout';
 
 /** Toque = ±1; segurar = ±10 a cada 0,6 s (como nos contadores de mesa). */
 function useHold(onStep: (delta: number) => void, sign: 1 | -1) {
@@ -71,6 +72,7 @@ function PlayerPanel({
   state,
   color,
   rotate,
+  swap,
   dispatch,
   onOpen,
 }: {
@@ -78,6 +80,8 @@ function PlayerPanel({
   state: TableState;
   color: string;
   rotate: number;
+  /** Modo "trocar lugares": a área inteira vira um botão para escolher o jogador. */
+  swap: { selected: boolean; onPick: () => void } | null;
   dispatch: (a: TableAction) => void;
   onOpen: () => void;
 }) {
@@ -184,6 +188,19 @@ function PlayerPanel({
           {t('lifeStatus', { name: player.name, life: player.life })}
           {reason ? ` ${t(`defeat.${reason}`)}` : ''}
         </p>
+        {swap && (
+          <button
+            type="button"
+            onClick={swap.onPick}
+            aria-pressed={swap.selected}
+            aria-label={t(swap.selected ? 'swapSelected' : 'swapPick', { name: player.name })}
+            className={`absolute inset-0 z-10 flex items-center justify-center rounded-2xl border-4 text-2xl font-extrabold text-white focus-visible:outline-2 focus-visible:-outline-offset-8 focus-visible:outline-white ${swap.selected ? 'border-white bg-black/40' : 'border-transparent bg-black/70 hover:bg-black/60'}`}
+          >
+            <span aria-hidden="true">
+              {swap.selected ? '✓' : '⇄'} {player.name}
+            </span>
+          </button>
+        )}
         {reason && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/55">
             <span
@@ -300,6 +317,18 @@ export function TableBoard({
   const [playerOpen, setPlayerOpen] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [roll, setRoll] = useState('');
+  /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
+  const [swapping, setSwapping] = useState<string | null>(null);
+  const [swapMessage, setSwapMessage] = useState('');
+  const pickSwap = (userId: string) => {
+    if (!swapping) return setSwapping(userId);
+    if (swapping === userId) return setSwapping('');
+    const a = state.players.find((p) => p.userId === swapping)!;
+    const b = state.players.find((p) => p.userId === userId)!;
+    dispatch({ type: 'swap', userId: swapping, withUserId: userId });
+    setSwapMessage(t('swapped', { a: a.name, b: b.name }));
+    setSwapping(null);
+  };
   const usesCommander = formatRules(state.format).usesCommander;
   const selected = state.players.find((p) => p.userId === playerOpen) ?? null;
   const { winnerId } = tableResult(state);
@@ -334,6 +363,14 @@ export function TableBoard({
                 state={state}
                 color={SEAT_COLORS[i % SEAT_COLORS.length]!}
                 rotate={seat.rotate}
+                swap={
+                  swapping === null
+                    ? null
+                    : {
+                        selected: swapping === player.userId,
+                        onPick: () => pickSwap(player.userId),
+                      }
+                }
                 dispatch={dispatch}
                 onOpen={() => setPlayerOpen(player.userId)}
               />
@@ -342,14 +379,28 @@ export function TableBoard({
         })}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setMenuOpen(true)}
-        className="absolute top-1/2 left-1/2 z-10 inline-flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-xl ring-4 ring-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-        aria-label={t('menu')}
-      >
-        <Icon name="dashboard" className="size-6" />
-      </button>
+      {swapping === null ? (
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          className="absolute top-1/2 left-1/2 z-10 inline-flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-zinc-950 shadow-xl ring-4 ring-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          aria-label={t('menu')}
+        >
+          <Icon name="dashboard" className="size-6" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setSwapping(null)}
+          className="absolute top-1/2 left-1/2 z-20 inline-flex min-h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-white px-5 font-semibold text-zinc-950 shadow-xl ring-4 ring-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+        >
+          <Icon name="done" />
+          {t('swapDone')}
+        </button>
+      )}
+      <p className="sr-only" role="status">
+        {swapMessage}
+      </p>
 
       <Dialog
         open={selected !== null}
@@ -477,6 +528,18 @@ export function TableBoard({
             }}
           >
             {t('pickFirst')}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary col-span-2"
+            onClick={() => {
+              setMenuOpen(false);
+              setSwapMessage(t('swapHint'));
+              setSwapping('');
+            }}
+          >
+            <Icon name="swap" />
+            {t('swap')}
           </button>
         </div>
         <p role="status" className="min-h-6 text-center text-lg font-semibold">

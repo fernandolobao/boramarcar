@@ -134,6 +134,8 @@ export const Icons = {
   // Grupo
   join: UserPlus,
   switchGroup: ArrowLeftRight,
+  swap: ArrowLeftRight,
+  done: Check,
   makeAdmin: ShieldCheck,
   removeAdmin: ShieldMinus,
   transfer: Crown,
