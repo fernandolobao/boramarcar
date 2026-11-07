@@ -163,6 +163,12 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: página inicial
+
+- Vídeo do topo decorativo (`aria-hidden`, sem som) com botão de pausar/reproduzir com nome (WCAG 2.2.2); com "reduzir movimento" ele não toca sozinho. O texto fica sobre camadas escuras para manter o contraste em qualquer quadro do vídeo.
+- Um `h1`, seções com `h2` (rótulo de cada seção) e numeração decorativa (`aria-hidden`); navegação por âncoras em `<nav>` com nome; a barra da nota é decorativa e os números estão em texto ao lado.
+- Links externos avisam que abrem em nova aba; o mesmo conteúdo para quem entrou ou não, com "Ir para o painel" ou "Entrar no painel" no menu superior.
+
 ### Pendências e limitações conhecidas
 
 - **Leitor de tela real**: os testes cobrem o que é automatizável; falta uma passada manual com VoiceOver e NVDA nos fluxos de registrar partida e importar deck.
