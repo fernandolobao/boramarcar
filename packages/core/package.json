@@ -18,7 +18,8 @@
     "./stats": "./src/stats/index.ts",
     "./achievements": "./src/achievements/index.ts",
     "./currency": "./src/currency/index.ts",
-    "./places": "./src/places/index.ts"
+    "./places": "./src/places/index.ts",
+    "./table": "./src/table/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p contract",
