@@ -135,6 +135,10 @@ const pt = {
   tableSaveError: 'Não foi possível salvar a partida. Ela continua neste aparelho; tente de novo.',
   tableCancelled: 'Este encontro foi cancelado.',
   tableFirstNone: 'Ninguém sorteado',
+  serverLabel: 'Servidor: {url}',
+  serverChecking: 'conectando…',
+  serverUnreachable:
+    'Não foi possível falar com o servidor ({url}). Se o site estiver rodando no seu computador, confira se o pnpm dev está aberto e se o celular está no mesmo Wi-Fi.',
 } as const;
 
 type Messages = Record<keyof typeof pt, string>;
@@ -271,6 +275,10 @@ const en: Messages = {
   tableSaveError: 'Could not save the game. It stays on this device; try again.',
   tableCancelled: 'This meetup was cancelled.',
   tableFirstNone: 'Nobody picked',
+  serverLabel: 'Server: {url}',
+  serverChecking: 'connecting…',
+  serverUnreachable:
+    "Couldn't reach the server ({url}). If the website runs on your computer, check that pnpm dev is running and the phone is on the same Wi-Fi.",
 };
 
 export type MessageKey = keyof typeof pt;

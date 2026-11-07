@@ -155,4 +155,19 @@ describe('cliente da API', () => {
     expect(fetchMock.mock.calls[1]![1]!.method).toBe('POST');
     expect(JSON.parse(String(fetchMock.mock.calls[1]![1]!.body)).players).toHaveLength(2);
   });
+
+  it('desiste do pedido depois do tempo máximo (erro de conexão)', async () => {
+    const fetchMock = vi.fn(
+      (_url: string, init?: RequestInit) =>
+        new Promise<Response>((_, reject) =>
+          init!.signal!.addEventListener('abort', () => reject(new Error('aborted'))),
+        ),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://x.dev',
+      fetch: fetchMock as unknown as typeof fetch,
+      timeoutMs: 20,
+    });
+    await expect(api.decks.list()).rejects.toMatchObject({ code: 'network_error' });
+  });
 });

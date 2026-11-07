@@ -16,10 +16,18 @@ import { useColors } from '@/lib/theme';
 /** Texto com a cor do tema; `muted` para texto secundário (contraste AA). */
 export function AppText({ muted, style, ...props }: TextProps & { muted?: boolean }) {
   const colors = useColors();
+  // A altura da linha acompanha o tamanho da fonte (senão títulos grandes ficam cortados).
+  const flat = StyleSheet.flatten(style) ?? {};
+  const fontSize = flat.fontSize ?? styles.text.fontSize;
   return (
     <Text
       {...props}
-      style={[styles.text, { color: muted ? colors.muted : colors.text }, style]}
+      style={[
+        styles.text,
+        { color: muted ? colors.muted : colors.text },
+        style,
+        flat.lineHeight === undefined && { lineHeight: Math.round(fontSize * 1.35) },
+      ]}
       maxFontSizeMultiplier={2}
     />
   );
@@ -109,7 +117,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => 
 }
 
 export const styles = StyleSheet.create({
-  text: { fontSize: 16, lineHeight: 22 },
+  text: { fontSize: 16 },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
   card: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 6 },
   button: {

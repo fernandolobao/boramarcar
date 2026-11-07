@@ -1,16 +1,64 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText, Button, styles } from '@/components/ui';
 import { authClient } from '@/lib/auth';
+import { API_URL, REQUEST_TIMEOUT_MS } from '@/lib/config';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+
+type Status = 'checking' | 'online' | 'offline';
+
+/** O servidor responde? (`/api/auth/ok` do Better Auth, com tempo máximo.) */
+async function ping(): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${API_URL}/api/auth/ok`, { signal: controller.signal });
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 /** Entrar com o Google (abre o navegador do sistema e volta para o app). */
 export default function SignIn() {
   const colors = useColors();
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<'signIn' | 'offline' | null>(null);
+  const [status, setStatus] = useState<Status>('checking');
+
+  const check = async () => {
+    setStatus('checking');
+    const ok = await ping();
+    setStatus(ok ? 'online' : 'offline');
+    return ok;
+  };
+  useEffect(() => {
+    void check();
+  }, []);
+
+  const signIn = async () => {
+    setPending(true);
+    setError(null);
+    try {
+      if (status !== 'online' && !(await check())) {
+        setError('offline');
+        return;
+      }
+      const result = await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
+      if (result.error) setError('signIn');
+    } catch {
+      // Sem resposta do servidor (tempo esgotado, outra rede…): mostra o erro em vez de travar.
+      setError('offline');
+      setStatus('offline');
+    } finally {
+      setPending(false);
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.center, { backgroundColor: colors.background }]}>
       <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
@@ -25,19 +73,28 @@ export default function SignIn() {
         label={pending ? t('signingIn') : t('signInGoogle')}
         disabled={pending}
         style={{ alignSelf: 'stretch', maxWidth: 360 }}
-        onPress={async () => {
-          setPending(true);
-          setError(false);
-          const result = await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
-          if (result.error) setError(true);
-          setPending(false);
-        }}
+        onPress={() => void signIn()}
       />
       {error && (
-        <AppText accessibilityRole="alert" style={{ color: colors.danger }}>
-          {t('signInError')}
+        <AppText
+          accessibilityRole="alert"
+          style={{ color: colors.danger, textAlign: 'center', maxWidth: 360 }}
+        >
+          {error === 'offline' ? t('serverUnreachable', { url: API_URL }) : t('signInError')}
         </AppText>
       )}
+      {status === 'offline' && !error && (
+        <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
+          <AppText accessibilityRole="alert" style={{ color: colors.danger, textAlign: 'center' }}>
+            {t('serverUnreachable', { url: API_URL })}
+          </AppText>
+          <Button label={t('retry')} variant="secondary" onPress={() => void check()} />
+        </View>
+      )}
+      <AppText muted style={{ fontSize: 13, textAlign: 'center' }}>
+        {t('serverLabel', { url: API_URL })}
+        {status === 'checking' ? ` · ${t('serverChecking')}` : ''}
+      </AppText>
     </SafeAreaView>
   );
 }
