@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   availabilityRuleSchema,
+  deckDetailSchema,
   availabilitySlotSchema,
   deckSummarySchema,
   errorBodySchema,
@@ -282,6 +283,15 @@ export function createApiClient(options: ApiClientOptions) {
     decks: {
       list: async () =>
         (await request('GET', '/decks', z.object({ decks: z.array(deckSummarySchema) }))).decks,
+      /** Deck com cartas e análise (quem pode ver o deck). */
+      get: async (deckId: string) =>
+        (
+          await request(
+            'GET',
+            `/decks/${encodeURIComponent(deckId)}`,
+            z.object({ deck: deckDetailSchema }),
+          )
+        ).deck,
     },
   };
 }

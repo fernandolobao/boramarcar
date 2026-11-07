@@ -1,12 +1,11 @@
-import * as WebBrowser from 'expo-web-browser';
+import { router } from 'expo-router';
 import { FlatList, Pressable, RefreshControl } from 'react-native';
 import { AppText, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
-import { API_URL } from '@/lib/config';
 import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 
-/** Meus decks (o detalhe e o editor abrem no site por enquanto). */
+/** Meus decks: o detalhe abre no app (5.8); editar continua no site. */
 export default function DecksScreen() {
   const decks = useAsync(() => api.decks.list(), []);
   if (decks.loading) return <Loading />;
@@ -25,9 +24,9 @@ export default function DecksScreen() {
       ListEmptyComponent={<AppText muted>{t('decksEmpty')}</AppText>}
       renderItem={({ item }) => (
         <Pressable
-          accessibilityRole="link"
-          accessibilityHint={t('openWeb')}
-          onPress={() => void WebBrowser.openBrowserAsync(`${API_URL}/decks/${item.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={t('deckOpen', { name: item.name })}
+          onPress={() => router.push({ pathname: '/decks/[id]', params: { id: item.id } })}
           style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
         >
           <Card>

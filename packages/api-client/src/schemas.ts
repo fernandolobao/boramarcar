@@ -194,6 +194,68 @@ export const locationSchema = z
   .loose();
 export type Location = z.infer<typeof locationSchema>;
 
+export const deckCardSchema = z
+  .object({
+    scryfallId: z.string(),
+    name: z.string(),
+    manaCost: z.string().nullish(),
+    cmc: z.number(),
+    typeLine: z.string(),
+    oracleText: z.string().nullish(),
+    imageUri: z.string().nullish(),
+    backImageUri: z.string().nullish(),
+    backName: z.string().nullish(),
+    setCode: z.string().nullish(),
+    setName: z.string().nullish(),
+    collectorNumber: z.string().nullish(),
+    priceUsd: z.string().nullish(),
+  })
+  .loose();
+export type DeckCard = z.infer<typeof deckCardSchema>;
+
+export const deckLineSchema = z
+  .object({
+    key: z.string(),
+    name: z.string(),
+    board: z.enum(['commander', 'mainboard', 'sideboard', 'maybeboard']),
+    quantity: z.number(),
+    proxies: z.number(),
+    scryfallId: z.string().nullable(),
+    card: deckCardSchema.nullable(),
+  })
+  .loose();
+export type DeckLine = z.infer<typeof deckLineSchema>;
+
+/** Deck com as linhas e a análise (o mesmo que o site mostra). */
+export const deckDetailSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    format: z.string(),
+    visibility: z.string(),
+    ownerName: z.string(),
+    isOwner: z.boolean(),
+    lines: z.array(deckLineSchema),
+    analysis: z
+      .object({
+        totalCards: z.number(),
+        commanders: z.array(z.string()),
+        colorIdentity: z.array(z.string()),
+        lands: z.number(),
+        averageCmc: z.number(),
+        manaCurve: z.record(z.string(), z.number()),
+        roles: z.record(z.string(), z.number()),
+        proxies: z.number(),
+        gameChangers: z.array(z.string()),
+        score: z.number().nullable(),
+        validation: z.array(z.object({ code: z.string() }).loose()),
+      })
+      .loose(),
+    bracket: z.object({ minimum: z.number() }).loose().nullable(),
+  })
+  .loose();
+export type DeckDetail = z.infer<typeof deckDetailSchema>;
+
 export const errorBodySchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), details: z.unknown().optional() }),
 });
