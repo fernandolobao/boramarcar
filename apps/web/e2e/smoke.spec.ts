@@ -5,7 +5,29 @@ test.describe('smoke', () => {
     await page.goto('/');
     await expect(page).toHaveTitle(/Bora Marcar/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Google/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Google/ }).first()).toBeVisible();
+    // Menu superior leva ao painel (entrando com o Google).
+    await expect(
+      page.getByRole('banner').getByRole('button', { name: 'Entrar no painel' }),
+    ).toBeVisible();
+    for (const section of [
+      'Funcionalidades',
+      'De onde vêm as informações',
+      'Como avaliamos e sugerimos',
+      'Nossos valores',
+      'Participe dos testes',
+    ]) {
+      await expect(page.getByRole('heading', { level: 2, name: section })).toBeVisible();
+    }
+    await expect(page.getByRole('link', { name: 'Enviar feedback por e-mail' })).toHaveAttribute(
+      'href',
+      /^mailto:fernando@fernandocamilotti\.com\?subject=/,
+    );
+    await expect(
+      page
+        .getByRole('button', { name: 'Pausar animação de fundo' })
+        .or(page.getByRole('button', { name: 'Reproduzir animação de fundo' })),
+    ).toBeVisible();
   });
 
   test('áreas logadas redirecionam visitantes para a página inicial', async ({ page }) => {
@@ -36,7 +58,7 @@ test.describe('smoke', () => {
     const context = await browser.newContext({ locale: 'en-US' });
     const page = await context.newPage();
     await page.goto('/');
-    await expect(page.getByRole('button', { name: 'Sign in with Google' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in with Google' }).first()).toBeVisible();
     await context.close();
   });
 });

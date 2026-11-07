@@ -29,15 +29,6 @@
     "userMenu": "Account menu",
     "signedInAs": "Signed in as"
   },
-  "landing": {
-    "title": "No more polls in the group chat.",
-    "subtitle": "Everyone marks when and where they can play. Bora Marcar finds the time when a 4-player pod comes together, records the games and keeps the ranking.",
-    "features": {
-      "schedule": "Availability and automatic time suggestions",
-      "ranking": "Ranking with wins, losses and draws",
-      "decks": "Decks imported from Archidekt, Moxfield or plain text, with analysis and proxy tracking"
-    }
-  },
   "dashboard": {
     "hello": "Hi, {name}!",
     "nextEvents": "Upcoming game nights",
@@ -854,5 +845,181 @@
     "leastPopular": "Least played cards",
     "leastPopularHint": "From the EDHREC popularity rank published by Scryfall: higher numbers = cards used in fewer Commander decks.",
     "rank": "#{rank}"
+  },
+  "home": {
+    "metaTitle": "Bora Marcar — meetups, ranking and decks for your Magic group",
+    "metaDescription": "Schedule your next Commander night: availability, meetups, games, ranking, decks with analysis and proxy sheets.",
+    "nav": {
+      "label": "Page sections",
+      "features": "Features",
+      "sources": "Where data comes from",
+      "method": "Methodology",
+      "values": "Values",
+      "join": "Join"
+    },
+    "goToDashboard": "Go to dashboard",
+    "signInToDashboard": "Sign in to dashboard",
+    "hero": {
+      "eyebrow": "In testing with Commander groups",
+      "title": "The table comes together. Bora Marcar handles the rest.",
+      "subtitle": "Everyone marks when and where they can play. The app finds when the table comes together, records games, keeps the ranking and helps improve your decks.",
+      "join": "Join the tests",
+      "pause": "Pause background animation",
+      "play": "Play background animation"
+    },
+    "intro": {
+      "title": "What is Bora Marcar",
+      "body": "A place for your Magic group to organize life away from the table: no more polls in the group chat, rankings in spreadsheets or lost decklists. It was born at a four-friend Commander table and is growing with help from players.",
+      "stats": {
+        "formats": "game formats",
+        "roles": "card roles analyzed",
+        "languages": "languages (Portuguese and English)"
+      }
+    },
+    "features": {
+      "title": "Features",
+      "subtitle": "Everything your group needs, from the invite to the last game of the night.",
+      "items": {
+        "availability": {
+          "title": "Availability and times",
+          "body": "Everyone marks the times and places they can play, once or weekly. The app shows when the table comes together and suggests the meetup."
+        },
+        "events": {
+          "title": "Meetups",
+          "body": "Create the meetup, RSVP, add it to your calendar (.ics) and share it on WhatsApp. Reminders and changes arrive by email."
+        },
+        "games": {
+          "title": "Games in many formats",
+          "body": "Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Modern, Draft and more: winner or draw, teams, deck used, who went first and elimination order."
+        },
+        "ranking": {
+          "title": "Ranking, seasons and stats",
+          "body": "Group-defined points, seasons, head-to-head, win streaks, the decks and commanders that win most, and a searchable meetup history."
+        },
+        "profiles": {
+          "title": "Profiles and achievements",
+          "body": "Every player has a profile with a summary, season titles, achievement badges and the decks they choose to show."
+        },
+        "decks": {
+          "title": "Decks with images",
+          "body": "Import from Archidekt, Moxfield or a pasted list, in the right format. Pick each card's printing, see both sides of double-faced cards and edit with Scryfall search."
+        },
+        "proxies": {
+          "title": "Proxies and prices",
+          "body": "Mark how many copies are proxies, print a real-size 3×3 sheet with cut marks and see the deck price in dollars and reais."
+        },
+        "analysis": {
+          "title": "Deck analysis",
+          "body": "A 0–100 score, card roles, estimated bracket, mana base, opening-hand odds, comparison with other decks of the same commander and swap suggestions."
+        },
+        "mobile": {
+          "title": "Android and iOS app",
+          "body": "In development: meetups, RSVPs, ranking and decks in your pocket, with Google sign-in."
+        }
+      }
+    },
+    "sources": {
+      "title": "Where the data comes from",
+      "subtitle": "We only use sources that allow it and we credit them. What belongs to your group stays in your group.",
+      "items": {
+        "scryfall": {
+          "name": "Scryfall",
+          "body": "Card data and images, printings, dollar prices, the Game Changers list, Scryfall Tagger roles and the EDHREC popularity rank published by Scryfall. Updated daily."
+        },
+        "spellbook": {
+          "name": "Commander Spellbook",
+          "body": "The deck's combos and the cards that weigh on the bracket (mass land denial, extra turns)."
+        },
+        "bcb": {
+          "name": "Central Bank of Brazil",
+          "body": "Official dollar rate (PTAX) to convert prices to reais."
+        },
+        "importers": {
+          "name": "Archidekt and Moxfield",
+          "body": "Importing the public lists you point to, with the chosen printings."
+        },
+        "links": {
+          "name": "LigaMagic and EDHREC",
+          "body": "Links only, so you can check Brazilian prices and the commander page: their terms of use don't allow automated requests."
+        },
+        "group": {
+          "name": "Your group",
+          "body": "Availability, meetups and games are only seen by group members. Each deck can be private, group-only or public."
+        }
+      }
+    },
+    "method": {
+      "title": "How we evaluate and suggest",
+      "subtitle": "Simple rules, explained on screen. The analysis is a guide for talking with your table, not a verdict.",
+      "steps": {
+        "format": {
+          "title": "1. Format first",
+          "body": "Every deck has a format. Validation follows its rules: deck size, copies per card (adding up all printings), sideboard, commanders and partners (Partner, Partner with, Background, Character select…) and color identity."
+        },
+        "roles": {
+          "title": "2. Card roles",
+          "body": "Ramp, draw, removal, wipe, tutor, protection, recursion and counterspell come from Scryfall Tagger. Cards not looked up yet are classified by reading their rules text, and the screen shows how many came from each source."
+        },
+        "score": {
+          "title": "3. A 0–100 score",
+          "body": "In commander formats, the score adds six parts with community reference targets. Roles earn points proportionally up to the target; lands lose 3 points per card outside the range; the curve earns everything up to an average mana value of 3 and drops to zero at 4.5."
+        },
+        "suggestions": {
+          "title": "4. Suggestions and alternatives",
+          "body": "Missing lands or a role? The app says how many and looks for same-role alternatives on Scryfall, within the color identity, format and chosen mana value, most played first."
+        },
+        "bracket": {
+          "title": "5. Estimated bracket",
+          "body": "Applies the objective rules of the official Commander brackets: Game Changers (none up to 2, up to three in 3), mass land denial, chained extra turns and two-card combos. The result is a minimum: intent and speed are for your table."
+        },
+        "mana": {
+          "title": "6. Mana base and opening hand",
+          "body": "Compares the lands producing each color with a target proportional to the mana symbols and uses the hypergeometric distribution to compute the odds of 2 to 4 lands in the opening hand and of hitting every land drop."
+        },
+        "compare": {
+          "title": "7. Comparison",
+          "body": "Shows the average of decks with the same commander on Bora Marcar that you can see, common cards you're missing and your own picks."
+        },
+        "group": {
+          "title": "And in the group",
+          "body": "Suggested times are the windows when at least a full table is free for the group's minimum duration. The ranking adds points for wins, draws and losses (3, 1 and 0 by default, adjustable by the group)."
+        }
+      },
+      "scoreCaption": "How the 100 points of the score are split",
+      "parts": {
+        "lands": "Lands (36 to 38)",
+        "ramp": "Ramp (target 10)",
+        "draw": "Card draw (target 10)",
+        "removal": "Removal (target 8)",
+        "wipe": "Board wipes (target 2)",
+        "curve": "Curve (average MV up to 3)"
+      },
+      "points": "{count} points"
+    },
+    "values": {
+      "title": "Our values",
+      "items": {
+        "accessible": {
+          "title": "Accessible to everyone",
+          "body": "We follow WCAG 2.2 level AA: everything works with keyboard and screen readers, with proper contrast, in light and dark themes. Every new screen is audited before it ships."
+        },
+        "privacy": {
+          "title": "Privacy and open data",
+          "body": "We don't sell data. We only use sources that allow it, credit each one, and you decide who sees your decks."
+        }
+      }
+    },
+    "join": {
+      "title": "Join the tests",
+      "body": "Bora Marcar is being tested with Commander groups. Use it with your table and tell us what worked, what was missing and what broke: every message becomes an improvement.",
+      "email": "Send feedback by email",
+      "emailSubject": "Bora Marcar — testing",
+      "or": "or start now:"
+    },
+    "footer": {
+      "credits": "Card data by Scryfall; combos by Commander Spellbook; dollar rate by the Central Bank of Brazil.",
+      "disclaimer": "Bora Marcar is a fan project and is not affiliated with Wizards of the Coast. Magic: The Gathering is a trademark of Wizards of the Coast LLC.",
+      "contact": "Contact"
+    }
   }
 }
