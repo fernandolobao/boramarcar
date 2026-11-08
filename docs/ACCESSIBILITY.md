@@ -174,6 +174,11 @@ sem rolagem horizontal em 320px.
 
 - No modo de troca, cada área vira um botão com nome ("Escolher Ana para trocar de lugar") e estado (`aria-pressed`/`selected`); o botão central vira "Pronto" com texto visível; a troca é anunciada numa região viva ("Ana e Bia trocaram de lugar.") e "Desfazer" volta a ordem.
 
+### Revisão: deck no app
+
+- Cada carta é um botão com quantidade, nome, edição e proxies no nome ("2 × Sol Ring, CMM, 1 proxy") e dica de que abre a carta; a carta grande tem a imagem com o nome como rótulo, botão para ver o verso e o texto da carta em texto.
+- A barra da nota é decorativa (o número está em texto); cada faixa da curva é lida como "Custo 3: 12 cartas". Problemas de validação têm ícone e texto, não só cor.
+
 ### Revisão: disponibilidade no app
 
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
