@@ -15,6 +15,7 @@ import {
   type GameFormat,
 } from '@boramarcar/core';
 import {
+  cachedExternal,
   findCachedCardByName,
   findCachedCards,
   moveLinePrint,
@@ -155,8 +156,13 @@ export async function resolveCardById(db: Database, id: string, fetchFn: FetchLi
 }
 
 /** Impressões de uma carta (escolha da edição no editor). */
-export const listCardPrints = (name: string, fetchFn: FetchLike = fetch) =>
-  scryfall(() => fetchScryfallPrints(name, { fetch: fetchFn }));
+/** Edições de uma carta (Scryfall), guardadas no cache compartilhado por 7 dias. */
+export const listCardPrints = (db: Database, name: string, fetchFn: FetchLike = fetch) =>
+  cachedExternal(db, `prints:${name.trim().toLowerCase()}`, 7 * DAY, () =>
+    scryfall(() => fetchScryfallPrints(name, { fetch: fetchFn })),
+  );
+
+const DAY = 24 * 60 * 60 * 1000;
 
 /** Troca a edição de parte das cópias de uma linha do deck. */
 export async function changeLinePrint(

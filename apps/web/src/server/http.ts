@@ -12,6 +12,7 @@ const STATUS_BY_CODE: Record<DomainErrorCode, number> = {
   not_found: 404,
   conflict: 409,
   upstream_error: 502,
+  rate_limited: 429,
 };
 
 export interface ApiErrorBody {
@@ -23,7 +24,12 @@ export function errorResponse(error: unknown): Response {
     const body: ApiErrorBody = {
       error: { code: error.code, message: error.message, details: error.details },
     };
-    return Response.json(body, { status: STATUS_BY_CODE[error.code] });
+    const retryAfter = (error.details as { retryAfterSeconds?: number } | undefined)
+      ?.retryAfterSeconds;
+    return Response.json(body, {
+      status: STATUS_BY_CODE[error.code],
+      headers: retryAfter ? { 'Retry-After': String(retryAfter) } : undefined,
+    });
   }
   if (error instanceof z.ZodError) {
     const body: ApiErrorBody = {

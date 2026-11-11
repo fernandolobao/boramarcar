@@ -1,6 +1,7 @@
 import { DomainError } from '../errors';
 import { SCRYFALL_API } from '../decks/scryfall';
 import type { FetchLike } from '../decks/types';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../external';
 
 /**
  * Funções de carta pelo Scryfall Tagger (4.5). As quatro primeiras entram na nota do deck;
@@ -72,15 +73,16 @@ export async function fetchCardRoles(
     for (const q of buildTagQueries(ROLE_OTAG[role], names)) {
       if (!first && delayMs > 0) await sleep(delayMs);
       first = false;
-      const response = await options.fetch(
-        `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&unique=cards`,
-        {
-          headers: {
-            Accept: 'application/json',
-            'User-Agent': options.userAgent ?? 'ArcanaKin/1.0',
-          },
+      const response = await withTimeout(
+        options.fetch,
+        EXTERNAL_TIMEOUT_MS.tagger,
+        'Scryfall Tagger',
+      )(`${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&unique=cards`, {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': options.userAgent ?? 'ArcanaKin/1.0',
         },
-      );
+      });
       // 404 = nenhuma carta do lote tem essa função.
       if (response.status === 404) continue;
       if (!response.ok) {

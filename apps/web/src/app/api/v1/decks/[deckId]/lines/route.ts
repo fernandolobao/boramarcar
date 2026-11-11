@@ -3,6 +3,7 @@ import { addDeckCopies, setDeckLine } from '@boramarcar/db';
 import { z } from 'zod';
 import { resolveCardById, resolveCardByName, resolveDefaultCardByName } from '@/server/deck-import';
 import { authed, parseJson } from '@/server/http';
+import { rateLimit } from '@/server/limits';
 
 const schema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -47,6 +48,7 @@ const addSchema = z.object({
  */
 export const POST = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, addSchema);
+  await rateLimit(db, user.id, 'search');
   const card = await resolveDefaultCardByName(db, body.name);
   const line = await addDeckCopies(db, { ...body, card, deckId: params.deckId, userId: user.id });
   return { line, found: card !== null };

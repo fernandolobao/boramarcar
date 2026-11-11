@@ -13,6 +13,7 @@ const KNOWN = [
   'not_found',
   'conflict',
   'upstream_error',
+  'rate_limited',
 ] as const;
 
 /**

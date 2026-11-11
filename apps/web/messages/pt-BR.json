@@ -658,6 +658,7 @@
     "not_found": "Não encontrado.",
     "conflict": "Conflito com dados existentes.",
     "upstream_error": "O serviço externo não respondeu como esperado. Tente novamente ou cole a lista em texto.",
+    "rate_limited": "Muitas tentativas em pouco tempo. Espere um minuto e tente de novo.",
     "internal_error": "Algo deu errado. Tente novamente."
   },
   "share": {

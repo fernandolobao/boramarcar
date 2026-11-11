@@ -658,6 +658,7 @@
     "not_found": "Not found.",
     "conflict": "Conflicts with existing data.",
     "upstream_error": "The external service didn't respond as expected. Try again or paste the list as text.",
+    "rate_limited": "Too many attempts in a short time. Wait a minute and try again.",
     "internal_error": "Something went wrong. Please try again."
   },
   "share": {

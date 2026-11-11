@@ -1,6 +1,7 @@
 import { DomainError, fetchAddressSuggestions, isDomainError } from '@boramarcar/core';
 import { z } from 'zod';
 import { authed, parseQuery } from '@/server/http';
+import { rateLimit } from '@/server/limits';
 
 const schema = z.object({
   q: z.string().max(200).default(''),
@@ -13,8 +14,9 @@ const cache = new Map<string, { at: number; value: unknown }>();
 const TTL = 24 * 60 * 60 * 1000;
 
 /** Autocompletar de endereço (2.14) pelo Photon/OpenStreetMap, só para quem entrou. */
-export const GET = authed(async ({ req }) => {
+export const GET = authed(async ({ req, db, user }) => {
   const { q, lat, lng } = parseQuery(req, schema);
+  await rateLimit(db, user.id, 'search');
   const near = lat !== undefined && lng !== undefined ? { lat, lng } : undefined;
   const key = `${q.trim().toLowerCase()}|${near ? `${lat?.toFixed(1)},${lng?.toFixed(1)}` : ''}`;
   const hit = cache.get(key);

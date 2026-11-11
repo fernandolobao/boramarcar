@@ -178,7 +178,7 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 
 ## Preços em reais
 
-O Scryfall só tem preço em dólar. O valor em reais é **conversão** pelo dólar PTAX de venda do Banco Central (API pública `olinda.bcb.gov.br`, sem chave), guardado por 6 h por instância; se o BCB falhar, a página mostra só US$. A LigaMagic não tem API pública e bloqueia acesso automático, então cada carta tem um link "Ver preço na LigaMagic" em vez de copiar preços de lá. O teste de contrato semanal também chama a PTAX.
+O Scryfall só tem preço em dólar. O valor em reais é **conversão** pelo dólar PTAX de venda do Banco Central (API pública `olinda.bcb.gov.br`, sem chave), guardado por 6 h na memória da instância e no cache compartilhado do banco (ver "Serviços externos"); se o BCB falhar, a página mostra só US$. A LigaMagic não tem API pública e bloqueia acesso automático, então cada carta tem um link "Ver preço na LigaMagic" em vez de copiar preços de lá. O teste de contrato semanal também chama a PTAX.
 
 ## Edições das cartas
 
@@ -193,6 +193,17 @@ Cada linha de `deck_cards` aponta para uma impressão (`scryfall_id`); o índice
 ## Cartas de duas faces
 
 Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e com uma imagem por face em `card_faces`; guardamos a frente em `image_uri` e o verso em `back_image_uri`/`back_name` (cartas divididas e aventuras têm uma imagem só e ficam sem verso). Na grade, o botão "Virar" troca a imagem; no diálogo, "Frente"/"Verso". Na folha de proxies, cada cópia sai com as duas faces lado a lado. Cartas que já estavam no cache ganham o verso na atualização diária (cron) ou ao atualizar a análise.
+
+## Serviços externos: cache, tempo máximo e limites
+
+Tudo no plano grátis, sem serviço novo: o CDN da Vercel e o próprio Postgres (Neon).
+
+- **Tempo máximo** (`core/external.ts`, `withTimeout`): toda chamada a serviço externo (Scryfall e Tagger 8 s, Commander Spellbook e importadores 10 s, Photon/Nominatim 5 s, PTAX 4 s, Resend 8 s) desiste a tempo e vira `upstream_error` (502), em vez de prender a função até o limite da Vercel.
+- **CDN da Vercel** (`PUBLIC_CDN_CACHE` em `server/limits.ts`): respostas iguais para todos — autocompletar de cartas, carta pelo nome, edições de uma carta — saem com `Cache-Control: public, s-maxage=86400, stale-while-revalidate=604800`. A mesma busca vira uma chamada por dia para todo mundo e nem roda a função. São dados públicos do Scryfall, então servir do CDN sem checar a sessão não expõe nada.
+- **Cache compartilhado no banco** (`external_cache`, `cachedExternal`): chave → JSON com validade, comum a todas as instâncias (a memória de cada função some no "cold start"). Usado para a PTAX (6 h), edições de uma carta (7 dias) e buscas de alternativas (1 dia). Vencido, o valor ainda serve de reserva se o serviço falhar. Funções do Tagger e combos do Spellbook já ficam guardados por carta e por lista do deck.
+- **Limites de uso** (`rate_limits`, `consumeRateLimit`, janela fixa por pessoa): importar deck e atualizar pela origem (10 a cada 10 min), atualizar a análise (20 a cada 10 min) e buscas pequenas (120 por minuto). Acima disso, 429 com `Retry-After` e a mensagem `errors.rate_limited`.
+- **Limpeza**: o cron diário do Scryfall apaga o cache vencido há mais de 30 dias e as janelas de limite com mais de um dia.
+- As imagens das cartas continuam vindo direto do CDN do Scryfall (`cards.scryfall.io`), sem passar pelo nosso servidor.
 
 ## Atualização do cache de cartas (cron)
 

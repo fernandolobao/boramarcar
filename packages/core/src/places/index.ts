@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DomainError } from '../errors';
 import type { FetchLike } from '../decks/types';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../external';
 
 /**
  * Endereços e mapas (2.14) com dados do OpenStreetMap: autocompletar pelo Photon (Komoot), que
@@ -106,7 +107,11 @@ export async function fetchAddressSuggestions(
     params.set('lat', String(options.near.lat));
     params.set('lon', String(options.near.lng));
   }
-  const response = await options.fetch(`${PHOTON_API}/api/?${params}`, {
+  const response = await withTimeout(
+    options.fetch,
+    EXTERNAL_TIMEOUT_MS.places,
+    'Serviço de endereços',
+  )(`${PHOTON_API}/api/?${params}`, {
     headers: {
       Accept: 'application/json',
       'User-Agent':
@@ -154,7 +159,11 @@ export async function locateAddress(
   const q = address.trim();
   if (q.length < 3 || !houseNumberFrom(q)) return null;
   const params = new URLSearchParams({ q, format: 'jsonv2', addressdetails: '1', limit: '1' });
-  const response = await options.fetch(`${NOMINATIM_API}/search?${params}`, {
+  const response = await withTimeout(
+    options.fetch,
+    EXTERNAL_TIMEOUT_MS.places,
+    'Serviço de endereços',
+  )(`${NOMINATIM_API}/search?${params}`, {
     headers: {
       Accept: 'application/json',
       'User-Agent':

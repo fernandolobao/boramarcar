@@ -334,6 +334,13 @@ describe('API v1 — decks', () => {
         },
       ],
     });
+    // Iguais para todos: CDN da Vercel e cache no banco (a 2ª busca não vai ao Scryfall).
+    expect(list.headers.get('Cache-Control')).toContain('s-maxage=86400');
+    const searches = () =>
+      vi.mocked(fetch).mock.calls.filter(([u]) => String(u).includes('/cards/search')).length;
+    const before = searches();
+    expect((await call(prints.GET, { path: '/?name=sol%20ring' })).body).toEqual(list.body);
+    expect(searches()).toBe(before);
 
     const move = (body: Record<string, unknown>) =>
       call(linePrint.POST, {
@@ -413,5 +420,21 @@ describe('API v1 — decks', () => {
       vi.fn(async () => new Response('erro', { status: 500 })),
     );
     expect((await add({ quantity: 1 })).body).toMatchObject({ found: true });
+  });
+
+  it('limita importações por pessoa (429 com Retry-After)', async () => {
+    const owner = await createTestUser(testState.db!, { name: 'Muitas importações' });
+    asUser(owner);
+    stubExternalApis();
+    const importText = () =>
+      call(decks.POST, { method: 'POST', body: { kind: 'text', name: 'X', text: '1 Sol Ring' } });
+    for (let i = 0; i < 10; i += 1) expect((await importText()).status).toBe(201);
+    const blocked = await importText();
+    expect(blocked.status).toBe(429);
+    expect(blocked.body!.error.code).toBe('rate_limited');
+    expect(Number(blocked.headers.get('Retry-After'))).toBeGreaterThan(0);
+    // O limite é por pessoa.
+    asUser(await createTestUser(testState.db!, { name: 'Outra pessoa' }));
+    expect((await importText()).status).toBe(201);
   });
 });

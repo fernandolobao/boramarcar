@@ -80,7 +80,12 @@ describe('cron do cache do Scryfall', () => {
         }),
       );
     const first = await run();
-    expect(await first.json()).toEqual({ checked: 2, updated: 1, missing: 1 });
+    expect(await first.json()).toEqual({
+      checked: 2,
+      updated: 1,
+      missing: 1,
+      purged: { cache: 0, rateLimits: 0 },
+    });
     expect(requested[0]!.sort()).toEqual(['gone', 'sol']);
     const all = await db.select().from(schema.cards);
     const sol = all.find((c) => c.scryfallId === 'sol');
@@ -89,7 +94,7 @@ describe('cron do cache do Scryfall', () => {
     expect(loose!.updatedAt).toEqual(old);
 
     // Logo em seguida não há nada velho para atualizar.
-    expect(await (await run()).json()).toEqual({ checked: 0, updated: 0, missing: 0 });
+    expect(await (await run()).json()).toMatchObject({ checked: 0, updated: 0, missing: 0 });
     expect(requested).toHaveLength(1);
   });
 });

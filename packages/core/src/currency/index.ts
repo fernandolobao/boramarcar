@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DomainError } from '../errors';
 import type { FetchLike } from '../decks/types';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../external';
 
 /** API pública do Banco Central (PTAX), sem chave. */
 export const PTAX_API = 'https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata';
@@ -47,7 +48,11 @@ export function parsePtax(payload: unknown): ExchangeRate {
 
 /** Cotação do dólar (PTAX de venda) mais recente. */
 export async function fetchUsdBrlRate(fetchFn: FetchLike, now = new Date()): Promise<ExchangeRate> {
-  const response = await fetchFn(ptaxUrl(now), { headers: { Accept: 'application/json' } });
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.ptax,
+    'Banco Central',
+  )(ptaxUrl(now), { headers: { Accept: 'application/json' } });
   if (!response.ok) throw new DomainError('upstream_error', `BCB respondeu ${response.status}`);
   return parsePtax(await response.json());
 }

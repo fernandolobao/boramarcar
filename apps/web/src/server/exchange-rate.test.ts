@@ -15,14 +15,20 @@ describe('cotação com cache', () => {
   it('busca uma vez, reaproveita por 6 h e cai para a última conhecida se o BCB falhar', async () => {
     vi.useFakeTimers({ now: new Date('2026-11-06T12:00:00Z') });
     const first = ok(5.4);
-    expect(await getUsdBrlRate(first as unknown as typeof fetch)).toMatchObject({ rate: 5.4 });
-    expect(await getUsdBrlRate(first as unknown as typeof fetch)).toMatchObject({ rate: 5.4 });
+    expect(
+      await getUsdBrlRate({ db: null, fetch: first as unknown as typeof fetch }),
+    ).toMatchObject({ rate: 5.4 });
+    expect(
+      await getUsdBrlRate({ db: null, fetch: first as unknown as typeof fetch }),
+    ).toMatchObject({ rate: 5.4 });
     expect(first).toHaveBeenCalledTimes(1);
 
     vi.setSystemTime(new Date('2026-11-06T19:00:00Z'));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const failing = vi.fn(async () => new Response('x', { status: 503 }));
-    expect(await getUsdBrlRate(failing as unknown as typeof fetch)).toMatchObject({ rate: 5.4 });
+    expect(
+      await getUsdBrlRate({ db: null, fetch: failing as unknown as typeof fetch }),
+    ).toMatchObject({ rate: 5.4 });
     expect(failing).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
@@ -32,7 +38,7 @@ describe('cotação com cache', () => {
     const failing = vi.fn(async () => {
       throw new Error('rede');
     });
-    expect(await getUsdBrlRate(failing as unknown as typeof fetch)).toBeNull();
+    expect(await getUsdBrlRate({ db: null, fetch: failing as unknown as typeof fetch })).toBeNull();
     warn.mockRestore();
   });
 });

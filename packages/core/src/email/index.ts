@@ -1,5 +1,6 @@
 import { DomainError } from '../errors';
 import type { FetchLike } from '../decks/types';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../external';
 
 export interface EmailAttachment {
   filename: string;
@@ -47,7 +48,11 @@ export async function sendEmails(
   const results: SendResult[] = [];
   for (const message of messages) {
     try {
-      const response = await options.fetch('https://api.resend.com/emails', {
+      const response = await withTimeout(
+        options.fetch,
+        EXTERNAL_TIMEOUT_MS.email,
+        'Resend',
+      )('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${options.apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({

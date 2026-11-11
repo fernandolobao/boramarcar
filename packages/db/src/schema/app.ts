@@ -439,3 +439,30 @@ export const collectionCards = pgTable(
     ),
   ],
 );
+
+/**
+ * Cache compartilhado de respostas de serviços externos (Scryfall, Commander Spellbook, PTAX…),
+ * para não repetir a mesma chamada a cada função do servidor (a memória delas se perde a cada
+ * "cold start"). Vencido, o valor ainda serve de reserva quando o serviço não responde.
+ */
+export const externalCache = pgTable(
+  'external_cache',
+  {
+    key: text('key').primaryKey(),
+    value: jsonb('value').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index('external_cache_expires_idx').on(t.expiresAt)],
+);
+
+/** Contadores de limite de uso (janela fixa) por chave, ex.: `import:<usuário>`. */
+export const rateLimits = pgTable(
+  'rate_limits',
+  {
+    key: text('key').notNull(),
+    windowStart: timestamp('window_start', { withTimezone: true }).notNull(),
+    count: integer('count').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.key, t.windowStart] })],
+);
