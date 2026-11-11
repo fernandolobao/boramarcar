@@ -1,10 +1,11 @@
 import { ScrollView, View } from 'react-native';
+import { AccountPrivacy } from '@/components/account-privacy';
 import { AppText, Button, Card, styles } from '@/components/ui';
 import { authClient } from '@/lib/auth';
 import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 
-/** Conta: quem está conectado, grupo ativo e sair. */
+/** Conta: quem está conectado, grupo ativo, sair e privacidade (LGPD). */
 export default function AccountScreen() {
   const { data: session } = authClient.useSession();
   const { groups, group, select } = useGroup();
@@ -38,6 +39,7 @@ export default function AccountScreen() {
         </View>
       )}
       <Button label={t('signOut')} variant="secondary" onPress={() => void authClient.signOut()} />
+      <AccountPrivacy />
     </ScrollView>
   );
 }

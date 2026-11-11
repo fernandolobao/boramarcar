@@ -22,6 +22,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   ]);
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
+  const tl = await getTranslations('legal');
 
   const links = [
     { href: '/painel', label: t('dashboard'), icon: 'dashboard' as const },
@@ -67,6 +68,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <BackLink main={links.map((l) => l.href)} />
         {children}
       </main>
+      <footer className="mx-auto max-w-5xl px-4 pb-8 text-sm print:hidden">
+        <Link href="/privacidade" className="muted underline underline-offset-2 hover:text-fg">
+          {tl('privacy')}
+        </Link>
+      </footer>
     </div>
   );
 }

@@ -220,7 +220,16 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
 
 ## Gravação de sessões (Hotjar/Contentsquare)
 
-`components/session-insights.tsx` carrega a tag do Contentsquare (o Hotjar hoje faz parte dele) depois da página ficar interativa, **só em produção** (`VERCEL_ENV=production`): previews, E2E e desenvolvimento não gravam. `NEXT_PUBLIC_SESSION_INSIGHTS=off` desliga sem novo código. Campos de formulário são mascarados pela ferramenta; nome/e-mail exibidos levam `data-cs-mask`. Pela LGPD, gravação de sessão pede aviso e consentimento: ver o roadmap.
+`components/session-insights.tsx` carrega a tag do Contentsquare (o Hotjar hoje faz parte dele) **só em produção** (`VERCEL_ENV=production`; `NEXT_PUBLIC_SESSION_INSIGHTS=off` desliga) e **só com consentimento** (cookie `ak_consent=accepted`). Previews, E2E e desenvolvimento não gravam nem mostram o aviso. Campos de formulário são mascarados pela ferramenta; o e-mail exibido leva `data-cs-mask`.
+
+## Privacidade e LGPD
+
+- **Aviso de cookies** (`consent-banner.tsx`): aparece enquanto não houver escolha, só quando a gravação de sessões está ligada (o Vercel Analytics não usa cookies). "Aceitar" e "Recusar" têm o mesmo peso. A escolha vale 6 meses (`lib/consent.ts`). Recusar apaga os cookies `_cs*`, e retirar o consentimento depois de aceitar recarrega a página sem a tag. O aviso não é modal: enquanto está na tela, a página reserva o espaço dele (`scroll-padding-bottom`) para o foco não ficar escondido (WCAG 2.4.11).
+- **Política de Privacidade** (`/privacidade`, pública): texto em `app/privacidade/content.ts`, nos dois idiomas. Mudou o que o app coleta, com quem compartilha ou por quanto tempo guarda? Atualize o texto e `PRIVACY_UPDATED`. Links no rodapé da página inicial e do app, no aviso de cookies, em Configurações e no app mobile.
+- **Direitos do titular em autoatendimento** (Configurações → Privacidade e dados; serviços em `packages/db/src/services/privacy.ts`):
+  - `GET /api/v1/me/export`: JSON com perfil, logins (sem tokens), grupos, locais hospedados, disponibilidade, presenças, partidas e decks. Dados de outras pessoas ficam de fora.
+  - `DELETE /api/v1/me` (`{ confirm: true }`): encerra a sessão e apaga login, sessões, decks, disponibilidade, presenças futuras e locais que a pessoa hospeda, e tira a pessoa dos grupos. O registro do usuário vira "Jogador removido" (sem e-mail real, foto, fuso ou idioma; `deleted_at` preenchido), para as partidas continuarem no histórico dos outros. Grupos de que era dona passam para o admin (ou membro) mais antigo, ou são apagados se ela estava sozinha. `GET /api/v1/me` mostra isso antes.
+  - No app mobile, a exclusão é feita no próprio app (exigência das lojas); baixar os dados abre o site.
 
 ## Marca e design tokens (ArcanaKin)
 

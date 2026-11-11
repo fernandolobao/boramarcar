@@ -16,6 +16,8 @@ export const user = pgTable('user', {
   locale: text('locale'),
   /** Aceita receber notificações por e-mail. */
   emailNotifications: boolean('email_notifications').notNull().default(true),
+  /** Conta excluída pelo titular (LGPD): dados pessoais apagados, partidas mantidas anônimas. */
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

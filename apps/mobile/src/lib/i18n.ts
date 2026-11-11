@@ -87,6 +87,20 @@ const pt = {
   group: 'Grupo',
   activeGroup: 'Grupo ativo',
   signOut: 'Sair',
+  privacyTitle: 'Privacidade e dados',
+  privacyPolicy: 'Política de Privacidade',
+  privacyExport: 'Baixar meus dados (no site)',
+  privacyExportHint: 'Abre as configurações no site, onde o arquivo é baixado',
+  privacyDeleteHint:
+    'Excluir a conta apaga o seu login, perfil, foto, decks, disponibilidade, presenças futuras e os locais que você hospeda, e tira você dos grupos. As partidas já registradas ficam no histórico como “Jogador removido”. Não dá para desfazer.',
+  privacyDeleteTransfers:
+    'A posse destes grupos passa para o admin (ou o membro) mais antigo: {groups}.',
+  privacyDeleteDeletions: 'Estes grupos só têm você e serão apagados: {groups}.',
+  privacyDelete: 'Excluir minha conta',
+  privacyConfirmDelete: 'Confirmar exclusão definitiva',
+  privacyConfirmHint: 'Toque de novo para excluir a conta. Isso não pode ser desfeito.',
+  privacyDeleting: 'Excluindo…',
+  privacyDeleteError: 'Não foi possível excluir a conta. Tente de novo.',
   openWeb: 'Abrir no site',
   tableTitle: 'Modo mesa',
   tableIntro:
@@ -341,6 +355,20 @@ const en: Messages = {
   group: 'Group',
   activeGroup: 'Active group',
   signOut: 'Sign out',
+  privacyTitle: 'Privacy and data',
+  privacyPolicy: 'Privacy Policy',
+  privacyExport: 'Download my data (on the website)',
+  privacyExportHint: 'Opens settings on the website, where the file is downloaded',
+  privacyDeleteHint:
+    'Deleting your account deletes your sign-in, profile, photo, decks, availability, upcoming RSVPs and the places you host, and removes you from your groups. Games already recorded stay in the history as “Jogador removido” (removed player). This can’t be undone.',
+  privacyDeleteTransfers:
+    'Ownership of these groups goes to the oldest admin (or member): {groups}.',
+  privacyDeleteDeletions: 'These groups only have you and will be deleted: {groups}.',
+  privacyDelete: 'Delete my account',
+  privacyConfirmDelete: 'Confirm permanent deletion',
+  privacyConfirmHint: 'Tap again to delete your account. This can’t be undone.',
+  privacyDeleting: 'Deleting…',
+  privacyDeleteError: 'Couldn’t delete the account. Try again.',
   openWeb: 'Open website',
   tableTitle: 'Table mode',
   tableIntro:

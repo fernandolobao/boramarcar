@@ -295,4 +295,21 @@ describe('cliente da API', () => {
     expect(deck.analysis.score).toBe(82);
     expect(deck.analysis.validation[0]).toMatchObject({ code: 'banned', name: 'X' });
   });
+
+  it('exclusão da conta (LGPD): prévia dos grupos e DELETE com confirmação', async () => {
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) =>
+      init?.method === 'DELETE'
+        ? json({ deleted: true, transferredGroups: ['g1'], deletedGroups: [] })
+        : json({ deletion: { transfers: ['Mesa'], deletions: [] } }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.me.deletionPreview()).toEqual({ transfers: ['Mesa'], deletions: [] });
+    await expect(api.me.deleteAccount()).resolves.toMatchObject({ deleted: true });
+    const [url, init] = fetchMock.mock.calls[1]!;
+    expect(url).toBe('https://www.arcanakin.com.br/api/v1/me');
+    expect(init).toMatchObject({ method: 'DELETE', body: JSON.stringify({ confirm: true }) });
+  });
 });

@@ -104,6 +104,27 @@ export function createApiClient(options: ApiClientOptions) {
   };
 
   return {
+    me: {
+      /** Grupos que mudam de dono (ou são apagados) se a pessoa excluir a conta. */
+      deletionPreview: async () =>
+        (
+          await request(
+            'GET',
+            '/me',
+            z.object({
+              deletion: z.object({
+                transfers: z.array(z.string()),
+                deletions: z.array(z.string()),
+              }),
+            }),
+          )
+        ).deletion,
+      /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
+      deleteAccount: () =>
+        request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {
+          confirm: true,
+        }),
+    },
     groups: {
       list: async () =>
         (await request('GET', '/groups', z.object({ groups: z.array(groupSchema) }))).groups,

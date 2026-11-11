@@ -94,8 +94,15 @@ function SectionHeading({
  * Página inicial (pública, igual para quem entrou ou não): apresenta o ArcanaKin, as
  * funcionalidades, as fontes de dados, a metodologia da análise, os valores e o convite aos testes.
  */
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await getSessionUser(await headers()).catch(() => null);
+  const accountDeleted = (await searchParams).conta === 'excluida';
+  const tp = await getTranslations('privacySettings');
+  const tl = await getTranslations('legal');
   const t = await getTranslations('home');
   const tc = await getTranslations('common');
   const mailto = `mailto:${CONTACT}?subject=${encodeURIComponent(t('join.emailSubject'))}`;
@@ -137,6 +144,11 @@ export default async function HomePage() {
       </header>
 
       <main id="conteudo" tabIndex={-1} className="focus:outline-none">
+        {accountDeleted && !user && (
+          <p role="status" className="bg-surface-muted px-4 py-3 text-center text-sm font-medium">
+            {tp('accountDeleted')}
+          </p>
+        )}
         {/* Hero com vídeo abstrato; o texto fica sobre uma camada escura (contraste AA). */}
         <section
           aria-labelledby="home-title"
@@ -382,6 +394,11 @@ export default async function HomePage() {
             <a href={`mailto:${CONTACT}`} className="underline underline-offset-2">
               {CONTACT}
             </a>
+          </p>
+          <p>
+            <Link href="/privacidade" className="underline underline-offset-2">
+              {tl('privacy')}
+            </Link>
           </p>
         </div>
       </footer>
