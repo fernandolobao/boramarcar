@@ -250,6 +250,14 @@ Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pesso
 
 Better Auth com o provedor Google e adaptador Drizzle. Sessões ficam no Postgres; o cookie é cacheado por 5 minutos (`cookieCache`) para evitar uma consulta por requisição. `proxy.ts` (antigo `middleware.ts` no Next 16) só verifica a presença do cookie; a validação real acontece nas páginas (`requireUser`) e na API (`authed`).
 
+**Escopos e foto do Google.** O login pede só `openid`, `email` e `profile` (`GOOGLE_SIGN_IN_OPTIONS`, com `disableDefaultScope`), sem Gmail, Drive ou outros. A foto do avatar é a claim `picture` do OpenID Connect:
+
+- **Usuário novo**: o Better Auth grava `picture` em `user.image` ao criar o usuário.
+- **Logins seguintes**: o Better Auth não atualiza o perfil por padrão (`overrideUserInfoOnSignIn` é `false`, e ligá-lo também sobrescreveria nome e e-mail). Por isso, os hooks `databaseHooks.account.create/update.after` — que rodam a cada login, quando a conta recebe o ID token novo — chamam `syncGoogleProfileImage` (`server/google-picture.ts`): lê só a claim `picture` do ID token e grava em `user.image` quando é uma URL `https` válida e diferente da atual. Sem foto (ou com foto inválida), a imagem existente fica como está — nunca vira `null` ou vazio. Uma falha aqui nunca impede o login.
+- O ID token vem direto do endpoint de token do Google, por HTTPS e com o client secret, e já foi aceito pelo Better Auth no login.
+- A URL da foto pode mudar e nunca identifica o usuário: quem identifica é o `sub` (em `account.accountId`).
+- **Avatar**: `<AvatarImage>` mostra a foto com `referrerPolicy="no-referrer"` (o servidor de fotos do Google pode recusar pedidos com referrer) e volta para as iniciais se não houver foto ou se a URL falhar. As fotos são `unoptimized` (vão direto do Google para o navegador); `lh3.googleusercontent.com` está em `images.remotePatterns` caso a otimização seja ligada. A sessão fica em cache por até 5 minutos, então uma foto nova pode levar esse tempo para aparecer.
+
 ## Internacionalização
 
 next-intl sem prefixo de idioma na URL. O idioma vem do cookie `NEXT_LOCALE` e, na falta dele, do `Accept-Language`; padrão `pt-BR`. As mensagens são tipadas a partir de `messages/pt-BR.json` e um teste garante que `en.json` tem as mesmas chaves. Cada usuário tem um fuso (`user.time_zone`), detectado no navegador no primeiro acesso e editável em /perfil; ele é espelhado no cookie `bm_tz`, lido pelo next-intl a cada requisição. Os horários digitados em `datetime-local` são convertidos para UTC no fuso do usuário (`zonedLocalToUtc` em `core/time`). Sem preferência, o padrão é `America/Sao_Paulo`.
