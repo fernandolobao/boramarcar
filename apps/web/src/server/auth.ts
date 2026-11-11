@@ -7,6 +7,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { getBaseUrl, getEnv } from '@/env';
 import { getDb } from './db';
+import { GOOGLE_SIGN_IN_OPTIONS, syncGoogleProfileImage } from './google-picture';
 
 function createAuth() {
   const env = getEnv();
@@ -26,7 +27,17 @@ function createAuth() {
       google: {
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
-        prompt: 'select_account',
+        // Só openid, email e profile (ver google-picture.ts).
+        ...GOOGLE_SIGN_IN_OPTIONS,
+        scope: [...GOOGLE_SIGN_IN_OPTIONS.scope],
+      },
+    },
+    databaseHooks: {
+      account: {
+        // A cada login com o Google a conta é criada (primeiro login) ou recebe tokens novos
+        // (logins seguintes): é aí que a foto do Google é sincronizada (ver google-picture.ts).
+        create: { after: (account) => syncImage(account) },
+        update: { after: (account) => syncImage(account) },
       },
     },
     session: {
@@ -39,6 +50,19 @@ function createAuth() {
     // nextCookies precisa ser o último plugin.
     plugins: [expo(), nextCookies()],
   });
+}
+
+/** Sincroniza a foto do Google sem nunca impedir o login se algo der errado. */
+async function syncImage(account: {
+  providerId?: string | null;
+  userId?: string | null;
+  idToken?: string | null;
+}) {
+  try {
+    await syncGoogleProfileImage(getDb(), account);
+  } catch (error) {
+    console.warn('[auth] não foi possível atualizar a foto do Google', error);
+  }
 }
 
 type Auth = ReturnType<typeof createAuth>;

@@ -1,7 +1,7 @@
 import type { AchievementId } from '@boramarcar/core';
 import type { getDeckCovers, getPlayerProfile } from '@boramarcar/db';
-import Image from 'next/image';
 import Link from 'next/link';
+import { AvatarImage } from './avatar-image';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeckGrid } from './deck-grid';
 import { Icon, type IconName } from './icons';
@@ -112,29 +112,12 @@ export async function PlayerProfile({
   const tp = await getTranslations('player');
   const tg = await getTranslations('group');
   const format = await getFormatter();
-  const initials = profile.name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase())
-    .join('');
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-4">
         <div className="relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-full bg-brand-100 text-2xl font-bold text-brand-700 dark:bg-brand-700 dark:text-white">
-          {profile.image ? (
-            <Image
-              src={profile.image}
-              alt=""
-              fill
-              sizes="80px"
-              unoptimized
-              className="object-cover"
-            />
-          ) : (
-            <span aria-hidden="true">{initials}</span>
-          )}
+          <AvatarImage name={profile.name} image={profile.image} sizes="80px" />
         </div>
         <div className="min-w-0">
           <h1 className="page-title">{profile.name}</h1>
