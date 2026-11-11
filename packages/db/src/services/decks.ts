@@ -25,7 +25,8 @@ import {
 import { and, asc, count, desc, eq, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
-import { cards, deckCards, decks, groupMembers, user } from '../schema';
+import { syncCollectionFromDecks } from './collection';
+import { cards, collectionCards, deckCards, decks, groupMembers, user } from '../schema';
 
 /** Insere ou atualiza o cache de cartas do Scryfall. */
 export async function upsertCards(db: Database, data: readonly CardData[]) {
@@ -55,6 +56,10 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         backImageUri: c.backImageUri ?? null,
         backName: c.backName ?? null,
         legalities: c.legalities ?? null,
+        artist: c.artist ?? null,
+        releasedAt: c.releasedAt ?? null,
+        rarity: c.rarity ?? null,
+        priceUsdFoil: c.priceUsdFoil ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -80,6 +85,11 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         backImageUri: sql`excluded.back_image_uri`,
         backName: sql`excluded.back_name`,
         legalities: sql`coalesce(excluded.legalities, ${cards.legalities})`,
+        artist: sql`coalesce(excluded.artist, ${cards.artist})`,
+        releasedAt: sql`coalesce(excluded.released_at, ${cards.releasedAt})`,
+        rarity: sql`coalesce(excluded.rarity, ${cards.rarity})`,
+        // Preço muda: o novo vale mesmo nulo (a versão foil pode ter saído do mercado).
+        priceUsdFoil: sql`excluded.price_usd_foil`,
         updatedAt: new Date(),
       },
     });
@@ -121,7 +131,7 @@ export async function findCachedCards(
   return rows.map(toCardData);
 }
 
-function toCardData(card: typeof cards.$inferSelect): CardData {
+export function toCardData(card: typeof cards.$inferSelect): CardData {
   return {
     scryfallId: card.scryfallId,
     oracleId: card.oracleId,
@@ -144,6 +154,10 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
     backImageUri: card.backImageUri,
     backName: card.backName,
     legalities: card.legalities,
+    artist: card.artist,
+    releasedAt: card.releasedAt,
+    rarity: card.rarity,
+    priceUsdFoil: card.priceUsdFoil,
   };
 }
 
@@ -235,7 +249,7 @@ export async function saveImportedDeck(
   await upsertCards(db, input.cards);
   const known = [...input.cards, ...(await findCachedCards(db, input.deck.entries))];
   const linked = attachCardData(input.deck.entries, known);
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [deck] = await tx
       .insert(decks)
       .values({
@@ -267,6 +281,9 @@ export async function saveImportedDeck(
     await tx.insert(deckCards).values([...rows.values()]);
     return deck!;
   });
+  // A coleção acompanha os decks (só acrescenta; ver collection.ts).
+  await syncCollectionFromDecks(db, input.ownerId);
+  return result;
 }
 
 export async function listDecks(db: Database, ownerId: string) {
@@ -480,7 +497,7 @@ export async function setDeckCardProxy(
     throw new DomainError('forbidden', 'Apenas o dono edita o deck');
   if (row.entry.isProxy === input.isProxy) return row.entry;
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [twin] = await tx
       .select()
       .from(deckCards)
@@ -512,6 +529,9 @@ export async function setDeckCardProxy(
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
     return updated!;
   });
+  // A coleção acompanha os decks (só acrescenta; ver collection.ts).
+  await syncCollectionFromDecks(db, input.userId);
+  return result;
 }
 
 export async function deleteDeck(db: Database, input: { deckId: string; userId: string }) {
@@ -689,6 +709,7 @@ export async function setDeckLine(
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
   });
+  await syncCollectionFromDecks(db, input.userId);
   return {
     name,
     board: input.board,
@@ -724,7 +745,7 @@ export async function moveLinePrint(
   }
   if (input.fromScryfallId === input.card.scryfallId) return { moved: 0 };
   await upsertCards(db, [input.card]);
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const rows = await tx
       .select()
       .from(deckCards)
@@ -786,6 +807,9 @@ export async function moveLinePrint(
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
     return { moved: input.quantity };
   });
+  // A coleção acompanha os decks (só acrescenta; ver collection.ts).
+  await syncCollectionFromDecks(db, input.userId);
+  return result;
 }
 
 /**
@@ -837,6 +861,7 @@ export async function syncDeckCards(
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
   });
+  await syncCollectionFromDecks(db, input.userId);
   return { added: plan.added, removed: plan.removed, changed: plan.changed };
 }
 
@@ -869,7 +894,9 @@ export async function staleDeckCards(db: Database, input: { olderThan: Date; lim
     .where(
       and(
         sql`${cards.updatedAt} < ${input.olderThan}`,
-        sql`exists (select 1 from ${deckCards} where ${deckCards.scryfallId} = ${cards.scryfallId})`,
+        // Cartas em algum deck ou em alguma coleção.
+        sql`(exists (select 1 from ${deckCards} where ${deckCards.scryfallId} = ${cards.scryfallId})
+          or exists (select 1 from ${collectionCards} where ${collectionCards.scryfallId} = ${cards.scryfallId}))`,
       ),
     )
     .orderBy(asc(cards.updatedAt))

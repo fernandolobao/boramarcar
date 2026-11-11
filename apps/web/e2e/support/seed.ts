@@ -4,7 +4,7 @@
  * Usado pelos testes E2E autenticados (acessibilidade e fluxos).
  */
 import { createHmac } from 'node:crypto';
-import { createDb, schema } from '@boramarcar/db';
+import { createDb, schema, syncCollectionFromDecks } from '@boramarcar/db';
 
 export const E2E_INVITE_CODE = 'E2ETESTE';
 export const E2E_SESSION_TOKEN = 'e2e-session-ana';
@@ -167,6 +167,13 @@ export async function seedE2E(databaseUrl: string) {
         manaCost: '{2}{G}',
         cmc: 3,
         typeLine: 'Sorcery',
+        setCode: 'm21',
+        setName: 'Core Set 2021',
+        collectorNumber: '178',
+        artist: 'Anthony Palumbo',
+        releasedAt: '2020-07-03',
+        rarity: 'common',
+        priceUsd: '0.30',
         oracleText:
           'Search your library for up to two basic land cards, put one onto the battlefield tapped and the other into your hand.',
         colorIdentity: ['G'],
@@ -195,6 +202,8 @@ export async function seedE2E(databaseUrl: string) {
       { deckId: E2E_IDS.deck, cardName: 'Forest', scryfallId: 'e2e-forest', quantity: 36 },
       { deckId: E2E_IDS.deck, cardName: 'Carta Inventada', quantity: 1, board: 'maybeboard' },
     ]);
+    // Coleção da Ana a partir do deck (sem o Sol Ring, que é proxy, nem o maybeboard).
+    await syncCollectionFromDecks(db, 'e2e-ana');
 
     // Partidas do encontro passado: uma vitória e um empate
     await db.insert(s.games).values([

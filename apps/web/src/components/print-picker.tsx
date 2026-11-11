@@ -26,7 +26,16 @@ export function printLabel(card: PrintLine['card']) {
  * Botão "Edição: CMM #400" que abre um diálogo para escolher a impressão da carta (todas as
  * edições em papel, mais novas primeiro) e quantas cópias usam essa edição.
  */
-export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine }) {
+export function PrintPicker({
+  deckId,
+  line,
+  onPick,
+}: {
+  deckId?: string;
+  line: PrintLine;
+  /** Em vez de mover no deck: o que fazer com a impressão escolhida (ex.: na coleção). */
+  onPick?: (toScryfallId: string, quantity: number) => Promise<unknown>;
+}) {
   const t = useTranslations('decks');
   const te = useTranslations('errors');
   const tc = useTranslations('common');
@@ -112,16 +121,18 @@ export function PrintPicker({ deckId, line }: { deckId: string; line: PrintLine 
               }
               void run(
                 () =>
-                  api(`/api/v1/decks/${deckId}/lines/print`, {
-                    method: 'POST',
-                    body: {
-                      name: line.name,
-                      board: line.board,
-                      fromScryfallId: line.scryfallId,
-                      toScryfallId: chosen,
-                      quantity: amount,
-                    },
-                  }),
+                  onPick
+                    ? onPick(chosen, amount)
+                    : api(`/api/v1/decks/${deckId}/lines/print`, {
+                        method: 'POST',
+                        body: {
+                          name: line.name,
+                          board: line.board,
+                          fromScryfallId: line.scryfallId,
+                          toScryfallId: chosen,
+                          quantity: amount,
+                        },
+                      }),
                 () => dialog.current?.close(),
               );
             }}

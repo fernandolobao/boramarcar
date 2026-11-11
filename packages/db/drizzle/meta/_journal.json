@@ -92,6 +92,13 @@
       "when": 1794406699504,
       "tag": "0012_user_deleted_at",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794411250600,
+      "tag": "0013_colecao",
+      "breakpoints": true
     }
   ]
 }

@@ -61,6 +61,14 @@ export interface CardData {
   backName?: string | null;
   /** Legalidade por formato do Scryfall (`legal`, `not_legal`, `banned`, `restricted`). */
   legalities?: Record<string, string> | null;
+  /** Ilustrador(es) desta impressão. */
+  artist?: string | null;
+  /** Data de lançamento desta impressão (AAAA-MM-DD). */
+  releasedAt?: string | null;
+  /** `common` | `uncommon` | `rare` | `mythic` | `special` | `bonus`. */
+  rarity?: string | null;
+  /** Preço da versão foil (USD). */
+  priceUsdFoil?: string | null;
 }
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;

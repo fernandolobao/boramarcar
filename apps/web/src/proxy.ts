@@ -20,6 +20,7 @@ export const config = {
     '/eventos/:path*',
     '/ranking/:path*',
     '/decks/:path*',
+    '/colecao/:path*',
     '/perfil/:path*',
     '/jogadores/:path*',
     '/configuracoes/:path*',
