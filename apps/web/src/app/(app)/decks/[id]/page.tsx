@@ -41,6 +41,8 @@ import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
 import { CardNames } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
+import { ManaFlowColors } from '@/components/mana-flow';
+import { deckFlow } from '@boramarcar/tokens/flow';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -98,8 +100,14 @@ export default async function DeckPage({ params }: Props) {
     runAfterResponse(() => refreshDeckAnalysis(getDb(), { deckId: deck.id, viewerId: user.id }));
   }
 
+  // Fluxo de mana nas cores do deck, no peso dos símbolos de mana de cada cor.
+  const flow = deckFlow(
+    identity,
+    Object.fromEntries(analysis.manaBase.map((row) => [row.color, row.pips])),
+  );
   return (
     <>
+      <ManaFlowColors stops={flow} />
       <div className="relative overflow-hidden rounded-3xl border border-ink-200 bg-surface dark:border-ink-800 dark:bg-ink-900">
         {background && (
           // Arte do comandante desfocada como fundo decorativo.

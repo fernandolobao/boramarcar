@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { RefreshControl } from 'react-native';
+import { deckFlow } from '@boramarcar/tokens/flow';
 import { Aura } from '@/components/aura';
 import { StackScrollView } from '@/components/stack';
 import { DeckBody } from '@/components/deck/deck-body';
@@ -13,9 +14,16 @@ export default function DeckScreen() {
   const deck = useAsync(() => api.decks.get(id), [id]);
   if (deck.loading) return <Loading />;
   if (deck.error || !deck.data) return <ErrorState error={deck.error} onRetry={deck.refresh} />;
+  const { analysis } = deck.data;
+  // Fluxo de mana nas cores do deck, no peso dos símbolos de mana (base de mana da análise).
+  const manaBase = (analysis as { manaBase?: { color: string; pips: number }[] }).manaBase ?? [];
+  const flow = deckFlow(
+    analysis.colorIdentity,
+    Object.fromEntries(manaBase.map((row) => [row.color, row.pips])),
+  );
   return (
     <>
-      <Aura />
+      <Aura stops={flow} />
       <StackScrollView
         contentContainerStyle={{ padding: 16, gap: 16 }}
         refreshControl={<RefreshControl refreshing={deck.refreshing} onRefresh={deck.refresh} />}

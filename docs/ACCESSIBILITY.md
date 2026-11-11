@@ -233,10 +233,10 @@ sem rolagem horizontal em 320px.
 - **Botão "Voltar"**: link com texto visível, alvo ≥ 24px, no mesmo lugar em todas as páginas internas (3.2.3).
 - **/privacidade**: um `h1`, seções numeradas com `h2` e índice com links para as âncoras; entra no teste axe de páginas públicas.
 
-## Seções em pilha e aura (11/11/2026)
+## Seções em pilha e fluxo de mana (11/11/2026)
 
-- **Pilha**: é só layout (`sticky`) ligado à rolagem, sem animação automática. A seção com foco vem para a frente (`:focus-within`, 2.4.11), e os títulos continuam `h2` na ordem do documento. No app, com "reduzir movimento", a pilha é desligada.
-- **Aura**: decorativa (`aria-hidden`/`accessibilityElementsHidden`, `pointer-events: none`), atrás do conteúdo, com opacidade baixa para não afetar o contraste do texto. Movimento muito lento e parado com `prefers-reduced-motion` / "reduzir movimento" (2.3.3).
+- **Pilha**: é só layout ligado à rolagem, sem animação automática. Títulos continuam `h2` na ordem do documento. A seção coberta esmaece no máximo 40% e só depois de metade coberta: o título na faixa mantém ≥ 4,5:1 nos dois temas (claro 5,4:1; escuro 6:1). A seção com foco vem para a frente sem corte nem esmaecimento (`:focus-within`, 2.4.11). Seção mais alta que a tela não gruda, então nada fica escondido embaixo das faixas. No app, com "reduzir movimento", a pilha é desligada.
+- **Fluxo de mana**: decorativo (`aria-hidden`/`accessibilityElementsHidden`, `pointer-events: none`), atrás do conteúdo, que fica em cartões opacos. Fios finos e semitransparentes (mais discretos no celular e no tema escuro). Movimento lento (2.2.2 não se aplica: é fundo, mas pausa fora da tela e com a aba escondida) e parado com `prefers-reduced-motion` / "reduzir movimento" (2.3.3). O axe não enxerga o canvas: o contraste de textos soltos sobre a faixa foi conferido à mão nas capturas (deck, coleção, perfil, painel; claro e escuro).
 
 ## Carregamento e ações (11/11/2026)
 
