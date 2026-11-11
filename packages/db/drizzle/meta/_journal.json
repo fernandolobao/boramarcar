@@ -99,6 +99,13 @@
       "when": 1794411250600,
       "tag": "0013_colecao",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794421230950,
+      "tag": "0014_deck_foil_parcial",
+      "breakpoints": true
     }
   ]
 }

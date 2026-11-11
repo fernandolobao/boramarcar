@@ -208,7 +208,7 @@ Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e 
 
 ## Foil
 
-`deck_cards.is_foil` (que já vinha das importações) agora aparece e é editável: a linha do deck é foil quando todas as cópias são (`DeckLine.foil`). No editor, a caixa "Foil" salva na hora (`PUT …/lines` com `foil`); mudar quantidade ou proxies sem mandar `foil` mantém o que estava. Na grade, a carta foil tem um brilho decorativo (parado com "reduzir movimento") e o selo "✦ Foil"; a exportação marca `*F*`.
+Foil é contado por cópia, como as proxies: numa linha (carta + edição) podem conviver cópias foil e comuns (ex.: 1 Plains foil e 1 comum). No banco, cada grupo (comum, foil, proxy) é uma linha de `deck_cards`; o índice único inclui `is_foil` (migration `0014`). `DeckLine.foils` é quantas cópias reais são foil, e `DeckLine.foil` diz se todas as reais são (proxies não contam). No editor, com 1 cópia real aparece a caixa "Foil" (salva na hora); com mais de uma, "Cópias foil" (`PUT …/lines` com `foils`; `foil` booleano continua aceito). Mudar a quantidade sem mandar `foils` mantém as cópias foil que já eram (cópias novas entram comuns). Na coleção, foil e comum são versões diferentes; trocar o acabamento de cópias no deck move essas cópias entre as versões. A exportação separa as linhas (`1 Plains` e `1 Plains *F*`). Na grade, a carta com alguma cópia foil tem o brilho decorativo e o selo "✦ Foil" (todas) ou "✦ N foil" (parte).
 
 ## Navegação: "Voltar"
 

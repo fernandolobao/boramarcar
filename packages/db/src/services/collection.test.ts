@@ -227,4 +227,52 @@ describe('coleção', () => {
       [true, 2, ['A']],
     ]);
   });
+
+  it('foil e comum da mesma edição no mesmo deck: cada um na sua versão da coleção', async () => {
+    const me = await createTestUser(db);
+    const a = await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('A', [
+        { name: 'Sol Ring', quantity: 2, board: 'mainboard', scryfallId: 'sol-c21', isFoil: true },
+      ]),
+      cards: [sol],
+    });
+    // Desmarca o foil de uma das duas cópias.
+    const line = await setDeckLine(db, {
+      deckId: a.id,
+      userId: me.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      quantity: 2,
+      proxies: 0,
+      card: sol,
+      scryfallId: 'sol-c21',
+      foils: 1,
+    });
+    expect(line).toMatchObject({ foils: 1, foil: false });
+    const byFoil = (l: Awaited<ReturnType<typeof listCollection>>) =>
+      [...l].sort((x, y) => Number(x.foil) - Number(y.foil));
+    let list = byFoil(await listCollection(db, me.id));
+    expect(list.map((e) => [e.foil, e.quantity, e.decks.map((d) => d.quantity)])).toEqual([
+      [false, 1, [1]],
+      [true, 1, [1]],
+    ]);
+
+    // Mais uma cópia: entra comum, o foil que já existia continua.
+    await setDeckLine(db, {
+      deckId: a.id,
+      userId: me.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      quantity: 3,
+      proxies: 0,
+      card: sol,
+      scryfallId: 'sol-c21',
+    });
+    list = byFoil(await listCollection(db, me.id));
+    expect(list.map((e) => [e.foil, e.quantity])).toEqual([
+      [false, 2],
+      [true, 1],
+    ]);
+  });
 });
