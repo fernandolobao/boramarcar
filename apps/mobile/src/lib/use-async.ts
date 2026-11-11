@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 
 /** Carrega dados assíncronos com estado de carregamento, erro e "puxar para atualizar". */
 export function useAsync<T>(load: () => Promise<T>, deps: readonly unknown[]) {
@@ -28,4 +29,24 @@ export function useAsync<T>(load: () => Promise<T>, deps: readonly unknown[]) {
   }, deps);
 
   return { data, setData, error, loading, refreshing, refresh: () => run(true) };
+}
+
+/**
+ * Recarrega quando a tela volta a ter o foco (ex.: ao voltar de "Registrar partida" ou do modo
+ * mesa), sem repetir a carga inicial. Recarrega como "puxar para atualizar": os dados atuais
+ * continuam na tela até os novos chegarem.
+ */
+export function useRefreshOnFocus(refresh: () => unknown) {
+  const refreshRef = useRef(refresh);
+  refreshRef.current = refresh;
+  const firstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) {
+        firstFocus.current = false;
+        return;
+      }
+      void refreshRef.current();
+    }, []),
+  );
 }

@@ -1,10 +1,10 @@
-import { Link } from 'expo-router';
-import { FlatList, Pressable, RefreshControl } from 'react-native';
-import { AppText, Card, ErrorState, Loading, styles } from '@/components/ui';
+import { Link, router } from 'expo-router';
+import { FlatList, Pressable, RefreshControl, View } from 'react-native';
+import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
 import { formatDateTime, t } from '@/lib/i18n';
-import { useAsync } from '@/lib/use-async';
+import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
 
 /** Próximos encontros do grupo ativo. */
@@ -15,6 +15,8 @@ export default function EventsScreen() {
     () => (group ? api.events.list(group.id, 'upcoming') : Promise.resolve([])),
     [group?.id],
   );
+  // Encontro criado (aqui ou pela disponibilidade) aparece ao voltar para a lista.
+  useRefreshOnFocus(events.refresh);
   if (loadingGroup) return <Loading />;
   if (groupError) return <ErrorState error={groupError} onRetry={() => void reload()} />;
   if (!group) return <AppText style={{ padding: 24 }}>{t('noGroup')}</AppText>;
@@ -28,9 +30,12 @@ export default function EventsScreen() {
       contentContainerStyle={{ padding: 16, gap: 12 }}
       refreshControl={<RefreshControl refreshing={events.refreshing} onRefresh={events.refresh} />}
       ListHeaderComponent={
-        <AppText accessibilityRole="header" style={styles.title}>
-          {group.name} · {t('upcoming')}
-        </AppText>
+        <View style={{ gap: 12, marginBottom: 4 }}>
+          <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
+            {group.name} · {t('upcoming')}
+          </AppText>
+          <Button label={t('eventNew')} onPress={() => router.push('/encontros/novo')} />
+        </View>
       }
       ListEmptyComponent={<AppText muted>{t('noEvents')}</AppText>}
       renderItem={({ item }) => (

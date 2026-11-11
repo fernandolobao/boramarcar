@@ -1,7 +1,7 @@
 import type { Location } from '@boramarcar/api-client';
 import { useState } from 'react';
-import { ScrollView, TextInput, View } from 'react-native';
-import { TimeStepper } from '@/components/fields';
+import { ScrollView, View } from 'react-native';
+import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import {
@@ -169,26 +169,7 @@ export function AddAvailability({
         </View>
       )}
 
-      <View style={{ gap: 6 }}>
-        <AppText style={{ fontWeight: '600' }}>{t('availNote')}</AppText>
-        <TextInput
-          accessibilityLabel={t('availNote')}
-          value={note}
-          onChangeText={setNote}
-          maxLength={200}
-          maxFontSizeMultiplier={2}
-          style={{
-            minHeight: 44,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 12,
-            paddingHorizontal: 12,
-            fontSize: 16,
-            color: colors.text,
-            backgroundColor: colors.background,
-          }}
-        />
-      </View>
+      <TextField label={t('availNote')} value={note} onChangeText={setNote} maxLength={200} />
 
       <Button label={t('availAdd')} disabled={saving} onPress={() => void save()} />
       {message && (

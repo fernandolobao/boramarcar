@@ -1,8 +1,14 @@
 import { ApiError } from '@boramarcar/api-client';
-import { GAME_FORMATS, type GameFormat } from '@boramarcar/core/games';
+import {
+  buildSimpleGame,
+  GAME_FORMATS,
+  isGameFormat,
+  type GameFormat,
+  type SimpleGameError,
+} from '@boramarcar/core/games';
 import { tableSupportsFormat } from '@boramarcar/core/table';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { TextField } from '@/components/fields';
 import { formatLabel } from '@/components/table/labels';
@@ -12,10 +18,11 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
+/** Formatos do formulário simples: todos contra todos e duelo (times seguem no site). */
 const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
 const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
     <Card style={{ gap: 10 }}>
       <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
@@ -27,12 +34,30 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   );
 }
 
-/** Número inteiro opcional digitado (vazio = sem valor). */
-const optionalInt = (text: string) => (text.trim() ? Number(text) : null);
+function errorMessage(error: SimpleGameError): string {
+  switch (error.code) {
+    case 'players':
+      return error.min === error.max
+        ? t('gameNeedPlayersExact', { count: error.min })
+        : t('gameNeedPlayers', { min: error.min, max: error.max });
+    case 'result':
+      return t('gameNeedResult');
+    case 'turn':
+      return t('gameTurnInvalid');
+    case 'duration':
+      return t('gameDurationInvalid');
+    case 'teams':
+      return t('gameTeamsWeb');
+    case 'invalid':
+      return t('gameError', { message: error.message });
+  }
+}
 
 /**
- * Registrar partida no app (5.4): tipo de jogo, quem jogou (com o deck), vencedor ou empate, quem
- * começou, turno da vitória, duração e observações. Partidas em times seguem no site.
+ * Registrar partida pelo formulário (5.4), sem o contador de vida do modo mesa: tipo de jogo, quem
+ * jogou (com o deck, na ordem da mesa), vencedor ou empate, quem começou, turno da vitória, duração e
+ * observações. As regras são as do servidor (`buildSimpleGame` do core). Partidas em times seguem
+ * no site.
  */
 export default function RecordGameScreen() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
@@ -52,14 +77,25 @@ export default function RecordGameScreen() {
   if (setup.loading) return <Loading />;
   if (setup.error || !setup.data) return <ErrorState error={setup.error} onRetry={setup.refresh} />;
   const data = setup.data;
+  if (data.status === 'cancelled') {
+    return (
+      <View style={{ padding: 16, gap: 16 }}>
+        <Stack.Screen options={{ title: t('gameTitle') }} />
+        <AppText accessibilityRole="alert">{t('gameCancelled')}</AppText>
+        <Button label={t('tableBack')} variant="secondary" onPress={() => router.back()} />
+      </View>
+    );
+  }
+
   const chosenFormat: GameFormat =
     format ??
-    ((FORMATS as readonly string[]).includes(data.defaultFormat)
-      ? (data.defaultFormat as GameFormat)
+    (isGameFormat(data.defaultFormat) && tableSupportsFormat(data.defaultFormat)
+      ? data.defaultFormat
       : 'commander');
-  const players =
-    selected ?? data.players.filter((p) => p.confirmed).map((p) => p.userId);
+  const players = selected ?? data.players.filter((p) => p.confirmed).map((p) => p.userId);
   const byId = new Map(data.players.map((p) => [p.userId, p]));
+  const nameOf = (userId: string) => byId.get(userId)?.name ?? '';
+
   const toggle = (userId: string) => {
     const next = players.includes(userId)
       ? players.filter((id) => id !== userId)
@@ -68,49 +104,37 @@ export default function RecordGameScreen() {
     if (winner && winner !== 'draw' && !next.includes(winner)) setWinner(null);
     if (first && !next.includes(first)) setFirst(null);
   };
-  const turnValue = optionalInt(turn);
-  const durationValue = optionalInt(duration);
 
   const save = async () => {
     setError('');
-    if (players.length < 2) return setError(t('gameNeedPlayers'));
-    if (!winner) return setError(t('gameNeedResult'));
-    if (turnValue !== null && !(Number.isInteger(turnValue) && turnValue >= 1 && turnValue <= 99)) {
-      return setError(t('gameTurnInvalid'));
-    }
-    if (
-      durationValue !== null &&
-      !(Number.isInteger(durationValue) && durationValue >= 1 && durationValue <= 1440)
-    ) {
-      return setError(t('gameDurationInvalid'));
-    }
+    const built = buildSimpleGame({
+      format: chosenFormat,
+      playerIds: players,
+      decks,
+      winner,
+      firstPlayerId: first,
+      winningTurn: turn,
+      durationMinutes: duration,
+      notes,
+    });
+    if (!built.ok) return setError(errorMessage(built.error));
     setSaving(true);
     try {
-      await api.games.record(eventId, {
-        format: chosenFormat,
-        firstPlayerId: first,
-        winningTurn: turnValue,
-        durationMinutes: durationValue,
-        notes: notes.trim() || null,
-        players: players.map((userId, i) => ({
-          userId,
-          deckId: decks[userId] ?? null,
-          seat: i + 1,
-          result: winner === 'draw' ? 'draw' : userId === winner ? 'win' : 'loss',
-        })),
-      });
+      await api.games.record(eventId, built.game);
+      // A tela do encontro recarrega ao voltar a ter o foco e mostra a partida nova.
       router.back();
     } catch (e) {
-      setError(
-        t('gameError', { message: e instanceof ApiError ? e.message : t('loadError') }),
-      );
+      setError(t('gameError', { message: e instanceof ApiError ? e.message : t('loadError') }));
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={{ padding: 16, gap: 16 }}
+      keyboardShouldPersistTaps="handled"
+    >
       <Stack.Screen options={{ title: t('gameTitle') }} />
       <View>
         <AppText accessibilityRole="header" style={styles.title}>
@@ -135,13 +159,17 @@ export default function RecordGameScreen() {
         </View>
       </Section>
 
-      <Section title={t('gamePlayers')}>
+      <Section title={t('gamePlayers')} hint={t('gamePlayersHint')}>
         {data.players.map((p) => {
-          const checked = players.includes(p.userId);
+          const seat = players.indexOf(p.userId);
+          const checked = seat >= 0;
+          const label = `${checked ? `${seat + 1}. ` : ''}${p.name}${
+            p.confirmed ? ` (${t('tableConfirmed')})` : ''
+          }`;
           return (
             <View key={p.userId} style={{ gap: 6 }}>
               <Button
-                label={`${checked ? '✓ ' : ''}${p.name}${p.confirmed ? ` (${t('tableConfirmed')})` : ''}`}
+                label={label}
                 variant="secondary"
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked }}
@@ -155,17 +183,21 @@ export default function RecordGameScreen() {
                   accessibilityRole="radiogroup"
                   accessibilityLabel={t('gameDeckOf', { name: p.name })}
                 >
-                  {[{ id: null, name: t('tableNoDeck') }, ...p.decks].map((d) => (
-                    <Button
-                      key={d.id ?? 'none'}
-                      label={d.name}
-                      variant="secondary"
-                      accessibilityRole="radio"
-                      accessibilityState={{ checked: (decks[p.userId] ?? null) === d.id }}
-                      selected={(decks[p.userId] ?? null) === d.id}
-                      onPress={() => setDecks((all) => ({ ...all, [p.userId]: d.id }))}
-                    />
-                  ))}
+                  {[{ id: null, name: t('tableNoDeck') }, ...p.decks].map((d) => {
+                    const on = (decks[p.userId] ?? null) === d.id;
+                    return (
+                      <Button
+                        key={d.id ?? 'none'}
+                        label={d.name}
+                        accessibilityLabel={`${t('gameDeckOf', { name: p.name })}: ${d.name}`}
+                        variant="secondary"
+                        accessibilityRole="radio"
+                        accessibilityState={{ checked: on }}
+                        selected={on}
+                        onPress={() => setDecks((all) => ({ ...all, [p.userId]: d.id }))}
+                      />
+                    );
+                  })}
                 </View>
               )}
             </View>
@@ -174,47 +206,56 @@ export default function RecordGameScreen() {
       </Section>
 
       <Section title={t('gameResult')}>
-        <View style={{ gap: 8 }} accessibilityRole="radiogroup" accessibilityLabel={t('gameResult')}>
-          {players.map((userId) => (
+        {players.length === 0 ? (
+          <AppText muted>{t('gameChoosePlayers')}</AppText>
+        ) : (
+          <View
+            style={{ gap: 8 }}
+            accessibilityRole="radiogroup"
+            accessibilityLabel={t('gameResult')}
+          >
+            {players.map((userId) => (
+              <Button
+                key={userId}
+                label={t('gameWinnerOption', { name: nameOf(userId) })}
+                variant="secondary"
+                accessibilityRole="radio"
+                accessibilityState={{ checked: winner === userId }}
+                selected={winner === userId}
+                onPress={() => setWinner(userId)}
+                style={{ alignItems: 'flex-start' }}
+              />
+            ))}
             <Button
-              key={userId}
-              label={t('gameWinnerOption', { name: byId.get(userId)?.name ?? '' })}
+              label={t('tableDraw')}
               variant="secondary"
               accessibilityRole="radio"
-              accessibilityState={{ checked: winner === userId }}
-              selected={winner === userId}
-              onPress={() => setWinner(userId)}
+              accessibilityState={{ checked: winner === 'draw' }}
+              selected={winner === 'draw'}
+              onPress={() => setWinner('draw')}
               style={{ alignItems: 'flex-start' }}
             />
-          ))}
-          <Button
-            label={t('tableDraw')}
-            variant="secondary"
-            accessibilityRole="radio"
-            accessibilityState={{ checked: winner === 'draw' }}
-            selected={winner === 'draw'}
-            onPress={() => setWinner('draw')}
-            style={{ alignItems: 'flex-start' }}
-          />
-        </View>
+          </View>
+        )}
       </Section>
 
       <Section title={t('gameDetails')}>
         <AppText style={{ fontWeight: '600' }}>{t('tableFirstPlayer')}</AppText>
         <View style={row} accessibilityRole="radiogroup" accessibilityLabel={t('tableFirstPlayer')}>
-          {[{ id: null as string | null, name: t('tableUnknown') }, ...players.map((id) => ({ id, name: byId.get(id)?.name ?? '' }))].map(
-            (p) => (
-              <Button
-                key={p.id ?? 'unknown'}
-                label={p.name}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: first === p.id }}
-                selected={first === p.id}
-                onPress={() => setFirst(p.id)}
-              />
-            ),
-          )}
+          {[
+            { id: null as string | null, name: t('tableUnknown') },
+            ...players.map((id) => ({ id, name: nameOf(id) })),
+          ].map((p) => (
+            <Button
+              key={p.id ?? 'unknown'}
+              label={p.name}
+              variant="secondary"
+              accessibilityRole="radio"
+              accessibilityState={{ checked: first === p.id }}
+              selected={first === p.id}
+              onPress={() => setFirst(p.id)}
+            />
+          ))}
         </View>
         <TextField
           label={t('tableWinningTurn')}
@@ -230,11 +271,21 @@ export default function RecordGameScreen() {
           value={duration}
           onChangeText={setDuration}
         />
-        <TextField label={t('gameNotes')} maxLength={500} multiline value={notes} onChangeText={setNotes} />
+        <TextField
+          label={t('gameNotes')}
+          maxLength={500}
+          multiline
+          value={notes}
+          onChangeText={setNotes}
+        />
       </Section>
 
       {error !== '' && (
-        <AppText accessibilityRole="alert" accessibilityLiveRegion="assertive" style={{ color: colors.danger }}>
+        <AppText
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
+          style={{ color: colors.danger }}
+        >
           {error}
         </AppText>
       )}

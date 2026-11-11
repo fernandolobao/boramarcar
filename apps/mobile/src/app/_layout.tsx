@@ -22,7 +22,9 @@ export default function RootLayout() {
     >
       <Stack.Protected guard={signedIn}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: t('appName') }} />
+        <Stack.Screen name="encontros/novo" options={{ title: t('eventNewTitle') }} />
         <Stack.Screen name="encontros/[id]" options={{ title: t('tabEvents') }} />
+        <Stack.Screen name="partida/[eventId]" options={{ title: t('gameTitle') }} />
         <Stack.Screen name="mesa/[id]" options={{ title: t('tableTitle') }} />
         <Stack.Screen name="decks/[id]" options={{ title: t('tabDecks') }} />
       </Stack.Protected>
