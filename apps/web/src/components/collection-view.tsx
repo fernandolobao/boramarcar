@@ -740,8 +740,9 @@ function EntryDialog({
         </div>
         <fieldset className="space-y-3 rounded-xl border border-line px-3 pt-1 pb-3">
           <legend className="px-1 text-sm font-semibold">{t('edit')}</legend>
-          <div className="grid grid-cols-2 items-end gap-3">
-            <div>
+          {/* Linha 1: as cópias e o acabamento. Linha 2: as ações. */}
+          <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+            <div className="w-24">
               <label className="label" htmlFor={`${id}-q`}>
                 {t('quantity')}
               </label>
@@ -774,53 +775,58 @@ function EntryDialog({
               <span aria-hidden="true">✦</span> {td('foil')}
             </label>
           </div>
-          {entry.card && (
-            <PrintPicker
-              line={{
-                name: entry.name,
-                board: 'collection',
-                quantity: entry.quantity,
-                scryfallId: entry.scryfallId,
-                card: entry.card,
-              }}
-              onPick={async (toScryfallId, amount) => {
-                // Todas as cópias: muda a impressão da linha. Parte delas: separa em outra linha.
-                if (amount >= entry.quantity) {
+          <div className="flex flex-wrap items-center gap-2">
+            {entry.card && (
+              <PrintPicker
+                line={{
+                  name: entry.name,
+                  board: 'collection',
+                  quantity: entry.quantity,
+                  scryfallId: entry.scryfallId,
+                  card: entry.card,
+                }}
+                onPick={async (toScryfallId, amount) => {
+                  // Todas as cópias: muda a impressão da linha. Parte delas: separa em outra linha.
+                  if (amount >= entry.quantity) {
+                    return api(`/api/v1/collection/${entry.id}`, {
+                      method: 'PATCH',
+                      body: { scryfallId: toScryfallId },
+                    });
+                  }
+                  await api('/api/v1/collection', {
+                    method: 'POST',
+                    body: {
+                      name: entry.name,
+                      scryfallId: toScryfallId,
+                      quantity: amount,
+                      foil: entry.foil,
+                    },
+                  });
                   return api(`/api/v1/collection/${entry.id}`, {
                     method: 'PATCH',
-                    body: { scryfallId: toScryfallId },
+                    body: { quantity: entry.quantity - amount },
                   });
-                }
-                await api('/api/v1/collection', {
-                  method: 'POST',
-                  body: {
-                    name: entry.name,
-                    scryfallId: toScryfallId,
-                    quantity: amount,
-                    foil: entry.foil,
-                  },
-                });
-                return api(`/api/v1/collection/${entry.id}`, {
-                  method: 'PATCH',
-                  body: { quantity: entry.quantity - amount },
-                });
+                }}
+              />
+            )}
+            <button
+              type="button"
+              className={`${confirming ? 'btn-danger border border-danger' : 'btn-danger'} ms-auto`}
+              disabled={pending}
+              onBlur={() => setConfirming(false)}
+              onClick={() => {
+                if (!confirming) return setConfirming(true);
+                setConfirming(false);
+                void run(
+                  () => api(`/api/v1/collection/${entry.id}`, { method: 'DELETE' }),
+                  onClose,
+                );
               }}
-            />
-          )}
-          <button
-            type="button"
-            className={confirming ? 'btn-danger border border-danger' : 'btn-danger'}
-            disabled={pending}
-            onBlur={() => setConfirming(false)}
-            onClick={() => {
-              if (!confirming) return setConfirming(true);
-              setConfirming(false);
-              void run(() => api(`/api/v1/collection/${entry.id}`, { method: 'DELETE' }), onClose);
-            }}
-          >
-            <Icon name="delete" />
-            {confirming ? t('confirmRemove') : t('remove')}
-          </button>
+            >
+              <Icon name="delete" />
+              {confirming ? t('confirmRemove') : t('remove')}
+            </button>
+          </div>
         </fieldset>
         <p role="status" className="text-sm text-success">
           {message ?? ''}
