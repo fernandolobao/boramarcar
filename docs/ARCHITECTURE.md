@@ -287,6 +287,18 @@ Better Auth com o provedor Google e adaptador Drizzle. Sessões ficam no Postgre
 - A URL da foto pode mudar e nunca identifica o usuário: quem identifica é o `sub` (em `account.accountId`).
 - **Avatar**: `<AvatarImage>` mostra a foto com `referrerPolicy="no-referrer"` (o servidor de fotos do Google pode recusar pedidos com referrer) e volta para as iniciais se não houver foto ou se a URL falhar. As fotos são `unoptimized` (vão direto do Google para o navegador); `lh3.googleusercontent.com` está em `images.remotePatterns` caso a otimização seja ligada. A sessão fica em cache por até 5 minutos, então uma foto nova pode levar esse tempo para aparecer.
 
+### Login nos previews da Vercel
+
+O Google só aceita endereços de retorno exatos, e cada preview tem um endereço diferente. Por isso, na Vercel (produção e preview), o Better Auth usa o plugin **OAuth proxy**:
+
+1. No preview, "Entrar com Google" sai com o retorno apontando para **produção** (`https://www.arcanakin.com.br/api/auth/callback/google`, já cadastrado no Google).
+2. Produção recebe o retorno do Google e manda o perfil **cifrado** (vale 60 s) de volta para o preview (`/api/auth/callback/google/oauth-proxy`).
+3. O preview cria a sessão no próprio domínio.
+
+- **Configuração** (`server/trusted-origins.ts`): produção e preview aceitam só os endereços dos previews deste projeto nesta conta (`https://boramarcar-*-fernandolobaos-projects.vercel.app`). Em desenvolvimento (localhost) o plugin fica desligado.
+- **Variáveis:** preview e produção usam o mesmo `BETTER_AUTH_SECRET`, ou o mesmo `OAUTH_PROXY_SECRET` (opcional, para não depender do segredo principal). `BETTER_AUTH_URL` fica vazio no preview, e o endereço vem da Vercel.
+- **Banco:** cada preview tem o próprio branch no Neon (integração Neon ↔ Vercel), com `MIGRATE_ON_BUILD=1` só em Preview. Sem `RESEND_API_KEY` no preview, nenhum e-mail real sai de lá.
+
 ## Internacionalização
 
 next-intl sem prefixo de idioma na URL. O idioma vem do cookie `NEXT_LOCALE` e, na falta dele, do `Accept-Language`; padrão `pt-BR`. As mensagens são tipadas a partir de `messages/pt-BR.json` e um teste garante que `en.json` tem as mesmas chaves. Cada usuário tem um fuso (`user.time_zone`), detectado no navegador no primeiro acesso e editável em /perfil; ele é espelhado no cookie `bm_tz`, lido pelo next-intl a cada requisição. Os horários digitados em `datetime-local` são convertidos para UTC no fuso do usuário (`zonedLocalToUtc` em `core/time`). Sem preferência, o padrão é `America/Sao_Paulo`.
