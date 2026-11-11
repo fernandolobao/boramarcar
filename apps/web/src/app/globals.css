@@ -235,7 +235,8 @@ input[type='radio'] {
   border-radius: 1rem;
   transform-origin: 50% 0;
   transform: translate3d(0, var(--stack-push, 0px), 0) scale(var(--stack-scale, 1));
-  clip-path: inset(0 0 var(--stack-clip, 0px) 0 round 1rem);
+  /* Cantos de baixo retos: onde a seção é cortada, a da frente começa logo abaixo. */
+  clip-path: inset(0 0 var(--stack-clip, 0px) 0 round 1rem 1rem 0 0);
 }
 .stack-card[data-stack='sticky'] {
   position: sticky;
@@ -258,12 +259,14 @@ input[type='radio'] {
   opacity: calc(max(0, var(--stack-fade, 0) - 0.5) * 0.8);
   pointer-events: none;
 }
-/* Foco nunca fica escondido atrás de outra seção nem cortado (WCAG 2.4.11). */
-.stack-card:focus-within {
+/* Foco de teclado nunca fica escondido atrás de outra seção nem cortado (WCAG 2.4.11). Só o
+   foco visível: um clique (ex.: abrir um item da análise) não pode trazer a seção para a frente
+   e deixá-la por cima das outras ao rolar. */
+.stack-card:has(:focus-visible) {
   z-index: 50 !important;
   clip-path: none;
 }
-.stack-card:focus-within::after {
+.stack-card:has(:focus-visible)::after {
   opacity: 0;
 }
 @media print {
@@ -278,14 +281,16 @@ input[type='radio'] {
 }
 
 /* ---------- Fluxo de mana ----------
-   Faixa de fios iridescentes (canvas, `ManaFlow`) que desce pela lateral direita, atrás do
-   conteúdo. As cores vêm da página (deck, coleção, perfil) ou do espectro padrão. */
+   Faixa de fios iridescentes (canvas, `ManaFlow`) que desce a página inteira em curvas, atrás
+   do conteúdo. As cores vêm da página (deck, coleção, perfil) ou do espectro padrão. */
 .mana-flow {
-  position: absolute;
-  top: 0;
-  right: 0;
+  /* Do tamanho da janela e parado: a faixa é desenhada em coordenadas da página e acompanha a
+     rolagem, então vai até o fim da página sem um canvas gigante. */
+  position: fixed;
+  inset: 0;
   width: 100%;
-  height: min(150dvh, 1600px);
+  height: 100vh;
+  height: 100lvh;
   pointer-events: none;
   z-index: -1;
   opacity: 0.9;

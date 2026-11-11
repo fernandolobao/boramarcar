@@ -64,7 +64,8 @@ export interface StackFrameItem {
  *
  * - Empurrão: quando a primeira seção do grupo seguinte passa do ponto em que grudaria neste
  *   grupo (faixa da última + `step`), o grupo inteiro sobe junto com ela, como no fim de um
- *   contêiner sticky. Grupos anteriores sobem pelo menos o mesmo tanto.
+ *   contêiner sticky. O mesmo vale no fim da pilha, quando o contêiner começa a soltar as seções:
+ *   o grupo sobe junto com a que mais subiu. Grupos anteriores sobem pelo menos o mesmo tanto.
  * - Corte: cada seção é cortada onde começa a seguinte, então os vãos nunca mostram o conteúdo
  *   de seções mais ao fundo.
  */
@@ -83,16 +84,26 @@ export function stackFrame(input: {
     if (!firstOf.has(p.group)) firstOf.set(p.group, i);
   });
 
+  // Quanto cada seção grudada já subiu sozinha: no fim da pilha o contêiner solta as seções
+  // (fim do `sticky`), a começar pela última. O grupo inteiro acompanha a que mais subiu, senão a
+  // seção da frente passaria por cima das faixas de trás.
+  const released = plan.map((p, i) => (p.sticky ? Math.max(0, p.top - naturalTops[i]!) : 0));
+
   // Empurrão de cada grupo, de trás para a frente.
   const groupPush = new Array<number>(groups).fill(0);
-  for (let g = groups - 2; g >= 0; g -= 1) {
+  for (let g = groups - 1; g >= 0; g -= 1) {
     const last = lastOf.get(g)!;
-    const next = firstOf.get(g + 1)!;
-    const own = plan[last]!.sticky ? Math.max(0, plan[last]!.top + step - naturalTops[next]!) : 0;
-    groupPush[g] = Math.max(own, groupPush[g + 1]!);
+    const next = firstOf.get(g + 1);
+    let own = 0;
+    for (let i = firstOf.get(g)!; i <= last; i += 1) own = Math.max(own, released[i]!);
+    if (next !== undefined && plan[last]!.sticky) {
+      own = Math.max(own, plan[last]!.top + step - naturalTops[next]!);
+    }
+    groupPush[g] = Math.max(own, groupPush[g + 1] ?? 0);
   }
 
-  const push = plan.map((p) => (p.sticky ? groupPush[p.group]! : 0));
+  // O que a seção já subiu sozinha não entra de novo no empurrão.
+  const push = plan.map((p, i) => (p.sticky ? Math.max(0, groupPush[p.group]! - released[i]!) : 0));
   const screenTops = naturalTops.map((top, i) => top - push[i]!);
 
   return plan.map((_, i) => {
