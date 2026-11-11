@@ -293,7 +293,7 @@ input[type='radio'] {
   height: 100lvh;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 @media (max-width: 639px) {
   /* No celular a faixa passa atrás de mais texto: mais discreta. */

@@ -38,30 +38,62 @@ interface Shape {
   minWidth: number;
   maxWidth: number;
   strands: number;
+  /** Fagulhas de luz que correm pela faixa. */
+  sparks: number;
 }
 
 const DESKTOP: Shape = {
   center: 0.55,
   amplitude: 0.41,
-  minWidth: 0.05,
-  maxWidth: 0.26,
-  strands: 160,
+  minWidth: 0.06,
+  maxWidth: 0.24,
+  strands: 72,
+  sparks: 46,
 };
-const MOBILE: Shape = { center: 0.55, amplitude: 0.47, minWidth: 0.08, maxWidth: 0.4, strands: 90 };
-const SEGMENTS = 48;
+const MOBILE: Shape = {
+  center: 0.55,
+  amplitude: 0.47,
+  minWidth: 0.1,
+  maxWidth: 0.38,
+  strands: 44,
+  sparks: 26,
+};
+/** Pontos do eixo no trecho à vista: muitos, para as curvas saírem lisas. */
+const SEGMENTS = 140;
+const STOPS = 12;
 const TAU = Math.PI * 2;
 
-const rgba = ([r, g, b]: [number, number, number], a: number) => `rgba(${r},${g},${b},${a})`;
+const rgba = ([r, g, b]: [number, number, number], a: number) =>
+  `rgba(${r},${g},${b},${Math.max(0, Math.min(1, a)).toFixed(3)})`;
 const smooth = (x: number) => {
   const k = Math.min(1, Math.max(0, x));
   return k * k * (3 - 2 * k);
 };
+/** Ruído determinístico (0–1) para fagulhas e fios, sem `Math.random` a cada quadro. */
+const hash = (n: number) => {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+/** Traça uma curva lisa pelos pontos (quadráticas entre os pontos médios). */
+function smoothPath(ctx: CanvasRenderingContext2D, points: readonly { x: number; y: number }[]) {
+  if (points.length < 2) return;
+  ctx.moveTo(points[0]!.x, points[0]!.y);
+  for (let i = 1; i < points.length - 1; i += 1) {
+    const p = points[i]!;
+    const next = points[i + 1]!;
+    ctx.quadraticCurveTo(p.x, p.y, (p.x + next.x) / 2, (p.y + next.y) / 2);
+  }
+  const last = points[points.length - 1]!;
+  ctx.lineTo(last.x, last.y);
+}
 
 /**
- * Uma faixa de fios finos que desce a página inteira em curvas (direita → esquerda → direita…),
- * torcendo e dobrando como seda ou mana líquida, e afina até sumir no fim da página. A cor de cada
- * fio corre pela paleta ao longo do caminho (iridescência); por baixo, um brilho desfocado
- * (desenhado em baixa resolução e ampliado) dá o volume.
+ * Mana fluindo pela página: uma faixa de fios de luz finos que desce a página inteira em curvas
+ * (direita → esquerda → direita…), torcendo devagar como seda. Alguns fios são "raios" mais
+ * brilhantes com um pulso de luz correndo por eles, e fagulhas sobem pela faixa. Por baixo, um
+ * brilho desfocado (baixa resolução ampliada) dá o volume. No fim da página os fios se abrem e
+ * esmaecem (em vez de convergirem num ponto).
  *
  * O canvas é do tamanho da janela e fica parado (`position: fixed`): a faixa é definida em
  * coordenadas da página e só o trecho à vista (`scrollY` … `scrollY + h`) é desenhado.
@@ -77,35 +109,35 @@ function draw(
   const { w, h, page, scrollY } = view;
   const shape = w < 640 ? MOBILE : DESKTOP;
   const t = seconds;
-  // Meia volta (de um lado ao outro) a cada ~1,5 tela, nunca menos de 900 px.
-  const period = Math.max(900, h * 1.5);
+  // Meia volta (de um lado ao outro) a cada ~1,6 tela, nunca menos de 900 px.
+  const period = Math.max(900, h * 1.6);
   const axisX = (y: number) =>
     w *
     (shape.center +
-      shape.amplitude * Math.cos((Math.PI * y) / period + 0.18 * Math.sin(t * 0.11 + y / h)));
+      shape.amplitude * Math.cos((Math.PI * y) / period + 0.15 * Math.sin(t * 0.1 + y / h)));
+  // Esmaece nos últimos ~70% de tela da página; ali a faixa se abre um pouco.
+  const ending = (y: number) => smooth((page - y) / (h * 0.7));
   const width = (y: number) =>
     w *
     (shape.minWidth +
       (shape.maxWidth - shape.minWidth) *
-        (0.5 + 0.5 * Math.cos((TAU * y) / (h * 0.95) + t * 0.07))) *
-    // Afina até sumir nos últimos ~60% de tela da página.
-    smooth((page - y) / (h * 0.6));
-  // Torção desigual ao longo da faixa: dobras mais fechadas em alguns trechos (vincos da seda).
+        (0.5 + 0.5 * Math.cos((TAU * y) / (h * 1.3) + t * 0.06))) *
+    (1 + 0.7 * (1 - ending(y)));
+  // Torção lenta e contínua: dobras suaves, sem vincos.
   const twist = (y: number) =>
-    (TAU * 1.15 * y) / h + 0.9 * Math.sin((Math.PI * y) / h + t * 0.09) + t * 0.2;
+    (TAU * 0.55 * y) / h + 0.5 * Math.sin((Math.PI * y) / (h * 1.2) + t * 0.08) + t * 0.16;
 
   ctx.clearRect(0, 0, w, h);
-  const from = Math.max(-h * 0.06, scrollY - h * 0.25);
-  const to = Math.min(page, scrollY + h * 1.25);
+  const from = Math.max(-h * 0.06, scrollY - h * 0.2);
+  const to = Math.min(page, scrollY + h * 1.2);
   if (to <= from) return;
 
-  // Eixo e normal em cada segmento (iguais para todos os fios), já em coordenadas da tela.
+  // Eixo e normal em cada ponto (iguais para todos os fios), já em coordenadas da tela.
   const axis = Array.from({ length: SEGMENTS + 1 }, (_, k) => {
     const y = from + ((to - from) * k) / SEGMENTS;
     const dx = axisX(y + 4) - axisX(y - 4);
     const len = Math.hypot(dx, 8) || 1;
     return {
-      k,
       y,
       x: axisX(y),
       sy: y - scrollY,
@@ -117,7 +149,9 @@ function draw(
   });
   const top = from - scrollY;
   const bottom = to - scrollY;
-  const stopsAt = [0, 0.2, 0.4, 0.6, 0.8, 1].map((f) => from + (to - from) * f);
+  const stopsAt = Array.from({ length: STOPS }, (_, k) => from + ((to - from) * k) / (STOPS - 1));
+  const offsetOf = (p: (typeof axis)[number], u: number) =>
+    u * p.width * 0.5 * Math.cos(p.twist + u * 0.3);
 
   // Brilho de fundo: poucos traços grossos em baixa resolução, ampliados (fica desfocado).
   const hw = haze.canvas.width;
@@ -126,59 +160,108 @@ function draw(
   const sy = hh / h;
   haze.clearRect(0, 0, hw, hh);
   haze.lineCap = 'round';
-  for (let b = 0; b < 5; b += 1) {
-    const u = -0.8 + (1.6 * b) / 4;
+  haze.lineJoin = 'round';
+  for (let b = 0; b < 4; b += 1) {
+    const u = -0.75 + (1.5 * b) / 3;
     const gradient = haze.createLinearGradient(0, top * sy, 0, bottom * sy);
     stopsAt.forEach((y, k) => {
-      gradient.addColorStop(
-        k / 5,
-        rgba(sampleFlow(palette, (y / h) * 0.3 + u * 0.2 + t * 0.012), 1),
-      );
+      const color = sampleFlow(palette, (y / h) * 0.25 + u * 0.25 + t * 0.01);
+      gradient.addColorStop(k / (STOPS - 1), rgba(color, ending(y)));
     });
     haze.strokeStyle = gradient;
-    haze.globalAlpha = dark ? 0.12 : 0.14;
-    haze.lineWidth = w * shape.maxWidth * 0.35 * sx;
+    haze.globalAlpha = dark ? 0.12 : 0.07;
+    haze.lineWidth = w * shape.maxWidth * 0.4 * sx;
     haze.beginPath();
-    for (const p of axis) {
-      const off = u * p.width * 0.5 * Math.cos(p.twist);
-      const x = (p.x + p.nx * off) * sx;
-      const y = (p.sy + p.ny * off) * sy;
-      if (p.k === 0) haze.moveTo(x, y);
-      else haze.lineTo(x, y);
-    }
+    smoothPath(
+      haze,
+      axis.map((p) => ({
+        x: (p.x + p.nx * offsetOf(p, u)) * sx,
+        y: (p.sy + p.ny * offsetOf(p, u)) * sy,
+      })),
+    );
     haze.stroke();
   }
-  ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
   ctx.imageSmoothingEnabled = true;
+  ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
   ctx.drawImage(haze.canvas, 0, 0, w, h);
 
   // Fios: cada um a uma distância do eixo; a torção (cos) dobra a faixa e junta os fios.
-  ctx.lineWidth = 1.25;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   const n = shape.strands;
   for (let j = 0; j < n; j += 1) {
     const u = -1 + (2 * j) / (n - 1);
-    const edge = Math.abs(u);
+    // Um em cada ~9 fios é um "raio": mais claro, com um pulso de luz correndo.
+    const ray = hash(j) > 0.84;
     const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+    // Posição do pulso (0–1 do trecho à vista), cada raio no seu ritmo.
+    const pulse = (t * (0.05 + 0.04 * hash(j + 7)) + hash(j + 3)) % 1.4;
     stopsAt.forEach((y, k) => {
+      const f = k / (STOPS - 1);
       const tw = twist(y);
-      // Cores em faixas ao longo dos fios (como a luz decomposta na seda), mudando devagar.
-      const hue = u * 0.5 + (y / h) * 0.3 + 0.12 * Math.sin(tw) + t * 0.012;
-      // Mais forte nas bordas e onde a faixa vira de frente (a luz "bate" na dobra).
-      const light = 0.45 + 0.55 * Math.abs(Math.sin(tw + u * 0.6));
-      gradient.addColorStop(k / 5, rgba(sampleFlow(palette, hue), light));
+      const hue = u * 0.45 + (y / h) * 0.25 + 0.1 * Math.sin(tw) + t * 0.01;
+      // A luz "bate" onde a faixa vira de frente.
+      const light = 0.35 + 0.65 * Math.abs(Math.sin(tw + u * 0.5));
+      const glow = ray ? Math.max(0, 1 - Math.abs(f - pulse) * 6) : 0;
+      const base = sampleFlow(palette, hue);
+      // No pulso, a cor vai para o branco: é a luz passando pelo fio.
+      const color = base.map((c) => Math.round(c + (255 - c) * glow * 0.85)) as typeof base;
+      gradient.addColorStop(f, rgba(color, (light * (ray ? 1 : 0.7) + glow) * ending(y)));
     });
     ctx.strokeStyle = gradient;
-    ctx.globalAlpha = (dark ? 0.34 : 0.62) * (0.6 + 0.4 * edge);
-    ctx.beginPath();
-    for (const p of axis) {
-      const wave = 2.5 * Math.sin(p.y / 40 + j * 0.37 + t * 0.6) * Math.min(1, p.width / 20);
-      const off = u * p.width * 0.5 * Math.cos(p.twist + u * 0.35) + wave;
-      const x = p.x + p.nx * off;
-      const y = p.sy + p.ny * off;
-      if (p.k === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+    ctx.lineWidth = ray ? 1.4 : 0.8;
+    ctx.globalAlpha = (dark ? 0.5 : 0.5) * (0.55 + 0.45 * Math.abs(u)) * (ray ? 1.5 : 1);
+    ctx.globalCompositeOperation = ray && dark ? 'lighter' : 'source-over';
+    const points = axis.map((p) => {
+      const wave = 2 * Math.sin(p.y / 55 + j * 0.37 + t * 0.5);
+      const off = offsetOf(p, u) + wave;
+      return { x: p.x + p.nx * off, y: p.sy + p.ny * off };
+    });
+    if (ray) {
+      // Halo do raio: o mesmo traço, largo e bem transparente.
+      const alpha = ctx.globalAlpha;
+      const width = ctx.lineWidth;
+      ctx.globalAlpha = alpha * 0.18;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      smoothPath(ctx, points);
+      ctx.stroke();
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = width;
     }
+    ctx.beginPath();
+    smoothPath(ctx, points);
     ctx.stroke();
+  }
+
+  // Fagulhas: pontos de luz que sobem devagar pela faixa, piscando.
+  ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+  const span = to - from;
+  for (let i = 0; i < shape.sparks; i += 1) {
+    const speed = 18 + 30 * hash(i + 11);
+    // Posição na página: cada fagulha dá a volta no trecho à vista, subindo.
+    const y = from + ((((hash(i) * span - t * speed) % span) + span) % span);
+    const u = hash(i + 5) * 2 - 1;
+    const tw = twist(y);
+    const off = u * width(y) * 0.5 * Math.cos(tw + u * 0.3);
+    const dx = axisX(y + 4) - axisX(y - 4);
+    const len = Math.hypot(dx, 8) || 1;
+    const x = axisX(y) + (-8 / len) * off;
+    const syy = y - scrollY + (dx / len) * off;
+    const twinkle = 0.5 + 0.5 * Math.sin(t * (1.5 + hash(i + 2) * 2) + i);
+    const alpha = twinkle * ending(y) * (dark ? 0.9 : 0.75);
+    if (alpha < 0.02) continue;
+    const r = 2 + 4 * hash(i + 9);
+    const color = sampleFlow(palette, (y / h) * 0.25 + u * 0.45 + t * 0.01);
+    const glow = ctx.createRadialGradient(x, syy, 0, x, syy, r * 3);
+    glow.addColorStop(0, rgba([255, 255, 255], alpha));
+    glow.addColorStop(0.25, rgba(color, alpha * 0.8));
+    glow.addColorStop(1, rgba(color, 0));
+    ctx.fillStyle = glow;
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.arc(x, syy, r * 3, 0, TAU);
+    ctx.fill();
   }
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
