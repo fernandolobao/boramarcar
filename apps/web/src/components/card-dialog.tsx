@@ -39,6 +39,7 @@ export function CardDialog({
   badges,
   price,
   children,
+  foil = false,
 }: {
   open: boolean;
   name: string;
@@ -54,6 +55,8 @@ export function CardDialog({
   price?: ReactNode;
   /** Conteúdo extra no fim (ex.: o editor da linha do deck, para o dono). */
   children?: ReactNode;
+  /** Carta foil: brilho na imagem (decorativo). */
+  foil?: boolean;
 }) {
   const t = useTranslations('decks');
   const tc = useTranslations('common');
@@ -75,94 +78,110 @@ export function CardDialog({
     <dialog
       ref={ref}
       aria-labelledby={titleId}
-      className="m-auto w-[min(92vw,26rem)] rounded-2xl bg-surface p-4 text-fg shadow-2xl backdrop:bg-noite/70"
+      className="m-auto max-h-[94dvh] w-[min(96vw,52rem)] overflow-y-auto rounded-2xl bg-surface p-3 text-fg shadow-2xl backdrop:bg-noite/70 sm:p-5"
       onClose={onClose}
     >
       {open && (
-        <div className="space-y-3">
-          <div className="flex items-start justify-between gap-3">
-            <h2 id={titleId} className="text-lg font-semibold">
-              {card?.name ?? name}
-            </h2>
-            <button type="button" className="btn-secondary" onClick={() => ref.current?.close()}>
-              <Icon name="close" />
-              {t('close')}
-            </button>
-          </div>
-          {status === 'loading' && (
-            <p role="status" className="muted">
-              {t('cardLoading')}
-            </p>
-          )}
-          {(status === 'missing' || status === 'error') && (
-            <p role="alert" className="muted">
-              {status === 'missing' ? t('cardMissing') : t('cardError')}
-            </p>
-          )}
-          {card?.backImageUri && (
-            <div role="group" aria-label={t('faces')} className="flex gap-2">
-              {(['front', 'back'] as const).map((face) => {
-                const pressed = face === 'back' ? back : !back;
-                return (
-                  <button
-                    key={face}
-                    type="button"
-                    className={pressed ? 'btn-primary' : 'btn-secondary'}
-                    aria-pressed={pressed}
-                    onClick={() => onBackChange?.(face === 'back')}
-                  >
-                    {t(face === 'front' ? 'faceFront' : 'faceBack')}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          {status === 'ready' &&
-            (image ? (
-              <div className="relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%]">
-                <Image
-                  src={image}
-                  alt={alt}
-                  fill
-                  unoptimized
-                  sizes="26rem"
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <p className="muted">{t('noImage')}</p>
-            ))}
-          {card && (
-            <p className="muted flex flex-wrap items-center gap-2 text-sm">
-              {card.typeLine}
-              <ManaCost cost={card.manaCost} />
-            </p>
-          )}
-          {card?.setName && (
-            <p className="text-sm">
-              {t('printOf', { set: card.setName, print: printLabel(card) ?? '' })}
-            </p>
-          )}
-          {badges}
-          {price ??
-            (card?.priceUsd && (
-              <p className="text-sm">
-                {t('cardPrice', {
-                  usd: format.number(Number(card.priceUsd), { style: 'currency', currency: 'USD' }),
+        // Carta à esquerda, informações e edição à direita (também no celular, com a carta
+        // menor), para editar sem rolar.
+        <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-start gap-3 sm:gap-6">
+          <div className="space-y-2">
+            {status === 'ready' &&
+              (image ? (
+                <div className="relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] shadow-md">
+                  <Image
+                    src={image}
+                    alt={alt}
+                    fill
+                    unoptimized
+                    sizes="(min-width: 640px) 20rem, 40vw"
+                    className="object-cover"
+                  />
+                  {foil && <span aria-hidden="true" className="foil-sheen" />}
+                </div>
+              ) : (
+                <p className="muted grid aspect-[488/680] w-full place-items-center rounded-[4.5%/3.2%] bg-surface-muted p-2 text-center text-sm">
+                  {t('noImage')}
+                </p>
+              ))}
+            {card?.backImageUri && (
+              <div role="group" aria-label={t('faces')} className="flex flex-wrap gap-2">
+                {(['front', 'back'] as const).map((face) => {
+                  const pressed = face === 'back' ? back : !back;
+                  return (
+                    <button
+                      key={face}
+                      type="button"
+                      className={`${pressed ? 'btn-primary' : 'btn-secondary'} flex-1 px-2 text-sm`}
+                      aria-pressed={pressed}
+                      onClick={() => onBackChange?.(face === 'back')}
+                    >
+                      {t(face === 'front' ? 'faceFront' : 'faceBack')}
+                    </button>
+                  );
                 })}
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <h2 id={titleId} className="text-lg leading-tight font-semibold">
+                {card?.name ?? name}
+              </h2>
+              <button
+                type="button"
+                className="btn-secondary shrink-0 px-2 sm:px-3"
+                onClick={() => ref.current?.close()}
+              >
+                <Icon name="close" />
+                <span className="sr-only sm:not-sr-only">{t('close')}</span>
+              </button>
+            </div>
+            {status === 'loading' && (
+              <p role="status" className="muted">
+                {t('cardLoading')}
               </p>
-            ))}
-          <a
-            href={ligaMagicCardUrl(card?.name ?? name)}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-secondary w-full"
-          >
-            <Icon name="externalLink" />
-            {t('ligaMagic')}
-            <span className="sr-only"> {tc('newTab')}</span>
-          </a>
-          {children}
+            )}
+            {(status === 'missing' || status === 'error') && (
+              <p role="alert" className="muted">
+                {status === 'missing' ? t('cardMissing') : t('cardError')}
+              </p>
+            )}
+            {card && (
+              <p className="muted flex flex-wrap items-center gap-2 text-sm">
+                {card.typeLine}
+                <ManaCost cost={card.manaCost} />
+              </p>
+            )}
+            {card?.setName && (
+              <p className="text-sm">
+                {t('printOf', { set: card.setName, print: printLabel(card) ?? '' })}
+              </p>
+            )}
+            {badges}
+            {price ??
+              (card?.priceUsd && (
+                <p className="text-sm">
+                  {t('cardPrice', {
+                    usd: format.number(Number(card.priceUsd), {
+                      style: 'currency',
+                      currency: 'USD',
+                    }),
+                  })}
+                </p>
+              ))}
+            <a
+              href={ligaMagicCardUrl(card?.name ?? name)}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-secondary w-full text-sm"
+            >
+              <Icon name="externalLink" />
+              {t('ligaMagic')}
+              <span className="sr-only"> {tc('newTab')}</span>
+            </a>
+            {children}
+          </div>
         </div>
       )}
     </dialog>
