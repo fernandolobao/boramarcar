@@ -589,6 +589,75 @@ describe('edições da mesma carta', () => {
   });
 });
 
+describe('adicionar cópias', () => {
+  const mountain = (id: string, set: string) =>
+    mapScryfallCard({
+      id,
+      name: 'Mountain',
+      cmc: 0,
+      type_line: 'Basic Land — Mountain',
+      color_identity: ['R'],
+      set,
+      set_name: set.toUpperCase(),
+      collector_number: '1',
+    });
+
+  it('cópias novas entram na impressão padrão, sem somar com uma edição trocada', async () => {
+    const { addDeckCopies, moveLinePrint } = await import('./decks');
+    const owner = await createTestUser(db, { name: 'Montanhas' });
+    const padrao = mountain('mtn-fdn', 'fdn');
+    const unf = mountain('mtn-unf', 'unf');
+    const saved = await saveImportedDeck(db, {
+      ownerId: owner.id,
+      deck: {
+        name: 'Mono R',
+        source: 'text',
+        entries: [{ name: 'Lightning Bolt', quantity: 1, board: 'mainboard' }],
+      },
+      cards: [],
+      format: 'other',
+    });
+    const base = { deckId: saved.id, userId: owner.id, board: 'mainboard' as const };
+    const lines = async () =>
+      (await getDeck(db, { deckId: saved.id, viewerId: owner.id })).lines
+        .filter((l) => l.name !== 'Lightning Bolt')
+        .map((l) => [l.scryfallId, l.quantity, l.proxies])
+        .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+
+    // 3 montanhas na edição padrão; a pessoa troca a edição delas.
+    await addDeckCopies(db, { ...base, name: 'Mountain', quantity: 3, proxies: 0, card: padrao });
+    await moveLinePrint(db, {
+      ...base,
+      name: 'Mountain',
+      fromScryfallId: 'mtn-fdn',
+      card: unf,
+      quantity: 3,
+    });
+    // Mais 3: viram uma pilha nova (padrão), separada das que mudaram de edição.
+    await addDeckCopies(db, { ...base, name: 'Mountain', quantity: 3, proxies: 1, card: padrao });
+    expect(await lines()).toEqual([
+      ['mtn-fdn', 3, 1],
+      ['mtn-unf', 3, 0],
+    ]);
+    // Mais 2 na padrão: somam com a pilha da mesma impressão.
+    await addDeckCopies(db, { ...base, name: 'Mountain', quantity: 2, proxies: 0, card: padrao });
+    expect(await lines()).toEqual([
+      ['mtn-fdn', 5, 1],
+      ['mtn-unf', 3, 0],
+    ]);
+    // Carta desconhecida (sem dados do Scryfall) entra sem impressão.
+    await addDeckCopies(db, { ...base, name: 'Carta Nova', quantity: 1, proxies: 0, card: null });
+    expect((await lines()).find((l) => l[0] === null)).toEqual([null, 1, 0]);
+
+    await expect(
+      addDeckCopies(db, { ...base, name: 'Mountain', quantity: 0, proxies: 0, card: padrao }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await expect(
+      addDeckCopies(db, { ...base, name: ' ', quantity: 1, proxies: 0, card: null }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+});
+
 describe('comparação com decks do mesmo comandante', () => {
   it('usa só decks visíveis com o mesmo conjunto de comandantes', async () => {
     const { compareWithCommanderDecks, updateDeck } = await import('./decks');

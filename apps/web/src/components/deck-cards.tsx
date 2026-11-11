@@ -208,7 +208,7 @@ export function DeckCards({
         </div>
       </div>
 
-      {isOwner && <AddCardForm deckId={deckId} lines={lines} />}
+      {isOwner && <AddCardForm deckId={deckId} />}
 
       {groups.map((group) => (
         <section key={group.key} aria-labelledby={`${titleId}-${group.key}`}>
@@ -579,6 +579,7 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
           {confirming ? t('confirmRemoveFromDeck') : t('removeFromDeck')}
         </button>
       </div>
+      {tile.card && tile.quantity > 1 && <p className="muted text-xs">{t('printSplitHint')}</p>}
       {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
       <p role="status" className={`text-sm ${error ? 'text-danger' : 'muted'}`}>
         {error ?? status}
@@ -587,8 +588,11 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
   );
 }
 
-/** Adicionar carta: busca com autocompletar do Scryfall, board e quantidade (soma ao que já há). */
-function AddCardForm({ deckId, lines }: { deckId: string; lines: DeckLineView[] }) {
+/**
+ * Adicionar carta: busca com autocompletar do Scryfall, board e quantidade. As cópias entram na
+ * edição padrão e somam só com a pilha dessa edição.
+ */
+function AddCardForm({ deckId }: { deckId: string }) {
   const t = useTranslations('decks');
   const { run, error, pending } = useApiAction();
   const [name, setName] = useState('');
@@ -606,22 +610,13 @@ function AddCardForm({ deckId, lines }: { deckId: string; lines: DeckLineView[] 
         e.preventDefault();
         const add = Number(quantity);
         if (!name.trim() || !Number.isInteger(add) || add < 1) return;
-        const existing = lines.find(
-          (l) => l.board === board && l.name.toLowerCase() === name.trim().toLowerCase(),
-        );
         setStatus('');
         void run(
           () =>
+            // Cópias novas entram na edição padrão (pilha própria), não numa edição já trocada.
             api<{ found: boolean; line: { name: string } }>(`/api/v1/decks/${deckId}/lines`, {
-              method: 'PUT',
-              body: {
-                name: name.trim(),
-                board,
-                quantity: (existing?.quantity ?? 0) + add,
-                proxies: (existing?.proxies ?? 0) + (proxy ? add : 0),
-                // Soma na edição que já está no deck (a primeira, se houver várias).
-                ...(existing ? { scryfallId: existing.scryfallId } : {}),
-              },
+              method: 'POST',
+              body: { name: name.trim(), board, quantity: add, proxies: proxy ? add : 0 },
             }),
           (result) => {
             setStatus(

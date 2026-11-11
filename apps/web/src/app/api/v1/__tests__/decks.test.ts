@@ -378,5 +378,40 @@ describe('API v1 — decks', () => {
     expect(after.body!.deck.lines.map((l: { scryfallId: string }) => l.scryfallId)).toEqual([
       'sol-lea',
     ]);
+
+    // "Adicionar carta": as cópias novas entram na edição padrão, numa pilha separada da LEA
+    // (antes somavam na primeira edição encontrada e não dava para separar).
+    const add = (body: Record<string, unknown>) =>
+      call(lines.POST, {
+        method: 'POST',
+        params: { deckId },
+        body: { name: 'Sol Ring', board: 'mainboard', quantity: 2, proxies: 0, ...body },
+      });
+    expect((await add({})).body).toMatchObject({
+      found: true,
+      line: { scryfallId: 'sol-ring-id' },
+    });
+    expect((await add({ quantity: 1, proxies: 1 })).status).toBe(200);
+    expect((await add({ quantity: 0 })).status).toBe(400);
+    const added = await call(deck.GET, { params: { deckId } });
+    expect(
+      added
+        .body!.deck.lines.map((l: { scryfallId: string; quantity: number; proxies: number }) => [
+          l.scryfallId,
+          l.quantity,
+          l.proxies,
+        ])
+        .sort(),
+    ).toEqual([
+      ['sol-lea', 1, 0],
+      ['sol-ring-id', 3, 1],
+    ]);
+
+    // Scryfall fora do ar: usa a carta do cache.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('erro', { status: 500 })),
+    );
+    expect((await add({ quantity: 1 })).body).toMatchObject({ found: true });
   });
 });

@@ -765,6 +765,58 @@ export async function setDeckLine(
 }
 
 /**
+ * Adicionar cópias de uma carta (formulário "Adicionar carta"): as cópias novas entram na
+ * impressão de `card` (a padrão do Scryfall para o nome) e só somam com uma linha da mesma
+ * impressão. Nunca entram numa edição que a pessoa escolheu para outras cópias — senão as
+ * cópias novas ficariam presas na mesma pilha e não daria para trocar a edição só delas.
+ */
+export async function addDeckCopies(
+  db: Database,
+  input: {
+    deckId: string;
+    userId: string;
+    board: DeckBoard;
+    name: string;
+    /** Cópias a acrescentar e quantas delas são proxy. */
+    quantity: number;
+    proxies: number;
+    card?: CardData | null;
+  },
+) {
+  const name = input.card?.name ?? input.name.trim();
+  if (!name) throw new DomainError('invalid_input', 'Informe a carta');
+  if (!Number.isInteger(input.quantity) || input.quantity < 1) {
+    throw new DomainError('invalid_input', 'Informe quantas cópias adicionar');
+  }
+  validateLine(input.quantity, input.proxies);
+  await requireOwnedDeck(db, input.deckId, input.userId);
+  const print = input.card?.scryfallId ?? null;
+  const current = await db
+    .select({ quantity: deckCards.quantity, isProxy: deckCards.isProxy })
+    .from(deckCards)
+    .where(
+      and(
+        eq(deckCards.deckId, input.deckId),
+        eq(deckCards.board, input.board),
+        sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
+        samePrint(print),
+      ),
+    );
+  const quantity = current.reduce((n, r) => n + r.quantity, 0);
+  const proxies = current.filter((r) => r.isProxy).reduce((n, r) => n + r.quantity, 0);
+  return setDeckLine(db, {
+    deckId: input.deckId,
+    userId: input.userId,
+    board: input.board,
+    name,
+    quantity: quantity + input.quantity,
+    proxies: proxies + input.proxies,
+    card: input.card ?? null,
+    scryfallId: print,
+  });
+}
+
+/**
  * Troca a edição (impressão) de `quantity` cópias de uma linha. Cópias reais vão primeiro; se
  * faltar, entram as proxy (que continuam proxy). Junta com a linha da nova edição se já existir.
  */

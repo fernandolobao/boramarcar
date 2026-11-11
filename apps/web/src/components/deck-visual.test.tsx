@@ -243,20 +243,19 @@ describe('editor de deck', () => {
     await screen.findByText('Sol Ring adicionada.');
     expect(calls.at(-1)).toEqual({
       url: '/api/v1/decks/d1/lines',
-      method: 'PUT',
+      method: 'POST',
       body: { name: 'Sol Ring', board: 'mainboard', quantity: 2, proxies: 2 },
     });
 
-    // Carta que já está no deck: soma à quantidade atual.
+    // Carta que já está no deck: manda só as cópias novas; o servidor decide a pilha (a da edição
+    // padrão), sem somar numa edição que a pessoa trocou.
     fireEvent.change(input, { target: { value: 'Forest' } });
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar carta' }));
     await vi.waitFor(() =>
-      expect(calls.at(-1)!.body).toEqual({
-        name: 'Forest',
-        board: 'mainboard',
-        quantity: 31,
-        proxies: 10,
-        scryfallId: 'f',
+      expect(calls.at(-1)).toEqual({
+        url: '/api/v1/decks/d1/lines',
+        method: 'POST',
+        body: { name: 'Forest', board: 'mainboard', quantity: 1, proxies: 0 },
       }),
     );
   });
@@ -315,11 +314,19 @@ describe('editor de deck', () => {
     });
     expect(screen.getByText('1 edição')).toBeInTheDocument();
     fireEvent.click(alpha);
-    fireEvent.change(screen.getByLabelText('Cópias com esta edição (de 30)'), {
-      target: { value: '5' },
-    });
+    expect(
+      screen.getByText(
+        'Para trocar a edição de só algumas cópias, abra a edição e escolha quantas.',
+      ),
+    ).toBeInTheDocument();
+    const copies = screen.getByLabelText('Quantas cópias mudam de edição (de 30)');
+    expect(copies).toHaveAccessibleDescription('Todas as cópias mudam.');
+    fireEvent.change(copies, { target: { value: '5' } });
+    expect(copies).toHaveAccessibleDescription(
+      'As outras 25 cópias continuam na edição atual, numa pilha separada.',
+    );
     expect(await audit(container)).toEqual([]);
-    fireEvent.click(screen.getByRole('button', { name: 'Usar esta edição' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Usar esta edição em 5 de 30' }));
     await vi.waitFor(() =>
       expect(calls.at(-1)).toEqual({
         url: '/api/v1/decks/d1/lines/print',
