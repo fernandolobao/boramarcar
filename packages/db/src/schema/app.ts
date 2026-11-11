@@ -369,6 +369,11 @@ export const cards = pgTable(
     backName: text('back_name'),
     /** Legalidade por formato (Scryfall): lista de banidas e restritas. */
     legalities: jsonb('legalities').$type<Record<string, string>>(),
+    /** Para a coleção: ilustrador, lançamento da impressão, raridade e preço foil. */
+    artist: text('artist'),
+    releasedAt: text('released_at'),
+    rarity: text('rarity'),
+    priceUsdFoil: text('price_usd_foil'),
     updatedAt: updatedAt(),
   },
   (t) => [index('cards_name_idx').on(sql`lower(${t.name})`)],
@@ -397,6 +402,38 @@ export const deckCards = pgTable(
       t.cardName,
       sql`coalesce(${t.scryfallId}, '')`,
       t.isProxy,
+    ),
+  ],
+);
+
+/* ---------- Coleção pessoal ---------- */
+
+/**
+ * Cartas físicas que a pessoa tem. Uma linha por carta, impressão e acabamento (foil ou não).
+ * Proxies nunca entram aqui. Os decks só acrescentam (ver `syncCollectionFromDecks`): tirar uma
+ * carta de um deck não tira da coleção.
+ */
+export const collectionCards = pgTable(
+  'collection_cards',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    cardName: text('card_name').notNull(),
+    scryfallId: text('scryfall_id').references(() => cards.scryfallId, { onDelete: 'set null' }),
+    quantity: integer('quantity').notNull().default(1),
+    isFoil: boolean('is_foil').notNull().default(false),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index('collection_cards_user_idx').on(t.userId),
+    uniqueIndex('collection_cards_unique_idx').on(
+      t.userId,
+      t.cardName,
+      sql`coalesce(${t.scryfallId}, '')`,
+      t.isFoil,
     ),
   ],
 );

@@ -26,7 +26,15 @@ const scryfallCardSchema = z.object({
   color_identity: z.array(z.string()).default([]),
   image_uris: z.object({ normal: z.string() }).partial().optional(),
   card_faces: z.array(faceSchema).optional(),
-  prices: z.object({ usd: z.string().nullable().optional() }).optional(),
+  prices: z
+    .object({
+      usd: z.string().nullable().optional(),
+      usd_foil: z.string().nullable().optional(),
+    })
+    .optional(),
+  artist: z.string().optional(),
+  released_at: z.string().optional(),
+  rarity: z.string().optional(),
   produced_mana: z.array(z.string()).optional(),
   game_changer: z.boolean().optional(),
   edhrec_rank: z.number().nullable().optional(),
@@ -83,6 +91,10 @@ export function mapScryfallCard(raw: unknown): CardData {
     // Cartas divididas/aventura têm `card_faces`, mas uma imagem só (`image_uris` no topo).
     ...twoSided(card),
     legalities: card.legalities ?? null,
+    artist: card.artist ?? null,
+    releasedAt: card.released_at ?? null,
+    rarity: card.rarity ?? null,
+    priceUsdFoil: card.prices?.usd_foil ?? null,
   };
 }
 

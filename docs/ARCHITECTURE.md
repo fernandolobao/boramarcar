@@ -237,6 +237,14 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
 - **No app** (`components/stack.tsx`): `StackScrollView` + `StackSection`, com `translateY` ligado à rolagem no thread nativo, mesma ideia (o título acompanha a faixa da seção). Com "reduzir movimento", rola normal.
 - **Aura** (`<Aura />`, site no layout do app e app no deck e em Encontros): formas desfocadas nas cores da marca (éter, mana, dourado, arcano) no canto superior direito, mudando de forma e flutuando muito devagar (40–70 s por ciclo, cada uma num ritmo). Decorativa (`aria-hidden`, sem toque), atrás do conteúdo, parada com "reduzir movimento" e fora da impressão. No site, o contêiner usa `overflow-x: clip`, porque `hidden` quebraria o `sticky` da pilha.
 
+## Coleção
+
+- **Dados** (`collection_cards`): uma linha por pessoa, carta, impressão e acabamento (foil), com a quantidade. Proxies nunca entram.
+- **Decks só acrescentam** (`syncCollectionFromDecks`, chamada em toda mudança de deck): para cada carta, impressão e acabamento, a coleção fica com pelo menos a soma das cópias não proxy em todos os decks da pessoa (fora o maybeboard). Tirar uma carta de um deck não tira da coleção. A migration `0013_colecao` fez a carga inicial com a mesma regra.
+- **Cache de cartas**: ganhou ilustrador, data de lançamento da impressão, raridade e preço foil (`artist`, `released_at`, `rarity`, `price_usd_foil`). O cron do Scryfall também atualiza as cartas que só estão em coleções.
+- **Tela** (`/colecao`): a coleção vem inteira do servidor e é filtrada e ordenada no navegador (`packages/core/src/collection`): cor (identidade), valor de mana, tipo, edição, ano, ilustrador, raridade, foil e "em deck". Galeria densa (120 por vez, imagens com carregamento preguiçoso) ou tabela. O diálogo da carta mostra os decks que a usam e edita cópias, foil e impressão. O valor total usa o preço foil para cópias foil e a cotação PTAX para R$.
+- **API**: `GET/POST /api/v1/collection`, `PATCH/DELETE /api/v1/collection/:id`.
+
 ## Marca e design tokens (ArcanaKin)
 
 `packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):
