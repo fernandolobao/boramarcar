@@ -110,11 +110,11 @@ export function PrintPicker({
       <button
         ref={opener}
         type="button"
-        className="mt-0.5 inline-flex items-center gap-1 rounded text-xs text-brand-700 underline underline-offset-2 dark:text-brand-300"
+        className="btn-secondary"
         aria-haspopup="dialog"
         onClick={show}
       >
-        <Icon name="edit" className="size-3.5 shrink-0" />
+        <Icon name="edit" />
         {current ? t('printCurrent', { print: current }) : t('printChoose')}
         <span className="sr-only"> ({line.name})</span>
       </button>
