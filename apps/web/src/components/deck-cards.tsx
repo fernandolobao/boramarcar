@@ -501,8 +501,9 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
       <legend className="px-1 text-sm font-semibold">
         {isFoil ? t('editLineFoil') : t('editLine')}
       </legend>
-      <div className="grid grid-cols-2 items-end gap-3">
-        <div>
+      {/* Linha 1: as cópias (quantidade, proxies e acabamento). Linha 2: as ações. */}
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+        <div className="w-24">
           <label className="label" htmlFor={`${id}-q`}>
             {t('quantityLabel')}
           </label>
@@ -521,7 +522,7 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
           />
         </div>
         {!isFoil && (
-          <div>
+          <div className="w-28">
             <label className="label" htmlFor={`${id}-p`}>
               {t('proxiesLabel')}
             </label>
@@ -540,8 +541,6 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
             />
           </div>
         )}
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
         <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
           <input
             type="checkbox"
@@ -551,6 +550,9 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
           />
           <span aria-hidden="true">✦</span> {t('foil')}
         </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {tile.card && <PrintPicker deckId={deckId} line={{ ...tile, foil: isFoil }} />}
         {real >= 2 && (
           <button
             type="button"
@@ -562,22 +564,21 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
             {isFoil ? t('splitNormal') : t('splitFoil')}
           </button>
         )}
-        {tile.card && <PrintPicker deckId={deckId} line={{ ...tile, foil: isFoil }} />}
+        <button
+          type="button"
+          className={`${confirming ? 'btn-danger border border-danger' : 'btn-danger'} ms-auto`}
+          disabled={pending}
+          onBlur={() => setConfirming(false)}
+          onClick={() => {
+            if (!confirming) return setConfirming(true);
+            setConfirming(false);
+            setThis(0, 0, t('cardRemoved', { name: tile.name }));
+          }}
+        >
+          <Icon name="delete" />
+          {confirming ? t('confirmRemoveFromDeck') : t('removeFromDeck')}
+        </button>
       </div>
-      <button
-        type="button"
-        className={confirming ? 'btn-danger border border-danger' : 'btn-danger'}
-        disabled={pending}
-        onBlur={() => setConfirming(false)}
-        onClick={() => {
-          if (!confirming) return setConfirming(true);
-          setConfirming(false);
-          setThis(0, 0, t('cardRemoved', { name: tile.name }));
-        }}
-      >
-        <Icon name="delete" />
-        {confirming ? t('confirmRemoveFromDeck') : t('removeFromDeck')}
-      </button>
       {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
       <p role="status" className={`text-sm ${error ? 'text-danger' : 'muted'}`}>
         {error ?? status}
