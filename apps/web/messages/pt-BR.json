@@ -491,7 +491,6 @@
     "faceBack": "Verso",
     "foil": "Foil",
     "foilOf": "Foil ({name})",
-    "foilSaved": "{name}: foil {state, select, on {marcado} other {desmarcado}}.",
     "cardLoading": "Carregando a carta…",
     "cardMissing": "Carta não encontrada no Scryfall.",
     "cardError": "Não foi possível carregar a carta agora.",
@@ -503,7 +502,10 @@
     "proxiesLabel": "Cópias proxy",
     "removeFromDeck": "Remover do deck",
     "confirmRemoveFromDeck": "Confirmar remoção",
-    "printsMore": "Mostrar mais {count}"
+    "printsMore": "Mostrar mais {count}",
+    "foilCount": "{count, plural, =1 {1 foil} other {# foil}}",
+    "foilsLabel": "Cópias foil",
+    "foilsSaved": "{name}: {count, plural, =0 {nenhuma cópia foil} =1 {1 cópia foil} other {# cópias foil}}."
   },
   "analysis": {
     "title": "Análise",

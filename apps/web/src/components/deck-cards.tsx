@@ -18,8 +18,10 @@ export interface DeckLineView {
   board: DeckBoard;
   quantity: number;
   proxies: number;
-  /** Todas as cópias são foil. */
+  /** Todas as cópias reais são foil. */
   foil?: boolean;
+  /** Quantas cópias reais são foil (foil e comum da mesma edição convivem). */
+  foils?: number;
   /** Edição (impressão) da linha. */
   scryfallId: string | null;
   card: {
@@ -49,14 +51,19 @@ function ProxyBadge({ line }: { line: DeckLineView }) {
   );
 }
 
-/** Selo de foil (texto + ✦; a cor não é a única pista). */
+/** Cópias foil da linha (linhas antigas sem `foils`: todas as reais se `foil`). */
+export const foilsOf = (line: Pick<DeckLineView, 'foil' | 'foils' | 'quantity' | 'proxies'>) =>
+  line.foils ?? (line.foil ? line.quantity - line.proxies : 0);
+
+/** Selo de foil: "Foil" quando todas as cópias reais são foil; senão "1 foil" (texto + ✦). */
 function FoilBadge({ line }: { line: DeckLineView }) {
   const t = useTranslations('decks');
-  if (!line.foil) return null;
+  const foils = foilsOf(line);
+  if (!foils) return null;
   return (
     <span className="rounded bg-teal-100 px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-teal-900 dark:bg-teal-900 dark:text-teal-100">
       <span aria-hidden="true">✦ </span>
-      {t('foil')}
+      {foils === line.quantity - line.proxies ? t('foil') : t('foilCount', { count: foils })}
     </span>
   );
 }
@@ -195,7 +202,7 @@ export function DeckCards({
                             className="object-cover"
                           />
                           {/* Brilho de carta foil (decorativo; parado com "reduzir movimento"). */}
-                          {line.foil && (
+                          {foilsOf(line) > 0 && (
                             <span
                               aria-hidden="true"
                               className="foil-sheen"
@@ -230,7 +237,7 @@ export function DeckCards({
                         {t('quantity', { count: line.quantity })}
                       </span>
                     )}
-                    {line.foil && (
+                    {foilsOf(line) > 0 && (
                       <span
                         aria-hidden="true"
                         className="pointer-events-none absolute bottom-[6%] left-1.5 rounded-md bg-teal-100 px-1.5 py-0.5 text-xs font-bold text-teal-900"
@@ -268,7 +275,7 @@ export function DeckCards({
                         )
                       </span>
                     )}
-                    {line.foil && <span className="sr-only"> ({t('foil')})</span>}
+                    {foilsOf(line) > 0 && <span className="sr-only"> ({t('foil')})</span>}
                   </p>
                 </li>
               ))}
@@ -311,7 +318,7 @@ export function DeckCards({
                         <span className="muted text-xs"> · {printLabel(line.card)}</span>
                       )}
                       {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
-                      {line.foil && (
+                      {foilsOf(line) > 0 && (
                         <>
                           {' '}
                           <FoilBadge line={line} />
@@ -341,7 +348,7 @@ export function DeckCards({
         name={current?.name ?? ''}
         card={current?.card ? { ...current.card, name: current.name } : null}
         back={current ? flipped.has(current.key) : false}
-        foil={Boolean(current?.foil)}
+        foil={current ? foilsOf(current) > 0 : false}
         onBackChange={(back) => {
           if (current && back !== flipped.has(current.key)) toggleFlip(current.key);
         }}
@@ -350,7 +357,7 @@ export function DeckCards({
           opener.current?.focus();
         }}
         badges={
-          current && (current.proxies > 0 || current.foil) ? (
+          current && (current.proxies > 0 || foilsOf(current) > 0) ? (
             <p className="flex flex-wrap gap-2">
               <ProxyBadge line={current} />
               <FoilBadge line={current} />
@@ -390,13 +397,15 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
   const id = useId();
   const [quantity, setQuantity] = useState(String(line.quantity));
   const [proxies, setProxies] = useState(String(line.proxies));
-  const [foil, setFoil] = useState(Boolean(line.foil));
+  const [foils, setFoils] = useState(String(foilsOf(line)));
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState('');
 
-  const save = (q: number, p: number, f: boolean = foil) => {
-    if (q === line.quantity && p === line.proxies && f === Boolean(line.foil)) return;
-    if (!Number.isInteger(q) || !Number.isInteger(p) || p > q) {
+  const save = (q: number, p: number, f: number = Number(foils)) => {
+    // Cópias foil nunca passam das reais (ex.: diminuiu a quantidade).
+    f = Math.min(f, q - p);
+    if (q === line.quantity && p === line.proxies && f === foilsOf(line)) return;
+    if (!Number.isInteger(q) || !Number.isInteger(p) || !Number.isInteger(f) || p > q || f < 0) {
       setStatus(t('invalidCopies'));
       return;
     }
@@ -411,15 +420,15 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
             quantity: q,
             proxies: p,
             scryfallId: line.scryfallId,
-            foil: f,
+            foils: f,
           },
         }),
       () =>
         setStatus(
           q === 0
             ? t('cardRemoved', { name: line.name })
-            : f !== Boolean(line.foil)
-              ? t('foilSaved', { name: line.name, state: f ? 'on' : 'off' })
+            : f !== foilsOf(line)
+              ? t('foilsSaved', { name: line.name, count: f })
               : t('lineSaved', { name: line.name }),
         ),
     );
@@ -474,18 +483,42 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            checked={foil}
-            disabled={pending}
-            onChange={(e) => {
-              setFoil(e.target.checked);
-              save(Number(quantity), Number(proxies), e.target.checked);
-            }}
-          />
-          <span aria-hidden="true">✦</span> {t('foil')}
-        </label>
+        {/* Uma cópia real: marcar/desmarcar. Mais de uma: quantas são foil. */}
+        {Number(quantity) - Number(proxies) <= 1 ? (
+          <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={Number(foils) > 0}
+              disabled={pending || Number(quantity) - Number(proxies) < 1}
+              onChange={(e) => {
+                const f = e.target.checked ? 1 : 0;
+                setFoils(String(f));
+                save(Number(quantity), Number(proxies), f);
+              }}
+            />
+            <span aria-hidden="true">✦</span> {t('foil')}
+          </label>
+        ) : (
+          <div className="w-32">
+            <label className="label" htmlFor={`${id}-f`}>
+              <span aria-hidden="true">✦ </span>
+              {t('foilsLabel')}
+            </label>
+            <input
+              id={`${id}-f`}
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={Math.max(0, Number(quantity) - Number(proxies))}
+              className="input"
+              value={foils}
+              disabled={pending}
+              onChange={(e) => setFoils(e.target.value)}
+              onBlur={commit}
+              onKeyDown={onKey}
+            />
+          </div>
+        )}
         {line.card && <PrintPicker deckId={deckId} line={line} />}
       </div>
       <button
