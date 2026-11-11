@@ -45,7 +45,7 @@ export interface CollectionEntry {
   foil: boolean;
   card: CardData | null;
   addedAt: Date;
-  /** Decks da pessoa com esta carta (qualquer impressão), pelo nome. */
+  /** Decks da pessoa com esta mesma versão (impressão e foil). */
   decks: CollectionDeckUse[];
 }
 
@@ -61,6 +61,8 @@ export async function listCollection(db: Database, userId: string): Promise<Coll
     db
       .select({
         name: sql<string>`lower(${deckCards.cardName})`,
+        scryfallId: deckCards.scryfallId,
+        isFoil: deckCards.isFoil,
         deckId: decks.id,
         deckName: decks.name,
         quantity: sql<number>`sum(${deckCards.quantity})`.mapWith(Number),
@@ -72,14 +74,22 @@ export async function listCollection(db: Database, userId: string): Promise<Coll
       .from(deckCards)
       .innerJoin(decks, eq(decks.id, deckCards.deckId))
       .where(and(eq(decks.ownerId, userId), ne(deckCards.board, 'maybeboard')))
-      .groupBy(sql`lower(${deckCards.cardName})`, decks.id, decks.name)
+      .groupBy(
+        sql`lower(${deckCards.cardName})`,
+        deckCards.scryfallId,
+        deckCards.isFoil,
+        decks.id,
+        decks.name,
+      )
       .orderBy(asc(decks.name)),
   ]);
-  const byName = new Map<string, CollectionDeckUse[]>();
-  for (const { name, ...use } of uses) {
-    const list = byName.get(name) ?? [];
-    list.push(use);
-    byName.set(name, list);
+  // A mesma versão: carta, impressão e acabamento (foil é outra versão, com outro valor).
+  const key = (name: string, scryfallId: string | null, foil: boolean) =>
+    `${name.toLowerCase()}|${scryfallId ?? ''}|${foil}`;
+  const byVersion = new Map<string, CollectionDeckUse[]>();
+  for (const { name, scryfallId, isFoil, ...use } of uses) {
+    const k = key(name, scryfallId, isFoil);
+    byVersion.set(k, [...(byVersion.get(k) ?? []), use]);
   }
   return rows.map(({ entry, card }) => ({
     id: entry.id,
@@ -89,7 +99,7 @@ export async function listCollection(db: Database, userId: string): Promise<Coll
     foil: entry.isFoil,
     card: card ? toCardData(card) : null,
     addedAt: entry.createdAt,
-    decks: byName.get(entry.cardName.toLowerCase()) ?? [],
+    decks: byVersion.get(key(entry.cardName, entry.scryfallId, entry.isFoil)) ?? [],
   }));
 }
 
@@ -97,6 +107,33 @@ function checkQuantity(quantity: number) {
   if (!Number.isInteger(quantity) || quantity < 0 || quantity > MAX_COLLECTION_COPIES) {
     throw new DomainError('invalid_input', `Quantidade entre 0 e ${MAX_COLLECTION_COPIES}`);
   }
+}
+
+/**
+ * Quando a pessoa troca a edição (ou o foil) de cópias reais num deck, aquelas cópias saem da
+ * versão antiga na coleção; a nova versão entra pela sincronia com os decks. Assim corrigir a
+ * edição no deck corrige a coleção, sem deixar a versão antiga para trás.
+ */
+export async function takeFromCollection(
+  db: Pick<Database, 'execute'>,
+  input: {
+    userId: string;
+    name: string;
+    scryfallId: string | null;
+    foil: boolean;
+    quantity: number;
+  },
+) {
+  if (input.quantity <= 0) return;
+  const same = sql`user_id = ${input.userId} and lower(card_name) = ${input.name.toLowerCase()}
+    and coalesce(scryfall_id, '') = ${input.scryfallId ?? ''} and is_foil = ${input.foil}`;
+  await db.execute(sql`
+    update ${collectionCards} set quantity = quantity - ${input.quantity}, updated_at = now()
+    where ${same} and quantity > ${input.quantity}
+  `);
+  await db.execute(
+    sql`delete from ${collectionCards} where ${same} and quantity <= ${input.quantity}`,
+  );
 }
 
 /** Soma cópias à linha (carta, impressão, acabamento), criando a linha se preciso. */
