@@ -1,16 +1,11 @@
 'use client';
 
-import {
-  DECK_BOARDS,
-  groupEntriesByType,
-  ligaMagicCardUrl,
-  MAX_COPIES,
-  type DeckBoard,
-} from '@boramarcar/core';
+import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@boramarcar/core';
 import Image from 'next/image';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useRef, useState, type CSSProperties } from 'react';
 import { api } from '@/lib/api';
+import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
 import { Icon } from './icons';
 import { ManaCost } from './mana';
@@ -23,6 +18,10 @@ export interface DeckLineView {
   board: DeckBoard;
   quantity: number;
   proxies: number;
+  /** Todas as cópias reais são foil. */
+  foil?: boolean;
+  /** Quantas cópias reais são foil (foil e comum da mesma edição convivem). */
+  foils?: number;
   /** Edição (impressão) da linha. */
   scryfallId: string | null;
   card: {
@@ -39,23 +38,88 @@ export interface DeckLineView {
   } | null;
 }
 
-type View = 'visual' | 'list' | 'edit';
+type View = 'visual' | 'list';
 
 /** Selo de proxy: "Proxy" quando todas as cópias são proxy; senão "3 proxies". */
 function ProxyBadge({ line }: { line: DeckLineView }) {
   const t = useTranslations('decks');
   if (!line.proxies) return null;
   return (
-    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+    <span className="rounded bg-gold-100 px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-gold-900 dark:bg-gold-900 dark:text-gold-100">
       {line.proxies === line.quantity ? t('proxy') : t('proxyCount', { count: line.proxies })}
     </span>
   );
 }
 
+/** Cópias foil da linha (linhas antigas sem `foils`: todas as reais se `foil`). */
+export const foilsOf = (line: Pick<DeckLineView, 'foil' | 'foils' | 'quantity' | 'proxies'>) =>
+  line.foils ?? (line.foil ? line.quantity - line.proxies : 0);
+
+/** Uma carta na grade/lista: as cópias comuns e as foil da mesma edição são cartas separadas. */
+export interface DeckTile extends DeckLineView {
+  finish: 'normal' | 'foil';
+  /** A linha inteira (carta + edição), com todas as cópias comuns, foil e proxies. */
+  group: DeckLineView;
+}
+
+/** Separa a linha em carta comum (com as proxies) e carta foil, quando há as duas. */
+export function tilesOf(line: DeckLineView): DeckTile[] {
+  const foils = foilsOf(line);
+  const normal = line.quantity - foils;
+  const tiles: DeckTile[] = [];
+  if (normal > 0) {
+    tiles.push({ ...line, quantity: normal, foils: 0, foil: false, finish: 'normal', group: line });
+  }
+  if (foils > 0) {
+    tiles.push({
+      ...line,
+      key: normal > 0 ? `${line.key}|foil` : line.key,
+      quantity: foils,
+      proxies: 0,
+      foils,
+      foil: true,
+      finish: 'foil',
+      group: line,
+    });
+  }
+  return tiles;
+}
+
+/** Selo de foil: "Foil" quando todas as cópias reais são foil; senão "1 foil" (texto + ✦). */
+function FoilBadge({ line }: { line: DeckLineView }) {
+  const t = useTranslations('decks');
+  const foils = foilsOf(line);
+  if (!foils) return null;
+  return (
+    <span className="rounded bg-teal-100 px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-teal-900 dark:bg-teal-900 dark:text-teal-100">
+      <span aria-hidden="true">✦ </span>
+      {foils === line.quantity - line.proxies ? t('foil') : t('foilCount', { count: foils })}
+    </span>
+  );
+}
+
 /**
- * Cartas do deck: **visual** (imagens por tipo, ampliar em diálogo), **lista** e, para o dono,
- * **editar** (adicionar com busca do Scryfall, mudar quantidades e proxies, remover).
+ * Cartas do deck: **visual** (imagens por tipo) e **lista**. Tocar numa carta abre o diálogo da
+ * carta; para o dono, o mesmo diálogo edita a linha (quantidade, proxies, foil, edição, remover).
+ * O dono também adiciona cartas com a busca do Scryfall.
  */
+
+/**
+ * Ritmo do brilho foil de cada carta, derivado da chave (estável entre servidor e cliente):
+ * duração, fase e "respiração" diferentes, para cartas vizinhas não brilharem em sincronia.
+ */
+export function foilTiming(key: string): CSSProperties {
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i++) h = Math.imul(h ^ key.charCodeAt(i), 16777619) >>> 0;
+  const unit = (shift: number) => ((h >>> shift) & 0xff) / 255;
+  const dur = 9 + unit(0) * 6; // 9–15s por volta
+  return {
+    '--foil-dur': `${dur.toFixed(2)}s`,
+    '--foil-delay': `-${(unit(8) * dur).toFixed(2)}s`,
+    '--foil-breath': `${(5 + unit(16) * 4).toFixed(2)}s`,
+  } as CSSProperties;
+}
+
 export function DeckCards({
   deckId,
   lines,
@@ -69,10 +133,10 @@ export function DeckCards({
   usdBrl?: number | null;
 }) {
   const t = useTranslations('decks');
-  const tc = useTranslations('common');
   const format = useFormatter();
   const [view, setView] = useState<View>('visual');
-  const [zoomed, setZoomed] = useState<DeckLineView | null>(null);
+  const [zoomed, setZoomed] = useState<DeckTile | null>(null);
+  const tiles = lines.flatMap(tilesOf);
   /** Cartas de duas faces mostrando o verso (na grade e no diálogo). */
   const [flipped, setFlipped] = useState<ReadonlySet<string>>(new Set());
   const toggleFlip = (key: string) =>
@@ -84,21 +148,20 @@ export function DeckCards({
     });
   const imageOf = (line: DeckLineView) =>
     flipped.has(line.key) && line.card?.backImageUri ? line.card.backImageUri : line.card?.imageUri;
-  const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const titleId = useId();
 
-  useEffect(() => {
-    const d = dialog.current;
-    if (!d) return;
-    if (zoomed && !d.open) d.showModal();
-    if (!zoomed && d.open) d.close();
-  }, [zoomed]);
-
-  const views: View[] = isOwner ? ['visual', 'list', 'edit'] : ['visual', 'list'];
-  type Group = { key: string; title: string; count: number; lines: DeckLineView[] };
+  const views: View[] = ['visual', 'list'];
+  // A linha aberta no diálogo, sempre com os dados mais novos (o editor atualiza a página).
+  // Se a carta mudou de acabamento (ex.: virou foil), segue para a outra carta da mesma linha.
+  const current = zoomed
+    ? (tiles.find((l) => l.key === zoomed.key) ??
+      tiles.find((l) => l.group.key === zoomed.group.key) ??
+      null)
+    : null;
+  type Group = { key: string; title: string; count: number; lines: DeckTile[] };
   const groups = DECK_BOARDS.flatMap((board): Group[] => {
-    const own = lines.filter((l) => l.board === board);
+    const own = tiles.filter((l) => l.board === board);
     if (!own.length) return [];
     // O deck principal é separado por tipo; comandante e boards secundários ficam juntos.
     return board === 'mainboard'
@@ -118,7 +181,7 @@ export function DeckCards({
         ];
   });
 
-  const openZoom = (line: DeckLineView, button: HTMLButtonElement) => {
+  const openZoom = (line: DeckTile, button: HTMLButtonElement) => {
     opener.current = button;
     setZoomed(line);
   };
@@ -138,14 +201,14 @@ export function DeckCards({
               className={view === v ? 'btn-primary' : 'btn-secondary'}
               onClick={() => setView(v)}
             >
-              <Icon name={v === 'visual' ? 'gallery' : v === 'list' ? 'list' : 'edit'} />
+              <Icon name={v === 'visual' ? 'gallery' : 'list'} />
               {t(`views.${v}`)}
             </button>
           ))}
         </div>
       </div>
 
-      {view === 'edit' && <AddCardForm deckId={deckId} lines={lines} />}
+      {isOwner && <AddCardForm deckId={deckId} lines={lines} />}
 
       {groups.map((group) => (
         <section key={group.key} aria-labelledby={`${titleId}-${group.key}`}>
@@ -160,19 +223,29 @@ export function DeckCards({
                     <button
                       type="button"
                       className="relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 shadow-sm ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-ink-800"
-                      aria-label={t('zoom', { name: line.name })}
+                      aria-label={t(isOwner ? 'zoomEdit' : 'zoom', { name: line.name })}
                       aria-haspopup="dialog"
                       onClick={(e) => openZoom(line, e.currentTarget)}
                     >
                       {imageOf(line) ? (
-                        <Image
-                          src={imageOf(line)!}
-                          alt=""
-                          fill
-                          unoptimized
-                          sizes="(min-width: 1280px) 16vw, (min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw"
-                          className="object-cover"
-                        />
+                        <>
+                          <Image
+                            src={imageOf(line)!}
+                            alt=""
+                            fill
+                            unoptimized
+                            sizes="(min-width: 1280px) 16vw, (min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 640px) 33vw, 50vw"
+                            className="object-cover"
+                          />
+                          {/* Brilho de carta foil (decorativo; parado com "reduzir movimento"). */}
+                          {foilsOf(line) > 0 && (
+                            <span
+                              aria-hidden="true"
+                              className="foil-sheen"
+                              style={foilTiming(line.key)}
+                            />
+                          )}
+                        </>
                       ) : (
                         <span className="absolute inset-0 grid place-items-center p-2 text-center text-sm font-medium">
                           {line.name}
@@ -200,10 +273,18 @@ export function DeckCards({
                         {t('quantity', { count: line.quantity })}
                       </span>
                     )}
+                    {foilsOf(line) > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute bottom-[6%] left-1.5 rounded-md bg-teal-100 px-1.5 py-0.5 text-xs font-bold text-teal-900"
+                      >
+                        ✦ {t('foil')}
+                      </span>
+                    )}
                     {line.proxies > 0 && (
                       <span
                         aria-hidden="true"
-                        className="pointer-events-none absolute top-[8%] right-1.5 rounded-md bg-amber-300 px-1.5 py-0.5 text-xs font-bold text-amber-950"
+                        className="pointer-events-none absolute top-[8%] right-1.5 rounded-md bg-accent px-1.5 py-0.5 text-xs font-bold text-on-accent"
                       >
                         {line.proxies === line.quantity
                           ? t('proxy')
@@ -230,6 +311,7 @@ export function DeckCards({
                         )
                       </span>
                     )}
+                    {foilsOf(line) > 0 && <span className="sr-only"> ({t('foil')})</span>}
                   </p>
                 </li>
               ))}
@@ -238,226 +320,132 @@ export function DeckCards({
             // table-fixed + <colgroup>: cada grupo é uma tabela, e as larguras fixas deixam as
             // colunas alinhadas entre todos os grupos.
             <table className="w-full table-fixed text-sm">
-              {view === 'edit' ? (
-                <colgroup>
-                  <col className="w-20" />
-                  <col />
-                  <col className="w-20" />
-                  <col className="w-14 sm:w-36" />
-                </colgroup>
-              ) : (
-                <colgroup>
-                  <col className="w-10" />
-                  <col />
-                  <col className="w-28 sm:w-40" />
-                  <col className="w-0 sm:w-[30%]" />
-                  <col className="w-20 sm:w-24" />
-                </colgroup>
-              )}
-              <thead
-                className={
-                  view === 'edit' ? 'text-left text-xs text-ink-600 dark:text-ink-400' : 'sr-only'
-                }
-              >
+              <colgroup>
+                <col className="w-10" />
+                <col />
+                <col className="w-28 sm:w-40" />
+                <col className="w-0 sm:w-[30%]" />
+                <col className="w-20 sm:w-24" />
+              </colgroup>
+              <thead className="sr-only">
                 <tr>
-                  <th
-                    scope="col"
-                    className={`py-1 pe-2 font-medium ${view === 'edit' ? 'w-20' : ''}`}
-                  >
-                    {t('quantityHeader')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 font-medium">
-                    {t('cardName')}
-                  </th>
-                  {view === 'edit' ? (
-                    <>
-                      <th scope="col" className="w-20 py-1 pe-2 font-medium">
-                        {t('proxiesHeader')}
-                      </th>
-                      <th scope="col" className="w-14 py-1 font-medium sm:w-36">
-                        <span className="sr-only">{t('actions')}</span>
-                      </th>
-                    </>
-                  ) : (
-                    <>
-                      <th scope="col">{t('manaCost')}</th>
-                      <th scope="col">{t('type')}</th>
-                      <th scope="col">{t('proxy')}</th>
-                    </>
-                  )}
+                  <th scope="col">{t('quantityHeader')}</th>
+                  <th scope="col">{t('cardName')}</th>
+                  <th scope="col">{t('manaCost')}</th>
+                  <th scope="col">{t('type')}</th>
+                  <th scope="col">{t('proxy')}</th>
                 </tr>
               </thead>
               <tbody>
-                {group.lines.map((line) =>
-                  view === 'edit' ? (
-                    <EditableLine key={line.key} deckId={deckId} line={line} />
-                  ) : (
-                    <tr key={line.key} className="border-t border-ink-200 dark:border-ink-800">
-                      <td className="py-1.5 tabular-nums">{line.quantity}</td>
-                      <td className="py-1.5 pe-2 break-words">
-                        <button
-                          type="button"
-                          className="text-left underline-offset-2 hover:underline"
-                          aria-haspopup="dialog"
-                          onClick={(e) => openZoom(line, e.currentTarget)}
-                        >
-                          {line.name}
-                        </button>
-                        {printLabel(line.card) && (
-                          <span className="muted text-xs"> · {printLabel(line.card)}</span>
-                        )}
-                        {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
-                      </td>
-                      <td className="py-1.5 pe-2">
-                        <ManaCost cost={line.card?.manaCost} className="text-sm" />
-                      </td>
-                      <td className="muted truncate py-1.5 sm:pe-2">
-                        {/* No celular a coluna tem largura 0: o tipo fica só no diálogo da carta. */}
-                        <span className="hidden sm:inline">{line.card?.typeLine}</span>
-                      </td>
-                      <td className="py-1.5 text-right">
-                        <ProxyBadge line={line} />
-                      </td>
-                    </tr>
-                  ),
-                )}
+                {group.lines.map((line) => (
+                  <tr key={line.key} className="border-t border-ink-200 dark:border-ink-800">
+                    <td className="py-1.5 tabular-nums">{line.quantity}</td>
+                    <td className="py-1.5 pe-2 break-words">
+                      <button
+                        type="button"
+                        className="text-left underline-offset-2 hover:underline"
+                        aria-haspopup="dialog"
+                        onClick={(e) => openZoom(line, e.currentTarget)}
+                      >
+                        {line.name}
+                        {isOwner && <span className="sr-only"> ({t('editHint')})</span>}
+                      </button>
+                      {printLabel(line.card) && (
+                        <span className="muted text-xs"> · {printLabel(line.card)}</span>
+                      )}
+                      {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
+                      {foilsOf(line) > 0 && (
+                        <>
+                          {' '}
+                          <FoilBadge line={line} />
+                        </>
+                      )}
+                    </td>
+                    <td className="py-1.5 pe-2">
+                      <ManaCost cost={line.card?.manaCost} className="text-sm" />
+                    </td>
+                    <td className="muted truncate py-1.5 sm:pe-2">
+                      {/* No celular a coluna tem largura 0: o tipo fica só no diálogo da carta. */}
+                      <span className="hidden sm:inline">{line.card?.typeLine}</span>
+                    </td>
+                    <td className="py-1.5 text-right">
+                      <ProxyBadge line={line} />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           )}
         </section>
       ))}
 
-      <dialog
-        ref={dialog}
-        aria-labelledby={`${titleId}-zoom`}
-        className="m-auto w-[min(92vw,26rem)] rounded-2xl bg-surface p-4 text-ink-900 shadow-2xl backdrop:bg-ink-950/70 dark:bg-ink-900 dark:text-ink-100"
+      <CardDialog
+        open={zoomed !== null && current !== null}
+        name={current?.name ?? ''}
+        card={current?.card ? { ...current.card, name: current.name } : null}
+        back={current ? flipped.has(current.key) : false}
+        foil={current ? foilsOf(current) > 0 : false}
+        onBackChange={(back) => {
+          if (current && back !== flipped.has(current.key)) toggleFlip(current.key);
+        }}
         onClose={() => {
           setZoomed(null);
           opener.current?.focus();
         }}
+        badges={
+          current && (current.proxies > 0 || foilsOf(current) > 0) ? (
+            <p className="flex flex-wrap gap-2">
+              <ProxyBadge line={current} />
+              <FoilBadge line={current} />
+            </p>
+          ) : null
+        }
+        price={
+          current?.card?.priceUsd && usdBrl ? (
+            <p className="text-sm">
+              {t('cardPriceBrl', {
+                usd: format.number(Number(current.card.priceUsd), {
+                  style: 'currency',
+                  currency: 'USD',
+                }),
+                brl: format.number(Number(current.card.priceUsd) * usdBrl, {
+                  style: 'currency',
+                  currency: 'BRL',
+                }),
+              })}
+            </p>
+          ) : undefined
+        }
       >
-        {zoomed && (
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <h2 id={`${titleId}-zoom`} className="text-lg font-semibold">
-                {zoomed.name}
-              </h2>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => dialog.current?.close()}
-              >
-                <Icon name="close" />
-                {t('close')}
-              </button>
-            </div>
-            {zoomed.card?.backImageUri && (
-              <div role="group" aria-label={t('faces')} className="flex gap-2">
-                {(['front', 'back'] as const).map((face) => {
-                  const showingBack = flipped.has(zoomed.key);
-                  const pressed = face === 'back' ? showingBack : !showingBack;
-                  return (
-                    <button
-                      key={face}
-                      type="button"
-                      className={pressed ? 'btn-primary' : 'btn-secondary'}
-                      aria-pressed={pressed}
-                      onClick={() => {
-                        if (!pressed) toggleFlip(zoomed.key);
-                      }}
-                    >
-                      {t(face === 'front' ? 'faceFront' : 'faceBack')}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-            {imageOf(zoomed) ? (
-              <div className="relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%]">
-                <Image
-                  src={imageOf(zoomed)!}
-                  alt={
-                    flipped.has(zoomed.key) && zoomed.card?.backName
-                      ? zoomed.card.backName
-                      : zoomed.name
-                  }
-                  fill
-                  unoptimized
-                  sizes="26rem"
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <p className="muted">{t('noImage')}</p>
-            )}
-            {zoomed.card && (
-              <p className="muted flex flex-wrap items-center gap-2 text-sm">
-                {zoomed.card.typeLine}
-                <ManaCost cost={zoomed.card.manaCost} />
-              </p>
-            )}
-            {zoomed.card?.setName && (
-              <p className="text-sm">
-                {t('printOf', {
-                  set: zoomed.card.setName,
-                  print: printLabel(zoomed.card) ?? '',
-                })}
-              </p>
-            )}
-            <ProxyBadge line={zoomed} />
-            {zoomed.card?.priceUsd && (
-              <p className="text-sm">
-                {usdBrl
-                  ? t('cardPriceBrl', {
-                      usd: format.number(Number(zoomed.card.priceUsd), {
-                        style: 'currency',
-                        currency: 'USD',
-                      }),
-                      brl: format.number(Number(zoomed.card.priceUsd) * usdBrl, {
-                        style: 'currency',
-                        currency: 'BRL',
-                      }),
-                    })
-                  : t('cardPrice', {
-                      usd: format.number(Number(zoomed.card.priceUsd), {
-                        style: 'currency',
-                        currency: 'USD',
-                      }),
-                    })}
-              </p>
-            )}
-            <a
-              href={ligaMagicCardUrl(zoomed.name)}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-secondary w-full"
-            >
-              <Icon name="externalLink" />
-              {t('ligaMagic')}
-              <span className="sr-only"> {tc('newTab')}</span>
-            </a>
-          </div>
-        )}
-      </dialog>
+        {isOwner && current && <LineEditor key={current.key} deckId={deckId} tile={current} />}
+      </CardDialog>
     </section>
   );
 }
 
-/** Linha editável: quantidade e proxies salvam ao sair do campo ou com Enter. */
-function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) {
+/**
+ * Editor da carta no diálogo (dono do deck). Cada carta da grade é uma versão: as cópias comuns
+ * (com as proxies) ou as foil da mesma edição. Quantidade e proxies salvam ao sair do campo ou
+ * com Enter; "Foil" passa as cópias desta carta para o outro acabamento; "Separar 1 cópia" cria
+ * a outra carta com uma cópia; a edição troca pelo seletor; remover pede confirmação.
+ */
+function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
   const t = useTranslations('decks');
   const { run, error, pending } = useApiAction();
-  const [quantity, setQuantity] = useState(String(line.quantity));
-  const [proxies, setProxies] = useState(String(line.proxies));
+  const id = useId();
+  const group = tile.group;
+  const isFoil = tile.finish === 'foil';
+  const groupFoils = foilsOf(group);
+  const [quantity, setQuantity] = useState(String(tile.quantity));
+  const [proxies, setProxies] = useState(String(tile.proxies));
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState('');
-  // Nome com a edição: distingue linhas da mesma carta para leitores de tela.
-  const print = printLabel(line.card);
-  const label = print ? `${line.name} (${print})` : line.name;
+  const real = tile.quantity - tile.proxies;
 
-  const save = (q: number, p: number) => {
-    if (q === line.quantity && p === line.proxies) return;
-    if (!Number.isInteger(q) || !Number.isInteger(p) || p > q) {
+  /** Grava a linha inteira (carta + edição): total, proxies e quantas são foil. */
+  const save = (q: number, p: number, f: number, message: string) => {
+    if (q === group.quantity && p === group.proxies && f === groupFoils) return;
+    if (![q, p, f].every(Number.isInteger) || p > q || f < 0 || f > q - p) {
       setStatus(t('invalidCopies'));
       return;
     }
@@ -467,92 +455,135 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
         api(`/api/v1/decks/${deckId}/lines`, {
           method: 'PUT',
           body: {
-            name: line.name,
-            board: line.board,
+            name: group.name,
+            board: group.board,
             quantity: q,
             proxies: p,
-            scryfallId: line.scryfallId,
+            scryfallId: group.scryfallId,
+            foils: f,
           },
         }),
-      () => setStatus(t('lineSaved', { name: line.name })),
+      () => setStatus(message),
     );
   };
-  const commit = () => save(Number(quantity), Number(proxies));
+  /** Esta carta com `n` cópias (e `px` proxies, só na carta comum); a outra fica como está. */
+  const setThis = (n: number, px: number, message: string) =>
+    isFoil
+      ? save(group.quantity - groupFoils + n, group.proxies, n, message)
+      : save(n + groupFoils, px, groupFoils, message);
+  const commit = () => {
+    const n = Number(quantity);
+    const px = isFoil ? 0 : Number(proxies);
+    if (!Number.isInteger(n) || !Number.isInteger(px) || px > n) {
+      setStatus(t('invalidCopies'));
+      return;
+    }
+    setThis(
+      n,
+      px,
+      n === 0 ? t('cardRemoved', { name: tile.name }) : t('lineSaved', { name: tile.name }),
+    );
+  };
   const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       commit();
     }
   };
+  /** Passa `n` cópias reais desta carta para o outro acabamento. */
+  const moveFinish = (n: number) => {
+    const f = isFoil ? groupFoils - n : groupFoils + n;
+    save(group.quantity, group.proxies, f, t('foilsSaved', { name: tile.name, count: f }));
+  };
 
   return (
-    <tr className="border-t border-ink-200 align-middle dark:border-ink-800">
-      <td className="py-1.5 pe-2">
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={MAX_COPIES}
-          className="input w-full px-2"
-          aria-label={t('quantityOf', { name: label })}
-          value={quantity}
-          disabled={pending}
-          onChange={(e) => setQuantity(e.target.value)}
-          onBlur={commit}
-          onKeyDown={onKey}
-        />
-      </td>
-      <td className="py-1.5 pe-2">
-        <span className="block font-medium">{line.name}</span>
-        {line.card && <PrintPicker deckId={deckId} line={line} />}
-        {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
-        <span
-          role="status"
-          className={`block text-xs ${error ? 'text-red-600 dark:text-red-400' : 'muted'}`}
-        >
-          {error ?? status}
-        </span>
-      </td>
-      <td className="py-1.5 pe-2">
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={Number(quantity) || 0}
-          className="input w-full px-2"
-          aria-label={t('proxiesOf', { name: label })}
-          value={proxies}
-          disabled={pending}
-          onChange={(e) => setProxies(e.target.value)}
-          onBlur={commit}
-          onKeyDown={onKey}
-        />
-      </td>
-      <td className="py-1.5 text-right">
+    <fieldset className="space-y-3 rounded-xl border border-line px-3 pt-1 pb-3">
+      <legend className="px-1 text-sm font-semibold">
+        {isFoil ? t('editLineFoil') : t('editLine')}
+      </legend>
+      {/* Linha 1: as cópias (quantidade, proxies e acabamento). Linha 2: as ações. */}
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+        <div className="w-24">
+          <label className="label" htmlFor={`${id}-q`}>
+            {t('quantityLabel')}
+          </label>
+          <input
+            id={`${id}-q`}
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={MAX_COPIES}
+            className="input"
+            value={quantity}
+            disabled={pending}
+            onChange={(e) => setQuantity(e.target.value)}
+            onBlur={commit}
+            onKeyDown={onKey}
+          />
+        </div>
+        {!isFoil && (
+          <div className="w-28">
+            <label className="label" htmlFor={`${id}-p`}>
+              {t('proxiesLabel')}
+            </label>
+            <input
+              id={`${id}-p`}
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={Number(quantity) || 0}
+              className="input"
+              value={proxies}
+              disabled={pending}
+              onChange={(e) => setProxies(e.target.value)}
+              onBlur={commit}
+              onKeyDown={onKey}
+            />
+          </div>
+        )}
+        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={isFoil}
+            disabled={pending || real < 1}
+            onChange={() => moveFinish(real)}
+          />
+          <span aria-hidden="true">✦</span> {t('foil')}
+        </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {tile.card && <PrintPicker deckId={deckId} line={{ ...tile, foil: isFoil }} />}
+        {real >= 2 && (
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={pending}
+            onClick={() => moveFinish(1)}
+          >
+            <Icon name="flip" />
+            {isFoil ? t('splitNormal') : t('splitFoil')}
+          </button>
+        )}
         <button
           type="button"
-          className={
-            confirming ? 'btn-danger border border-red-300 dark:border-red-800' : 'btn-danger'
-          }
+          className={`${confirming ? 'btn-danger border border-danger' : 'btn-danger'} ms-auto`}
           disabled={pending}
           onBlur={() => setConfirming(false)}
           onClick={() => {
             if (!confirming) return setConfirming(true);
             setConfirming(false);
-            save(0, 0);
+            setThis(0, 0, t('cardRemoved', { name: tile.name }));
           }}
         >
           <Icon name="delete" />
-          <span className="hidden sm:inline">
-            {confirming ? t('confirmRemoveCard') : t('removeCard')}
-          </span>
-          <span className="sr-only sm:hidden">
-            {confirming ? t('confirmRemoveCard') : t('removeCard')}
-          </span>
-          <span className="sr-only"> ({label})</span>
+          {confirming ? t('confirmRemoveFromDeck') : t('removeFromDeck')}
         </button>
-      </td>
-    </tr>
+      </div>
+      {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
+      <p role="status" className={`text-sm ${error ? 'text-danger' : 'muted'}`}>
+        {error ?? status}
+      </p>
+    </fieldset>
   );
 }
 

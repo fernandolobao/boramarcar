@@ -163,6 +163,13 @@ sem rolagem horizontal em 320px.
 - "Virar" é um botão com texto visível, `aria-pressed` e o nome da carta para leitores de tela; fica fora do botão "Ampliar" (nada de botão dentro de botão).
 - No diálogo, "Frente" e "Verso" são botões com `aria-pressed` num grupo nomeado ("Faces da carta"); o `alt` da imagem muda para o nome da face mostrada.
 
+### Revisão: painel, nomes clicáveis e foil
+
+- Painel: números em texto (o anel de aproveitamento, as barras de atividade e o pódio são decorativos, com tabela ou texto equivalente); a forma recente usa letras (V/D/E) além da cor e tem o texto por extenso para leitores de tela; avatares decorativos com os nomes em `sr-only`.
+- Nomes de jogador são links com sublinhado (não só cor); nomes de carta são botões (`aria-haspopup="dialog"`) com sublinhado pontilhado, cujo nome acessível é o próprio nome da carta. O diálogo devolve o foco ao botão ao fechar.
+- Foil: caixa de seleção com rótulo visível e o nome da carta para leitores de tela; selo com "✦ Foil" em texto; o brilho é decorativo e para com "reduzir movimento".
+- Achado e corrigido: o diálogo da carta dentro de um parágrafo causava erro de hidratação (o React refazia a página e perdia o tema escuro escolhido). Agora ele é criado no primeiro clique, fora do texto.
+
 ### Revisão: rebranding ArcanaKin (cores e logotipo)
 
 - Cores vêm dos design tokens (`packages/tokens`), com testes de contraste para todos os pares usados: texto ≥ 4,5:1 (inclusive o secundário sobre o Pergaminho, as superfícies e o hover), bordas de campos e anel de foco ≥ 3:1, nos temas claro e escuro.
@@ -173,6 +180,11 @@ sem rolagem horizontal em 320px.
 ### Revisão: trocar lugares no modo mesa
 
 - No modo de troca, cada área vira um botão com nome ("Escolher Ana para trocar de lugar") e estado (`aria-pressed`/`selected`); o botão central vira "Pronto" com texto visível; a troca é anunciada numa região viva ("Ana e Bia trocaram de lugar.") e "Desfazer" volta a ordem.
+
+### Revisão: deck no app
+
+- Cada carta é um botão com quantidade, nome, edição e proxies no nome ("2 × Sol Ring, CMM, 1 proxy") e dica de que abre a carta; a carta grande tem a imagem com o nome como rótulo, botão para ver o verso e o texto da carta em texto.
+- A barra da nota é decorativa (o número está em texto); cada faixa da curva é lida como "Custo 3: 12 cartas". Problemas de validação têm ícone e texto, não só cor.
 
 ### Revisão: disponibilidade no app
 
@@ -213,3 +225,16 @@ sem rolagem horizontal em 320px.
 - **Mensagens de erro de formulário**: aparecem em `role="alert"`, mas ainda não são ligadas ao campo com `aria-describedby`/`aria-invalid` (a maioria dos erros vem do servidor e não é de um campo só).
 - **Campos obrigatórios**: os opcionais estão marcados como "(opcional)"; considerar também um indicador visual nos obrigatórios em formulários longos.
 - **Login com Google**: depende da tela do Google (fora do nosso controle).
+
+## Privacidade e LGPD (11/11/2026)
+
+- **Aviso de cookies**: região com título (`<section aria-labelledby>`), não modal, no fim da ordem de foco. Enquanto está na tela, a página reserva o espaço dele (`scroll-padding-bottom` e `padding-bottom`), para nenhum elemento focado ficar escondido atrás do aviso (2.4.11). "Aceitar" e "Recusar" têm o mesmo estilo e texto visível.
+- **Configurações → Privacidade e dados**: escolha de cookies em `fieldset/legend` com rádios e confirmação em `role="status"`. "Excluir minha conta" usa a confirmação em dois cliques do projeto, com o aviso em `role="alert"` ligado ao botão por `aria-describedby`.
+- **Botão "Voltar"**: link com texto visível, alvo ≥ 24px, no mesmo lugar em todas as páginas internas (3.2.3).
+- **/privacidade**: um `h1`, seções numeradas com `h2` e índice com links para as âncoras; entra no teste axe de páginas públicas.
+
+## Carregamento e ações (11/11/2026)
+
+- **Toda ação na API** (`useApiAction`) deixa o botão que a disparou com `aria-busy="true"`. O ícone do botão vira um indicador girando (parado com "reduzir movimento") e o botão fica desabilitado **durante a espera pelo servidor**; antes, só ficava desabilitado depois da resposta. Uma ação de cada vez: clique duplo e Enter + "perdeu o foco" não repetem a ação.
+- **Barra no topo** (`ActivityBar`) durante ações e mudanças de página (link interno para outra página), decorativa (`aria-hidden`), com "Carregando…" numa região de status para leitores de tela. Testes E2E que procuram mensagens de status devem filtrar pelo texto, porque essa região existe em todas as páginas.
+- **Ações no diálogo da carta** (deck e coleção) são todas botões: "Edição: …" deixou de parecer link.

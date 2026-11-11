@@ -150,6 +150,7 @@ export async function changeLinePrint(
     fromScryfallId: string | null;
     toScryfallId: string;
     quantity: number;
+    foil?: boolean;
   },
   fetchFn: FetchLike = fetch,
 ) {

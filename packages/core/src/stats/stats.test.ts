@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeGroupStats, resolvePeriod, type StatsGame } from '.';
+import { computeGroupStats, gamesByMonth, RECENT_RESULTS, resolvePeriod, type StatsGame } from '.';
 
 let n = 0;
 const game = (
@@ -123,6 +123,40 @@ describe('computeGroupStats', () => {
       averageWinningTurn: null,
       firstPlayerWinRate: null,
     });
+  });
+});
+
+describe('forma recente e atividade por mês', () => {
+  it('guarda os últimos resultados de cada jogador, do mais antigo ao mais novo', () => {
+    const many = Array.from({ length: 12 }, (_, i) =>
+      game([
+        ['ana', i % 3 === 0 ? 'loss' : 'win'],
+        ['bia', i % 3 === 0 ? 'win' : 'loss'],
+      ]),
+    );
+    const ana = computeGroupStats(many).players.find((p) => p.userId === 'ana')!;
+    expect(ana.recent).toHaveLength(RECENT_RESULTS);
+    expect(ana.recent.at(-1)).toBe('win');
+    expect(ana.recent.slice(0, 2)).toEqual(['win', 'loss']);
+  });
+
+  it('conta partidas por mês no fuso do grupo, com zeros nos meses vazios', () => {
+    const now = new Date('2026-11-07T15:00:00Z');
+    expect(
+      gamesByMonth(
+        [
+          { playedAt: new Date('2026-11-02T22:00:00Z') },
+          { playedAt: new Date('2026-11-01T01:00:00Z') }, // 31/out 22h em São Paulo
+          { playedAt: new Date('2026-09-10T22:00:00Z') },
+          { playedAt: new Date('2025-01-10T22:00:00Z') },
+        ],
+        { now, months: 3 },
+      ),
+    ).toEqual([
+      { month: '2026-09', games: 1 },
+      { month: '2026-10', games: 1 },
+      { month: '2026-11', games: 1 },
+    ]);
   });
 });
 

@@ -35,14 +35,43 @@ describe('linhas do deck', () => {
 
   it('valida e separa quantidade e proxies', () => {
     expect(splitLine(10, 3)).toEqual([
-      { quantity: 7, isProxy: false },
-      { quantity: 3, isProxy: true },
+      { quantity: 7, isProxy: false, isFoil: false },
+      { quantity: 3, isProxy: true, isFoil: false },
     ]);
-    expect(splitLine(2, 2)).toEqual([{ quantity: 2, isProxy: true }]);
+    expect(splitLine(2, 2)).toEqual([{ quantity: 2, isProxy: true, isFoil: false }]);
     expect(splitLine(0, 0)).toEqual([]);
     expect(() => validateLine(1, 2)).toThrow(/Proxies/);
     expect(() => validateLine(-1, 0)).toThrow(/Quantidade/);
     expect(() => validateLine(1.5, 0)).toThrow(/Quantidade/);
+  });
+
+  it('foil e não foil da mesma edição na mesma linha (cópias foil contadas como proxies)', () => {
+    // 2 Plains da mesma edição: 1 foil e 1 comum.
+    expect(splitLine(2, 0, 1)).toEqual([
+      { quantity: 1, isProxy: false, isFoil: false },
+      { quantity: 1, isProxy: false, isFoil: true },
+    ]);
+    expect(splitLine(5, 2, 3)).toEqual([
+      { quantity: 3, isProxy: false, isFoil: true },
+      { quantity: 2, isProxy: true, isFoil: false },
+    ]);
+    expect(() => validateLine(3, 2, 2)).toThrow(/foil/);
+    const [line] = mergeDeckLines([
+      { id: 'a', name: 'Plains', board: 'mainboard', quantity: 1, isProxy: false, card: null },
+      {
+        id: 'b',
+        name: 'Plains',
+        board: 'mainboard',
+        quantity: 1,
+        isProxy: false,
+        isFoil: true,
+        card: null,
+      },
+    ]);
+    expect(line).toMatchObject({ quantity: 2, foils: 1, foil: false });
+    expect(
+      exportDeckText([{ name: 'Plains', board: 'mainboard', quantity: 2, proxies: 0, foils: 1 }]),
+    ).toBe('Deck\n1 Plains\n1 Plains *F*\n');
   });
 });
 
@@ -168,5 +197,60 @@ describe('edições (impressões) diferentes da mesma carta', () => {
     ]);
     expect(plan.added).toEqual(['Sol Ring']);
     expect(plan.changed).toEqual(['Sol Ring']);
+  });
+});
+
+describe('foil', () => {
+  it('a linha é foil quando todas as cópias reais são foil, e a exportação marca *F*', () => {
+    const lines = mergeDeckLines([
+      {
+        id: '1',
+        name: 'Sol Ring',
+        board: 'mainboard',
+        quantity: 1,
+        isProxy: false,
+        isFoil: true,
+        card: null,
+      },
+      {
+        id: '2',
+        name: 'Sol Ring',
+        board: 'mainboard',
+        quantity: 1,
+        isProxy: true,
+        isFoil: true,
+        card: null,
+      },
+      {
+        id: '3',
+        name: 'Forest',
+        board: 'mainboard',
+        quantity: 9,
+        isProxy: false,
+        isFoil: true,
+        card: null,
+      },
+      { id: '4', name: 'Forest', board: 'mainboard', quantity: 1, isProxy: true, card: null },
+    ]);
+    expect(lines.find((l) => l.name === 'Sol Ring')).toMatchObject({ quantity: 2, foil: true });
+    // Proxies não contam: as 9 cópias reais são foil.
+    expect(lines.find((l) => l.name === 'Forest')).toMatchObject({
+      quantity: 10,
+      foils: 9,
+      foil: true,
+    });
+    expect(
+      exportDeckText([
+        {
+          name: 'Sol Ring',
+          board: 'mainboard',
+          quantity: 1,
+          proxies: 0,
+          foil: true,
+          setCode: 'cmm',
+          collectorNumber: '400',
+        },
+      ]),
+    ).toBe('Deck\n1 Sol Ring (CMM) 400 *F*\n');
   });
 });

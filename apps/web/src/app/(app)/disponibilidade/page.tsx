@@ -21,6 +21,7 @@ import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { Icon } from '@/components/icons';
+import { PlayerLink, PlayerLinks } from '@/components/player-link';
 
 export const generateMetadata = navMetadata('availability');
 
@@ -114,8 +115,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
                 <div>
                   <p className="font-medium">{range(w.start, w.end)}</p>
                   <p className="muted">
-                    {w.locationName ?? tc('locationTbd')} ·{' '}
-                    {w.players.map((p) => p.name).join(', ')}
+                    {w.locationName ?? tc('locationTbd')} · <PlayerLinks players={w.players} />
                   </p>
                 </div>
                 <CreateEventFromWindowButton
@@ -237,7 +237,8 @@ export default async function AvailabilityPage({ searchParams }: Props) {
               <li key={slot.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
                 <div>
                   <p className="font-medium">
-                    {slot.userName} · {range(slot.startsAt, slot.endsAt)}
+                    <PlayerLink userId={slot.userId} name={slot.userName} /> ·{' '}
+                    {range(slot.startsAt, slot.endsAt)}
                     {slot.kind === 'weekly' && (
                       <span className="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-normal dark:bg-ink-800">
                         ↻ {t('weeklyTag')}

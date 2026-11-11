@@ -197,6 +197,48 @@ Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e 
 
 `/api/cron/scryfall` roda todo dia às 06:43 UTC (`vercel.json`, protegido por `CRON_SECRET`, como o cron de lembretes). Em vez do _bulk data_ do Scryfall (centenas de MB, pesado demais para uma função serverless), relê pelo `/cards/collection` só as cartas que estão em algum deck e não foram atualizadas nas últimas 20 h, das mais antigas para as mais novas, até 1 500 por execução (20 lotes de 75, 100 ms entre lotes). Assim preços, Game Changers, imagens e edições ficam em dia; cartas que sumiram do Scryfall são marcadas como verificadas para não repetir a consulta.
 
+## Painel
+
+`/painel` junta o que importa ao abrir o app: o **próximo encontro** em destaque (contagem regressiva, quem confirmou e a sua resposta), **os seus números** (posição, pontos, aproveitamento com anel, vitórias seguidas), a **forma** (últimos 10 resultados, `PlayerStats.recent`), o **pódio**, a **atividade do grupo** (partidas por mês nos últimos 6 meses, `gamesByMonth` no fuso do grupo, com tabela para leitores de tela, turno médio e duração média), os **melhores horários** (com "Marcar encontro") e os **comandantes em alta**.
+
+## Nomes clicáveis
+
+- **Jogadores**: `<PlayerLink>`/`<PlayerLinks>` levam a `/jogadores/:id` (o próprio vai para `/perfil`) em encontros, partidas, ranking, estatísticas, disponibilidade e painel. Em frases traduzidas, o nome entra por `t.rich` com uma tag (ex.: `<owner>{ownerName}</owner>`).
+- **Cartas**: `<CardName>`/`<CardNames>` abrem o mesmo diálogo da carta do deck (`<CardDialog>`), buscando por nome em `GET /api/v1/cards/named?name=` (cache local; senão, Scryfall, e grava no cache). Usado na análise (funções, curva, nota, bracket, validação), na comparação, nas estatísticas, nas partidas e no painel. O diálogo é criado no primeiro clique e vai para o `<body>` por portal — um `<dialog>` dentro de um `<p>` quebra o HTML e a hidratação.
+
+## Foil
+
+Foil é contado por cópia, como as proxies: numa linha (carta + edição) podem conviver cópias foil e comuns (ex.: 1 Plains foil e 1 comum). No banco, cada grupo (comum, foil, proxy) é uma linha de `deck_cards`; o índice único inclui `is_foil` (migration `0014`). `DeckLine.foils` é quantas cópias reais são foil, e `DeckLine.foil` diz se todas as reais são (proxies não contam). No editor, com 1 cópia real aparece a caixa "Foil" (salva na hora); com mais de uma, "Cópias foil" (`PUT …/lines` com `foils`; `foil` booleano continua aceito). Mudar a quantidade sem mandar `foils` mantém as cópias foil que já eram (cópias novas entram comuns). Na coleção, foil e comum são versões diferentes; trocar o acabamento de cópias no deck move essas cópias entre as versões. A exportação separa as linhas (`1 Plains` e `1 Plains *F*`). Na grade, a carta com alguma cópia foil tem o brilho decorativo e o selo "✦ Foil" (todas) ou "✦ N foil" (parte).
+
+## Navegação: "Voltar"
+
+Toda página fora da navegação principal (deck, encontro, jogador, perfil, configurações, importar, imprimir, histórico) mostra "Voltar" no topo, pelo layout do app (`components/back-link.tsx`), então páginas novas ganham o botão sozinhas. Com página anterior no app, volta para ela (`router.back()`); entrando direto pelo link, vai para a página "mãe" (`/decks/x/imprimir` → `/decks/x`, `/jogadores/x` → `/grupo`, `/perfil` → `/painel`). É um link de verdade, então Ctrl/Cmd+clique abre a página mãe em outra aba.
+
+## Lista de decks: nota e bracket
+
+Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e o bracket mínimo de cada deck, pela mesma conta da página do deck (`getDeckRatings`). As proxies ficam só na página do deck.
+
+## Gravação de sessões (Hotjar/Contentsquare)
+
+`components/session-insights.tsx` carrega a tag do Contentsquare (o Hotjar hoje faz parte dele) **só em produção** (`VERCEL_ENV=production`; `NEXT_PUBLIC_SESSION_INSIGHTS=off` desliga) e **só com consentimento** (cookie `ak_consent=accepted`). Previews, E2E e desenvolvimento não gravam nem mostram o aviso. Campos de formulário são mascarados pela ferramenta; o e-mail exibido leva `data-cs-mask`.
+
+## Privacidade e LGPD
+
+- **Aviso de cookies** (`consent-banner.tsx`): aparece enquanto não houver escolha, só quando a gravação de sessões está ligada (o Vercel Analytics não usa cookies). "Aceitar" e "Recusar" têm o mesmo peso. A escolha vale 6 meses (`lib/consent.ts`). Recusar apaga os cookies `_cs*`, e retirar o consentimento depois de aceitar recarrega a página sem a tag. O aviso não é modal: enquanto está na tela, a página reserva o espaço dele (`scroll-padding-bottom`) para o foco não ficar escondido (WCAG 2.4.11).
+- **Política de Privacidade** (`/privacidade`, pública): texto em `app/privacidade/content.ts`, nos dois idiomas. Mudou o que o app coleta, com quem compartilha ou por quanto tempo guarda? Atualize o texto e `PRIVACY_UPDATED`. Links no rodapé da página inicial e do app, no aviso de cookies, em Configurações e no app mobile.
+- **Direitos do titular em autoatendimento** (Configurações → Privacidade e dados; serviços em `packages/db/src/services/privacy.ts`):
+  - `GET /api/v1/me/export`: JSON com perfil, logins (sem tokens), grupos, locais hospedados, disponibilidade, presenças, partidas e decks. Dados de outras pessoas ficam de fora.
+  - `DELETE /api/v1/me` (`{ confirm: true }`): encerra a sessão e apaga login, sessões, decks, disponibilidade, presenças futuras e locais que a pessoa hospeda, e tira a pessoa dos grupos. O registro do usuário vira "Jogador removido" (sem e-mail real, foto, fuso ou idioma; `deleted_at` preenchido), para as partidas continuarem no histórico dos outros. Grupos de que era dona passam para o admin (ou membro) mais antigo, ou são apagados se ela estava sozinha. `GET /api/v1/me` mostra isso antes.
+  - No app mobile, a exclusão é feita no próprio app (exigência das lojas); baixar os dados abre o site.
+
+## Coleção
+
+- **Dados** (`collection_cards`): uma linha por pessoa, carta, impressão e acabamento (foil), com a quantidade. Proxies nunca entram.
+- **Decks só acrescentam** (`syncCollectionFromDecks`, chamada em toda mudança de deck): para cada carta, impressão e acabamento, a coleção fica com pelo menos a soma das cópias não proxy em todos os decks da pessoa (fora o maybeboard). Tirar uma carta de um deck não tira da coleção. A migration `0013_colecao` fez a carga inicial com a mesma regra.
+- **Cache de cartas**: ganhou ilustrador, data de lançamento da impressão, raridade e preço foil (`artist`, `released_at`, `rarity`, `price_usd_foil`). O cron do Scryfall também atualiza as cartas que só estão em coleções.
+- **Tela** (`/colecao`): a coleção vem inteira do servidor e é filtrada e ordenada no navegador (`packages/core/src/collection`): cor (identidade), valor de mana, tipo, edição, ano, ilustrador, raridade, foil e "em deck". Galeria densa (120 por vez, imagens com carregamento preguiçoso) ou tabela. O diálogo da carta mostra os decks que a usam e edita cópias, foil e impressão. O valor total usa o preço foil para cópias foil e a cotação PTAX para R$.
+- **API**: `GET/POST /api/v1/collection`, `PATCH/DELETE /api/v1/collection/:id`.
+
 ## Marca e design tokens (ArcanaKin)
 
 `packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):
@@ -236,6 +278,26 @@ Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pesso
 ## Autenticação
 
 Better Auth com o provedor Google e adaptador Drizzle. Sessões ficam no Postgres; o cookie é cacheado por 5 minutos (`cookieCache`) para evitar uma consulta por requisição. `proxy.ts` (antigo `middleware.ts` no Next 16) só verifica a presença do cookie; a validação real acontece nas páginas (`requireUser`) e na API (`authed`).
+
+**Escopos e foto do Google.** O login pede só `openid`, `email` e `profile` (`GOOGLE_SIGN_IN_OPTIONS`, com `disableDefaultScope`), sem Gmail, Drive ou outros. A foto do avatar é a claim `picture` do OpenID Connect:
+
+- **Usuário novo**: o Better Auth grava `picture` em `user.image` ao criar o usuário.
+- **Logins seguintes**: o Better Auth não atualiza o perfil por padrão (`overrideUserInfoOnSignIn` é `false`, e ligá-lo também sobrescreveria nome e e-mail). Por isso, os hooks `databaseHooks.account.create/update.after` — que rodam a cada login, quando a conta recebe o ID token novo — chamam `syncGoogleProfileImage` (`server/google-picture.ts`): lê só a claim `picture` do ID token e grava em `user.image` quando é uma URL `https` válida e diferente da atual. Sem foto (ou com foto inválida), a imagem existente fica como está — nunca vira `null` ou vazio. Uma falha aqui nunca impede o login.
+- O ID token vem direto do endpoint de token do Google, por HTTPS e com o client secret, e já foi aceito pelo Better Auth no login.
+- A URL da foto pode mudar e nunca identifica o usuário: quem identifica é o `sub` (em `account.accountId`).
+- **Avatar**: `<AvatarImage>` mostra a foto com `referrerPolicy="no-referrer"` (o servidor de fotos do Google pode recusar pedidos com referrer) e volta para as iniciais se não houver foto ou se a URL falhar. As fotos são `unoptimized` (vão direto do Google para o navegador); `lh3.googleusercontent.com` está em `images.remotePatterns` caso a otimização seja ligada. A sessão fica em cache por até 5 minutos, então uma foto nova pode levar esse tempo para aparecer.
+
+### Login nos previews da Vercel
+
+O Google só aceita endereços de retorno exatos, e cada preview tem um endereço diferente. Por isso, na Vercel (produção e preview), o Better Auth usa o plugin **OAuth proxy**:
+
+1. No preview, "Entrar com Google" sai com o retorno apontando para **produção** (`https://www.arcanakin.com.br/api/auth/callback/google`, já cadastrado no Google).
+2. Produção recebe o retorno do Google e manda o perfil **cifrado** (vale 60 s) de volta para o preview (`/api/auth/callback/google/oauth-proxy`).
+3. O preview cria a sessão no próprio domínio.
+
+- **Configuração** (`server/trusted-origins.ts`): produção e preview aceitam só os endereços dos previews deste projeto nesta conta (`https://boramarcar-*-fernandolobaos-projects.vercel.app`). Em desenvolvimento (localhost) o plugin fica desligado.
+- **Variáveis:** preview e produção usam o mesmo `BETTER_AUTH_SECRET`, ou o mesmo `OAUTH_PROXY_SECRET` (opcional, para não depender do segredo principal). `BETTER_AUTH_URL` fica vazio no preview, e o endereço vem da Vercel.
+- **Banco:** cada preview tem o próprio branch no Neon (integração Neon ↔ Vercel), com `MIGRATE_ON_BUILD=1` só em Preview. Sem `RESEND_API_KEY` no preview, nenhum e-mail real sai de lá.
 
 ## Internacionalização
 

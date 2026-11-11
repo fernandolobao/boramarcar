@@ -1,20 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import { authClient } from '@/lib/auth-client';
+import { AvatarImage } from './avatar-image';
 import { Icon } from './icons';
-
-const initials = (name: string) =>
-  name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
 
 /**
  * Menu da conta (padrão "disclosure" de navegação: botão com aria-expanded + lista de links).
@@ -79,11 +71,7 @@ export function UserMenu({
         onClick={() => setOpen((v) => !v)}
       >
         <span className="relative grid size-8 place-items-center overflow-hidden rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-700 dark:text-white">
-          {image ? (
-            <Image src={image} alt="" fill sizes="32px" unoptimized className="object-cover" />
-          ) : (
-            <span aria-hidden="true">{initials(name)}</span>
-          )}
+          <AvatarImage name={name} image={image} sizes="32px" />
         </span>
         <span className="max-w-32 truncate">{firstName}</span>
         <span className="sr-only">({t('userMenu')})</span>
@@ -100,7 +88,9 @@ export function UserMenu({
         <p className="border-b border-ink-200 px-3 pt-1 pb-2 text-sm dark:border-ink-700">
           <span className="muted block text-xs">{t('signedInAs')}</span>
           <span className="block truncate font-medium">{name}</span>
-          <span className="muted block truncate text-xs">{email}</span>
+          <span className="muted block truncate text-xs" data-cs-mask>
+            {email}
+          </span>
         </p>
         <ul className="mt-1 space-y-0.5">
           <li>

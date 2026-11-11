@@ -32,7 +32,12 @@ export interface PlayerStats {
   winsFirst: number;
   /** Vezes em que foi o primeiro eliminado. */
   firstOut: number;
+  /** Resultados das últimas partidas (a mais recente por último, até `RECENT_RESULTS`). */
+  recent: ('win' | 'loss' | 'draw')[];
 }
+
+/** Quantas partidas entram na "forma" recente de cada jogador. */
+export const RECENT_RESULTS = 10;
 
 export interface HeadToHead {
   /** Jogador da linha. */
@@ -98,6 +103,7 @@ export function computeGroupStats(games: readonly StatsGame[]): GroupStats {
         gamesFirst: 0,
         winsFirst: 0,
         firstOut: 0,
+        recent: [],
       };
       players.set(userId, row);
     }
@@ -125,6 +131,7 @@ export function computeGroupStats(games: readonly StatsGame[]): GroupStats {
         if (p.result === 'win') row.winsFirst += 1;
       }
       if (p.eliminatedOrder != null && p.eliminatedOrder === minOrder) row.firstOut += 1;
+      row.recent = [...row.recent, p.result].slice(-RECENT_RESULTS);
 
       if (p.deckId) {
         const deck = decks.get(p.deckId) ?? {
@@ -195,6 +202,32 @@ export function computeGroupStats(games: readonly StatsGame[]): GroupStats {
     firstPlayerSample: firstSample,
     winsBySeat: [...seats.values()].sort((a, b) => a.seat - b.seat),
   };
+}
+
+/**
+ * Partidas por mês nos últimos `months` meses (incluindo o atual, do mais antigo ao mais novo),
+ * no fuso do grupo; meses sem partida aparecem com 0.
+ */
+export function gamesByMonth(
+  games: readonly { playedAt: Date }[],
+  options: { months?: number; now?: Date; timeZone?: string } = {},
+): { month: string; games: number }[] {
+  const months = options.months ?? 6;
+  const timeZone = options.timeZone ?? 'America/Sao_Paulo';
+  const key = (date: Date) =>
+    new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit' }).format(date);
+  const current = key(options.now ?? new Date());
+  const [year, month] = current.split('-').map(Number) as [number, number];
+  const keys = Array.from({ length: months }, (_, i) => {
+    const d = new Date(Date.UTC(year, month - 1 - (months - 1 - i), 1));
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+  });
+  const counts = new Map(keys.map((k) => [k, 0]));
+  for (const game of games) {
+    const k = key(game.playedAt);
+    if (counts.has(k)) counts.set(k, counts.get(k)! + 1);
+  }
+  return keys.map((k) => ({ month: k, games: counts.get(k)! }));
 }
 
 /* ---------- Períodos do ranking (2.6) ---------- */

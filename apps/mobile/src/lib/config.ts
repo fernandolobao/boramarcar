@@ -1,5 +1,5 @@
 /** Site em produção (API e login). */
-export const PRODUCTION_URL = 'https://boramarcar-zeta.vercel.app';
+export const PRODUCTION_URL = 'https://www.arcanakin.com.br';
 
 /**
  * Servidor do ArcanaKin (API e login): a produção, ou `EXPO_PUBLIC_API_URL` para outro

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   availabilityRuleSchema,
+  deckDetailSchema,
   availabilitySlotSchema,
   deckSummarySchema,
   errorBodySchema,
@@ -30,7 +31,7 @@ export class ApiError extends Error {
 }
 
 export interface ApiClientOptions {
-  /** Origem do servidor, ex.: `https://boramarcar.vercel.app` (sem barra no fim). */
+  /** Origem do servidor, ex.: `https://www.arcanakin.com.br` (sem barra no fim). */
   baseUrl: string;
   /** Cabeçalhos de autenticação a cada pedido (no app: o cookie da sessão do Better Auth). */
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>;
@@ -103,6 +104,27 @@ export function createApiClient(options: ApiClientOptions) {
   };
 
   return {
+    me: {
+      /** Grupos que mudam de dono (ou são apagados) se a pessoa excluir a conta. */
+      deletionPreview: async () =>
+        (
+          await request(
+            'GET',
+            '/me',
+            z.object({
+              deletion: z.object({
+                transfers: z.array(z.string()),
+                deletions: z.array(z.string()),
+              }),
+            }),
+          )
+        ).deletion,
+      /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
+      deleteAccount: () =>
+        request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {
+          confirm: true,
+        }),
+    },
     groups: {
       list: async () =>
         (await request('GET', '/groups', z.object({ groups: z.array(groupSchema) }))).groups,
@@ -282,6 +304,15 @@ export function createApiClient(options: ApiClientOptions) {
     decks: {
       list: async () =>
         (await request('GET', '/decks', z.object({ decks: z.array(deckSummarySchema) }))).decks,
+      /** Deck com cartas e análise (quem pode ver o deck). */
+      get: async (deckId: string) =>
+        (
+          await request(
+            'GET',
+            `/decks/${encodeURIComponent(deckId)}`,
+            z.object({ deck: deckDetailSchema }),
+          )
+        ).deck,
     },
   };
 }

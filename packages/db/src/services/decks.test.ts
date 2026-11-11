@@ -9,6 +9,7 @@ import {
   saveCardRoles,
   deleteDeck,
   getDeck,
+  getDeckRatings,
   listDecks,
   listDecksForUsers,
   saveImportedDeck,
@@ -103,6 +104,26 @@ describe('decks', () => {
       code: 'unknown_card',
       name: 'Carta Inventada',
     });
+  });
+
+  it('nota e bracket para a lista de decks são os mesmos da página do deck', async () => {
+    const owner = await createTestUser(db);
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+    const modern = await saveImportedDeck(db, {
+      ownerId: owner.id,
+      deck: { ...deck, name: 'Modern', format: 'modern', sourceId: '2' } as ImportedDeck,
+      cards: [],
+    });
+    const ratings = await getDeckRatings(db, [saved.id, modern.id, saved.id]);
+    const detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(ratings.get(saved.id)).toEqual({
+      score: detail.analysis.score,
+      bracket: detail.bracket!.minimum,
+    });
+    const modernDetail = await getDeck(db, { deckId: modern.id, viewerId: owner.id });
+    expect(ratings.get(modern.id)?.score).toBe(modernDetail.analysis.score);
+    expect(ratings.get(modern.id)?.bracket).toBe(modernDetail.bracket?.minimum ?? null);
+    expect(await getDeckRatings(db, [])).toEqual(new Map());
   });
 
   it('atualiza o cache de cartas e reaproveita na importação', async () => {
@@ -267,6 +288,43 @@ describe('editor e sincronização', () => {
         [3, true],
       ]),
     );
+
+    // Foil: marcar vale para as cópias reais; cópias novas entram comuns (os foil continuam).
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Forest',
+      quantity: 10,
+      proxies: 3,
+      card: cardsData[2],
+      foil: true,
+    });
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Forest',
+      quantity: 12,
+      proxies: 3,
+      card: cardsData[2],
+    });
+    detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.lines.find((l) => l.name === 'Forest')).toMatchObject({
+      quantity: 12,
+      foils: 7,
+      foil: false,
+    });
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Forest',
+      quantity: 10,
+      proxies: 3,
+      card: cardsData[2],
+      foil: false,
+    });
 
     // Carta nova pelo nome (sem dados do Scryfall) e remoção com quantidade 0.
     await setDeckLine(db, {
@@ -461,11 +519,9 @@ describe('edições da mesma carta', () => {
       format: 'other',
     });
     const lines = async () =>
-      (await getDeck(db, { deckId: saved.id, viewerId: owner.id })).lines.map((l) => [
-        l.scryfallId,
-        l.quantity,
-        l.proxies,
-      ]);
+      (await getDeck(db, { deckId: saved.id, viewerId: owner.id })).lines
+        .map((l) => [l.scryfallId, l.quantity, l.proxies])
+        .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
     expect(await lines()).toEqual([
       ['sol-cmm', 3, 1],
       ['sol-lea', 1, 0],

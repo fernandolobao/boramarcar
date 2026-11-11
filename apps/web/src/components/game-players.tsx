@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Icon } from './icons';
+import { PlayerLink } from '@/components/player-link';
+import { CardNames } from './card-dialog';
 
 export interface GamePlayerView {
   userId: string;
@@ -73,9 +75,11 @@ export function GamePlayers({
                           className="size-4 shrink-0 text-emerald-700 dark:text-emerald-400"
                         />
                       )}
-                      <span className={p.result === 'win' ? 'font-semibold' : 'font-medium'}>
-                        {p.name}
-                      </span>
+                      <PlayerLink
+                        userId={p.userId}
+                        name={p.name}
+                        className={p.result === 'win' ? 'font-semibold' : 'font-medium'}
+                      />
                       <span className="muted">
                         · {t(`result.${p.result}`)}
                         {p.eliminatedOrder != null &&
@@ -85,7 +89,12 @@ export function GamePlayers({
                     {p.deckName && (
                       <p className="muted truncate">
                         {p.deckName}
-                        {commanders && commanders.length > 0 && ` — ${commanders.join(' & ')}`}
+                        {commanders && commanders.length > 0 && (
+                          <>
+                            {' — '}
+                            <CardNames names={commanders} separator=" & " />
+                          </>
+                        )}
                       </p>
                     )}
                   </div>

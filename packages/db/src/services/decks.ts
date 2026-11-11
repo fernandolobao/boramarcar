@@ -17,6 +17,7 @@ import {
   mergeDeckLines,
   planDeckSync,
   splitLine,
+  validateLine,
   type CardData,
   type DeckBoard,
   type DeckEntry,
@@ -25,7 +26,8 @@ import {
 import { and, asc, count, desc, eq, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
-import { cards, deckCards, decks, groupMembers, user } from '../schema';
+import { syncCollectionFromDecks, takeFromCollection } from './collection';
+import { cards, collectionCards, deckCards, decks, groupMembers, user } from '../schema';
 
 /** Insere ou atualiza o cache de cartas do Scryfall. */
 export async function upsertCards(db: Database, data: readonly CardData[]) {
@@ -55,6 +57,10 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         backImageUri: c.backImageUri ?? null,
         backName: c.backName ?? null,
         legalities: c.legalities ?? null,
+        artist: c.artist ?? null,
+        releasedAt: c.releasedAt ?? null,
+        rarity: c.rarity ?? null,
+        priceUsdFoil: c.priceUsdFoil ?? null,
       })),
     )
     .onConflictDoUpdate({
@@ -80,6 +86,11 @@ export async function upsertCards(db: Database, data: readonly CardData[]) {
         backImageUri: sql`excluded.back_image_uri`,
         backName: sql`excluded.back_name`,
         legalities: sql`coalesce(excluded.legalities, ${cards.legalities})`,
+        artist: sql`coalesce(excluded.artist, ${cards.artist})`,
+        releasedAt: sql`coalesce(excluded.released_at, ${cards.releasedAt})`,
+        rarity: sql`coalesce(excluded.rarity, ${cards.rarity})`,
+        // Preço muda: o novo vale mesmo nulo (a versão foil pode ter saído do mercado).
+        priceUsdFoil: sql`excluded.price_usd_foil`,
         updatedAt: new Date(),
       },
     });
@@ -121,7 +132,7 @@ export async function findCachedCards(
   return rows.map(toCardData);
 }
 
-function toCardData(card: typeof cards.$inferSelect): CardData {
+export function toCardData(card: typeof cards.$inferSelect): CardData {
   return {
     scryfallId: card.scryfallId,
     oracleId: card.oracleId,
@@ -144,6 +155,10 @@ function toCardData(card: typeof cards.$inferSelect): CardData {
     backImageUri: card.backImageUri,
     backName: card.backName,
     legalities: card.legalities,
+    artist: card.artist,
+    releasedAt: card.releasedAt,
+    rarity: card.rarity,
+    priceUsdFoil: card.priceUsdFoil,
   };
 }
 
@@ -235,7 +250,7 @@ export async function saveImportedDeck(
   await upsertCards(db, input.cards);
   const known = [...input.cards, ...(await findCachedCards(db, input.deck.entries))];
   const linked = attachCardData(input.deck.entries, known);
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [deck] = await tx
       .insert(decks)
       .values({
@@ -259,7 +274,7 @@ export async function saveImportedDeck(
         isProxy: entry.isProxy ?? false,
         isFoil: entry.isFoil ?? false,
       };
-      const key = `${row.board}|${row.cardName.toLowerCase()}|${row.scryfallId}|${row.isProxy}`;
+      const key = `${row.board}|${row.cardName.toLowerCase()}|${row.scryfallId}|${row.isProxy}|${row.isFoil}`;
       const existing = rows.get(key);
       if (existing) existing.quantity = (existing.quantity ?? 0) + row.quantity;
       else rows.set(key, row);
@@ -267,6 +282,9 @@ export async function saveImportedDeck(
     await tx.insert(deckCards).values([...rows.values()]);
     return deck!;
   });
+  // A coleção acompanha os decks (só acrescenta; ver collection.ts).
+  await syncCollectionFromDecks(db, input.ownerId);
+  return result;
 }
 
 export async function listDecks(db: Database, ownerId: string) {
@@ -331,6 +349,75 @@ async function canView(
   return sharesGroup(db, deck.ownerId, viewerId);
 }
 
+/**
+ * Bracket do deck (só formatos com brackets): usa os sinais do Commander Spellbook guardados
+ * quando foram gerados por esta mesma lista; senão, só os Game Changers (estimativa local).
+ */
+function deckBracket(
+  deck: { format: string; bracketSignals: unknown; bracketHash: string | null },
+  entries: Parameters<typeof spellbookDeck>[0],
+  analysis: ReturnType<typeof analyzeDeck>,
+) {
+  const hash = deckListHash(spellbookDeck(entries));
+  const stored = deck.bracketHash === hash ? parseBracketSignals(deck.bracketSignals) : null;
+  const bracket = deckFormatProfile(deck.format).brackets
+    ? {
+        ...estimateBracket(
+          stored ?? {
+            gameChangers: analysis.gameChangers,
+            massLandDenial: [],
+            extraTurns: [],
+            combos: [],
+          },
+        ),
+        /** `spellbook` = combos e cartas conferidos; `local` = só os Game Changers. */
+        source: stored ? ('spellbook' as const) : ('local' as const),
+      }
+    : null;
+  return { bracket, stored };
+}
+
+/**
+ * Nota (0–100, ou null quando o formato não tem nota) e bracket mínimo de vários decks, para as
+ * listas de decks. Mesma conta da página do deck.
+ */
+export async function getDeckRatings(db: Database, deckIds: readonly string[]) {
+  const ratings = new Map<string, { score: number | null; bracket: 2 | 3 | 4 | null }>();
+  const ids = [...new Set(deckIds)];
+  if (!ids.length) return ratings;
+  const [list, rows] = await Promise.all([
+    db
+      .select({
+        id: decks.id,
+        format: decks.format,
+        bracketSignals: decks.bracketSignals,
+        bracketHash: decks.bracketHash,
+      })
+      .from(decks)
+      .where(inArray(decks.id, ids)),
+    db
+      .select({ entry: deckCards, card: cards })
+      .from(deckCards)
+      .leftJoin(cards, eq(cards.scryfallId, deckCards.scryfallId))
+      .where(inArray(deckCards.deckId, ids)),
+  ]);
+  for (const deck of list) {
+    const entries = rows
+      .filter((r) => r.entry.deckId === deck.id)
+      .map(({ entry, card }) => ({
+        name: entry.cardName,
+        quantity: entry.quantity,
+        board: entry.board,
+        isProxy: entry.isProxy,
+        card: card ? toCardData(card) : null,
+      }));
+    const analysis = analyzeDeck(entries, deck.format);
+    const { bracket } = deckBracket(deck, entries, analysis);
+    ratings.set(deck.id, { score: analysis.score, bracket: bracket?.minimum ?? null });
+  }
+  return ratings;
+}
+
 export async function getDeck(db: Database, input: { deckId: string; viewerId: string }) {
   const [deck] = await db.select().from(decks).where(eq(decks.id, input.deckId)).limit(1);
   if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
@@ -362,22 +449,7 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
     .limit(1);
   const analysis = analyzeDeck(entries, deck.format);
   const profile = deckFormatProfile(deck.format);
-  const hash = deckListHash(spellbookDeck(entries));
-  const stored = deck.bracketHash === hash ? parseBracketSignals(deck.bracketSignals) : null;
-  const bracket = profile.brackets
-    ? {
-        ...estimateBracket(
-          stored ?? {
-            gameChangers: analysis.gameChangers,
-            massLandDenial: [],
-            extraTurns: [],
-            combos: [],
-          },
-        ),
-        /** `spellbook` = combos e cartas conferidos; `local` = só os Game Changers. */
-        source: stored ? ('spellbook' as const) : ('local' as const),
-      }
-    : null;
+  const { bracket, stored } = deckBracket(deck, entries, analysis);
   const roleCutoff = Date.now() - ROLES_TTL_MS;
   const analysisStale =
     rows.some(
@@ -426,7 +498,7 @@ export async function setDeckCardProxy(
     throw new DomainError('forbidden', 'Apenas o dono edita o deck');
   if (row.entry.isProxy === input.isProxy) return row.entry;
 
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [twin] = await tx
       .select()
       .from(deckCards)
@@ -437,6 +509,7 @@ export async function setDeckCardProxy(
           eq(deckCards.cardName, row.entry.cardName),
           samePrint(row.entry.scryfallId),
           eq(deckCards.isProxy, input.isProxy),
+          eq(deckCards.isFoil, row.entry.isFoil),
         ),
       )
       .limit(1);
@@ -458,6 +531,9 @@ export async function setDeckCardProxy(
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
     return updated!;
   });
+  // A coleção acompanha os decks (só acrescenta; ver collection.ts).
+  await syncCollectionFromDecks(db, input.userId);
+  return result;
 }
 
 export async function deleteDeck(db: Database, input: { deckId: string; userId: string }) {
@@ -593,6 +669,10 @@ export async function setDeckLine(
     card?: CardData | null;
     /** Impressão da linha a alterar; sem valor, a linha da carta pela impressão de `card`. */
     scryfallId?: string | null;
+    /** Quantas cópias reais são foil. Sem valor: mantém as que já eram (limitadas às reais). */
+    foils?: number;
+    /** Atalho antigo: todas as cópias reais foil (`true`) ou nenhuma (`false`). */
+    foil?: boolean;
   },
 ) {
   const name = input.card?.name ?? input.name.trim();
@@ -601,21 +681,62 @@ export async function setDeckLine(
   // Sem impressão nem carta (ex.: remover pelo nome): vale para todas as edições da carta.
   const anyPrint = input.scryfallId === undefined && !input.card;
   if (!name) throw new DomainError('invalid_input', 'Informe a carta');
-  const parts = splitLine(input.quantity, input.proxies);
+  validateLine(input.quantity, input.proxies);
+  const real = input.quantity - input.proxies;
   await requireOwnedDeck(db, input.deckId, input.userId);
   if (input.card) await upsertCards(db, [input.card]);
 
+  let foils = 0;
   await db.transaction(async (tx) => {
-    await tx
-      .delete(deckCards)
-      .where(
-        and(
-          eq(deckCards.deckId, input.deckId),
-          eq(deckCards.board, input.board),
-          sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
-          anyPrint ? undefined : samePrint(print),
-        ),
-      );
+    const sameLine = and(
+      eq(deckCards.deckId, input.deckId),
+      eq(deckCards.board, input.board),
+      sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
+      anyPrint ? undefined : samePrint(print),
+    );
+    const current = await tx
+      .select({
+        isFoil: deckCards.isFoil,
+        isProxy: deckCards.isProxy,
+        quantity: deckCards.quantity,
+      })
+      .from(deckCards)
+      .where(sameLine);
+    const sum = (rows: typeof current, foil: boolean) =>
+      rows.filter((r) => !r.isProxy && r.isFoil === foil).reduce((n, r) => n + r.quantity, 0);
+    const foilsBefore = sum(current, true);
+    const plainBefore = sum(current, false);
+    foils =
+      input.foils !== undefined
+        ? input.foils
+        : input.foil !== undefined
+          ? input.foil
+            ? real
+            : 0
+          : Math.min(foilsBefore, real);
+    const plainAfter = real - foils;
+    // Cópias reais que trocaram de acabamento (foil ↔ comum) mudam de versão na coleção:
+    // saem da versão antiga (a nova entra pela sincronia com os decks).
+    if (!anyPrint) {
+      const toPlain = Math.min(foilsBefore - foils, plainAfter - plainBefore);
+      const toFoil = Math.min(plainBefore - plainAfter, foils - foilsBefore);
+      for (const [foil, quantity] of [
+        [true, toPlain],
+        [false, toFoil],
+      ] as const) {
+        if (quantity > 0) {
+          await takeFromCollection(tx, {
+            userId: input.userId,
+            name,
+            scryfallId: print,
+            foil,
+            quantity,
+          });
+        }
+      }
+    }
+    const parts = splitLine(input.quantity, input.proxies, foils);
+    await tx.delete(deckCards).where(sameLine);
     if (parts.length) {
       await tx.insert(deckCards).values(
         parts.map((p) => ({
@@ -625,17 +746,21 @@ export async function setDeckLine(
           board: input.board,
           quantity: p.quantity,
           isProxy: p.isProxy,
+          isFoil: p.isFoil,
         })),
       );
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
   });
+  await syncCollectionFromDecks(db, input.userId);
   return {
     name,
     board: input.board,
     scryfallId: print,
     quantity: input.quantity,
     proxies: input.proxies,
+    foils,
+    foil: real > 0 && foils === real,
   };
 }
 
@@ -653,6 +778,8 @@ export async function moveLinePrint(
     fromScryfallId: string | null;
     card: CardData;
     quantity: number;
+    /** Só as cópias foil (`true`) ou só as comuns (`false`); sem valor, qualquer uma. */
+    foil?: boolean;
   },
 ) {
   await requireOwnedDeck(db, input.deckId, input.userId);
@@ -664,7 +791,7 @@ export async function moveLinePrint(
   }
   if (input.fromScryfallId === input.card.scryfallId) return { moved: 0 };
   await upsertCards(db, [input.card]);
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const rows = await tx
       .select()
       .from(deckCards)
@@ -674,6 +801,7 @@ export async function moveLinePrint(
           eq(deckCards.board, input.board),
           sql`lower(${deckCards.cardName}) = ${input.name.trim().toLowerCase()}`,
           samePrint(input.fromScryfallId),
+          input.foil === undefined ? undefined : eq(deckCards.isFoil, input.foil),
         ),
       );
     const total = rows.reduce((sum, r) => sum + r.quantity, 0);
@@ -682,11 +810,13 @@ export async function moveLinePrint(
       throw new DomainError('invalid_input', `O deck tem só ${total} cópias desta edição`);
     }
     let left = input.quantity;
+    const realMoved = new Map<boolean, number>();
     // Reais primeiro, depois proxies.
     for (const row of [...rows].sort((a, b) => Number(a.isProxy) - Number(b.isProxy))) {
       if (!left) break;
       const take = Math.min(left, row.quantity);
       left -= take;
+      if (!row.isProxy) realMoved.set(row.isFoil, (realMoved.get(row.isFoil) ?? 0) + take);
       if (take === row.quantity) await tx.delete(deckCards).where(eq(deckCards.id, row.id));
       else
         await tx
@@ -703,6 +833,7 @@ export async function moveLinePrint(
             eq(deckCards.cardName, input.card.name),
             eq(deckCards.scryfallId, input.card.scryfallId),
             eq(deckCards.isProxy, row.isProxy),
+            eq(deckCards.isFoil, row.isFoil),
           ),
         )
         .limit(1);
@@ -724,8 +855,21 @@ export async function moveLinePrint(
       }
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
+    // Cópias reais que mudaram de edição saem da versão antiga na coleção.
+    for (const [foil, quantity] of realMoved) {
+      await takeFromCollection(tx, {
+        userId: input.userId,
+        name: input.card.name,
+        scryfallId: input.fromScryfallId,
+        foil,
+        quantity,
+      });
+    }
     return { moved: input.quantity };
   });
+  // A nova edição entra na coleção pela sincronia com os decks.
+  await syncCollectionFromDecks(db, input.userId);
+  return result;
 }
 
 /**
@@ -771,12 +915,13 @@ export async function syncDeckCards(
           board: r.board,
           quantity: r.quantity,
           isProxy: r.isProxy,
-          isFoil: r.entry.isFoil ?? false,
+          isFoil: r.isFoil,
         })),
       );
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
   });
+  await syncCollectionFromDecks(db, input.userId);
   return { added: plan.added, removed: plan.removed, changed: plan.changed };
 }
 
@@ -809,7 +954,9 @@ export async function staleDeckCards(db: Database, input: { olderThan: Date; lim
     .where(
       and(
         sql`${cards.updatedAt} < ${input.olderThan}`,
-        sql`exists (select 1 from ${deckCards} where ${deckCards.scryfallId} = ${cards.scryfallId})`,
+        // Cartas em algum deck ou em alguma coleção.
+        sql`(exists (select 1 from ${deckCards} where ${deckCards.scryfallId} = ${cards.scryfallId})
+          or exists (select 1 from ${collectionCards} where ${collectionCards.scryfallId} = ${cards.scryfallId}))`,
       ),
     )
     .orderBy(asc(cards.updatedAt))

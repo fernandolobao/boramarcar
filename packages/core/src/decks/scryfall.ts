@@ -26,7 +26,15 @@ const scryfallCardSchema = z.object({
   color_identity: z.array(z.string()).default([]),
   image_uris: z.object({ normal: z.string() }).partial().optional(),
   card_faces: z.array(faceSchema).optional(),
-  prices: z.object({ usd: z.string().nullable().optional() }).optional(),
+  prices: z
+    .object({
+      usd: z.string().nullable().optional(),
+      usd_foil: z.string().nullable().optional(),
+    })
+    .optional(),
+  artist: z.string().optional(),
+  released_at: z.string().optional(),
+  rarity: z.string().optional(),
   produced_mana: z.array(z.string()).optional(),
   game_changer: z.boolean().optional(),
   edhrec_rank: z.number().nullable().optional(),
@@ -83,6 +91,10 @@ export function mapScryfallCard(raw: unknown): CardData {
     // Cartas divididas/aventura têm `card_faces`, mas uma imagem só (`image_uris` no topo).
     ...twoSided(card),
     legalities: card.legalities ?? null,
+    artist: card.artist ?? null,
+    releasedAt: card.released_at ?? null,
+    rarity: card.rarity ?? null,
+    priceUsdFoil: card.prices?.usd_foil ?? null,
   };
 }
 
@@ -245,7 +257,14 @@ export async function fetchScryfallAutocomplete(
   return autocompleteSchema.parse(await response.json()).data;
 }
 
-const searchSchema = z.object({ data: z.array(z.unknown()) });
+const searchSchema = z.object({
+  data: z.array(z.unknown()),
+  has_more: z.boolean().optional(),
+  next_page: z.string().optional(),
+});
+
+/** Páginas lidas no máximo ao listar impressões (175 por página: até 2.100 impressões). */
+export const MAX_PRINT_PAGES = 12;
 
 /** Primeira página de uma busca do Scryfall (`/cards/search`); sem resultados = lista vazia. */
 export async function fetchScryfallSearch(
@@ -278,35 +297,49 @@ export interface CardPrint {
   priceUsd: string | null;
 }
 
-/** Todas as impressões de uma carta (mais novas primeiro), sem variações. Até 175. */
+/**
+ * Todas as impressões em papel de uma carta (mais novas primeiro). O Scryfall devolve 175 por
+ * página; terrenos básicos têm mais de mil impressões, então segue as próximas páginas (até
+ * `MAX_PRINT_PAGES`, com uma pausa entre elas, como o Scryfall pede).
+ */
 export async function fetchScryfallPrints(
   name: string,
   {
     fetch: fetchFn,
     userAgent = 'ArcanaKin/0.1',
-  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
+    delayMs = 100,
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent' | 'delayMs'>,
 ): Promise<CardPrint[]> {
   const q = `!"${name.replace(/"/g, '')}" game:paper`;
-  const response = await fetchFn(
-    `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&unique=prints&order=released&dir=desc`,
-    { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
-  );
-  if (response.status === 404) return [];
-  if (!response.ok) {
-    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  let url: string | undefined =
+    `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&unique=prints&order=released&dir=desc`;
+  const prints: CardPrint[] = [];
+  for (let page = 0; url && page < MAX_PRINT_PAGES; page++) {
+    if (page > 0 && delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+    const response = await fetchFn(url, {
+      headers: { Accept: 'application/json', 'User-Agent': userAgent },
+    });
+    if (response.status === 404) break;
+    if (!response.ok) {
+      // Já temos páginas: melhor mostrar o que veio do que nada.
+      if (prints.length) break;
+      throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+    }
+    const body = searchSchema.parse(await response.json());
+    for (const c of body.data.map(mapScryfallCard)) {
+      prints.push({
+        scryfallId: c.scryfallId,
+        name: c.name,
+        setCode: c.setCode ?? '',
+        setName: c.setName ?? '',
+        collectorNumber: c.collectorNumber ?? '',
+        imageUri: c.imageUri ?? null,
+        priceUsd: c.priceUsd ?? null,
+      });
+    }
+    url = body.has_more ? body.next_page : undefined;
   }
-  return searchSchema
-    .parse(await response.json())
-    .data.map(mapScryfallCard)
-    .map((c) => ({
-      scryfallId: c.scryfallId,
-      name: c.name,
-      setCode: c.setCode ?? '',
-      setName: c.setName ?? '',
-      collectorNumber: c.collectorNumber ?? '',
-      imageUri: c.imageUri ?? null,
-      priceUsd: c.priceUsd ?? null,
-    }));
+  return prints;
 }
 
 /** Uma carta pelo id do Scryfall; `null` se não existir. */

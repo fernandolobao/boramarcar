@@ -171,8 +171,39 @@ jobs:
           restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
       - name: Build
         run: pnpm build
+      # O download do Chromium às vezes trava (CDN do Playwright ou espelhos do apt fora do ar):
+      # cache por versão, tentativas com tempo limite e as dependências do sistema à parte.
+      - name: Versão do Playwright
+        id: playwright
+        run: echo "version=$(node -p "require('./apps/web/node_modules/@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache dos navegadores do Playwright
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - name: Instalar navegadores do Playwright
-        run: pnpm --filter @boramarcar/web exec playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 8
+        run: |
+          for i in 1 2 3; do
+            timeout 150 pnpm --filter @boramarcar/web exec playwright install chromium && break
+            [ "$i" = 3 ] && exit 1
+            echo "::warning::Download do Chromium falhou (tentativa $i); tentando de novo"
+            sleep 15
+          done
+      # As bibliotecas do Chromium já vêm na imagem do runner (que tem o Google Chrome). O apt
+      # é só garantia: se os espelhos estiverem fora do ar, segue com aviso em vez de falhar;
+      # se faltar mesmo alguma biblioteca, o passo seguinte falha com a mensagem do Playwright.
+      - name: Dependências do sistema para o Chromium
+        timeout-minutes: 6
+        run: |
+          for i in 1 2; do
+            timeout 120 pnpm --filter @boramarcar/web exec playwright install-deps chromium && exit 0
+            echo "::warning::apt falhou (tentativa $i)"
+            sleep 10
+          done
+          echo "::warning::Seguindo sem atualizar as dependências do sistema (apt indisponível)"
       - name: Playwright (smoke + acessibilidade WCAG 2.2 AA, claro/escuro, desktop/mobile)
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v7

@@ -149,3 +149,130 @@ input[type='radio'] {
   padding: 1px 6px;
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
 }
+
+/* Brilho das cartas foil (decorativo). Loop sem começo nem fim: uma faixa repetida que anda
+   exatamente um período (a largura da carta), inclinada, mais um "respirar" de opacidade com outro
+   período, para nunca repetir igual. Visível, sem chamar mais atenção que a carta. Cada carta recebe --foil-dur/--foil-delay/--foil-breath
+   próprios (deck-cards.tsx), então cartas vizinhas não brilham juntas. Parado com "reduzir movimento". */
+.foil-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: color-dodge;
+  animation: foil-breath var(--foil-breath, 7s) ease-in-out var(--foil-delay, 0s) infinite alternate;
+}
+.foil-sheen::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -100%;
+  width: 300%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-dourado) 45%, transparent) 25%,
+    color-mix(in srgb, var(--color-mana) 40%, transparent) 40%,
+    color-mix(in srgb, var(--color-eter) 45%, transparent) 55%,
+    transparent 80%,
+    transparent 100%
+  );
+  /* Um período = 1/3 da faixa = a largura da carta. */
+  background-size: calc(100% / 3) 100%;
+  background-repeat: repeat-x;
+  animation: foil-shift var(--foil-dur, 11s) linear var(--foil-delay, 0s) infinite;
+}
+@keyframes foil-shift {
+  from {
+    transform: translateX(0) skewX(-20deg);
+  }
+  to {
+    transform: translateX(calc(100% / 3)) skewX(-20deg);
+  }
+}
+@keyframes foil-breath {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .foil-sheen,
+  .foil-sheen::before {
+    animation: none;
+  }
+  .foil-sheen::before {
+    transform: translateX(10%) skewX(-20deg);
+  }
+}
+
+/* ---------- Carregando ----------
+   Botão com ação em andamento (`aria-busy`, posto por `useApiAction`): o ícone vira um
+   indicador girando e o cursor mostra progresso. Com "reduzir movimento", o indicador fica
+   parado (o botão desabilitado e a barra do topo continuam avisando). */
+button[aria-busy='true'] {
+  cursor: progress;
+}
+button[aria-busy='true'] > svg:first-child {
+  display: none;
+}
+button[aria-busy='true']::before {
+  content: '';
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: busy-spin 0.7s linear infinite;
+}
+@keyframes busy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Barra no topo durante ações e mudanças de página (indeterminada). */
+.activity-bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-eter) 25%, transparent);
+}
+.activity-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, var(--color-eter), var(--color-mana));
+  animation: activity-slide 1.1s ease-in-out infinite;
+}
+@keyframes activity-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button[aria-busy='true']::before,
+  .activity-bar::after {
+    animation: none;
+  }
+  .activity-bar::after {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+@media print {
+  .activity-bar {
+    display: none;
+  }
+}

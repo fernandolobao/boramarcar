@@ -21,13 +21,13 @@ describe('cliente da API', () => {
       }),
     );
     const api = createApiClient({
-      baseUrl: 'https://boramarcar.vercel.app/',
+      baseUrl: 'https://www.arcanakin.com.br/',
       getHeaders: async () => ({ Cookie: 'better-auth.session_token=abc' }),
       fetch: fetchMock as unknown as typeof fetch,
     });
     const events = await api.events.list('g 1');
     expect(fetchMock.mock.calls[0]![0]).toBe(
-      'https://boramarcar.vercel.app/api/v1/groups/g%201/events?when=upcoming',
+      'https://www.arcanakin.com.br/api/v1/groups/g%201/events?when=upcoming',
     );
     const init = fetchMock.mock.calls[0]![1]!;
     expect(init.headers).toMatchObject({ Cookie: 'better-auth.session_token=abc' });
@@ -237,5 +237,79 @@ describe('cliente da API', () => {
     expect(JSON.parse(String(calls[3]!.init!.body))).toMatchObject({ weekdays: [4] });
     await api.rules.setException('r1', '2026-11-19', true);
     expect(calls[4]!.init!.method).toBe('PUT');
+  });
+
+  it('deck: linhas com a carta e a análise', async () => {
+    const fetchMock = vi.fn(async () =>
+      json({
+        deck: {
+          id: 'd1',
+          name: 'Omnath',
+          format: 'commander',
+          visibility: 'group',
+          ownerName: 'Ana',
+          isOwner: true,
+          ownerId: 'u1',
+          lines: [
+            {
+              key: 'commander|omnath|x',
+              name: 'Omnath, Locus of Creation',
+              board: 'commander',
+              quantity: 1,
+              proxies: 0,
+              scryfallId: 'x',
+              card: {
+                scryfallId: 'x',
+                name: 'Omnath, Locus of Creation',
+                cmc: 4,
+                typeLine: 'Legendary Creature — Elemental',
+                imageUri: 'https://cards.scryfall.io/x.jpg',
+                colors: ['R', 'G', 'W', 'U'],
+              },
+              ids: ['e1'],
+            },
+          ],
+          analysis: {
+            totalCards: 100,
+            commanders: ['Omnath, Locus of Creation'],
+            colorIdentity: ['W', 'U', 'R', 'G'],
+            lands: 37,
+            averageCmc: 3.1,
+            manaCurve: { '0': 0, '1': 8 },
+            roles: { ramp: 11 },
+            proxies: 3,
+            gameChangers: [],
+            score: 82,
+            validation: [{ code: 'banned', name: 'X' }],
+          },
+          bracket: { minimum: 3, reasons: [] },
+        },
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://x.dev',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const deck = await api.decks.get('d1');
+    expect(deck.lines[0]!.card?.typeLine).toContain('Creature');
+    expect(deck.analysis.score).toBe(82);
+    expect(deck.analysis.validation[0]).toMatchObject({ code: 'banned', name: 'X' });
+  });
+
+  it('exclusão da conta (LGPD): prévia dos grupos e DELETE com confirmação', async () => {
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) =>
+      init?.method === 'DELETE'
+        ? json({ deleted: true, transferredGroups: ['g1'], deletedGroups: [] })
+        : json({ deletion: { transfers: ['Mesa'], deletions: [] } }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.me.deletionPreview()).toEqual({ transfers: ['Mesa'], deletions: [] });
+    await expect(api.me.deleteAccount()).resolves.toMatchObject({ deleted: true });
+    const [url, init] = fetchMock.mock.calls[1]!;
+    expect(url).toBe('https://www.arcanakin.com.br/api/v1/me');
+    expect(init).toMatchObject({ method: 'DELETE', body: JSON.stringify({ confirm: true }) });
   });
 });

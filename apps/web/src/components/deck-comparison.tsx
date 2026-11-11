@@ -1,6 +1,7 @@
 import type { DeckComparison } from '@boramarcar/core';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Icon } from './icons';
+import { CardName, CardNames } from './card-dialog';
 
 /**
  * Comparação com outros decks do mesmo comandante no ArcanaKin e popularidade das cartas
@@ -101,7 +102,7 @@ export function DeckComparisonCard({
                 <ul className="space-y-1 text-sm">
                   {comparison.commonMissing.map((c) => (
                     <li key={c.name}>
-                      {c.name}{' '}
+                      <CardName name={c.name} />{' '}
                       <span className="muted">({t('inShare', { share: percent(c.share) })})</span>
                     </li>
                   ))}
@@ -114,7 +115,9 @@ export function DeckComparisonCard({
               <h3 className="mb-1 font-semibold">{t('unique')}</h3>
               <p className="muted mb-2 text-sm">{t('uniqueHint')}</p>
               {comparison.unique.length ? (
-                <p className="text-sm">{comparison.unique.join(', ')}</p>
+                <p className="text-sm">
+                  <CardNames names={comparison.unique} />
+                </p>
               ) : (
                 <p className="text-sm">{t('noUnique')}</p>
               )}

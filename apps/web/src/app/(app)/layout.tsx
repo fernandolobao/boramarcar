@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
@@ -21,6 +22,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   ]);
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
+  const tl = await getTranslations('legal');
 
   const links = [
     { href: '/painel', label: t('dashboard'), icon: 'dashboard' as const },
@@ -28,6 +30,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     { href: '/eventos', label: t('events'), icon: 'events' as const },
     { href: '/ranking', label: t('ranking'), icon: 'ranking' as const },
     { href: '/decks', label: t('decks'), icon: 'decks' as const },
+    { href: '/colecao', label: t('collection'), icon: 'collection' as const },
     { href: '/grupo', label: t('group'), icon: 'group' as const },
   ];
 
@@ -62,8 +65,15 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-6 px-4 py-8 focus:outline-none print:max-w-none print:p-0"
       >
+        {/* Páginas fora da navegação principal ganham "Voltar" (mesmo lugar em todas). */}
+        <BackLink main={links.map((l) => l.href)} />
         {children}
       </main>
+      <footer className="mx-auto max-w-5xl px-4 pb-8 text-sm print:hidden">
+        <Link href="/privacidade" className="muted underline underline-offset-2 hover:text-fg">
+          {tl('privacy')}
+        </Link>
+      </footer>
     </div>
   );
 }

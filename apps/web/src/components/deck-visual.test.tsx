@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
-import { DeckCards } from './deck-cards';
+import { DeckCards, foilTiming } from './deck-cards';
 import { ColorIdentity, DeckSettingsForm } from './deck-visual';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
@@ -93,6 +93,8 @@ describe('DeckCards', () => {
     const { container } = wrap(<DeckCards deckId="d" lines={lines} isOwner usdBrl={5.4} />);
     expect(screen.getByRole('button', { name: 'Visual' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      // O dono adiciona cartas no topo; editar uma carta é pelo diálogo dela.
+      'Adicionar carta',
       'Comandante (1)',
       'Criaturas (1)',
       'Terrenos (30)',
@@ -102,7 +104,7 @@ describe('DeckCards', () => {
     expect(screen.getByText(/10 proxies/, { selector: '.sr-only' })).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
 
-    const zoom = screen.getByRole('button', { name: 'Ampliar Elvish Mystic' });
+    const zoom = screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' });
     zoom.focus();
     fireEvent.click(zoom);
     const dialog = screen.getByRole('dialog', { name: 'Elvish Mystic' });
@@ -127,7 +129,7 @@ describe('DeckCards', () => {
     expect(screen.getByRole('button', { name: 'Lista' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByRole('table')).toHaveLength(4);
     expect(screen.getByRole('button', { name: 'Forest' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Editar no deck' })).not.toBeInTheDocument();
     expect(screen.getByText('10 proxies')).toBeInTheDocument();
     expect(screen.getByText('(não encontrada no Scryfall)')).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
@@ -154,45 +156,69 @@ describe('editor de deck', () => {
     return calls;
   };
 
-  it('muda quantidade e proxies (salva ao sair do campo) e remove com confirmação', async () => {
+  it('edita a linha no diálogo da carta: quantidade, proxies, foil e remover com confirmação', async () => {
     const calls = stubApi();
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    // Sem modo "Editar" separado: a carta abre o diálogo com o editor.
+    expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Forest' }));
+    let dialog = screen.getByRole('dialog', { name: 'Forest' });
+    expect(within(dialog).getByRole('group', { name: 'Editar no deck' })).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
 
-    const proxies = screen.getByRole('spinbutton', { name: 'Proxies de Forest' });
+    const proxies = within(dialog).getByRole('spinbutton', { name: 'Cópias proxy' });
     fireEvent.change(proxies, { target: { value: '12' } });
     fireEvent.blur(proxies);
-    await screen.findByText('Forest salva.');
+    await within(dialog).findByText('Forest salva.');
     expect(calls.at(-1)).toEqual({
       url: '/api/v1/decks/d1/lines',
       method: 'PUT',
-      body: { name: 'Forest', board: 'mainboard', quantity: 30, proxies: 12, scryfallId: 'f' },
+      body: {
+        name: 'Forest',
+        board: 'mainboard',
+        quantity: 30,
+        proxies: 12,
+        scryfallId: 'f',
+        foils: 0,
+      },
     });
 
-    const qty = screen.getByRole('spinbutton', { name: 'Quantidade de Elvish Mystic' });
+    // Foil: separar uma cópia vira outra carta (a versão foil); o total da linha não muda.
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Separar 1 cópia foil' }));
+    await within(dialog).findByText('Forest: 1 cópia foil.');
+    expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foils: 1 });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' }));
+    dialog = screen.getByRole('dialog', { name: 'Elvish Mystic' });
+    const qty = within(dialog).getByRole('spinbutton', { name: 'Quantidade' });
     fireEvent.change(qty, { target: { value: '0' } });
     fireEvent.keyDown(qty, { key: 'Enter' });
-    expect(await screen.findByText('Proxies não podem passar da quantidade.')).toBeInTheDocument();
+    expect(
+      await within(dialog).findByText('Proxies não podem passar da quantidade.'),
+    ).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
 
-    const remove = screen.getByRole('button', { name: /Remover ?\(Carta Inventada\)/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Carta Inventada' }));
+    dialog = screen.getByRole('dialog', { name: 'Carta Inventada' });
+    const remove = within(dialog).getByRole('button', { name: 'Remover do deck' });
     fireEvent.click(remove);
-    expect(remove).toHaveTextContent('Confirmar');
+    expect(remove).toHaveTextContent('Confirmar remoção');
     fireEvent.click(remove);
-    await screen.findByText('Carta Inventada salva.');
+    await within(dialog).findByText('Carta Inventada saiu do deck.');
     expect(calls.at(-1)!.body).toEqual({
       name: 'Carta Inventada',
       board: 'maybeboard',
       quantity: 0,
       proxies: 0,
       scryfallId: null,
+      foils: 0,
     });
   });
 
   it('adiciona carta pela busca com autocompletar e teclado, somando ao que já existe', async () => {
     const calls = stubApi();
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
     const input = screen.getByRole('combobox', { name: 'Carta' });
     fireEvent.change(input, { target: { value: 'sol' } });
     const listbox = await screen.findByRole('listbox', {}, { timeout: 2000 });
@@ -277,12 +303,14 @@ describe('editor de deck', () => {
       this.dispatchEvent(new Event('close'));
     };
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Omnath, Locus of Mana' }));
     expect(screen.getByRole('button', { name: /Edição: CMM #42/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Forest' }));
     fireEvent.click(screen.getByRole('button', { name: /^Escolher edição ?\(Forest\)$/ }));
     const alpha = await screen.findByRole('radio', { name: /Limited Edition Alpha/ });
     expect(screen.getByText('2 edições')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Filtrar por edição ou número'), {
+    fireEvent.change(screen.getByLabelText('Edição, código ou número (ex.: pca 137)'), {
       target: { value: 'alpha' },
     });
     expect(screen.getByText('1 edição')).toBeInTheDocument();
@@ -301,10 +329,52 @@ describe('editor de deck', () => {
           fromScryfallId: 'f',
           toScryfallId: 'f2',
           quantity: 5,
+          foil: false,
         },
       }),
     );
     expect(calls[0]!.url).toBe('/api/v1/cards/prints?name=Forest');
+  });
+});
+
+describe('foil e comum da mesma edição', () => {
+  it('são cartas separadas na grade, cada uma com o seu editor', async () => {
+    const calls: { body: unknown }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        calls.push({ body: init?.body ? JSON.parse(init.body as string) : null });
+        return Response.json({ found: true, line: { name: 'Plains' } });
+      }),
+    );
+    const plains = {
+      key: 'mainboard|plains|p',
+      name: 'Plains',
+      board: 'mainboard' as const,
+      quantity: 2,
+      proxies: 0,
+      foils: 1,
+      foil: false,
+      scryfallId: 'p',
+      card: { typeLine: 'Basic Land — Plains', cmc: 0, imageUri: 'https://x/p.jpg' },
+    };
+    const { container } = wrap(<DeckCards deckId="d1" lines={[plains]} isOwner />);
+    const tiles = screen.getAllByRole('button', { name: 'Ver e editar Plains' });
+    expect(tiles).toHaveLength(2);
+    // Só a carta foil tem o selo.
+    expect(screen.getAllByText('Foil', { exact: false })).not.toHaveLength(0);
+    expect(await audit(container)).toEqual([]);
+
+    // Abre a foil e desmarca: a cópia volta a ser comum (0 foil, total 2).
+    fireEvent.click(tiles[1]!);
+    const dialog = screen.getByRole('dialog', { name: 'Plains' });
+    expect(
+      within(dialog).getByRole('group', { name: 'Editar a versão foil no deck' }),
+    ).toBeTruthy();
+    fireEvent.click(within(dialog).getByRole('checkbox', { name: /Foil/ }));
+    await within(dialog).findByText('Plains: nenhuma cópia foil.');
+    expect(calls.at(-1)!.body).toMatchObject({ quantity: 2, proxies: 0, foils: 0 });
+    vi.unstubAllGlobals();
   });
 });
 
@@ -383,5 +453,26 @@ describe('ColorIdentity e DeckSettingsForm', () => {
       format: 'brawl',
       visibility: 'private',
     });
+  });
+});
+
+describe('foilTiming', () => {
+  it('é estável para a mesma carta e muda entre cartas', () => {
+    expect(foilTiming('sol-ring')).toEqual(foilTiming('sol-ring'));
+    const keys = ['sol-ring', 'arcane-signet', 'command-tower', 'swords', 'rhystic-study'];
+    const durs = new Set(keys.map((k) => (foilTiming(k) as Record<string, string>)['--foil-dur']));
+    expect(durs.size).toBeGreaterThan(1);
+  });
+
+  it('fica entre 9 e 15s, com fase negativa dentro de uma volta', () => {
+    for (const k of ['a', 'b', 'c', 'deck-1:Sol Ring', 'x'.repeat(40)]) {
+      const v = foilTiming(k) as Record<string, string>;
+      const dur = parseFloat(v['--foil-dur']!);
+      const delay = parseFloat(v['--foil-delay']!);
+      expect(dur).toBeGreaterThanOrEqual(9);
+      expect(dur).toBeLessThanOrEqual(15);
+      expect(delay).toBeLessThanOrEqual(0);
+      expect(-delay).toBeLessThanOrEqual(dur);
+    }
   });
 });

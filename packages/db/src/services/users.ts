@@ -83,3 +83,28 @@ export async function getUserSummary(db: Database, userId: string) {
     groups: userGroups,
   };
 }
+
+/**
+ * Foto de perfil vinda do provedor de login (ex.: claim `picture` do Google). Só grava quando a URL
+ * muda: a URL da foto pode trocar a qualquer momento e não identifica o usuário. Quem chama já
+ * validou a URL; para limpar a foto, este não é o caminho (nunca grava vazio).
+ */
+export async function updateUserImage(db: Database, input: { userId: string; image: string }) {
+  if (!input.image.trim()) return false;
+  const updated = await db
+    .update(user)
+    .set({ image: input.image, updatedAt: new Date() })
+    .where(sql`${user.id} = ${input.userId} and ${user.image} is distinct from ${input.image}`)
+    .returning({ id: user.id });
+  return updated.length > 0;
+}
+
+/** Foto atual do usuário (ou `null`). */
+export async function getUserImage(db: Database, userId: string) {
+  const [row] = await db
+    .select({ image: user.image })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+  return row?.image ?? null;
+}
