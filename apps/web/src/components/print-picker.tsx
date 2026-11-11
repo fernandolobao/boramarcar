@@ -13,6 +13,8 @@ export interface PrintLine {
   board: string;
   quantity: number;
   scryfallId: string | null;
+  /** Só as cópias foil (`true`) ou comuns (`false`) mudam de edição; sem valor, qualquer uma. */
+  foil?: boolean;
   card: { setCode?: string | null; collectorNumber?: string | null } | null;
 }
 
@@ -146,6 +148,7 @@ export function PrintPicker({
                           fromScryfallId: line.scryfallId,
                           toScryfallId: chosen,
                           quantity: amount,
+                          ...(line.foil === undefined ? {} : { foil: line.foil }),
                         },
                       }),
                 () => dialog.current?.close(),
