@@ -54,7 +54,7 @@ test.describe('deck', () => {
     await expect(page.getByRole('img', { name: 'Omnath, Locus of Mana' })).toBeAttached();
     await expect(page.getByRole('heading', { name: 'Terrenos (36)' })).toBeVisible();
 
-    const zoom = page.getByRole('button', { name: 'Ampliar Cultivate' });
+    const zoom = page.getByRole('button', { name: 'Ver e editar Cultivate' });
     await zoom.focus();
     await page.keyboard.press('Enter');
     const dialog = page.getByRole('dialog', { name: 'Cultivate' });
@@ -68,19 +68,21 @@ test.describe('deck', () => {
       'aria-pressed',
       'true',
     );
-    await expect(page.getByRole('button', { name: 'Sol Ring' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Sol Ring/ })).toBeVisible();
   });
 
   test('editor: proxies parciais e lista exportada', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    await page.getByRole('button', { name: 'Editar', exact: true }).click();
-    const proxies = page.getByRole('spinbutton', { name: 'Proxies de Forest' });
+    // Editar é no diálogo da carta (visualização e edição unificadas).
+    await page.getByRole('button', { name: 'Ver e editar Forest' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Forest' });
+    const proxies = dialog.getByRole('spinbutton', { name: 'Cópias proxy' });
     await proxies.fill('5');
     await proxies.press('Enter');
     await expect(page.getByText('Forest salva.')).toBeVisible();
-
-    await page.getByRole('button', { name: 'Visual', exact: true }).click();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
     await expect(page.getByText('5 proxies', { exact: true })).toBeVisible();
 
     const exported = await page.request.get(`/api/v1/decks/${E2E_IDS.deck}/export?format=proxies`);
