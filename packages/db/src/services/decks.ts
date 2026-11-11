@@ -778,6 +778,8 @@ export async function moveLinePrint(
     fromScryfallId: string | null;
     card: CardData;
     quantity: number;
+    /** Só as cópias foil (`true`) ou só as comuns (`false`); sem valor, qualquer uma. */
+    foil?: boolean;
   },
 ) {
   await requireOwnedDeck(db, input.deckId, input.userId);
@@ -799,6 +801,7 @@ export async function moveLinePrint(
           eq(deckCards.board, input.board),
           sql`lower(${deckCards.cardName}) = ${input.name.trim().toLowerCase()}`,
           samePrint(input.fromScryfallId),
+          input.foil === undefined ? undefined : eq(deckCards.isFoil, input.foil),
         ),
       );
     const total = rows.reduce((sum, r) => sum + r.quantity, 0);

@@ -370,3 +370,71 @@ input[type='radio'] {
     display: none;
   }
 }
+
+/* ---------- Carregando ----------
+   Botão com ação em andamento (`aria-busy`, posto por `useApiAction`): o ícone vira um
+   indicador girando e o cursor mostra progresso. Com "reduzir movimento", o indicador fica
+   parado (o botão desabilitado e a barra do topo continuam avisando). */
+button[aria-busy='true'] {
+  cursor: progress;
+}
+button[aria-busy='true'] > svg:first-child {
+  display: none;
+}
+button[aria-busy='true']::before {
+  content: '';
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: busy-spin 0.7s linear infinite;
+}
+@keyframes busy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Barra no topo durante ações e mudanças de página (indeterminada). */
+.activity-bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-eter) 25%, transparent);
+}
+.activity-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, var(--color-eter), var(--color-mana));
+  animation: activity-slide 1.1s ease-in-out infinite;
+}
+@keyframes activity-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button[aria-busy='true']::before,
+  .activity-bar::after {
+    animation: none;
+  }
+  .activity-bar::after {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+@media print {
+  .activity-bar {
+    display: none;
+  }
+}

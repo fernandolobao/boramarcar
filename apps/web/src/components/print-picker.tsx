@@ -13,6 +13,8 @@ export interface PrintLine {
   board: string;
   quantity: number;
   scryfallId: string | null;
+  /** Só as cópias foil (`true`) ou comuns (`false`) mudam de edição; sem valor, qualquer uma. */
+  foil?: boolean;
   card: { setCode?: string | null; collectorNumber?: string | null } | null;
 }
 
@@ -108,11 +110,11 @@ export function PrintPicker({
       <button
         ref={opener}
         type="button"
-        className="mt-0.5 inline-flex items-center gap-1 rounded text-xs text-brand-700 underline underline-offset-2 dark:text-brand-300"
+        className="btn-secondary"
         aria-haspopup="dialog"
         onClick={show}
       >
-        <Icon name="edit" className="size-3.5 shrink-0" />
+        <Icon name="edit" />
         {current ? t('printCurrent', { print: current }) : t('printChoose')}
         <span className="sr-only"> ({line.name})</span>
       </button>
@@ -146,6 +148,7 @@ export function PrintPicker({
                           fromScryfallId: line.scryfallId,
                           toScryfallId: chosen,
                           quantity: amount,
+                          ...(line.foil === undefined ? {} : { foil: line.foil }),
                         },
                       }),
                 () => dialog.current?.close(),

@@ -55,6 +55,36 @@ function ProxyBadge({ line }: { line: DeckLineView }) {
 export const foilsOf = (line: Pick<DeckLineView, 'foil' | 'foils' | 'quantity' | 'proxies'>) =>
   line.foils ?? (line.foil ? line.quantity - line.proxies : 0);
 
+/** Uma carta na grade/lista: as cópias comuns e as foil da mesma edição são cartas separadas. */
+export interface DeckTile extends DeckLineView {
+  finish: 'normal' | 'foil';
+  /** A linha inteira (carta + edição), com todas as cópias comuns, foil e proxies. */
+  group: DeckLineView;
+}
+
+/** Separa a linha em carta comum (com as proxies) e carta foil, quando há as duas. */
+export function tilesOf(line: DeckLineView): DeckTile[] {
+  const foils = foilsOf(line);
+  const normal = line.quantity - foils;
+  const tiles: DeckTile[] = [];
+  if (normal > 0) {
+    tiles.push({ ...line, quantity: normal, foils: 0, foil: false, finish: 'normal', group: line });
+  }
+  if (foils > 0) {
+    tiles.push({
+      ...line,
+      key: normal > 0 ? `${line.key}|foil` : line.key,
+      quantity: foils,
+      proxies: 0,
+      foils,
+      foil: true,
+      finish: 'foil',
+      group: line,
+    });
+  }
+  return tiles;
+}
+
 /** Selo de foil: "Foil" quando todas as cópias reais são foil; senão "1 foil" (texto + ✦). */
 function FoilBadge({ line }: { line: DeckLineView }) {
   const t = useTranslations('decks');
@@ -105,7 +135,8 @@ export function DeckCards({
   const t = useTranslations('decks');
   const format = useFormatter();
   const [view, setView] = useState<View>('visual');
-  const [zoomed, setZoomed] = useState<DeckLineView | null>(null);
+  const [zoomed, setZoomed] = useState<DeckTile | null>(null);
+  const tiles = lines.flatMap(tilesOf);
   /** Cartas de duas faces mostrando o verso (na grade e no diálogo). */
   const [flipped, setFlipped] = useState<ReadonlySet<string>>(new Set());
   const toggleFlip = (key: string) =>
@@ -122,10 +153,15 @@ export function DeckCards({
 
   const views: View[] = ['visual', 'list'];
   // A linha aberta no diálogo, sempre com os dados mais novos (o editor atualiza a página).
-  const current = zoomed ? (lines.find((l) => l.key === zoomed.key) ?? zoomed) : null;
-  type Group = { key: string; title: string; count: number; lines: DeckLineView[] };
+  // Se a carta mudou de acabamento (ex.: virou foil), segue para a outra carta da mesma linha.
+  const current = zoomed
+    ? (tiles.find((l) => l.key === zoomed.key) ??
+      tiles.find((l) => l.group.key === zoomed.group.key) ??
+      null)
+    : null;
+  type Group = { key: string; title: string; count: number; lines: DeckTile[] };
   const groups = DECK_BOARDS.flatMap((board): Group[] => {
-    const own = lines.filter((l) => l.board === board);
+    const own = tiles.filter((l) => l.board === board);
     if (!own.length) return [];
     // O deck principal é separado por tipo; comandante e boards secundários ficam juntos.
     return board === 'mainboard'
@@ -145,7 +181,7 @@ export function DeckCards({
         ];
   });
 
-  const openZoom = (line: DeckLineView, button: HTMLButtonElement) => {
+  const openZoom = (line: DeckTile, button: HTMLButtonElement) => {
     opener.current = button;
     setZoomed(line);
   };
@@ -344,7 +380,7 @@ export function DeckCards({
       ))}
 
       <CardDialog
-        open={zoomed !== null}
+        open={zoomed !== null && current !== null}
         name={current?.name ?? ''}
         card={current?.card ? { ...current.card, name: current.name } : null}
         back={current ? flipped.has(current.key) : false}
@@ -381,31 +417,35 @@ export function DeckCards({
           ) : undefined
         }
       >
-        {isOwner && current && <LineEditor key={current.key} deckId={deckId} line={current} />}
+        {isOwner && current && <LineEditor key={current.key} deckId={deckId} tile={current} />}
       </CardDialog>
     </section>
   );
 }
 
 /**
- * Editor da linha no diálogo da carta (dono do deck): quantidade e proxies salvam ao sair do campo
- * ou com Enter; foil salva na hora; a edição troca pelo seletor; remover pede confirmação.
+ * Editor da carta no diálogo (dono do deck). Cada carta da grade é uma versão: as cópias comuns
+ * (com as proxies) ou as foil da mesma edição. Quantidade e proxies salvam ao sair do campo ou
+ * com Enter; "Foil" passa as cópias desta carta para o outro acabamento; "Separar 1 cópia" cria
+ * a outra carta com uma cópia; a edição troca pelo seletor; remover pede confirmação.
  */
-function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
+function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
   const t = useTranslations('decks');
   const { run, error, pending } = useApiAction();
   const id = useId();
-  const [quantity, setQuantity] = useState(String(line.quantity));
-  const [proxies, setProxies] = useState(String(line.proxies));
-  const [foils, setFoils] = useState(String(foilsOf(line)));
+  const group = tile.group;
+  const isFoil = tile.finish === 'foil';
+  const groupFoils = foilsOf(group);
+  const [quantity, setQuantity] = useState(String(tile.quantity));
+  const [proxies, setProxies] = useState(String(tile.proxies));
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState('');
+  const real = tile.quantity - tile.proxies;
 
-  const save = (q: number, p: number, f: number = Number(foils)) => {
-    // Cópias foil nunca passam das reais (ex.: diminuiu a quantidade).
-    f = Math.min(f, q - p);
-    if (q === line.quantity && p === line.proxies && f === foilsOf(line)) return;
-    if (!Number.isInteger(q) || !Number.isInteger(p) || !Number.isInteger(f) || p > q || f < 0) {
+  /** Grava a linha inteira (carta + edição): total, proxies e quantas são foil. */
+  const save = (q: number, p: number, f: number, message: string) => {
+    if (q === group.quantity && p === group.proxies && f === groupFoils) return;
+    if (![q, p, f].every(Number.isInteger) || p > q || f < 0 || f > q - p) {
       setStatus(t('invalidCopies'));
       return;
     }
@@ -415,35 +455,52 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
         api(`/api/v1/decks/${deckId}/lines`, {
           method: 'PUT',
           body: {
-            name: line.name,
-            board: line.board,
+            name: group.name,
+            board: group.board,
             quantity: q,
             proxies: p,
-            scryfallId: line.scryfallId,
+            scryfallId: group.scryfallId,
             foils: f,
           },
         }),
-      () =>
-        setStatus(
-          q === 0
-            ? t('cardRemoved', { name: line.name })
-            : f !== foilsOf(line)
-              ? t('foilsSaved', { name: line.name, count: f })
-              : t('lineSaved', { name: line.name }),
-        ),
+      () => setStatus(message),
     );
   };
-  const commit = () => save(Number(quantity), Number(proxies));
+  /** Esta carta com `n` cópias (e `px` proxies, só na carta comum); a outra fica como está. */
+  const setThis = (n: number, px: number, message: string) =>
+    isFoil
+      ? save(group.quantity - groupFoils + n, group.proxies, n, message)
+      : save(n + groupFoils, px, groupFoils, message);
+  const commit = () => {
+    const n = Number(quantity);
+    const px = isFoil ? 0 : Number(proxies);
+    if (!Number.isInteger(n) || !Number.isInteger(px) || px > n) {
+      setStatus(t('invalidCopies'));
+      return;
+    }
+    setThis(
+      n,
+      px,
+      n === 0 ? t('cardRemoved', { name: tile.name }) : t('lineSaved', { name: tile.name }),
+    );
+  };
   const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       commit();
     }
   };
+  /** Passa `n` cópias reais desta carta para o outro acabamento. */
+  const moveFinish = (n: number) => {
+    const f = isFoil ? groupFoils - n : groupFoils + n;
+    save(group.quantity, group.proxies, f, t('foilsSaved', { name: tile.name, count: f }));
+  };
 
   return (
     <fieldset className="space-y-3 rounded-xl border border-line px-3 pt-1 pb-3">
-      <legend className="px-1 text-sm font-semibold">{t('editLine')}</legend>
+      <legend className="px-1 text-sm font-semibold">
+        {isFoil ? t('editLineFoil') : t('editLine')}
+      </legend>
       <div className="grid grid-cols-2 items-end gap-3">
         <div>
           <label className="label" htmlFor={`${id}-q`}>
@@ -463,63 +520,49 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
             onKeyDown={onKey}
           />
         </div>
-        <div>
-          <label className="label" htmlFor={`${id}-p`}>
-            {t('proxiesLabel')}
-          </label>
-          <input
-            id={`${id}-p`}
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={Number(quantity) || 0}
-            className="input"
-            value={proxies}
-            disabled={pending}
-            onChange={(e) => setProxies(e.target.value)}
-            onBlur={commit}
-            onKeyDown={onKey}
-          />
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Uma cópia real: marcar/desmarcar. Mais de uma: quantas são foil. */}
-        {Number(quantity) - Number(proxies) <= 1 ? (
-          <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
-            <input
-              type="checkbox"
-              checked={Number(foils) > 0}
-              disabled={pending || Number(quantity) - Number(proxies) < 1}
-              onChange={(e) => {
-                const f = e.target.checked ? 1 : 0;
-                setFoils(String(f));
-                save(Number(quantity), Number(proxies), f);
-              }}
-            />
-            <span aria-hidden="true">✦</span> {t('foil')}
-          </label>
-        ) : (
-          <div className="w-32">
-            <label className="label" htmlFor={`${id}-f`}>
-              <span aria-hidden="true">✦ </span>
-              {t('foilsLabel')}
+        {!isFoil && (
+          <div>
+            <label className="label" htmlFor={`${id}-p`}>
+              {t('proxiesLabel')}
             </label>
             <input
-              id={`${id}-f`}
+              id={`${id}-p`}
               type="number"
               inputMode="numeric"
               min={0}
-              max={Math.max(0, Number(quantity) - Number(proxies))}
+              max={Number(quantity) || 0}
               className="input"
-              value={foils}
+              value={proxies}
               disabled={pending}
-              onChange={(e) => setFoils(e.target.value)}
+              onChange={(e) => setProxies(e.target.value)}
               onBlur={commit}
               onKeyDown={onKey}
             />
           </div>
         )}
-        {line.card && <PrintPicker deckId={deckId} line={line} />}
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={isFoil}
+            disabled={pending || real < 1}
+            onChange={() => moveFinish(real)}
+          />
+          <span aria-hidden="true">✦</span> {t('foil')}
+        </label>
+        {real >= 2 && (
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={pending}
+            onClick={() => moveFinish(1)}
+          >
+            <Icon name="flip" />
+            {isFoil ? t('splitNormal') : t('splitFoil')}
+          </button>
+        )}
+        {tile.card && <PrintPicker deckId={deckId} line={{ ...tile, foil: isFoil }} />}
       </div>
       <button
         type="button"
@@ -529,7 +572,7 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
         onClick={() => {
           if (!confirming) return setConfirming(true);
           setConfirming(false);
-          save(0, 0);
+          setThis(0, 0, t('cardRemoved', { name: tile.name }));
         }}
       >
         <Icon name="delete" />

@@ -9,6 +9,8 @@ const schema = z.object({
   fromScryfallId: z.string().min(1).max(64).nullable(),
   toScryfallId: z.string().min(1).max(64),
   quantity: z.number().int().min(1).max(MAX_COPIES),
+  /** Só as cópias foil (`true`) ou só as comuns (`false`); sem valor, qualquer uma. */
+  foil: z.boolean().optional(),
 });
 
 /** Troca a edição de cópias de uma carta (reais primeiro, depois proxies). */

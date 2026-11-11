@@ -3,8 +3,9 @@ import { themes } from '@boramarcar/tokens';
 import { Analytics } from '@vercel/analytics/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { cookies } from 'next/headers';
+import { ActivityBar } from '@/components/activity-bar';
 import { ConsentBanner } from '@/components/consent-banner';
 import { SessionInsights } from '@/components/session-insights';
 import { CONSENT_COOKIE, parseConsent } from '@/lib/consent';
@@ -52,6 +53,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           {t('skipToContent')}
         </a>
         <NextIntlClientProvider>
+          {/* useSearchParams pede um limite de Suspense (não atrasa a página). */}
+          <Suspense fallback={null}>
+            <ActivityBar />
+          </Suspense>
           {children}
           {insights && <ConsentBanner initial={consent} />}
           <SessionInsights enabled={insights} consent={consent} />

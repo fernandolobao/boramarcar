@@ -237,3 +237,9 @@ sem rolagem horizontal em 320px.
 
 - **Pilha**: é só layout (`sticky`) ligado à rolagem, sem animação automática. A seção com foco vem para a frente (`:focus-within`, 2.4.11), e os títulos continuam `h2` na ordem do documento. No app, com "reduzir movimento", a pilha é desligada.
 - **Aura**: decorativa (`aria-hidden`/`accessibilityElementsHidden`, `pointer-events: none`), atrás do conteúdo, com opacidade baixa para não afetar o contraste do texto. Movimento muito lento e parado com `prefers-reduced-motion` / "reduzir movimento" (2.3.3).
+
+## Carregamento e ações (11/11/2026)
+
+- **Toda ação na API** (`useApiAction`) deixa o botão que a disparou com `aria-busy="true"`. O ícone do botão vira um indicador girando (parado com "reduzir movimento") e o botão fica desabilitado **durante a espera pelo servidor**; antes, só ficava desabilitado depois da resposta. Uma ação de cada vez: clique duplo e Enter + "perdeu o foco" não repetem a ação.
+- **Barra no topo** (`ActivityBar`) durante ações e mudanças de página (link interno para outra página), decorativa (`aria-hidden`), com "Carregando…" numa região de status para leitores de tela. Testes E2E que procuram mensagens de status devem filtrar pelo texto, porque essa região existe em todas as páginas.
+- **Ações no diálogo da carta** (deck e coleção) são todas botões: "Edição: …" deixou de parecer link.
