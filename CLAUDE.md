@@ -35,6 +35,40 @@ O `git push` direto da nuvem é bloqueado. O caminho é pelo computador do dono,
 
 O token não lê logs do Actions: para ver o erro, use os passos dos jobs (`/actions/runs/<id>/jobs`) ou peça só o trecho do log em volta de `##[error]`.
 
+### Armadilhas conhecidas (sessões na nuvem)
+
+Aprendidas na prática. Leia antes de concluir que algo "não funciona".
+
+**Push e bundles**
+
+- No Mac, crie o bundle em `$HOME` e copie para `~/Documents`. O `git bundle create` direto na pasta conectada falha em silêncio (não consegue apagar o `.lock`) e deixa um bundle **antigo**.
+- Na nuvem, use um **nome de arquivo novo** para cada bundle.
+- Antes de buscar um bundle, confira com `git bundle list-heads <arquivo>` que ele tem o commit esperado.
+- Proteja o push: só empurre se o PR estiver aberto (`state == open`) e, para branch novo, se ele ainda não existir no remoto. A checagem precisa **interromper** o comando (`exit 1`), não só imprimir o estado.
+- Depois do push pelo Mac, atualize a referência local: `git update-ref refs/remotes/origin/<branch> <branch>`. Sem isso, o hook de "commits não enviados" acusa um problema que não existe.
+- Commits feitos pelo Claude: `git config user.email noreply@anthropic.com && git config user.name Claude`. Senão o GitHub mostra "Unverified".
+- Antes de `git commit`, `git add -A` e `git status --short`: mudanças fora do índice ficam para trás e "vazam" para o próximo branch.
+
+**Testes locais (container da nuvem)**
+
+- Postgres 16 em `/usr/lib/postgresql/16/bin`, dados em `/home/claude/pgdata`, porta 5433. Ele **para entre as respostas**, então confira com `pg_isready -h /tmp -p 5433` e suba com `su claude -c "/usr/lib/postgresql/16/bin/pg_ctl -D /home/claude/pgdata -o '-p 5433 -k /tmp' -l /tmp/pg.log start"`. Se o diretório não existir: `initdb` como o usuário `claude` e `createdb boramarcar`.
+- Variáveis para E2E (valores fictícios, nada real): `DATABASE_URL=E2E_DATABASE_URL=postgres://boramarcar@127.0.0.1:5433/boramarcar`, `BETTER_AUTH_URL=http://localhost:3000`, um `BETTER_AUTH_SECRET` qualquer com 32+ caracteres, `GOOGLE_CLIENT_ID=x`, `GOOGLE_CLIENT_SECRET=y`. Depois: `pnpm db:migrate`, `pkill -f next-server`, `pnpm build`, `cd apps/web && npx playwright test`.
+- No sandbox não há rede para Scryfall, Commander Spellbook nem Banco Central. Os erros `[deck-analysis] … ENOTFOUND` e `[cambio] PTAX indisponível` nos logs do E2E são esperados, e as imagens das cartas não carregam nas capturas de tela.
+- `.next/types` velho de outro branch gera erros falsos no `tsc` direto. Use `pnpm typecheck`, que roda `next typegen` antes.
+- Testes E2E rodam em sequência no mesmo banco: outro teste pode ter criado dados (ex.: um deck da Ana). Não dependa de contagens exatas. Há uma região `role="status"` em todas as páginas (barra de carregamento), então filtre mensagens de status pelo texto.
+
+**Vercel e previews**
+
+- Logs de runtime: pelo navegador interno, em `https://vercel.com/fernandolobaos-projects/boramarcar/logs?environment=preview` (com `&requestPath=/api/...` para filtrar). Os erros de variável de ambiente aparecem ali como "Variáveis de ambiente inválidas".
+- O projeto separa os segredos de produção: variáveis secretas de Production **não** valem em Preview e precisam ser criadas lá também.
+- Login no preview: OAuth proxy (ver `docs/ARCHITECTURE.md`). Um 403 "Invalid origin" num preview antigo some com um deploy novo do branch. Teste com `fetch('/api/auth/sign-in/social', {method:'POST', …, body: {provider:'google', callbackURL:'/painel', disableRedirect:true}})` no próprio preview: o `redirect_uri` deve ser o de produção.
+- Um PR aberto antes de uma mudança de infraestrutura (CI, login) precisa de "Update branch" para pegá-la.
+
+**App mobile**
+
+- Login no Expo Go contra produção exige `EXPO_GO_LOGIN=lan` no servidor (ver `server/trusted-origins.ts`).
+- Para ver telas do app sem aparelho: instale temporariamente `react-native-web`/`react-dom` (`npx expo install`), crie uma rota de prévia, rode `npx expo export --platform web`, sirva a pasta e tire capturas com Playwright. Depois **restaure** `package.json`/`pnpm-lock.yaml` e apague a rota.
+
 ### Economia de contexto
 
 - Uma conversa por funcionalidade grande. Ao começar, leia este arquivo, o `README`, `docs/ARCHITECTURE.md` e `docs/ROADMAP.md` em vez de pedir contexto.

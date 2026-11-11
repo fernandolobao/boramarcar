@@ -143,15 +143,15 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 
 | Item                                                                                                                                                                                   | Tamanho |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| E2E autenticado (usuário de teste criado direto no banco + cookie de sessão) cobrindo o fluxo completo                                                                                 | M       |
+| E2E autenticado (usuário de teste criado direto no banco + cookie de sessão) cobrindo o fluxo completo ✅                                                                              | M       |
 | **Previews na Vercel** ✅: branch de banco do Neon por PR (integração Neon ↔ Vercel) e login com Google no preview pelo OAuth proxy do Better Auth                                     | M       |
-| **Domínio próprio no Resend**: verificar um domínio (registros DNS SPF/DKIM) e definir `EMAIL_FROM`; até lá, o remetente de testes só entrega para o e-mail dono da conta Resend       | P       |
+| **Domínio próprio no Resend** ✅: `arcanakin.com.br` verificado (SPF/DKIM no registro.br) e `EMAIL_FROM` em produção                                                                   | P       |
 | Observabilidade: Vercel Analytics/Speed Insights e Sentry                                                                                                                              | P       |
 | **Hotjar/Contentsquare e LGPD** ✅: gravação de sessões só em produção e com consentimento (aviso de cookies), Política de Privacidade, baixar meus dados e excluir conta (site e app) | P       |
 | Rate limiting nas rotas de importação (Upstash Redis free) e timeouts nas chamadas externas                                                                                            | P       |
 | Cabeçalhos de segurança (CSP) e revisão de permissões                                                                                                                                  | P       |
 | Acessibilidade (auditoria WCAG AA) e modo escuro refinado                                                                                                                              | M       |
-| LGPD: exportar e excluir conta                                                                                                                                                         | P       |
+| LGPD: exportar e excluir conta ✅                                                                                                                                                      | P       |
 | OpenAPI da API v1 (documentação para o app mobile)                                                                                                                                     | M       |
 | PWA (instalar na tela inicial) enquanto o app nativo não sai                                                                                                                           | P       |
 
