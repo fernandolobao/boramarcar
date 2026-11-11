@@ -341,6 +341,7 @@ export function DeckCards({
         name={current?.name ?? ''}
         card={current?.card ? { ...current.card, name: current.name } : null}
         back={current ? flipped.has(current.key) : false}
+        foil={Boolean(current?.foil)}
         onBackChange={(back) => {
           if (current && back !== flipped.has(current.key)) toggleFlip(current.key);
         }}
@@ -432,9 +433,9 @@ function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
   };
 
   return (
-    <fieldset className="space-y-3 border-t border-line pt-3">
-      <legend className="pt-3 font-semibold">{t('editLine')}</legend>
-      <div className="grid grid-cols-2 gap-3">
+    <fieldset className="space-y-3 rounded-xl border border-line px-3 pt-1 pb-3">
+      <legend className="px-1 text-sm font-semibold">{t('editLine')}</legend>
+      <div className="grid grid-cols-2 items-end gap-3">
         <div>
           <label className="label" htmlFor={`${id}-q`}>
             {t('quantityLabel')}
