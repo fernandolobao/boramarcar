@@ -785,28 +785,14 @@ function EntryDialog({
                   scryfallId: entry.scryfallId,
                   card: entry.card,
                 }}
-                onPick={async (toScryfallId, amount) => {
-                  // Todas as cópias: muda a impressão da linha. Parte delas: separa em outra linha.
-                  if (amount >= entry.quantity) {
-                    return api(`/api/v1/collection/${entry.id}`, {
-                      method: 'PATCH',
-                      body: { scryfallId: toScryfallId },
-                    });
-                  }
-                  await api('/api/v1/collection', {
-                    method: 'POST',
-                    body: {
-                      name: entry.name,
-                      scryfallId: toScryfallId,
-                      quantity: amount,
-                      foil: entry.foil,
-                    },
-                  });
-                  return api(`/api/v1/collection/${entry.id}`, {
+                onPick={(toScryfallId, amount) =>
+                  // Uma chamada só: as cópias mudam de impressão na coleção e nos decks (senão a
+                  // sincronia com os decks traria a impressão antiga de volta).
+                  api(`/api/v1/collection/${entry.id}`, {
                     method: 'PATCH',
-                    body: { quantity: entry.quantity - amount },
-                  });
-                }}
+                    body: { scryfallId: toScryfallId, copies: amount },
+                  })
+                }
               />
             )}
             <button
