@@ -102,6 +102,13 @@ export const deckSummarySchema = z
     visibility: z.string(),
     cardCount: z.number().nullable(),
     proxyCount: z.number(),
+    /** Nota 0–100 (null quando o formato não tem nota). Servidores antigos não mandam. */
+    score: z.number().nullable().optional(),
+    /** Bracket mínimo (2 = 1–2, 3, 4 = 4–5); null fora do Commander. */
+    bracket: z
+      .union([z.literal(2), z.literal(3), z.literal(4)])
+      .nullable()
+      .optional(),
     updatedAt: date,
   })
   .loose();

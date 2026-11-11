@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
@@ -62,6 +63,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         tabIndex={-1}
         className="mx-auto max-w-5xl space-y-6 px-4 py-8 focus:outline-none print:max-w-none print:p-0"
       >
+        {/* Páginas fora da navegação principal ganham "Voltar" (mesmo lugar em todas). */}
+        <BackLink main={links.map((l) => l.href)} />
         {children}
       </main>
     </div>

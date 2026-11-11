@@ -1,12 +1,25 @@
 import { GAME_FORMATS } from '@boramarcar/core';
-import { listDecks } from '@boramarcar/db';
+import { getDeckRatings, listDecks } from '@boramarcar/db';
 import { z } from 'zod';
 import { runAfterResponse } from '@/server/background';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { importDeck } from '@/server/deck-import';
 import { authed, parseJson } from '@/server/http';
 
-export const GET = authed(async ({ db, user }) => ({ decks: await listDecks(db, user.id) }));
+export const GET = authed(async ({ db, user }) => {
+  const decks = await listDecks(db, user.id);
+  const ratings = await getDeckRatings(
+    db,
+    decks.map((d) => d.id),
+  );
+  return {
+    decks: decks.map((d) => ({
+      ...d,
+      score: ratings.get(d.id)?.score ?? null,
+      bracket: ratings.get(d.id)?.bracket ?? null,
+    })),
+  };
+});
 
 const importSchema = z.discriminatedUnion('kind', [
   z.object({

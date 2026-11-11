@@ -1,5 +1,6 @@
 {
   "common": {
+    "back": "Back",
     "appName": "ArcanaKin",
     "tagline": "Schedule your next Commander night.",
     "save": "Save",
@@ -328,6 +329,9 @@
     "list": "Card list",
     "listHint": "One card per line, e.g. \"1 Sol Ring\". Use Commander/Deck/Sideboard sections. Mark proxies with #proxy.",
     "notFound": "Cards not found on Scryfall: {names}",
+    "gridScore": "Score {score}",
+    "gridBracket": "Bracket {value}",
+    "bracketShort": { "2": "1–2", "3": "3", "4": "4–5" },
     "cards": "{count, plural, =1 {1 card} other {# cards}}",
     "proxies": "{count, plural, =0 {no proxies} =1 {1 proxy} other {# proxies}}",
     "proxy": "Proxy",

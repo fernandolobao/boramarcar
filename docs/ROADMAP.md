@@ -146,6 +146,7 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 | **Previews na Vercel**: branch de banco do Neon por PR (integração Neon ↔ Vercel) e login em preview (domínio fixo de preview ou e-mail/senha só em preview)                     | M       |
 | **Domínio próprio no Resend**: verificar um domínio (registros DNS SPF/DKIM) e definir `EMAIL_FROM`; até lá, o remetente de testes só entrega para o e-mail dono da conta Resend | P       |
 | Observabilidade: Vercel Analytics/Speed Insights e Sentry                                                                                                                        | P       |
+| **Hotjar/Contentsquare**: gravação de sessões e mapas de calor em produção ✅; falta aviso de cookies com consentimento (LGPD) e política de privacidade                         | P       |
 | Rate limiting nas rotas de importação (Upstash Redis free) e timeouts nas chamadas externas                                                                                      | P       |
 | Cabeçalhos de segurança (CSP) e revisão de permissões                                                                                                                            | P       |
 | Acessibilidade (auditoria WCAG AA) e modo escuro refinado                                                                                                                        | M       |

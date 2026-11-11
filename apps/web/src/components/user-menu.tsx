@@ -88,7 +88,9 @@ export function UserMenu({
         <p className="border-b border-ink-200 px-3 pt-1 pb-2 text-sm dark:border-ink-700">
           <span className="muted block text-xs">{t('signedInAs')}</span>
           <span className="block truncate font-medium">{name}</span>
-          <span className="muted block truncate text-xs">{email}</span>
+          <span className="muted block truncate text-xs" data-cs-mask>
+            {email}
+          </span>
         </p>
         <ul className="mt-1 space-y-0.5">
           <li>

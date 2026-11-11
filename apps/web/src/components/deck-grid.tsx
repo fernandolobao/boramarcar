@@ -12,8 +12,10 @@ export interface DeckSummary {
   format: string;
   visibility: string;
   cardCount: number | null;
-  proxyCount: number;
 }
+
+/** Nota e bracket mínimo de cada deck (getDeckRatings). */
+export type DeckRatings = Map<string, { score: number | null; bracket: 2 | 3 | 4 | null }>;
 
 const VISIBILITY_ICON = { private: 'private', group: 'group', public: 'public' } as const;
 
@@ -33,11 +35,13 @@ export async function VisibilityBadge({ visibility }: { visibility: string }) {
 export async function DeckGrid({
   decks,
   covers,
+  ratings,
   showVisibility = true,
   headingLevel = 2,
 }: {
   decks: DeckSummary[];
   covers: Map<string, DeckCover>;
+  ratings?: DeckRatings;
   showVisibility?: boolean;
   headingLevel?: 2 | 3;
 }) {
@@ -48,6 +52,7 @@ export async function DeckGrid({
     <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {decks.map((deck) => {
         const cover = covers.get(deck.id);
+        const rating = ratings?.get(deck.id);
         const format = isGameFormat(deck.format) ? deck.format : 'other';
         const commanders = formatRules(format).usesCommander
           ? cover?.cards.map((c) => c.name).join(' & ')
@@ -88,11 +93,23 @@ export async function DeckGrid({
               {commanders !== null && (
                 <p className="muted text-sm">{commanders || t('noCommander')}</p>
               )}
-              <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
-                <p className="muted text-sm">
-                  {t('cards', { count: deck.cardCount ?? 0 })} ·{' '}
-                  {t('proxies', { count: deck.proxyCount })}
+              {(rating?.score != null || rating?.bracket) && (
+                <p className="flex flex-wrap items-center gap-2 pt-1 text-sm">
+                  {rating.score != null && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 font-medium">
+                      {t('gridScore', { score: rating.score })}
+                    </span>
+                  )}
+                  {rating.bracket && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 font-medium">
+                      <Icon name="bracket" className="size-3.5 shrink-0" />
+                      {t('gridBracket', { value: t(`bracketShort.${rating.bracket}`) })}
+                    </span>
+                  )}
                 </p>
+              )}
+              <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
+                <p className="muted text-sm">{t('cards', { count: deck.cardCount ?? 0 })}</p>
                 {showVisibility && <VisibilityBadge visibility={deck.visibility} />}
               </div>
             </div>
