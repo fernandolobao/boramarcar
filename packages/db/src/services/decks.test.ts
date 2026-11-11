@@ -289,7 +289,7 @@ describe('editor e sincronização', () => {
       ]),
     );
 
-    // Foil: marcar vale para todas as cópias; mudar a quantidade sem dizer nada mantém o foil.
+    // Foil: marcar vale para as cópias reais; cópias novas entram comuns (os foil continuam).
     await setDeckLine(db, {
       deckId: saved.id,
       userId: owner.id,
@@ -312,7 +312,8 @@ describe('editor e sincronização', () => {
     detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
     expect(detail.lines.find((l) => l.name === 'Forest')).toMatchObject({
       quantity: 12,
-      foil: true,
+      foils: 7,
+      foil: false,
     });
     await setDeckLine(db, {
       deckId: saved.id,
@@ -518,11 +519,9 @@ describe('edições da mesma carta', () => {
       format: 'other',
     });
     const lines = async () =>
-      (await getDeck(db, { deckId: saved.id, viewerId: owner.id })).lines.map((l) => [
-        l.scryfallId,
-        l.quantity,
-        l.proxies,
-      ]);
+      (await getDeck(db, { deckId: saved.id, viewerId: owner.id })).lines
+        .map((l) => [l.scryfallId, l.quantity, l.proxies])
+        .sort((a, b) => String(a[0]).localeCompare(String(b[0])));
     expect(await lines()).toEqual([
       ['sol-cmm', 3, 1],
       ['sol-lea', 1, 0],

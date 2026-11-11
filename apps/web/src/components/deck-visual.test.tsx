@@ -179,14 +179,16 @@ describe('editor de deck', () => {
         quantity: 30,
         proxies: 12,
         scryfallId: 'f',
-        foil: false,
+        foils: 0,
       },
     });
 
-    // Foil: a caixa salva na hora, para todas as cópias da linha.
-    fireEvent.click(within(dialog).getByRole('checkbox', { name: /Foil/ }));
-    await within(dialog).findByText('Forest: foil marcado.');
-    expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foil: true });
+    // Foil: com várias cópias reais, quantas são foil (1 Forest foil e o resto comum).
+    const foils = within(dialog).getByRole('spinbutton', { name: /Cópias foil/ });
+    fireEvent.change(foils, { target: { value: '2' } });
+    fireEvent.keyDown(foils, { key: 'Enter' });
+    await within(dialog).findByText('Forest: 2 cópias foil.');
+    expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foils: 2 });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' }));
@@ -212,7 +214,7 @@ describe('editor de deck', () => {
       quantity: 0,
       proxies: 0,
       scryfallId: null,
-      foil: false,
+      foils: 0,
     });
   });
 
@@ -310,7 +312,7 @@ describe('editor de deck', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Escolher edição ?\(Forest\)$/ }));
     const alpha = await screen.findByRole('radio', { name: /Limited Edition Alpha/ });
     expect(screen.getByText('2 edições')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Filtrar por edição ou número'), {
+    fireEvent.change(screen.getByLabelText('Edição, código ou número (ex.: pca 137)'), {
       target: { value: 'alpha' },
     });
     expect(screen.getByText('1 edição')).toBeInTheDocument();

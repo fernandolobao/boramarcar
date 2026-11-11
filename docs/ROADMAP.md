@@ -144,7 +144,7 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 | Item                                                                                                                                                                                   | Tamanho |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | E2E autenticado (usuário de teste criado direto no banco + cookie de sessão) cobrindo o fluxo completo                                                                                 | M       |
-| **Previews na Vercel**: branch de banco do Neon por PR (integração Neon ↔ Vercel) e login em preview (domínio fixo de preview ou e-mail/senha só em preview)                           | M       |
+| **Previews na Vercel** ✅: branch de banco do Neon por PR (integração Neon ↔ Vercel) e login com Google no preview pelo OAuth proxy do Better Auth                                     | M       |
 | **Domínio próprio no Resend**: verificar um domínio (registros DNS SPF/DKIM) e definir `EMAIL_FROM`; até lá, o remetente de testes só entrega para o e-mail dono da conta Resend       | P       |
 | Observabilidade: Vercel Analytics/Speed Insights e Sentry                                                                                                                              | P       |
 | **Hotjar/Contentsquare e LGPD** ✅: gravação de sessões só em produção e com consentimento (aviso de cookies), Política de Privacidade, baixar meus dados e excluir conta (site e app) | P       |

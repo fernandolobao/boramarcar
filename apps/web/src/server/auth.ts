@@ -1,8 +1,9 @@
 import 'server-only';
 import { schema } from '@boramarcar/db';
 import { expo } from '@better-auth/expo';
-import { authTrustedOrigins } from './trusted-origins';
+import { authTrustedOrigins, oauthProxyOptions } from './trusted-origins';
 import { betterAuth } from 'better-auth';
+import { oAuthProxy } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { getBaseUrl, getEnv } from '@/env';
@@ -11,6 +12,10 @@ import { GOOGLE_SIGN_IN_OPTIONS, syncGoogleProfileImage } from './google-picture
 
 function createAuth() {
   const env = getEnv();
+  const proxy = oauthProxyOptions({
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    OAUTH_PROXY_SECRET: process.env.OAUTH_PROXY_SECRET,
+  });
   return betterAuth({
     baseURL: getBaseUrl(env),
     secret: env.BETTER_AUTH_SECRET,
@@ -47,8 +52,9 @@ function createAuth() {
     },
     // App mobile (Expo): o login social volta para o app (`boramarcar://` ou o Expo Go).
     trustedOrigins: authTrustedOrigins(process.env),
-    // nextCookies precisa ser o último plugin.
-    plugins: [expo(), nextCookies()],
+    // nextCookies precisa ser o último plugin. O OAuth proxy permite entrar com o Google nos
+    // previews da Vercel (o Google só aceita a URL de produção).
+    plugins: [expo(), ...(proxy ? [oAuthProxy(proxy)] : []), nextCookies()],
   });
 }
 

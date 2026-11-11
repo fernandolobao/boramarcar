@@ -395,13 +395,15 @@ export const deckCards = pgTable(
   },
   (t) => [
     index('deck_cards_deck_idx').on(t.deckId),
-    // Uma linha por carta, edição (impressão) e status de proxy em cada board.
+    // Uma linha por carta, edição (impressão), proxy e foil em cada board: foil e não foil da
+    // mesma edição convivem no deck (ex.: 1 Plains foil e 1 comum).
     uniqueIndex('deck_cards_unique_idx').on(
       t.deckId,
       t.board,
       t.cardName,
       sql`coalesce(${t.scryfallId}, '')`,
       t.isProxy,
+      t.isFoil,
     ),
   ],
 );

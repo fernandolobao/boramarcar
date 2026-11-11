@@ -1,0 +1,2 @@
+DROP INDEX "deck_cards_unique_idx";--> statement-breakpoint
+CREATE UNIQUE INDEX "deck_cards_unique_idx" ON "deck_cards" USING btree ("deck_id","board","card_name",coalesce("scryfall_id", ''),"is_proxy","is_foil");
