@@ -30,6 +30,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     { href: '/eventos', label: t('events'), icon: 'events' as const },
     { href: '/ranking', label: t('ranking'), icon: 'ranking' as const },
     { href: '/decks', label: t('decks'), icon: 'decks' as const },
+    { href: '/colecao', label: t('collection'), icon: 'collection' as const },
     { href: '/grupo', label: t('group'), icon: 'group' as const },
   ];
 

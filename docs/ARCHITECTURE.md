@@ -231,6 +231,14 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
   - `DELETE /api/v1/me` (`{ confirm: true }`): encerra a sessão e apaga login, sessões, decks, disponibilidade, presenças futuras e locais que a pessoa hospeda, e tira a pessoa dos grupos. O registro do usuário vira "Jogador removido" (sem e-mail real, foto, fuso ou idioma; `deleted_at` preenchido), para as partidas continuarem no histórico dos outros. Grupos de que era dona passam para o admin (ou membro) mais antigo, ou são apagados se ela estava sozinha. `GET /api/v1/me` mostra isso antes.
   - No app mobile, a exclusão é feita no próprio app (exigência das lojas); baixar os dados abre o site.
 
+## Coleção
+
+- **Dados** (`collection_cards`): uma linha por pessoa, carta, impressão e acabamento (foil), com a quantidade. Proxies nunca entram.
+- **Decks só acrescentam** (`syncCollectionFromDecks`, chamada em toda mudança de deck): para cada carta, impressão e acabamento, a coleção fica com pelo menos a soma das cópias não proxy em todos os decks da pessoa (fora o maybeboard). Tirar uma carta de um deck não tira da coleção. A migration `0013_colecao` fez a carga inicial com a mesma regra.
+- **Cache de cartas**: ganhou ilustrador, data de lançamento da impressão, raridade e preço foil (`artist`, `released_at`, `rarity`, `price_usd_foil`). O cron do Scryfall também atualiza as cartas que só estão em coleções.
+- **Tela** (`/colecao`): a coleção vem inteira do servidor e é filtrada e ordenada no navegador (`packages/core/src/collection`): cor (identidade), valor de mana, tipo, edição, ano, ilustrador, raridade, foil e "em deck". Galeria densa (120 por vez, imagens com carregamento preguiçoso) ou tabela. O diálogo da carta mostra os decks que a usam e edita cópias, foil e impressão. O valor total usa o preço foil para cópias foil e a cotação PTAX para R$.
+- **API**: `GET/POST /api/v1/collection`, `PATCH/DELETE /api/v1/collection/:id`.
+
 ## Marca e design tokens (ArcanaKin)
 
 `packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):
