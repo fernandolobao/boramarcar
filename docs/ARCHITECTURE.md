@@ -300,7 +300,7 @@ O Google só aceita endereços de retorno exatos, e cada preview tem um endereç
 
 - **Configuração** (`server/trusted-origins.ts`): produção e preview aceitam só os endereços dos previews deste projeto nesta conta (`https://boramarcar-*-fernandolobaos-projects.vercel.app`). Em desenvolvimento (localhost) o plugin fica desligado.
 - **Variáveis:** preview e produção usam o mesmo `BETTER_AUTH_SECRET`, ou o mesmo `OAUTH_PROXY_SECRET` (opcional, para não depender do segredo principal). `BETTER_AUTH_URL` fica vazio no preview, e o endereço vem da Vercel.
-- **Banco:** cada preview tem o próprio branch no Neon (integração Neon ↔ Vercel), com `MIGRATE_ON_BUILD=1` só em Preview. Sem `RESEND_API_KEY` no preview, nenhum e-mail real sai de lá.
+- **Banco:** cada preview tem o próprio branch no Neon (integração Neon ↔ Vercel), com `MIGRATE_ON_BUILD=1` só em Preview. Sem `RESEND_API_KEY` no preview, nenhum e-mail real sai de lá. Ao fechar ou mergear o PR, o workflow `neon-cleanup.yml` apaga o branch `preview/<branch>` no Neon (o Neon sozinho só apaga quando o último deploy de preview some da Vercel, e o plano grátis tem limite de branches); precisa do secret `NEON_API_KEY` e da variável `NEON_PROJECT_ID` no GitHub.
 
 ## Internacionalização
 
