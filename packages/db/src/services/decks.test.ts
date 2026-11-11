@@ -9,6 +9,7 @@ import {
   saveCardRoles,
   deleteDeck,
   getDeck,
+  getDeckRatings,
   listDecks,
   listDecksForUsers,
   saveImportedDeck,
@@ -103,6 +104,26 @@ describe('decks', () => {
       code: 'unknown_card',
       name: 'Carta Inventada',
     });
+  });
+
+  it('nota e bracket para a lista de decks são os mesmos da página do deck', async () => {
+    const owner = await createTestUser(db);
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+    const modern = await saveImportedDeck(db, {
+      ownerId: owner.id,
+      deck: { ...deck, name: 'Modern', format: 'modern', sourceId: '2' } as ImportedDeck,
+      cards: [],
+    });
+    const ratings = await getDeckRatings(db, [saved.id, modern.id, saved.id]);
+    const detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(ratings.get(saved.id)).toEqual({
+      score: detail.analysis.score,
+      bracket: detail.bracket!.minimum,
+    });
+    const modernDetail = await getDeck(db, { deckId: modern.id, viewerId: owner.id });
+    expect(ratings.get(modern.id)?.score).toBe(modernDetail.analysis.score);
+    expect(ratings.get(modern.id)?.bracket).toBe(modernDetail.bracket?.minimum ?? null);
+    expect(await getDeckRatings(db, [])).toEqual(new Map());
   });
 
   it('atualiza o cache de cartas e reaproveita na importação', async () => {

@@ -27,9 +27,23 @@ test.describe('deck', () => {
     await expect(deck.getByText('Commander', { exact: true })).toBeVisible();
     await expect(deck.getByText('Omnath, Locus of Mana')).toBeVisible();
     await expect(deck.getByText('Identidade de cor: Verde')).toBeAttached();
+    // Nota e bracket no lugar das proxies.
+    await expect(deck.getByText(/^Nota \d+$/)).toBeVisible();
+    await expect(deck.getByText(/^Bracket (1–2|3|4–5)$/)).toBeVisible();
+    await expect(deck.getByText(/prox/)).toHaveCount(0);
     // O cartão inteiro é clicável (o link cobre a área com ::after).
     const box = await deck.boundingBox();
     await page.mouse.click(box!.x + box!.width / 2, box!.y + 20);
+    await expect(page).toHaveURL(new RegExp(`/decks/${E2E_IDS.deck}$`));
+    // Fora da navegação principal há "Voltar", que volta para a página anterior.
+    await page.getByRole('link', { name: 'Voltar', exact: true }).click();
+    await expect(page).toHaveURL(/\/decks$/);
+    await expect(page.getByRole('link', { name: 'Voltar', exact: true })).toHaveCount(0);
+  });
+
+  test('Voltar sem página anterior leva à página mãe', async ({ page }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}/imprimir`);
+    await page.getByRole('link', { name: 'Voltar', exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/decks/${E2E_IDS.deck}$`));
   });
 

@@ -210,6 +210,18 @@ Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e 
 
 `deck_cards.is_foil` (que já vinha das importações) agora aparece e é editável: a linha do deck é foil quando todas as cópias são (`DeckLine.foil`). No editor, a caixa "Foil" salva na hora (`PUT …/lines` com `foil`); mudar quantidade ou proxies sem mandar `foil` mantém o que estava. Na grade, a carta foil tem um brilho decorativo (parado com "reduzir movimento") e o selo "✦ Foil"; a exportação marca `*F*`.
 
+## Navegação: "Voltar"
+
+Toda página fora da navegação principal (deck, encontro, jogador, perfil, configurações, importar, imprimir, histórico) mostra "Voltar" no topo, pelo layout do app (`components/back-link.tsx`), então páginas novas ganham o botão sozinhas. Com página anterior no app, volta para ela (`router.back()`); entrando direto pelo link, vai para a página "mãe" (`/decks/x/imprimir` → `/decks/x`, `/jogadores/x` → `/grupo`, `/perfil` → `/painel`). É um link de verdade, então Ctrl/Cmd+clique abre a página mãe em outra aba.
+
+## Lista de decks: nota e bracket
+
+Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e o bracket mínimo de cada deck, pela mesma conta da página do deck (`getDeckRatings`). As proxies ficam só na página do deck.
+
+## Gravação de sessões (Hotjar/Contentsquare)
+
+`components/session-insights.tsx` carrega a tag do Contentsquare (o Hotjar hoje faz parte dele) depois da página ficar interativa, **só em produção** (`VERCEL_ENV=production`): previews, E2E e desenvolvimento não gravam. `NEXT_PUBLIC_SESSION_INSIGHTS=off` desliga sem novo código. Campos de formulário são mascarados pela ferramenta; nome/e-mail exibidos levam `data-cs-mask`. Pela LGPD, gravação de sessão pede aviso e consentimento: ver o roadmap.
+
 ## Marca e design tokens (ArcanaKin)
 
 `packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):

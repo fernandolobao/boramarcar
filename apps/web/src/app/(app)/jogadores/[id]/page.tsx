@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { isDomainError } from '@boramarcar/core';
-import { getDeckCovers, getPlayerProfile } from '@boramarcar/db';
+import { getDeckCovers, getDeckRatings, getPlayerProfile } from '@boramarcar/db';
 import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { PlayerProfile } from '@/components/player-profile';
@@ -31,9 +31,7 @@ export default async function PlayerPage({ params }: Props) {
       throw error;
     },
   );
-  const covers = await getDeckCovers(
-    db,
-    profile.decks.map((d) => d.id),
-  );
-  return <PlayerProfile profile={profile} covers={covers} />;
+  const ids = profile.decks.map((d) => d.id);
+  const [covers, ratings] = await Promise.all([getDeckCovers(db, ids), getDeckRatings(db, ids)]);
+  return <PlayerProfile profile={profile} covers={covers} ratings={ratings} />;
 }

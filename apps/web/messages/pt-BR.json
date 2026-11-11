@@ -1,5 +1,6 @@
 {
   "common": {
+    "back": "Voltar",
     "appName": "ArcanaKin",
     "tagline": "Marque o próximo Commander com a sua mesa.",
     "save": "Salvar",
@@ -328,6 +329,9 @@
     "list": "Lista de cartas",
     "listHint": "Uma carta por linha, ex.: \"1 Sol Ring\". Use seções Commander/Deck/Sideboard. Marque proxies com #proxy.",
     "notFound": "Cartas não encontradas no Scryfall: {names}",
+    "gridScore": "Nota {score}",
+    "gridBracket": "Bracket {value}",
+    "bracketShort": { "2": "1–2", "3": "3", "4": "4–5" },
     "cards": "{count, plural, =1 {1 carta} other {# cartas}}",
     "proxies": "{count, plural, =0 {sem proxies} =1 {1 proxy} other {# proxies}}",
     "proxy": "Proxy",

@@ -331,6 +331,75 @@ async function canView(
   return sharesGroup(db, deck.ownerId, viewerId);
 }
 
+/**
+ * Bracket do deck (só formatos com brackets): usa os sinais do Commander Spellbook guardados
+ * quando foram gerados por esta mesma lista; senão, só os Game Changers (estimativa local).
+ */
+function deckBracket(
+  deck: { format: string; bracketSignals: unknown; bracketHash: string | null },
+  entries: Parameters<typeof spellbookDeck>[0],
+  analysis: ReturnType<typeof analyzeDeck>,
+) {
+  const hash = deckListHash(spellbookDeck(entries));
+  const stored = deck.bracketHash === hash ? parseBracketSignals(deck.bracketSignals) : null;
+  const bracket = deckFormatProfile(deck.format).brackets
+    ? {
+        ...estimateBracket(
+          stored ?? {
+            gameChangers: analysis.gameChangers,
+            massLandDenial: [],
+            extraTurns: [],
+            combos: [],
+          },
+        ),
+        /** `spellbook` = combos e cartas conferidos; `local` = só os Game Changers. */
+        source: stored ? ('spellbook' as const) : ('local' as const),
+      }
+    : null;
+  return { bracket, stored };
+}
+
+/**
+ * Nota (0–100, ou null quando o formato não tem nota) e bracket mínimo de vários decks, para as
+ * listas de decks. Mesma conta da página do deck.
+ */
+export async function getDeckRatings(db: Database, deckIds: readonly string[]) {
+  const ratings = new Map<string, { score: number | null; bracket: 2 | 3 | 4 | null }>();
+  const ids = [...new Set(deckIds)];
+  if (!ids.length) return ratings;
+  const [list, rows] = await Promise.all([
+    db
+      .select({
+        id: decks.id,
+        format: decks.format,
+        bracketSignals: decks.bracketSignals,
+        bracketHash: decks.bracketHash,
+      })
+      .from(decks)
+      .where(inArray(decks.id, ids)),
+    db
+      .select({ entry: deckCards, card: cards })
+      .from(deckCards)
+      .leftJoin(cards, eq(cards.scryfallId, deckCards.scryfallId))
+      .where(inArray(deckCards.deckId, ids)),
+  ]);
+  for (const deck of list) {
+    const entries = rows
+      .filter((r) => r.entry.deckId === deck.id)
+      .map(({ entry, card }) => ({
+        name: entry.cardName,
+        quantity: entry.quantity,
+        board: entry.board,
+        isProxy: entry.isProxy,
+        card: card ? toCardData(card) : null,
+      }));
+    const analysis = analyzeDeck(entries, deck.format);
+    const { bracket } = deckBracket(deck, entries, analysis);
+    ratings.set(deck.id, { score: analysis.score, bracket: bracket?.minimum ?? null });
+  }
+  return ratings;
+}
+
 export async function getDeck(db: Database, input: { deckId: string; viewerId: string }) {
   const [deck] = await db.select().from(decks).where(eq(decks.id, input.deckId)).limit(1);
   if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
@@ -362,22 +431,7 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
     .limit(1);
   const analysis = analyzeDeck(entries, deck.format);
   const profile = deckFormatProfile(deck.format);
-  const hash = deckListHash(spellbookDeck(entries));
-  const stored = deck.bracketHash === hash ? parseBracketSignals(deck.bracketSignals) : null;
-  const bracket = profile.brackets
-    ? {
-        ...estimateBracket(
-          stored ?? {
-            gameChangers: analysis.gameChangers,
-            massLandDenial: [],
-            extraTurns: [],
-            combos: [],
-          },
-        ),
-        /** `spellbook` = combos e cartas conferidos; `local` = só os Game Changers. */
-        source: stored ? ('spellbook' as const) : ('local' as const),
-      }
-    : null;
+  const { bracket, stored } = deckBracket(deck, entries, analysis);
   const roleCutoff = Date.now() - ROLES_TTL_MS;
   const analysisStale =
     rows.some(

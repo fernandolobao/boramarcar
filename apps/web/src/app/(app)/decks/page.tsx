@@ -1,4 +1,4 @@
-import { getDeckCovers, listDecks } from '@boramarcar/db';
+import { getDeckCovers, getDeckRatings, listDecks } from '@boramarcar/db';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { DeckGrid } from '@/components/deck-grid';
@@ -13,10 +13,8 @@ export default async function DecksPage() {
   const user = await requireUser();
   const db = getDb();
   const decks = await listDecks(db, user.id);
-  const covers = await getDeckCovers(
-    db,
-    decks.map((d) => d.id),
-  );
+  const ids = decks.map((d) => d.id);
+  const [covers, ratings] = await Promise.all([getDeckCovers(db, ids), getDeckRatings(db, ids)]);
   const t = await getTranslations('decks');
 
   return (
@@ -34,7 +32,7 @@ export default async function DecksPage() {
       {decks.length === 0 ? (
         <p className="muted">{t('empty')}</p>
       ) : (
-        <DeckGrid decks={decks} covers={covers} />
+        <DeckGrid decks={decks} covers={covers} ratings={ratings} />
       )}
     </>
   );

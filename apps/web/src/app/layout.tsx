@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { SessionInsights } from '@/components/session-insights';
 import { THEME_STORAGE_KEY } from '@/lib/theme';
 import './globals.css';
 import '@/styles/mana.css';
@@ -44,6 +45,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         </a>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
         <Analytics />
+        <SessionInsights />
       </body>
     </html>
   );
