@@ -183,12 +183,10 @@ describe('editor de deck', () => {
       },
     });
 
-    // Foil: com várias cópias reais, quantas são foil (1 Forest foil e o resto comum).
-    const foils = within(dialog).getByRole('spinbutton', { name: /Cópias foil/ });
-    fireEvent.change(foils, { target: { value: '2' } });
-    fireEvent.keyDown(foils, { key: 'Enter' });
-    await within(dialog).findByText('Forest: 2 cópias foil.');
-    expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foils: 2 });
+    // Foil: separar uma cópia vira outra carta (a versão foil); o total da linha não muda.
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Separar 1 cópia foil' }));
+    await within(dialog).findByText('Forest: 1 cópia foil.');
+    expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foils: 1 });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' }));
@@ -331,10 +329,52 @@ describe('editor de deck', () => {
           fromScryfallId: 'f',
           toScryfallId: 'f2',
           quantity: 5,
+          foil: false,
         },
       }),
     );
     expect(calls[0]!.url).toBe('/api/v1/cards/prints?name=Forest');
+  });
+});
+
+describe('foil e comum da mesma edição', () => {
+  it('são cartas separadas na grade, cada uma com o seu editor', async () => {
+    const calls: { body: unknown }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        calls.push({ body: init?.body ? JSON.parse(init.body as string) : null });
+        return Response.json({ found: true, line: { name: 'Plains' } });
+      }),
+    );
+    const plains = {
+      key: 'mainboard|plains|p',
+      name: 'Plains',
+      board: 'mainboard' as const,
+      quantity: 2,
+      proxies: 0,
+      foils: 1,
+      foil: false,
+      scryfallId: 'p',
+      card: { typeLine: 'Basic Land — Plains', cmc: 0, imageUri: 'https://x/p.jpg' },
+    };
+    const { container } = wrap(<DeckCards deckId="d1" lines={[plains]} isOwner />);
+    const tiles = screen.getAllByRole('button', { name: 'Ver e editar Plains' });
+    expect(tiles).toHaveLength(2);
+    // Só a carta foil tem o selo.
+    expect(screen.getAllByText('Foil', { exact: false })).not.toHaveLength(0);
+    expect(await audit(container)).toEqual([]);
+
+    // Abre a foil e desmarca: a cópia volta a ser comum (0 foil, total 2).
+    fireEvent.click(tiles[1]!);
+    const dialog = screen.getByRole('dialog', { name: 'Plains' });
+    expect(
+      within(dialog).getByRole('group', { name: 'Editar a versão foil no deck' }),
+    ).toBeTruthy();
+    fireEvent.click(within(dialog).getByRole('checkbox', { name: /Foil/ }));
+    await within(dialog).findByText('Plains: nenhuma cópia foil.');
+    expect(calls.at(-1)!.body).toMatchObject({ quantity: 2, proxies: 0, foils: 0 });
+    vi.unstubAllGlobals();
   });
 });
 
