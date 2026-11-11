@@ -174,10 +174,79 @@ export async function addCollectionCard(
   });
 }
 
+type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
+
+/**
+ * Leva para outra versão (impressão e/ou acabamento) as cópias dos decks da pessoa que não cabem
+ * mais na versão antiga da coleção. Sem isso, a próxima sincronia com os decks (que só
+ * acrescenta) traria a versão antiga de volta, como se fossem cartas novas.
+ */
+async function moveDeckCopies(
+  tx: Tx,
+  input: {
+    userId: string;
+    name: string;
+    from: { scryfallId: string | null; foil: boolean };
+    to: { scryfallId: string | null; foil: boolean };
+    /** Cópias da versão antiga que continuam na coleção. */
+    remaining: number;
+    /** No máximo quantas cópias de deck podem mudar (as que mudaram na coleção). */
+    max: number;
+  },
+) {
+  const same = (v: { scryfallId: string | null; foil: boolean }) =>
+    and(
+      sql`${deckCards.deckId} in (select ${decks.id} from ${decks} where ${decks.ownerId} = ${input.userId})`,
+      sql`lower(${deckCards.cardName}) = ${input.name.toLowerCase()}`,
+      v.scryfallId ? eq(deckCards.scryfallId, v.scryfallId) : sql`${deckCards.scryfallId} is null`,
+      eq(deckCards.isFoil, v.foil),
+      eq(deckCards.isProxy, false),
+      ne(deckCards.board, 'maybeboard'),
+    );
+  const rows = await tx.select().from(deckCards).where(same(input.from)).orderBy(asc(deckCards.id));
+  const inDecks = rows.reduce((n, r) => n + r.quantity, 0);
+  let left = Math.min(input.max, Math.max(0, inDecks - input.remaining));
+  for (const row of rows) {
+    if (left <= 0) break;
+    const take = Math.min(left, row.quantity);
+    left -= take;
+    if (take === row.quantity) await tx.delete(deckCards).where(eq(deckCards.id, row.id));
+    else
+      await tx
+        .update(deckCards)
+        .set({ quantity: row.quantity - take })
+        .where(eq(deckCards.id, row.id));
+    const [twin] = await tx
+      .select()
+      .from(deckCards)
+      .where(and(same(input.to), eq(deckCards.deckId, row.deckId), eq(deckCards.board, row.board)))
+      .limit(1);
+    if (twin) {
+      await tx
+        .update(deckCards)
+        .set({ quantity: twin.quantity + take })
+        .where(eq(deckCards.id, twin.id));
+    } else {
+      await tx.insert(deckCards).values({
+        deckId: row.deckId,
+        cardName: row.cardName,
+        scryfallId: input.to.scryfallId,
+        board: row.board,
+        quantity: take,
+        isProxy: false,
+        isFoil: input.to.foil,
+      });
+    }
+    await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, row.deckId));
+  }
+}
+
 /**
  * Muda quantidade, acabamento ou impressão de uma linha. Se a mudança cair numa linha que já
  * existe (ex.: marcar foil e já havia foil dessa impressão), as cópias são somadas nela.
- * Quantidade 0 remove a linha.
+ * Quantidade 0 remove a linha. Com `copies`, só essa parte das cópias muda de versão (o resto
+ * fica na linha). As cópias que mudam de versão mudam também nos decks da pessoa, para a
+ * sincronia não trazer a versão antiga de volta.
  */
 export async function updateCollectionCard(
   db: Database,
@@ -188,6 +257,8 @@ export async function updateCollectionCard(
     foil?: boolean;
     /** Nova impressão (a carta já resolvida no Scryfall). */
     card?: CardData;
+    /** Quantas cópias mudam de impressão/acabamento (padrão: todas). */
+    copies?: number;
   },
 ) {
   const [row] = await db
@@ -222,13 +293,31 @@ export async function updateCollectionCard(
         .where(eq(collectionCards.id, row.id));
       return;
     }
-    await tx.delete(collectionCards).where(eq(collectionCards.id, row.id));
+    const moving = input.copies ?? quantity;
+    if (!Number.isInteger(moving) || moving < 1 || moving > quantity) {
+      throw new DomainError('invalid_input', `A coleção tem só ${quantity} cópias desta versão`);
+    }
+    const remaining = quantity - moving;
+    if (remaining === 0) await tx.delete(collectionCards).where(eq(collectionCards.id, row.id));
+    else
+      await tx
+        .update(collectionCards)
+        .set({ quantity: remaining, updatedAt: new Date() })
+        .where(eq(collectionCards.id, row.id));
     await addTo(tx, {
       userId: input.userId,
       name: row.cardName,
       scryfallId: target.scryfallId,
       foil: target.foil,
-      quantity,
+      quantity: moving,
+    });
+    await moveDeckCopies(tx, {
+      userId: input.userId,
+      name: row.cardName,
+      from: { scryfallId: row.scryfallId, foil: row.isFoil },
+      to: target,
+      remaining,
+      max: moving,
     });
   });
   return { removed: quantity === 0 };

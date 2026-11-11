@@ -10,12 +10,17 @@ const schema = z
     foil: z.boolean().optional(),
     /** Outra impressão da mesma carta. */
     scryfallId: z.string().min(1).max(64).optional(),
+    /** Com `scryfallId` ou `foil`: quantas cópias mudam (padrão: todas). */
+    copies: z.number().int().min(1).max(MAX_COLLECTION_COPIES).optional(),
   })
   .refine((v) => v.quantity !== undefined || v.foil !== undefined || v.scryfallId, {
     message: 'Informe quantity, foil ou scryfallId',
   });
 
-/** Quantidade (0 remove), foil ou impressão de uma linha da coleção. */
+/**
+ * Quantidade (0 remove), foil ou impressão de uma linha da coleção. Cópias que mudam de versão
+ * mudam também nos decks da pessoa.
+ */
 export const PATCH = authed<{ entryId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, schema);
   const card = body.scryfallId ? await resolveCardById(db, body.scryfallId) : undefined;
@@ -26,6 +31,7 @@ export const PATCH = authed<{ entryId: string }>(async ({ req, db, user, params 
     quantity: body.quantity,
     foil: body.foil,
     card,
+    copies: body.copies,
   });
 });
 

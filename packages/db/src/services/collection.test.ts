@@ -9,7 +9,7 @@ import {
   syncCollectionFromDecks,
   updateCollectionCard,
 } from './collection';
-import { deleteDeck, moveLinePrint, saveImportedDeck, setDeckLine } from './decks';
+import { deleteDeck, getDeck, moveLinePrint, saveImportedDeck, setDeckLine } from './decks';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -274,5 +274,91 @@ describe('coleção', () => {
       [false, 2],
       [true, 1],
     ]);
+  });
+
+  it('trocar a impressão na coleção troca nos decks: a antiga não volta na sincronia', async () => {
+    const me = await createTestUser(db);
+    const a = await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('A', [
+        { name: 'Sol Ring', quantity: 2, board: 'mainboard', scryfallId: 'sol-c21' },
+        { name: 'Sol Ring', quantity: 1, board: 'mainboard', scryfallId: 'sol-c21', isProxy: true },
+      ]),
+      cards: [sol],
+    });
+    const entry = async () =>
+      (await listCollection(db, me.id)).find((e) => e.scryfallId === 'sol-c21')!;
+    const deckLines = async () =>
+      (await getDeck(db, { deckId: a.id, viewerId: me.id })).lines
+        .map((l) => [l.scryfallId, l.quantity, l.proxies])
+        .sort((x, y) => String(x[0]).localeCompare(String(y[0])));
+
+    // Todas as cópias: as reais do deck mudam; a proxy fica (não é da coleção).
+    await updateCollectionCard(db, { userId: me.id, id: (await entry()).id, card: solLtc });
+    await syncCollectionFromDecks(db, me.id);
+    expect((await listCollection(db, me.id)).map((e) => [e.scryfallId, e.quantity])).toEqual([
+      ['sol-ltc', 2],
+    ]);
+    expect(await deckLines()).toEqual([
+      ['sol-c21', 1, 1],
+      ['sol-ltc', 2, 0],
+    ]);
+  });
+
+  it('trocar parte das cópias: o deck só muda o que não cabe mais na versão antiga', async () => {
+    const me = await createTestUser(db);
+    const a = await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('A', [
+        { name: 'Sol Ring', quantity: 2, board: 'mainboard', scryfallId: 'sol-c21' },
+      ]),
+      cards: [sol],
+    });
+    const id = (await listCollection(db, me.id))[0]!.id;
+    // 4 na coleção (2 fora de deck): mudar 2 não mexe no deck.
+    await updateCollectionCard(db, { userId: me.id, id, quantity: 4 });
+    await updateCollectionCard(db, { userId: me.id, id, card: solLtc, copies: 2 });
+    const lines = async () =>
+      (await getDeck(db, { deckId: a.id, viewerId: me.id })).lines.map((l) => [
+        l.scryfallId,
+        l.quantity,
+      ]);
+    expect(await lines()).toEqual([['sol-c21', 2]]);
+    // Mais 1 da antiga: sobra 1 na coleção, então 1 cópia do deck vai para a nova.
+    await updateCollectionCard(db, { userId: me.id, id, card: solLtc, copies: 1 });
+    await syncCollectionFromDecks(db, me.id);
+    expect(
+      (await listCollection(db, me.id))
+        .map((e) => [e.scryfallId, e.quantity])
+        .sort((x, y) => String(x[0]).localeCompare(String(y[0]))),
+    ).toEqual([
+      ['sol-c21', 1],
+      ['sol-ltc', 3],
+    ]);
+    expect((await lines()).sort((x, y) => String(x[0]).localeCompare(String(y[0])))).toEqual([
+      ['sol-c21', 1],
+      ['sol-ltc', 1],
+    ]);
+    await expect(
+      updateCollectionCard(db, { userId: me.id, id, card: solLtc, copies: 5 }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+
+  it('marcar foil na coleção marca também as cópias do deck', async () => {
+    const me = await createTestUser(db);
+    const a = await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('A', [
+        { name: 'Sol Ring', quantity: 1, board: 'mainboard', scryfallId: 'sol-c21' },
+      ]),
+      cards: [sol],
+    });
+    const id = (await listCollection(db, me.id))[0]!.id;
+    await updateCollectionCard(db, { userId: me.id, id, foil: true });
+    await syncCollectionFromDecks(db, me.id);
+    expect((await listCollection(db, me.id)).map((e) => [e.foil, e.quantity])).toEqual([[true, 1]]);
+    expect((await getDeck(db, { deckId: a.id, viewerId: me.id })).lines[0]).toMatchObject({
+      foils: 1,
+    });
   });
 });
