@@ -152,7 +152,7 @@ input[type='radio'] {
 
 /* Brilho das cartas foil (decorativo). Loop sem começo nem fim: uma faixa repetida que anda
    exatamente um período (a largura da carta), inclinada, mais um "respirar" de opacidade com outro
-   período, para nunca repetir igual. Cada carta recebe --foil-dur/--foil-delay/--foil-breath
+   período, para nunca repetir igual. Visível, sem chamar mais atenção que a carta. Cada carta recebe --foil-dur/--foil-delay/--foil-breath
    próprios (deck-cards.tsx), então cartas vizinhas não brilham juntas. Parado com "reduzir movimento". */
 .foil-sheen {
   position: absolute;
@@ -172,9 +172,9 @@ input[type='radio'] {
   background-image: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in srgb, var(--color-dourado) 22%, transparent) 25%,
-    color-mix(in srgb, var(--color-mana) 22%, transparent) 40%,
-    color-mix(in srgb, var(--color-eter) 22%, transparent) 55%,
+    color-mix(in srgb, var(--color-dourado) 45%, transparent) 25%,
+    color-mix(in srgb, var(--color-mana) 40%, transparent) 40%,
+    color-mix(in srgb, var(--color-eter) 45%, transparent) 55%,
     transparent 80%,
     transparent 100%
   );
@@ -193,7 +193,7 @@ input[type='radio'] {
 }
 @keyframes foil-breath {
   from {
-    opacity: 0.55;
+    opacity: 0.75;
   }
   to {
     opacity: 1;

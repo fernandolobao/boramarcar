@@ -13,6 +13,34 @@ Leia também o [README](README.md), a [arquitetura](docs/ARCHITECTURE.md) e o [r
 - Horários digitados pelo usuário são convertidos com `zonedLocalToUtc` no fuso do usuário (`useTimeZone()`), nunca com `new Date(valorDoInput)`.
 - Antes de abrir PR: `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test` e, quando mexer em UI, os testes E2E (ver abaixo).
 
+## Fluxo de trabalho (branches, PRs e CI)
+
+- **Antes de qualquer push num branch existente, confira se o PR dele ainda está aberto.** PR mergeado ou fechado = branch novo a partir da `main` atualizada e PR novo. Nunca empurre commits para um branch já mergeado.
+- Cada trabalho novo começa num branch novo a partir da `main` atualizada (`feat/…`, `fix/…`, `ci/…`, `docs/…`). Um assunto por PR. Se um PR depende de outro ainda aberto, diga isso no topo da descrição ("faça o merge do #N antes").
+- Antes de criar o branch, confira se ele já não existe no remoto.
+- Descrição do PR: o que muda, acessibilidade (o que foi auditado), testes executados e qualquer configuração externa necessária (Vercel, Google Cloud, DNS…). Mudança que quebra se for mergeada fora de ordem (ex.: domínio, variáveis de ambiente) avisa a ordem no topo.
+- **CI vermelho:** veja primeiro qual job e qual passo falhou. Falha de infraestrutura (download, apt, rede) não é do código: corrija o workflow num PR `ci/…`. "Re-run" de um PR **não** pega mudanças da `main`; depois do merge da correção, atualize os branches dos PRs abertos ("Update branch").
+- Nunca imprima, registre em log, comite ou coloque em documentação tokens, chaves ou segredos (PAT do GitHub, chave do Resend, segredos do Better Auth/Google). Não peça essas chaves ao dono do projeto.
+- Mudança de escopo no meio de uma tarefa: termine ou pause o que está em andamento (commit no branch), responda e só então siga.
+
+### Sessões do Claude na nuvem (Cowork)
+
+O `git push` direto da nuvem é bloqueado. O caminho é pelo computador do dono, com a pasta Documents conectada e o clone em `$HOME/bm`:
+
+1. Na nuvem: `git bundle create /mnt/user-data/outputs/<nome>.bundle origin/main..<branch>`.
+2. Grave o bundle em `~/Documents/<nome>.bundle` (`device_commit_files`).
+3. No computador (`device_bash`): `cd $HOME/bm && git fetch -q origin && git fetch -q $HOME/mnt/Documents/<nome>.bundle <branch>:refs/up/<nome> && git push -q origin refs/up/<nome>:refs/heads/<branch>`.
+4. PR e consultas à API do GitHub com `curl`, lendo o token do remoto **sem imprimi-lo**: `TOKEN=$(git remote get-url origin | sed -n 's#https://[^:]*:\([^@]*\)@.*#\1#p')`.
+5. Para trazer a `main` nova para a nuvem: no computador, `git bundle create $HOME/mnt/Documents/main.bundle <último-conhecido>..origin/main`; na nuvem, `device_stage_files` e `git fetch <bundle> 'refs/remotes/origin/main:refs/remotes/origin/main'`.
+
+O token não lê logs do Actions: para ver o erro, use os passos dos jobs (`/actions/runs/<id>/jobs`) ou peça só o trecho do log em volta de `##[error]`.
+
+### Economia de contexto
+
+- Uma conversa por funcionalidade grande. Ao começar, leia este arquivo, o `README`, `docs/ARCHITECTURE.md` e `docs/ROADMAP.md` em vez de pedir contexto.
+- Em mudanças pequenas e de baixo risco, rode só os testes afetados (`vitest run <arquivo>`) e deixe o CI fazer o resto; build completa + E2E locais quando mexer em UI, rotas ou banco.
+- Prefira comandos que mostram só o resultado (`| tail`, `grep -E "Tests |FAIL"`) a despejar saídas longas.
+
 ## Acessibilidade e usabilidade (obrigatório)
 
 A plataforma segue **WCAG 2.2 nível AA**. Toda tela ou componente novo — ou alterado — precisa passar por auditoria de acessibilidade **antes** do PR. Isso não é opcional.
