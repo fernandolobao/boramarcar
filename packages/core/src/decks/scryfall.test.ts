@@ -206,6 +206,49 @@ describe('fetchScryfallAutocomplete', () => {
     );
   });
 
+  it('segue as próximas páginas das impressões (terrenos básicos têm mais de mil)', async () => {
+    const { fetchScryfallPrints, MAX_PRINT_PAGES } = await import('./scryfall');
+    let calls = 0;
+    const fetchMock = vi.fn(async (url: string) => {
+      calls++;
+      const page = Number(new URL(url).searchParams.get('page') ?? '1');
+      return Response.json({
+        data: [
+          scryCard('Island', {
+            id: `i${page}`,
+            set: page === 3 ? 'pca' : 'x',
+            collector_number: '137',
+          }),
+        ],
+        has_more: page < 3,
+        next_page: `https://api.scryfall.com/cards/search?q=x&page=${page + 1}`,
+      });
+    });
+    const prints = await fetchScryfallPrints('Island', {
+      fetch: fetchMock as unknown as typeof fetch,
+      delayMs: 0,
+    });
+    expect(prints.map((p) => p.scryfallId)).toEqual(['i1', 'i2', 'i3']);
+    expect(prints[2]).toMatchObject({ setCode: 'pca', collectorNumber: '137' });
+    expect(calls).toBe(3);
+
+    // Limite de páginas, e erro numa página do meio devolve o que já veio.
+    const endless = vi.fn(async () =>
+      Response.json({ data: [scryCard('Island')], has_more: true, next_page: 'https://x/next' }),
+    );
+    await fetchScryfallPrints('Island', { fetch: endless as unknown as typeof fetch, delayMs: 0 });
+    expect(endless).toHaveBeenCalledTimes(MAX_PRINT_PAGES);
+    let n = 0;
+    const flaky = vi.fn(async () =>
+      n++ === 0
+        ? Response.json({ data: [scryCard('Island')], has_more: true, next_page: 'https://x/2' })
+        : new Response('', { status: 500 }),
+    );
+    expect(
+      await fetchScryfallPrints('Island', { fetch: flaky as unknown as typeof fetch, delayMs: 0 }),
+    ).toHaveLength(1);
+  });
+
   it('guarda o verso de cartas de duas faces (e não de cartas divididas)', () => {
     const dfc = mapScryfallCard(
       scryCard('Delver of Secrets // Insectile Aberration', {
