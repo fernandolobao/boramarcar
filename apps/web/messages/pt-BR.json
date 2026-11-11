@@ -475,7 +475,7 @@
     "printCurrent": "Edição: {print}",
     "printChoose": "Escolher edição",
     "printTitle": "Edição de {name}",
-    "printFilter": "Filtrar por edição ou número",
+    "printFilter": "Edição, código ou número (ex.: pca 137)",
     "printCopies": "Cópias com esta edição (de {total})",
     "printsLoading": "Buscando edições no Scryfall…",
     "printsUnavailable": "O Scryfall não respondeu. Tente de novo em instantes.",
@@ -502,7 +502,8 @@
     "quantityLabel": "Quantidade",
     "proxiesLabel": "Cópias proxy",
     "removeFromDeck": "Remover do deck",
-    "confirmRemoveFromDeck": "Confirmar remoção"
+    "confirmRemoveFromDeck": "Confirmar remoção",
+    "printsMore": "Mostrar mais {count}"
   },
   "analysis": {
     "title": "Análise",

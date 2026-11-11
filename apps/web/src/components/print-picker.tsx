@@ -22,6 +22,26 @@ export function printLabel(card: PrintLine['card']) {
   return `${card.setCode.toUpperCase()}${card.collectorNumber ? ` #${card.collectorNumber}` : ''}`;
 }
 
+/** Impressões desenhadas de cada vez (terrenos básicos têm mais de mil). */
+const PRINTS_PAGE = 60;
+
+/**
+ * A impressão casa com o filtro? Cada palavra precisa bater com o código da edição, o número de
+ * colecionador ou parte do nome da edição: "pca 137", "pca #137", "lord of the rings 262".
+ */
+export function matchesPrint(
+  p: { setCode: string; setName: string; collectorNumber: string },
+  filter: string,
+) {
+  const tokens = filter.toLowerCase().replace(/#/g, ' ').split(/\s+/).filter(Boolean);
+  const setName = p.setName.toLowerCase();
+  const code = p.setCode.toLowerCase();
+  const number = p.collectorNumber.toLowerCase();
+  // Palavras que não são código nem número precisam aparecer juntas no nome da edição.
+  const words = tokens.filter((t) => t !== code && t !== number);
+  return words.length === 0 || setName.includes(words.join(' '));
+}
+
 /**
  * Botão "Edição: CMM #400" que abre um diálogo para escolher a impressão da carta (todas as
  * edições em papel, mais novas primeiro) e quantas cópias usam essa edição.
@@ -48,6 +68,7 @@ export function PrintPicker({
   const [prints, setPrints] = useState<CardPrint[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
+  const [limit, setLimit] = useState(PRINTS_PAGE);
   const [chosen, setChosen] = useState<string | null>(line.scryfallId);
   const [copies, setCopies] = useState(String(line.quantity));
   const current = printLabel(line.card);
@@ -77,14 +98,8 @@ export function PrintPicker({
       );
   };
 
-  const term = filter.trim().toLowerCase();
-  const visible = (prints ?? []).filter(
-    (p) =>
-      !term ||
-      p.setName.toLowerCase().includes(term) ||
-      p.setCode.toLowerCase() === term ||
-      p.collectorNumber === term,
-  );
+  const visible = (prints ?? []).filter((p) => matchesPrint(p, filter));
+  const shown = visible.slice(0, limit);
   const amount = Number(copies);
   const valid = Number.isInteger(amount) && amount >= 1 && amount <= line.quantity;
 
@@ -163,7 +178,10 @@ export function PrintPicker({
                   id={`${id}-filter`}
                   className="input"
                   value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
+                  onChange={(e) => {
+                    setFilter(e.target.value);
+                    setLimit(PRINTS_PAGE);
+                  }}
                 />
               </div>
               {line.quantity > 1 && (
@@ -197,7 +215,7 @@ export function PrintPicker({
                     {t('printsCount', { count: visible.length })}
                   </p>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                    {visible.map((p) => (
+                    {shown.map((p) => (
                       <label
                         key={p.scryfallId}
                         className="flex cursor-pointer flex-col gap-1 rounded-xl border-2 border-transparent p-1.5 text-xs has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500 dark:has-[:checked]:bg-brand-700/20"
@@ -238,6 +256,15 @@ export function PrintPicker({
                       </label>
                     ))}
                   </div>
+                  {visible.length > limit && (
+                    <button
+                      type="button"
+                      className="btn-secondary mt-3 w-full"
+                      onClick={() => setLimit((l) => l + PRINTS_PAGE)}
+                    >
+                      {t('printsMore', { count: Math.min(PRINTS_PAGE, visible.length - limit) })}
+                    </button>
+                  )}
                 </fieldset>
               )}
             </div>
