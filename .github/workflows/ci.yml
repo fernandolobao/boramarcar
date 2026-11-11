@@ -192,15 +192,18 @@ jobs:
             echo "::warning::Download do Chromium falhou (tentativa $i); tentando de novo"
             sleep 15
           done
+      # As bibliotecas do Chromium já vêm na imagem do runner (que tem o Google Chrome). O apt
+      # é só garantia: se os espelhos estiverem fora do ar, segue com aviso em vez de falhar;
+      # se faltar mesmo alguma biblioteca, o passo seguinte falha com a mensagem do Playwright.
       - name: Dependências do sistema para o Chromium
-        timeout-minutes: 8
+        timeout-minutes: 6
         run: |
-          for i in 1 2 3; do
-            timeout 150 pnpm --filter @boramarcar/web exec playwright install-deps chromium && break
-            [ "$i" = 3 ] && exit 1
-            echo "::warning::apt falhou (tentativa $i); tentando de novo"
-            sleep 15
+          for i in 1 2; do
+            timeout 120 pnpm --filter @boramarcar/web exec playwright install-deps chromium && exit 0
+            echo "::warning::apt falhou (tentativa $i)"
+            sleep 10
           done
+          echo "::warning::Seguindo sem atualizar as dependências do sistema (apt indisponível)"
       - name: Playwright (smoke + acessibilidade WCAG 2.2 AA, claro/escuro, desktop/mobile)
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v7
