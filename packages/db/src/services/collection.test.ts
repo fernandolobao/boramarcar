@@ -9,7 +9,7 @@ import {
   syncCollectionFromDecks,
   updateCollectionCard,
 } from './collection';
-import { deleteDeck, saveImportedDeck, setDeckLine } from './decks';
+import { deleteDeck, moveLinePrint, saveImportedDeck, setDeckLine } from './decks';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -162,5 +162,69 @@ describe('coleção', () => {
     ).rejects.toMatchObject({ code: 'not_found' });
     await updateCollectionCard(db, { userId: me.id, id: list[0]!.id, quantity: 0 });
     expect(await listCollection(db, me.id)).toEqual([]);
+  });
+
+  it('trocar a edição no deck move as cópias na coleção; "em decks" é por versão', async () => {
+    const me = await createTestUser(db);
+    const a = await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('A', [
+        { name: 'Sol Ring', quantity: 1, board: 'mainboard', scryfallId: 'sol-c21' },
+      ]),
+      cards: [sol],
+    });
+    await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('B', [
+        { name: 'Sol Ring', quantity: 1, board: 'mainboard', scryfallId: 'sol-ltc' },
+      ]),
+      cards: [solLtc],
+    });
+    let list = await listCollection(db, me.id);
+    // Cada versão mostra só o deck que usa aquela versão.
+    expect(list.map((e) => [e.scryfallId, e.quantity, e.decks.map((d) => d.deckName)])).toEqual([
+      ['sol-c21', 1, ['A']],
+      ['sol-ltc', 1, ['B']],
+    ]);
+
+    await moveLinePrint(db, {
+      deckId: a.id,
+      userId: me.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      fromScryfallId: 'sol-c21',
+      card: solLtc,
+      quantity: 1,
+    });
+    list = await listCollection(db, me.id);
+    expect(list.map((e) => [e.scryfallId, e.quantity, e.decks.map((d) => d.deckName)])).toEqual([
+      ['sol-ltc', 2, ['A', 'B']],
+    ]);
+  });
+
+  it('foil é outra versão: marcar foil no deck move a cópia para a versão foil', async () => {
+    const me = await createTestUser(db);
+    const a = await saveImportedDeck(db, {
+      ownerId: me.id,
+      deck: deck('A', [
+        { name: 'Sol Ring', quantity: 2, board: 'mainboard', scryfallId: 'sol-c21' },
+      ]),
+      cards: [sol],
+    });
+    await setDeckLine(db, {
+      deckId: a.id,
+      userId: me.id,
+      board: 'mainboard',
+      name: 'Sol Ring',
+      quantity: 2,
+      proxies: 0,
+      card: sol,
+      scryfallId: 'sol-c21',
+      foil: true,
+    });
+    const list = await listCollection(db, me.id);
+    expect(list.map((e) => [e.foil, e.quantity, e.decks.map((d) => d.deckName)])).toEqual([
+      [true, 2, ['A']],
+    ]);
   });
 });

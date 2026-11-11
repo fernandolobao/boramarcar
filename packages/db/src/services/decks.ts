@@ -25,7 +25,7 @@ import {
 import { and, asc, count, desc, eq, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
-import { syncCollectionFromDecks } from './collection';
+import { syncCollectionFromDecks, takeFromCollection } from './collection';
 import { cards, collectionCards, deckCards, decks, groupMembers, user } from '../schema';
 
 /** Insere ou atualiza o cache de cartas do Scryfall. */
@@ -689,9 +689,28 @@ export async function setDeckLine(
       sql`lower(${deckCards.cardName}) = ${name.toLowerCase()}`,
       anyPrint ? undefined : samePrint(print),
     );
-    if (input.foil === undefined) {
-      const current = await tx.select({ isFoil: deckCards.isFoil }).from(deckCards).where(sameLine);
-      foil = current.length > 0 && current.every((r) => r.isFoil);
+    const current = await tx
+      .select({
+        isFoil: deckCards.isFoil,
+        isProxy: deckCards.isProxy,
+        quantity: deckCards.quantity,
+      })
+      .from(deckCards)
+      .where(sameLine);
+    const wasFoil = current.length > 0 && current.every((r) => r.isFoil);
+    if (input.foil === undefined) foil = wasFoil;
+    // Mudou o foil de cópias reais: elas saem da versão antiga na coleção (a nova entra pela
+    // sincronia), porque foil e não foil são versões diferentes.
+    const realBefore = current.filter((r) => !r.isProxy).reduce((sum, r) => sum + r.quantity, 0);
+    const realAfter = parts.filter((p) => !p.isProxy).reduce((sum, p) => sum + p.quantity, 0);
+    if (!anyPrint && current.length && foil !== wasFoil) {
+      await takeFromCollection(tx, {
+        userId: input.userId,
+        name,
+        scryfallId: print,
+        foil: wasFoil,
+        quantity: Math.min(realBefore, realAfter),
+      });
     }
     await tx.delete(deckCards).where(sameLine);
     if (parts.length) {
@@ -763,11 +782,13 @@ export async function moveLinePrint(
       throw new DomainError('invalid_input', `O deck tem só ${total} cópias desta edição`);
     }
     let left = input.quantity;
+    const realMoved = new Map<boolean, number>();
     // Reais primeiro, depois proxies.
     for (const row of [...rows].sort((a, b) => Number(a.isProxy) - Number(b.isProxy))) {
       if (!left) break;
       const take = Math.min(left, row.quantity);
       left -= take;
+      if (!row.isProxy) realMoved.set(row.isFoil, (realMoved.get(row.isFoil) ?? 0) + take);
       if (take === row.quantity) await tx.delete(deckCards).where(eq(deckCards.id, row.id));
       else
         await tx
@@ -805,9 +826,19 @@ export async function moveLinePrint(
       }
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
+    // Cópias reais que mudaram de edição saem da versão antiga na coleção.
+    for (const [foil, quantity] of realMoved) {
+      await takeFromCollection(tx, {
+        userId: input.userId,
+        name: input.card.name,
+        scryfallId: input.fromScryfallId,
+        foil,
+        quantity,
+      });
+    }
     return { moved: input.quantity };
   });
-  // A coleção acompanha os decks (só acrescenta; ver collection.ts).
+  // A nova edição entra na coleção pela sincronia com os decks.
   await syncCollectionFromDecks(db, input.userId);
   return result;
 }
