@@ -21,13 +21,13 @@ describe('cliente da API', () => {
       }),
     );
     const api = createApiClient({
-      baseUrl: 'https://boramarcar.vercel.app/',
+      baseUrl: 'https://www.arcanakin.com.br/',
       getHeaders: async () => ({ Cookie: 'better-auth.session_token=abc' }),
       fetch: fetchMock as unknown as typeof fetch,
     });
     const events = await api.events.list('g 1');
     expect(fetchMock.mock.calls[0]![0]).toBe(
-      'https://boramarcar.vercel.app/api/v1/groups/g%201/events?when=upcoming',
+      'https://www.arcanakin.com.br/api/v1/groups/g%201/events?when=upcoming',
     );
     const init = fetchMock.mock.calls[0]![1]!;
     expect(init.headers).toMatchObject({ Cookie: 'better-auth.session_token=abc' });
