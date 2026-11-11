@@ -41,7 +41,7 @@ test.describe('ranking e estatísticas', () => {
     await page.getByLabel('Primeiro dia').fill('2026-01-01');
     await page.getByLabel('Último dia').fill('2026-12-31');
     await page.getByRole('button', { name: 'Criar temporada' }).click();
-    await expect(page.getByRole('status')).toHaveText('Temporada criada.');
+    await expect(page.getByRole('status').filter({ hasText: 'Temporada criada.' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Temporada E2E' })).toBeVisible();
     await expect(
       page.getByLabel('Período').locator('option', { hasText: 'Temporada: Temporada E2E' }),

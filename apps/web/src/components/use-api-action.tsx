@@ -2,7 +2,8 @@
 
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
+import { activity, pressedButton } from '@/lib/activity';
 import { ApiError } from '@/lib/api';
 
 const KNOWN = [
@@ -14,15 +15,29 @@ const KNOWN = [
   'upstream_error',
 ] as const;
 
-/** Executa uma ação contra a API, traduz o erro e atualiza os Server Components. */
+/**
+ * Executa uma ação contra a API, traduz o erro e atualiza os Server Components. Enquanto a ação
+ * roda (inclusive a espera pelo servidor), `pending` fica verdadeiro, o botão que a disparou
+ * mostra um indicador de carregamento (`aria-busy`) e a barra do topo aparece.
+ */
 export function useApiAction() {
   const t = useTranslations('errors');
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [busy, setBusy] = useState(false);
+  const [refreshing, startTransition] = useTransition();
+  // Uma ação de cada vez: clique duplo, ou Enter seguido do "perdeu o foco" quando o campo é
+  // desabilitado, não disparam a mesma ação de novo enquanto a primeira não termina.
+  const inFlight = useRef(false);
 
   async function run<T>(action: () => Promise<T>, after?: (result: T) => void) {
+    if (inFlight.current) return undefined;
+    inFlight.current = true;
     setError(null);
+    setBusy(true);
+    const button = typeof document === 'undefined' ? null : pressedButton();
+    button?.setAttribute('aria-busy', 'true');
+    activity.start();
     try {
       const result = await action();
       startTransition(() => {
@@ -42,10 +57,15 @@ export function useApiAction() {
           : t(known),
       );
       return undefined;
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+      button?.removeAttribute('aria-busy');
+      activity.done();
     }
   }
 
-  return { run, error, pending };
+  return { run, error, pending: busy || refreshing };
 }
 
 export function FormError({ message }: { message: string | null }) {

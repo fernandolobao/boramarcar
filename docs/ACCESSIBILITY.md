@@ -232,3 +232,9 @@ sem rolagem horizontal em 320px.
 - **Configurações → Privacidade e dados**: escolha de cookies em `fieldset/legend` com rádios e confirmação em `role="status"`. "Excluir minha conta" usa a confirmação em dois cliques do projeto, com o aviso em `role="alert"` ligado ao botão por `aria-describedby`.
 - **Botão "Voltar"**: link com texto visível, alvo ≥ 24px, no mesmo lugar em todas as páginas internas (3.2.3).
 - **/privacidade**: um `h1`, seções numeradas com `h2` e índice com links para as âncoras; entra no teste axe de páginas públicas.
+
+## Carregamento e ações (11/11/2026)
+
+- **Toda ação na API** (`useApiAction`) deixa o botão que a disparou com `aria-busy="true"`. O ícone do botão vira um indicador girando (parado com "reduzir movimento") e o botão fica desabilitado **durante a espera pelo servidor**; antes, só ficava desabilitado depois da resposta. Uma ação de cada vez: clique duplo e Enter + "perdeu o foco" não repetem a ação.
+- **Barra no topo** (`ActivityBar`) durante ações e mudanças de página (link interno para outra página), decorativa (`aria-hidden`), com "Carregando…" numa região de status para leitores de tela. Testes E2E que procuram mensagens de status devem filtrar pelo texto, porque essa região existe em todas as páginas.
+- **Ações no diálogo da carta** (deck e coleção) são todas botões: "Edição: …" deixou de parecer link.
