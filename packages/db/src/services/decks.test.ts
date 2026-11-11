@@ -268,6 +268,42 @@ describe('editor e sincronização', () => {
       ]),
     );
 
+    // Foil: marcar vale para todas as cópias; mudar a quantidade sem dizer nada mantém o foil.
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Forest',
+      quantity: 10,
+      proxies: 3,
+      card: cardsData[2],
+      foil: true,
+    });
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Forest',
+      quantity: 12,
+      proxies: 3,
+      card: cardsData[2],
+    });
+    detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
+    expect(detail.lines.find((l) => l.name === 'Forest')).toMatchObject({
+      quantity: 12,
+      foil: true,
+    });
+    await setDeckLine(db, {
+      deckId: saved.id,
+      userId: owner.id,
+      board: 'mainboard',
+      name: 'Forest',
+      quantity: 10,
+      proxies: 3,
+      card: cardsData[2],
+      foil: false,
+    });
+
     // Carta nova pelo nome (sem dados do Scryfall) e remoção com quantidade 0.
     await setDeckLine(db, {
       deckId: saved.id,

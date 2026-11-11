@@ -70,7 +70,11 @@ describe('DeckScore / DeckValidation / DeckSuggestions', () => {
     );
     expect(screen.getByTestId('deck-score')).toHaveTextContent(String(analysis.score));
     expect(screen.getByText('O deck tem 4 cartas (esperado: 100).')).toBeInTheDocument();
-    expect(screen.getByText('Big aparece 2 vezes.')).toBeInTheDocument();
+    // O nome da carta é um botão que abre a carta; a frase continua inteira no item.
+    expect(
+      screen.getAllByRole('listitem').some((li) => li.textContent === 'Big aparece 2 vezes.'),
+    ).toBe(true);
+    expect(screen.getByRole('button', { name: 'Big' })).toHaveAttribute('aria-haspopup', 'dialog');
     const links = screen.getAllByRole('link', { name: /^Buscar substitutos no Scryfall/ });
     expect(links[0]).toHaveAttribute(
       'href',
@@ -153,7 +157,11 @@ describe('banidas', () => {
       },
     ]);
     wrap(<DeckValidation analysis={banned} formatName="Commander" />);
-    expect(screen.getByText('Primeval Titan é banida neste formato.')).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole('listitem')
+        .some((li) => li.textContent === 'Primeval Titan é banida neste formato.'),
+    ).toBe(true);
     expect(
       screen.getByText(/conferidas pelos dados de legalidade do Scryfall/),
     ).toBeInTheDocument();

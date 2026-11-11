@@ -9,6 +9,7 @@ import {
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 import { Icon } from './icons';
+import { CardNames } from './card-dialog';
 
 /**
  * Curva de mana interativa (4.11): cada barra é um botão (`aria-pressed`) que mostra as cartas
@@ -95,7 +96,7 @@ export function ManaCurve({
               <span className="font-medium">
                 {t('curveSelected', { bucket: selected, count: curve[selected] })}
               </span>{' '}
-              {[...new Set(cardsByCurve![selected])].join(', ')}
+              <CardNames names={[...new Set(cardsByCurve![selected])]} />
             </p>
           )}
         </div>
@@ -210,7 +211,8 @@ export function ScoreBreakdown({
               <p>{explain(c)}</p>
               {cards.length > 0 && (
                 <p>
-                  <span className="font-medium">{t('countedCards')}</span> {cards.join(', ')}
+                  <span className="font-medium">{t('countedCards')}</span>{' '}
+                  <CardNames names={cards} />
                 </p>
               )}
             </div>

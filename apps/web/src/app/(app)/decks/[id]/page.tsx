@@ -39,6 +39,7 @@ import { requireUser } from '@/server/current-user';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
+import { CardNames } from '@/components/card-dialog';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -141,7 +142,9 @@ export default async function DeckPage({ params }: Props) {
               </p>
             )}
             {analysis.commanders.length > 0 && (
-              <p className="text-lg font-medium">{analysis.commanders.join(' & ')}</p>
+              <p className="text-lg font-medium">
+                <CardNames names={analysis.commanders} separator=" & " />
+              </p>
             )}
             <p className="muted">
               {t('cards', { count: analysis.totalCards })} ·{' '}

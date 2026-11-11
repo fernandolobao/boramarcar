@@ -10,6 +10,8 @@ import { SeasonForm } from '@/components/season-form';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
+import { PlayerLink, PlayerLinks } from '@/components/player-link';
+import { CardNames } from '@/components/card-dialog';
 
 export const generateMetadata = navMetadata('ranking');
 
@@ -276,7 +278,7 @@ export default async function RankingPage({ searchParams }: Props) {
                     {stats.players.map((p) => (
                       <tr key={p.userId} className="border-t border-ink-200 dark:border-ink-800">
                         <th scope="row" className="py-2 pr-2 text-left font-medium">
-                          {p.name}
+                          <PlayerLink userId={p.userId} name={p.name} />
                         </th>
                         <td className="py-2 pr-2 text-right">{p.currentStreak}</td>
                         <td className="py-2 pr-2 text-right">{p.bestStreak}</td>
@@ -317,7 +319,7 @@ export default async function RankingPage({ searchParams }: Props) {
                             scope="row"
                             className="py-2 pr-3 text-left font-medium whitespace-nowrap"
                           >
-                            {p.name}
+                            <PlayerLink userId={p.userId} name={p.name} />
                           </th>
                           {people.map((o) => {
                             const h = p.userId === o.userId ? null : pair(p.userId, o.userId);
@@ -365,13 +367,14 @@ export default async function RankingPage({ searchParams }: Props) {
                         <div className="min-w-0 text-sm">
                           <Link
                             href={`/decks/${d.deckId}`}
-                            className="font-medium underline-offset-2 hover:underline"
+                            className="inline-flex min-h-6 items-center font-medium underline-offset-2 hover:underline"
                           >
                             {d.name}
                           </Link>
                           <p className="muted">
-                            {ts('deckLine', {
-                              owner: d.ownerName,
+                            {ts.rich('deckLine', {
+                              owner: () => <PlayerLink userId={d.userId} name={d.ownerName} />,
+                              ownerName: d.ownerName,
                               games: d.games,
                               wins: d.wins,
                               rate: percent(d.winRate),
@@ -393,10 +396,12 @@ export default async function RankingPage({ searchParams }: Props) {
                       <li key={c.name} className="flex items-center gap-3">
                         <Art src={c.artUri} />
                         <div className="min-w-0 text-sm">
-                          <p className="font-medium">{c.name}</p>
+                          <p className="font-medium">
+                            <CardNames names={c.name.split(' & ')} separator=" & " />
+                          </p>
                           <p className="muted">
-                            {ts('commanderLine', {
-                              players: c.players.join(', '),
+                            {ts.rich('commanderLine', {
+                              players: () => <PlayerLinks players={c.players} />,
                               games: c.games,
                               rate: percent(c.winRate),
                             })}

@@ -11,10 +11,12 @@ const schema = z.object({
   proxies: z.number().int().min(0).max(MAX_COPIES),
   /** Edição da linha (a mesma carta pode estar em várias edições). */
   scryfallId: z.string().min(1).max(64).nullable().optional(),
+  /** Foil para todas as cópias da linha; sem valor, mantém como está. */
+  foil: z.boolean().optional(),
 });
 
 /**
- * Define a quantidade (e quantas são proxy) de uma carta num board. Quantidade 0 remove.
+ * Define a quantidade (e quantas são proxy, e se é foil) de uma carta num board. Quantidade 0 remove.
  * Cartas novas são buscadas no Scryfall pelo nome; se não existirem, a resposta avisa.
  */
 export const PUT = authed<{ deckId: string }>(async ({ req, db, user, params }) => {

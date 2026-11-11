@@ -8,6 +8,7 @@ import { api, ApiError } from '@/lib/api';
 import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { FormError, useApiAction } from './use-api-action';
+import { CardNames } from './card-dialog';
 
 interface Alternative {
   name: string;
@@ -235,7 +236,9 @@ export function DeckRoles({
                     {t('roleCards')}
                     <span className="sr-only"> ({t(`roles.${role}`)})</span>
                   </summary>
-                  <p className="mt-1">{[...new Set(cardsByRole[role])].join(', ')}</p>
+                  <p className="mt-1">
+                    <CardNames names={[...new Set(cardsByRole[role])]} />
+                  </p>
                 </details>
               )}
               <RoleAlternatives deckId={deckId} role={role} />

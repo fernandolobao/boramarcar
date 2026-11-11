@@ -8,6 +8,8 @@ export interface StoredDeckRow<C = unknown> {
   board: DeckBoard;
   quantity: number;
   isProxy: boolean;
+  /** Cópia foil (brilhante). */
+  isFoil?: boolean;
   /** Impressão escolhida (edição); `null` = carta sem dados do Scryfall. */
   scryfallId?: string | null;
   card: C | null;
@@ -20,6 +22,8 @@ export interface DeckLine<C = unknown> {
   board: DeckBoard;
   quantity: number;
   proxies: number;
+  /** Todas as cópias desta linha são foil. */
+  foil: boolean;
   /** Impressão (edição) desta linha: a mesma carta pode aparecer em várias edições. */
   scryfallId: string | null;
   card: C | null;
@@ -41,11 +45,13 @@ export function mergeDeckLines<C>(rows: readonly StoredDeckRow<C>[]): DeckLine<C
       board: row.board,
       quantity: 0,
       proxies: 0,
+      foil: true,
       scryfallId: row.scryfallId ?? null,
       card: row.card,
       ids: [],
     };
     line.quantity += row.quantity;
+    line.foil &&= Boolean(row.isFoil);
     if (row.isProxy) line.proxies += row.quantity;
     line.card ??= row.card;
     line.ids.push(row.id);
@@ -91,16 +97,18 @@ export type ExportFormat = 'plain' | 'proxies';
  */
 export function exportDeckText(
   lines: readonly (Pick<DeckLine, 'name' | 'board' | 'quantity' | 'proxies'> & {
+    foil?: boolean;
     setCode?: string | null;
     collectorNumber?: string | null;
   })[],
   format: ExportFormat = 'plain',
 ) {
-  // Edição no padrão aceito por Moxfield/Archidekt/Arena: "1 Sol Ring (CMM) 400".
+  // Edição no padrão aceito por Moxfield/Archidekt/Arena: "1 Sol Ring (CMM) 400", e foil
+  // com "*F*" (Moxfield e o importador daqui).
   const label = (l: (typeof lines)[number]) =>
-    l.setCode && l.collectorNumber
+    (l.setCode && l.collectorNumber
       ? `${l.name} (${l.setCode.toUpperCase()}) ${l.collectorNumber}`
-      : l.name;
+      : l.name) + (l.foil ? ' *F*' : '');
   const sections = DECK_BOARDS.map((board) => {
     const own = lines
       .filter((l) => l.board === board && l.quantity > 0)

@@ -170,3 +170,53 @@ describe('edições (impressões) diferentes da mesma carta', () => {
     expect(plan.changed).toEqual(['Sol Ring']);
   });
 });
+
+describe('foil', () => {
+  it('a linha é foil quando todas as cópias são foil, e a exportação marca *F*', () => {
+    const lines = mergeDeckLines([
+      {
+        id: '1',
+        name: 'Sol Ring',
+        board: 'mainboard',
+        quantity: 1,
+        isProxy: false,
+        isFoil: true,
+        card: null,
+      },
+      {
+        id: '2',
+        name: 'Sol Ring',
+        board: 'mainboard',
+        quantity: 1,
+        isProxy: true,
+        isFoil: true,
+        card: null,
+      },
+      {
+        id: '3',
+        name: 'Forest',
+        board: 'mainboard',
+        quantity: 9,
+        isProxy: false,
+        isFoil: true,
+        card: null,
+      },
+      { id: '4', name: 'Forest', board: 'mainboard', quantity: 1, isProxy: true, card: null },
+    ]);
+    expect(lines.find((l) => l.name === 'Sol Ring')).toMatchObject({ quantity: 2, foil: true });
+    expect(lines.find((l) => l.name === 'Forest')).toMatchObject({ quantity: 10, foil: false });
+    expect(
+      exportDeckText([
+        {
+          name: 'Sol Ring',
+          board: 'mainboard',
+          quantity: 1,
+          proxies: 0,
+          foil: true,
+          setCode: 'cmm',
+          collectorNumber: '400',
+        },
+      ]),
+    ).toBe('Deck\n1 Sol Ring (CMM) 400 *F*\n');
+  });
+});

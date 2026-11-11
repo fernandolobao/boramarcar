@@ -27,6 +27,9 @@ Há a aplicação web (Next.js na Vercel) e o app Android/iOS (Expo), em testes,
 | Importação de decks: Archidekt, Moxfield (experimental) e lista em texto                                                                   | ✅                            |
 | Dados de cartas via Scryfall com cache local                                                                                               | ✅                            |
 | Marcação de **proxies** por carta                                                                                                          | ✅                            |
+| Marcação de **foil** por carta (com brilho na grade e `*F*` na exportação)                                                                 | ✅                            |
+| **Painel** com próximo encontro, seus números, forma recente, pódio, atividade do grupo e comandantes em alta                              | ✅                            |
+| Nomes de jogadores levam ao perfil; nomes de cartas abrem a carta                                                                          | ✅                            |
 | Análise do deck: nota, curva de mana, cores, funções (ramp/compra/remoção/wipes), validação de Commander e sugestões com busca no Scryfall | ✅ (heurística inicial)       |
 | Interface em pt-BR com i18n pronto (en incluído)                                                                                           | ✅                            |
 | Mostrar o deck de cada jogador nas partidas do evento                                                                                      | ✅ (registro opcional)        |
