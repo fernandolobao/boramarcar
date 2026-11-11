@@ -111,7 +111,7 @@ pnpm dev
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`                              | URL do Postgres. Na Vercel, use a URL **pooled** do Neon (`...-pooler...`).                                               |
 | `BETTER_AUTH_SECRET`                        | Segredo aleatório com 32+ caracteres (`openssl rand -base64 32`).                                                         |
-| `BETTER_AUTH_URL`                           | URL pública do app (ex.: `https://boramarcar.vercel.app`). Se ausente, usa `VERCEL_URL`.                                  |
+| `BETTER_AUTH_URL`                           | URL pública do app (em produção: `https://www.arcanakin.com.br`). Se ausente, usa `VERCEL_URL`.                           |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciais OAuth do Google Cloud.                                                                                        |
 | `RESEND_API_KEY`                            | Opcional. Chave do [Resend](https://resend.com) para os avisos por e-mail. Sem ela, os e-mails só são registrados no log. |
 | `EMAIL_FROM`                                | Opcional. Remetente (padrão: `ArcanaKin <onboarding@resend.dev>`, que só entrega para o dono da conta Resend).            |
@@ -144,7 +144,7 @@ pnpm --filter @boramarcar/mobile start   # usa o site em produção
 - **Testar no celular com o Expo Go** (sem build próprio), contra a produção:
   1. Na Vercel, adicione a variável `EXPO_GO_LOGIN=lan` (produção) e faça um novo deploy. Ela deixa o login do Google voltar para o Expo Go **só** em endereços de rede local (`exp://192.168…`, `10.…`, `172.16–31.…`); tire-a quando não estiver testando.
   2. `pnpm --filter @boramarcar/mobile start` e leia o QR code com a câmera (iPhone) ou com o Expo Go (Android), com o celular no mesmo Wi-Fi do computador.
-  3. O app usa `https://boramarcar-zeta.vercel.app`; para outro servidor, `EXPO_PUBLIC_API_URL=https://…` (um IP da rede local não serve: o Google não volta para ele). A tela de entrada mostra o servidor e avisa se ele não responder.
+  3. O app usa `https://www.arcanakin.com.br`; para outro servidor, `EXPO_PUBLIC_API_URL=https://…` (um IP da rede local não serve: o Google não volta para ele). A tela de entrada mostra o servidor e avisa se ele não responder.
 - Sem `EXPO_GO_LOGIN`, a produção só aceita o link do app instalado (`arcanakin://`; o antigo `boramarcar://` continua aceito por um tempo) (_development build_ com `npx expo run:android|ios` ou `eas build --profile development`).
 - Telas desta primeira versão: encontros (próximos, detalhe e confirmação de presença), disponibilidade (melhores horários com atalho para marcar o encontro, horários avulsos e semanais, pular uma data), modo mesa (contador de vida no estilo do Lotus que registra a partida no encontro), ranking, meus decks (o deck abre no app: cartas por tipo, carta grande com verso e edição, curva, funções, nota e validação; editar continua no site) e conta (grupo ativo e sair).
 - Textos em `apps/mobile/src/lib/i18n.ts` (português e inglês, pelo idioma do aparelho).

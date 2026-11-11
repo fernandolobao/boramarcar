@@ -31,7 +31,7 @@ export class ApiError extends Error {
 }
 
 export interface ApiClientOptions {
-  /** Origem do servidor, ex.: `https://boramarcar.vercel.app` (sem barra no fim). */
+  /** Origem do servidor, ex.: `https://www.arcanakin.com.br` (sem barra no fim). */
   baseUrl: string;
   /** Cabeçalhos de autenticação a cada pedido (no app: o cookie da sessão do Better Auth). */
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>;
