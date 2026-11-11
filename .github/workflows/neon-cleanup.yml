@@ -1,0 +1,49 @@
+name: Apagar branch de banco do preview
+
+# Cada PR ganha um branch de banco no Neon (integração Neon ↔ Vercel, nome `preview/<branch>`).
+# O Neon só apaga esse branch quando o último deploy de preview é apagado na Vercel, o que
+# pode levar semanas, e o plano grátis tem limite de branches ("Branch limit reached").
+# Aqui, ao fechar ou mergear o PR, o branch de banco dele é apagado na hora.
+#
+# Requer: secret NEON_API_KEY (Neon > Account settings > API keys) e a variável
+# NEON_PROJECT_ID (Neon > Project settings), em Settings > Secrets and variables > Actions.
+on:
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch do Git cujo banco de preview será apagado (ex.: feat/algo)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+      GIT_BRANCH: ${{ github.event.pull_request.head.ref || inputs.branch }}
+    steps:
+      - name: Apagar preview/<branch> no Neon
+        run: |
+          if [ -z "$NEON_API_KEY" ] || [ -z "$PROJECT_ID" ]; then
+            echo "::warning::NEON_API_KEY ou NEON_PROJECT_ID não configurados; nada a fazer."
+            exit 0
+          fi
+          api="https://console.neon.tech/api/v2/projects/$PROJECT_ID/branches"
+          auth=(-H "Authorization: Bearer $NEON_API_KEY" -H "Accept: application/json")
+          name="preview/$GIT_BRANCH"
+          ids=$(curl -fsS "${auth[@]}" "$api" \
+            | jq -r --arg name "$name" '.branches[] | select(.name == $name and (.default | not)) | .id')
+          if [ -z "$ids" ]; then
+            echo "Nenhum branch $name no Neon (já apagado ou o preview não chegou a criar)."
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Apagando $name ($id)"
+            curl -fsS -X DELETE "${auth[@]}" "$api/$id" > /dev/null
+          done
