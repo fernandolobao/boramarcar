@@ -271,6 +271,8 @@ Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pesso
 
 **Login**: o servidor usa o plugin `expo()` do Better Auth e confia em `arcanakin://` (e em `boramarcar://`, o esquema anterior ao rebranding, por um tempo); o Expo Go (`exp://`) é aceito em desenvolvimento e, em produção, só com `EXPO_GO_LOGIN=lan` e só em IPs de rede local (`server/trusted-origins.ts`): um `exp://` público, de túnel, poderia levar a sessão para outro projeto. No app, `expoClient` guarda o cookie da sessão no SecureStore; o cliente da API manda esse cookie no cabeçalho `Cookie` com `credentials: 'omit'`. As rotas da API não mudaram: `getSession` lê o cookie do cabeçalho como no site.
 
+**Telas de escrita**: "Marcar encontro" (`encontros/novo`: título, dia, início, término opcional e local; os horários são convertidos com `localRangeToUtc`/`zonedLocalToUtc` do core no fuso do aparelho) e "Registrar partida" (`partida/[eventId]`: formulário sem contador de vida, com os jogadores e decks de `GET /events/:id/table`). O formulário de partida é montado e validado por `buildSimpleGame` (`core/games/form.ts`), que aplica as mesmas regras do servidor (`validateGame`) antes do envio; partidas em times ficam no site. As listas e o detalhe do encontro recarregam ao voltar a ter o foco (`useRefreshOnFocus`), então a partida ou o encontro novos aparecem sem puxar para atualizar.
+
 **Grupo ativo**: no site é um cookie; no app fica no SecureStore do aparelho (`GroupProvider`).
 
 **Monorepo**: pnpm com instalação isolada (suportada pelo Expo desde o SDK 54); o Metro não precisa de configuração própria. A CI roda `expo export` para Android e iOS para garantir que o empacotamento funciona.

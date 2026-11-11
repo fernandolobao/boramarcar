@@ -1,11 +1,9 @@
-import { zonedLocalToUtc } from '@boramarcar/core/time';
+import { addLocalDays, localRangeToUtc } from '@boramarcar/core/time';
 import { locale } from './i18n';
 
 /** Fuso do aparelho (o mesmo que o site usa para quem não escolheu outro). */
 export const deviceTimeZone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo';
-
-const DAY = 24 * 60 * 60 * 1000;
 
 /** Data local (AAAA-MM-DD) de um instante no fuso. */
 export const localDate = (date: Date, timeZone: string) =>
@@ -16,8 +14,7 @@ export const localDate = (date: Date, timeZone: string) =>
     day: '2-digit',
   }).format(date);
 
-export const addDays = (date: string, days: number) =>
-  new Date(Date.parse(`${date}T12:00:00Z`) + days * DAY).toISOString().slice(0, 10);
+export const addDays = addLocalDays;
 
 /** Próximos `count` dias a partir de hoje, no fuso. */
 export const nextDays = (count: number, timeZone: string, now = new Date()) => {
@@ -42,9 +39,8 @@ export const stepTime = (time: string, steps: number) => {
  * dia seguinte (ex.: 19:00–01:00).
  */
 export function slotRange(date: string, start: string, end: string, timeZone: string) {
-  const startsAt = zonedLocalToUtc(`${date}T${start}`, timeZone);
-  const endDate = end <= start ? addDays(date, 1) : date;
-  return { startsAt, endsAt: zonedLocalToUtc(`${endDate}T${end}`, timeZone) };
+  const { startsAt, endsAt } = localRangeToUtc(date, start, end, timeZone);
+  return { startsAt, endsAt: endsAt! };
 }
 
 /** Segunda a domingo (0 = domingo, como no servidor). */

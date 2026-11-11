@@ -6,7 +6,7 @@ import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
-import { useAsync } from '@/lib/use-async';
+import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
 
 const RSVP_LABEL: Record<Rsvp, MessageKey> = { yes: 'rsvpYes', maybe: 'rsvpMaybe', no: 'rsvpNo' };
@@ -19,6 +19,8 @@ export default function EventScreen() {
   const event = useAsync(() => api.events.get(id), [id]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  // Partida registrada (formulário ou modo mesa) aparece ao voltar para cá.
+  useRefreshOnFocus(event.refresh);
 
   if (event.loading) return <Loading />;
   if (event.error || !event.data) {
@@ -94,14 +96,22 @@ export default function EventScreen() {
       )}
 
       {e.status !== 'cancelled' && (
-        <Card>
+        <Card style={{ gap: 10 }}>
           <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-            {t('tableTitle')}
+            {t('gameRecord')}
           </AppText>
           <AppText muted>{t('tableOpenHint')}</AppText>
           <Button
             label={t('tableOpen')}
             onPress={() => router.push({ pathname: '/mesa/[id]', params: { id: e.id } })}
+          />
+          <AppText muted>{t('gameRecordHint')}</AppText>
+          <Button
+            label={t('gameRecord')}
+            variant="secondary"
+            onPress={() =>
+              router.push({ pathname: '/partida/[eventId]', params: { eventId: e.id } })
+            }
           />
         </Card>
       )}

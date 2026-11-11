@@ -1,6 +1,7 @@
 import type { Location } from '@boramarcar/api-client';
 import { useState } from 'react';
-import { ScrollView, TextInput, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import {
@@ -8,7 +9,6 @@ import {
   deviceTimeZone,
   nextDays,
   slotRange,
-  stepTime,
   WEEKDAY_ORDER,
   weekdayName,
 } from '@/lib/dates';
@@ -16,44 +16,6 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
 const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
-
-/** Horário com −/+ de meia em meia hora (sem relógio nativo, funciona no Expo Go e no leitor de tela). */
-function TimeStepper({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <AppText style={{ flex: 1, fontWeight: '600' }}>{label}</AppText>
-      <Button
-        label="−"
-        variant="secondary"
-        accessibilityLabel={t('availEarlier', { label, time: value })}
-        onPress={() => onChange(stepTime(value, -1))}
-        style={{ width: 48, paddingHorizontal: 0 }}
-      />
-      <AppText
-        style={{ minWidth: 64, textAlign: 'center', fontSize: 20, fontWeight: '700' }}
-        accessibilityLabel={`${label}: ${value}`}
-        accessibilityLiveRegion="polite"
-      >
-        {value}
-      </AppText>
-      <Button
-        label="+"
-        variant="secondary"
-        accessibilityLabel={t('availLater', { label, time: value })}
-        onPress={() => onChange(stepTime(value, 1))}
-        style={{ width: 48, paddingHorizontal: 0 }}
-      />
-    </View>
-  );
-}
 
 /** Adicionar disponibilidade: uma vez (dia + horário) ou toda semana (dias + horário). */
 export function AddAvailability({
@@ -207,26 +169,7 @@ export function AddAvailability({
         </View>
       )}
 
-      <View style={{ gap: 6 }}>
-        <AppText style={{ fontWeight: '600' }}>{t('availNote')}</AppText>
-        <TextInput
-          accessibilityLabel={t('availNote')}
-          value={note}
-          onChangeText={setNote}
-          maxLength={200}
-          maxFontSizeMultiplier={2}
-          style={{
-            minHeight: 44,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 12,
-            paddingHorizontal: 12,
-            fontSize: 16,
-            color: colors.text,
-            backgroundColor: colors.background,
-          }}
-        />
-      </View>
+      <TextField label={t('availNote')} value={note} onChangeText={setNote} maxLength={200} />
 
       <Button label={t('availAdd')} disabled={saving} onPress={() => void save()} />
       {message && (

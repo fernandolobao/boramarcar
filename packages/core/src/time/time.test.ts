@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { DomainError } from '../errors';
-import { isValidTimeZone, timeZoneOffsetMs, utcToZonedLocalInput, zonedLocalToUtc } from './index';
+import {
+  addLocalDays,
+  isValidTimeZone,
+  localRangeToUtc,
+  timeZoneOffsetMs,
+  utcToZonedLocalInput,
+  zonedLocalToUtc,
+} from './index';
 
 describe('isValidTimeZone', () => {
   it.each([
@@ -52,5 +59,34 @@ describe('zonedLocalToUtc / utcToZonedLocalInput', () => {
   it('rejeita entradas inválidas', () => {
     expect(() => zonedLocalToUtc('14/11/2026 19:30', 'America/Sao_Paulo')).toThrow(DomainError);
     expect(() => zonedLocalToUtc('2026-11-14T19:30', 'Lua/Base')).toThrow(DomainError);
+  });
+});
+
+describe('localRangeToUtc', () => {
+  it('converte data e horários locais no fuso do usuário', () => {
+    const { startsAt, endsAt } = localRangeToUtc(
+      '2026-11-14',
+      '19:00',
+      '23:30',
+      'America/Sao_Paulo',
+    );
+    expect(startsAt.toISOString()).toBe('2026-11-14T22:00:00.000Z');
+    expect(endsAt?.toISOString()).toBe('2026-11-15T02:30:00.000Z');
+  });
+
+  it('fim antes (ou igual) do início termina no dia seguinte', () => {
+    const { endsAt } = localRangeToUtc('2026-12-31', '20:00', '01:00', 'America/Sao_Paulo');
+    expect(endsAt?.toISOString()).toBe('2027-01-01T04:00:00.000Z');
+  });
+
+  it('sem fim devolve null', () => {
+    expect(localRangeToUtc('2026-11-14', '19:00', null, 'UTC').endsAt).toBeNull();
+  });
+
+  it('addLocalDays atravessa meses e anos e rejeita datas inválidas', () => {
+    expect(addLocalDays('2026-02-28', 1)).toBe('2026-03-01');
+    expect(addLocalDays('2026-12-31', 1)).toBe('2027-01-01');
+    expect(addLocalDays('2026-01-01', -1)).toBe('2025-12-31');
+    expect(() => addLocalDays('ontem', 1)).toThrow(DomainError);
   });
 });
