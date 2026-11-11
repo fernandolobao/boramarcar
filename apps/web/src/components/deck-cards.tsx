@@ -36,7 +36,7 @@ export interface DeckLineView {
   } | null;
 }
 
-type View = 'visual' | 'list' | 'edit';
+type View = 'visual' | 'list';
 
 /** Selo de proxy: "Proxy" quando todas as cópias são proxy; senão "3 proxies". */
 function ProxyBadge({ line }: { line: DeckLineView }) {
@@ -62,8 +62,9 @@ function FoilBadge({ line }: { line: DeckLineView }) {
 }
 
 /**
- * Cartas do deck: **visual** (imagens por tipo, ampliar em diálogo), **lista** e, para o dono,
- * **editar** (adicionar com busca do Scryfall, mudar quantidades e proxies, remover).
+ * Cartas do deck: **visual** (imagens por tipo) e **lista**. Tocar numa carta abre o diálogo da
+ * carta; para o dono, o mesmo diálogo edita a linha (quantidade, proxies, foil, edição, remover).
+ * O dono também adiciona cartas com a busca do Scryfall.
  */
 export function DeckCards({
   deckId,
@@ -95,7 +96,9 @@ export function DeckCards({
   const opener = useRef<HTMLButtonElement | null>(null);
   const titleId = useId();
 
-  const views: View[] = isOwner ? ['visual', 'list', 'edit'] : ['visual', 'list'];
+  const views: View[] = ['visual', 'list'];
+  // A linha aberta no diálogo, sempre com os dados mais novos (o editor atualiza a página).
+  const current = zoomed ? (lines.find((l) => l.key === zoomed.key) ?? zoomed) : null;
   type Group = { key: string; title: string; count: number; lines: DeckLineView[] };
   const groups = DECK_BOARDS.flatMap((board): Group[] => {
     const own = lines.filter((l) => l.board === board);
@@ -138,14 +141,14 @@ export function DeckCards({
               className={view === v ? 'btn-primary' : 'btn-secondary'}
               onClick={() => setView(v)}
             >
-              <Icon name={v === 'visual' ? 'gallery' : v === 'list' ? 'list' : 'edit'} />
+              <Icon name={v === 'visual' ? 'gallery' : 'list'} />
               {t(`views.${v}`)}
             </button>
           ))}
         </div>
       </div>
 
-      {view === 'edit' && <AddCardForm deckId={deckId} lines={lines} />}
+      {isOwner && <AddCardForm deckId={deckId} lines={lines} />}
 
       {groups.map((group) => (
         <section key={group.key} aria-labelledby={`${titleId}-${group.key}`}>
@@ -160,7 +163,7 @@ export function DeckCards({
                     <button
                       type="button"
                       className="relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 shadow-sm ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-ink-800"
-                      aria-label={t('zoom', { name: line.name })}
+                      aria-label={t(isOwner ? 'zoomEdit' : 'zoom', { name: line.name })}
                       aria-haspopup="dialog"
                       onClick={(e) => openZoom(line, e.currentTarget)}
                     >
@@ -251,95 +254,59 @@ export function DeckCards({
             // table-fixed + <colgroup>: cada grupo é uma tabela, e as larguras fixas deixam as
             // colunas alinhadas entre todos os grupos.
             <table className="w-full table-fixed text-sm">
-              {view === 'edit' ? (
-                <colgroup>
-                  <col className="w-20" />
-                  <col />
-                  <col className="w-20" />
-                  <col className="w-14 sm:w-36" />
-                </colgroup>
-              ) : (
-                <colgroup>
-                  <col className="w-10" />
-                  <col />
-                  <col className="w-28 sm:w-40" />
-                  <col className="w-0 sm:w-[30%]" />
-                  <col className="w-20 sm:w-24" />
-                </colgroup>
-              )}
-              <thead
-                className={
-                  view === 'edit' ? 'text-left text-xs text-ink-600 dark:text-ink-400' : 'sr-only'
-                }
-              >
+              <colgroup>
+                <col className="w-10" />
+                <col />
+                <col className="w-28 sm:w-40" />
+                <col className="w-0 sm:w-[30%]" />
+                <col className="w-20 sm:w-24" />
+              </colgroup>
+              <thead className="sr-only">
                 <tr>
-                  <th
-                    scope="col"
-                    className={`py-1 pe-2 font-medium ${view === 'edit' ? 'w-20' : ''}`}
-                  >
-                    {t('quantityHeader')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 font-medium">
-                    {t('cardName')}
-                  </th>
-                  {view === 'edit' ? (
-                    <>
-                      <th scope="col" className="w-20 py-1 pe-2 font-medium">
-                        {t('proxiesHeader')}
-                      </th>
-                      <th scope="col" className="w-14 py-1 font-medium sm:w-36">
-                        <span className="sr-only">{t('actions')}</span>
-                      </th>
-                    </>
-                  ) : (
-                    <>
-                      <th scope="col">{t('manaCost')}</th>
-                      <th scope="col">{t('type')}</th>
-                      <th scope="col">{t('proxy')}</th>
-                    </>
-                  )}
+                  <th scope="col">{t('quantityHeader')}</th>
+                  <th scope="col">{t('cardName')}</th>
+                  <th scope="col">{t('manaCost')}</th>
+                  <th scope="col">{t('type')}</th>
+                  <th scope="col">{t('proxy')}</th>
                 </tr>
               </thead>
               <tbody>
-                {group.lines.map((line) =>
-                  view === 'edit' ? (
-                    <EditableLine key={line.key} deckId={deckId} line={line} />
-                  ) : (
-                    <tr key={line.key} className="border-t border-ink-200 dark:border-ink-800">
-                      <td className="py-1.5 tabular-nums">{line.quantity}</td>
-                      <td className="py-1.5 pe-2 break-words">
-                        <button
-                          type="button"
-                          className="text-left underline-offset-2 hover:underline"
-                          aria-haspopup="dialog"
-                          onClick={(e) => openZoom(line, e.currentTarget)}
-                        >
-                          {line.name}
-                        </button>
-                        {printLabel(line.card) && (
-                          <span className="muted text-xs"> · {printLabel(line.card)}</span>
-                        )}
-                        {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
-                        {line.foil && (
-                          <>
-                            {' '}
-                            <FoilBadge line={line} />
-                          </>
-                        )}
-                      </td>
-                      <td className="py-1.5 pe-2">
-                        <ManaCost cost={line.card?.manaCost} className="text-sm" />
-                      </td>
-                      <td className="muted truncate py-1.5 sm:pe-2">
-                        {/* No celular a coluna tem largura 0: o tipo fica só no diálogo da carta. */}
-                        <span className="hidden sm:inline">{line.card?.typeLine}</span>
-                      </td>
-                      <td className="py-1.5 text-right">
-                        <ProxyBadge line={line} />
-                      </td>
-                    </tr>
-                  ),
-                )}
+                {group.lines.map((line) => (
+                  <tr key={line.key} className="border-t border-ink-200 dark:border-ink-800">
+                    <td className="py-1.5 tabular-nums">{line.quantity}</td>
+                    <td className="py-1.5 pe-2 break-words">
+                      <button
+                        type="button"
+                        className="text-left underline-offset-2 hover:underline"
+                        aria-haspopup="dialog"
+                        onClick={(e) => openZoom(line, e.currentTarget)}
+                      >
+                        {line.name}
+                        {isOwner && <span className="sr-only"> ({t('editHint')})</span>}
+                      </button>
+                      {printLabel(line.card) && (
+                        <span className="muted text-xs"> · {printLabel(line.card)}</span>
+                      )}
+                      {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
+                      {line.foil && (
+                        <>
+                          {' '}
+                          <FoilBadge line={line} />
+                        </>
+                      )}
+                    </td>
+                    <td className="py-1.5 pe-2">
+                      <ManaCost cost={line.card?.manaCost} className="text-sm" />
+                    </td>
+                    <td className="muted truncate py-1.5 sm:pe-2">
+                      {/* No celular a coluna tem largura 0: o tipo fica só no diálogo da carta. */}
+                      <span className="hidden sm:inline">{line.card?.typeLine}</span>
+                    </td>
+                    <td className="py-1.5 text-right">
+                      <ProxyBadge line={line} />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           )}
@@ -348,33 +315,33 @@ export function DeckCards({
 
       <CardDialog
         open={zoomed !== null}
-        name={zoomed?.name ?? ''}
-        card={zoomed?.card ? { ...zoomed.card, name: zoomed.name } : null}
-        back={zoomed ? flipped.has(zoomed.key) : false}
+        name={current?.name ?? ''}
+        card={current?.card ? { ...current.card, name: current.name } : null}
+        back={current ? flipped.has(current.key) : false}
         onBackChange={(back) => {
-          if (zoomed && back !== flipped.has(zoomed.key)) toggleFlip(zoomed.key);
+          if (current && back !== flipped.has(current.key)) toggleFlip(current.key);
         }}
         onClose={() => {
           setZoomed(null);
           opener.current?.focus();
         }}
         badges={
-          zoomed && (zoomed.proxies > 0 || zoomed.foil) ? (
+          current && (current.proxies > 0 || current.foil) ? (
             <p className="flex flex-wrap gap-2">
-              <ProxyBadge line={zoomed} />
-              <FoilBadge line={zoomed} />
+              <ProxyBadge line={current} />
+              <FoilBadge line={current} />
             </p>
           ) : null
         }
         price={
-          zoomed?.card?.priceUsd && usdBrl ? (
+          current?.card?.priceUsd && usdBrl ? (
             <p className="text-sm">
               {t('cardPriceBrl', {
-                usd: format.number(Number(zoomed.card.priceUsd), {
+                usd: format.number(Number(current.card.priceUsd), {
                   style: 'currency',
                   currency: 'USD',
                 }),
-                brl: format.number(Number(zoomed.card.priceUsd) * usdBrl, {
+                brl: format.number(Number(current.card.priceUsd) * usdBrl, {
                   style: 'currency',
                   currency: 'BRL',
                 }),
@@ -382,23 +349,26 @@ export function DeckCards({
             </p>
           ) : undefined
         }
-      />
+      >
+        {isOwner && current && <LineEditor key={current.key} deckId={deckId} line={current} />}
+      </CardDialog>
     </section>
   );
 }
 
-/** Linha editável: quantidade e proxies salvam ao sair do campo ou com Enter. */
-function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) {
+/**
+ * Editor da linha no diálogo da carta (dono do deck): quantidade e proxies salvam ao sair do campo
+ * ou com Enter; foil salva na hora; a edição troca pelo seletor; remover pede confirmação.
+ */
+function LineEditor({ deckId, line }: { deckId: string; line: DeckLineView }) {
   const t = useTranslations('decks');
   const { run, error, pending } = useApiAction();
+  const id = useId();
   const [quantity, setQuantity] = useState(String(line.quantity));
   const [proxies, setProxies] = useState(String(line.proxies));
   const [foil, setFoil] = useState(Boolean(line.foil));
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState('');
-  // Nome com a edição: distingue linhas da mesma carta para leitores de tela.
-  const print = printLabel(line.card);
-  const label = print ? `${line.name} (${print})` : line.name;
 
   const save = (q: number, p: number, f: boolean = foil) => {
     if (q === line.quantity && p === line.proxies && f === Boolean(line.foil)) return;
@@ -422,9 +392,11 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
         }),
       () =>
         setStatus(
-          f !== Boolean(line.foil)
-            ? t('foilSaved', { name: line.name, state: f ? 'on' : 'off' })
-            : t('lineSaved', { name: line.name }),
+          q === 0
+            ? t('cardRemoved', { name: line.name })
+            : f !== Boolean(line.foil)
+              ? t('foilSaved', { name: line.name, state: f ? 'on' : 'off' })
+              : t('lineSaved', { name: line.name }),
         ),
     );
   };
@@ -437,88 +409,80 @@ function EditableLine({ deckId, line }: { deckId: string; line: DeckLineView }) 
   };
 
   return (
-    <tr className="border-t border-ink-200 align-middle dark:border-ink-800">
-      <td className="py-1.5 pe-2">
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={MAX_COPIES}
-          className="input w-full px-2"
-          aria-label={t('quantityOf', { name: label })}
-          value={quantity}
-          disabled={pending}
-          onChange={(e) => setQuantity(e.target.value)}
-          onBlur={commit}
-          onKeyDown={onKey}
-        />
-      </td>
-      <td className="py-1.5 pe-2">
-        <span className="block font-medium">{line.name}</span>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          {line.card && <PrintPicker deckId={deckId} line={line} />}
-          <label className="inline-flex min-h-8 items-center gap-1.5 text-xs font-medium">
-            <input
-              type="checkbox"
-              checked={foil}
-              disabled={pending}
-              onChange={(e) => {
-                setFoil(e.target.checked);
-                save(Number(quantity), Number(proxies), e.target.checked);
-              }}
-            />
-            {t('foil')}
-            <span className="sr-only"> ({label})</span>
+    <fieldset className="space-y-3 border-t border-line pt-3">
+      <legend className="pt-3 font-semibold">{t('editLine')}</legend>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label" htmlFor={`${id}-q`}>
+            {t('quantityLabel')}
           </label>
+          <input
+            id={`${id}-q`}
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={MAX_COPIES}
+            className="input"
+            value={quantity}
+            disabled={pending}
+            onChange={(e) => setQuantity(e.target.value)}
+            onBlur={commit}
+            onKeyDown={onKey}
+          />
         </div>
-        {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
-        <span
-          role="status"
-          className={`block text-xs ${error ? 'text-red-600 dark:text-red-400' : 'muted'}`}
-        >
-          {error ?? status}
-        </span>
-      </td>
-      <td className="py-1.5 pe-2">
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={Number(quantity) || 0}
-          className="input w-full px-2"
-          aria-label={t('proxiesOf', { name: label })}
-          value={proxies}
-          disabled={pending}
-          onChange={(e) => setProxies(e.target.value)}
-          onBlur={commit}
-          onKeyDown={onKey}
-        />
-      </td>
-      <td className="py-1.5 text-right">
-        <button
-          type="button"
-          className={
-            confirming ? 'btn-danger border border-red-300 dark:border-red-800' : 'btn-danger'
-          }
-          disabled={pending}
-          onBlur={() => setConfirming(false)}
-          onClick={() => {
-            if (!confirming) return setConfirming(true);
-            setConfirming(false);
-            save(0, 0);
-          }}
-        >
-          <Icon name="delete" />
-          <span className="hidden sm:inline">
-            {confirming ? t('confirmRemoveCard') : t('removeCard')}
-          </span>
-          <span className="sr-only sm:hidden">
-            {confirming ? t('confirmRemoveCard') : t('removeCard')}
-          </span>
-          <span className="sr-only"> ({label})</span>
-        </button>
-      </td>
-    </tr>
+        <div>
+          <label className="label" htmlFor={`${id}-p`}>
+            {t('proxiesLabel')}
+          </label>
+          <input
+            id={`${id}-p`}
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={Number(quantity) || 0}
+            className="input"
+            value={proxies}
+            disabled={pending}
+            onChange={(e) => setProxies(e.target.value)}
+            onBlur={commit}
+            onKeyDown={onKey}
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={foil}
+            disabled={pending}
+            onChange={(e) => {
+              setFoil(e.target.checked);
+              save(Number(quantity), Number(proxies), e.target.checked);
+            }}
+          />
+          <span aria-hidden="true">✦</span> {t('foil')}
+        </label>
+        {line.card && <PrintPicker deckId={deckId} line={line} />}
+      </div>
+      <button
+        type="button"
+        className={confirming ? 'btn-danger border border-danger' : 'btn-danger'}
+        disabled={pending}
+        onBlur={() => setConfirming(false)}
+        onClick={() => {
+          if (!confirming) return setConfirming(true);
+          setConfirming(false);
+          save(0, 0);
+        }}
+      >
+        <Icon name="delete" />
+        {confirming ? t('confirmRemoveFromDeck') : t('removeFromDeck')}
+      </button>
+      {/* Região viva sempre presente, para o leitor de tela anunciar o resultado. */}
+      <p role="status" className={`text-sm ${error ? 'text-danger' : 'muted'}`}>
+        {error ?? status}
+      </p>
+    </fieldset>
   );
 }
 

@@ -93,6 +93,8 @@ describe('DeckCards', () => {
     const { container } = wrap(<DeckCards deckId="d" lines={lines} isOwner usdBrl={5.4} />);
     expect(screen.getByRole('button', { name: 'Visual' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      // O dono adiciona cartas no topo; editar uma carta é pelo diálogo dela.
+      'Adicionar carta',
       'Comandante (1)',
       'Criaturas (1)',
       'Terrenos (30)',
@@ -102,7 +104,7 @@ describe('DeckCards', () => {
     expect(screen.getByText(/10 proxies/, { selector: '.sr-only' })).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
 
-    const zoom = screen.getByRole('button', { name: 'Ampliar Elvish Mystic' });
+    const zoom = screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' });
     zoom.focus();
     fireEvent.click(zoom);
     const dialog = screen.getByRole('dialog', { name: 'Elvish Mystic' });
@@ -127,7 +129,7 @@ describe('DeckCards', () => {
     expect(screen.getByRole('button', { name: 'Lista' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByRole('table')).toHaveLength(4);
     expect(screen.getByRole('button', { name: 'Forest' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Editar no deck' })).not.toBeInTheDocument();
     expect(screen.getByText('10 proxies')).toBeInTheDocument();
     expect(screen.getByText('(não encontrada no Scryfall)')).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
@@ -154,16 +156,20 @@ describe('editor de deck', () => {
     return calls;
   };
 
-  it('muda quantidade e proxies (salva ao sair do campo) e remove com confirmação', async () => {
+  it('edita a linha no diálogo da carta: quantidade, proxies, foil e remover com confirmação', async () => {
     const calls = stubApi();
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    // Sem modo "Editar" separado: a carta abre o diálogo com o editor.
+    expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Forest' }));
+    let dialog = screen.getByRole('dialog', { name: 'Forest' });
+    expect(within(dialog).getByRole('group', { name: 'Editar no deck' })).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
 
-    const proxies = screen.getByRole('spinbutton', { name: 'Proxies de Forest' });
+    const proxies = within(dialog).getByRole('spinbutton', { name: 'Cópias proxy' });
     fireEvent.change(proxies, { target: { value: '12' } });
     fireEvent.blur(proxies);
-    await screen.findByText('Forest salva.');
+    await within(dialog).findByText('Forest salva.');
     expect(calls.at(-1)).toEqual({
       url: '/api/v1/decks/d1/lines',
       method: 'PUT',
@@ -178,20 +184,28 @@ describe('editor de deck', () => {
     });
 
     // Foil: a caixa salva na hora, para todas as cópias da linha.
-    fireEvent.click(screen.getByLabelText(/^Foil \(Forest/));
-    await screen.findByText('Forest: foil marcado.');
+    fireEvent.click(within(dialog).getByRole('checkbox', { name: /Foil/ }));
+    await within(dialog).findByText('Forest: foil marcado.');
     expect(calls.at(-1)!.body).toMatchObject({ name: 'Forest', quantity: 30, foil: true });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
 
-    const qty = screen.getByRole('spinbutton', { name: 'Quantidade de Elvish Mystic' });
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' }));
+    dialog = screen.getByRole('dialog', { name: 'Elvish Mystic' });
+    const qty = within(dialog).getByRole('spinbutton', { name: 'Quantidade' });
     fireEvent.change(qty, { target: { value: '0' } });
     fireEvent.keyDown(qty, { key: 'Enter' });
-    expect(await screen.findByText('Proxies não podem passar da quantidade.')).toBeInTheDocument();
+    expect(
+      await within(dialog).findByText('Proxies não podem passar da quantidade.'),
+    ).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
 
-    const remove = screen.getByRole('button', { name: /Remover ?\(Carta Inventada\)/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Carta Inventada' }));
+    dialog = screen.getByRole('dialog', { name: 'Carta Inventada' });
+    const remove = within(dialog).getByRole('button', { name: 'Remover do deck' });
     fireEvent.click(remove);
-    expect(remove).toHaveTextContent('Confirmar');
+    expect(remove).toHaveTextContent('Confirmar remoção');
     fireEvent.click(remove);
-    await screen.findByText('Carta Inventada salva.');
+    await within(dialog).findByText('Carta Inventada saiu do deck.');
     expect(calls.at(-1)!.body).toEqual({
       name: 'Carta Inventada',
       board: 'maybeboard',
@@ -205,7 +219,6 @@ describe('editor de deck', () => {
   it('adiciona carta pela busca com autocompletar e teclado, somando ao que já existe', async () => {
     const calls = stubApi();
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
     const input = screen.getByRole('combobox', { name: 'Carta' });
     fireEvent.change(input, { target: { value: 'sol' } });
     const listbox = await screen.findByRole('listbox', {}, { timeout: 2000 });
@@ -290,8 +303,10 @@ describe('editor de deck', () => {
       this.dispatchEvent(new Event('close'));
     };
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Omnath, Locus of Mana' }));
     expect(screen.getByRole('button', { name: /Edição: CMM #42/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Forest' }));
     fireEvent.click(screen.getByRole('button', { name: /^Escolher edição ?\(Forest\)$/ }));
     const alpha = await screen.findByRole('radio', { name: /Limited Edition Alpha/ });
     expect(screen.getByText('2 edições')).toBeInTheDocument();

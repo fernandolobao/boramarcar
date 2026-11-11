@@ -369,8 +369,7 @@
     "view": "Modo de exibição",
     "views": {
       "visual": "Visual",
-      "list": "Lista",
-      "edit": "Editar"
+      "list": "Lista"
     },
     "types": {
       "creature": "Criaturas",
@@ -486,7 +485,15 @@
     "foilSaved": "{name}: foil {state, select, on {marcado} other {desmarcado}}.",
     "cardLoading": "Carregando a carta…",
     "cardMissing": "Carta não encontrada no Scryfall.",
-    "cardError": "Não foi possível carregar a carta agora."
+    "cardError": "Não foi possível carregar a carta agora.",
+    "zoomEdit": "Ver e editar {name}",
+    "editHint": "abre para editar",
+    "editLine": "Editar no deck",
+    "cardRemoved": "{name} saiu do deck.",
+    "quantityLabel": "Quantidade",
+    "proxiesLabel": "Cópias proxy",
+    "removeFromDeck": "Remover do deck",
+    "confirmRemoveFromDeck": "Confirmar remoção"
   },
   "analysis": {
     "title": "Análise",
