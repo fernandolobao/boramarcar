@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
-import { DeckCards } from './deck-cards';
+import { DeckCards, foilTiming } from './deck-cards';
 import { ColorIdentity, DeckSettingsForm } from './deck-visual';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
@@ -411,5 +411,26 @@ describe('ColorIdentity e DeckSettingsForm', () => {
       format: 'brawl',
       visibility: 'private',
     });
+  });
+});
+
+describe('foilTiming', () => {
+  it('é estável para a mesma carta e muda entre cartas', () => {
+    expect(foilTiming('sol-ring')).toEqual(foilTiming('sol-ring'));
+    const keys = ['sol-ring', 'arcane-signet', 'command-tower', 'swords', 'rhystic-study'];
+    const durs = new Set(keys.map((k) => (foilTiming(k) as Record<string, string>)['--foil-dur']));
+    expect(durs.size).toBeGreaterThan(1);
+  });
+
+  it('fica entre 9 e 15s, com fase negativa dentro de uma volta', () => {
+    for (const k of ['a', 'b', 'c', 'deck-1:Sol Ring', 'x'.repeat(40)]) {
+      const v = foilTiming(k) as Record<string, string>;
+      const dur = parseFloat(v['--foil-dur']!);
+      const delay = parseFloat(v['--foil-delay']!);
+      expect(dur).toBeGreaterThanOrEqual(9);
+      expect(dur).toBeLessThanOrEqual(15);
+      expect(delay).toBeLessThanOrEqual(0);
+      expect(-delay).toBeLessThanOrEqual(dur);
+    }
   });
 });

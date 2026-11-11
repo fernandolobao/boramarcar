@@ -150,34 +150,61 @@ input[type='radio'] {
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
 }
 
-/* Brilho das cartas foil (decorativo): faixa de arco-íris que passa devagar; parado com "reduzir movimento". */
+/* Brilho das cartas foil (decorativo). Loop sem começo nem fim: uma faixa repetida que anda
+   exatamente um período (a largura da carta), inclinada, mais um "respirar" de opacidade com outro
+   período, para nunca repetir igual. Cada carta recebe --foil-dur/--foil-delay/--foil-breath
+   próprios (deck-cards.tsx), então cartas vizinhas não brilham juntas. Parado com "reduzir movimento". */
 .foil-sheen {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 20%,
-    color-mix(in srgb, var(--color-dourado) 35%, transparent) 35%,
-    color-mix(in srgb, var(--color-mana) 35%, transparent) 45%,
-    color-mix(in srgb, var(--color-eter) 35%, transparent) 55%,
-    transparent 70%
-  );
-  background-size: 250% 250%;
   mix-blend-mode: color-dodge;
-  animation: foil-shift 6s linear infinite;
+  animation: foil-breath var(--foil-breath, 7s) ease-in-out var(--foil-delay, 0s) infinite alternate;
+}
+.foil-sheen::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -100%;
+  width: 300%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-dourado) 22%, transparent) 25%,
+    color-mix(in srgb, var(--color-mana) 22%, transparent) 40%,
+    color-mix(in srgb, var(--color-eter) 22%, transparent) 55%,
+    transparent 80%,
+    transparent 100%
+  );
+  /* Um período = 1/3 da faixa = a largura da carta. */
+  background-size: calc(100% / 3) 100%;
+  background-repeat: repeat-x;
+  animation: foil-shift var(--foil-dur, 11s) linear var(--foil-delay, 0s) infinite;
 }
 @keyframes foil-shift {
   from {
-    background-position: 100% 0;
+    transform: translateX(0) skewX(-20deg);
   }
   to {
-    background-position: -150% 0;
+    transform: translateX(calc(100% / 3)) skewX(-20deg);
+  }
+}
+@keyframes foil-breath {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .foil-sheen {
+  .foil-sheen,
+  .foil-sheen::before {
     animation: none;
-    background-position: 30% 0;
+  }
+  .foil-sheen::before {
+    transform: translateX(10%) skewX(-20deg);
   }
 }

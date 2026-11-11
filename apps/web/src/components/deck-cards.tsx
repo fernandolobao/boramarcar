@@ -3,7 +3,7 @@
 import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@boramarcar/core';
 import Image from 'next/image';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState, type CSSProperties } from 'react';
 import { api } from '@/lib/api';
 import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
@@ -66,6 +66,23 @@ function FoilBadge({ line }: { line: DeckLineView }) {
  * carta; para o dono, o mesmo diálogo edita a linha (quantidade, proxies, foil, edição, remover).
  * O dono também adiciona cartas com a busca do Scryfall.
  */
+
+/**
+ * Ritmo do brilho foil de cada carta, derivado da chave (estável entre servidor e cliente):
+ * duração, fase e "respiração" diferentes, para cartas vizinhas não brilharem em sincronia.
+ */
+export function foilTiming(key: string): CSSProperties {
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i++) h = Math.imul(h ^ key.charCodeAt(i), 16777619) >>> 0;
+  const unit = (shift: number) => ((h >>> shift) & 0xff) / 255;
+  const dur = 9 + unit(0) * 6; // 9–15s por volta
+  return {
+    '--foil-dur': `${dur.toFixed(2)}s`,
+    '--foil-delay': `-${(unit(8) * dur).toFixed(2)}s`,
+    '--foil-breath': `${(5 + unit(16) * 4).toFixed(2)}s`,
+  } as CSSProperties;
+}
+
 export function DeckCards({
   deckId,
   lines,
@@ -178,7 +195,13 @@ export function DeckCards({
                             className="object-cover"
                           />
                           {/* Brilho de carta foil (decorativo; parado com "reduzir movimento"). */}
-                          {line.foil && <span aria-hidden="true" className="foil-sheen" />}
+                          {line.foil && (
+                            <span
+                              aria-hidden="true"
+                              className="foil-sheen"
+                              style={foilTiming(line.key)}
+                            />
+                          )}
                         </>
                       ) : (
                         <span className="absolute inset-0 grid place-items-center p-2 text-center text-sm font-medium">
