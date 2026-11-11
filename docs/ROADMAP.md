@@ -148,7 +148,7 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 | **Domínio próprio no Resend** ✅: `arcanakin.com.br` verificado (SPF/DKIM no registro.br) e `EMAIL_FROM` em produção                                                                   | P       |
 | Observabilidade: Vercel Analytics/Speed Insights e Sentry                                                                                                                              | P       |
 | **Hotjar/Contentsquare e LGPD** ✅: gravação de sessões só em produção e com consentimento (aviso de cookies), Política de Privacidade, baixar meus dados e excluir conta (site e app) | P       |
-| Rate limiting nas rotas de importação (Upstash Redis free) e timeouts nas chamadas externas                                                                                            | P       |
+| **Rate limiting e timeouts** ✅: limites por pessoa e cache compartilhado no Postgres (sem Upstash), tempo máximo em toda chamada externa e CDN da Vercel para buscas de cartas        | P       |
 | Cabeçalhos de segurança (CSP) e revisão de permissões                                                                                                                                  | P       |
 | Acessibilidade (auditoria WCAG AA) e modo escuro refinado                                                                                                                              | M       |
 | LGPD: exportar e excluir conta ✅                                                                                                                                                      | P       |

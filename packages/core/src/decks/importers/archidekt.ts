@@ -3,6 +3,7 @@ import { DomainError } from '../../errors';
 import type { GameFormat } from '../../games';
 import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
 import { mergeDuplicates } from './text';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../../external';
 
 const archidektDeckSchema = z.object({
   id: z.number(),
@@ -99,7 +100,11 @@ export function mapArchidektDeck(payload: unknown): ImportedDeck {
 }
 
 export async function fetchArchidektDeck(id: string, fetchFn: FetchLike): Promise<ImportedDeck> {
-  const response = await fetchFn(`https://archidekt.com/api/decks/${encodeURIComponent(id)}/`, {
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.importer,
+    'Archidekt',
+  )(`https://archidekt.com/api/decks/${encodeURIComponent(id)}/`, {
     headers: { Accept: 'application/json' },
   });
   if (response.status === 404)

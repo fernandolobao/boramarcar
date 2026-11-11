@@ -14,6 +14,7 @@ import {
   type FetchLike,
 } from '@boramarcar/core';
 import {
+  cachedExternal,
   deckCardsForEnrichment,
   getDeck,
   saveBracketSignals,
@@ -117,7 +118,10 @@ export async function findAlternatives(
     profile.scryfallFormat,
   );
   const inDeck = new Set(deck.entries.map((e) => e.name.toLowerCase()));
-  const found = await fetchScryfallSearch(query, { fetch: fetchFn }).catch((error: unknown) => {
+  // A mesma busca (função, cores, custo, formato) vale para todos: cache compartilhado de 1 dia.
+  const found = await cachedExternal(db, `search:${query}`, 24 * 60 * 60 * 1000, () =>
+    fetchScryfallSearch(query, { fetch: fetchFn }),
+  ).catch((error: unknown) => {
     // Falha de rede vira "serviço externo" (502), não erro interno.
     if (isDomainError(error)) throw error;
     console.warn('[alternatives] Scryfall indisponível', error);

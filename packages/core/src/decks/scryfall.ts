@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DomainError } from '../errors';
 import type { CardData, DeckEntry, FetchLike } from './types';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../external';
 
 export const SCRYFALL_API = 'https://api.scryfall.com';
 /** Limite de identificadores por requisição em /cards/collection. */
@@ -141,7 +142,11 @@ export async function fetchScryfallCollection(
     for (let i = 0; i < identifiers.length; i += SCRYFALL_COLLECTION_LIMIT) {
       if ((i > 0 || !allowRetry) && delayMs > 0) await sleep(delayMs);
       const batch = identifiers.slice(i, i + SCRYFALL_COLLECTION_LIMIT);
-      const response = await fetchFn(`${SCRYFALL_API}/cards/collection`, {
+      const response = await withTimeout(
+        fetchFn,
+        EXTERNAL_TIMEOUT_MS.scryfall,
+        'Scryfall',
+      )(`${SCRYFALL_API}/cards/collection`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -248,7 +253,11 @@ export async function fetchScryfallAutocomplete(
 ): Promise<string[]> {
   const q = query.trim();
   if (q.length < 2) return [];
-  const response = await fetchFn(`${SCRYFALL_API}/cards/autocomplete?q=${encodeURIComponent(q)}`, {
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.scryfall,
+    'Scryfall',
+  )(`${SCRYFALL_API}/cards/autocomplete?q=${encodeURIComponent(q)}`, {
     headers: { Accept: 'application/json', 'User-Agent': userAgent },
   });
   if (!response.ok) {
@@ -275,10 +284,13 @@ export async function fetchScryfallSearch(
     order = 'edhrec',
   }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'> & { order?: string },
 ): Promise<CardData[]> {
-  const response = await fetchFn(
-    `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&order=${order}&unique=cards`,
-    { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
-  );
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.scryfall,
+    'Scryfall',
+  )(`${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&order=${order}&unique=cards`, {
+    headers: { Accept: 'application/json', 'User-Agent': userAgent },
+  });
   if (response.status === 404) return [];
   if (!response.ok) {
     throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
@@ -316,7 +328,11 @@ export async function fetchScryfallPrints(
   const prints: CardPrint[] = [];
   for (let page = 0; url && page < MAX_PRINT_PAGES; page++) {
     if (page > 0 && delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
-    const response = await fetchFn(url, {
+    const response = await withTimeout(
+      fetchFn,
+      EXTERNAL_TIMEOUT_MS.scryfall,
+      'Scryfall',
+    )(url, {
       headers: { Accept: 'application/json', 'User-Agent': userAgent },
     });
     if (response.status === 404) break;
@@ -350,7 +366,11 @@ export async function fetchScryfallCard(
     userAgent = 'ArcanaKin/0.1',
   }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
 ): Promise<CardData | null> {
-  const response = await fetchFn(`${SCRYFALL_API}/cards/${encodeURIComponent(id)}`, {
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.scryfall,
+    'Scryfall',
+  )(`${SCRYFALL_API}/cards/${encodeURIComponent(id)}`, {
     headers: { Accept: 'application/json', 'User-Agent': userAgent },
   });
   if (response.status === 404) return null;

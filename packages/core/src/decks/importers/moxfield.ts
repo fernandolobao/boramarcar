@@ -3,6 +3,7 @@ import { DomainError } from '../../errors';
 import type { GameFormat } from '../../games';
 import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
 import { mergeDuplicates } from './text';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../../external';
 
 const boardSchema = z
   .object({
@@ -121,10 +122,13 @@ export async function fetchMoxfieldDeck(
   });
   let response: Response;
   try {
-    response = await fetchFn(
-      `https://api2.moxfield.com/v3/decks/all/${encodeURIComponent(publicId)}`,
-      { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
-    );
+    response = await withTimeout(
+      fetchFn,
+      EXTERNAL_TIMEOUT_MS.importer,
+      'Moxfield',
+    )(`https://api2.moxfield.com/v3/decks/all/${encodeURIComponent(publicId)}`, {
+      headers: { Accept: 'application/json', 'User-Agent': userAgent },
+    });
   } catch {
     throw new DomainError('upstream_error', 'Não foi possível conectar ao Moxfield', details(null));
   }

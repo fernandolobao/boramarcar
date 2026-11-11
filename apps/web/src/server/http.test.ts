@@ -17,6 +17,14 @@ describe('errorResponse', () => {
     expect(await res.json()).toEqual({ error: { code, message: 'msg' } });
   });
 
+  it('limite de uso: 429 com Retry-After', async () => {
+    const res = errorResponse(
+      new DomainError('rate_limited', 'Muitas tentativas', { retryAfterSeconds: 42 }),
+    );
+    expect(res.status).toBe(429);
+    expect(res.headers.get('Retry-After')).toBe('42');
+  });
+
   it('converte ZodError em 400 com detalhes', async () => {
     const result = z.object({ a: z.string() }).safeParse({ a: 1 });
     const res = errorResponse(result.error);

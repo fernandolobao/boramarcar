@@ -1,5 +1,11 @@
 export type DomainErrorCode =
-  'invalid_input' | 'not_found' | 'forbidden' | 'conflict' | 'unauthorized' | 'upstream_error';
+  | 'invalid_input'
+  | 'not_found'
+  | 'forbidden'
+  | 'conflict'
+  | 'unauthorized'
+  | 'upstream_error'
+  | 'rate_limited';
 
 /**
  * Erro de domínio com um código estável. A camada HTTP traduz o código para status

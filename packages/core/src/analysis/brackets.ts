@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DomainError } from '../errors';
 import type { FetchLike } from '../decks/types';
+import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../external';
 
 /** API pública do Commander Spellbook (combos e classificação de cartas). */
 export const SPELLBOOK_API = 'https://backend.commanderspellbook.com';
@@ -113,7 +114,11 @@ export async function fetchSpellbookSignals(
   deck: { commanders: readonly string[]; main: readonly { name: string; quantity: number }[] },
   fetchFn: FetchLike,
 ): Promise<BracketSignals> {
-  const response = await fetchFn(`${SPELLBOOK_API}/estimate-bracket`, {
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.spellbook,
+    'Commander Spellbook',
+  )(`${SPELLBOOK_API}/estimate-bracket`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({

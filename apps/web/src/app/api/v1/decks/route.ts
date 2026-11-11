@@ -5,6 +5,7 @@ import { runAfterResponse } from '@/server/background';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { importDeck } from '@/server/deck-import';
 import { authed, parseJson } from '@/server/http';
+import { rateLimit } from '@/server/limits';
 
 export const GET = authed(async ({ db, user }) => {
   const decks = await listDecks(db, user.id);
@@ -39,6 +40,7 @@ const importSchema = z.discriminatedUnion('kind', [
 export const POST = authed(
   async ({ req, db, user }) => {
     const { format, ...input } = await parseJson(req, importSchema);
+    await rateLimit(db, user.id, 'import');
     const result = await importDeck(db, user.id, input, fetch, format);
     // Tagger e Spellbook em segundo plano: a importação não espera por eles.
     runAfterResponse(() => refreshDeckAnalysis(db, { deckId: result.deck.id, viewerId: user.id }));

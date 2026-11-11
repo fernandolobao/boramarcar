@@ -36,7 +36,7 @@ describe('sendEmails', () => {
         ok: false,
         error: '403: You can only send testing emails to your own email address',
       },
-      { to: 'c@x.com', ok: false, error: 'TypeError: network' },
+      { to: 'c@x.com', ok: false, error: 'DomainError: Resend indisponível' },
     ]);
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe('https://api.resend.com/emails');
