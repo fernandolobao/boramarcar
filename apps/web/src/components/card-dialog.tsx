@@ -38,6 +38,7 @@ export function CardDialog({
   onClose,
   badges,
   price,
+  children,
 }: {
   open: boolean;
   name: string;
@@ -51,6 +52,8 @@ export function CardDialog({
   badges?: ReactNode;
   /** Preço já formatado (ex.: com reais); sem valor, mostra o preço em dólar da carta. */
   price?: ReactNode;
+  /** Conteúdo extra no fim (ex.: o editor da linha do deck, para o dono). */
+  children?: ReactNode;
 }) {
   const t = useTranslations('decks');
   const tc = useTranslations('common');
@@ -159,6 +162,7 @@ export function CardDialog({
             {t('ligaMagic')}
             <span className="sr-only"> {tc('newTab')}</span>
           </a>
+          {children}
         </div>
       )}
     </dialog>
