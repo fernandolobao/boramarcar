@@ -75,6 +75,25 @@ export async function resolveCardByName(db: Database, name: string, fetchFn: Fet
 }
 
 /**
+ * Carta pelo nome na impressão padrão do Scryfall (a que a busca por nome devolve), para
+ * "Adicionar carta". O cache local guarda qualquer edição que já apareceu num deck, então só é
+ * usado se o Scryfall não responder.
+ */
+export async function resolveDefaultCardByName(
+  db: Database,
+  name: string,
+  fetchFn: FetchLike = fetch,
+) {
+  try {
+    const { cards } = await fetchScryfallCollection([{ name }], { fetch: fetchFn });
+    if (cards[0]) return cards[0];
+    return null;
+  } catch {
+    return findCachedCardByName(db, name);
+  }
+}
+
+/**
  * Sincroniza o deck (3.8) com a origem (Archidekt/Moxfield) ou com uma lista colada —
  * útil quando o Moxfield bloqueia a leitura automática. Mantém as marcações de proxy.
  */

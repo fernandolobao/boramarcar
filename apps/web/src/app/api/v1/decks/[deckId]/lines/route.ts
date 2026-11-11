@@ -1,7 +1,7 @@
 import { DECK_BOARDS, MAX_COPIES } from '@boramarcar/core';
-import { setDeckLine } from '@boramarcar/db';
+import { addDeckCopies, setDeckLine } from '@boramarcar/db';
 import { z } from 'zod';
-import { resolveCardById, resolveCardByName } from '@/server/deck-import';
+import { resolveCardById, resolveCardByName, resolveDefaultCardByName } from '@/server/deck-import';
 import { authed, parseJson } from '@/server/http';
 
 const schema = z.object({
@@ -31,4 +31,23 @@ export const PUT = authed<{ deckId: string }>(async ({ req, db, user, params }) 
         : await resolveCardByName(db, body.name);
   const line = await setDeckLine(db, { ...body, card, deckId: params.deckId, userId: user.id });
   return { line, found: body.quantity === 0 || card !== null };
+});
+
+const addSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  board: z.enum(DECK_BOARDS),
+  quantity: z.number().int().min(1).max(MAX_COPIES),
+  proxies: z.number().int().min(0).max(MAX_COPIES),
+});
+
+/**
+ * Adiciona cópias de uma carta pelo nome ("Adicionar carta"): entram na impressão padrão do
+ * Scryfall e só somam com a linha dessa mesma impressão — nunca com uma edição escolhida para
+ * outras cópias, que assim continuam separadas e editáveis.
+ */
+export const POST = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
+  const body = await parseJson(req, addSchema);
+  const card = await resolveDefaultCardByName(db, body.name);
+  const line = await addDeckCopies(db, { ...body, card, deckId: params.deckId, userId: user.id });
+  return { line, found: card !== null };
 });

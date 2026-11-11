@@ -200,8 +200,13 @@ export function PrintPicker({
                     min={1}
                     max={line.quantity}
                     value={copies}
+                    aria-describedby={`${id}-copies-hint`}
                     onChange={(e) => setCopies(e.target.value)}
                   />
+                  {/* Diz o que acontece com o resto: separar cópias de edição é isto. */}
+                  <p id={`${id}-copies-hint`} className="muted mt-1 max-w-56 text-xs">
+                    {valid ? t('printCopiesRest', { rest: line.quantity - amount }) : null}
+                  </p>
                 </div>
               )}
             </div>
@@ -285,7 +290,9 @@ export function PrintPicker({
               </button>
               <button className="btn-primary" disabled={pending || !prints || !chosen || !valid}>
                 <Icon name="save" />
-                {t('printSave')}
+                {valid && amount < line.quantity
+                  ? t('printSavePart', { count: amount, total: line.quantity })
+                  : t('printSave')}
               </button>
             </div>
           </form>
