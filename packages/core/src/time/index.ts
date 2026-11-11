@@ -90,3 +90,26 @@ export function utcToZonedLocalInput(date: Date, timeZone: string): string {
   const w = wallClockIn(date, timeZone);
   return `${w.year}-${pad(w.month)}-${pad(w.day)}T${pad(w.hour)}:${pad(w.minute)}`;
 }
+
+/** Soma `days` dias a uma data local "AAAA-MM-DD" (sem depender de fuso). */
+export function addLocalDays(date: string, days: number): string {
+  const ms = Date.parse(`${date}T12:00:00Z`);
+  if (Number.isNaN(ms)) throw new DomainError('invalid_input', 'Data inválida');
+  return new Date(ms + days * 86_400_000).toISOString().slice(0, 10);
+}
+
+/**
+ * Início e fim (opcional) a partir de uma data e horários locais ("19:00") no fuso do usuário.
+ * Fim menor ou igual ao início = termina no dia seguinte (ex.: 20:00–01:00).
+ */
+export function localRangeToUtc(
+  date: string,
+  start: string,
+  end: string | null,
+  timeZone: string,
+): { startsAt: Date; endsAt: Date | null } {
+  const startsAt = zonedLocalToUtc(`${date}T${start}`, timeZone);
+  if (end === null) return { startsAt, endsAt: null };
+  const endDate = end <= start ? addLocalDays(date, 1) : date;
+  return { startsAt, endsAt: zonedLocalToUtc(`${endDate}T${end}`, timeZone) };
+}

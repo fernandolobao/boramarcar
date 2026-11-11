@@ -198,6 +198,7 @@ sem rolagem horizontal em 320px.
 - Erros e confirmações em regiões vivas (`accessibilityRole="alert"`, `accessibilityLiveRegion`); carregamento com rótulo.
 - Cores com contraste AA nos temas claro e escuro (segue o tema do aparelho); texto escala com o tamanho de fonte do sistema (até 2×).
 - Modo mesa no app: cada metade da área é um botão com nome e vida atual ("Tirar 1 de vida de Ana (vida 38)"), a vida é anunciada numa região viva, segurar (ou tocar duas vezes e segurar, com leitor de tela) soma 10; nome do jogador abre a folha com marcadores em botões −/+ com nome e valor; monarca e desistir como `switch`; escolhas (tipo de jogo, jogadores, decks, vencedor) como `radio`/`checkbox`. Texto branco sobre as cores das áreas com contraste AA (mesmas cores do site).
+- Marcar encontro e registrar partida (11/11/2026): campos de texto com rótulo visível que também é o nome acessível (`TextField`); dia, horários, local, tipo de jogo, deck, vencedor e quem começou como `radiogroup`/`radio`; jogadores e "Definir horário de término" como `checkbox`; horários com botões −/+ nomeados ("Começa às: meia hora mais cedo (agora 19:00)") e valor anunciado; o número do assento aparece no texto do botão do jogador ("2. Ana"), não só na cor; erros de validação em `alert` antes de enviar, com as mesmas regras do servidor; os botões de deck incluem o nome do jogador ("Deck de Ana: Atraxa").
 - Pendente: passada manual com TalkBack e VoiceOver, e testes automatizados de acessibilidade no app.
 
 ### Revisão: página inicial
