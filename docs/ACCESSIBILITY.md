@@ -232,3 +232,8 @@ sem rolagem horizontal em 320px.
 - **Configurações → Privacidade e dados**: escolha de cookies em `fieldset/legend` com rádios e confirmação em `role="status"`. "Excluir minha conta" usa a confirmação em dois cliques do projeto, com o aviso em `role="alert"` ligado ao botão por `aria-describedby`.
 - **Botão "Voltar"**: link com texto visível, alvo ≥ 24px, no mesmo lugar em todas as páginas internas (3.2.3).
 - **/privacidade**: um `h1`, seções numeradas com `h2` e índice com links para as âncoras; entra no teste axe de páginas públicas.
+
+## Seções em pilha e aura (11/11/2026)
+
+- **Pilha**: é só layout (`sticky`) ligado à rolagem, sem animação automática. A seção com foco vem para a frente (`:focus-within`, 2.4.11), e os títulos continuam `h2` na ordem do documento. No app, com "reduzir movimento", a pilha é desligada.
+- **Aura**: decorativa (`aria-hidden`/`accessibilityElementsHidden`, `pointer-events: none`), atrás do conteúdo, com opacidade baixa para não afetar o contraste do texto. Movimento muito lento e parado com `prefers-reduced-motion` / "reduzir movimento" (2.3.3).

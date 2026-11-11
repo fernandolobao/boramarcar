@@ -7,6 +7,7 @@ import {
 } from '@boramarcar/db';
 import Image from 'next/image';
 import Link from 'next/link';
+import { StackSections } from '@/components/stack-sections';
 import { getFormatter, getTimeZone, getTranslations } from 'next-intl/server';
 import { CreateEventFromWindowButton } from '@/components/availability-forms';
 import { CardNames } from '@/components/card-dialog';
@@ -295,7 +296,8 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Seções em pilha de cartas: cada uma desliza por cima da anterior ao rolar. */}
+      <StackSections>
         {/* Pódio. */}
         <section className="card" aria-labelledby="painel-podio">
           <div className="mb-4 flex items-center justify-between gap-2">
@@ -499,31 +501,30 @@ export default async function DashboardPage() {
             </ol>
           )}
         </section>
-      </div>
-
-      {events.length > 1 && (
-        <section className="card" aria-labelledby="painel-encontros">
-          <h2 id="painel-encontros" className="section-title">
-            {t('moreEvents')}
-          </h2>
-          <ul className="divide-y divide-line">
-            {events.slice(1, 6).map((event) => (
-              <li key={event.id}>
-                <Link
-                  href={`/eventos/${event.id}`}
-                  className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl p-2 hover:bg-surface-muted"
-                >
-                  <span className="font-medium">{event.title}</span>
-                  <span className="muted">
-                    {format.dateTime(event.startsAt, { dateStyle: 'medium', timeStyle: 'short' })} ·{' '}
-                    {event.locationName ?? tc('locationTbd')}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        {events.length > 1 && (
+          <section className="card" aria-labelledby="painel-encontros">
+            <h2 id="painel-encontros" className="section-title">
+              {t('moreEvents')}
+            </h2>
+            <ul className="divide-y divide-line">
+              {events.slice(1, 6).map((event) => (
+                <li key={event.id}>
+                  <Link
+                    href={`/eventos/${event.id}`}
+                    className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl p-2 hover:bg-surface-muted"
+                  >
+                    <span className="font-medium">{event.title}</span>
+                    <span className="muted">
+                      {format.dateTime(event.startsAt, { dateStyle: 'medium', timeStyle: 'short' })}{' '}
+                      · {event.locationName ?? tc('locationTbd')}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </StackSections>
     </>
   );
 }

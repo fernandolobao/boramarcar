@@ -231,6 +231,12 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
   - `DELETE /api/v1/me` (`{ confirm: true }`): encerra a sessão e apaga login, sessões, decks, disponibilidade, presenças futuras e locais que a pessoa hospeda, e tira a pessoa dos grupos. O registro do usuário vira "Jogador removido" (sem e-mail real, foto, fuso ou idioma; `deleted_at` preenchido), para as partidas continuarem no histórico dos outros. Grupos de que era dona passam para o admin (ou membro) mais antigo, ou são apagados se ela estava sozinha. `GET /api/v1/me` mostra isso antes.
   - No app mobile, a exclusão é feita no próprio app (exigência das lojas); baixar os dados abre o site.
 
+## Seções em pilha e aura
+
+- **Pilha de cartas** (`StackSections`, CSS `.stack-*` em `globals.css`): no deck e no painel, cada seção gruda um pouco abaixo da anterior ao rolar (`position: sticky`, `top` = base + índice × passo) e a próxima desliza por cima. O título de cada seção também gruda, então a faixa que sobra à mostra é o título. Seções mais altas que a tela grudam pelo fim (o componente mede a altura em `--stack-h`). No máximo 4 faixas no celular e 5 no computador. `:focus-within` traz a seção para a frente (WCAG 2.4.11), e na impressão a pilha some. Para usar em outra página, envolva as seções (cada uma com o título `h2` como primeiro filho) em `<StackSections>`.
+- **No app** (`components/stack.tsx`): `StackScrollView` + `StackSection`, com `translateY` ligado à rolagem no thread nativo, mesma ideia (o título acompanha a faixa da seção). Com "reduzir movimento", rola normal.
+- **Aura** (`<Aura />`, site no layout do app e app no deck e em Encontros): formas desfocadas nas cores da marca (éter, mana, dourado, arcano) no canto superior direito, mudando de forma e flutuando muito devagar (40–70 s por ciclo, cada uma num ritmo). Decorativa (`aria-hidden`, sem toque), atrás do conteúdo, parada com "reduzir movimento" e fora da impressão. No site, o contêiner usa `overflow-x: clip`, porque `hidden` quebraria o `sticky` da pilha.
+
 ## Marca e design tokens (ArcanaKin)
 
 `packages/tokens` é a fonte única das cores e do logotipo, sem dependências e num arquivo só (o script que gera o CSS roda direto no Node):

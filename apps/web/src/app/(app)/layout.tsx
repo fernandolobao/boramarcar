@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Aura } from '@/components/aura';
 import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
@@ -34,7 +35,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="min-h-dvh">
+    // isolate: a aura fica atrás de tudo sem sair desta área; overflow-x-clip (e não hidden)
+    // corta a aura na lateral sem quebrar o `position: sticky` das seções empilhadas.
+    <div className="relative isolate min-h-dvh overflow-x-clip">
+      <Aura />
       <TimeZoneSync
         savedTimeZone={preferences.timeZoneIsDefault ? null : preferences.timeZone}
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}

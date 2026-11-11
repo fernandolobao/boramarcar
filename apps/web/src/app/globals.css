@@ -208,3 +208,165 @@ input[type='radio'] {
     transform: translateX(10%) skewX(-20deg);
   }
 }
+
+/* ---------- Seções empilhadas (pilha de cartas) ----------
+   Cada seção gruda no topo um pouco abaixo da anterior (--stack-i × --stack-step), e a próxima
+   desliza por cima. O título de cada seção também gruda, então a faixa que sobra à mostra da
+   seção de trás é justamente o título. Seções mais altas que a tela grudam pelo fim (o JS mede a
+   altura em --stack-h), para nada ficar escondido. Só com rolagem: nenhuma animação. */
+.stack-sections {
+  --stack-base: 1rem;
+  /* Faixa à mostra de cada seção de trás: o respiro do cartão + o título. */
+  --stack-step: 3.25rem;
+  /* Quantas faixas no máximo (as seções além disso grudam na última posição). */
+  --stack-cap: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .stack-sections {
+    --stack-step: 3.5rem;
+    --stack-cap: 5;
+  }
+}
+.stack-card {
+  --stack-top: calc(
+    var(--stack-base) + min(var(--stack-i, 0), var(--stack-cap)) * var(--stack-step)
+  );
+  position: sticky;
+  top: min(var(--stack-top), calc(100dvh - var(--stack-h, 0px) - 1rem));
+  z-index: calc(1 + var(--stack-i, 0));
+}
+.stack-card > * {
+  box-shadow:
+    0 -10px 24px -18px color-mix(in srgb, var(--color-noite) 45%, transparent),
+    0 1px 3px color-mix(in srgb, var(--color-noite) 12%, transparent);
+}
+/* O título da seção gruda na faixa dela (vale para seções mais altas que a tela). */
+.stack-card > * > :is(h2, header):first-child,
+.stack-card > * > div:first-child > h2:first-child {
+  position: sticky;
+  top: var(--stack-top);
+  z-index: 1;
+  background: var(--color-surface);
+  padding-block: 0.25rem;
+}
+/* Foco nunca fica escondido atrás de outra seção (WCAG 2.4.11). */
+.stack-card:focus-within {
+  z-index: 50;
+}
+@media print {
+  .stack-card,
+  .stack-card h2 {
+    position: static !important;
+  }
+}
+
+/* ---------- Aura: detalhes coloridos no canto superior direito ----------
+   Formas orgânicas desfocadas nas cores da marca, que mudam de forma e flutuam bem devagar
+   (40–60 s por ciclo). Decorativas (aria-hidden), atrás do conteúdo, paradas com
+   "reduzir movimento". */
+.aura {
+  position: absolute;
+  top: -8rem;
+  right: -6rem;
+  width: min(44rem, 90vw);
+  height: 30rem;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.55;
+  filter: blur(56px) saturate(1.1);
+}
+:root[data-theme='dark'] .aura {
+  opacity: 0.4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .aura {
+    opacity: 0.4;
+  }
+}
+.aura > span {
+  position: absolute;
+  border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  animation:
+    aura-morph var(--aura-morph, 48s) ease-in-out infinite alternate,
+    aura-drift var(--aura-drift, 60s) ease-in-out infinite alternate;
+}
+.aura > span:nth-child(1) {
+  top: 2rem;
+  right: 4rem;
+  width: 22rem;
+  height: 18rem;
+  background: radial-gradient(circle at 30% 30%, var(--color-eter), transparent 70%);
+  --aura-morph: 46s;
+  --aura-drift: 58s;
+}
+.aura > span:nth-child(2) {
+  top: 9rem;
+  right: 15rem;
+  width: 16rem;
+  height: 14rem;
+  background: radial-gradient(circle at 60% 40%, var(--color-mana), transparent 70%);
+  --aura-morph: 52s;
+  --aura-drift: 64s;
+  animation-delay:
+    -18s,
+    -27s;
+}
+.aura > span:nth-child(3) {
+  top: 0;
+  right: 18rem;
+  width: 12rem;
+  height: 11rem;
+  background: radial-gradient(circle at 50% 50%, var(--color-dourado), transparent 70%);
+  --aura-morph: 40s;
+  --aura-drift: 50s;
+  animation-delay:
+    -9s,
+    -33s;
+}
+.aura > span:nth-child(4) {
+  top: 13rem;
+  right: 2rem;
+  width: 14rem;
+  height: 12rem;
+  background: radial-gradient(circle at 40% 60%, var(--color-arcano), transparent 70%);
+  --aura-morph: 56s;
+  --aura-drift: 70s;
+  animation-delay:
+    -30s,
+    -12s;
+}
+@keyframes aura-morph {
+  0% {
+    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  }
+  50% {
+    border-radius: 63% 37% 45% 55% / 55% 62% 38% 45%;
+  }
+  100% {
+    border-radius: 38% 62% 52% 48% / 62% 38% 62% 38%;
+  }
+}
+@keyframes aura-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(-1.25rem, 0.75rem, 0) rotate(8deg) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0.75rem, 1.5rem, 0) rotate(-6deg) scale(0.97);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aura > span {
+    animation: none;
+  }
+}
+@media print {
+  .aura {
+    display: none;
+  }
+}

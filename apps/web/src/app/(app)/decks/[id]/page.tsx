@@ -40,6 +40,7 @@ import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
 import { CardNames } from '@/components/card-dialog';
+import { StackSections } from '@/components/stack-sections';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -219,7 +220,8 @@ export default async function DeckPage({ params }: Props) {
         </details>
       )}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}
+      <StackSections>
         <section className="card space-y-4">
           <h2 className="section-title mb-0">{ta('title')}</h2>
           <DeckScore analysis={analysis} formatName={formatName} />
@@ -242,11 +244,11 @@ export default async function DeckPage({ params }: Props) {
           </section>
         )}
         {deck.bracket && (
-          <section className="card md:col-span-2">
+          <section className="card">
             <BracketCard bracket={deck.bracket} />
           </section>
         )}
-        <section className="card md:col-span-2">
+        <section className="card">
           <DeckRoles
             deckId={deck.id}
             roles={analysis.roles}
@@ -255,11 +257,11 @@ export default async function DeckPage({ params }: Props) {
             tagged={analysis.rolesTagged}
           />
         </section>
-        <section className="card md:col-span-2">
+        <section className="card">
           <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
         </section>
         {analysis.commanders.length > 0 && (
-          <section className="card md:col-span-2">
+          <section className="card">
             <DeckComparisonCard
               commanders={analysis.commanders}
               comparison={comparison}
@@ -269,11 +271,11 @@ export default async function DeckPage({ params }: Props) {
           </section>
         )}
         {analysis.handOdds && (
-          <section className="card md:col-span-2">
+          <section className="card">
             <HandOdds odds={analysis.handOdds} />
           </section>
         )}
-      </div>
+      </StackSections>
 
       <DeckCards
         deckId={deck.id}
