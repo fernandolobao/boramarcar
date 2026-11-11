@@ -66,7 +66,10 @@ test.describe('agenda', () => {
     await expect(toggle).toHaveAccessibleDescription(/Novos encontros/);
     const save = async () => {
       await page.getByRole('button', { name: 'Salvar' }).click();
-      await expect(page.getByRole('status')).toHaveText('Preferências salvas.');
+      // Há outra região de status na página (escolha de cookies): filtra pelo texto.
+      await expect(
+        page.getByRole('status').filter({ hasText: 'Preferências salvas.' }),
+      ).toBeVisible();
     };
 
     await toggle.focus();

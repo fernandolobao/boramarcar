@@ -4,7 +4,11 @@ import { Analytics } from '@vercel/analytics/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { cookies } from 'next/headers';
+import { ConsentBanner } from '@/components/consent-banner';
 import { SessionInsights } from '@/components/session-insights';
+import { CONSENT_COOKIE, parseConsent } from '@/lib/consent';
+import { sessionInsightsEnabled } from '@/lib/session-insights';
 import { THEME_STORAGE_KEY } from '@/lib/theme';
 import './globals.css';
 import '@/styles/mana.css';
@@ -33,6 +37,10 @@ const THEME_SCRIPT = `try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
   const t = await getTranslations('common');
+  const consent = parseConsent((await cookies()).get(CONSENT_COOKIE)?.value);
+  // O aviso de cookies só existe quando há algo não essencial para aceitar (a gravação de
+  // sessões, só em produção); o Vercel Analytics não usa cookies.
+  const insights = sessionInsightsEnabled();
   return (
     // `data-theme` é definido pelo script antes da hidratação (preferência salva no navegador).
     <html lang={locale} suppressHydrationWarning>
@@ -43,9 +51,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <a href="#conteudo" className="skip-link">
           {t('skipToContent')}
         </a>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          {children}
+          {insights && <ConsentBanner initial={consent} />}
+          <SessionInsights enabled={insights} consent={consent} />
+        </NextIntlClientProvider>
         <Analytics />
-        <SessionInsights />
       </body>
     </html>
   );

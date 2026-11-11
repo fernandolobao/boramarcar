@@ -331,7 +331,11 @@
     "notFound": "Cartas não encontradas no Scryfall: {names}",
     "gridScore": "Nota {score}",
     "gridBracket": "Bracket {value}",
-    "bracketShort": { "2": "1–2", "3": "3", "4": "4–5" },
+    "bracketShort": {
+      "2": "1–2",
+      "3": "3",
+      "4": "4–5"
+    },
     "cards": "{count, plural, =1 {1 carta} other {# cartas}}",
     "proxies": "{count, plural, =0 {sem proxies} =1 {1 proxy} other {# proxies}}",
     "proxy": "Proxy",
@@ -1199,5 +1203,34 @@
     "swapSelected": "{name} escolhido; toque em outro jogador para trocar",
     "swapped": "{a} e {b} trocaram de lugar.",
     "swapDone": "Pronto"
+  },
+  "consent": {
+    "title": "Cookies e gravação de sessão",
+    "text": "Usamos cookies essenciais para o login e as suas preferências. Com a sua permissão, também gravamos como as telas são usadas (cliques, rolagem e navegação, sem o que você digita) com o Hotjar, para melhorar a experiência. Saiba mais na <link>Política de Privacidade</link>.",
+    "accept": "Aceitar",
+    "reject": "Recusar",
+    "settingsTitle": "Cookies e gravação de sessão",
+    "settingsHint": "Gravação de como as telas são usadas (Hotjar), sem o que você digita, para melhorar a experiência. Detalhes na <link>Política de Privacidade</link>.",
+    "optionAccept": "Permitir",
+    "optionReject": "Não permitir",
+    "saved": "Escolha salva."
+  },
+  "privacySettings": {
+    "title": "Privacidade e dados",
+    "exportTitle": "Baixar meus dados",
+    "exportHint": "Arquivo JSON com o seu perfil, grupos, locais que você hospeda, disponibilidade, presenças, partidas e decks.",
+    "export": "Baixar meus dados",
+    "deleteTitle": "Excluir minha conta",
+    "deleteHint": "Apaga o seu login, perfil, foto, decks, disponibilidade, presenças futuras e os locais que você hospeda, e tira você dos grupos. As partidas já registradas continuam no histórico dos grupos como “Jogador removido”. Não dá para desfazer.",
+    "deleteTransfers": "A posse destes grupos passa para o admin (ou o membro) mais antigo: {groups}.",
+    "deleteDeletions": "Estes grupos só têm você e serão apagados: {groups}.",
+    "delete": "Excluir minha conta",
+    "confirmDelete": "Confirmar exclusão definitiva",
+    "confirmHint": "Clique de novo para excluir a conta. Isso não pode ser desfeito.",
+    "deleting": "Excluindo…",
+    "accountDeleted": "Sua conta foi excluída. Obrigado por ter jogado com a gente."
+  },
+  "legal": {
+    "privacy": "Política de Privacidade"
   }
 }

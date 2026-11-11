@@ -225,3 +225,10 @@ sem rolagem horizontal em 320px.
 - **Mensagens de erro de formulário**: aparecem em `role="alert"`, mas ainda não são ligadas ao campo com `aria-describedby`/`aria-invalid` (a maioria dos erros vem do servidor e não é de um campo só).
 - **Campos obrigatórios**: os opcionais estão marcados como "(opcional)"; considerar também um indicador visual nos obrigatórios em formulários longos.
 - **Login com Google**: depende da tela do Google (fora do nosso controle).
+
+## Privacidade e LGPD (11/11/2026)
+
+- **Aviso de cookies**: região com título (`<section aria-labelledby>`), não modal, no fim da ordem de foco. Enquanto está na tela, a página reserva o espaço dele (`scroll-padding-bottom` e `padding-bottom`), para nenhum elemento focado ficar escondido atrás do aviso (2.4.11). "Aceitar" e "Recusar" têm o mesmo estilo e texto visível.
+- **Configurações → Privacidade e dados**: escolha de cookies em `fieldset/legend` com rádios e confirmação em `role="status"`. "Excluir minha conta" usa a confirmação em dois cliques do projeto, com o aviso em `role="alert"` ligado ao botão por `aria-describedby`.
+- **Botão "Voltar"**: link com texto visível, alvo ≥ 24px, no mesmo lugar em todas as páginas internas (3.2.3).
+- **/privacidade**: um `h1`, seções numeradas com `h2` e índice com links para as âncoras; entra no teste axe de páginas públicas.

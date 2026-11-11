@@ -331,7 +331,11 @@
     "notFound": "Cards not found on Scryfall: {names}",
     "gridScore": "Score {score}",
     "gridBracket": "Bracket {value}",
-    "bracketShort": { "2": "1–2", "3": "3", "4": "4–5" },
+    "bracketShort": {
+      "2": "1–2",
+      "3": "3",
+      "4": "4–5"
+    },
     "cards": "{count, plural, =1 {1 card} other {# cards}}",
     "proxies": "{count, plural, =0 {no proxies} =1 {1 proxy} other {# proxies}}",
     "proxy": "Proxy",
@@ -1199,5 +1203,34 @@
     "swapSelected": "{name} picked; tap another player to swap",
     "swapped": "{a} and {b} swapped seats.",
     "swapDone": "Done"
+  },
+  "consent": {
+    "title": "Cookies and session recording",
+    "text": "We use essential cookies for sign-in and your preferences. With your permission, we also record how screens are used (clicks, scrolling and navigation, not what you type) with Hotjar, to improve the experience. Learn more in the <link>Privacy Policy</link>.",
+    "accept": "Accept",
+    "reject": "Decline",
+    "settingsTitle": "Cookies and session recording",
+    "settingsHint": "Recording of how screens are used (Hotjar), not what you type, to improve the experience. Details in the <link>Privacy Policy</link>.",
+    "optionAccept": "Allow",
+    "optionReject": "Don’t allow",
+    "saved": "Choice saved."
+  },
+  "privacySettings": {
+    "title": "Privacy and data",
+    "exportTitle": "Download my data",
+    "exportHint": "JSON file with your profile, groups, places you host, availability, RSVPs, games and decks.",
+    "export": "Download my data",
+    "deleteTitle": "Delete my account",
+    "deleteHint": "Deletes your sign-in, profile, photo, decks, availability, upcoming RSVPs and the places you host, and removes you from your groups. Games already recorded stay in the groups’ history as “Jogador removido” (removed player). This can’t be undone.",
+    "deleteTransfers": "Ownership of these groups goes to the oldest admin (or member): {groups}.",
+    "deleteDeletions": "These groups only have you and will be deleted: {groups}.",
+    "delete": "Delete my account",
+    "confirmDelete": "Confirm permanent deletion",
+    "confirmHint": "Click again to delete your account. This can’t be undone.",
+    "deleting": "Deleting…",
+    "accountDeleted": "Your account was deleted. Thanks for playing with us."
+  },
+  "legal": {
+    "privacy": "Privacy Policy"
   }
 }
