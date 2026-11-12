@@ -100,15 +100,13 @@ test.describe('tema', () => {
 
 test.describe('página inicial com sessão', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
-  test.use({ storageState: AUTH_STATE, reducedMotion: 'reduce' });
+  test.use({ storageState: AUTH_STATE });
 
-  test('fica na página inicial, com botão para o painel; sem animação com "reduzir movimento"', async ({
-    page,
-  }) => {
+  test('fica na página inicial, com botão para o painel', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole('button', { name: 'Reproduzir animação de fundo' })).toBeVisible();
-    expect(await page.locator('video').evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+    // O topo não tem mais vídeo (nem animação de fundo).
+    await expect(page.locator('video')).toHaveCount(0);
     await page.getByRole('banner').getByRole('link', { name: 'Ir para o painel' }).click();
     await expect(page).toHaveURL(/\/painel$/);
   });
