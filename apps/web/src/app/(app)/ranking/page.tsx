@@ -269,7 +269,7 @@ export default async function RankingPage({ searchParams }: Props) {
             </section>
 
             <div className="card">
-              <h3 className="font-semibold">{ts('streaks')}</h3>
+              <h3 className="section-title">{ts('streaks')}</h3>
               <ScrollTable label={ts('streaks')}>
                 <table className="mt-2 w-full text-sm">
                   <caption className="sr-only">{ts('streaksCaption')}</caption>
@@ -313,7 +313,7 @@ export default async function RankingPage({ searchParams }: Props) {
 
             {people.length > 1 && (
               <div className="card">
-                <h3 className="font-semibold">{ts('headToHead')}</h3>
+                <h3 className="section-title">{ts('headToHead')}</h3>
                 <p id="h2h-hint" className="muted mt-1 text-sm">
                   {ts('headToHeadHint')}
                 </p>
@@ -373,7 +373,7 @@ export default async function RankingPage({ searchParams }: Props) {
             )}
 
             <div className="card">
-              <h3 className="font-semibold">{ts('decks')}</h3>
+              <h3 className="section-title">{ts('decks')}</h3>
               {stats.decks.length === 0 ? (
                 <p className="muted mt-2 text-sm">{ts('noDecks')}</p>
               ) : (
@@ -404,7 +404,7 @@ export default async function RankingPage({ searchParams }: Props) {
               )}
             </div>
             <div className="card">
-              <h3 className="font-semibold">{ts('commanders')}</h3>
+              <h3 className="section-title">{ts('commanders')}</h3>
               {stats.commanders.length === 0 ? (
                 <p className="muted mt-2 text-sm">{ts('noDecks')}</p>
               ) : (

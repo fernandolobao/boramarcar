@@ -275,3 +275,7 @@ sem rolagem horizontal em 320px.
 
 - **App**: "Avisos neste celular" é um `Switch` nativo com nome e dica acessíveis (`accessibilityLabel`/`accessibilityHint`); o texto da dica também aparece na tela. A permissão do sistema só é pedida quando a pessoa liga. Permissão negada e falhas aparecem como `accessibilityRole="alert"`, com botão para abrir as configurações do celular.
 - **Notificações**: título e texto curtos, sem depender de cor ou ícone; tocar abre a tela do encontro ou a disponibilidade. Sem som próprio com o app aberto.
+
+## Ranking: títulos das estatísticas (12/11/2026)
+
+- "Sequências e mesa", "Confronto direto", "Decks mais jogados" e "Comandantes do grupo" agora usam o mesmo estilo de título das outras seções (`section-title`, fonte de display), porque cada um é uma carta da pilha e o título é o que fica à mostra na faixa. Continuam `h3` dentro de "Estatísticas" (`h2`), sem pular níveis. Não viraram `<section>` com nome para não duplicar a região "Confronto direto" da tabela com rolagem.
