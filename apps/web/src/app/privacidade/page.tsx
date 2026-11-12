@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { getFormatter, getLocale, getTranslations } from 'next-intl/server';
+import { HistoryBackLink } from '@/components/history-back-link';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
-import { PRIVACY_CONTACT, PRIVACY_POLICY, PRIVACY_UPDATED } from './content';
+import { getSessionUser } from '@/server/session';
+import { CONTACT_EMAIL } from '@/lib/contact';
+import { PRIVACY_POLICY, PRIVACY_UPDATED } from './content';
 
 async function policy() {
   const locale = await getLocale();
@@ -19,6 +23,7 @@ export default async function PrivacyPage() {
   const p = await policy();
   const tc = await getTranslations('common');
   const format = await getFormatter();
+  const signedIn = Boolean(await getSessionUser(await headers()).catch(() => null));
   const updated = format.dateTime(new Date(`${PRIVACY_UPDATED}T12:00:00Z`), {
     dateStyle: 'long',
   });
@@ -33,13 +38,14 @@ export default async function PrivacyPage() {
         <Link href="/" className="rounded-lg py-1">
           <Logo title={tc('appName')} className="h-6 w-auto text-arcano dark:text-pergaminho" />
         </Link>
-        <Link
-          href="/"
+        {/* Volta para onde a pessoa estava (app, configurações ou página inicial). */}
+        <HistoryBackLink
+          fallback={signedIn ? '/painel' : '/'}
           className="inline-flex min-h-6 items-center gap-1.5 text-sm font-medium text-link underline-offset-2 hover:underline"
         >
           <Icon name="back" />
           {tc('back')}
-        </Link>
+        </HistoryBackLink>
       </div>
       <header className="space-y-2">
         <h1 className="page-title">{p.title}</h1>
@@ -47,8 +53,8 @@ export default async function PrivacyPage() {
         <p>{p.intro}</p>
         <p>
           {p.contactLabel}:{' '}
-          <a href={`mailto:${PRIVACY_CONTACT}`} className="text-link underline underline-offset-2">
-            {PRIVACY_CONTACT}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-link underline underline-offset-2">
+            {CONTACT_EMAIL}
           </a>
         </p>
       </header>

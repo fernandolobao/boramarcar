@@ -94,7 +94,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 
 \* A API do Moxfield não é pública e costuma exigir um _User-Agent_ aprovado. Ação: pedir acesso ao Moxfield; enquanto isso, a importação por texto ("Export → Copy for MTGA/Plain text") funciona sempre.
 
-## Fase 4 — Análise de deck (estilo mythic.tools)
+## Fase 4 — Análise de deck
 
 | #    | Item                                                                                                                                                                        | Tamanho | Status                                                           |
 | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------- |

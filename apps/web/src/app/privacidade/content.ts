@@ -21,8 +21,7 @@ export interface PrivacyPolicy {
   sections: PolicySection[];
 }
 
-export const PRIVACY_CONTACT = 'fernando@fernandocamilotti.com';
-export const PRIVACY_UPDATED = '2026-11-11';
+export const PRIVACY_UPDATED = '2026-11-12';
 
 export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
   'pt-BR': {
@@ -36,7 +35,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         id: 'controlador',
         title: '1. Quem cuida dos seus dados',
         paragraphs: [
-          'A ArcanaKin é um projeto independente, sem fins lucrativos, mantido por Fernando Camilotti Monteiro (Porto Alegre, RS), que é o controlador dos dados e também o encarregado pelo tratamento. Para qualquer assunto de privacidade, escreva para o e-mail abaixo.',
+          'A ArcanaKin é um projeto independente e sem fins lucrativos. Ela é a controladora dos dados e também a encarregada pelo tratamento. Para qualquer assunto de privacidade, escreva para o e-mail de contato indicado acima.',
         ],
       },
       {
@@ -159,7 +158,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         id: 'controlador',
         title: '1. Who looks after your data',
         paragraphs: [
-          'ArcanaKin is an independent, non-profit project maintained by Fernando Camilotti Monteiro (Porto Alegre, Brazil), who is the data controller and also the data protection officer. For any privacy matter, write to the e-mail below.',
+          'ArcanaKin is an independent, non-profit project. It is the data controller and also the data protection officer. For any privacy matter, write to the contact e-mail shown above.',
         ],
       },
       {
