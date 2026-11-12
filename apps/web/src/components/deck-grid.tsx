@@ -2,6 +2,7 @@ import { formatRules, isGameFormat } from '@boramarcar/core';
 import type { DeckCover } from '@boramarcar/db';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ViewTransition } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { ColorIdentity } from './deck-visual';
 import { Icon } from './icons';
@@ -64,14 +65,17 @@ export async function DeckGrid({
           >
             <div className="relative aspect-[16/10] bg-gradient-to-br from-ink-200 to-ink-300 dark:from-ink-800 dark:to-ink-700">
               {cover?.artUri && (
-                <Image
-                  src={cover.artUri}
-                  alt=""
-                  fill
-                  unoptimized
-                  sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                />
+                // A arte "vira" a carta do comandante no topo do deck (transição entre telas).
+                <ViewTransition name={`deck-${deck.id}`} share="morph" default="none">
+                  <Image
+                    src={cover.artUri}
+                    alt=""
+                    fill
+                    unoptimized
+                    sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  />
+                </ViewTransition>
               )}
               <span className="absolute top-2 left-2 rounded-full bg-ink-950/80 px-2.5 py-1 text-xs font-medium text-white">
                 {tf(format)}
@@ -83,6 +87,7 @@ export async function DeckGrid({
                   {/* O link cobre o cartão inteiro (::after), mantendo um único alvo de foco. */}
                   <Link
                     href={`/decks/${deck.id}`}
+                    transitionTypes={['nav-forward']}
                     className="after:absolute after:inset-0 after:content-['']"
                   >
                     {deck.name}

@@ -22,6 +22,7 @@ export function NavLinks({
             <li key={link.href}>
               <Link
                 href={link.href}
+                transitionTypes={['nav-section']}
                 aria-current={current ? 'page' : undefined}
                 className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 whitespace-nowrap hover:bg-ink-100 focus-visible:outline-2 focus-visible:outline-brand-500 aria-[current=page]:bg-ink-100 aria-[current=page]:font-semibold dark:hover:bg-ink-800 dark:aria-[current=page]:bg-ink-800"
               >

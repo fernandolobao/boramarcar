@@ -19,6 +19,7 @@ import {
   type CollectionType,
 } from '@boramarcar/core';
 import Image from 'next/image';
+import { HoloLayers } from './holo-effects';
 import Link from 'next/link';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useMemo, useRef, useState } from 'react';
@@ -268,7 +269,9 @@ function GalleryTile({
         type="button"
         aria-haspopup="dialog"
         aria-label={`${t('open', { name: entry.name })} (${t('copies', { count: entry.quantity })})`}
-        className="relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-surface-muted shadow-sm"
+        className={`relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-surface-muted shadow-sm ${
+          entry.foil && image ? 'holo' : ''
+        }`}
         onClick={(e) => onOpen(entry, e.currentTarget)}
       >
         {image ? (
@@ -287,6 +290,7 @@ function GalleryTile({
           </span>
         )}
         {entry.foil && image && <span aria-hidden="true" className="foil-sheen" />}
+        {entry.foil && image && <HoloLayers foil />}
       </button>
       {/* Fora do botão (o nome dele já diz as cópias), para o texto visível bater com o nome. */}
       <span

@@ -55,6 +55,7 @@ export function BackLink({ main }: { main: MainPaths }) {
   return (
     <Link
       href={parentPath(pathname)}
+      transitionTypes={['nav-back']}
       className="inline-flex min-h-6 items-center gap-1.5 rounded-md text-sm font-medium text-link underline-offset-2 hover:underline print:hidden"
       onClick={(e) => {
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;

@@ -213,6 +213,71 @@ input[type='radio'] {
   }
 }
 
+/* ---------- Cartas holográficas (.holo) ----------
+   `HoloEffects` (holo-effects.tsx) define --hx/--hy (−1…1) e --ha (0–1): pela posição do mouse
+   sobre a carta ou, no celular, pela inclinação do aparelho. A carta inclina em 3D, um reflexo
+   segue a luz e, nas foil, uma camada holográfica muda de cor com o ângulo. Decorativo; parado
+   com "reduzir movimento". */
+.holo {
+  --tx: var(--hx, 0);
+  --ty: var(--hy, 0);
+  --ta: var(--ha, 0);
+  transform: perspective(800px) rotateX(calc(var(--ty) * -9deg)) rotateY(calc(var(--tx) * 11deg));
+  transition: transform 0.35s ease-out;
+}
+.holo[data-holo-active] {
+  transition: transform 0.08s linear;
+}
+.holo-glare,
+.holo-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.holo-glare {
+  background: radial-gradient(
+    circle at calc(50% + var(--tx) * 45%) calc(50% + var(--ty) * 45%),
+    rgb(255 255 255 / 0.55),
+    rgb(255 255 255 / 0.1) 35%,
+    transparent 60%
+  );
+  mix-blend-mode: overlay;
+  opacity: calc(var(--ta) * 0.9);
+  transition: opacity 0.3s ease-out;
+}
+.holo-shine {
+  background:
+    repeating-linear-gradient(
+      115deg,
+      #f9b3eb 0%,
+      #e2a6fc 8%,
+      #88a2f8 16%,
+      #a2f5a9 24%,
+      #f6e58d 32%,
+      #f9b3eb 40%
+    ),
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.12) 0 2px, transparent 2px 6px);
+  background-size:
+    300% 300%,
+    100% 100%;
+  background-position:
+    calc(50% + var(--tx) * 60%) calc(50% + var(--ty) * 60%),
+    0 0;
+  mix-blend-mode: color-dodge;
+  opacity: calc(0.18 + var(--ta) * 0.45);
+  filter: saturate(1.2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .holo {
+    transform: none;
+    transition: none;
+  }
+  .holo-glare {
+    display: none;
+  }
+}
+
 /* ---------- Seções empilhadas (pilha de cartas) ----------
    `StackSections` (stack-sections.tsx) decide quais seções grudam (`data-stack="sticky"`) e, a
    cada quadro da rolagem, quanto cada uma sobe (--stack-push), quanto dela fica coberto
@@ -388,6 +453,81 @@ input[type='radio'] {
 @media print {
   .mana-flow {
     display: none;
+  }
+}
+
+/* ---------- Transição entre telas (View Transitions) ----------
+   Classes dadas pelo <ViewTransition> do layout do app (tipos nas <Link>: nav-section,
+   nav-forward, nav-back) e pela arte do deck (share="morph"). Curtas, para não atrasar quem
+   navega rápido; cliques passam para a página durante a transição. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.nav-fade) {
+  animation: 120ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.nav-fade) {
+  animation: 200ms ease-out 60ms both vt-fade;
+}
+::view-transition-old(.nav-forward) {
+  --vt-offset: -40px;
+  animation:
+    140ms ease-in both vt-fade reverse,
+    320ms ease-in-out both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --vt-offset: 40px;
+  animation:
+    200ms ease-out 120ms both vt-fade,
+    320ms ease-in-out both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --vt-offset: 40px;
+  animation:
+    140ms ease-in both vt-fade reverse,
+    320ms ease-in-out both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --vt-offset: -40px;
+  animation:
+    200ms ease-out 120ms both vt-fade,
+    320ms ease-in-out both vt-slide;
+}
+::view-transition-group(.morph) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: vt-via-blur;
+}
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes vt-slide {
+  from {
+    translate: var(--vt-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+@keyframes vt-via-blur {
+  30% {
+    filter: blur(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
 
