@@ -49,6 +49,7 @@ Por que assim:
 - **Mobile no futuro.** O app Expo vai consumir a mesma API REST (`/api/v1`) e importar `@boramarcar/core` para lógica de cliente (ex.: mostrar a curva de mana offline). Nada em `core` depende de Node, React ou banco.
 - **Testabilidade.** Regras ficam em funções puras (testes unitários rápidos); serviços são testados contra Postgres real em memória (PGlite) com as migrations de verdade; route handlers são testados chamando as funções exportadas.
 - **Rotas finas.** Cada route handler só autentica, valida a entrada com Zod e chama um serviço. O wrapper `authed()` em `apps/web/src/server/http.ts` converte `DomainError` em status HTTP.
+- **Matriz de autorização** (`api/v1/__tests__/autorizacao.test.ts`): cada rota com ID na URL é chamada por quem não é do grupo e, nas ações de dono/admin, por um membro comum; exige 403/404 e nenhum dado do recurso no corpo (nome do grupo, título do encontro, endereço, decks, e-mail). Controles confirmam que os mesmos IDs funcionam para quem tem acesso.
 
 ### Erros
 
