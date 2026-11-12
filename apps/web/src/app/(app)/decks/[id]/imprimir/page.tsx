@@ -8,6 +8,7 @@ import { Icon } from '@/components/icons';
 import { PrintButton } from '@/components/print-button';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
+import { pageMetadata } from '@/server/seo';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -18,7 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await requireUser();
   const deck = await getDeck(getDb(), { deckId: id, viewerId: user.id }).catch(() => null);
-  return { title: `${(await getTranslations('decks'))('print')} · ${deck?.name ?? ''}` };
+  return pageMetadata({
+    section: 'deckPrint',
+    path: `/decks/${id}/imprimir`,
+    title: `${(await getTranslations('decks'))('print')} · ${deck?.name ?? ''}`,
+  });
 }
 
 const COLS = 3;

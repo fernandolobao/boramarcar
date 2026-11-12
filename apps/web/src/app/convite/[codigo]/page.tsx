@@ -8,6 +8,7 @@ import { SignInButton } from '@/components/auth-buttons';
 import { JoinInviteButton } from '@/components/invite';
 import { getDb } from '@/server/db';
 import { getSessionUser } from '@/server/session';
+import { inviteMetadata } from '@/server/seo-pages';
 
 type Props = { params: Promise<{ codigo: string }> };
 
@@ -15,12 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { codigo } = await params;
   const t = await getTranslations('invite');
   const group = await getInvitePreview(getDb(), codigo);
-  return {
-    title: t('title'),
-    // Prévia do link no WhatsApp/Telegram mostra o nome do grupo.
-    openGraph: group ? { title: t('heading', { group: group.name }) } : undefined,
-    robots: { index: false },
-  };
+  return inviteMetadata(codigo, group?.name ?? null, t('title'));
 }
 
 export default async function InvitePage({ params }: Props) {

@@ -6,15 +6,13 @@ import {
   listGroupsForBeta,
   listRecentFeedback,
 } from '@boramarcar/db';
-import type { Metadata } from 'next';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { getDb } from '@/server/db';
 import { requireAdmin } from '@/server/admin';
 import { BetaControl } from '@/components/beta-control';
+import { sectionMetadata } from '@/server/seo';
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getTranslations('admin'))('title'), robots: { index: false } };
-}
+export const generateMetadata = sectionMetadata('admin', '/admin');
 
 /** Métricas do beta (8.3) e feedback recente (8.4), só para ADMIN_EMAILS. */
 export default async function AdminPage() {

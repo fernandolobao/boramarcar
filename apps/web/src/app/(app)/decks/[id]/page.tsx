@@ -45,6 +45,7 @@ import { CardNames } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { deckBarBackground, deckBarEdge, deckFlow } from '@boramarcar/tokens/flow';
+import { deckMetadata } from '@/server/seo-pages';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await requireUser();
   const deck = await getDeck(getDb(), { deckId: id, viewerId: user.id }).catch(() => null);
-  return { title: deck?.name ?? (await getTranslations('nav'))('decks') };
+  return deckMetadata(id, deck?.name ?? (await getTranslations('nav'))('decks'));
 }
 
 export default async function DeckPage({ params }: Props) {

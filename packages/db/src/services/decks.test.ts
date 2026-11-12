@@ -12,7 +12,9 @@ import {
   getDeckRatings,
   listDecks,
   listDecksForUsers,
+  getPublicDeckPreview,
   saveImportedDeck,
+  updateDeck,
   setDeckCardProxy,
   upsertCards,
 } from './decks';
@@ -226,6 +228,22 @@ describe('decks', () => {
     await expect(
       saveImportedDeck(db, { ownerId: owner.id, deck: { ...deck, entries: [] }, cards: [] }),
     ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+});
+
+describe('prévia de compartilhamento', () => {
+  it('só decks públicos aparecem, com nome, comandante e arte', async () => {
+    const owner = await createTestUser(db);
+    const saved = await saveImportedDeck(db, { ownerId: owner.id, deck, cards: cardsData });
+    expect(await getPublicDeckPreview(db, saved.id)).toBeNull();
+    await updateDeck(db, { deckId: saved.id, userId: owner.id, visibility: 'public' });
+    expect(await getPublicDeckPreview(db, saved.id)).toMatchObject({
+      name: 'Omnath Ramp',
+      commanders: ['Omnath, Locus of Mana'],
+    });
+    expect(await getPublicDeckPreview(db, 'nao-existe')).toBeNull();
+    // Não interfere na comparação (decks visíveis do mesmo comandante).
+    await deleteDeck(db, { deckId: saved.id, userId: owner.id });
   });
 });
 

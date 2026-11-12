@@ -19,18 +19,20 @@ import '@/styles/mana.css';
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('common');
   return {
-    // URLs absolutas da imagem de compartilhamento (opengraph-image.png): produção ou o preview.
+    // URLs absolutas das imagens de compartilhamento (/og): produção ou o preview.
     metadataBase: new URL(process.env.BETTER_AUTH_URL ?? 'https://www.arcanakin.com.br'),
     title: { default: t('appName'), template: `%s · ${t('appName')}` },
     description: t('tagline'),
     applicationName: t('appName'),
+    // Padrão para páginas sem metadados próprios (cada página usa `server/seo.ts`).
     openGraph: {
       siteName: t('appName'),
       type: 'website',
       title: t('appName'),
       description: t('tagline'),
+      images: [{ url: '/og/s/home', width: 1200, height: 630, alt: t('tagline') }],
     },
-    twitter: { card: 'summary_large_image' },
+    twitter: { card: 'summary_large_image', images: ['/og/s/home'] },
     appleWebApp: { title: t('appName'), statusBarStyle: 'black-translucent' },
     // O Safari/Chrome do iPhone transformava nomes ("Monteiro" é uma cidade), datas e números
     // em links de mapa, agenda e telefone. Endereços e datas reais já têm os nossos links.

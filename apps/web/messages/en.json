@@ -1519,6 +1519,100 @@
       "welcomePending": "Not yet"
     }
   },
+  "meta": {
+    "ogLocale": "en_US",
+    "inviteImage": "{count, plural, =0 {Be the first one in the group} =1 {1 person is already in the group} other {# people are already in the group}}",
+    "invitePreview": "Join {group} on ArcanaKin to schedule your Commander nights together.",
+    "deckPreview": "{commanders} — decklist, mana curve, estimated bracket and analysis on ArcanaKin.",
+    "loginToSee": "Sign in to ArcanaKin to see this page.",
+    "loginCta": "Sign in",
+    "home": {
+      "title": "ArcanaKin",
+      "description": "Schedule your next Commander night: times when everyone can play, meetups, rankings, decks and games in one place."
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "How ArcanaKin handles your data: what we keep, why, for how long and how to delete it."
+    },
+    "invite": {
+      "title": "Group invite",
+      "description": "Join the group to schedule your Commander nights together."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "The next meetup, the times when the table fills up and the group's numbers."
+    },
+    "availability": {
+      "title": "Availability",
+      "description": "Mark when you can play and see when the table fills up."
+    },
+    "events": {
+      "title": "Meetups",
+      "description": "The group's upcoming meetups, with place, time and who's coming."
+    },
+    "event": {
+      "title": "Commander meetup",
+      "description": "Date, place and who's coming. Sign in to ArcanaKin to RSVP."
+    },
+    "history": {
+      "title": "Meetup history",
+      "description": "The meetups and games the group has already played."
+    },
+    "ranking": {
+      "title": "Group ranking",
+      "description": "Standings, streaks, head-to-head and the most played decks."
+    },
+    "decks": {
+      "title": "Decks",
+      "description": "The group's decks with rating, estimated bracket and analysis."
+    },
+    "deck": {
+      "title": "Commander deck",
+      "description": "Decklist, mana curve, estimated bracket and deck analysis."
+    },
+    "deckImport": {
+      "title": "Import deck",
+      "description": "Bring your deck from Moxfield, Archidekt or a text list."
+    },
+    "deckPrint": {
+      "title": "Print proxies",
+      "description": "The deck's cards ready to print and playtest."
+    },
+    "collection": {
+      "title": "Collection",
+      "description": "The cards you own and what the collection is worth."
+    },
+    "group": {
+      "title": "Group",
+      "description": "Members, invite, places and group settings."
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "Your decks, achievements and numbers at the table."
+    },
+    "player": {
+      "title": "Player profile",
+      "description": "A group player's decks, achievements and numbers."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Notifications, language, theme and your data."
+    },
+    "feedback": {
+      "title": "Send feedback",
+      "description": "Tell us what works, what gets in the way and what's missing in ArcanaKin."
+    },
+    "table": {
+      "title": "Table mode",
+      "description": "Each player's life, poison and monarch, right from your phone at the table."
+    },
+    "admin": {
+      "title": "Beta metrics",
+      "description": "ArcanaKin beta metrics."
+    },
+    "homeImage": "Schedule your next Commander night.",
+    "homeImageSubtitle": "Times when everyone can play, meetups, rankings, decks and games in one place."
+  },
   "beta": {
     "title": "Your group is in the ArcanaKin beta",
     "body": "Week {week} of {weeks}, until {until}. Tell us what works, what gets in the way and what's missing: every message is read.",

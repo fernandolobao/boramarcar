@@ -27,6 +27,7 @@ import { isDomainError } from '@boramarcar/core';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { StackSections } from '@/components/stack-sections';
 import { EmptyState } from '@/components/empty-state';
+import { pageMetadata } from '@/server/seo';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -35,7 +36,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await requireUser();
   const event = await getEventDetail(getDb(), { eventId: id, userId: user.id }).catch(() => null);
-  return { title: event?.title ?? (await getTranslations('nav'))('events') };
+  return pageMetadata({
+    section: 'event',
+    path: `/eventos/${id}`,
+    title: event?.title ?? (await getTranslations('nav'))('events'),
+  });
 }
 
 export default async function EventPage({ params }: Props) {

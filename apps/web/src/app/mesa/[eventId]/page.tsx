@@ -6,11 +6,17 @@ import { TableMode } from '@/components/table/table-mode';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { getTableSetup } from '@/server/table-setup';
+import { pageMetadata } from '@/server/seo';
 
 type Props = { params: Promise<{ eventId: string }> };
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getTranslations('table'))('title') };
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { eventId } = await params;
+  return pageMetadata({
+    section: 'table',
+    path: `/mesa/${eventId}`,
+    title: (await getTranslations('table'))('title'),
+  });
 }
 
 /** Modo mesa em tela cheia (fora do layout do app, para caber no celular deitado na mesa). */

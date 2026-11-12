@@ -1139,3 +1139,24 @@ export async function compareWithCommanderDecks(
   };
   return compareWithDecks(target, others);
 }
+
+/**
+ * Prévia de compartilhamento de um deck **público** (nome, formato, comandantes e arte), para
+ * quem ainda não entrou: decks "do grupo" ou privados devolvem `null` e não aparecem na prévia.
+ */
+export async function getPublicDeckPreview(db: Database, deckId: string) {
+  const [deck] = await db
+    .select({ id: decks.id, name: decks.name, format: decks.format, visibility: decks.visibility })
+    .from(decks)
+    .where(eq(decks.id, deckId))
+    .limit(1);
+  if (!deck || deck.visibility !== 'public') return null;
+  const cover = (await getDeckCovers(db, [deck.id])).get(deck.id);
+  return {
+    id: deck.id,
+    name: deck.name,
+    format: deck.format,
+    commanders: cover?.cards.map((c) => c.name) ?? [],
+    artUri: cover?.artUri ?? null,
+  };
+}

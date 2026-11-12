@@ -8,6 +8,7 @@ import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
 import { CONTACT_EMAIL } from '@/lib/contact';
 import { PRIVACY_POLICY, PRIVACY_UPDATED } from './content';
+import { pageMetadata } from '@/server/seo';
 
 async function policy() {
   const locale = await getLocale();
@@ -15,7 +16,12 @@ async function policy() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await policy()).title };
+  return pageMetadata({
+    section: 'privacy',
+    path: '/privacidade',
+    title: (await policy()).title,
+    index: true,
+  });
 }
 
 /** Política de Privacidade (LGPD): pública, sem login, nos dois idiomas. */

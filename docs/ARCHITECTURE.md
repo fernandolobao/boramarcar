@@ -270,6 +270,12 @@ Foil é contado por cópia, como as proxies: numa linha (carta + edição) podem
 
 Toda página fora da navegação principal (deck, encontro, jogador, perfil, configurações, importar, imprimir, histórico) mostra "Voltar" no topo, pelo layout do app (`components/back-link.tsx`), então páginas novas ganham o botão sozinhas. Com página anterior no app, volta para ela (`router.back()`); entrando direto pelo link, vai para a página "mãe" (`/decks/x/imprimir` → `/decks/x`, `/jogadores/x` → `/grupo`, `/perfil` → `/painel`). É um link de verdade, então Ctrl/Cmd+clique abre a página mãe em outra aba.
 
+## Metadados e prévias de link
+
+- **Toda página** usa `server/seo.ts` (`pageMetadata`, `navMetadata`): título, descrição (`messages` → `meta.<seção>`), `canonical`, Open Graph e Twitter com imagem 1200×630. Só a home e a privacidade são indexáveis (`robots.ts`, `sitemap.ts`); o resto leva `noindex`.
+- **Imagens** (`app/og/[...slug]`, `server/og`): `/og/s/<seção>` (título e descrição da seção; a home usa a frase da marca), `/og/deck/<id>` (deck **público**: nome, comandantes e arte do comandante ao lado, como na página do deck; os demais caem na imagem de deck) e `/og/convite/<código>` (nome do grupo e quantas pessoas). O visual segue a plataforma (tema claro dos tokens: fundo pergaminho, cartão claro com borda e faixa roxa, título em Fraunces, etiqueta dourada), independente da landing. Fonte Fraunces 600, símbolo e logotipo embutidos (`server/og/assets.ts`); cache de um dia na CDN.
+- **Robôs de prévia** (WhatsApp, Telegram, Slack, Discord, buscadores…) não têm login: em vez do redirecionamento para a home, o `proxy.ts` reescreve a área logada para `/previa/...`, que mostra só o que é público — a prévia da seção, ou o deck se ele for público. Encontros, perfis e o resto nunca expõem dados do grupo. Pessoas sem login continuam indo para a home.
+
 ## Lista de decks: nota e bracket
 
 Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e o bracket mínimo de cada deck, pela mesma conta da página do deck (`getDeckRatings`). As proxies ficam só na página do deck.
