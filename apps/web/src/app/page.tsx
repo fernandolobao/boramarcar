@@ -9,10 +9,17 @@ import { Icon, type IconName } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
 import { CONTACT_EMAIL } from '@/lib/contact';
+import { pageMetadata } from '@/server/seo';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('home');
-  return { title: { absolute: t('metaTitle') }, description: t('metaDescription') };
+  return pageMetadata({
+    section: 'home',
+    path: '/',
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    index: true,
+  });
 }
 
 const FEATURES = [

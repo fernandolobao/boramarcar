@@ -6,6 +6,7 @@ import { EventStatusBadge } from '@/components/event-manage';
 import { Icon } from '@/components/icons';
 import { getDb } from '@/server/db';
 import { requireUserAndGroup } from '@/server/require-group';
+import { pageMetadata } from '@/server/seo';
 
 const STATUSES = ['finished', 'scheduled', 'cancelled'] as const;
 type Status = (typeof STATUSES)[number];
@@ -15,7 +16,11 @@ type Props = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getTranslations('history'))('title') };
+  return pageMetadata({
+    section: 'history',
+    path: '/eventos/historico',
+    title: (await getTranslations('history'))('title'),
+  });
 }
 
 /** Histórico de encontros (2.10): busca por texto, situação e jogador, com paginação. */

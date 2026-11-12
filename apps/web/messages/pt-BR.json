@@ -1475,5 +1475,97 @@
     "feedbackFrom": "{name} · {platform} · {date}",
     "metric": "Métrica",
     "value": "Valor"
+  },
+  "meta": {
+    "ogLocale": "pt_BR",
+    "inviteImage": "{count, plural, =0 {Seja a primeira pessoa do grupo} =1 {1 pessoa já está no grupo} other {# pessoas já estão no grupo}}",
+    "invitePreview": "Entre no grupo {group} no ArcanaKin para marcar os encontros de Commander juntos.",
+    "deckPreview": "{commanders} — lista, curva de mana, bracket estimado e análise no ArcanaKin.",
+    "loginToSee": "Entre no ArcanaKin para ver esta página.",
+    "loginCta": "Entrar",
+    "home": {
+      "title": "ArcanaKin",
+      "description": "Marque o próximo Commander com a sua mesa: horários em que todo mundo pode, encontros, ranking, decks e partidas num lugar só."
+    },
+    "privacy": {
+      "title": "Política de privacidade",
+      "description": "Como o ArcanaKin trata os seus dados: o que guardamos, por quê, por quanto tempo e como apagar."
+    },
+    "invite": {
+      "title": "Convite para um grupo",
+      "description": "Entre no grupo para marcar os encontros de Commander juntos."
+    },
+    "dashboard": {
+      "title": "Painel",
+      "description": "O próximo encontro, os horários em que a mesa fecha e os números do grupo."
+    },
+    "availability": {
+      "title": "Disponibilidade",
+      "description": "Marque quando você pode jogar e veja quando a mesa fecha."
+    },
+    "events": {
+      "title": "Encontros",
+      "description": "Os próximos encontros do grupo, com local, horário e quem confirmou."
+    },
+    "event": {
+      "title": "Encontro de Commander",
+      "description": "Data, local e quem vai. Entre no ArcanaKin para confirmar presença."
+    },
+    "history": {
+      "title": "Histórico de encontros",
+      "description": "Os encontros e as partidas que o grupo já jogou."
+    },
+    "ranking": {
+      "title": "Ranking do grupo",
+      "description": "Classificação, sequências, confrontos diretos e os decks mais jogados."
+    },
+    "decks": {
+      "title": "Decks",
+      "description": "Os decks do grupo com nota, bracket estimado e análise."
+    },
+    "deck": {
+      "title": "Deck de Commander",
+      "description": "Lista, curva de mana, bracket estimado e análise do deck."
+    },
+    "deckImport": {
+      "title": "Importar deck",
+      "description": "Traga o seu deck do Moxfield, do Archidekt ou de uma lista em texto."
+    },
+    "deckPrint": {
+      "title": "Imprimir proxies",
+      "description": "As cartas do deck prontas para imprimir e testar na mesa."
+    },
+    "collection": {
+      "title": "Coleção",
+      "description": "As cartas que você tem e o valor da coleção."
+    },
+    "group": {
+      "title": "Grupo",
+      "description": "Membros, convite, locais e configurações do grupo."
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "Os seus decks, conquistas e números nas mesas."
+    },
+    "player": {
+      "title": "Perfil de jogador",
+      "description": "Decks, conquistas e números de um jogador do grupo."
+    },
+    "settings": {
+      "title": "Configurações",
+      "description": "Avisos, idioma, tema e os seus dados."
+    },
+    "feedback": {
+      "title": "Enviar feedback",
+      "description": "Conte o que funciona, o que trava e o que falta no ArcanaKin."
+    },
+    "table": {
+      "title": "Modo mesa",
+      "description": "Vida, veneno e monarca de cada jogador, direto do celular na mesa."
+    },
+    "admin": {
+      "title": "Métricas do beta",
+      "description": "Métricas do beta do ArcanaKin."
+    }
   }
 }

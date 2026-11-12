@@ -8,6 +8,7 @@ import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { GOLD_FLOW } from '@boramarcar/tokens/flow';
+import { pageMetadata } from '@/server/seo';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -18,7 +19,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const profile = await getPlayerProfile(getDb(), { userId: id, viewerId: user.id }).catch(
     () => null,
   );
-  return { title: profile?.name ?? (await getTranslations('nav'))('profile') };
+  // O nome aparece na aba de quem já entrou; a prévia de link (sem login) é genérica.
+  return pageMetadata({
+    section: 'player',
+    path: `/jogadores/${id}`,
+    title: profile?.name ?? (await getTranslations('nav'))('profile'),
+  });
 }
 
 /** Perfil de outro jogador: visível para quem divide um grupo com ele. */
