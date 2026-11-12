@@ -124,7 +124,7 @@ Objetivo: o grupo para de usar enquete e passa a marcar pelo app.
 | 5.6 | Modo "mesa": registrar partida rapidamente durante o jogo (com contador de vida opcional)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | G       | ✅ no site (`/mesa/:encontro`) e no app                                                                                   |
 | 5.7 | Publicação nas lojas (EAS Build/Submit), ícones, splash, política de privacidade                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | M       | depois do rebranding (6.x): nome, ícone e identificador do app vão para as lojas                                          |
 | 5.8 | Deck no app: ver o deck (cartas, edições, curva e nota da análise) sem abrir o site; editar continua no site                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | M       | ✅ (cartas por tipo, carta grande com verso e edição, curva, funções, nota, bracket e validação)                          |
-| 5.9 | **Scan de cartas pela câmera**: aponta o celular para uma ou várias cartas e elas entram no deck (ou numa lista para importar), como nos apps de coleção. Lê o nome e, nas cartas modernas, o código da edição e o número de colecionador no rodapé, para achar a impressão exata no Scryfall (`/cards/:set/:número`; sem isso, busca aproximada pelo nome). Modo contínuo com som/vibração a cada carta, lista para conferir e corrigir antes de salvar, quantidade e idioma. Reconhecimento de texto no aparelho (sem enviar imagens a terceiros), o que exige build próprio, fora do Expo Go | G       |                                                                                                                           |
+| 5.9 | **Scan de cartas pela câmera**: aponta o celular para uma ou várias cartas e elas entram no deck (ou numa lista para importar), como nos apps de coleção. Lê o nome e, nas cartas modernas, o código da edição e o número de colecionador no rodapé, para achar a impressão exata no Scryfall (`/cards/:set/:número`; sem isso, busca aproximada pelo nome). Modo contínuo com som/vibração a cada carta, lista para conferir e corrigir antes de salvar, quantidade e idioma. Reconhecimento de texto no aparelho (sem enviar imagens a terceiros), o que exige build próprio, fora do Expo Go | G       | **Depois, só com demanda** (decidido em 12/11/2026): caro e é o forte de concorrentes maduros; ver Fase 8                 |
 
 ## Fase 6 — Rebranding para ArcanaKin
 
@@ -156,6 +156,30 @@ Objetivo: quem chega (por convite ou pela página inicial) entende o app e faz a
 
 **Decidido — o guia pode ser pulado:** o primeiro acesso guiado (7.1) nunca é obrigatório. Dá para pular a qualquer momento (grava "pulou o guia") e retomar depois pelos primeiros passos do painel (7.2).
 
+## Fase 8 — Beta assistido e crescimento
+
+Posicionamento: **o hub da mesa de Magic** — onde o grupo combina a próxima partida, registra a mesa e guarda a própria história (antes, durante e depois do encontro). O ArcanaKin não precisa substituir Moxfield, Archidekt, Magic Companion nem os trackers de partidas; traz os decks e as partidas para o contexto do grupo. Foco inicial: grupos casuais de Commander que jogam presencialmente com regularidade no Brasil.
+
+Ciclo principal: **convite → disponibilidade → encontro → partida registrada → histórico → próximo encontro.**
+
+**Métrica norte:** grupos ativos com pelo menos um encontro realizado **e** uma partida registrada numa janela de 28 dias. Calculada direto do banco (sem ferramenta de analytics nem dado pessoal novo). Métricas de apoio: ativação (grupo novo com 3+ membros e primeiro encontro), conversão de convite, encontros que fecham a mesa, encontros que geram partida, retenção de grupos em 4 e 8 semanas, decks ligados às partidas.
+
+| #   | Item                                                                                                                                                                                                 | Tamanho | Status |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ |
+| 8.1 | **Matriz de autorização**: teste que roda cada rota da API como não membro / membro / admin / dono, em grupos e decks diferentes, conferindo o status **e** que o corpo não traz dados alheios       | M       |        |
+| 8.2 | **Limites restantes**: entrar por convite, criar grupo, trocar convite e o relatório de CSP; na importação, redirecionamento controlado e tamanho máximo da resposta                                 | P       |        |
+| 8.3 | **Métrica norte e ativação** (junto com 7.6): consulta agregada no banco e um relatório periódico para o dono do projeto (sem dados pessoais)                                                        | M       |        |
+| 8.4 | **Feedback no app** (site e mobile): canal simples para o beta contar o que travou                                                                                                                   | P       |        |
+| 8.5 | **Beta assistido**: 5 grupos por 8 semanas (criação, convite, primeira agenda; depois registro e histórico), com 8–12 entrevistas com organizadores e jogadores. Não é código: acompanhar numa issue | —       |        |
+| 8.6 | **Recap pós-encontro e resumo mensal do grupo** (e-mail/push, que já existem), compartilhável sem expor dados privados                                                                               | M       |        |
+| 8.7 | **Alertas** no Sentry (erro novo, pico de erros) e aviso quando um cron falhar                                                                                                                       | P       |        |
+| 8.8 | **Medir o registro pós-jogo** (tempo até registrar, encontros que viram partida) antes de simplificar o formulário/modo mesa                                                                         | P       |        |
+| 8.9 | **Parcerias-piloto** com 1–3 lojas/comunidades (QR para grupos e encontros casuais), só depois do beta                                                                                               | —       |        |
+
+**Decidido — monetização (12/11/2026):** nada de anúncios, billing ou paywall sem decisão explícita do dono do projeto, e não antes de sinais de retenção. Princípios: organizar e participar de encontros nunca depende de pagamento; não vendemos dados pessoais, listas de membros nem histórico; patrocínio e afiliados ficam separados das análises, recomendações e rankings, e são identificados. Modelos a testar no futuro (sem compromisso): assinatura individual de recursos avançados, plano de grupo, patrocínio de lojas.
+
+**Decidido — escopo:** não expandir agora para marketplace, scanner de coleção (5.9) ou rede social genérica.
+
 ## Transversal (contínuo)
 
 | Item                                                                                                                                                                                   | Tamanho |
@@ -183,7 +207,8 @@ Objetivo: quem chega (por convite ou pela página inicial) entende o app e faz a
 5. **Semana 10–13 — análise (4.5–4.9).** Começar pelo Tagger (4.5), que melhora todo o resto.
 6. ✅ **Mobile (Fase 5), primeira parte:** app com login, encontros, disponibilidade, ranking, decks e modo mesa.
 7. **Depois — rebranding (Fase 6)** e, em seguida, a publicação nas lojas (5.7).
-8. **Onboarding (Fase 7)** antes de divulgar para outros grupos: começar por 7.3 e 7.2 (baratos e com mais efeito), depois 7.1.
+8. ✅ **Onboarding (Fase 7), primeira parte:** 7.3 e 7.2. Depois, 7.1.
+9. **Beta assistido (Fase 8):** primeiro confiança (8.1, 8.2), medição (8.3) e feedback (8.4); depois o beta com 5 grupos (8.5) e o recap (8.6).
 
 ### Definição de pronto (para cada item)
 
@@ -195,9 +220,10 @@ Objetivo: quem chega (por convite ou pela página inicial) entende o app e faz a
 
 ## Decisões em aberto
 
-- **Onboarding (Fase 7):** quais eventos de ativação medir (7.6)?
+- **Onboarding (Fase 7):** quais eventos de ativação medir (7.6)? Proposta: os da métrica norte da Fase 8, calculados do banco.
+- **Concorrentes:** a comparação usada no plano de crescimento (Playgroup.gg, Magic Companion, TurnZero HQ, Mythic Tools, WUBRG, Mapa TCG) veio de páginas públicas e não foi verificada; conferir antes de usar em decisão comercial.
 
-- **Scan de cartas (5.9):** escolher a biblioteca de reconhecimento de texto no aparelho (ex.: ML Kit) e decidir se o scan também alimenta uma coleção (3.x) ou só decks; avaliar uma versão no site com a câmera do navegador.
+- **Scan de cartas (5.9):** adiado (Fase 8). Se voltar: escolher a biblioteca de reconhecimento de texto no aparelho (ex.: ML Kit) e decidir se alimenta a coleção ou só decks.
 
 - **Rebranding:** o nome ArcanaKin, a paleta e o símbolo (provisório, pode ser trocado em `public/brand/simbolo.svg` + `scripts/brand-icons.mjs`) estão aplicados. Não usar "Bora Marcar" em lugares novos (os nomes internos `boramarcar` só mudam no item 6.6).
 
