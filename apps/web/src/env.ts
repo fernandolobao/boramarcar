@@ -15,6 +15,10 @@ const schema = z.object({
   EMAIL_FROM: z.string().min(3).default('ArcanaKin <onboarding@resend.dev>'),
   /** Segredo que a Vercel envia no header Authorization ao chamar os cron jobs. */
   CRON_SECRET: z.string().min(16).optional(),
+  /** Token de acesso do Expo para o envio de push (opcional; só se a segurança extra estiver ligada no Expo). */
+  EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
+  /** `off` desliga o envio de notificações push. */
+  PUSH_NOTIFICATIONS: z.enum(['on', 'off']).default('on'),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -39,6 +43,8 @@ export function getEnv(): Env {
       RESEND_API_KEY: process.env.RESEND_API_KEY,
       EMAIL_FROM: process.env.EMAIL_FROM ?? 'ArcanaKin <onboarding@resend.dev>',
       CRON_SECRET: process.env.CRON_SECRET,
+      EXPO_ACCESS_TOKEN: process.env.EXPO_ACCESS_TOKEN,
+      PUSH_NOTIFICATIONS: process.env.PUSH_NOTIFICATIONS === 'off' ? 'off' : 'on',
     };
     return cached;
   }

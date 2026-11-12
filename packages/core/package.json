@@ -19,7 +19,8 @@
     "./achievements": "./src/achievements/index.ts",
     "./currency": "./src/currency/index.ts",
     "./places": "./src/places/index.ts",
-    "./table": "./src/table/index.ts"
+    "./table": "./src/table/index.ts",
+    "./push": "./src/push/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p contract",

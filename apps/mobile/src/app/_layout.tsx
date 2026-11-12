@@ -3,8 +3,15 @@ import { StatusBar } from 'expo-status-bar';
 import { authClient } from '@/lib/auth';
 import { GroupProvider } from '@/lib/group';
 import { t } from '@/lib/i18n';
+import { usePushNotifications } from '@/lib/push';
 import { useColors } from '@/lib/theme';
 import { Loading } from '@/components/ui';
+
+/** Na área logada: renova o token de push e abre a tela de um aviso tocado. */
+function PushNotifications() {
+  usePushNotifications();
+  return null;
+}
 
 /** Raiz: sessão do Better Auth; sem sessão só a tela de entrada fica acessível. */
 export default function RootLayout() {
@@ -36,7 +43,14 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="auto" />
-      {signedIn ? <GroupProvider>{content}</GroupProvider> : content}
+      {signedIn ? (
+        <GroupProvider>
+          {content}
+          <PushNotifications />
+        </GroupProvider>
+      ) : (
+        content
+      )}
     </>
   );
 }

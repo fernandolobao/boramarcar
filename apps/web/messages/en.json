@@ -1341,5 +1341,27 @@
       "Land": "Land",
       "Battle": "Battle"
     }
+  },
+  "push": {
+    "created": {
+      "title": "New game night in {group}",
+      "body": "{title} · {when}. Tap to say if you're going."
+    },
+    "updated": {
+      "title": "Game night changed",
+      "body": "{title} · {when}"
+    },
+    "cancelled": {
+      "title": "Game night cancelled",
+      "body": "{title} · {when}"
+    },
+    "reminder": {
+      "title": "Reminder: {title}",
+      "body": "{when} · {where}"
+    },
+    "window": {
+      "title": "The table is full in {group}!",
+      "body": "{count} players can play {when}. Shall we schedule it?"
+    }
   }
 }

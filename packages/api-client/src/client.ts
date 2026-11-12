@@ -119,6 +119,15 @@ export function createApiClient(options: ApiClientOptions) {
             }),
           )
         ).deletion,
+      /** Liga as notificações push neste aparelho (token do Expo). */
+      registerPushToken: (token: string, platform: 'ios' | 'android') =>
+        request('POST', '/me/push-tokens', z.object({ registered: z.literal(true) }), {
+          token,
+          platform,
+        }),
+      /** Desliga as notificações push neste aparelho. */
+      removePushToken: (token: string) =>
+        request('DELETE', '/me/push-tokens', z.object({ removed: z.literal(true) }), { token }),
       /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
       deleteAccount: () =>
         request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {

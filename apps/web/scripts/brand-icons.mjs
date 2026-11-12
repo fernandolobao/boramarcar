@@ -106,6 +106,12 @@ const outputs = [
     size: 432,
     html: square(432, { scale: 0.48, color: '#ffffff' }),
   },
+  // Ícone das notificações no Android: silhueta branca em fundo transparente.
+  {
+    file: join(mobile, 'assets/notification-icon.png'),
+    size: 96,
+    html: square(96, { scale: 0.83, color: '#ffffff' }),
+  },
   // Abertura do app: símbolo dourado (fundo Noite em app.json).
   { file: join(mobile, 'assets/splash-icon.png'), size: 1024, html: square(1024, { scale: 0.8 }) },
 ];

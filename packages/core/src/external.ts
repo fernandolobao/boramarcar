@@ -10,6 +10,7 @@ export const EXTERNAL_TIMEOUT_MS = {
   places: 5_000,
   ptax: 4_000,
   email: 8_000,
+  push: 8_000,
 } as const;
 
 /**

@@ -170,6 +170,13 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - **Conteúdo**: `server/email.ts` monta HTML (texto escapado) e texto puro no idioma (`user.locale`) e no fuso (`user.time_zone`) de quem recebe, com o `.ics` anexo (mesmo UID/SEQUENCE do download, então a agenda atualiza o evento). `core/email` fala com a API do Resend, um e-mail por destinatário.
 - **Opt-out**: `user.email_notifications`, no perfil. Sem `RESEND_API_KEY`, nada é enviado.
 
+## Notificações push (app)
+
+- **Mesmos avisos do e-mail** (encontro novo, alterado, cancelado, lembrete e "a mesa fechou!"), com a mesma regra de quem recebe, mas sem depender do opt-out de e-mail: quem não quer push simplesmente não liga no celular. Saem junto com os e-mails em `server/notify.ts`; uma falha num canal não afeta o outro.
+- **Aparelhos**: tabela `push_tokens` (token do Expo → pessoa, plataforma, último uso). `POST/DELETE /api/v1/me/push-tokens` (o token é validado no formato do Expo). Se outra pessoa entrar no mesmo celular, o token passa para ela. Excluir a conta apaga os tokens; a exportação de dados lista os aparelhos (sem o token).
+- **Envio** (`core/push`, `server/push.ts`): API do Expo Push em lotes de 100, com tempo máximo; tokens que voltam como `DeviceNotRegistered` são apagados. Texto curto no idioma e fuso de quem recebe (namespace `push` das mensagens) e `data.url` com a tela do app (`/encontros/:id` ou `/disponibilidade`). `PUSH_NOTIFICATIONS=off` desliga; `EXPO_ACCESS_TOKEN` só se a segurança extra do Expo estiver ligada.
+- **App** (`lib/push.ts`, `components/push-setting.tsx`): "Avisos neste celular" na Conta; a permissão do sistema só é pedida ao ligar. A escolha fica no SecureStore; ao entrar, o token é renovado. Tocar num aviso abre a tela dele (também com o app fechado). Sair da conta desliga os avisos do aparelho. Canal `default` no Android e ícone monocromático (`assets/notification-icon.png`). Push remoto precisa de build próprio (EAS) com `extra.eas.projectId`; no Expo Go do Android não funciona.
+
 ## Perfis, visibilidade e conquistas
 
 - **Visibilidade do deck** (`decks.visibility`): `private` (só o dono), `group` (padrão: quem divide grupo com o dono) e `public` (qualquer pessoa com conta e o link). Vale para a página do deck e para o perfil.
