@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { printLabel } from './print-picker';
+import { useLightDismiss } from './use-light-dismiss';
 
 /** O que o diálogo precisa saber de uma carta (os campos vêm do cache do Scryfall). */
 export interface DialogCard {
@@ -63,6 +64,7 @@ export function CardDialog({
   const tc = useTranslations('common');
   const format = useFormatter();
   const ref = useRef<HTMLDialogElement>(null);
+  useLightDismiss(ref);
   const titleId = useId();
 
   useEffect(() => {

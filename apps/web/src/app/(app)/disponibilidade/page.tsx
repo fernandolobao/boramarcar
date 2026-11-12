@@ -23,6 +23,7 @@ import { requireUserAndGroup } from '@/server/require-group';
 import { Icon } from '@/components/icons';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { StackSections } from '@/components/stack-sections';
+import { EmptyState } from '@/components/empty-state';
 
 export const generateMetadata = navMetadata('availability');
 
@@ -106,7 +107,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
             {t('windows')}
           </h2>
           {windows.length === 0 ? (
-            <p className="muted">{t('empty')}</p>
+            <EmptyState>{t('empty')}</EmptyState>
           ) : (
             <ul className="divide-y divide-ink-200 dark:divide-ink-800">
               {windows.map((w) => (
@@ -178,7 +179,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
             {t('myRules')}
           </h2>
           {myRules.length === 0 ? (
-            <p className="muted">{t('noRules')}</p>
+            <EmptyState>{t('noRules')}</EmptyState>
           ) : (
             <ul className="divide-y divide-ink-200 dark:divide-ink-800">
               {myRules.map((rule) => (
@@ -232,7 +233,7 @@ export default async function AvailabilityPage({ searchParams }: Props) {
             {t('everyone')}
           </h2>
           {slots.length === 0 ? (
-            <p className="muted">{t('empty')}</p>
+            <EmptyState>{t('empty')}</EmptyState>
           ) : (
             <ul className="divide-y divide-ink-200 dark:divide-ink-800">
               {slots.map((slot) => (

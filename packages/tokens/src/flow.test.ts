@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { contrastRatio, themes } from './index';
 import {
   collectionFlow,
+  deckBarBackground,
+  MANA_BAR_COLORS,
   DEFAULT_FLOW,
   deckFlow,
   flowFromWeights,
@@ -104,5 +107,23 @@ describe('normalizeFlow e sampleFlow', () => {
       expect(r).toBeGreaterThanOrEqual(g!);
       expect(g).toBeGreaterThanOrEqual(b!);
     }
+  });
+});
+
+describe('barras nas cores do deck', () => {
+  it('cada cor tem contraste ≥ 3:1 com a superfície nos dois temas', () => {
+    for (const theme of ['light', 'dark'] as const) {
+      for (const color of Object.values(MANA_BAR_COLORS[theme])) {
+        expect(contrastRatio(color, themes[theme].surface)).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  it('uma cor, degradê na ordem WUBRG ou incolor', () => {
+    expect(deckBarBackground(['G'], 'light')).toBe(MANA_BAR_COLORS.light.G);
+    expect(deckBarBackground(['G', 'U'], 'dark')).toBe(
+      `linear-gradient(135deg, ${MANA_BAR_COLORS.dark.U}, ${MANA_BAR_COLORS.dark.G})`,
+    );
+    expect(deckBarBackground([], 'light')).toBe(MANA_BAR_COLORS.light.C);
   });
 });

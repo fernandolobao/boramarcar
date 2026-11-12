@@ -244,6 +244,19 @@ sem rolagem horizontal em 320px.
 - **Holo**: decorativo (camadas `aria-hidden`, nada depende do efeito). Inclinação pequena (até ~11°), sem piscar. Desligado por completo com `prefers-reduced-motion` (sem listeners de mouse nem de orientação). No celular, segue a orientação do aparelho só nas cartas à vista; no iPhone, a permissão de movimento é pedida no primeiro toque numa carta e pode ser negada sem prejuízo.
 - **Transições entre telas**: esmaecer e deslize de 40 px, ≤ 400 ms; com "reduzir movimento", duração zero. O foco e o anúncio da página nova são os de sempre (a transição é só visual), e cliques não ficam bloqueados durante a animação.
 
+## Identidade visual (11/11/2026)
+
+- **Arte no topo** (painel e encontro): decorativa (`aria-hidden`, fundo em CSS), sob uma camada escura que mantém o texto claro com ≥ 7:1 mesmo sobre uma arte branca.
+- **Barras nas cores do deck**: cada cor de mana tem um tom por tema com ≥ 3:1 contra a superfície (WCAG 1.4.11, teste em `tokens/flow.test.ts`); o valor de cada barra continua em texto. A barra selecionada da curva tem contorno, além do `aria-pressed` do botão.
+- **Pódio**: texto escuro (noite) sobre ouro (8,1:1), prata (9,4:1) e bronze (6,3:1); reflexo animado só sem "reduzir movimento".
+- **Estados vazios**: símbolos de mana decorativos (`aria-hidden`); a mensagem é o texto.
+- **Fonte de display**: só nos títulos; `font-display: swap` e fontes de reserva serifadas (Georgia).
+
+## Fechar diálogos clicando fora (11/11/2026)
+
+- Todos os `<dialog>` modais do site (carta, edição, opções do jogador na mesa) fecham com um clique no fundo escurecido (`useLightDismiss`), além do Esc e do botão "Fechar", que continuam sendo o caminho para teclado e leitor de tela. O clique só conta se começou e terminou fora da caixa: arrastar uma seleção de texto para fora não fecha. Ao fechar, o foco volta para o botão que abriu.
+- No app, os modais são de tela cheia (sem fundo à mostra); fecham pelo botão "Fechar" e pelo voltar do Android.
+
 ## Carregamento e ações (11/11/2026)
 
 - **Toda ação na API** (`useApiAction`) deixa o botão que a disparou com `aria-busy="true"`. O ícone do botão vira um indicador girando (parado com "reduzir movimento") e o botão fica desabilitado **durante a espera pelo servidor**; antes, só ficava desabilitado depois da resposta. Uma ação de cada vez: clique duplo e Enter + "perdeu o foco" não repetem a ação.

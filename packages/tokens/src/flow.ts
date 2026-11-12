@@ -142,3 +142,39 @@ export function sampleFlow(
   const b = hex(next.color);
   return [0, 1, 2].map((j) => Math.round(a[j]! + (b[j]! - a[j]!) * k)) as [number, number, number];
 }
+
+/**
+ * Cor das barras de gráfico por cor de mana (curva, nota, chances), com contraste ≥ 3:1 sobre a
+ * superfície dos cartões no tema claro e no escuro (WCAG 1.4.11; testado em `flow.test.ts`).
+ */
+export const MANA_BAR_COLORS: Record<'light' | 'dark', Record<ManaColor, string>> = {
+  light: {
+    W: '#a07a1c',
+    U: '#2563eb',
+    B: '#4b3a63',
+    R: '#dc2626',
+    G: '#15803d',
+    C: '#78716c',
+  },
+  dark: {
+    W: '#f0d68a',
+    U: '#60a5fa',
+    B: '#a294b8',
+    R: '#f87171',
+    G: '#4ade80',
+    C: '#a8a29e',
+  },
+};
+
+/**
+ * Fundo das barras nas cores de um deck: uma cor só, ou um degradê pelas cores da identidade
+ * (na ordem WUBRG). Sem identidade, incolor.
+ */
+export function deckBarBackground(identity: readonly string[], theme: 'light' | 'dark'): string {
+  const colors = MANA_COLORS.filter((c) => c !== 'C' && identity.includes(c)).map(
+    (c) => MANA_BAR_COLORS[theme][c],
+  );
+  if (colors.length === 0) return MANA_BAR_COLORS[theme].C;
+  if (colors.length === 1) return colors[0]!;
+  return `linear-gradient(135deg, ${colors.join(', ')})`;
+}

@@ -16,6 +16,7 @@ import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
+import { EmptyState } from '@/components/empty-state';
 
 export const generateMetadata = navMetadata('dashboard');
 
@@ -90,19 +91,17 @@ function Tile({
   children?: React.ReactNode;
 }) {
   return (
-    <li className="card flex items-center gap-4 p-3 sm:p-4">
-      {children ?? (
-        <span
-          className="hidden size-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 sm:inline-flex dark:bg-brand-900 dark:text-brand-300"
-          aria-hidden="true"
-        >
-          <Icon name={icon} className="size-6" />
-        </span>
-      )}
-      <div className="min-w-0">
-        <p className="muted">{label}</p>
-        <p className="text-2xl font-extrabold tabular-nums sm:text-3xl">{value}</p>
-        {detail && <p className="muted">{detail}</p>}
+    <li className="card relative flex items-center gap-4 overflow-hidden p-3 sm:p-4">
+      {/* Ícone grande e apagado no canto: textura, não um "botão" de painel genérico. */}
+      <Icon
+        name={icon}
+        className="pointer-events-none absolute -end-3 -bottom-3 size-20 text-fg opacity-[0.06]"
+      />
+      {children}
+      <div className="relative min-w-0">
+        <p className="text-xs font-semibold tracking-wider text-fg-muted uppercase">{label}</p>
+        <p className="font-display text-4xl leading-tight font-semibold tabular-nums">{value}</p>
+        {detail && <p className="muted text-sm">{detail}</p>}
       </div>
     </li>
   );
@@ -155,6 +154,7 @@ export default async function DashboardPage() {
     format.dateTime(new Date(`${month}-15T12:00:00Z`), { month: 'short', timeZone: 'UTC' });
   const recent = mine?.recent ?? [];
   const count = (r: string) => recent.filter((x) => x === r).length;
+  const heroArt = stats.commanders.find((c) => c.artUri)?.artUri ?? null;
 
   return (
     <>
@@ -163,6 +163,16 @@ export default async function DashboardPage() {
         aria-labelledby="painel-titulo"
         className="relative isolate overflow-hidden rounded-3xl bg-arcano p-6 text-pergaminho sm:p-8"
       >
+        {/* Arte do comandante em alta no grupo, tingida na cor da marca (só textura: o texto fica
+            sobre uma camada escura que garante o contraste com qualquer arte). */}
+        {heroArt && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 bg-cover bg-[50%_30%] mix-blend-luminosity"
+            style={{ backgroundImage: `url(${JSON.stringify(heroArt)})` }}
+          />
+        )}
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-arcano/80" />
         <div
           aria-hidden="true"
           className="absolute -inset-24 -z-10 opacity-70 blur-3xl"
@@ -172,7 +182,10 @@ export default async function DashboardPage() {
           }}
         />
         <p className="text-sm font-medium text-gold-300">{group.name}</p>
-        <h1 id="painel-titulo" className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">
+        <h1
+          id="painel-titulo"
+          className="mt-1 font-display text-4xl font-semibold tracking-tight sm:text-5xl"
+        >
           {t('hello', { name: user.name.split(' ')[0] ?? user.name })}
         </h1>
         {next ? (
@@ -312,30 +325,32 @@ export default async function DashboardPage() {
             </Link>
           </div>
           {podium.length === 0 ? (
-            <p className="muted">{t('noRanking')}</p>
+            <EmptyState>{t('noRanking')}</EmptyState>
           ) : (
             <ol className="grid grid-cols-3 items-end gap-2 text-center">
               {[podium[1], podium[0], podium[2]].map((s, i) => {
                 if (!s) return <li key={`empty-${i}`} aria-hidden="true" />;
                 const place = s.position;
+                // Ouro, prata e bronze em degradê metálico; o 1º lugar com coroa e um reflexo.
                 const style =
                   place === 1
-                    ? 'h-32 bg-accent text-on-accent'
+                    ? 'h-32 podium-gold'
                     : place === 2
-                      ? 'h-24 bg-ink-300 text-noite dark:bg-ink-700 dark:text-ink-100'
-                      : 'h-20 bg-gold-600 text-noite';
+                      ? 'h-24 podium-silver'
+                      : 'h-20 podium-bronze';
                 return (
                   <li
                     key={s.userId}
                     className="flex flex-col items-center gap-2"
                     style={{ order: i }}
                   >
+                    {place === 1 && <Icon name="champion" className="size-6 text-accent-text" />}
                     <span className="text-sm font-semibold">
                       <PlayerLink userId={s.userId} name={s.name} />
                     </span>
                     <span className="muted text-xs">{t('pointsShort', { count: s.points })}</span>
                     <span
-                      className={`flex w-full items-start justify-center rounded-t-xl pt-2 text-2xl font-extrabold ${style}`}
+                      className={`flex w-full items-start justify-center rounded-t-xl pt-2 font-display text-3xl font-semibold ${style}`}
                     >
                       {place}º
                     </span>
@@ -415,7 +430,7 @@ export default async function DashboardPage() {
             {t('bestWindows')}
           </h2>
           {windows.length === 0 ? (
-            <p className="muted">{t('noWindows')}</p>
+            <EmptyState>{t('noWindows')}</EmptyState>
           ) : (
             <ul className="space-y-4">
               {windows.slice(0, 3).map((w) => (
@@ -461,7 +476,7 @@ export default async function DashboardPage() {
             {t('hotCommanders')}
           </h2>
           {stats.commanders.length === 0 ? (
-            <p className="muted">{t('noCommanders')}</p>
+            <EmptyState>{t('noCommanders')}</EmptyState>
           ) : (
             <ol className="space-y-3">
               {stats.commanders.slice(0, 4).map((c) => (

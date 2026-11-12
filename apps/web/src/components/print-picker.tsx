@@ -7,6 +7,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
+import { useLightDismiss } from './use-light-dismiss';
 
 export interface PrintLine {
   name: string;
@@ -64,6 +65,7 @@ export function PrintPicker({
   const format = useFormatter();
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
+  useLightDismiss(dialog);
   const opener = useRef<HTMLButtonElement>(null);
   const { run, error, pending } = useApiAction();
   const [open, setOpen] = useState(false);

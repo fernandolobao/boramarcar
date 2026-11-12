@@ -16,6 +16,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../icons';
+import { useLightDismiss } from '../use-light-dismiss';
 
 /** Toque = ±1; segurar = ±10 a cada 0,6 s (como nos contadores de mesa). */
 function useHold(onStep: (delta: number) => void, sign: 1 | -1) {
@@ -268,6 +269,7 @@ function Dialog({
 }) {
   const t = useTranslations('table');
   const ref = useRef<HTMLDialogElement>(null);
+  useLightDismiss(ref);
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
