@@ -204,3 +204,25 @@ export async function deliverEmails(messages: EmailMessage[]) {
   }
   return results;
 }
+
+/** Boas-vindas ao beta (8.5): o que é, até quando vai e como mandar feedback. */
+export function buildBetaWelcomeEmail(
+  recipient: EmailRecipient,
+  data: { groupName: string; endsAt: Date; weeks: number },
+): EmailMessage {
+  const { locale, t, format } = tools(recipient);
+  const until = format.dateTime(data.endsAt, { day: 'numeric', month: 'long' });
+  return {
+    to: recipient.email,
+    ...render({
+      locale,
+      subject: t('beta.subject', { group: data.groupName }),
+      greeting: t('greeting', { name: firstName(recipient.name) }),
+      intro: t('beta.intro', { group: data.groupName, weeks: data.weeks, until }),
+      lines: [t('beta.use'), t('beta.feedback')],
+      cta: { label: t('beta.cta'), url: `${getBaseUrl()}/feedback?de=/painel` },
+      note: t('beta.note'),
+      footer: t('footer', { group: data.groupName, url: profileUrl() }),
+    }),
+  };
+}

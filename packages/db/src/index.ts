@@ -13,6 +13,7 @@ export * from './services/push';
 export * from './services/onboarding';
 export * from './services/feedback';
 export * from './services/metrics';
+export * from './services/beta';
 export * from './services/stats';
 export * from './services/profiles';
 export * from './services/privacy';

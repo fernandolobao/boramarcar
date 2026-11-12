@@ -777,7 +777,15 @@
     "openEvent": "Open the game night",
     "calendarHint": "The attached .ics file adds (or updates) the game night in your calendar.",
     "footer": "You're getting this email because you're in {group} on ArcanaKin. To stop these notices, turn them off in your settings: {url}",
-    "feedbackSubject": "Feedback ({kind}): {name}"
+    "feedbackSubject": "Feedback ({kind}): {name}",
+    "beta": {
+      "subject": "{group} is in the ArcanaKin beta",
+      "intro": "{group} is part of the ArcanaKin beta: over the next {weeks} weeks (until {until}), we'll closely follow how the group uses the app to schedule meetups and record games.",
+      "use": "Just use it as usual: set your availability, RSVP and record your games.",
+      "feedback": "Found something odd or have an idea? Send it from the app (account menu → Send feedback).",
+      "cta": "Send feedback",
+      "note": "We only follow the group's numbers, such as meetups and recorded games."
+    }
   },
   "formats": {
     "commander": "Commander",
@@ -1474,7 +1482,42 @@
     "noFeedback": "No feedback yet.",
     "feedbackFrom": "{name} · {platform} · {date}",
     "metric": "Metric",
-    "value": "Value"
+    "value": "Value",
+    "beta": {
+      "title": "Assisted beta",
+      "intro": "Pick the groups and decide when it starts. Nothing changes for them until the start date; after that, members see the beta banner on the dashboard and get a welcome email. The beta lasts {weeks} weeks.",
+      "phase": {
+        "draft": "No start date yet.",
+        "scheduled": "Starts on {start} and runs until {end}.",
+        "running": "Running: week {week} of {weeks} (until {end}).",
+        "ended": "Ended on {end}."
+      },
+      "groups": "Beta groups",
+      "noGroups": "No groups created yet.",
+      "members": "{count, plural, =1 {1 person} other {# people}}",
+      "selected": "{count, plural, =0 {No groups selected} =1 {1 group selected} other {# groups selected}}",
+      "startDate": "Start date",
+      "startHint": "Starts at midnight on this date in your time zone. Leave blank to decide later.",
+      "save": "Save",
+      "startNow": "Start now",
+      "end": "End beta",
+      "endConfirm": "Confirm: end now",
+      "saved": "Beta saved.",
+      "started": "Beta started. Welcome emails are on their way.",
+      "ended": "Beta ended.",
+      "statsCaption": "Beta groups since the start",
+      "cols": {
+        "group": "Group",
+        "members": "People",
+        "events": "Meetups",
+        "games": "Games",
+        "lastGame": "Last game",
+        "welcome": "Welcome"
+      },
+      "never": "None yet",
+      "welcomeSent": "Sent",
+      "welcomePending": "Not yet"
+    }
   },
   "meta": {
     "ogLocale": "en_US",
@@ -1569,5 +1612,12 @@
     },
     "homeImage": "Schedule your next Commander night.",
     "homeImageSubtitle": "Times when everyone can play, meetups, rankings, decks and games in one place."
+  },
+  "beta": {
+    "title": "Your group is in the ArcanaKin beta",
+    "body": "Week {week} of {weeks}, until {until}. Tell us what works, what gets in the way and what's missing: every message is read.",
+    "cta": "Send feedback",
+    "dismiss": "Dismiss",
+    "dismissLabel": "Dismiss the beta notice"
   }
 }

@@ -14,7 +14,11 @@ import {
  * outro caminho aparece com o passo feito); `onboarding_steps` guarda só o que não dá para
  * deduzir, como "dispensou os primeiros passos".
  */
-export const ONBOARDING_FLAGS = ['checklist-dismissed', 'guide-skipped'] as const;
+export const ONBOARDING_FLAGS = [
+  'checklist-dismissed',
+  'guide-skipped',
+  'beta-banner-dismissed',
+] as const;
 export type OnboardingFlag = (typeof ONBOARDING_FLAGS)[number];
 
 export const CHECKLIST_STEPS = ['availability', 'invite', 'rsvp', 'deck'] as const;

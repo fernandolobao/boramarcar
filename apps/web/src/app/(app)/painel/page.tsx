@@ -1,5 +1,6 @@
 import {
   getEventDetail,
+  getBetaBanner,
   getOnboardingChecklist,
   getGroupRanking,
   getGroupStats,
@@ -19,6 +20,8 @@ import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { EmptyState } from '@/components/empty-state';
+import { BETA_WEEKS } from '@boramarcar/core';
+import { BetaBanner } from '@/components/beta-banner';
 import { FirstSteps } from '@/components/first-steps';
 
 export const generateMetadata = navMetadata('dashboard');
@@ -120,7 +123,7 @@ export default async function DashboardPage() {
   const db = getDb();
   const now = new Date();
   const timeZone = await getTimeZone();
-  const [events, windows, ranking, stats, onboarding] = await Promise.all([
+  const [events, windows, ranking, stats, onboarding, beta] = await Promise.all([
     listEvents(db, {
       groupId: group.id,
       userId: user.id,
@@ -137,6 +140,7 @@ export default async function DashboardPage() {
     getGroupRanking(db, { groupId: group.id, userId: user.id }),
     getGroupStats(db, { groupId: group.id, userId: user.id, now, timeZone }),
     getOnboardingChecklist(db, { userId: user.id, groupId: group.id, now }),
+    getBetaBanner(db, { userId: user.id, groupId: group.id, now }),
   ]);
   const showFirstSteps = !onboarding.dismissed && onboarding.completed < onboarding.steps.length;
   const next = events[0]
@@ -247,6 +251,14 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+
+      {beta && (
+        <BetaBanner
+          week={beta.week}
+          weeks={BETA_WEEKS}
+          until={format.dateTime(beta.endsAt, { day: 'numeric', month: 'long' })}
+        />
+      )}
 
       {showFirstSteps && (
         <FirstSteps steps={onboarding.steps} members={onboarding.members} tableSize={TABLE_SIZE} />

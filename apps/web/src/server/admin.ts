@@ -1,4 +1,5 @@
 import 'server-only';
+import { DomainError } from '@boramarcar/core';
 import { notFound } from 'next/navigation';
 import { adminEmails } from '@/env';
 import { requireUser } from './current-user';
@@ -11,4 +12,9 @@ export async function requireAdmin() {
   const user = await requireUser();
   if (!isAdmin(user.email)) notFound();
   return user;
+}
+
+/** Rotas de administração na API: para quem não é admin, 404 (a rota "não existe"). */
+export function assertAdmin(email: string) {
+  if (!isAdmin(email)) throw new DomainError('not_found', 'Não encontrado');
 }

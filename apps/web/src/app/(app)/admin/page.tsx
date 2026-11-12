@@ -1,7 +1,15 @@
-import { getProductMetrics, listRecentFeedback } from '@boramarcar/db';
+import { BETA_WEEKS } from '@boramarcar/core';
+import {
+  getBeta,
+  getBetaGroupStats,
+  getProductMetrics,
+  listGroupsForBeta,
+  listRecentFeedback,
+} from '@boramarcar/db';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { getDb } from '@/server/db';
 import { requireAdmin } from '@/server/admin';
+import { BetaControl } from '@/components/beta-control';
 import { sectionMetadata } from '@/server/seo';
 
 export const generateMetadata = sectionMetadata('admin', '/admin');
@@ -10,8 +18,16 @@ export const generateMetadata = sectionMetadata('admin', '/admin');
 export default async function AdminPage() {
   await requireAdmin();
   const db = getDb();
-  const [m, recent] = await Promise.all([getProductMetrics(db), listRecentFeedback(db, 30)]);
+  const now = new Date();
+  const [m, recent, beta, betaGroups] = await Promise.all([
+    getProductMetrics(db, now),
+    listRecentFeedback(db, 30),
+    getBeta(db, now),
+    listGroupsForBeta(db),
+  ]);
+  const betaStats = await getBetaGroupStats(db, beta.state, now);
   const t = await getTranslations('admin');
+  const tb = await getTranslations('admin.beta');
   const tf = await getTranslations('feedback');
   const format = await getFormatter();
 
@@ -67,6 +83,81 @@ export default async function AdminPage() {
           {t('retention')}:{' '}
           {t('retentionValue', { retained: m.retention.retained, previous: m.retention.previous })}
         </p>
+      </section>
+
+      <section className="card space-y-4" aria-labelledby="admin-beta">
+        <div>
+          <h2 id="admin-beta" className="section-title mb-1">
+            {tb('title')}
+          </h2>
+          <p data-testid="beta-status">
+            {tb(`phase.${beta.state.phase}`, {
+              start: beta.state.startsAt
+                ? format.dateTime(beta.state.startsAt, { dateStyle: 'long' })
+                : '',
+              end: beta.state.endsAt
+                ? format.dateTime(beta.state.endsAt, { dateStyle: 'long' })
+                : '',
+              week: beta.state.week ?? 0,
+              weeks: BETA_WEEKS,
+            })}
+          </p>
+          <p className="muted">{tb('intro', { weeks: BETA_WEEKS })}</p>
+        </div>
+        <BetaControl
+          phase={beta.state.phase}
+          startsAt={beta.state.startsAt?.toISOString() ?? null}
+          groups={betaGroups}
+        />
+        {betaStats.length > 0 && (
+          <div>
+            <table className="w-full text-xs sm:text-sm">
+              <caption className="mb-2 text-left font-semibold">{tb('statsCaption')}</caption>
+              <thead>
+                <tr className="text-left">
+                  <th scope="col" className="py-2 pr-3">
+                    {tb('cols.group')}
+                  </th>
+                  <th scope="col" className="py-2 pr-3 text-right">
+                    {tb('cols.members')}
+                  </th>
+                  <th scope="col" className="py-2 pr-3 text-right">
+                    {tb('cols.events')}
+                  </th>
+                  <th scope="col" className="py-2 pr-3 text-right">
+                    {tb('cols.games')}
+                  </th>
+                  <th scope="col" className="py-2 pr-3">
+                    {tb('cols.lastGame')}
+                  </th>
+                  <th scope="col" className="py-2">
+                    {tb('cols.welcome')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {betaStats.map((g) => (
+                  <tr key={g.id} className="border-t border-line">
+                    <th scope="row" className="py-2 pr-3 text-left font-medium">
+                      {g.name}
+                    </th>
+                    <td className="py-2 pr-3 text-right tabular-nums">{g.members}</td>
+                    <td className="py-2 pr-3 text-right tabular-nums">{g.eventsHeld}</td>
+                    <td className="py-2 pr-3 text-right tabular-nums">{g.games}</td>
+                    <td className="py-2 pr-3">
+                      {g.lastGameAt
+                        ? format.dateTime(g.lastGameAt, { dateStyle: 'medium' })
+                        : tb('never')}
+                    </td>
+                    <td className="py-2">
+                      {g.welcomed ? tb('welcomeSent') : tb('welcomePending')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <div className="grid gap-6 md:grid-cols-3">
