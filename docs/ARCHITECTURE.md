@@ -186,6 +186,12 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - **Servidor**: `POST /api/v1/feedback` (10 por hora por pessoa) grava em `feedback` (pessoa, tipo, texto, **só o caminho** da página — sem query string —, plataforma) e, depois de responder, manda um e-mail para `ADMIN_EMAILS` (texto escapado) com o nome e o e-mail de quem enviou, para responder. Sem `ADMIN_EMAILS`, fica só no banco.
 - **LGPD**: entra na exportação de dados, sai na exclusão de conta e está na política de privacidade (legítimo interesse).
 
+## Métricas do beta (8.3)
+
+- **Métrica norte**: grupos ativos — grupos com ao menos uma partida registrada nos últimos 28 dias (`METRICS_WINDOW_DAYS`) — e a retenção (quantos dos ativos no período anterior continuam ativos).
+- **Consulta** (`db/services/metrics.ts`, `getProductMetrics`): só contagens agregadas, direto do banco, sem eventos de rastreamento nem dados de pessoas. Ativação de grupos novos (3+ pessoas, encontro marcado, entradas por convite), encontros (aconteceram, fecharam a mesa, viraram partida), pessoas (novas, com disponibilidade), decks importados e partidas com deck. Cobre também a medição de ativação do onboarding (7.6) por estes passos.
+- **Onde ver**: `/admin` (só para `ADMIN_EMAILS`; para os demais, 404 e fora da navegação; `noindex`), com o feedback recente. Toda segunda-feira (UTC) o cron diário (`/api/cron/reminders`) manda o resumo por e-mail para `ADMIN_EMAILS`, com o link da página.
+
 ## Onboarding (Fase 7)
 
 - **Progresso** (`db/services/onboarding.ts`): os passos são calculados dos dados — disponibilidade no grupo ativo (regra semanal ou horário futuro), grupo com 3+ pessoas (`TABLE_SIZE`, uma mesa de Commander), resposta a algum encontro, deck importado. Quem fez a ação por outro caminho já aparece com o passo feito. A tabela `onboarding_steps` guarda só o que não dá para deduzir (`checklist-dismissed`, `guide-skipped`), via `POST /api/v1/me/onboarding`; entra na exportação e sai na exclusão de conta.

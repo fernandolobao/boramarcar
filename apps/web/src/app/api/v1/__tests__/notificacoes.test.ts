@@ -248,12 +248,12 @@ describe('lembretes (cron)', () => {
       );
     const first = await authorized();
     expect(first.status).toBe(200);
-    expect(await first.json()).toEqual({ events: 1, emails: 2 });
+    expect(await first.json()).toMatchObject({ events: 1, emails: 2 });
     expect(sent.map((s) => s.to[0]).sort()).toEqual([ana.email, caio.email].sort());
     expect(sentTo(caio)[0]!.subject).toMatch(/^Lembrete: Hoje tem — /);
 
     sent = [];
-    expect(await (await authorized()).json()).toEqual({ events: 0, emails: 0 });
+    expect(await (await authorized()).json()).toMatchObject({ events: 0, emails: 0 });
     expect(sent).toHaveLength(0);
   });
 });

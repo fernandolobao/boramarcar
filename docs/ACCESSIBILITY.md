@@ -290,4 +290,4 @@ sem rolagem horizontal em 320px.
 
 - **Site**: `h1`, tipo em `fieldset`/`legend` com rádios nativos, mensagem com `label` e dica ligada por `aria-describedby`, botão com texto. Depois de enviar, a confirmação vira `role="status"` e recebe o foco. Link no menu da conta (com `aria-current` na própria página) e no rodapé.
 - **App**: tipo como `radiogroup` de botões com `accessibilityState.checked`, campo com rótulo visível e dica, confirmação e erro com `accessibilityRole="alert"`.
-- axe em jsdom (componente) e no E2E (`/feedback`, claro/escuro, desktop/celular) sem violações.
+- axe em jsdom (componente) e no E2E (`/feedback`, `/admin`, claro/escuro, desktop/celular) sem violações.

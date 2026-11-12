@@ -16,6 +16,7 @@ import { UserMenu } from '@/components/user-menu';
 import { TIME_ZONE_COOKIE } from '@/i18n/config';
 import { getActiveGroup } from '@/server/active-group';
 import { requireUser } from '@/server/current-user';
+import { isAdmin } from '@/server/admin';
 import { getDb } from '@/server/db';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -67,7 +68,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               </span>
             )}
           </Link>
-          <UserMenu name={user.name} email={user.email} image={user.image ?? null} />
+          <UserMenu
+            name={user.name}
+            email={user.email}
+            image={user.image ?? null}
+            admin={isAdmin(user.email)}
+          />
         </div>
         <div className="mx-auto max-w-5xl px-4 pt-2 pb-1">
           <NavLinks label={t('label')} links={links} />

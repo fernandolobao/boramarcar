@@ -30,7 +30,8 @@
     "userMenu": "Account menu",
     "signedInAs": "Signed in as",
     "collection": "Collection",
-    "feedback": "Send feedback"
+    "feedback": "Send feedback",
+    "admin": "Beta metrics"
   },
   "dashboard": {
     "hello": "Hi, {name}!",
@@ -1410,5 +1411,36 @@
     "sent": "Thanks! We got your feedback.",
     "sendAnother": "Send another",
     "privacy": "We keep the text, the type, the page you came from and the platform, with your account, to reply and improve the app."
+  },
+  "admin": {
+    "title": "Beta metrics",
+    "intro": "Aggregated counts for the last {days} days, computed straight from the database (no personal data). Only people in ADMIN_EMAILS see this page.",
+    "northStar": "North star metric",
+    "activeGroups": "Active groups (with a recorded game)",
+    "ofGroups": "of {total} groups",
+    "retention": "Retention",
+    "retentionValue": "{retained} of {previous} groups active in the previous period are still active",
+    "activation": "New group activation",
+    "newGroups": "Groups created",
+    "withThree": "With 3 or more people",
+    "withEvent": "With a game night scheduled",
+    "invites": "People who joined by invite",
+    "events": "Game nights",
+    "held": "Game nights that happened",
+    "tableFilled": "Filled the table (confirmed ≥ table size)",
+    "withGame": "Turned into a recorded game",
+    "people": "People",
+    "users": "Accounts",
+    "newUsers": "New accounts",
+    "withAvailability": "With availability set",
+    "decks": "Decks imported",
+    "deckLinked": "Games with a deck",
+    "deckLinkedValue": "{withDeck} of {slots} seats",
+    "feedback": "Recent feedback",
+    "feedbackCount": "{count} in the period",
+    "noFeedback": "No feedback yet.",
+    "feedbackFrom": "{name} · {platform} · {date}",
+    "metric": "Metric",
+    "value": "Value"
   }
 }

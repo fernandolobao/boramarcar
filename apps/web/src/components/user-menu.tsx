@@ -16,10 +16,13 @@ export function UserMenu({
   name,
   email,
   image,
+  admin = false,
 }: {
   name: string;
   email: string;
   image: string | null;
+  /** Quem está em ADMIN_EMAILS vê o link das métricas do beta. */
+  admin?: boolean;
 }) {
   const t = useTranslations('nav');
   const tc = useTranslations('common');
@@ -127,6 +130,18 @@ export function UserMenu({
               {t('feedback')}
             </Link>
           </li>
+          {admin && (
+            <li>
+              <Link
+                href="/admin"
+                className={itemClass}
+                aria-current={pathname === '/admin' ? 'page' : undefined}
+              >
+                <Icon name="ranking" />
+                {t('admin')}
+              </Link>
+            </li>
+          )}
           <li className="mt-1 border-t border-ink-200 pt-1 dark:border-ink-700">
             <button
               type="button"
