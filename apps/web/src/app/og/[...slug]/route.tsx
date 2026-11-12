@@ -15,6 +15,7 @@ import ptBR from '../../../../messages/pt-BR.json';
  */
 const t = createTranslator({ locale: DEFAULT_LOCALE, messages: ptBR, namespace: 'meta' });
 const tr = createTranslator({ locale: DEFAULT_LOCALE, messages: ptBR, namespace: 'recap' });
+const tf = createTranslator({ locale: DEFAULT_LOCALE, messages: ptBR, namespace: 'formats' });
 
 /** Arte remota só do Scryfall; se não carregar, o cartão sai sem fundo. */
 async function artDataUri(url: string | null) {
@@ -43,7 +44,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string[]
     const deck = await getPublicDeckPreview(getDb(), id).catch(() => null);
     if (!deck) return section('deck');
     return renderOg({
-      eyebrow: t('deck.title'),
+      eyebrow: tf.has(deck.format as never)
+        ? t('deckEyebrow', { format: tf(deck.format as never) })
+        : t('deck.title'),
       title: deck.name,
       subtitle: deck.commanders.length ? deck.commanders.join(' + ') : undefined,
       art: await artDataUri(deck.artUri),

@@ -11,7 +11,7 @@ const CACHE = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=6048
 const c = themes.light;
 
 export interface OgContent {
-  /** Etiqueta acima do título (ex.: "Deck de Commander"). */
+  /** Etiqueta acima do título (ex.: "Deck de Commander", "Convite para um grupo"). */
   eyebrow?: string;
   title: string;
   subtitle?: string;

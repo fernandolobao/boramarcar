@@ -1535,8 +1535,8 @@
   "meta": {
     "ogLocale": "pt_BR",
     "inviteImage": "{count, plural, =0 {Seja a primeira pessoa do grupo} =1 {1 pessoa já está no grupo} other {# pessoas já estão no grupo}}",
-    "invitePreview": "Entre no grupo {group} no ArcanaKin para marcar os encontros de Commander juntos.",
-    "deckPreview": "{commanders} — lista, curva de mana, bracket estimado e análise no ArcanaKin.",
+    "invitePreview": "Entre no grupo {group} no ArcanaKin para marcar os encontros juntos.",
+    "deckPreview": "{commanders} — lista, curva de mana e análise no ArcanaKin.",
     "loginToSee": "Entre no ArcanaKin para ver esta página.",
     "loginCta": "Entrar",
     "home": {
@@ -1549,7 +1549,7 @@
     },
     "invite": {
       "title": "Convite para um grupo",
-      "description": "Entre no grupo para marcar os encontros de Commander juntos."
+      "description": "Entre no grupo para marcar os encontros juntos."
     },
     "dashboard": {
       "title": "Painel",
@@ -1564,8 +1564,8 @@
       "description": "Os próximos encontros do grupo, com local, horário e quem confirmou."
     },
     "event": {
-      "title": "Encontro de Commander",
-      "description": "Data, local e quem vai. Entre no ArcanaKin para confirmar presença."
+      "title": "Encontro do grupo",
+      "description": "Data, local e quem vai. Entre no ArcanaKin para ver e confirmar presença."
     },
     "history": {
       "title": "Histórico de encontros",
@@ -1580,8 +1580,8 @@
       "description": "Os decks do grupo com nota, bracket estimado e análise."
     },
     "deck": {
-      "title": "Deck de Commander",
-      "description": "Lista, curva de mana, bracket estimado e análise do deck."
+      "title": "Deck",
+      "description": "Lista, curva de mana e análise do deck."
     },
     "deckImport": {
       "title": "Importar deck",
@@ -1628,7 +1628,8 @@
     "recap": {
       "title": "Resumo do encontro",
       "description": "Quem jogou, quem venceu e com quais comandantes."
-    }
+    },
+    "deckEyebrow": "Deck de {format}"
   },
   "beta": {
     "title": "Seu grupo está no beta do ArcanaKin",
