@@ -273,6 +273,15 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
 
 Os testes verificam contraste AA (texto ≥ 4,5:1, bordas de campo e foco ≥ 3:1) em todos os pares usados nos dois temas, e que o `tokens.css` gerado está atualizado. E-mails usam o tema claro dos tokens; o QR do convite, a Noite. O vídeo do topo da página inicial é gerado com as cores da paleta (`apps/web/scripts/hero-video.py`).
 
+## Identidade visual (títulos, arte, gráficos e estados vazios)
+
+- **Títulos** em Fraunces (variável, serifada como o logotipo), arquivo local em `apps/web/src/fonts` (subconjunto latino, licença SIL OFL 1.1) carregado com `next/font/local` como `--font-display` (classe `font-display`; `page-title` e `section-title` já usam). O texto corrido continua na fonte do sistema.
+- **Arte das cartas no topo**: o painel usa a arte do comandante em alta no grupo; o encontro, a do deck de quem venceu a última partida (ou de quem jogou). A arte entra como fundo tingido (`mix-blend-luminosity` sobre o roxo da marca) sob uma camada `bg-arcano/80`, que garante o contraste do texto com qualquer arte (≥ 7:1 no pior caso, arte branca). É `background-image` (sem ícone de imagem quebrada se a arte falhar).
+- **"Os seus números"**: rótulo em versalete, número grande em Fraunces e o ícone grande e apagado no canto (textura), no lugar do quadradinho lilás.
+- **Gráficos nas cores do deck** (`.deck-bar`): a curva de mana, os componentes da nota e as chances da mão inicial usam as cores da identidade do deck (`deckBarBackground`/`MANA_BAR_COLORS` em `@boramarcar/tokens/flow`, contraste ≥ 3:1 com a superfície nos dois temas, testado). A página do deck define `--deck-bar-light`/`--deck-bar-dark`; fora dela, a cor da marca. Os números continuam em texto.
+- **Pódio** (painel): ouro, prata e bronze em degradê metálico, coroa no 1º e um reflexo que passa devagar (parado com "reduzir movimento").
+- **Estados vazios** (`EmptyState`): os cinco símbolos de mana (decorativos) sobre um brilho suave, com o texto de sempre.
+
 ## Tema claro/escuro
 
 Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pessoa pode fixar Claro ou Escuro: a escolha fica no `localStorage` (`bm-theme`) e vira `data-theme` no `<html>`, aplicado por um script inline antes da pintura. A variante `dark:` do Tailwind (`@custom-variant` em `globals.css`) vale com `data-theme="dark"` ou com o sistema escuro quando não há `data-theme="light"`.

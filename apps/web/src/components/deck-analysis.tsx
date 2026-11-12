@@ -377,7 +377,7 @@ export function HandOdds({ odds }: { odds: OpeningHandOdds }) {
                   <span className="flex items-center gap-2">
                     <span className="w-12 shrink-0 tabular-nums">{percent(p)}</span>
                     <span
-                      className="h-2 rounded-full bg-brand-500"
+                      className="deck-bar h-2 rounded-full"
                       style={{ width: `${max ? (p / max) * 100 : 0}%`, maxWidth: '10rem' }}
                       aria-hidden="true"
                     />

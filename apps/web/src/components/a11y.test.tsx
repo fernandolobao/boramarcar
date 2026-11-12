@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { DeckImportForm } from './deck-forms';
+import { EmptyState } from './empty-state';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
 import { DeckRoles, RefreshAnalysis } from './deck-roles';
 import { DeckComparisonCard } from './deck-comparison';
@@ -143,6 +144,7 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['DeckImportForm', <DeckImportForm key="d" />],
+  ['EmptyState', <EmptyState key="empty">Nenhum encontro marcado.</EmptyState>],
   [
     'EventManage',
     <EventManage

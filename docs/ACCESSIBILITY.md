@@ -239,6 +239,14 @@ sem rolagem horizontal em 320px.
 - **Pilha**: é só layout ligado à rolagem, sem animação automática. Títulos continuam `h2` na ordem do documento. A seção coberta esmaece no máximo 40% e só depois de metade coberta: o título na faixa mantém ≥ 4,5:1 nos dois temas (claro 5,4:1; escuro 6:1). A seção com foco de teclado vem para a frente sem corte nem esmaecimento (`:has(:focus-visible)`, 2.4.11); um clique com o mouse não a traz, para ela não ficar por cima das outras ao rolar. Seção mais alta que a tela não gruda, então nada fica escondido embaixo das faixas. No app, com "reduzir movimento", a pilha é desligada. Disponibilidade, encontros, ranking e grupo (11/11/2026): mesma estrutura de títulos; no ranking, o `h2` "Estatísticas" passou para a primeira carta (os blocos seguem com `h3`), e no encontro o aviso de cancelado fica fora da pilha, logo abaixo do título. E2E de acessibilidade (axe, claro/escuro, desktop/celular) sem violações.
 - **Fluxo de mana**: decorativo (`aria-hidden`/`accessibilityElementsHidden`, `pointer-events: none`), atrás do conteúdo, que fica em cartões opacos. Fios finos e semitransparentes (mais discretos no celular e no tema escuro). Movimento lento (2.2.2 não se aplica: é fundo, mas pausa fora da tela e com a aba escondida) e parado com `prefers-reduced-motion` / "reduzir movimento" (2.3.3). O axe não enxerga o canvas: o contraste de textos soltos sobre a faixa foi conferido à mão nas capturas (deck, coleção, perfil, painel; claro e escuro).
 
+## Identidade visual (11/11/2026)
+
+- **Arte no topo** (painel e encontro): decorativa (`aria-hidden`, fundo em CSS), sob uma camada escura que mantém o texto claro com ≥ 7:1 mesmo sobre uma arte branca.
+- **Barras nas cores do deck**: cada cor de mana tem um tom por tema com ≥ 3:1 contra a superfície (WCAG 1.4.11, teste em `tokens/flow.test.ts`); o valor de cada barra continua em texto. A barra selecionada da curva tem contorno, além do `aria-pressed` do botão.
+- **Pódio**: texto escuro (noite) sobre ouro (8,1:1), prata (9,4:1) e bronze (6,3:1); reflexo animado só sem "reduzir movimento".
+- **Estados vazios**: símbolos de mana decorativos (`aria-hidden`); a mensagem é o texto.
+- **Fonte de display**: só nos títulos; `font-display: swap` e fontes de reserva serifadas (Georgia).
+
 ## Fechar diálogos clicando fora (11/11/2026)
 
 - Todos os `<dialog>` modais do site (carta, edição, opções do jogador na mesa) fecham com um clique no fundo escurecido (`useLightDismiss`), além do Esc e do botão "Fechar", que continuam sendo o caminho para teclado e leitor de tela. O clique só conta se começou e terminou fora da caixa: arrastar uma seleção de texto para fora não fecha. Ao fechar, o foco volta para o botão que abriu.

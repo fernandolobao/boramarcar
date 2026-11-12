@@ -20,6 +20,8 @@
 
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Títulos: Fraunces (src/fonts), serifada como o logotipo. */
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
 
   /* Cores de mana */
   --color-mana-w: #f8e7b9;
@@ -82,10 +84,12 @@ body {
   @apply mb-1 block text-sm font-medium text-fg;
 }
 @utility page-title {
-  @apply text-2xl font-semibold tracking-tight;
+  @apply font-display text-3xl font-semibold tracking-tight;
+  font-optical-sizing: auto;
 }
 @utility section-title {
-  @apply mb-3 text-lg font-semibold;
+  @apply mb-3 font-display text-xl font-semibold;
+  font-optical-sizing: auto;
 }
 /* Texto secundário: fg-muted mantém ≥ 4,5:1 sobre canvas, surface e surface-muted (testado nos tokens). */
 @utility muted {
@@ -278,6 +282,86 @@ input[type='radio'] {
   .stack-card::after {
     display: none;
   }
+}
+
+/* ---------- Estado vazio ----------
+   Brilho suave atrás dos símbolos de mana (`EmptyState`). Decorativo. */
+.empty-state {
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    color-mix(in srgb, var(--color-eter) 12%, transparent),
+    transparent 70%
+  );
+}
+
+/* ---------- Pódio (painel) ----------
+   Ouro, prata e bronze em degradê metálico, com um reflexo que passa devagar no 1º lugar
+   (parado com "reduzir movimento"). Texto escuro (noite) com contraste ≥ 4,5:1 nos três. */
+.podium-gold,
+.podium-silver,
+.podium-bronze {
+  position: relative;
+  overflow: hidden;
+  color: var(--color-noite);
+}
+.podium-gold {
+  background: linear-gradient(160deg, #fff1c1 0%, #f6b944 35%, #d99a1e 70%, #f6c65b 100%);
+  box-shadow: 0 -6px 24px -6px color-mix(in srgb, #f6b944 70%, transparent);
+}
+.podium-silver {
+  background: linear-gradient(160deg, #ffffff 0%, #d9d6e0 40%, #b5b0bf 75%, #e4e1ea 100%);
+}
+.podium-bronze {
+  background: linear-gradient(160deg, #f6d3b0 0%, #d99a63 45%, #c2834e 80%, #e3ae7d 100%);
+}
+.podium-gold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    color-mix(in srgb, white 65%, transparent) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  animation: podium-shine 4.5s ease-in-out infinite;
+}
+@keyframes podium-shine {
+  0%,
+  55% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .podium-gold::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ---------- Barras nas cores do deck ----------
+   Curva de mana, componentes da nota e chances da mão inicial usam as cores da identidade do
+   deck (`deckBarBackground` em @boramarcar/tokens/flow, contraste ≥ 3:1 nos dois temas). A
+   página do deck define --deck-bar-light/--deck-bar-dark; fora dela, a cor da marca. */
+.deck-bar {
+  background: var(--deck-bar-light, var(--color-brand-500));
+}
+:root[data-theme='dark'] .deck-bar {
+  background: var(--deck-bar-dark, var(--color-brand-400));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .deck-bar {
+    background: var(--deck-bar-dark, var(--color-brand-400));
+  }
+}
+/* Barra selecionada (curva): contorno, além do estado exposto no botão. */
+.deck-bar[data-pressed] {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 1px;
 }
 
 /* ---------- Fluxo de mana ----------

@@ -7,6 +7,7 @@ import { Icon } from '../icons';
 import { DirectionsLinks } from './directions';
 import { LocationForm, type LocationView } from './location-form';
 import { LocationMap } from './location-map';
+import { EmptyState } from '../empty-state';
 
 /** Locais do grupo (2.14): mapa com todos, lista com rotas e edição, e o formulário para cadastrar. */
 export function LocationsSection({
@@ -36,7 +37,7 @@ export function LocationsSection({
     <div className="space-y-6">
       {points.length > 0 && <LocationMap points={points} label={t('groupMap')} className="h-72" />}
       {locations.length === 0 ? (
-        <p className="muted">{t('empty')}</p>
+        <EmptyState>{t('empty')}</EmptyState>
       ) : (
         <ul className="divide-y divide-ink-200 dark:divide-ink-800">
           {locations.map((l) => (

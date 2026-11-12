@@ -42,7 +42,7 @@ import { getDb } from '@/server/db';
 import { CardNames } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
 import { ManaFlowColors } from '@/components/mana-flow';
-import { deckFlow } from '@boramarcar/tokens/flow';
+import { deckBarBackground, deckFlow } from '@boramarcar/tokens/flow';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -106,7 +106,16 @@ export default async function DeckPage({ params }: Props) {
     Object.fromEntries(analysis.manaBase.map((row) => [row.color, row.pips])),
   );
   return (
-    <>
+    // Barras dos gráficos nas cores do deck (curva, nota, mão inicial), nos dois temas.
+    <div
+      className="space-y-6"
+      style={
+        {
+          '--deck-bar-light': deckBarBackground(identity, 'light'),
+          '--deck-bar-dark': deckBarBackground(identity, 'dark'),
+        } as React.CSSProperties
+      }
+    >
       <ManaFlowColors stops={flow} />
       <div className="relative overflow-hidden rounded-3xl border border-ink-200 bg-surface dark:border-ink-800 dark:bg-ink-900">
         {background && (
@@ -301,6 +310,6 @@ export default async function DeckPage({ params }: Props) {
           Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
         }
       />
-    </>
+    </div>
   );
 }

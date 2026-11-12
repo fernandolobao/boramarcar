@@ -13,6 +13,7 @@ import { requireUserAndGroup } from '@/server/require-group';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { CardNames } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
+import { EmptyState } from '@/components/empty-state';
 
 export const generateMetadata = navMetadata('ranking');
 
@@ -142,7 +143,7 @@ export default async function RankingPage({ searchParams }: Props) {
             {t('standings')}
           </h2>
           {ranking.standings.length === 0 ? (
-            <p className="muted">{t('empty')}</p>
+            <EmptyState>{t('empty')}</EmptyState>
           ) : (
             <ScrollTable label={t('standings')}>
               <table className="w-full text-sm">
