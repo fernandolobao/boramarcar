@@ -270,6 +270,12 @@ Foil é contado por cópia, como as proxies: numa linha (carta + edição) podem
 
 Toda página fora da navegação principal (deck, encontro, jogador, perfil, configurações, importar, imprimir, histórico) mostra "Voltar" no topo, pelo layout do app (`components/back-link.tsx`), então páginas novas ganham o botão sozinhas. Com página anterior no app, volta para ela (`router.back()`); entrando direto pelo link, vai para a página "mãe" (`/decks/x/imprimir` → `/decks/x`, `/jogadores/x` → `/grupo`, `/perfil` → `/painel`). É um link de verdade, então Ctrl/Cmd+clique abre a página mãe em outra aba.
 
+## Resumo da noite (8.6)
+
+- **Quando sai**: ao **finalizar** o encontro (`PATCH /api/v1/events/:id` com `status: finished`), ou ao registrar uma partida num encontro já finalizado. Sai **uma vez** (`events.recap_sent_at`, marcado antes do envio): reabrir e finalizar de novo não repete. Sem partida, nada.
+- **Para quem**: quem jogou ou confirmou presença. E-mail (respeita quem desligou os avisos) com as partidas e o destaque da noite; push que abre o encontro no app.
+- **Página pública** `/resumo/:id` (`db/services/recap.ts`, `getEventRecap`): para quem tem o link, feita para mandar no grupo do WhatsApp. Só título e data do encontro, **primeiros nomes** (com a inicial do sobrenome se dois se chamam igual), comandantes e placar — nada de local, foto, e-mail ou nome do grupo. A prévia do link usa `/og/resumo/:id` (quem mais venceu e a arte do comandante dele). Na página do encontro, "Resumo para compartilhar" aparece quando ele está finalizado e tem partida. Está na política de privacidade.
+
 ## Metadados e prévias de link
 
 - **Toda página** usa `server/seo.ts` (`pageMetadata`, `navMetadata`): título, descrição (`messages` → `meta.<seção>`), `canonical`, Open Graph e Twitter com imagem 1200×630. Só a home e a privacidade são indexáveis (`robots.ts`, `sitemap.ts`); o resto leva `noindex`.

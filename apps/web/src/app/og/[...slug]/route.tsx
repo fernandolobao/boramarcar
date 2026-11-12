@@ -1,4 +1,4 @@
-import { getInvitePreview, getPublicDeckPreview } from '@boramarcar/db';
+import { getEventRecap, getInvitePreview, getPublicDeckPreview } from '@boramarcar/db';
 import { createTranslator } from 'next-intl';
 import { DEFAULT_LOCALE } from '@/i18n/config';
 import { getDb } from '@/server/db';
@@ -10,9 +10,11 @@ import ptBR from '../../../../messages/pt-BR.json';
  * Imagens de compartilhamento (Open Graph), em português (quem gera a prévia não manda idioma):
  * - `/og/s/<seção>`: título e descrição da seção;
  * - `/og/deck/<id>`: deck **público** com a arte do comandante (os demais caem na imagem de deck);
- * - `/og/convite/<código>`: nome do grupo e quantas pessoas já estão.
+ * - `/og/convite/<código>`: nome do grupo e quantas pessoas já estão;
+ * - `/og/resumo/<encontro>`: resumo da noite (quem mais venceu, partidas) com a arte do comandante.
  */
 const t = createTranslator({ locale: DEFAULT_LOCALE, messages: ptBR, namespace: 'meta' });
+const tr = createTranslator({ locale: DEFAULT_LOCALE, messages: ptBR, namespace: 'recap' });
 
 /** Arte remota só do Scryfall; se não carregar, o cartão sai sem fundo. */
 async function artDataUri(url: string | null) {
@@ -54,6 +56,20 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string[]
       eyebrow: t('invite.title'),
       title: group.name,
       subtitle: t('inviteImage', { count: group.members }),
+    });
+  }
+  if (kind === 'resumo' && id) {
+    const recap = await getEventRecap(getDb(), id).catch(() => null);
+    if (!recap) return section('recap');
+    const top = recap.standings[0];
+    return renderOg({
+      eyebrow: t('recap.title'),
+      title: recap.title,
+      subtitle:
+        top && top.wins > 0
+          ? tr('summaryTop', { name: top.name, wins: top.wins, count: recap.games.length })
+          : tr('summary', { count: recap.games.length }),
+      art: await artDataUri(recap.artUri),
     });
   }
   return new Response('Não encontrado', { status: 404 });

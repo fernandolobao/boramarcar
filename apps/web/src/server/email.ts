@@ -1,5 +1,6 @@
 import 'server-only';
 import { escapeHtml, sendEmails, type EmailMessage } from '@boramarcar/core/email';
+import type { EventRecap } from '@boramarcar/db';
 import { palette, themes } from '@boramarcar/tokens';
 import { createFormatter, createTranslator } from 'next-intl';
 import { getBaseUrl, getEnv } from '@/env';
@@ -226,3 +227,41 @@ export function buildBetaWelcomeEmail(
     }),
   };
 }
+
+/** Resumo da noite (8.6), para quem jogou ou confirmou presença, com o link para compartilhar. */
+export function buildRecapEmail(
+  recipient: EmailRecipient,
+  data: { groupName: string; recap: EventRecap },
+): EmailMessage {
+  const { locale, t, format } = tools(recipient);
+  const { recap } = data;
+  const day = format.dateTime(recap.startsAt, { weekday: 'long', day: 'numeric', month: 'long' });
+  const lines = recap.games.map((game) =>
+    game.winners.length
+      ? t('recap.gameWin', {
+          number: game.number,
+          names: game.winners.join(', '),
+          commanders: game.players.find((p) => p.result === 'win')?.commanders.join(' + ') || '-',
+        })
+      : t('recap.gameDraw', { number: game.number }),
+  );
+  const top = recap.standings[0];
+  return {
+    to: recipient.email,
+    ...render({
+      locale,
+      subject: t('recap.subject', { title: recap.title }),
+      greeting: t('greeting', { name: firstName(recipient.name) }),
+      intro: t('recap.intro', { count: recap.games.length, group: data.groupName, day }),
+      lines: [
+        ...lines,
+        ...(top && top.wins > 0 ? [t('recap.top', { name: top.name, wins: top.wins })] : []),
+      ],
+      cta: { label: t('recap.cta'), url: recapUrl(recap.eventId) },
+      footer: t('footer', { group: data.groupName, url: profileUrl() }),
+    }),
+  };
+}
+
+/** Página pública do resumo (só primeiros nomes, comandantes e placar). */
+export const recapUrl = (eventId: string) => `${getBaseUrl()}/resumo/${eventId}`;

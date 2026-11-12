@@ -785,6 +785,14 @@
       "feedback": "Found something odd or have an idea? Send it from the app (account menu → Send feedback).",
       "cta": "Send feedback",
       "note": "We only follow the group's numbers, such as meetups and recorded games."
+    },
+    "recap": {
+      "subject": "How it went: {title}",
+      "intro": "{count, plural, =1 {1 game} other {# games}} in {group} ({day}). Here's the recap:",
+      "gameWin": "Game {number}: {names} ({commanders})",
+      "gameDraw": "Game {number}: draw",
+      "top": "Standout: {name}, with {wins, plural, =1 {1 win} other {# wins}}.",
+      "cta": "See and share the recap"
     }
   },
   "formats": {
@@ -1418,6 +1426,11 @@
     "window": {
       "title": "The table is full in {group}!",
       "body": "{count} players can play {when}. Shall we schedule it?"
+    },
+    "recap": {
+      "title": "How it went: {title}",
+      "body": "{name} won {wins} out of {count}. See the recap and send it to the group.",
+      "bodyDraw": "{count, plural, =1 {1 game} other {# games}} recorded. See the recap and send it to the group."
     }
   },
   "onboarding": {
@@ -1611,7 +1624,11 @@
       "description": "ArcanaKin beta metrics."
     },
     "homeImage": "Schedule your next Commander night.",
-    "homeImageSubtitle": "Times when everyone can play, meetups, rankings, decks and games in one place."
+    "homeImageSubtitle": "Times when everyone can play, meetups, rankings, decks and games in one place.",
+    "recap": {
+      "title": "Meetup recap",
+      "description": "Who played, who won and with which commanders."
+    }
   },
   "beta": {
     "title": "Your group is in the ArcanaKin beta",
@@ -1619,5 +1636,24 @@
     "cta": "Send feedback",
     "dismiss": "Dismiss",
     "dismissLabel": "Dismiss the beta notice"
+  },
+  "recap": {
+    "eyebrow": "Meetup recap",
+    "metaTitle": "Recap: {title}",
+    "summaryTop": "{name} won {wins, plural, =1 {1 game} other {# games}} out of {count}.",
+    "summary": "{count, plural, =1 {1 game played} other {# games played}}.",
+    "standings": "Tonight's standings",
+    "wins": "{wins, plural, =1 {1 win} other {# wins}} in {games}",
+    "games": "Games",
+    "game": "Game {number}",
+    "draw": "draw",
+    "winner": "won",
+    "share": "Send to the group",
+    "shareText": "Recap of {title}: {summary} {url}",
+    "openEvent": "Open the meetup",
+    "cta": "Organize your group's Commander nights on ArcanaKin: times, games, rankings and decks.",
+    "ctaButton": "Discover ArcanaKin",
+    "link": "Recap to share",
+    "linkHint": "First names, commanders and score — no place or contacts."
   }
 }

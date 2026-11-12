@@ -27,6 +27,7 @@ export const SECTIONS = [
   'settings',
   'feedback',
   'table',
+  'recap',
   'admin',
 ] as const;
 export type Section = (typeof SECTIONS)[number];

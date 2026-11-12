@@ -68,6 +68,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         title: '4. Quem mais vê os seus dados',
         paragraphs: [
           'As pessoas dos seus grupos veem o seu nome, a sua foto, a sua disponibilidade, presenças, partidas e os decks que você deixou visíveis para o grupo ou público. O seu e-mail não aparece para outros jogadores.',
+          'O resumo de um encontro finalizado (página "Resumo do encontro", feita para mandar no grupo) pode ser aberto por quem tiver o link: mostra só o título e a data do encontro, o primeiro nome de quem jogou, os comandantes e o placar — nada de local, foto, e-mail ou nome do grupo.',
           'Usamos estes serviços (operadores), cada um só com os dados necessários para a sua função:',
         ],
         items: [
@@ -195,6 +196,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         title: '4. Who else sees your data',
         paragraphs: [
           'People in your groups see your name, photo, availability, RSVPs, games and the decks you made visible to the group or public. Your e-mail isn’t shown to other players.',
+          'The recap of a finished meetup (the “Meetup recap” page, made to send to the group) can be opened by anyone with the link: it shows only the meetup’s title and date, the first names of who played, the commanders and the score — no place, photo, e-mail or group name.',
           'We use these services (processors), each with only the data it needs:',
         ],
         items: [
