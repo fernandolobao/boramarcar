@@ -22,6 +22,7 @@ import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { Icon } from '@/components/icons';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
+import { StackSections } from '@/components/stack-sections';
 
 export const generateMetadata = navMetadata('availability');
 
@@ -99,181 +100,186 @@ export default async function AvailabilityPage({ searchParams }: Props) {
     <>
       <h1 className="page-title">{t('title')}</h1>
 
-      <section className="card" aria-labelledby="windows-title">
-        <h2 id="windows-title" className="section-title">
-          {t('windows')}
-        </h2>
-        {windows.length === 0 ? (
-          <p className="muted">{t('empty')}</p>
-        ) : (
-          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
-            {windows.map((w) => (
-              <li
-                key={`${w.start.toISOString()}-${w.locationId}`}
-                className="flex flex-wrap items-center justify-between gap-3 py-3"
-              >
-                <div>
-                  <p className="font-medium">{range(w.start, w.end)}</p>
-                  <p className="muted">
-                    {w.locationName ?? tc('locationTbd')} · <PlayerLinks players={w.players} />
-                  </p>
-                </div>
-                <CreateEventFromWindowButton
-                  groupId={group.id}
-                  title={te('defaultTitle')}
-                  startsAt={w.start.toISOString()}
-                  endsAt={w.end.toISOString()}
-                  locationId={w.locationId}
-                  participantIds={w.userIds}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="card space-y-3" aria-labelledby="grid-title">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="grid-title" className="section-title mb-0">
-            {t('gridTitle')}
+      <StackSections>
+        <section className="card" aria-labelledby="windows-title">
+          <h2 id="windows-title" className="section-title">
+            {t('windows')}
           </h2>
-          <nav aria-label={t('gridTitle')} className="flex flex-wrap gap-2">
-            <Link className="btn-secondary" href={weekLink(addDays(weekStart, -7))}>
-              <Icon name="previous" />
-              {t('previousWeek')}
-            </Link>
-            {weekStart !== currentWeek && (
-              <Link className="btn-secondary" href="/disponibilidade">
-                {t('thisWeek')}
-              </Link>
-            )}
-            <Link className="btn-secondary" href={weekLink(addDays(weekStart, 7))}>
-              {t('nextWeek')}
-              <Icon name="next" />
-            </Link>
-          </nav>
-        </div>
-        <AvailabilityGrid
-          groupId={group.id}
-          grid={grid}
-          members={members.map((m) => ({ userId: m.userId, name: m.name }))}
-          minPlayers={group.tableSize}
-        />
-      </section>
-
-      <section className="card" aria-labelledby="add-title">
-        <h2 id="add-title" className="section-title">
-          {t('add')}
-        </h2>
-        <AvailabilityForm
-          groupId={group.id}
-          locations={locations.map((l) => ({ id: l.id, name: l.name }))}
-        />
-      </section>
-
-      <section className="card" aria-labelledby="rules-title">
-        <h2 id="rules-title" className="section-title">
-          {t('myRules')}
-        </h2>
-        {myRules.length === 0 ? (
-          <p className="muted">{t('noRules')}</p>
-        ) : (
-          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
-            {myRules.map((rule) => (
-              <li key={rule.id} className="space-y-2 py-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
+          {windows.length === 0 ? (
+            <p className="muted">{t('empty')}</p>
+          ) : (
+            <ul className="divide-y divide-ink-200 dark:divide-ink-800">
+              {windows.map((w) => (
+                <li
+                  key={`${w.start.toISOString()}-${w.locationId}`}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3"
+                >
                   <div>
-                    <p className="font-medium first-letter:uppercase">{ruleSummary(rule)}</p>
+                    <p className="font-medium">{range(w.start, w.end)}</p>
                     <p className="muted">
-                      {rule.locationIds.length
-                        ? rule.locationIds.map((id) => locationName.get(id) ?? id).join(', ')
-                        : tc('anyLocation')}
-                      {rule.note && ` · ${rule.note}`}
+                      {w.locationName ?? tc('locationTbd')} · <PlayerLinks players={w.players} />
                     </p>
                   </div>
-                  <DeleteButton
-                    path={`/api/v1/availability-rules/${rule.id}`}
-                    context={t('removeRule', { summary: ruleSummary(rule) })}
+                  <CreateEventFromWindowButton
+                    groupId={group.id}
+                    title={te('defaultTitle')}
+                    startsAt={w.start.toISOString()}
+                    endsAt={w.end.toISOString()}
+                    locationId={w.locationId}
+                    participantIds={w.userIds}
                   />
-                </div>
-                {rule.exceptions.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2 text-sm">
-                    <span className="muted">{t('skippedDates')}</span>
-                    {rule.exceptions.map((date) => (
-                      <span
-                        key={date}
-                        className="flex items-center gap-1 rounded-full bg-ink-100 py-0.5 pr-1 pl-3 dark:bg-ink-800"
-                      >
-                        {localDate(date)}
-                        <ApiActionButton
-                          path={`/api/v1/availability-rules/${rule.id}/exceptions`}
-                          method="PUT"
-                          body={{ date, skip: false }}
-                          label={t('unskipLabel', { date: localDate(date) })}
-                          className="btn min-h-8 px-2 text-brand-700 underline dark:text-brand-100"
-                        >
-                          <Icon name="undo" className="size-3.5" />
-                          {t('unskip')}
-                        </ApiActionButton>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-      <section className="card" aria-labelledby="everyone-title">
-        <h2 id="everyone-title" className="section-title">
-          {t('everyone')}
-        </h2>
-        {slots.length === 0 ? (
-          <p className="muted">{t('empty')}</p>
-        ) : (
-          <ul className="divide-y divide-ink-200 dark:divide-ink-800">
-            {slots.map((slot) => (
-              <li key={slot.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
-                <div>
-                  <p className="font-medium">
-                    <PlayerLink userId={slot.userId} name={slot.userName} /> ·{' '}
-                    {range(slot.startsAt, slot.endsAt)}
-                    {slot.kind === 'weekly' && (
-                      <span className="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-normal dark:bg-ink-800">
-                        ↻ {t('weeklyTag')}
-                      </span>
-                    )}
-                  </p>
-                  <p className="muted">
-                    {slot.locationIds.length
-                      ? slot.locationIds.map((id) => locationName.get(id) ?? id).join(', ')
-                      : tc('anyLocation')}
-                    {slot.note && ` · ${slot.note}`}
-                  </p>
-                </div>
-                {slot.userId === user.id &&
-                  (slot.kind === 'weekly' && slot.ruleId && slot.date ? (
-                    <ApiActionButton
-                      path={`/api/v1/availability-rules/${slot.ruleId}/exceptions`}
-                      method="PUT"
-                      body={{ date: slot.date, skip: true }}
-                      label={`${t('skipDate')}: ${t('skipDateLabel', { date: localDate(slot.date) })}`}
-                    >
-                      <Icon name="skipDate" />
-                      {t('skipDate')}
-                    </ApiActionButton>
-                  ) : (
+        <section className="card space-y-3" aria-labelledby="grid-title">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="grid-title" className="section-title mb-0">
+              {t('gridTitle')}
+            </h2>
+            <nav aria-label={t('gridTitle')} className="flex flex-wrap gap-2">
+              <Link className="btn-secondary" href={weekLink(addDays(weekStart, -7))}>
+                <Icon name="previous" />
+                {t('previousWeek')}
+              </Link>
+              {weekStart !== currentWeek && (
+                <Link className="btn-secondary" href="/disponibilidade">
+                  {t('thisWeek')}
+                </Link>
+              )}
+              <Link className="btn-secondary" href={weekLink(addDays(weekStart, 7))}>
+                {t('nextWeek')}
+                <Icon name="next" />
+              </Link>
+            </nav>
+          </div>
+          <AvailabilityGrid
+            groupId={group.id}
+            grid={grid}
+            members={members.map((m) => ({ userId: m.userId, name: m.name }))}
+            minPlayers={group.tableSize}
+          />
+        </section>
+
+        <section className="card" aria-labelledby="add-title">
+          <h2 id="add-title" className="section-title">
+            {t('add')}
+          </h2>
+          <AvailabilityForm
+            groupId={group.id}
+            locations={locations.map((l) => ({ id: l.id, name: l.name }))}
+          />
+        </section>
+
+        <section className="card" aria-labelledby="rules-title">
+          <h2 id="rules-title" className="section-title">
+            {t('myRules')}
+          </h2>
+          {myRules.length === 0 ? (
+            <p className="muted">{t('noRules')}</p>
+          ) : (
+            <ul className="divide-y divide-ink-200 dark:divide-ink-800">
+              {myRules.map((rule) => (
+                <li key={rule.id} className="space-y-2 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="font-medium first-letter:uppercase">{ruleSummary(rule)}</p>
+                      <p className="muted">
+                        {rule.locationIds.length
+                          ? rule.locationIds.map((id) => locationName.get(id) ?? id).join(', ')
+                          : tc('anyLocation')}
+                        {rule.note && ` · ${rule.note}`}
+                      </p>
+                    </div>
                     <DeleteButton
-                      path={`/api/v1/availability/${slot.id}`}
-                      context={t('removeSlot', { when: range(slot.startsAt, slot.endsAt) })}
+                      path={`/api/v1/availability-rules/${rule.id}`}
+                      context={t('removeRule', { summary: ruleSummary(rule) })}
                     />
-                  ))}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                  </div>
+                  {rule.exceptions.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="muted">{t('skippedDates')}</span>
+                      {rule.exceptions.map((date) => (
+                        <span
+                          key={date}
+                          className="flex items-center gap-1 rounded-full bg-ink-100 py-0.5 pr-1 pl-3 dark:bg-ink-800"
+                        >
+                          {localDate(date)}
+                          <ApiActionButton
+                            path={`/api/v1/availability-rules/${rule.id}/exceptions`}
+                            method="PUT"
+                            body={{ date, skip: false }}
+                            label={t('unskipLabel', { date: localDate(date) })}
+                            className="btn min-h-8 px-2 text-brand-700 underline dark:text-brand-100"
+                          >
+                            <Icon name="undo" className="size-3.5" />
+                            {t('unskip')}
+                          </ApiActionButton>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="card" aria-labelledby="everyone-title">
+          <h2 id="everyone-title" className="section-title">
+            {t('everyone')}
+          </h2>
+          {slots.length === 0 ? (
+            <p className="muted">{t('empty')}</p>
+          ) : (
+            <ul className="divide-y divide-ink-200 dark:divide-ink-800">
+              {slots.map((slot) => (
+                <li
+                  key={slot.id}
+                  className="flex flex-wrap items-center justify-between gap-2 py-3"
+                >
+                  <div>
+                    <p className="font-medium">
+                      <PlayerLink userId={slot.userId} name={slot.userName} /> ·{' '}
+                      {range(slot.startsAt, slot.endsAt)}
+                      {slot.kind === 'weekly' && (
+                        <span className="ml-2 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-normal dark:bg-ink-800">
+                          ↻ {t('weeklyTag')}
+                        </span>
+                      )}
+                    </p>
+                    <p className="muted">
+                      {slot.locationIds.length
+                        ? slot.locationIds.map((id) => locationName.get(id) ?? id).join(', ')
+                        : tc('anyLocation')}
+                      {slot.note && ` · ${slot.note}`}
+                    </p>
+                  </div>
+                  {slot.userId === user.id &&
+                    (slot.kind === 'weekly' && slot.ruleId && slot.date ? (
+                      <ApiActionButton
+                        path={`/api/v1/availability-rules/${slot.ruleId}/exceptions`}
+                        method="PUT"
+                        body={{ date: slot.date, skip: true }}
+                        label={`${t('skipDate')}: ${t('skipDateLabel', { date: localDate(slot.date) })}`}
+                      >
+                        <Icon name="skipDate" />
+                        {t('skipDate')}
+                      </ApiActionButton>
+                    ) : (
+                      <DeleteButton
+                        path={`/api/v1/availability/${slot.id}`}
+                        context={t('removeSlot', { when: range(slot.startsAt, slot.endsAt) })}
+                      />
+                    ))}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </StackSections>
     </>
   );
 }

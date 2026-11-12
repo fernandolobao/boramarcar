@@ -1,6 +1,6 @@
 'use client';
 
-import { Children, useEffect, useRef, type ReactNode } from 'react';
+import { Children, Fragment, isValidElement, useEffect, useRef, type ReactNode } from 'react';
 import { planStack, stackFrame, type StackPlanItem } from './stack-layout';
 
 /**
@@ -16,11 +16,20 @@ import { planStack, stackFrame, type StackPlanItem } from './stack-layout';
  * - Sem JavaScript, as seções ficam uma embaixo da outra. Foco dentro de uma seção coberta tira o
  *   corte e o esmaecimento dela e a traz para a frente (WCAG 2.4.11).
  */
+/** Cada seção vira uma carta: fragmentos (`<>…</>`) e listas são abertos; vazios saem. */
+function flatten(children: ReactNode): ReactNode[] {
+  return Children.toArray(children).flatMap((child) =>
+    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+      ? flatten(child.props.children)
+      : [child],
+  );
+}
+
 const STACK_VARS = ['--stack-top', '--stack-push', '--stack-clip', '--stack-fade', '--stack-scale'];
 
 export function StackSections({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const items = Children.toArray(children).filter(Boolean);
+  const items = flatten(children);
 
   useEffect(() => {
     const root = ref.current;
