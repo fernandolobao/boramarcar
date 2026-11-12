@@ -1,33 +1,24 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { api } from '@/lib/api';
 
 /**
- * Mantém o cookie de idioma igual ao idioma salvo no perfil. Num navegador ou endereço novo (ex.:
- * o preview de um deploy), o cookie não existe e o idioma cairia no do navegador; aqui ele volta
- * para o salvo e a página é recarregada. Não renderiza nada.
+ * Grava o cookie de idioma quando ele falta neste navegador ou endereço (ex.: o preview de um
+ * deploy). A página já veio no idioma salvo no perfil (`i18n/request.ts` usa o salvo quando não
+ * há cookie); o cookie só evita consultar o perfil a cada página. Com cookie, ele manda: é a
+ * escolha feita neste navegador. Não renderiza nada.
  */
 export function LocaleSync({
   savedLocale,
-  currentLocale,
+  hasCookie,
 }: {
   savedLocale: string | null;
-  currentLocale: string;
+  hasCookie: boolean;
 }) {
-  const router = useRouter();
   useEffect(() => {
-    if (!savedLocale || savedLocale === currentLocale) return;
-    let cancelled = false;
-    api('/api/v1/me/preferences', { method: 'PUT', body: { locale: savedLocale } })
-      .then(() => {
-        if (!cancelled) router.refresh();
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [savedLocale, currentLocale, router]);
+    if (!savedLocale || hasCookie) return;
+    api('/api/v1/me/preferences', { method: 'PUT', body: { locale: savedLocale } }).catch(() => {});
+  }, [savedLocale, hasCookie]);
   return null;
 }
