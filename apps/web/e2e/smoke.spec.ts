@@ -21,7 +21,7 @@ test.describe('smoke', () => {
     }
     await expect(page.getByRole('link', { name: 'Enviar feedback por e-mail' })).toHaveAttribute(
       'href',
-      /^mailto:fernando@fernandocamilotti\.com\?subject=/,
+      /^mailto:contato@arcanakin\.com\.br\?subject=/,
     );
     await expect(
       page

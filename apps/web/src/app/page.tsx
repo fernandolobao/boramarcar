@@ -8,8 +8,7 @@ import { HeroVideo } from '@/components/home/hero-video';
 import { Icon, type IconName } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
-
-const CONTACT = 'fernando@fernandocamilotti.com';
+import { CONTACT_EMAIL } from '@/lib/contact';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('home');
@@ -105,7 +104,7 @@ export default async function HomePage({
   const tl = await getTranslations('legal');
   const t = await getTranslations('home');
   const tc = await getTranslations('common');
-  const mailto = `mailto:${CONTACT}?subject=${encodeURIComponent(t('join.emailSubject'))}`;
+  const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t('join.emailSubject'))}`;
   const sections = ['features', 'sources', 'method', 'values', 'join'] as const;
 
   const dashboardButton = (size: 'sm' | 'lg') =>
@@ -391,8 +390,8 @@ export default async function HomePage({
           <p className="muted">{t('footer.disclaimer')}</p>
           <p>
             {t('footer.contact')}:{' '}
-            <a href={`mailto:${CONTACT}`} className="underline underline-offset-2">
-              {CONTACT}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2">
+              {CONTACT_EMAIL}
             </a>
           </p>
           <p>

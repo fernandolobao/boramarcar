@@ -253,6 +253,6 @@ Todas as rotas exigem sessão (cookie do Better Auth; no mobile, bearer token �
 
 ## Créditos e avisos
 
-Dados de cartas fornecidos pela [Scryfall](https://scryfall.com/docs/api). Importação de decks do [Archidekt](https://archidekt.com/) e [Moxfield](https://moxfield.com/). A análise de deck se inspira em ferramentas como o [mythic.tools](https://mythic.tools/).
+Dados de cartas fornecidos pela [Scryfall](https://scryfall.com/docs/api). Importação de decks do [Archidekt](https://archidekt.com/) e [Moxfield](https://moxfield.com/).
 
 ArcanaKin é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.
