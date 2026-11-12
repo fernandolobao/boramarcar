@@ -11,6 +11,7 @@ import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { printLabel } from './print-picker';
 import { useLightDismiss } from './use-light-dismiss';
+import { openerImage, zoom } from './card-zoom';
 
 /** O que o diálogo precisa saber de uma carta (os campos vêm do cache do Scryfall). */
 export interface DialogCard {
@@ -64,13 +65,35 @@ export function CardDialog({
   const tc = useTranslations('common');
   const format = useFormatter();
   const ref = useRef<HTMLDialogElement>(null);
-  useLightDismiss(ref);
+  /** Imagem da carta no diálogo e a de quem abriu (para o zoom de ida e volta). */
+  const imageRef = useRef<HTMLDivElement>(null);
+  const originRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
+
+  /** Fecha com o zoom de volta para a carta de origem (botão, Esc e clique no fundo). */
+  const dismiss = () => {
+    const d = ref.current;
+    if (!d?.open) return;
+    zoom(
+      imageRef.current,
+      () => d.close(),
+      () => originRef.current,
+    );
+  };
+  useLightDismiss(ref, dismiss);
 
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      const from = openerImage();
+      originRef.current = from;
+      zoom(
+        from,
+        () => d.showModal(),
+        () => imageRef.current,
+      );
+    }
     if (!open && d.open) d.close();
   }, [open]);
 
@@ -83,21 +106,28 @@ export function CardDialog({
       aria-labelledby={titleId}
       className="m-auto max-h-[94dvh] w-[min(96vw,52rem)] overflow-y-auto rounded-2xl bg-surface p-3 text-fg shadow-2xl backdrop:bg-noite/70 sm:p-5"
       onClose={onClose}
+      onCancel={(e) => {
+        e.preventDefault();
+        dismiss();
+      }}
     >
       {open && (
-        // Carta à esquerda, informações e edição à direita (também no celular, com a carta
-        // menor), para editar sem rolar.
-        <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-start gap-3 sm:gap-6">
-          <div className="space-y-2">
+        // Celular: uma coluna, carta no topo (com altura limitada para as informações aparecerem
+        // logo abaixo). A partir de sm: carta à esquerda, informações e edição à direita.
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-6">
+          <div className="mx-auto w-full max-w-[min(15rem,38dvh)] space-y-2 sm:max-w-none">
             {status === 'ready' &&
               (image ? (
-                <div className="holo relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] shadow-md">
+                <div
+                  ref={imageRef}
+                  className="holo relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] shadow-md"
+                >
                   <Image
                     src={image}
                     alt={alt}
                     fill
                     unoptimized
-                    sizes="(min-width: 640px) 20rem, 40vw"
+                    sizes="(min-width: 640px) 20rem, 15rem"
                     className="object-cover"
                   />
                   {foil && <span aria-hidden="true" className="foil-sheen" />}
@@ -135,7 +165,7 @@ export function CardDialog({
               <button
                 type="button"
                 className="btn-secondary shrink-0 px-2 sm:px-3"
-                onClick={() => ref.current?.close()}
+                onClick={dismiss}
               >
                 <Icon name="close" />
                 <span className="sr-only sm:not-sr-only">{t('close')}</span>

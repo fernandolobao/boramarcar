@@ -49,6 +49,12 @@ a[x-apple-data-detectors] {
   pointer-events: none;
 }
 
+/* Diálogo modal aberto: a página de trás não rola com a roda do mouse nem com o toque. */
+html:has(dialog:modal) {
+  overflow: hidden;
+  /* Mantém o espaço da barra de rolagem: o conteúdo não pula para o lado. */
+  scrollbar-gutter: stable;
+}
 body {
   @apply bg-canvas text-fg antialiased;
 }
@@ -243,7 +249,7 @@ input[type='radio'] {
     transparent 60%
   );
   mix-blend-mode: overlay;
-  opacity: calc(var(--ta) * 0.9);
+  opacity: calc(var(--ta) * 0.72);
   transition: opacity 0.3s ease-out;
 }
 .holo-shine {
@@ -265,7 +271,7 @@ input[type='radio'] {
     calc(50% + var(--tx) * 60%) calc(50% + var(--ty) * 60%),
     0 0;
   mix-blend-mode: color-dodge;
-  opacity: calc(0.18 + var(--ta) * 0.45);
+  opacity: calc(0.14 + var(--ta) * 0.36);
   filter: saturate(1.2);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -328,16 +334,9 @@ input[type='radio'] {
   opacity: calc(max(0, var(--stack-fade, 0) - 0.5) * 0.8);
   pointer-events: none;
 }
-/* Foco de teclado nunca fica escondido atrás de outra seção nem cortado (WCAG 2.4.11). Só o
-   foco visível: um clique (ex.: abrir um item da análise) não pode trazer a seção para a frente
-   e deixá-la por cima das outras ao rolar. */
-.stack-card:has(:focus-visible) {
-  z-index: 50 !important;
-  clip-path: none;
-}
-.stack-card:has(:focus-visible)::after {
-  opacity: 0;
-}
+/* Foco de teclado nunca fica escondido atrás de outra seção (WCAG 2.4.11): em vez de trazer a
+   seção para a frente (o que a deixava por cima das outras ao rolar), `StackSections` rola a
+   página o bastante para o elemento focado aparecer acima da seção seguinte. */
 @media print {
   .stack-card {
     position: static !important;

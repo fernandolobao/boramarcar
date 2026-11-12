@@ -3,6 +3,7 @@ import { contrastRatio, themes } from './index';
 import {
   collectionFlow,
   deckBarBackground,
+  GOLD_BAR_COLORS,
   MANA_BAR_COLORS,
   DEFAULT_FLOW,
   deckFlow,
@@ -113,7 +114,7 @@ describe('normalizeFlow e sampleFlow', () => {
 describe('barras nas cores do deck', () => {
   it('cada cor tem contraste ≥ 3:1 com a superfície nos dois temas', () => {
     for (const theme of ['light', 'dark'] as const) {
-      for (const color of Object.values(MANA_BAR_COLORS[theme])) {
+      for (const color of [...Object.values(MANA_BAR_COLORS[theme]), GOLD_BAR_COLORS[theme]]) {
         expect(contrastRatio(color, themes[theme].surface)).toBeGreaterThanOrEqual(3);
       }
     }
@@ -125,5 +126,8 @@ describe('barras nas cores do deck', () => {
       `linear-gradient(135deg, ${MANA_BAR_COLORS.dark.U}, ${MANA_BAR_COLORS.dark.G})`,
     );
     expect(deckBarBackground([], 'light')).toBe(MANA_BAR_COLORS.light.C);
+    // Três cores ou mais: dourado (o degradê de muitas cores atrapalha a leitura).
+    expect(deckBarBackground(['W', 'U', 'B'], 'light')).toBe(GOLD_BAR_COLORS.light);
+    expect(deckBarBackground(['W', 'U', 'B', 'R', 'G'], 'dark')).toBe(GOLD_BAR_COLORS.dark);
   });
 });
