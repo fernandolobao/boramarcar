@@ -4,11 +4,12 @@ import {
   validCoordinates,
   type GroupSettings,
 } from '@boramarcar/core';
-import { and, asc, count, eq } from 'drizzle-orm';
+import { and, asc, count, eq, gt } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   availabilityRules,
   availabilitySlots,
+  events,
   groupMembers,
   groups,
   locations,
@@ -218,7 +219,7 @@ export async function listLocations(db: Database, groupId: string) {
 }
 
 /** Dados públicos de um convite (para a página /convite/:codigo, antes do login). */
-export async function getInvitePreview(db: Database, inviteCode: string) {
+export async function getInvitePreview(db: Database, inviteCode: string, now = new Date()) {
   const code = inviteCode.trim().toUpperCase();
   if (!code) return null;
   const [row] = await db
@@ -233,7 +234,31 @@ export async function getInvitePreview(db: Database, inviteCode: string) {
     .where(eq(groups.inviteCode, code))
     .groupBy(groups.id)
     .limit(1);
-  return row ?? null;
+  if (!row) return null;
+  // Contexto para quem ainda não entrou (7.3): só o primeiro nome de quem já está e o título e a
+  // data do próximo encontro. Nada de e-mail, foto nem endereço: o link do convite circula.
+  const [people, [next]] = await Promise.all([
+    db
+      .select({ name: user.name })
+      .from(groupMembers)
+      .innerJoin(user, eq(user.id, groupMembers.userId))
+      .where(eq(groupMembers.groupId, row.id))
+      .orderBy(asc(groupMembers.joinedAt))
+      .limit(8),
+    db
+      .select({ title: events.title, startsAt: events.startsAt })
+      .from(events)
+      .where(
+        and(eq(events.groupId, row.id), eq(events.status, 'scheduled'), gt(events.startsAt, now)),
+      )
+      .orderBy(asc(events.startsAt))
+      .limit(1),
+  ]);
+  return {
+    ...row,
+    firstNames: people.map((p) => p.name.trim().split(/\s+/)[0] ?? p.name),
+    nextEvent: next ?? null,
+  };
 }
 
 /** Diz se o usuário já participa do grupo (sem lançar erro). */

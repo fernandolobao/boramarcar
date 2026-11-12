@@ -31,14 +31,14 @@ const DAY = 24 * 60 * 60 * 1000;
 const addDays = (date: string, days: number) =>
   new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY).toISOString().slice(0, 10);
 
-type Props = { searchParams: Promise<{ semana?: string }> };
+type Props = { searchParams: Promise<{ semana?: string; bemvindo?: string }> };
 
 export default async function AvailabilityPage({ searchParams }: Props) {
   const { user, group } = await requireUserAndGroup();
   const db = getDb();
   const timeZone = await getTimeZone();
   const locale = await getLocale();
-  const { semana } = await searchParams;
+  const { semana, bemvindo } = await searchParams;
 
   const currentWeek = weekStartFor(new Date(), timeZone);
   const weekStart =
@@ -100,6 +100,26 @@ export default async function AvailabilityPage({ searchParams }: Props) {
   return (
     <>
       <h1 className="page-title">{t('title')}</h1>
+
+      {/* Quem acabou de entrar pelo convite (onboarding 7.3): o que fazer primeiro. */}
+      {bemvindo === '1' && (
+        <section aria-labelledby="bem-vindo" className="card space-y-3 border-primary">
+          <h2 id="bem-vindo" className="section-title mb-0">
+            {t('welcomeTitle', { group: group.name })}
+          </h2>
+          <p>{t('welcomeText')}</p>
+          <div className="flex flex-wrap gap-2">
+            <a href="#rules-title" className="btn-primary">
+              <Icon name="weekly" />
+              {t('welcomeWeekly')}
+            </a>
+            <a href="#add-title" className="btn-secondary">
+              <Icon name="once" />
+              {t('welcomeOnce')}
+            </a>
+          </div>
+        </section>
+      )}
 
       <StackSections>
         <section className="card" aria-labelledby="windows-title">

@@ -211,6 +211,22 @@ export const pushTokens = pgTable(
   (t) => [index('push_tokens_user_idx').on(t.userId)],
 );
 
+/**
+ * Onboarding (Fase 7): só o que não dá para deduzir dos dados (ex.: "dispensou os primeiros
+ * passos", "pulou o guia"). Os passos em si (disponibilidade, deck, convite…) são calculados.
+ */
+export const onboardingSteps = pgTable(
+  'onboarding_steps',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    step: text('step').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.step] })],
+);
+
 /* ---------- Eventos e partidas ---------- */
 
 export const events = pgTable(
