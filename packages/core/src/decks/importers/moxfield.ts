@@ -3,7 +3,7 @@ import { DomainError } from '../../errors';
 import type { GameFormat } from '../../games';
 import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
 import { mergeDuplicates } from './text';
-import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../../external';
+import { EXTERNAL_TIMEOUT_MS, readJsonLimited, withTimeout } from '../../external';
 
 const boardSchema = z
   .object({
@@ -128,6 +128,8 @@ export async function fetchMoxfieldDeck(
       'Moxfield',
     )(`https://api2.moxfield.com/v3/decks/all/${encodeURIComponent(publicId)}`, {
       headers: { Accept: 'application/json', 'User-Agent': userAgent },
+      // Endereço montado aqui, sempre na API do serviço: um redirecionamento para outro lugar é erro.
+      redirect: 'error',
     });
   } catch {
     throw new DomainError('upstream_error', 'Não foi possível conectar ao Moxfield', details(null));
@@ -142,5 +144,9 @@ export async function fetchMoxfieldDeck(
       details(response.status),
     );
   }
-  return mapMoxfieldDeck(await response.json());
+  return mapMoxfieldDeck(
+    (await readJsonLimited(response, { service: 'Moxfield' })) as Parameters<
+      typeof mapMoxfieldDeck
+    >[0],
+  );
 }

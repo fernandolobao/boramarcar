@@ -3,7 +3,7 @@ import { DomainError } from '../../errors';
 import type { GameFormat } from '../../games';
 import type { DeckBoard, DeckEntry, FetchLike, ImportedDeck } from '../types';
 import { mergeDuplicates } from './text';
-import { EXTERNAL_TIMEOUT_MS, withTimeout } from '../../external';
+import { EXTERNAL_TIMEOUT_MS, readJsonLimited, withTimeout } from '../../external';
 
 const archidektDeckSchema = z.object({
   id: z.number(),
@@ -106,11 +106,17 @@ export async function fetchArchidektDeck(id: string, fetchFn: FetchLike): Promis
     'Archidekt',
   )(`https://archidekt.com/api/decks/${encodeURIComponent(id)}/`, {
     headers: { Accept: 'application/json' },
+    // Endereço montado aqui, sempre na API do serviço: um redirecionamento para outro lugar é erro.
+    redirect: 'error',
   });
   if (response.status === 404)
     throw new DomainError('not_found', 'Deck não encontrado no Archidekt');
   if (!response.ok) {
     throw new DomainError('upstream_error', `Archidekt respondeu ${response.status}`);
   }
-  return mapArchidektDeck(await response.json());
+  return mapArchidektDeck(
+    (await readJsonLimited(response, { service: 'Archidekt' })) as Parameters<
+      typeof mapArchidektDeck
+    >[0],
+  );
 }
