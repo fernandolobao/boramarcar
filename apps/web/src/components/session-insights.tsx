@@ -14,9 +14,12 @@ import { CONTENTSQUARE_TAG_ID, contentsquareTagUrl } from '@/lib/session-insight
 export function SessionInsights({
   enabled,
   consent: initial,
+  nonce,
 }: {
   enabled: boolean;
   consent: Consent | null;
+  /** Nonce da CSP da página (`proxy.ts`). */
+  nonce?: string;
 }) {
   const [consent, setConsent] = useState(initial);
 
@@ -35,5 +38,5 @@ export function SessionInsights({
 
   const src = contentsquareTagUrl(CONTENTSQUARE_TAG_ID);
   if (!enabled || !src || consent !== 'accepted') return null;
-  return <Script id="contentsquare" src={src} strategy="afterInteractive" />;
+  return <Script id="contentsquare" src={src} strategy="afterInteractive" nonce={nonce} />;
 }

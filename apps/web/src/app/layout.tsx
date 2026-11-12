@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { themes } from '@boramarcar/tokens';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Suspense, type ReactNode } from 'react';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { ActivityBar } from '@/components/activity-bar';
 import { ConsentBanner } from '@/components/consent-banner';
 import { SessionInsights } from '@/components/session-insights';
@@ -43,11 +44,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // O aviso de cookies só existe quando há algo não essencial para aceitar (a gravação de
   // sessões, só em produção); o Vercel Analytics não usa cookies.
   const insights = sessionInsightsEnabled();
+  // Nonce da CSP (proxy.ts) para o único script inline nosso.
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     // `data-theme` é definido pelo script antes da hidratação (preferência salva no navegador).
     <html lang={locale} className={display.variable} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {/* O navegador esconde o atributo nonce depois de ler: sem aviso de hidratação. */}
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        />
       </head>
       <body>
         <a href="#conteudo" className="skip-link">
@@ -60,9 +68,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </Suspense>
           {children}
           {insights && <ConsentBanner initial={consent} />}
-          <SessionInsights enabled={insights} consent={consent} />
+          <SessionInsights enabled={insights} consent={consent} nonce={nonce} />
         </NextIntlClientProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

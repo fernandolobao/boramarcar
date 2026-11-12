@@ -44,7 +44,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         items: [
           'Da sua conta Google, ao entrar: nome, e-mail, foto de perfil e o identificador da conta. Não pedimos acesso ao Gmail, ao Drive nem a nenhum outro serviço do Google, e não guardamos senha.',
           'O que você informa no app: grupos de que participa, disponibilidade, locais e endereços cadastrados, encontros e presenças, partidas e resultados, decks e preferências (fuso horário, idioma, tema e avisos por e-mail).',
-          'Dados técnicos: cookies de sessão, endereço IP e registros de acesso mantidos pelo provedor de hospedagem, e métricas de uso agregadas do Vercel Analytics, que não usa cookies nem identifica você.',
+          'Dados técnicos: cookies de sessão, endereço IP e registros de acesso mantidos pelo provedor de hospedagem, métricas de uso agregadas do Vercel Analytics (sem cookies e sem identificar você) e, quando algo dá errado, o registro do erro no Sentry, sem nome nem e-mail.',
           'Só com o seu consentimento: gravação de como as telas são usadas (cliques, rolagem, navegação e mapas de calor) pelo Hotjar (Contentsquare). O que você digita em campos de formulário não é gravado, e o seu e-mail é mascarado na tela.',
         ],
       },
@@ -71,6 +71,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         items: [
           'Google: login (OpenID Connect).',
           'Vercel: hospedagem do site e da API, e métricas agregadas sem cookies.',
+          'Sentry: registro de erros do site (mensagem do erro, página, navegador e sistema), sem nome, e-mail nem gravação de tela.',
           'Neon: banco de dados.',
           'Resend: envio dos e-mails de aviso.',
           'Hotjar/Contentsquare: gravação de sessões, só com o seu consentimento.',
@@ -167,7 +168,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         items: [
           'From your Google account, when you sign in: name, e-mail, profile photo and the account identifier. We don’t ask for access to Gmail, Drive or any other Google service, and we don’t store passwords.',
           'What you enter in the app: the groups you are in, availability, places and addresses, meetups and RSVPs, games and results, decks and preferences (time zone, language, theme and e-mail notices).',
-          'Technical data: session cookies, IP address and access logs kept by the hosting provider, and aggregated usage metrics from Vercel Analytics, which uses no cookies and doesn’t identify you.',
+          'Technical data: session cookies, IP address and access logs kept by the hosting provider, aggregated usage metrics from Vercel Analytics (no cookies, doesn’t identify you) and, when something goes wrong, the error log in Sentry, without name or e-mail.',
           'Only with your consent: recordings of how screens are used (clicks, scrolling, navigation and heatmaps) by Hotjar (Contentsquare). What you type in form fields isn’t recorded, and your e-mail is masked on screen.',
         ],
       },
@@ -194,6 +195,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         items: [
           'Google: sign-in (OpenID Connect).',
           'Vercel: hosting of the site and API, and cookieless aggregated metrics.',
+          'Sentry: error logging for the site (error message, page, browser and system), without name, e-mail or screen recording.',
           'Neon: database.',
           'Resend: sending notice e-mails.',
           'Hotjar/Contentsquare: session recording, only with your consent.',
