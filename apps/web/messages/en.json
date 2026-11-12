@@ -1011,9 +1011,7 @@
       "eyebrow": "In testing with Commander groups",
       "title": "The table comes together. ArcanaKin handles the rest.",
       "subtitle": "Everyone marks when and where they can play. The app finds when the table comes together, records games, keeps the ranking and helps improve your decks.",
-      "join": "Join the tests",
-      "pause": "Pause background animation",
-      "play": "Play background animation"
+      "join": "Join the tests"
     },
     "intro": {
       "title": "What is ArcanaKin",
@@ -1169,6 +1167,18 @@
       "credits": "Card data by Scryfall; combos by Commander Spellbook; dollar rate by the Central Bank of Brazil.",
       "disclaimer": "ArcanaKin is a fan project and is not affiliated with Wizards of the Coast. Magic: The Gathering is a trademark of Wizards of the Coast LLC.",
       "contact": "Contact"
+    },
+    "preview": {
+      "label": "ArcanaKin example: the next meetup with who's coming, the alert that the table filled up and the night's standings.",
+      "nextEvent": "Next meetup",
+      "eventTitle": "Friday Commander",
+      "eventWhen": "Friday, 8:00 PM",
+      "eventWhere": "Ana's place",
+      "confirmed": "4 coming",
+      "windowTitle": "The table filled up!",
+      "windowBody": "4 players are free on Saturday, 3–7 PM",
+      "recap": "Tonight's standings",
+      "wins": "{wins, plural, =1 {1 win} other {# wins}}"
     }
   },
   "places": {

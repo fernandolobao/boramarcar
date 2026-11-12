@@ -23,11 +23,9 @@ test.describe('smoke', () => {
       'href',
       /^mailto:contato@arcanakin\.com\.br\?subject=/,
     );
-    await expect(
-      page
-        .getByRole('button', { name: 'Pausar animação de fundo' })
-        .or(page.getByRole('button', { name: 'Reproduzir animação de fundo' })),
-    ).toBeVisible();
+    // Sem vídeo no topo: a prévia do app é lida como uma imagem só.
+    await expect(page.locator('video')).toHaveCount(0);
+    await expect(page.getByRole('img', { name: /Exemplo do ArcanaKin/ })).toBeVisible();
   });
 
   test('áreas logadas redirecionam visitantes para a página inicial', async ({ page }) => {

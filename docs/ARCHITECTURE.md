@@ -163,7 +163,7 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 
 ## Página inicial
 
-`/` é pública e igual para todos (não redireciona mais quem já entrou): apresentação, funcionalidades, fontes de dados, metodologia da análise (os pontos da nota vêm de `ROLE_POINTS` do core), valores e o convite para os testes (e-mail). O menu superior leva ao painel (ou faz o login com o Google, que volta para `/painel`). O vídeo abstrato do topo (`public/home/hero.webm|mp4` + capa `hero-poster.webp`) é gerado por `apps/web/scripts/hero-video.py` (quadros em Python + ffmpeg, loop de 12 s).
+`/` é pública e igual para todos (não redireciona mais quem já entrou): apresentação, funcionalidades, fontes de dados, metodologia da análise (os pontos da nota vêm de `ROLE_POINTS` do core), valores e o convite para os testes (e-mail). O menu superior leva ao painel (ou faz o login com o Google, que volta para `/painel`). O topo segue o visual da plataforma (fundo pergaminho, título em Fraunces, etiqueta dourada) com uma prévia do app montada com os mesmos cartões das telas (`components/home/app-preview.tsx`: próximo encontro, "a mesa fechou!" e placar da noite, com dados fictícios e lida como uma imagem só).
 
 ## Notificações por e-mail
 
@@ -327,7 +327,7 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
 2. **Escalas** (`scales`): `brand` (600 = Éter, 900 = Arcano), `ink` (neutros do Pergaminho, 100, à Noite, 950, interpolados em OKLab), `gold` (400 = Dourado) e `teal` (500 = Mana). Viram classes do Tailwind (`bg-ink-200`, `text-gold-800`…).
 3. **Cores por função** (`themes.light`/`themes.dark`): `canvas`, `surface`, `surfaceMuted`, `fg`, `fgMuted`, `line`, `lineStrong`, `primary`, `primaryHover`, `onPrimary`, `link`, `focus`, `accent`, `onAccent`, `accentText`, `manaText`, `success`, `danger`. No site são variáveis CSS (`--ak-*`) que trocam com o tema e viram classes (`bg-canvas`, `text-fg-muted`, `outline-focus`…); no app, `useColors()`.
 
-Os testes verificam contraste AA (texto ≥ 4,5:1, bordas de campo e foco ≥ 3:1) em todos os pares usados nos dois temas, e que o `tokens.css` gerado está atualizado. E-mails usam o tema claro dos tokens; o QR do convite, a Noite. O vídeo do topo da página inicial é gerado com as cores da paleta (`apps/web/scripts/hero-video.py`).
+Os testes verificam contraste AA (texto ≥ 4,5:1, bordas de campo e foco ≥ 3:1) em todos os pares usados nos dois temas, e que o `tokens.css` gerado está atualizado. E-mails usam o tema claro dos tokens; o QR do convite, a Noite.
 
 **Símbolo** (escudo com o "A", `apps/web/public/brand/simbolo.svg`): favicon em SVG (`app/icon.svg`, Dourado com contorno Noite fino, legível em abas claras e escuras — o Chrome não segue o tema do sistema no favicon, então um favicon que troca de cor sumia no tema escuro do navegador), ícone do iPhone (`app/apple-icon.png`), ícones do PWA (`public/icons/`, com versão _maskable_), imagem de compartilhamento (`app/opengraph-image.png` + texto alternativo) e, no app, ícone, ícone adaptativo do Android (frente, fundo e monocromático) e abertura (`expo-splash-screen`, fundo Noite). Tudo gerado por `node apps/web/scripts/brand-icons.mjs` (Chromium do Playwright): trocou o símbolo, rode de novo. O manifesto do PWA (`app/manifest.ts`) abre o painel em tela cheia; ainda sem modo offline.
 
