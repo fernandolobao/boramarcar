@@ -132,12 +132,29 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 
 | #   | Item                                                                                                                                                                             | Tamanho | Status                                                                                             |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| 6.1 | Nome, logotipo e paleta de cores                                                                                                                                                 | M       | ✅ nome, logotipo e paleta; falta o **símbolo** (ícone)                                            |
+| 6.1 | Nome, logotipo e paleta de cores                                                                                                                                                 | M       | ✅ nome, logotipo, paleta e símbolo (escudo com o "A")                                             |
 | 6.2 | Design tokens compartilhados entre site e app (`packages/tokens`): paleta, escalas, cores por função nos temas claro/escuro, contraste AA testado                                | M       | ✅                                                                                                 |
-| 6.3 | Site: logotipo, página inicial (textos, cores e vídeo do topo), e-mails, PDF e calendário com o nome novo em `pt-BR`/`en`                                                        | M       | ✅; falta **favicon** e imagens de compartilhamento (Open Graph), que dependem do símbolo          |
-| 6.4 | App: nome, cores, logotipo, link `arcanakin://` e identificador `app.arcanakin` (o servidor aceita também `boramarcar://` por um tempo)                                          | M       | ✅; falta **ícone** e **splash**, que dependem do símbolo                                          |
+| 6.3 | Site: logotipo, página inicial (textos, cores e vídeo do topo), e-mails, PDF e calendário com o nome novo em `pt-BR`/`en`                                                        | M       | ✅ (favicon, ícones e imagem de compartilhamento com o símbolo)                                    |
+| 6.4 | App: nome, cores, logotipo, link `arcanakin://` e identificador `app.arcanakin` (o servidor aceita também `boramarcar://` por um tempo)                                          | M       | ✅ (ícone, ícone adaptativo do Android e abertura com o símbolo)                                   |
 | 6.5 | Domínio **www.arcanakin.com.br**, com redirecionamento do endereço atual; URLs de retorno do Google OAuth, `BETTER_AUTH_URL`, endereço no app, links do calendário e dos e-mails | P       | ✅ `www.arcanakin.com.br`; o endereço antigo da Vercel e o domínio sem "www" redirecionam para ele |
 | 6.6 | Nomes internos: repositório, pacotes (`@boramarcar/*`), chaves salvas no navegador e no app (com migração), e o aviso aos grupos sobre a mudança                                 | P       |                                                                                                    |
+
+## Fase 7 — Onboarding
+
+Objetivo: quem chega (por convite ou pela página inicial) entende o app e faz as primeiras ações sozinho — entrar num grupo, marcar disponibilidade e ver o próximo encontro — sem ninguém explicar.
+
+| #   | Item                                                                                                                                                                                                                     | Tamanho | Status |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- | ------ |
+| 7.1 | **Primeiro acesso guiado** (site e app): boas-vindas em poucos passos — criar ou entrar num grupo, confirmar fuso e idioma, marcar a primeira disponibilidade. Pode ser pulado e retomado; nunca bloqueia o resto do app | M       |        |
+| 7.2 | **Primeiros passos no painel**: lista de tarefas que some ao concluir ou ao dispensar — grupo, disponibilidade semanal, primeiro deck importado, avisos (e-mail/push), convidar amigos                                   | P       |        |
+| 7.3 | **Convite com contexto**: antes de entrar, a página do convite mostra o grupo, quem já está e o próximo encontro; depois de entrar, segue direto para a disponibilidade                                                  | P       |        |
+| 7.4 | **Dicas nas telas mais densas** (análise de deck, modo mesa, coleção): uma vez por pessoa, dispensáveis, sem modal e sem tirar o foco (WCAG 2.2)                                                                         | M       |        |
+| 7.5 | **Onboarding do app**: entrar, escolher o grupo e oferecer os avisos no momento útil (ex.: ao confirmar presença no primeiro encontro), não ao abrir o app                                                               | P       |        |
+| 7.6 | **Medir a ativação**: quantas pessoas concluem cada passo (eventos agregados, sem dados pessoais) para saber onde travam                                                                                                 | P       |        |
+
+**Decidido — onde fica o progresso:** no servidor, calculado sempre que possível. Os passos que já deixam rastro no banco (grupo, disponibilidade, deck importado, push ligado) são consultados, não gravados; assim quem fez a ação fora do guia já aparece com o passo feito. Só o que não dá para deduzir vai para uma tabela `onboarding_steps` (pessoa, passo, data): "dispensou os primeiros passos", "pulou o guia", "viu a dica X". Vale no site e no app, não se perde em navegador ou endereço novo (lição do idioma nos previews), entra na exportação e na exclusão de conta (LGPD) e permite contar a ativação por passo (7.6) direto no banco. Exceção: o que é por aparelho (oferecer os avisos neste celular) continua no próprio aparelho.
+
+**Decidido — o guia pode ser pulado:** o primeiro acesso guiado (7.1) nunca é obrigatório. Dá para pular a qualquer momento (grava "pulou o guia") e retomar depois pelos primeiros passos do painel (7.2).
 
 ## Transversal (contínuo)
 
@@ -153,7 +170,7 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 | Acessibilidade (auditoria WCAG AA) e modo escuro refinado                                                                                                                              | M       |
 | LGPD: exportar e excluir conta ✅                                                                                                                                                      | P       |
 | OpenAPI da API v1 (documentação para o app mobile)                                                                                                                                     | M       |
-| PWA (instalar na tela inicial) enquanto o app nativo não sai                                                                                                                           | P       |
+| **PWA** ✅ (manifesto e ícones; ainda sem modo offline): instalar na tela inicial enquanto o app nativo não sai                                                                        | P       |
 
 ---
 
@@ -166,6 +183,7 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 5. **Semana 10–13 — análise (4.5–4.9).** Começar pelo Tagger (4.5), que melhora todo o resto.
 6. ✅ **Mobile (Fase 5), primeira parte:** app com login, encontros, disponibilidade, ranking, decks e modo mesa.
 7. **Depois — rebranding (Fase 6)** e, em seguida, a publicação nas lojas (5.7).
+8. **Onboarding (Fase 7)** antes de divulgar para outros grupos: começar por 7.3 e 7.2 (baratos e com mais efeito), depois 7.1.
 
 ### Definição de pronto (para cada item)
 
@@ -177,9 +195,11 @@ O app passou a se chamar **ArcanaKin** (antes Bora Marcar). Vem **antes da publi
 
 ## Decisões em aberto
 
+- **Onboarding (Fase 7):** quais eventos de ativação medir (7.6)?
+
 - **Scan de cartas (5.9):** escolher a biblioteca de reconhecimento de texto no aparelho (ex.: ML Kit) e decidir se o scan também alimenta uma coleção (3.x) ou só decks; avaliar uma versão no site com a câmera do navegador.
 
-- **Rebranding:** o nome ArcanaKin e a paleta estão aplicados; o símbolo e o favicon ainda estão em criação. Não usar "Bora Marcar" em lugares novos (os nomes internos `boramarcar` só mudam no item 6.6).
+- **Rebranding:** o nome ArcanaKin, a paleta e o símbolo (provisório, pode ser trocado em `public/brand/simbolo.svg` + `scripts/brand-icons.mjs`) estão aplicados. Não usar "Bora Marcar" em lugares novos (os nomes internos `boramarcar` só mudam no item 6.6).
 
 - **"Importar do Scryfall":** o Scryfall não hospeda mais decks; hoje ele é a fonte de dados das cartas (e da busca de substitutos). Se a ideia era importar outra coisa (ex.: uma lista de cartas favoritas/coleção), registrar aqui.
 - **Pontuação do ranking:** 3/1/0 foi um ponto de partida; confirmar com o grupo.
