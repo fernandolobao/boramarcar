@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { DomainError } from './errors';
-import { withTimeout } from './external';
+import { readJsonLimited, withTimeout } from './external';
 
 describe('withTimeout', () => {
   it('passa a resposta adiante e manda um signal', async () => {
@@ -53,5 +53,32 @@ describe('withTimeout', () => {
       return new Response('ok');
     });
     await withTimeout(fetchFn, 1000, 'X')('https://x.test', { signal: controller.signal });
+  });
+});
+
+describe('readJsonLimited', () => {
+  it('lê o JSON dentro do limite', async () => {
+    expect(await readJsonLimited(Response.json({ ok: 1 }), { service: 'X' })).toEqual({ ok: 1 });
+  });
+
+  it('recusa pelo Content-Length e, sem ele, para de ler no limite', async () => {
+    const big = new Response('{}', { headers: { 'content-length': '999999' } });
+    await expect(readJsonLimited(big, { service: 'X', maxBytes: 100 })).rejects.toMatchObject({
+      code: 'upstream_error',
+    });
+    const stream = new ReadableStream({
+      pull(controller) {
+        controller.enqueue(new TextEncoder().encode('x'.repeat(64)));
+      },
+    });
+    await expect(
+      readJsonLimited(new Response(stream), { service: 'X', maxBytes: 200 }),
+    ).rejects.toThrow('grandes demais');
+  });
+
+  it('resposta que não é JSON vira upstream_error', async () => {
+    await expect(readJsonLimited(new Response('<html>'), { service: 'X' })).rejects.toThrow(
+      'não é JSON',
+    );
   });
 });
