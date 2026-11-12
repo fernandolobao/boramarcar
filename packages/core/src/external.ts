@@ -35,3 +35,54 @@ export function withTimeout(fetchFn: FetchLike, timeoutMs: number, service: stri
     }
   };
 }
+
+/** Tamanho máximo de uma resposta de importador (um deck grande em JSON tem ~1 MB). */
+export const MAX_IMPORT_RESPONSE_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Lê o JSON de uma resposta externa com tamanho máximo: recusa pelo `Content-Length` e, sem
+ * ele, para de ler no limite. Assim uma resposta enorme (ou infinita) não ocupa a memória da
+ * função até o fim do tempo máximo.
+ */
+export async function readJsonLimited(
+  response: Response,
+  { maxBytes = MAX_IMPORT_RESPONSE_BYTES, service }: { maxBytes?: number; service: string },
+): Promise<unknown> {
+  const tooBig = () =>
+    new DomainError('upstream_error', `${service} respondeu com dados grandes demais`, {
+      service,
+      maxBytes,
+    });
+  const declared = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    await response.body?.cancel().catch(() => undefined);
+    throw tooBig();
+  }
+  if (!response.body) return response.json();
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > maxBytes) {
+      await reader.cancel().catch(() => undefined);
+      throw tooBig();
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    throw new DomainError('upstream_error', `${service} respondeu algo que não é JSON`, {
+      service,
+    });
+  }
+}
