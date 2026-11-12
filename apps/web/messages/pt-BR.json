@@ -30,7 +30,8 @@
     "userMenu": "Menu da conta",
     "signedInAs": "Conectado como",
     "collection": "Coleção",
-    "feedback": "Enviar feedback"
+    "feedback": "Enviar feedback",
+    "admin": "Métricas do beta"
   },
   "dashboard": {
     "hello": "Olá, {name}!",
@@ -1410,5 +1411,36 @@
     "sent": "Obrigado! Recebemos o seu feedback.",
     "sendAnother": "Enviar outro",
     "privacy": "Guardamos o texto, o tipo, a página de onde você veio e a plataforma, junto com a sua conta, para responder e melhorar o app."
+  },
+  "admin": {
+    "title": "Métricas do beta",
+    "intro": "Contagens agregadas dos últimos {days} dias, calculadas direto do banco (sem dados de pessoas). Só quem está em ADMIN_EMAILS vê esta página.",
+    "northStar": "Métrica norte",
+    "activeGroups": "Grupos ativos (com partida registrada)",
+    "ofGroups": "de {total} grupos",
+    "retention": "Retenção",
+    "retentionValue": "{retained} de {previous} grupos ativos no período anterior continuam ativos",
+    "activation": "Ativação de grupos novos",
+    "newGroups": "Grupos criados",
+    "withThree": "Com 3 ou mais pessoas",
+    "withEvent": "Com encontro marcado",
+    "invites": "Pessoas que entraram por convite",
+    "events": "Encontros",
+    "held": "Encontros que aconteceram",
+    "tableFilled": "Fecharam a mesa (confirmados ≥ tamanho da mesa)",
+    "withGame": "Viraram partida registrada",
+    "people": "Pessoas",
+    "users": "Contas",
+    "newUsers": "Contas novas",
+    "withAvailability": "Com disponibilidade marcada",
+    "decks": "Decks importados",
+    "deckLinked": "Partidas com deck informado",
+    "deckLinkedValue": "{withDeck} de {slots} participações",
+    "feedback": "Feedback recente",
+    "feedbackCount": "{count} no período",
+    "noFeedback": "Nenhum feedback ainda.",
+    "feedbackFrom": "{name} · {platform} · {date}",
+    "metric": "Métrica",
+    "value": "Valor"
   }
 }

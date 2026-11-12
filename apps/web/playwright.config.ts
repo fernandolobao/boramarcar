@@ -27,5 +27,10 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        // A Ana do seed é admin nos testes (página /admin de métricas e feedback).
+        env: { ...process.env, ADMIN_EMAILS: process.env.ADMIN_EMAILS ?? 'ana@e2e.test' } as Record<
+          string,
+          string
+        >,
       },
 });
