@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Design tokens do ArcanaKin: paleta da marca, escalas e cores por função (tema claro e escuro), para o site e o app.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./flow": "./src/flow.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

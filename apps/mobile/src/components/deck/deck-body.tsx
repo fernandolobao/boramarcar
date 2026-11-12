@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { CardViewer } from './card-viewer';
 import { formatLabel } from '@/components/table/labels';
-import { AppText, Button, Card, styles } from '@/components/ui';
+import { StackSection } from '@/components/stack';
+import { AppText, Button, styles } from '@/components/ui';
 import { API_URL } from '@/lib/config';
 import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -22,14 +23,20 @@ const tKey = (prefix: string, code: string, values: Record<string, string | numb
 
 const CURVE = ['0', '1', '2', '3', '4', '5', '6', '7+'] as const;
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+/** Seção do deck: cartão da pilha (ao rolar, desliza por cima da anterior). */
+function Section({
+  title,
+  index,
+  children,
+}: {
+  title: string;
+  index: number;
+  children: React.ReactNode;
+}) {
   return (
-    <Card style={{ gap: 8 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
-        {title}
-      </AppText>
+    <StackSection index={index} title={title}>
       {children}
-    </Card>
+    </StackSection>
   );
 }
 
@@ -106,6 +113,9 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
     .map((board) => ({ board, lines: deck.lines.filter((l) => l.board === board) }))
     .filter((b) => b.lines.length > 0);
   const count = (lines: readonly DeckLine[]) => lines.reduce((sum, l) => sum + l.quantity, 0);
+  // Posição de cada seção na pilha (algumas só aparecem quando há dados).
+  let stackIndex = 0;
+  const next = () => stackIndex++;
 
   return (
     <>
@@ -137,7 +147,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
       </View>
 
       {(a.score !== null || deck.bracket) && (
-        <Section title={t('deckScore')}>
+        <Section title={t('deckScore')} index={next()}>
           {a.score !== null && (
             <>
               <AppText style={{ fontSize: 28, fontWeight: '800' }}>
@@ -172,7 +182,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
         </Section>
       )}
 
-      <Section title={t('deckValidation')}>
+      <Section title={t('deckValidation')} index={next()}>
         {a.validation.length === 0 ? (
           <AppText style={{ color: colors.success }}>✓ {t('deckValid')}</AppText>
         ) : (
@@ -184,7 +194,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
         )}
       </Section>
 
-      <Section title={t('deckCurve')}>
+      <Section title={t('deckCurve')} index={next()}>
         {CURVE.map((bucket) => {
           const value = a.manaCurve[bucket] ?? 0;
           return (
@@ -215,7 +225,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
       </Section>
 
       {roles.length > 0 && (
-        <Section title={t('deckRoles')}>
+        <Section title={t('deckRoles')} index={next()}>
           {roles.map(([role, value]) => (
             <AppText key={role}>
               {t('deckRoleRow', { role: tKey('role', role), count: value })}
@@ -224,7 +234,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
         </Section>
       )}
 
-      <Section title={t('deckCardsTitle')}>
+      <Section title={t('deckCardsTitle')} index={next()}>
         {commanders.length > 0 && (
           <View>
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 4 }}>

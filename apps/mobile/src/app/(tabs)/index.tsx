@@ -1,5 +1,6 @@
 import { Link, router } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, View } from 'react-native';
+import { Aura } from '@/components/aura';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
@@ -24,42 +25,47 @@ export default function EventsScreen() {
   if (events.error) return <ErrorState error={events.error} onRetry={events.refresh} />;
 
   return (
-    <FlatList
-      data={events.data ?? []}
-      keyExtractor={(e) => e.id}
-      contentContainerStyle={{ padding: 16, gap: 12 }}
-      refreshControl={<RefreshControl refreshing={events.refreshing} onRefresh={events.refresh} />}
-      ListHeaderComponent={
-        <View style={{ gap: 12, marginBottom: 4 }}>
-          <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
-            {group.name} · {t('upcoming')}
-          </AppText>
-          <Button label={t('eventNew')} onPress={() => router.push('/encontros/novo')} />
-        </View>
-      }
-      ListEmptyComponent={<AppText muted>{t('noEvents')}</AppText>}
-      renderItem={({ item }) => (
-        <Link href={{ pathname: '/encontros/[id]', params: { id: item.id } }} asChild>
-          <Pressable
-            accessibilityRole="link"
-            accessibilityLabel={`${item.title}, ${formatDateTime(item.startsAt)}, ${
-              item.locationName ?? t('locationTbd')
-            }${item.status === 'cancelled' ? `, ${t('statusCancelled')}` : ''}`}
-            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-          >
-            <Card>
-              <AppText style={{ fontWeight: '700' }}>
-                {item.title}
-                {item.status === 'cancelled' && (
-                  <AppText style={{ color: colors.danger }}> · {t('statusCancelled')}</AppText>
-                )}
-              </AppText>
-              <AppText muted>{formatDateTime(item.startsAt)}</AppText>
-              <AppText muted>{item.locationName ?? t('locationTbd')}</AppText>
-            </Card>
-          </Pressable>
-        </Link>
-      )}
-    />
+    <>
+      <Aura />
+      <FlatList
+        data={events.data ?? []}
+        keyExtractor={(e) => e.id}
+        contentContainerStyle={{ padding: 16, gap: 12 }}
+        refreshControl={
+          <RefreshControl refreshing={events.refreshing} onRefresh={events.refresh} />
+        }
+        ListHeaderComponent={
+          <View style={{ gap: 12, marginBottom: 4 }}>
+            <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
+              {group.name} · {t('upcoming')}
+            </AppText>
+            <Button label={t('eventNew')} onPress={() => router.push('/encontros/novo')} />
+          </View>
+        }
+        ListEmptyComponent={<AppText muted>{t('noEvents')}</AppText>}
+        renderItem={({ item }) => (
+          <Link href={{ pathname: '/encontros/[id]', params: { id: item.id } }} asChild>
+            <Pressable
+              accessibilityRole="link"
+              accessibilityLabel={`${item.title}, ${formatDateTime(item.startsAt)}, ${
+                item.locationName ?? t('locationTbd')
+              }${item.status === 'cancelled' ? `, ${t('statusCancelled')}` : ''}`}
+              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+            >
+              <Card>
+                <AppText style={{ fontWeight: '700' }}>
+                  {item.title}
+                  {item.status === 'cancelled' && (
+                    <AppText style={{ color: colors.danger }}> · {t('statusCancelled')}</AppText>
+                  )}
+                </AppText>
+                <AppText muted>{formatDateTime(item.startsAt)}</AppText>
+                <AppText muted>{item.locationName ?? t('locationTbd')}</AppText>
+              </Card>
+            </Pressable>
+          </Link>
+        )}
+      />
+    </>
   );
 }

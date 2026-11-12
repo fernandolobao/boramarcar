@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ManaFlow } from '@/components/mana-flow';
 import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
@@ -35,7 +36,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="min-h-dvh">
+    // isolate: o fluxo de mana fica atrás de tudo sem sair desta área; overflow-x-clip (e não
+    // hidden) corta a lateral sem quebrar o `position: sticky` das seções empilhadas.
+    <div className="relative isolate min-h-dvh overflow-x-clip">
+      <ManaFlow />
       <TimeZoneSync
         savedTimeZone={preferences.timeZoneIsDefault ? null : preferences.timeZone}
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}

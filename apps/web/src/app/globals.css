@@ -209,6 +209,104 @@ input[type='radio'] {
   }
 }
 
+/* ---------- Seções empilhadas (pilha de cartas) ----------
+   `StackSections` (stack-sections.tsx) decide quais seções grudam (`data-stack="sticky"`) e, a
+   cada quadro da rolagem, quanto cada uma sobe (--stack-push), quanto dela fica coberto
+   (--stack-clip) e o esmaecimento (--stack-fade, 0–1). A seção de trás é cortada onde começa a da
+   frente: nada aparece através dos vãos. Sem JS, as seções ficam uma embaixo da outra. */
+.stack-sections {
+  --stack-base: 1rem;
+  /* Faixa à mostra de cada seção de trás: o respiro do cartão + o título. */
+  --stack-step: 3.25rem;
+  /* Quantas faixas no máximo (as seções além disso grudam na última posição). */
+  --stack-cap: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .stack-sections {
+    --stack-step: 3.5rem;
+    --stack-cap: 5;
+  }
+}
+.stack-card {
+  position: relative;
+  border-radius: 1rem;
+  transform-origin: 50% 0;
+  transform: translate3d(0, var(--stack-push, 0px), 0) scale(var(--stack-scale, 1));
+  /* Cantos de baixo retos: onde a seção é cortada, a da frente começa logo abaixo. */
+  clip-path: inset(0 0 var(--stack-clip, 0px) 0 round 1rem 1rem 0 0);
+}
+.stack-card[data-stack='sticky'] {
+  position: sticky;
+  top: var(--stack-top, 1rem);
+}
+.stack-card[data-stack] > * {
+  box-shadow:
+    0 -10px 24px -18px color-mix(in srgb, var(--color-noite) 45%, transparent),
+    0 1px 3px color-mix(in srgb, var(--color-noite) 12%, transparent);
+}
+/* Esmaecimento da seção coberta: uma camada da cor do fundo por cima (opaca, então a seção não
+   fica translúcida). Começa quando metade da seção já foi coberta e chega a 40% na faixa, o que
+   mantém o título com contraste AA (≥ 4,5:1 nos dois temas). */
+.stack-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-canvas);
+  opacity: calc(max(0, var(--stack-fade, 0) - 0.5) * 0.8);
+  pointer-events: none;
+}
+/* Foco de teclado nunca fica escondido atrás de outra seção nem cortado (WCAG 2.4.11). Só o
+   foco visível: um clique (ex.: abrir um item da análise) não pode trazer a seção para a frente
+   e deixá-la por cima das outras ao rolar. */
+.stack-card:has(:focus-visible) {
+  z-index: 50 !important;
+  clip-path: none;
+}
+.stack-card:has(:focus-visible)::after {
+  opacity: 0;
+}
+@media print {
+  .stack-card {
+    position: static !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  .stack-card::after {
+    display: none;
+  }
+}
+
+/* ---------- Fluxo de mana ----------
+   Faixa de fios iridescentes (canvas, `ManaFlow`) que desce a página inteira em curvas, atrás
+   do conteúdo. As cores vêm da página (deck, coleção, perfil) ou do espectro padrão. */
+.mana-flow {
+  /* Do tamanho da janela e parado: a faixa é desenhada em coordenadas da página e acompanha a
+     rolagem, então vai até o fim da página sem um canvas gigante. */
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.85;
+}
+@media (max-width: 639px) {
+  /* No celular a faixa passa atrás de mais texto: mais discreta. */
+  .mana-flow {
+    opacity: 0.55;
+  }
+}
+@media print {
+  .mana-flow {
+    display: none;
+  }
+}
+
 /* ---------- Carregando ----------
    Botão com ação em andamento (`aria-busy`, posto por `useApiAction`): o ícone vira um
    indicador girando e o cursor mostra progresso. Com "reduzir movimento", o indicador fica
