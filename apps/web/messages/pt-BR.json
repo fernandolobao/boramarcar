@@ -1009,9 +1009,7 @@
       "eyebrow": "Em testes com grupos de Commander",
       "title": "A mesa fecha. O ArcanaKin cuida do resto.",
       "subtitle": "Cada um marca quando e onde pode jogar. O app encontra o horário em que a mesa fecha, registra as partidas, mantém o ranking e ajuda a melhorar os seus decks.",
-      "join": "Participar dos testes",
-      "pause": "Pausar animação de fundo",
-      "play": "Reproduzir animação de fundo"
+      "join": "Participar dos testes"
     },
     "intro": {
       "title": "O que é o ArcanaKin",
@@ -1167,6 +1165,18 @@
       "credits": "Dados de cartas pelo Scryfall; combos pelo Commander Spellbook; cotação do dólar pelo Banco Central do Brasil.",
       "disclaimer": "ArcanaKin é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
       "contact": "Contato"
+    },
+    "preview": {
+      "label": "Exemplo do ArcanaKin: o próximo encontro com quem confirmou, o aviso de que a mesa fechou e o placar da noite.",
+      "nextEvent": "Próximo encontro",
+      "eventTitle": "Commander de sexta",
+      "eventWhen": "Sexta, 20:00",
+      "eventWhere": "Casa da Ana",
+      "confirmed": "4 confirmados",
+      "windowTitle": "A mesa fechou!",
+      "windowBody": "4 jogadores podem no sábado, 15:00–19:00",
+      "recap": "Placar da noite",
+      "wins": "{wins, plural, =1 {1 vitória} other {# vitórias}}"
     }
   },
   "places": {

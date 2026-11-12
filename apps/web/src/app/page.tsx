@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { SignInButton } from '@/components/auth-buttons';
-import { HeroVideo } from '@/components/home/hero-video';
+import { AppPreview } from '@/components/home/app-preview';
 import { Icon, type IconName } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
@@ -29,7 +29,6 @@ const FEATURES = [
   ['ranking', 'ranking'],
   ['profiles', 'achievement'],
   ['decks', 'decks'],
-  ['proxies', 'print'],
   ['analysis', 'bracket'],
   ['mobile', 'mobile'],
 ] as const satisfies readonly (readonly [string, IconName])[];
@@ -64,7 +63,7 @@ const SCORE_PARTS = [
  * Todas com ícone branco ≥ 3:1 por cima.
  */
 const ACCENTS = [
-  'var(--color-eter)',
+  'var(--color-primary)',
   'var(--color-teal-700)',
   'var(--color-gold-700)',
   'var(--color-arcano)',
@@ -85,10 +84,16 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-10 max-w-2xl space-y-3">
-      <p className="font-mono text-sm font-semibold text-link" aria-hidden="true">
+      <p
+        className="inline-flex rounded-full bg-accent px-3 py-0.5 text-sm font-semibold text-on-accent tabular-nums"
+        aria-hidden="true"
+      >
         {index}
       </p>
-      <h2 id={id} className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+      <h2
+        id={id}
+        className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
+      >
         {title}
       </h2>
       {subtitle && <p className="muted text-lg">{subtitle}</p>}
@@ -155,51 +160,44 @@ export default async function HomePage({
             {tp('accountDeleted')}
           </p>
         )}
-        {/* Hero com vídeo abstrato; o texto fica sobre uma camada escura (contraste AA). */}
-        <section
-          aria-labelledby="home-title"
-          className="relative isolate flex min-h-[72svh] items-center overflow-hidden bg-noite text-pergaminho"
-        >
-          <HeroVideo />
+        {/* Hero no visual da plataforma: fundo pergaminho, título em Fraunces e uma prévia do app
+            montada com os mesmos cartões das telas. */}
+        <section aria-labelledby="home-title" className="relative isolate overflow-hidden">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-noite/90 via-noite/55 to-noite/10"
             aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_85%_10%,color-mix(in_oklab,var(--color-primary)_14%,transparent),transparent),radial-gradient(50%_50%_at_0%_100%,color-mix(in_oklab,var(--color-accent)_18%,transparent),transparent)]"
           />
-          <div
-            className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-noite/80 to-transparent"
-            aria-hidden="true"
-          />
-          <div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6">
-            {/* O nome em texto está no título da página e no cabeçalho; aqui o logotipo é a marca. */}
-            <Logo className="mb-8 h-10 w-auto text-pergaminho sm:h-14" />
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium ring-1 ring-white/25 backdrop-blur">
-              <span className="size-2 rounded-full bg-mana" aria-hidden="true" />
-              {t('hero.eyebrow')}
-            </p>
-            <h1
-              id="home-title"
-              className="max-w-4xl text-4xl font-extrabold tracking-tight text-balance sm:text-6xl lg:text-7xl"
-            >
-              {t('hero.title')}
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-ink-200 sm:text-xl">{t('hero.subtitle')}</p>
-            <div className="mt-10 flex flex-wrap gap-3">
-              {dashboardButton('lg')}
-              <a
-                href="#join"
-                className="btn inline-flex bg-accent px-6 text-base text-on-accent hover:bg-gold-300"
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_1fr]">
+            <div>
+              <p className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-on-accent">
+                {t('hero.eyebrow')}
+              </p>
+              <h1
+                id="home-title"
+                className="font-display text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
               >
-                <Icon name="email" />
-                {t('hero.join')}
-              </a>
+                {t('hero.title')}
+              </h1>
+              <p className="muted mt-6 max-w-xl text-lg sm:text-xl">{t('hero.subtitle')}</p>
+              <div className="mt-10 flex flex-wrap gap-3">
+                {dashboardButton('lg')}
+                <a href="#join" className="btn-secondary px-6 text-base">
+                  <Icon name="email" />
+                  {t('hero.join')}
+                </a>
+              </div>
             </div>
+            <AppPreview />
           </div>
         </section>
 
         <section aria-labelledby="intro" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <div className="grid gap-10 lg:grid-cols-[3fr_2fr] lg:items-center">
             <div className="space-y-4">
-              <h2 id="intro" className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2
+                id="intro"
+                className="font-display text-3xl font-semibold tracking-tight sm:text-4xl"
+              >
                 {t('intro.title')}
               </h2>
               <p className="muted text-lg">{t('intro.body')}</p>
@@ -215,9 +213,7 @@ export default async function HomePage({
               ).map(([key, value]) => (
                 <div key={key} className="card flex flex-col-reverse justify-end text-center">
                   <dt className="muted text-sm">{t(`intro.stats.${key}`)}</dt>
-                  <dd className="text-4xl font-extrabold text-brand-700 dark:text-brand-400">
-                    {value}
-                  </dd>
+                  <dd className="font-display text-4xl font-semibold text-link">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -237,7 +233,7 @@ export default async function HomePage({
             />
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map(([key, icon], i) => (
-                <li key={key} className="rounded-2xl border border-line bg-canvas p-6">
+                <li key={key} className="rounded-2xl border border-line bg-canvas p-6 shadow-sm">
                   <span
                     className="mb-4 inline-flex size-11 items-center justify-center rounded-xl text-white"
                     style={{ backgroundColor: ACCENTS[i % ACCENTS.length] }}
@@ -359,32 +355,30 @@ export default async function HomePage({
         </section>
 
         <section aria-labelledby="join" className="scroll-mt-20 px-4 pb-20 sm:px-6">
-          <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-3xl bg-noite px-6 py-16 text-pergaminho sm:px-12">
-            <div
-              className="absolute -inset-20 -z-10 opacity-90 blur-3xl"
-              style={{
-                background:
-                  'radial-gradient(closest-side at 15% 20%, var(--color-eter), transparent), radial-gradient(closest-side at 85% 90%, var(--color-teal-800), transparent), radial-gradient(closest-side at 90% 10%, var(--color-arcano), transparent), radial-gradient(closest-side at 50% 110%, var(--color-gold-800), transparent)',
-              }}
-              aria-hidden="true"
-            />
-            <p className="font-mono text-sm font-semibold text-gold-300" aria-hidden="true">
-              05
-            </p>
-            <h2 id="join" className="mt-3 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">
-              {t('join.title')}
-            </h2>
-            <p className="mt-5 max-w-2xl text-lg text-ink-200">{t('join.body')}</p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a
-                href={mailto}
-                className="btn inline-flex bg-accent px-6 text-base text-on-accent hover:bg-gold-300"
+          <div className="mx-auto flex max-w-6xl overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
+            <span className="w-3 shrink-0 bg-primary" aria-hidden="true" />
+            <div className="flex-1 px-6 py-14 sm:px-12">
+              <p
+                className="inline-flex rounded-full bg-accent px-3 py-0.5 text-sm font-semibold text-on-accent tabular-nums"
+                aria-hidden="true"
               >
-                <Icon name="email" />
-                {t('join.email')}
-              </a>
-              <span className="text-ink-200">{t('join.or')}</span>
-              {dashboardButton('lg')}
+                05
+              </p>
+              <h2
+                id="join"
+                className="mt-4 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-5xl"
+              >
+                {t('join.title')}
+              </h2>
+              <p className="muted mt-5 max-w-2xl text-lg">{t('join.body')}</p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <a href={mailto} className="btn-secondary px-6 text-base">
+                  <Icon name="email" />
+                  {t('join.email')}
+                </a>
+                <span className="muted">{t('join.or')}</span>
+                {dashboardButton('lg')}
+              </div>
             </div>
           </div>
         </section>
