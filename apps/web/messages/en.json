@@ -1537,8 +1537,8 @@
   "meta": {
     "ogLocale": "en_US",
     "inviteImage": "{count, plural, =0 {Be the first one in the group} =1 {1 person is already in the group} other {# people are already in the group}}",
-    "invitePreview": "Join {group} on ArcanaKin to schedule your Commander nights together.",
-    "deckPreview": "{commanders} — decklist, mana curve, estimated bracket and analysis on ArcanaKin.",
+    "invitePreview": "Join {group} on ArcanaKin to schedule your meetups together.",
+    "deckPreview": "{commanders} — decklist, mana curve and analysis on ArcanaKin.",
     "loginToSee": "Sign in to ArcanaKin to see this page.",
     "loginCta": "Sign in",
     "home": {
@@ -1551,7 +1551,7 @@
     },
     "invite": {
       "title": "Group invite",
-      "description": "Join the group to schedule your Commander nights together."
+      "description": "Join the group to schedule your meetups together."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -1566,8 +1566,8 @@
       "description": "The group's upcoming meetups, with place, time and who's coming."
     },
     "event": {
-      "title": "Commander meetup",
-      "description": "Date, place and who's coming. Sign in to ArcanaKin to RSVP."
+      "title": "Group meetup",
+      "description": "Date, place and who is coming. Sign in to ArcanaKin to see it and RSVP."
     },
     "history": {
       "title": "Meetup history",
@@ -1582,8 +1582,8 @@
       "description": "The group's decks with rating, estimated bracket and analysis."
     },
     "deck": {
-      "title": "Commander deck",
-      "description": "Decklist, mana curve, estimated bracket and deck analysis."
+      "title": "Deck",
+      "description": "Decklist, mana curve and deck analysis."
     },
     "deckImport": {
       "title": "Import deck",
@@ -1630,7 +1630,8 @@
     "recap": {
       "title": "Meetup recap",
       "description": "Who played, who won and with which commanders."
-    }
+    },
+    "deckEyebrow": "{format} deck"
   },
   "beta": {
     "title": "Your group is in the ArcanaKin beta",
