@@ -7,6 +7,7 @@ Leia também o [README](README.md), a [arquitetura](docs/ARCHITECTURE.md) e o [r
 
 - TypeScript strict. Regras de negócio em `packages/core` (puras e testadas); acesso a dados em `packages/db/src/services`; rotas da API finas (auth + Zod + serviço).
 - Mudou o schema? `pnpm db:generate` e commit da migration.
+- Rota nova (ou método novo) com ID de grupo, encontro, deck, partida etc. na URL? Inclua os casos em `apps/web/src/app/api/v1/__tests__/autorizacao.test.ts` (quem não é do grupo e, se for só de dono/admin, o membro comum): a resposta precisa ser 403/404 sem os dados no corpo.
 - Todo texto de interface vai em `apps/web/messages/pt-BR.json` **e** `en.json` (há teste de paridade). No app mobile, em `apps/mobile/src/lib/i18n.ts` (português e inglês; o TypeScript exige as mesmas chaves).
 - App mobile (`apps/mobile`): Expo + Expo Router; dependências com `npx expo install` (versões do SDK); fala com o servidor só pelo `@boramarcar/api-client`. Leia `apps/mobile/AGENTS.md`.
 - Marca **ArcanaKin**: cores só pelos design tokens (`packages/tokens`). No site, prefira as classes por função (`bg-canvas`, `bg-surface`, `text-fg`, `text-fg-muted`, `border-line`, `border-line-strong`, `bg-primary`, `text-link`, `bg-accent`/`text-on-accent`) às escalas (`ink-*`, `brand-*`, `gold-*`, `teal-*`); nada de cores fixas (`#…`, `zinc-*`). Mudou os tokens? `pnpm --filter @boramarcar/tokens build:css`. Logotipo: `<Logo>` (site e app).
