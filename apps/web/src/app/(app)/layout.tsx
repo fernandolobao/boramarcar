@@ -95,9 +95,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <div className="space-y-6">{children}</div>
         </ViewTransition>
       </main>
-      <footer className="mx-auto max-w-5xl px-4 pb-8 text-sm print:hidden">
+      <footer className="mx-auto flex max-w-5xl flex-wrap gap-x-4 gap-y-2 px-4 pb-8 text-sm print:hidden">
         <Link href="/privacidade" className="muted underline underline-offset-2 hover:text-fg">
           {tl('privacy')}
+        </Link>
+        <Link href="/feedback" className="muted underline underline-offset-2 hover:text-fg">
+          {t('feedback')}
         </Link>
       </footer>
     </div>

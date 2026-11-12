@@ -29,7 +29,8 @@
     "settings": "Configurações",
     "userMenu": "Menu da conta",
     "signedInAs": "Conectado como",
-    "collection": "Coleção"
+    "collection": "Coleção",
+    "feedback": "Enviar feedback"
   },
   "dashboard": {
     "hello": "Olá, {name}!",
@@ -741,7 +742,8 @@
     "confirmed": "Confirmados ({count}): {names}",
     "openEvent": "Abrir o encontro",
     "calendarHint": "O arquivo .ics anexo adiciona (ou atualiza) o encontro na sua agenda.",
-    "footer": "Você recebe este e-mail porque participa de {group} no ArcanaKin. Para não receber mais avisos, desative-os nas configurações: {url}"
+    "footer": "Você recebe este e-mail porque participa de {group} no ArcanaKin. Para não receber mais avisos, desative-os nas configurações: {url}",
+    "feedbackSubject": "Feedback ({kind}): {name}"
   },
   "formats": {
     "commander": "Commander",
@@ -1391,5 +1393,22 @@
     "rsvpHint": "Diga se vai (ou talvez) no próximo encontro do grupo.",
     "deck": "Importe um deck",
     "deckHint": "Do Archidekt, Moxfield ou de uma lista colada, para ver a análise e usar nas partidas."
+  },
+  "feedback": {
+    "title": "Enviar feedback",
+    "intro": "O ArcanaKin está em testes. Conte o que travou, o que confundiu ou o que faria o seu grupo usar mais. Quem cuida do app lê tudo e pode responder pelo seu e-mail.",
+    "kind": "Sobre o quê?",
+    "kinds": {
+      "problem": "Algo não funcionou",
+      "idea": "Ideia ou sugestão",
+      "other": "Outro assunto"
+    },
+    "message": "Mensagem",
+    "messageHint": "Se for um problema, diga o que você tentou fazer e o que aconteceu.",
+    "page": "Enviado a partir de: {page}",
+    "send": "Enviar",
+    "sent": "Obrigado! Recebemos o seu feedback.",
+    "sendAnother": "Enviar outro",
+    "privacy": "Guardamos o texto, o tipo, a página de onde você veio e a plataforma, junto com a sua conta, para responder e melhorar o app."
   }
 }

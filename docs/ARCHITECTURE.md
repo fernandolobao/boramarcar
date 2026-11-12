@@ -180,6 +180,12 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - **Envio** (`core/push`, `server/push.ts`): API do Expo Push em lotes de 100, com tempo máximo; tokens que voltam como `DeviceNotRegistered` são apagados. Texto curto no idioma e fuso de quem recebe (namespace `push` das mensagens) e `data.url` com a tela do app (`/encontros/:id` ou `/disponibilidade`). `PUSH_NOTIFICATIONS=off` desliga; `EXPO_ACCESS_TOKEN` só se a segurança extra do Expo estiver ligada.
 - **App** (`lib/push.ts`, `components/push-setting.tsx`): "Avisos neste celular" na Conta; a permissão do sistema só é pedida ao ligar. A escolha fica no SecureStore; ao entrar, o token é renovado. Tocar num aviso abre a tela dele (também com o app fechado). Sair da conta desliga os avisos do aparelho. Canal `default` no Android e ícone monocromático (`assets/notification-icon.png`). Push remoto precisa de build próprio (EAS) com `extra.eas.projectId`; no Expo Go do Android não funciona.
 
+## Feedback do beta (8.4)
+
+- **Onde**: "Enviar feedback" no menu da conta e no rodapé (site, `/feedback?de=<página>`) e na Conta do app (`app/feedback.tsx`). Tipo (problema, ideia, outro) e mensagem (até 2.000 caracteres).
+- **Servidor**: `POST /api/v1/feedback` (10 por hora por pessoa) grava em `feedback` (pessoa, tipo, texto, **só o caminho** da página — sem query string —, plataforma) e, depois de responder, manda um e-mail para `ADMIN_EMAILS` (texto escapado) com o nome e o e-mail de quem enviou, para responder. Sem `ADMIN_EMAILS`, fica só no banco.
+- **LGPD**: entra na exportação de dados, sai na exclusão de conta e está na política de privacidade (legítimo interesse).
+
 ## Onboarding (Fase 7)
 
 - **Progresso** (`db/services/onboarding.ts`): os passos são calculados dos dados — disponibilidade no grupo ativo (regra semanal ou horário futuro), grupo com 3+ pessoas (`TABLE_SIZE`, uma mesa de Commander), resposta a algum encontro, deck importado. Quem fez a ação por outro caminho já aparece com o passo feito. A tabela `onboarding_steps` guarda só o que não dá para deduzir (`checklist-dismissed`, `guide-skipped`), via `POST /api/v1/me/onboarding`; entra na exportação e sai na exclusão de conta.

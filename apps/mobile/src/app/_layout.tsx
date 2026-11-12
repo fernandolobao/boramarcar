@@ -34,6 +34,7 @@ export default function RootLayout() {
         <Stack.Screen name="partida/[eventId]" options={{ title: t('gameTitle') }} />
         <Stack.Screen name="mesa/[id]" options={{ title: t('tableTitle') }} />
         <Stack.Screen name="decks/[id]" options={{ title: t('tabDecks') }} />
+        <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="entrar" options={{ headerShown: false }} />

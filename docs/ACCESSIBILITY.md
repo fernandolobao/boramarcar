@@ -285,3 +285,9 @@ sem rolagem horizontal em 320px.
 - **Primeiros passos**: seção com `h2`, progresso em texto ("1 de 4 feitos"; a barra é decorativa), lista ordenada de links em que cada passo diz "Feito"/"A fazer" para leitores de tela, além do ícone e do riscado. "Dispensar" tem nome com contexto ("Dispensar os primeiros passos", contendo o texto visível) e devolve o foco ao `<main>` quando a seção some.
 - **Convite**: um `h1`, contexto em texto simples, "Como funciona" com `h2` e lista ordenada. Boas-vindas na disponibilidade com `h2` e links-âncora para as seções do formulário.
 - axe em jsdom (componente) e no E2E (painel e convite, claro/escuro, desktop/celular) sem violações.
+
+## Feedback do beta (12/11/2026)
+
+- **Site**: `h1`, tipo em `fieldset`/`legend` com rádios nativos, mensagem com `label` e dica ligada por `aria-describedby`, botão com texto. Depois de enviar, a confirmação vira `role="status"` e recebe o foco. Link no menu da conta (com `aria-current` na própria página) e no rodapé.
+- **App**: tipo como `radiogroup` de botões com `accessibilityState.checked`, campo com rótulo visível e dica, confirmação e erro com `accessibilityRole="alert"`.
+- axe em jsdom (componente) e no E2E (`/feedback`, claro/escuro, desktop/celular) sem violações.

@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 import { AccountPrivacy } from '@/components/account-privacy';
 import { PushSetting } from '@/components/push-setting';
@@ -41,6 +42,11 @@ export default function AccountScreen() {
         </View>
       )}
       <PushSetting />
+      <Button
+        label={t('feedbackTitle')}
+        variant="secondary"
+        onPress={() => router.push('/feedback')}
+      />
       <Button
         label={t('signOut')}
         variant="secondary"

@@ -44,6 +44,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         items: [
           'Da sua conta Google, ao entrar: nome, e-mail, foto de perfil e o identificador da conta. Não pedimos acesso ao Gmail, ao Drive nem a nenhum outro serviço do Google, e não guardamos senha.',
           'O que você informa no app: grupos de que participa, disponibilidade, locais e endereços cadastrados, encontros e presenças, partidas e resultados, decks e preferências (fuso horário, idioma, tema e avisos por e-mail). Se você liga os avisos no celular, guardamos o identificador de notificação daquele aparelho (apagado quando você desliga, sai da conta ou desinstala o app).',
+          'Feedback que você envia pelo site ou pelo app: o texto, o tipo, a página de onde veio e a plataforma, junto com a sua conta.',
           'Dados técnicos: cookies de sessão, endereço IP e registros de acesso mantidos pelo provedor de hospedagem, métricas de uso agregadas do Vercel Analytics (sem cookies e sem identificar você) e, quando algo dá errado, o registro do erro no Sentry, sem nome nem e-mail.',
           'Só com o seu consentimento: gravação de como as telas são usadas (cliques, rolagem, navegação e mapas de calor) pelo Hotjar (Contentsquare). O que você digita em campos de formulário não é gravado, e o seu e-mail é mascarado na tela.',
         ],
@@ -55,6 +56,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
           'Criar e manter a sua conta, montar os grupos, sugerir horários, marcar encontros, registrar partidas, calcular o ranking e analisar decks: execução do serviço que você pediu (art. 7º, V).',
           'Enviar avisos por e-mail (encontros, lembretes e mudanças): execução do serviço; você pode desligar em Configurações.',
           'Segurança, prevenção de abuso, correção de erros e métricas agregadas sem cookies: legítimo interesse (art. 7º, IX), sempre no mínimo necessário.',
+          'Ler e responder ao feedback que você envia (pelo seu e-mail) e melhorar o app com ele: legítimo interesse (art. 7º, IX).',
           'Gravação de sessões com o Hotjar, para entender onde as pessoas têm dificuldade e melhorar o app: consentimento (art. 7º, I), que você pode dar ou retirar a qualquer momento.',
         ],
         after: [
@@ -169,6 +171,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         items: [
           'From your Google account, when you sign in: name, e-mail, profile photo and the account identifier. We don’t ask for access to Gmail, Drive or any other Google service, and we don’t store passwords.',
           'What you enter in the app: the groups you are in, availability, places and addresses, meetups and RSVPs, games and results, decks and preferences (time zone, language, theme and e-mail notices). If you turn on notifications on your phone, we keep that device’s notification identifier (deleted when you turn them off, sign out or uninstall the app).',
+          'Feedback you send from the website or the app: the text, the type, the page you came from and the platform, with your account.',
           'Technical data: session cookies, IP address and access logs kept by the hosting provider, aggregated usage metrics from Vercel Analytics (no cookies, doesn’t identify you) and, when something goes wrong, the error log in Sentry, without name or e-mail.',
           'Only with your consent: recordings of how screens are used (clicks, scrolling, navigation and heatmaps) by Hotjar (Contentsquare). What you type in form fields isn’t recorded, and your e-mail is masked on screen.',
         ],
@@ -180,6 +183,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
           'Creating and keeping your account, running groups, suggesting times, scheduling meetups, recording games, computing the ranking and analyzing decks: performing the service you asked for (art. 7, V).',
           'Sending e-mail notices (meetups, reminders and changes): performing the service; you can turn them off in Settings.',
           'Security, abuse prevention, bug fixing and cookieless aggregated metrics: legitimate interest (art. 7, IX), always to the minimum necessary.',
+          'Reading and replying to the feedback you send (to your e-mail) and improving the app with it: legitimate interest (art. 7, IX).',
           'Session recording with Hotjar, to understand where people struggle and improve the app: consent (art. 7, I), which you can give or withdraw at any time.',
         ],
         after: [

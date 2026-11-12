@@ -1,0 +1,21 @@
+import { expect, test } from '@playwright/test';
+import { AUTH_STATE } from './support/global-setup';
+
+/** Feedback do beta (8.4): pelo menu da conta, com a página de origem. */
+test.describe('feedback', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('envia feedback a partir do menu da conta', async ({ page }) => {
+    await page.goto('/ranking');
+    await page.getByRole('button', { name: /Menu da conta/ }).click();
+    // O do menu (o rodapé também tem um link, sem a página de origem).
+    await page.locator('a[href^="/feedback?de="]').click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Enviar feedback' })).toBeVisible();
+    await expect(page.getByText('Enviado a partir de: /ranking')).toBeVisible();
+    await page.getByLabel('Ideia ou sugestão').check();
+    await page.getByLabel('Mensagem').fill('Seria ótimo ver o ranking por temporada no celular.');
+    await page.getByRole('button', { name: 'Enviar', exact: true }).click();
+    await expect(page.getByText('Obrigado! Recebemos o seu feedback.')).toBeFocused();
+  });
+});

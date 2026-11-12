@@ -17,6 +17,8 @@ export const RATE_LIMITS = {
   analysis: { limit: 20, windowMs: 10 * MINUTE },
   /** Buscas pequenas: autocompletar, edições, alternativas, endereços, adicionar carta. */
   search: { limit: 120, windowMs: MINUTE },
+  /** Feedback do beta. */
+  feedback: { limit: 10, windowMs: 60 * MINUTE },
 } as const;
 
 export type RateLimitKind = keyof typeof RATE_LIMITS;

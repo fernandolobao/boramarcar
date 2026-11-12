@@ -87,6 +87,20 @@ const pt = {
   group: 'Grupo',
   activeGroup: 'Grupo ativo',
   signOut: 'Sair',
+  feedbackTitle: 'Enviar feedback',
+  feedbackIntro:
+    'O ArcanaKin está em testes. Conte o que travou, o que confundiu ou o que faria o seu grupo usar mais. Quem cuida do app lê tudo e pode responder pelo seu e-mail.',
+  feedbackKind: 'Sobre o quê?',
+  feedbackProblem: 'Algo não funcionou',
+  feedbackIdea: 'Ideia ou sugestão',
+  feedbackOther: 'Outro assunto',
+  feedbackMessage: 'Mensagem',
+  feedbackHint: 'Se for um problema, diga o que você tentou fazer e o que aconteceu.',
+  feedbackSend: 'Enviar',
+  feedbackSent: 'Obrigado! Recebemos o seu feedback.',
+  feedbackError: 'Não deu para enviar agora. Tente de novo.',
+  feedbackPrivacy:
+    'Guardamos o texto, o tipo e a plataforma, junto com a sua conta, para responder e melhorar o app.',
   pushTitle: 'Avisos',
   pushToggle: 'Avisos neste celular',
   pushHint:
@@ -398,6 +412,20 @@ const en: Messages = {
   group: 'Group',
   activeGroup: 'Active group',
   signOut: 'Sign out',
+  feedbackTitle: 'Send feedback',
+  feedbackIntro:
+    'ArcanaKin is in beta. Tell us what got stuck, what was confusing or what would make your group use it more. The person behind the app reads everything and may reply to your e-mail.',
+  feedbackKind: 'What is it about?',
+  feedbackProblem: "Something didn't work",
+  feedbackIdea: 'Idea or suggestion',
+  feedbackOther: 'Something else',
+  feedbackMessage: 'Message',
+  feedbackHint: "If it's a problem, say what you tried to do and what happened.",
+  feedbackSend: 'Send',
+  feedbackSent: 'Thanks! We got your feedback.',
+  feedbackError: "Couldn't send right now. Please try again.",
+  feedbackPrivacy:
+    'We keep the text, the type and the platform, with your account, to reply and improve the app.',
   pushTitle: 'Notifications',
   pushToggle: 'Notifications on this phone',
   pushHint:

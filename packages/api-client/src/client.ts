@@ -134,6 +134,16 @@ export function createApiClient(options: ApiClientOptions) {
           confirm: true,
         }),
     },
+    feedback: {
+      /** Feedback do beta (8.4): problema, ideia ou outro assunto. */
+      send: (input: {
+        kind: 'problem' | 'idea' | 'other';
+        message: string;
+        page?: string | null;
+        platform: 'ios' | 'android' | 'web';
+      }) =>
+        request('POST', '/feedback', z.object({ feedback: z.object({ id: z.string() }) }), input),
+    },
     groups: {
       list: async () =>
         (await request('GET', '/groups', z.object({ groups: z.array(groupSchema) }))).groups,
