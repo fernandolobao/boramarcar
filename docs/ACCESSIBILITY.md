@@ -279,3 +279,9 @@ sem rolagem horizontal em 320px.
 ## Ranking: títulos das estatísticas (12/11/2026)
 
 - "Sequências e mesa", "Confronto direto", "Decks mais jogados" e "Comandantes do grupo" agora usam o mesmo estilo de título das outras seções (`section-title`, fonte de display), porque cada um é uma carta da pilha e o título é o que fica à mostra na faixa. Continuam `h3` dentro de "Estatísticas" (`h2`), sem pular níveis. Não viraram `<section>` com nome para não duplicar a região "Confronto direto" da tabela com rolagem.
+
+## Onboarding: convite e primeiros passos (12/11/2026)
+
+- **Primeiros passos**: seção com `h2`, progresso em texto ("1 de 4 feitos"; a barra é decorativa), lista ordenada de links em que cada passo diz "Feito"/"A fazer" para leitores de tela, além do ícone e do riscado. "Dispensar" tem nome com contexto ("Dispensar os primeiros passos", contendo o texto visível) e devolve o foco ao `<main>` quando a seção some.
+- **Convite**: um `h1`, contexto em texto simples, "Como funciona" com `h2` e lista ordenada. Boas-vindas na disponibilidade com `h2` e links-âncora para as seções do formulário.
+- axe em jsdom (componente) e no E2E (painel e convite, claro/escuro, desktop/celular) sem violações.

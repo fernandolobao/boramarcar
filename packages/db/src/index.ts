@@ -10,6 +10,7 @@ export * from './services/decks';
 export * from './services/users';
 export * from './services/notifications';
 export * from './services/push';
+export * from './services/onboarding';
 export * from './services/stats';
 export * from './services/profiles';
 export * from './services/privacy';

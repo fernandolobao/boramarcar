@@ -177,6 +177,12 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - **Envio** (`core/push`, `server/push.ts`): API do Expo Push em lotes de 100, com tempo máximo; tokens que voltam como `DeviceNotRegistered` são apagados. Texto curto no idioma e fuso de quem recebe (namespace `push` das mensagens) e `data.url` com a tela do app (`/encontros/:id` ou `/disponibilidade`). `PUSH_NOTIFICATIONS=off` desliga; `EXPO_ACCESS_TOKEN` só se a segurança extra do Expo estiver ligada.
 - **App** (`lib/push.ts`, `components/push-setting.tsx`): "Avisos neste celular" na Conta; a permissão do sistema só é pedida ao ligar. A escolha fica no SecureStore; ao entrar, o token é renovado. Tocar num aviso abre a tela dele (também com o app fechado). Sair da conta desliga os avisos do aparelho. Canal `default` no Android e ícone monocromático (`assets/notification-icon.png`). Push remoto precisa de build próprio (EAS) com `extra.eas.projectId`; no Expo Go do Android não funciona.
 
+## Onboarding (Fase 7)
+
+- **Progresso** (`db/services/onboarding.ts`): os passos são calculados dos dados — disponibilidade no grupo ativo (regra semanal ou horário futuro), grupo com 3+ pessoas (`TABLE_SIZE`, uma mesa de Commander), resposta a algum encontro, deck importado. Quem fez a ação por outro caminho já aparece com o passo feito. A tabela `onboarding_steps` guarda só o que não dá para deduzir (`checklist-dismissed`, `guide-skipped`), via `POST /api/v1/me/onboarding`; entra na exportação e sai na exclusão de conta.
+- **Primeiros passos** (`components/first-steps.tsx`, no painel, logo abaixo do destaque): some quando tudo está feito ou ao dispensar (o foco volta para o conteúdo principal).
+- **Convite** (`/convite/:codigo`): antes de entrar, primeiros nomes de quem já está (até 8, "e mais N"), o próximo encontro (título e data, sem endereço) e "como funciona" em três passos. Nada de e-mail, foto ou endereço, porque o link circula. Depois de entrar, `/disponibilidade?bemvindo=1` dá as boas-vindas com atalhos para o horário semanal e o dia específico.
+
 ## Perfis, visibilidade e conquistas
 
 - **Visibilidade do deck** (`decks.visibility`): `private` (só o dono), `group` (padrão: quem divide grupo com o dono) e `public` (qualquer pessoa com conta e o link). Vale para a página do deck e para o perfil.

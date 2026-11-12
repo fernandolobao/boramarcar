@@ -1,9 +1,11 @@
 import {
   getEventDetail,
+  getOnboardingChecklist,
   getGroupRanking,
   getGroupStats,
   listEvents,
   suggestGameWindows,
+  TABLE_SIZE,
 } from '@boramarcar/db';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,6 +19,7 @@ import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { EmptyState } from '@/components/empty-state';
+import { FirstSteps } from '@/components/first-steps';
 
 export const generateMetadata = navMetadata('dashboard');
 
@@ -117,7 +120,7 @@ export default async function DashboardPage() {
   const db = getDb();
   const now = new Date();
   const timeZone = await getTimeZone();
-  const [events, windows, ranking, stats] = await Promise.all([
+  const [events, windows, ranking, stats, onboarding] = await Promise.all([
     listEvents(db, {
       groupId: group.id,
       userId: user.id,
@@ -133,7 +136,9 @@ export default async function DashboardPage() {
     }),
     getGroupRanking(db, { groupId: group.id, userId: user.id }),
     getGroupStats(db, { groupId: group.id, userId: user.id, now, timeZone }),
+    getOnboardingChecklist(db, { userId: user.id, groupId: group.id, now }),
   ]);
+  const showFirstSteps = !onboarding.dismissed && onboarding.completed < onboarding.steps.length;
   const next = events[0]
     ? await getEventDetail(db, { eventId: events[0].id, userId: user.id }).catch(() => null)
     : null;
@@ -242,6 +247,10 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+
+      {showFirstSteps && (
+        <FirstSteps steps={onboarding.steps} members={onboarding.members} tableSize={TABLE_SIZE} />
+      )}
 
       {/* Os seus números. */}
       <section aria-labelledby="painel-numeros" className="space-y-3">
