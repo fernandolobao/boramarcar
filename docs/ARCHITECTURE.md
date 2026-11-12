@@ -194,6 +194,13 @@ Cada linha de `deck_cards` aponta para uma impressão (`scryfall_id`); o índice
 
 Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e com uma imagem por face em `card_faces`; guardamos a frente em `image_uri` e o verso em `back_image_uri`/`back_name` (cartas divididas e aventuras têm uma imagem só e ficam sem verso). Na grade, o botão "Virar" troca a imagem; no diálogo, "Frente"/"Verso". Na folha de proxies, cada cópia sai com as duas faces lado a lado. Cartas que já estavam no cache ganham o verso na atualização diária (cron) ou ao atualizar a análise.
 
+## Segurança e observabilidade
+
+- **CSP** (`lib/csp.ts`, aplicada em `proxy.ts` em toda página): a cada requisição um _nonce_ novo; o Next põe o nonce nos scripts dele e o layout no script do tema (`x-nonce`). Scripts só com nonce (`'strict-dynamic'` deixa rodar o que eles carregam: Vercel Analytics/Speed Insights e Contentsquare); sem `<object>`, sem `<base>` de fora, formulários só para o próprio site, página fora de `<iframe>` alheio (`frame-ancestors 'none'`) e conexões só por HTTPS. Estilos precisam de `'unsafe-inline'` (atributos `style`). Uma segunda política, **só relatada** (`Content-Security-Policy-Report-Only`), tem a lista exata de destinos de conexão e imagem e manda as violações para `/api/csp-report`, que escreve uma linha `[csp] …` no log da Vercel; quando o log estiver limpo, dá para passar essa lista para a política aplicada. O Zod roda em modo `jitless` no navegador (sem testar `new Function`, que a CSP bloqueia). Teste E2E em `e2e/seguranca.spec.ts`: páginas sem violação nenhuma.
+- **Outros cabeçalhos** (`next.config.ts`): `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS de 2 anos e `Permissions-Policy` sem câmera, microfone, localização, pagamento e USB (a inclinação do celular das cartas holográficas continua liberada).
+- **Sentry** (`instrumentation.ts`, `instrumentation-client.ts`, `lib/sentry-options.ts`): erros do navegador, do servidor e da renderização (`onRequestError`). Só liga com `NEXT_PUBLIC_SENTRY_DSN`; sem dados pessoais (`sendDefaultPii: false`, sem gravação de tela) e 10% de rastreamento de desempenho. Os eventos passam pelo próprio site (`/monitoring`, fora do `proxy.ts`), então a CSP não precisa liberar o Sentry e bloqueadores de anúncio não cortam o envio. Mapas de código só sobem com `SENTRY_AUTH_TOKEN`. O app mobile ainda não manda erros.
+- **Vercel Speed Insights** (`<SpeedInsights />` no layout): métricas de desempenho reais (Core Web Vitals), sem cookies; precisa ser ligado no painel da Vercel.
+
 ## Serviços externos: cache, tempo máximo e limites
 
 Tudo no plano grátis, sem serviço novo: o CDN da Vercel e o próprio Postgres (Neon).

@@ -266,3 +266,7 @@ sem rolagem horizontal em 320px.
 - **Toda ação na API** (`useApiAction`) deixa o botão que a disparou com `aria-busy="true"`. O ícone do botão vira um indicador girando (parado com "reduzir movimento") e o botão fica desabilitado **durante a espera pelo servidor**; antes, só ficava desabilitado depois da resposta. Uma ação de cada vez: clique duplo e Enter + "perdeu o foco" não repetem a ação.
 - **Barra no topo** (`ActivityBar`) durante ações e mudanças de página (link interno para outra página), decorativa (`aria-hidden`), com "Carregando…" numa região de status para leitores de tela. Testes E2E que procuram mensagens de status devem filtrar pelo texto, porque essa região existe em todas as páginas.
 - **Ações no diálogo da carta** (deck e coleção) são todas botões: "Edição: …" deixou de parecer link.
+
+## Segurança (12/11/2026)
+
+- A CSP e os cabeçalhos novos não mudam a interface. A `Permissions-Policy` não bloqueia os sensores de movimento (inclinação das cartas holográficas no celular). E2E de acessibilidade completo sem violações com a CSP aplicada.
