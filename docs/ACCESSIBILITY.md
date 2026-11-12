@@ -250,7 +250,7 @@ sem rolagem horizontal em 320px.
 ## Identidade visual (11/11/2026)
 
 - **Arte no topo** (painel e encontro): decorativa (`aria-hidden`, fundo em CSS), sob uma camada escura que mantém o texto claro com ≥ 7:1 mesmo sobre uma arte branca.
-- **Barras nas cores do deck**: cada cor de mana tem um tom por tema com ≥ 3:1 contra a superfície (WCAG 1.4.11, teste em `tokens/flow.test.ts`); o valor de cada barra continua em texto. Decks de três ou mais cores usam dourado (≥ 3:1 nos dois temas: claro 4,1:1, escuro 10,3:1). A barra selecionada da curva tem contorno, além do `aria-pressed` do botão.
+- **Barras nas cores do deck**: cada cor de mana tem um tom por tema com ≥ 3:1 contra a superfície (WCAG 1.4.11, teste em `tokens/flow.test.ts`); o valor de cada barra continua em texto. Decks de três ou mais cores usam um degradê dourado: no tema claro, o contorno de 1 px (`gold-700`, 5,4:1) dá o contraste; no escuro, todos os tons do degradê passam de 3:1 (o tom único escuro do claro parecia marrom). A barra selecionada da curva tem contorno, além do `aria-pressed` do botão.
 - **Pódio**: texto escuro (noite) sobre ouro (8,1:1), prata (9,4:1) e bronze (6,3:1); reflexo animado só sem "reduzir movimento".
 - **Estados vazios**: símbolos de mana decorativos (`aria-hidden`); a mensagem é o texto.
 - **Fonte de display**: só nos títulos; `font-display: swap` e fontes de reserva serifadas (Georgia).
