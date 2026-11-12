@@ -11,6 +11,7 @@ import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { NoGroup } from '@/components/no-group';
 
 const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
 
@@ -40,7 +41,7 @@ export default function NewEventScreen() {
 
   if (loadingGroup || locations.loading) return <Loading />;
   if (groupError) return <ErrorState error={groupError} onRetry={() => void reload()} />;
-  if (!group) return <AppText style={{ padding: 24 }}>{t('noGroup')}</AppText>;
+  if (!group) return <NoGroup />;
   if (locations.error) return <ErrorState error={locations.error} onRetry={locations.refresh} />;
 
   const save = async () => {

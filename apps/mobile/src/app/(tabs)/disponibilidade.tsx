@@ -11,6 +11,7 @@ import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { NoGroup } from '@/components/no-group';
 
 /** Ação destrutiva em dois toques (padrão do projeto): o primeiro pede confirmação. */
 function ConfirmButton({
@@ -64,7 +65,7 @@ export default function AvailabilityScreen() {
   const [message, setMessage] = useState('');
   const [creating, setCreating] = useState<string | null>(null);
 
-  if (!group) return <AppText style={{ padding: 24 }}>{t('noGroup')}</AppText>;
+  if (!group) return <NoGroup />;
   if (data.loading) return <Loading />;
   if (data.error || !data.data) return <ErrorState error={data.error} onRetry={data.refresh} />;
   const { windows, slots, rules, locations } = data.data;

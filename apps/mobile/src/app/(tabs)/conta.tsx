@@ -41,6 +41,11 @@ export default function AccountScreen() {
           ))}
         </View>
       )}
+      <Button
+        label={t('groupsManage')}
+        variant="secondary"
+        onPress={() => router.push('/grupos')}
+      />
       <PushSetting />
       <Button
         label={t('feedbackTitle')}

@@ -35,10 +35,13 @@ export default function RootLayout() {
         <Stack.Screen name="mesa/[id]" options={{ title: t('tableTitle') }} />
         <Stack.Screen name="decks/[id]" options={{ title: t('tabDecks') }} />
         <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
+        <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="entrar" options={{ headerShown: false }} />
       </Stack.Protected>
+      {/* Convite: aberto com ou sem login (sem login, guarda o código e vai para a entrada). */}
+      <Stack.Screen name="convite/[codigo]" options={{ title: t('inviteTitle') }} />
     </Stack>
   );
   return (

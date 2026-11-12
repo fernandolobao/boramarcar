@@ -4,6 +4,7 @@ import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
+import { NoGroup } from '@/components/no-group';
 
 /** Ranking do grupo ativo (todas as partidas). */
 export default function RankingScreen() {
@@ -12,7 +13,7 @@ export default function RankingScreen() {
     () => (group ? api.ranking.get(group.id) : Promise.resolve(null)),
     [group?.id],
   );
-  if (!group) return <AppText style={{ padding: 24 }}>{t('noGroup')}</AppText>;
+  if (!group) return <NoGroup />;
   if (ranking.loading) return <Loading />;
   if (ranking.error) return <ErrorState error={ranking.error} onRetry={ranking.refresh} />;
   return (

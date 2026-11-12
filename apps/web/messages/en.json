@@ -730,7 +730,9 @@
     "howTitle": "How it works",
     "how1": "Sign in with your Google account.",
     "how2": "Say when you can usually play.",
-    "how3": "When the table is full, the group schedules the game night and you get notified."
+    "how3": "When the table is full, the group schedules the game night and you get notified.",
+    "appHint": "Already have the ArcanaKin app? Use the code {code} or",
+    "openInApp": "open the invite in the app"
   },
   "profile": {
     "title": "Profile",

@@ -6,8 +6,10 @@ import {
   deckSummarySchema,
   errorBodySchema,
   eventDetailSchema,
+  eventStatusSchema,
   eventSummarySchema,
   gameWindowSchema,
+  createdGroupSchema,
   groupSchema,
   locationSchema,
   rankingSchema,
@@ -128,6 +130,9 @@ export function createApiClient(options: ApiClientOptions) {
       /** Desliga as notificações push neste aparelho. */
       removePushToken: (token: string) =>
         request('DELETE', '/me/push-tokens', z.object({ removed: z.literal(true) }), { token }),
+      /** Guarda uma escolha do onboarding (ex.: dispensar a faixa do beta). */
+      markOnboarding: (flag: 'checklist-dismissed' | 'guide-skipped' | 'beta-banner-dismissed') =>
+        request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
       /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
       deleteAccount: () =>
         request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {
@@ -149,6 +154,29 @@ export function createApiClient(options: ApiClientOptions) {
         (await request('GET', '/groups', z.object({ groups: z.array(groupSchema) }))).groups,
       setActive: (groupId: string) =>
         request('PUT', '/me/active-group', z.object({ groupId: z.string() }), { groupId }),
+      /** Cria um grupo (quem cria vira o dono). */
+      create: async (name: string) =>
+        (await request('POST', '/groups', z.object({ group: createdGroupSchema }), { name })).group,
+      /** Faixa do beta (8.5): semana atual, ou `null` fora do beta (ou se a pessoa dispensou). */
+      beta: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/beta`,
+            z.object({
+              beta: z
+                .object({ week: z.number(), weeks: z.number(), endsAt: z.coerce.date() })
+                .nullable(),
+            }),
+          )
+        ).beta,
+      /** Entra num grupo pelo código do convite. */
+      join: async (inviteCode: string) =>
+        (
+          await request('POST', '/groups/join', z.object({ group: createdGroupSchema }), {
+            inviteCode,
+          })
+        ).group,
     },
     events: {
       list: async (groupId: string, when: 'upcoming' | 'past' | 'all' = 'upcoming') =>
@@ -187,6 +215,16 @@ export function createApiClient(options: ApiClientOptions) {
               startsAt: event.startsAt.toISOString(),
               endsAt: event.endsAt ? event.endsAt.toISOString() : null,
             },
+          )
+        ).event,
+      /** Muda a situação do encontro: finalizar (dispara o resumo da noite), cancelar ou reabrir. */
+      setStatus: async (eventId: string, status: 'scheduled' | 'cancelled' | 'finished') =>
+        (
+          await request(
+            'PATCH',
+            `/events/${encodeURIComponent(eventId)}`,
+            z.object({ event: z.object({ id: z.string(), status: eventStatusSchema }).loose() }),
+            { status },
           )
         ).event,
       rsvp: async (eventId: string, rsvp: Rsvp) =>

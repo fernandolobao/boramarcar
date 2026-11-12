@@ -2,6 +2,7 @@ import type { Rsvp } from '@boramarcar/api-client';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
+import { EventRecap, FinishEvent } from '@/components/event-finish';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
@@ -115,6 +116,12 @@ export default function EventScreen() {
           />
         </Card>
       )}
+
+      {/* Organizador: finalizar depois do início (manda o resumo da noite). */}
+      {e.canManage && e.status === 'scheduled' && e.startsAt.getTime() <= Date.now() && (
+        <FinishEvent event={e} onDone={() => void event.refresh()} />
+      )}
+      {e.status === 'finished' && e.games.length > 0 && <EventRecap event={e} />}
 
       <Card>
         <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
