@@ -3,7 +3,8 @@ import { contrastRatio, themes } from './index';
 import {
   collectionFlow,
   deckBarBackground,
-  GOLD_BAR_COLORS,
+  deckBarEdge,
+  GOLD_BAR,
   MANA_BAR_COLORS,
   DEFAULT_FLOW,
   deckFlow,
@@ -114,7 +115,12 @@ describe('normalizeFlow e sampleFlow', () => {
 describe('barras nas cores do deck', () => {
   it('cada cor tem contraste ≥ 3:1 com a superfície nos dois temas', () => {
     for (const theme of ['light', 'dark'] as const) {
-      for (const color of [...Object.values(MANA_BAR_COLORS[theme]), GOLD_BAR_COLORS[theme]]) {
+      for (const color of Object.values(MANA_BAR_COLORS[theme])) {
+        expect(contrastRatio(color, themes[theme].surface)).toBeGreaterThanOrEqual(3);
+      }
+      // Dourado: o contorno dá o contraste; sem contorno, todos os tons do degradê precisam dar.
+      const { edge, stops } = GOLD_BAR[theme];
+      for (const color of edge ? [edge] : stops) {
         expect(contrastRatio(color, themes[theme].surface)).toBeGreaterThanOrEqual(3);
       }
     }
@@ -127,7 +133,13 @@ describe('barras nas cores do deck', () => {
     );
     expect(deckBarBackground([], 'light')).toBe(MANA_BAR_COLORS.light.C);
     // Três cores ou mais: dourado (o degradê de muitas cores atrapalha a leitura).
-    expect(deckBarBackground(['W', 'U', 'B'], 'light')).toBe(GOLD_BAR_COLORS.light);
-    expect(deckBarBackground(['W', 'U', 'B', 'R', 'G'], 'dark')).toBe(GOLD_BAR_COLORS.dark);
+    expect(deckBarBackground(['W', 'U', 'B'], 'light')).toBe(
+      `linear-gradient(180deg, ${GOLD_BAR.light.stops.join(', ')})`,
+    );
+    expect(deckBarBackground(['W', 'U', 'B', 'R', 'G'], 'dark')).toContain(GOLD_BAR.dark.stops[1]);
+    // Contorno só nas douradas do tema claro.
+    expect(deckBarEdge(['W', 'U', 'B'], 'light')).toBe(GOLD_BAR.light.edge);
+    expect(deckBarEdge(['W', 'U', 'B'], 'dark')).toBe('transparent');
+    expect(deckBarEdge(['W', 'U'], 'light')).toBe('transparent');
   });
 });

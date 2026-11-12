@@ -63,6 +63,7 @@ Aprendidas na prática. Leia antes de concluir que algo "não funciona".
 - O projeto separa os segredos de produção: variáveis secretas de Production **não** valem em Preview e precisam ser criadas lá também.
 - Login no preview: OAuth proxy (ver `docs/ARCHITECTURE.md`). Um 403 "Invalid origin" num preview antigo some com um deploy novo do branch. Teste com `fetch('/api/auth/sign-in/social', {method:'POST', …, body: {provider:'google', callbackURL:'/painel', disableRedirect:true}})` no próprio preview: o `redirect_uri` deve ser o de produção.
 - Um PR aberto antes de uma mudança de infraestrutura (CI, login) precisa de "Update branch" para pegá-la.
+- **Minutos do Actions** (repositório privado, 2.000/mês): o CI roda só o que mudou (`.github/workflows/ci.yml`). Jobs que terminam em ~2 s sem passo nenhum = minutos esgotados ou limite de gasto, não o código. Mexeu muito em telas para celular? Ponha o rótulo `e2e-completo` no PR. Evite empurrar vários commits seguidos num PR aberto: junte e empurre uma vez.
 
 **App mobile**
 

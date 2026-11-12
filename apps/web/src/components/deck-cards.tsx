@@ -8,6 +8,7 @@ import { useId, useRef, useState, type CSSProperties } from 'react';
 import { api } from '@/lib/api';
 import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
+import { flipCard } from './card-flip';
 import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { printLabel, PrintPicker } from './print-picker';
@@ -262,7 +263,18 @@ export function DeckCards({
                         type="button"
                         className="absolute right-1.5 bottom-[6%] inline-flex items-center gap-1 rounded-md bg-ink-950/85 px-1.5 py-1 text-xs font-medium text-white hover:bg-ink-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
                         aria-pressed={flipped.has(line.key)}
-                        onClick={() => toggleFlip(line.key)}
+                        onClick={(e) => {
+                          const toBack = !flipped.has(line.key);
+                          // O botão da carta vem logo antes deste.
+                          flipCard(
+                            e.currentTarget.previousElementSibling as HTMLElement | null,
+                            () => toggleFlip(line.key),
+                            {
+                              toBack,
+                              preload: toBack ? line.card?.backImageUri : line.card?.imageUri,
+                            },
+                          );
+                        }}
                       >
                         <Icon name="flip" className="size-3.5 shrink-0" />
                         {t('flip')}

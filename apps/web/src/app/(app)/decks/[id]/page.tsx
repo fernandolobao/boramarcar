@@ -43,7 +43,7 @@ import { getDb } from '@/server/db';
 import { CardNames } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
 import { ManaFlowColors } from '@/components/mana-flow';
-import { deckBarBackground, deckFlow } from '@boramarcar/tokens/flow';
+import { deckBarBackground, deckBarEdge, deckFlow } from '@boramarcar/tokens/flow';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -114,6 +114,8 @@ export default async function DeckPage({ params }: Props) {
         {
           '--deck-bar-light': deckBarBackground(identity, 'light'),
           '--deck-bar-dark': deckBarBackground(identity, 'dark'),
+          '--deck-bar-edge-light': deckBarEdge(identity, 'light'),
+          '--deck-bar-edge-dark': deckBarEdge(identity, 'dark'),
         } as React.CSSProperties
       }
     >

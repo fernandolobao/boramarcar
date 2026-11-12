@@ -37,20 +37,20 @@ Há a aplicação web (Next.js na Vercel) e o app Android/iOS (Expo), em testes,
 
 ## Stack
 
-| Camada    | Escolha                                                           | Por quê                                                                           |
-| --------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Linguagem | TypeScript (strict) em tudo                                       | Tipos de ponta a ponta, do banco à UI                                             |
-| Monorepo  | pnpm workspaces + Turborepo                                       | `packages/core` será compartilhado com o app mobile                               |
-| Web       | Next.js 16 (App Router, React 19, Server Components)              | Deploy nativo na Vercel; API REST em route handlers                               |
-| Banco     | **Neon Postgres** (serverless)                                    | Plano gratuito, integração nativa no Vercel Marketplace, branches de banco por PR |
-| ORM       | Drizzle ORM + drizzle-kit                                         | Leve, tipado, migrations em SQL versionadas                                       |
-| Auth      | Better Auth (Google OAuth)                                        | Sessões no próprio banco; tem plugin para Expo (mobile)                           |
-| i18n      | next-intl                                                         | pt-BR padrão, inglês incluído                                                     |
-| Estilo    | Tailwind CSS v4                                                   |                                                                                   |
-| Ícones    | Lucide (`lucide-react`)                                           | ~1.600 ícones consistentes (traço 2px), MIT, importados um a um (tree-shaking)    |
-| Validação | Zod 4                                                             | Entrada da API e respostas de APIs externas                                       |
-| Testes    | Vitest, PGlite (Postgres em memória), Testing Library, Playwright | Testes de integração com Postgres real sem Docker                                 |
-| CI        | GitHub Actions                                                    | Lint, formatação, tipos, testes, cobertura, migrations, build e E2E em cada PR    |
+| Camada    | Escolha                                                           | Por quê                                                                                         |
+| --------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Linguagem | TypeScript (strict) em tudo                                       | Tipos de ponta a ponta, do banco à UI                                                           |
+| Monorepo  | pnpm workspaces + Turborepo                                       | `packages/core` será compartilhado com o app mobile                                             |
+| Web       | Next.js 16 (App Router, React 19, Server Components)              | Deploy nativo na Vercel; API REST em route handlers                                             |
+| Banco     | **Neon Postgres** (serverless)                                    | Plano gratuito, integração nativa no Vercel Marketplace, branches de banco por PR               |
+| ORM       | Drizzle ORM + drizzle-kit                                         | Leve, tipado, migrations em SQL versionadas                                                     |
+| Auth      | Better Auth (Google OAuth)                                        | Sessões no próprio banco; tem plugin para Expo (mobile)                                         |
+| i18n      | next-intl                                                         | pt-BR padrão, inglês incluído                                                                   |
+| Estilo    | Tailwind CSS v4                                                   |                                                                                                 |
+| Ícones    | Lucide (`lucide-react`)                                           | ~1.600 ícones consistentes (traço 2px), MIT, importados um a um (tree-shaking)                  |
+| Validação | Zod 4                                                             | Entrada da API e respostas de APIs externas                                                     |
+| Testes    | Vitest, PGlite (Postgres em memória), Testing Library, Playwright | Testes de integração com Postgres real sem Docker                                               |
+| CI        | GitHub Actions                                                    | Lint, formatação, tipos, testes, cobertura, migrations, build e E2E em cada PR (só o que mudou) |
 
 ## Estrutura
 
@@ -167,7 +167,7 @@ As cores vêm da paleta da marca (`packages/tokens/palette.json`: Arcano, Éter,
 
 ## Acessibilidade
 
-A interface segue **WCAG 2.2 AA**. O lint (`jsx-a11y`), os testes de componentes (axe-core) e os testes E2E (axe em todas as telas, claro/escuro, desktop/mobile) bloqueiam regressões na CI. Regras e histórico de auditorias em [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) e [CLAUDE.md](CLAUDE.md).
+A interface segue **WCAG 2.2 AA**. O lint (`jsx-a11y`), os testes de componentes (axe-core) e os testes E2E (axe em todas as telas, claro/escuro, desktop/mobile) bloqueiam regressões na CI. Nos PRs o E2E roda no perfil de computador; o de celular roda na `main` ou com o rótulo `e2e-completo` no PR. Regras e histórico de auditorias em [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) e [CLAUDE.md](CLAUDE.md).
 
 ## Integração contínua
 

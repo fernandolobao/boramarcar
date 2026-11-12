@@ -8,7 +8,9 @@ import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getUserPreferences } from '@boramarcar/db';
 import { cookies } from 'next/headers';
+import { LocaleSync } from '@/components/locale-sync';
 import { TimeZoneSync } from '@/components/time-zone-sync';
+import { isLocale, LOCALE_COOKIE } from '@/i18n/config';
 import { Logo } from '@/components/logo';
 import { UserMenu } from '@/components/user-menu';
 import { TIME_ZONE_COOKIE } from '@/i18n/config';
@@ -43,6 +45,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <div className="relative isolate min-h-dvh overflow-x-clip">
       <ManaFlow />
       <HoloEffects />
+      <LocaleSync
+        savedLocale={isLocale(preferences.locale) ? preferences.locale : null}
+        hasCookie={isLocale(cookieStore.get(LOCALE_COOKIE)?.value)}
+      />
       <TimeZoneSync
         savedTimeZone={preferences.timeZoneIsDefault ? null : preferences.timeZone}
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}
