@@ -14,7 +14,7 @@
     "android": {
       "package": "app.arcanakin",
       "adaptiveIcon": {
-        "backgroundColor": "#3B0D6B",
+        "backgroundColor": "#0B0716",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -25,7 +25,16 @@
       "expo-status-bar",
       "expo-secure-store",
       "expo-web-browser",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#0B0716"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
