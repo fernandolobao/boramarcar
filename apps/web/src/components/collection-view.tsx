@@ -329,7 +329,7 @@ function CollectionTable({
   const td = useTranslations('decks');
   const format = useFormatter();
   return (
-    <div className="overflow-x-auto rounded-xl border border-line">
+    <div className="overflow-x-auto rounded-xl border border-line bg-surface">
       <table className="w-full min-w-[44rem] text-sm">
         <thead className="bg-surface-muted text-left">
           <tr>

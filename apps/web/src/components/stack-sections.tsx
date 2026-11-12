@@ -13,8 +13,9 @@ import { planStack, stackFrame, type StackPlanItem } from './stack-layout';
  * - Seção mais alta que a tela não gruda: rola normal e empurra para cima a pilha anterior, como
  *   se fosse o fim dela; as seções seguintes começam uma pilha nova. Assim nada fica escondido
  *   nem passa por cima das faixas.
- * - Sem JavaScript, as seções ficam uma embaixo da outra. Foco dentro de uma seção coberta tira o
- *   corte e o esmaecimento dela e a traz para a frente (WCAG 2.4.11).
+ * - Sem JavaScript, as seções ficam uma embaixo da outra. Foco de teclado dentro de uma seção
+ *   coberta rola a página até o elemento aparecer acima da seção seguinte (WCAG 2.4.11), sem
+ *   tirar a seção do lugar dela na pilha.
  */
 /** Cada seção vira uma carta: fragmentos (`<>…</>`) e listas são abertos; vazios saem. */
 function flatten(children: ReactNode): ReactNode[] {
@@ -93,13 +94,31 @@ export function StackSections({ children }: { children: ReactNode }) {
       if (!frame) frame = requestAnimationFrame(update);
     };
 
+    // Foco de teclado escondido atrás da seção seguinte: rola só o necessário para revelá-lo.
+    const revealFocus = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.matches?.(':focus-visible')) return;
+      const index = cards.findIndex((c) => c.contains(target));
+      if (index < 0) return;
+      const box = target.getBoundingClientRect();
+      const cover = cards
+        .slice(index + 1)
+        .map((c) => c.getBoundingClientRect().top)
+        .filter((top) => top < box.bottom);
+      if (cover.length === 0) return;
+      const overlap = box.bottom - Math.min(...cover) + 16;
+      window.scrollBy({ top: -overlap, behavior: 'instant' });
+    };
+
     replan();
+    root.addEventListener('focusin', revealFocus);
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(replan);
     for (const card of cards) observer?.observe(card);
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', replan);
     return () => {
       observer?.disconnect();
+      root.removeEventListener('focusin', revealFocus);
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', replan);
       if (frame) cancelAnimationFrame(frame);

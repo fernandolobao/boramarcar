@@ -166,9 +166,16 @@ export const MANA_BAR_COLORS: Record<'light' | 'dark', Record<ManaColor, string>
   },
 };
 
+/** Dourado das barras para decks de três cores ou mais (≥ 3:1 com a superfície nos dois temas). */
+export const GOLD_BAR_COLORS: Record<'light' | 'dark', string> = {
+  light: '#a8700f',
+  dark: '#f6b944',
+};
+
 /**
- * Fundo das barras nas cores de um deck: uma cor só, ou um degradê pelas cores da identidade
- * (na ordem WUBRG). Sem identidade, incolor.
+ * Fundo das barras nas cores de um deck: uma cor, ou um degradê das duas cores (na ordem WUBRG).
+ * Com três cores ou mais o degradê vira um arco-íris que atrapalha a leitura, então as barras
+ * ficam douradas, a cor de destaque da marca. Sem identidade, incolor.
  */
 export function deckBarBackground(identity: readonly string[], theme: 'light' | 'dark'): string {
   const colors = MANA_COLORS.filter((c) => c !== 'C' && identity.includes(c)).map(
@@ -176,5 +183,6 @@ export function deckBarBackground(identity: readonly string[], theme: 'light' | 
   );
   if (colors.length === 0) return MANA_BAR_COLORS[theme].C;
   if (colors.length === 1) return colors[0]!;
-  return `linear-gradient(135deg, ${colors.join(', ')})`;
+  if (colors.length === 2) return `linear-gradient(135deg, ${colors.join(', ')})`;
+  return GOLD_BAR_COLORS[theme];
 }
