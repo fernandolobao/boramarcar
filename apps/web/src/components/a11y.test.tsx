@@ -35,6 +35,7 @@ import { ProfileForm } from './profile-form';
 import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
 import { FirstSteps } from './first-steps';
+import { FeedbackForm } from './feedback-form';
 
 vi.mock('./places/location-map', () => ({
   LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
@@ -441,5 +442,9 @@ describe('acessibilidade dos componentes (axe-core)', () => {
         />,
       ),
     ).toEqual([]);
+  });
+
+  it('formulário de feedback sem violações', async () => {
+    expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
   });
 });

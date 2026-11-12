@@ -9,6 +9,7 @@ import {
   decks,
   eventParticipants,
   events,
+  feedback,
   gamePlayers,
   games,
   groupMembers,
@@ -164,6 +165,16 @@ export async function exportUserData(db: Database, userId: string) {
     })
     .from(pushTokens)
     .where(eq(pushTokens.userId, userId));
+  const sentFeedback = await db
+    .select({
+      kind: feedback.kind,
+      message: feedback.message,
+      page: feedback.page,
+      platform: feedback.platform,
+      createdAt: feedback.createdAt,
+    })
+    .from(feedback)
+    .where(eq(feedback.userId, userId));
   const onboarding = await db
     .select({ step: onboardingSteps.step, at: onboardingSteps.createdAt })
     .from(onboardingSteps)
@@ -177,6 +188,7 @@ export async function exportUserData(db: Database, userId: string) {
     logins,
     pushDevices: devices,
     onboarding,
+    feedback: sentFeedback,
     groups: memberships,
     hostedPlaces: hosted,
     availability: { slots, weekly: rules },
@@ -251,6 +263,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(session).where(eq(session.userId, userId));
     await tx.delete(pushTokens).where(eq(pushTokens.userId, userId));
     await tx.delete(onboardingSteps).where(eq(onboardingSteps.userId, userId));
+    await tx.delete(feedback).where(eq(feedback.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
     await tx
       .update(user)

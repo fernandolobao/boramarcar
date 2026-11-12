@@ -63,6 +63,7 @@ import {
   LogIn,
   LogOut,
   MessageCircle,
+  MessageSquareText,
   Pencil,
   Printer,
   Plus,
@@ -184,6 +185,7 @@ export const Icons = {
   accessible: Accessibility,
   privacy: ShieldCheck,
   email: Mail,
+  feedback: MessageSquareText,
   pause: Pause,
   play: Play,
   // Tema

@@ -14,6 +14,7 @@ const PROTECTED = [
   '/perfil',
   '/jogadores',
   '/configuracoes',
+  '/feedback',
 ];
 
 const isProtected = (path: string) =>

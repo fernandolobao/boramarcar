@@ -29,7 +29,8 @@
     "settings": "Settings",
     "userMenu": "Account menu",
     "signedInAs": "Signed in as",
-    "collection": "Collection"
+    "collection": "Collection",
+    "feedback": "Send feedback"
   },
   "dashboard": {
     "hello": "Hi, {name}!",
@@ -741,7 +742,8 @@
     "confirmed": "Confirmed ({count}): {names}",
     "openEvent": "Open the game night",
     "calendarHint": "The attached .ics file adds (or updates) the game night in your calendar.",
-    "footer": "You're getting this email because you're in {group} on ArcanaKin. To stop these notices, turn them off in your settings: {url}"
+    "footer": "You're getting this email because you're in {group} on ArcanaKin. To stop these notices, turn them off in your settings: {url}",
+    "feedbackSubject": "Feedback ({kind}): {name}"
   },
   "formats": {
     "commander": "Commander",
@@ -1391,5 +1393,22 @@
     "rsvpHint": "Say if you're going (or maybe) to the group's next game night.",
     "deck": "Import a deck",
     "deckHint": "From Archidekt, Moxfield or a pasted list, to see the analysis and use it in games."
+  },
+  "feedback": {
+    "title": "Send feedback",
+    "intro": "ArcanaKin is in beta. Tell us what got stuck, what was confusing or what would make your group use it more. The person behind the app reads everything and may reply to your e-mail.",
+    "kind": "What is it about?",
+    "kinds": {
+      "problem": "Something didn't work",
+      "idea": "Idea or suggestion",
+      "other": "Something else"
+    },
+    "message": "Message",
+    "messageHint": "If it's a problem, say what you tried to do and what happened.",
+    "page": "Sent from: {page}",
+    "send": "Send",
+    "sent": "Thanks! We got your feedback.",
+    "sendAnother": "Send another",
+    "privacy": "We keep the text, the type, the page you came from and the platform, with your account, to reply and improve the app."
   }
 }

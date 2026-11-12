@@ -227,6 +227,26 @@ export const onboardingSteps = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.step] })],
 );
 
+/**
+ * Feedback do beta (8.4): o que a pessoa contou pelo site ou pelo app. Some com a conta (LGPD);
+ * a página guarda só o caminho, sem query string.
+ */
+export const feedback = pgTable(
+  'feedback',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    message: text('message').notNull(),
+    page: text('page'),
+    platform: text('platform').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index('feedback_created_idx').on(t.createdAt)],
+);
+
 /* ---------- Eventos e partidas ---------- */
 
 export const events = pgTable(

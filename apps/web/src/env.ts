@@ -19,6 +19,8 @@ const schema = z.object({
   EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
   /** `off` desliga o envio de notificações push. */
   PUSH_NOTIFICATIONS: z.enum(['on', 'off']).default('on'),
+  /** E-mails de quem administra o projeto (separados por vírgula): recebem o feedback do beta. */
+  ADMIN_EMAILS: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -45,6 +47,7 @@ export function getEnv(): Env {
       CRON_SECRET: process.env.CRON_SECRET,
       EXPO_ACCESS_TOKEN: process.env.EXPO_ACCESS_TOKEN,
       PUSH_NOTIFICATIONS: process.env.PUSH_NOTIFICATIONS === 'off' ? 'off' : 'on',
+      ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     };
     return cached;
   }
@@ -67,4 +70,12 @@ export function getBaseUrl(env: Env = getEnv()): string {
   if (env.BETTER_AUTH_URL) return env.BETTER_AUTH_URL;
   if (env.VERCEL_URL) return `https://${env.VERCEL_URL}`;
   return 'http://localhost:3000';
+}
+
+/** E-mails de administração (`ADMIN_EMAILS`), em minúsculas, sem vazios. */
+export function adminEmails(env: Env = getEnv()): string[] {
+  return (env.ADMIN_EMAILS ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => e.includes('@'));
 }

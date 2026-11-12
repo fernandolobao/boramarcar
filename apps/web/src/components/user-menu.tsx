@@ -113,6 +113,20 @@ export function UserMenu({
               {t('settings')}
             </Link>
           </li>
+          <li>
+            <Link
+              href={
+                pathname === '/feedback'
+                  ? '/feedback'
+                  : `/feedback?de=${encodeURIComponent(pathname)}`
+              }
+              className={itemClass}
+              aria-current={pathname === '/feedback' ? 'page' : undefined}
+            >
+              <Icon name="feedback" />
+              {t('feedback')}
+            </Link>
+          </li>
           <li className="mt-1 border-t border-ink-200 pt-1 dark:border-ink-700">
             <button
               type="button"

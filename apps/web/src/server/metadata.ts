@@ -10,7 +10,8 @@ type NavKey =
   | 'collection'
   | 'group'
   | 'profile'
-  | 'settings';
+  | 'settings'
+  | 'feedback';
 
 /** Gera `generateMetadata` com o título traduzido da seção. */
 export const navMetadata = (key: NavKey) => async (): Promise<Metadata> => ({

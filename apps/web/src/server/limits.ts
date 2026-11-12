@@ -23,6 +23,8 @@ export const RATE_LIMITS = {
   groups: { limit: 20, windowMs: 60 * MINUTE },
   /** Relatórios de CSP (sem login): por endereço, para ninguém encher o log. */
   cspReport: { limit: 60, windowMs: MINUTE },
+  /** Feedback do beta. */
+  feedback: { limit: 10, windowMs: 60 * MINUTE },
 } as const;
 
 export type RateLimitKind = keyof typeof RATE_LIMITS;
