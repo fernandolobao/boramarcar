@@ -284,6 +284,8 @@ export const events = pgTable(
     sequence: integer('sequence').notNull().default(0),
     /** Quando o lembrete do dia foi enviado (evita duplicar). */
     reminderSentAt: timestamp('reminder_sent_at', { withTimezone: true }),
+    /** Quando o resumo da noite (8.6) foi enviado, ao finalizar (evita duplicar ao reabrir). */
+    recapSentAt: timestamp('recap_sent_at', { withTimezone: true }),
     createdBy: text('created_by')
       .notNull()
       .references(() => user.id),

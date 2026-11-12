@@ -90,3 +90,25 @@ export async function deliverPush(db: Database, messages: PushMessage[]) {
   if (result.failed) console.error(`[push] ${result.failed} de ${messages.length} não enviado(s)`);
   return result;
 }
+
+/** Push do resumo da noite: abre o encontro no app. */
+export function buildRecapPush(
+  target: PushTarget,
+  data: {
+    eventId: string;
+    title: string;
+    games: number;
+    top: { name: string; wins: number } | null;
+  },
+): PushMessage {
+  const { t } = tools(target);
+  return {
+    to: target.token,
+    title: t('recap.title', { title: data.title }),
+    body:
+      data.top && data.top.wins > 0
+        ? t('recap.body', { name: data.top.name, wins: data.top.wins, count: data.games })
+        : t('recap.bodyDraw', { count: data.games }),
+    data: { url: `/encontros/${data.eventId}` },
+  };
+}

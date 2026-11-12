@@ -69,6 +69,7 @@ export default async function EventPage({ params }: Props) {
   const tp = await getTranslations('places');
   const tt = await getTranslations('table');
   const tf = await getTranslations('formats');
+  const tr = await getTranslations('recap');
   const format = await getFormatter();
 
   const me = event.participants.find((p) => p.userId === user.id);
@@ -170,6 +171,15 @@ export default async function EventPage({ params }: Props) {
             title={event.title}
             icsHref={`/api/v1/events/${event.id}/ics`}
           />
+          {event.status === 'finished' && event.games.length > 0 && (
+            <div className="space-y-1 border-t border-line pt-3">
+              <Link href={`/resumo/${event.id}`} className="btn-secondary">
+                <Icon name="ranking" />
+                {tr('link')}
+              </Link>
+              <p className="muted">{tr('linkHint')}</p>
+            </div>
+          )}
         </section>
 
         <section className="card space-y-4">

@@ -785,6 +785,14 @@
       "feedback": "Achou algo estranho ou teve uma ideia? Mande pelo app (menu da conta → Enviar feedback).",
       "cta": "Enviar feedback",
       "note": "Acompanhamos só os números do grupo, como encontros e partidas registradas."
+    },
+    "recap": {
+      "subject": "Como foi: {title}",
+      "intro": "{count, plural, =1 {1 partida} other {# partidas}} em {group} ({day}). O resumo da noite:",
+      "gameWin": "Partida {number}: {names} ({commanders})",
+      "gameDraw": "Partida {number}: empate",
+      "top": "Destaque: {name}, com {wins, plural, =1 {1 vitória} other {# vitórias}}.",
+      "cta": "Ver e compartilhar o resumo"
     }
   },
   "formats": {
@@ -1418,6 +1426,11 @@
     "window": {
       "title": "A mesa fechou em {group}!",
       "body": "{count} jogadores podem jogar {when}. Que tal marcar?"
+    },
+    "recap": {
+      "title": "Como foi: {title}",
+      "body": "{name} venceu {wins} de {count}. Veja o resumo e mande no grupo.",
+      "bodyDraw": "{count, plural, =1 {1 partida} other {# partidas}} registradas. Veja o resumo e mande no grupo."
     }
   },
   "onboarding": {
@@ -1611,7 +1624,11 @@
       "description": "Métricas do beta do ArcanaKin."
     },
     "homeImage": "Marque o próximo Commander com a sua mesa.",
-    "homeImageSubtitle": "Horários em que todo mundo pode, encontros, ranking, decks e partidas num lugar só."
+    "homeImageSubtitle": "Horários em que todo mundo pode, encontros, ranking, decks e partidas num lugar só.",
+    "recap": {
+      "title": "Resumo do encontro",
+      "description": "Quem jogou, quem venceu e com quais comandantes."
+    }
   },
   "beta": {
     "title": "Seu grupo está no beta do ArcanaKin",
@@ -1619,5 +1636,24 @@
     "cta": "Enviar feedback",
     "dismiss": "Dispensar",
     "dismissLabel": "Dispensar o aviso do beta"
+  },
+  "recap": {
+    "eyebrow": "Resumo do encontro",
+    "metaTitle": "Resumo: {title}",
+    "summaryTop": "{name} venceu {wins, plural, =1 {1 partida} other {# partidas}} de {count}.",
+    "summary": "{count, plural, =1 {1 partida jogada} other {# partidas jogadas}}.",
+    "standings": "Placar da noite",
+    "wins": "{wins, plural, =1 {1 vitória} other {# vitórias}} em {games}",
+    "games": "Partidas",
+    "game": "Partida {number}",
+    "draw": "empate",
+    "winner": "venceu",
+    "share": "Mandar para o grupo",
+    "shareText": "Resumo de {title}: {summary} {url}",
+    "openEvent": "Abrir o encontro",
+    "cta": "Organize os encontros de Commander do seu grupo no ArcanaKin: horários, partidas, ranking e decks.",
+    "ctaButton": "Conhecer o ArcanaKin",
+    "link": "Resumo para compartilhar",
+    "linkHint": "Primeiros nomes, comandantes e placar — sem local nem contatos."
   }
 }

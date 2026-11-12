@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authed, isoDate, parseJson } from '@/server/http';
 import { eventChangeKind, notifyEvent } from '@/server/notify';
 import { runAfterResponse } from '@/server/background';
+import { sendEventRecap } from '@/server/recap';
 
 export const GET = authed<{ eventId: string }>(async ({ db, user, params }) => ({
   event: await getEventDetail(db, { eventId: params.eventId, userId: user.id }),
@@ -26,6 +27,10 @@ export const PATCH = authed<{ eventId: string }>(async ({ req, db, user, params 
   const kind = before ? eventChangeKind(before, event) : null;
   if (kind) {
     runAfterResponse(() => notifyEvent(db, { eventId: event.id, kind, actorId: user.id }));
+  }
+  // Finalizou: resumo da noite para quem jogou (uma vez por encontro).
+  if (before?.status !== 'finished' && event.status === 'finished') {
+    runAfterResponse(() => sendEventRecap(db, event.id));
   }
   return { event };
 });

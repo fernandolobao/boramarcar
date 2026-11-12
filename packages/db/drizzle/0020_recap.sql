@@ -1,0 +1,1 @@
+ALTER TABLE "events" ADD COLUMN "recap_sent_at" timestamp with time zone;
