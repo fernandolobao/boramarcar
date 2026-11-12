@@ -14,6 +14,7 @@ import {
   groupMembers,
   groups,
   locations,
+  pushTokens,
   session,
   user,
 } from '../schema';
@@ -153,12 +154,23 @@ export async function exportUserData(db: Database, userId: string) {
         .orderBy(asc(deckCards.cardName))
     : [];
 
+  // Aparelhos com avisos ligados: plataforma e datas (o token em si é só um endereço técnico).
+  const devices = await db
+    .select({
+      platform: pushTokens.platform,
+      createdAt: pushTokens.createdAt,
+      lastSeenAt: pushTokens.lastSeenAt,
+    })
+    .from(pushTokens)
+    .where(eq(pushTokens.userId, userId));
+
   return {
     format: 'arcanakin-export',
     version: 1,
     exportedAt: new Date().toISOString(),
     profile: me,
     logins,
+    pushDevices: devices,
     groups: memberships,
     hostedPlaces: hosted,
     availability: { slots, weekly: rules },
@@ -231,6 +243,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(decks).where(eq(decks.ownerId, userId));
     await tx.delete(groupMembers).where(eq(groupMembers.userId, userId));
     await tx.delete(session).where(eq(session.userId, userId));
+    await tx.delete(pushTokens).where(eq(pushTokens.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
     await tx
       .update(user)

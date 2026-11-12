@@ -8,17 +8,69 @@ import {
   listEvents,
   listEventsNeedingReminder,
   listGroupRecipients,
+  listPushTargets,
   suggestGameWindows,
   type Database,
 } from '@boramarcar/db';
 import { buildEventEmail, buildWindowEmail, deliverEmails, type EventEmailKind } from './email';
 import { eventIcs } from './event-ics';
+import { buildEventPush, buildWindowPush, deliverPush } from './push';
+
+/** Push e e-mail saem juntos; uma falha no push nunca impede o e-mail (nem o contrário). */
+async function safely<T>(label: string, task: () => Promise<T>) {
+  try {
+    return await task();
+  } catch (error) {
+    console.error(`[${label}]`, error);
+    return null;
+  }
+}
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
+/** Push do encontro para os aparelhos de quem deve saber (mesma regra do e-mail, sem o opt-out dele). */
+async function pushEvent(
+  db: Database,
+  input: { eventId: string; kind: EventEmailKind; actorId?: string },
+) {
+  const data = await getEventForNotification(db, {
+    eventId: input.eventId,
+    audience: input.kind === 'created' ? 'group' : 'participants',
+    excludeUserId: input.actorId,
+    channel: 'push',
+  });
+  if (!data || data.recipients.length === 0) return null;
+  const targets = await listPushTargets(
+    db,
+    data.recipients.map((r) => r.userId),
+  );
+  return deliverPush(
+    db,
+    targets.map((target) =>
+      buildEventPush(target, {
+        kind: input.kind,
+        groupName: data.groupName,
+        event: data.event,
+        locationName: data.location?.name ?? null,
+      }),
+    ),
+  );
+}
+
 /** Avisa sobre um encontro: novo (grupo todo), alterado/cancelado (quem não recusou) ou lembrete. */
 export async function notifyEvent(
+  db: Database,
+  input: { eventId: string; kind: EventEmailKind; actorId?: string },
+) {
+  const [emails] = await Promise.all([
+    safely('email', () => emailEvent(db, input)),
+    safely('push', () => pushEvent(db, input)),
+  ]);
+  return emails ?? [];
+}
+
+async function emailEvent(
   db: Database,
   input: { eventId: string; kind: EventEmailKind; actorId?: string },
 ) {
@@ -94,7 +146,7 @@ export async function notifyNewWindows(
       return e.startsAt < end && eventEnd > start;
     });
 
-  const fresh = [];
+  const fresh: typeof windows = [];
   for (const window of windows) {
     if (fresh.length >= MAX_WINDOWS_PER_CHANGE) break;
     if (overlapsEvent(window.start, window.end)) continue;
@@ -103,11 +155,34 @@ export async function notifyNewWindows(
   }
   if (fresh.length === 0) return [];
 
+  const groupName = (await getGroupName(db, input.groupId)) ?? '';
+  await safely('push', async () => {
+    const members = await listGroupRecipients(db, {
+      groupId: input.groupId,
+      excludeUserId: input.actorId,
+      channel: 'push',
+    });
+    const targets = await listPushTargets(
+      db,
+      members.map((m) => m.userId),
+    );
+    return deliverPush(
+      db,
+      fresh.flatMap((window) =>
+        targets.map((target) =>
+          buildWindowPush(target, {
+            groupName,
+            start: window.start,
+            players: window.players.length,
+          }),
+        ),
+      ),
+    );
+  });
   const recipients = await listGroupRecipients(db, {
     groupId: input.groupId,
     excludeUserId: input.actorId,
   });
-  const groupName = (await getGroupName(db, input.groupId)) ?? '';
   return deliverEmails(
     fresh.flatMap((window) =>
       recipients.map((recipient) =>

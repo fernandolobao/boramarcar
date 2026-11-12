@@ -1341,5 +1341,27 @@
       "Land": "Terreno",
       "Battle": "Batalha"
     }
+  },
+  "push": {
+    "created": {
+      "title": "Novo encontro em {group}",
+      "body": "{title} · {when}. Toque para confirmar se você vai."
+    },
+    "updated": {
+      "title": "Encontro alterado",
+      "body": "{title} · {when}"
+    },
+    "cancelled": {
+      "title": "Encontro cancelado",
+      "body": "{title} · {when}"
+    },
+    "reminder": {
+      "title": "Lembrete: {title}",
+      "body": "{when} · {where}"
+    },
+    "window": {
+      "title": "A mesa fechou em {group}!",
+      "body": "{count} jogadores podem jogar {when}. Que tal marcar?"
+    }
   }
 }

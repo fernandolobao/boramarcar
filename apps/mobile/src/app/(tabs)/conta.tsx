@@ -1,11 +1,13 @@
 import { ScrollView, View } from 'react-native';
 import { AccountPrivacy } from '@/components/account-privacy';
+import { PushSetting } from '@/components/push-setting';
 import { AppText, Button, Card, styles } from '@/components/ui';
 import { authClient } from '@/lib/auth';
 import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
+import { disablePush } from '@/lib/push';
 
-/** Conta: quem está conectado, grupo ativo, sair e privacidade (LGPD). */
+/** Conta: quem está conectado, grupo ativo, avisos neste celular, sair e privacidade (LGPD). */
 export default function AccountScreen() {
   const { data: session } = authClient.useSession();
   const { groups, group, select } = useGroup();
@@ -38,7 +40,13 @@ export default function AccountScreen() {
           ))}
         </View>
       )}
-      <Button label={t('signOut')} variant="secondary" onPress={() => void authClient.signOut()} />
+      <PushSetting />
+      <Button
+        label={t('signOut')}
+        variant="secondary"
+        // Sair desliga os avisos deste celular (o próximo a entrar liga de novo, se quiser).
+        onPress={() => void disablePush().finally(() => void authClient.signOut())}
+      />
       <AccountPrivacy />
     </ScrollView>
   );

@@ -192,6 +192,25 @@ export const windowNotifications = pgTable(
   (t) => [primaryKey({ columns: [t.groupId, t.key] })],
 );
 
+/**
+ * Aparelhos que recebem notificações push (app mobile, Expo Push). Um token por aparelho; se
+ * outra pessoa entrar no mesmo celular, o token passa para ela. Ter token = avisos ligados
+ * naquele aparelho (desligar no app apaga o token).
+ */
+export const pushTokens = pgTable(
+  'push_tokens',
+  {
+    token: text('token').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    platform: text('platform').notNull(),
+    createdAt: createdAt(),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('push_tokens_user_idx').on(t.userId)],
+);
+
 /* ---------- Eventos e partidas ---------- */
 
 export const events = pgTable(

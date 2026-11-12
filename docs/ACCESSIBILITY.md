@@ -270,3 +270,8 @@ sem rolagem horizontal em 320px.
 ## Segurança (12/11/2026)
 
 - A CSP e os cabeçalhos novos não mudam a interface. A `Permissions-Policy` não bloqueia os sensores de movimento (inclinação das cartas holográficas no celular). E2E de acessibilidade completo sem violações com a CSP aplicada.
+
+## Avisos no celular (12/11/2026)
+
+- **App**: "Avisos neste celular" é um `Switch` nativo com nome e dica acessíveis (`accessibilityLabel`/`accessibilityHint`); o texto da dica também aparece na tela. A permissão do sistema só é pedida quando a pessoa liga. Permissão negada e falhas aparecem como `accessibilityRole="alert"`, com botão para abrir as configurações do celular.
+- **Notificações**: título e texto curtos, sem depender de cor ou ícone; tocar abre a tela do encontro ou a disponibilidade. Sem som próprio com o app aberto.

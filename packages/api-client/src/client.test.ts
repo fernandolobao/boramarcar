@@ -312,4 +312,22 @@ describe('cliente da API', () => {
     expect(url).toBe('https://www.arcanakin.com.br/api/v1/me');
     expect(init).toMatchObject({ method: 'DELETE', body: JSON.stringify({ confirm: true }) });
   });
+
+  it('liga e desliga o push do aparelho', async () => {
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) =>
+      init?.method === 'DELETE' ? json({ removed: true }) : json({ registered: true }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    await api.me.registerPushToken('ExponentPushToken[abcdefgh1]', 'android');
+    await api.me.removePushToken('ExponentPushToken[abcdefgh1]');
+    expect(fetchMock.mock.calls[0]![0]).toBe('https://www.arcanakin.com.br/api/v1/me/push-tokens');
+    expect(fetchMock.mock.calls[0]![1]).toMatchObject({
+      method: 'POST',
+      body: JSON.stringify({ token: 'ExponentPushToken[abcdefgh1]', platform: 'android' }),
+    });
+    expect(fetchMock.mock.calls[1]![1]).toMatchObject({ method: 'DELETE' });
+  });
 });
