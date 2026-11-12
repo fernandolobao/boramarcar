@@ -1,7 +1,18 @@
 name: CI
 
+# Economia de minutos do Actions (o repositório é privado: 2.000 min/mês no plano grátis, e cada
+# job é cobrado arredondado para cima ao minuto):
+# - um job só para lint, formatação, tipos e testes (uma instalação em vez de duas);
+# - o app mobile só quando ele (ou um pacote que ele usa) muda;
+# - build + E2E só quando o site, os pacotes ou o banco mudam (as migrations são checadas ali);
+# - nos PRs, o E2E roda só no Chrome de computador; o perfil de celular roda na `main` ou com o
+#   rótulo `e2e-completo` no PR;
+# - um commit novo cancela a execução anterior do mesmo PR (concurrency).
+
 on:
   pull_request:
+    # `labeled`: pôr o rótulo `e2e-completo` roda o CI de novo com o perfil de celular.
+    types: [opened, synchronize, reopened, labeled]
   push:
     branches: [main]
   workflow_dispatch:
@@ -25,10 +36,42 @@ env:
   NEXT_TELEMETRY_DISABLED: '1'
 
 jobs:
-  quality:
-    name: Lint, formatação e tipos
+  changes:
+    name: O que mudou
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      mobile: ${{ steps.filter.outputs.mobile }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - 'packages/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'turbo.json'
+              - 'tsconfig*.json'
+              - '.nvmrc'
+              - '.github/workflows/ci.yml'
+            mobile:
+              - *shared
+              - 'apps/mobile/**'
+            web:
+              - *shared
+              - 'apps/web/**'
+
+  quality:
+    name: Lint, formatação, tipos e testes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v5
@@ -43,38 +86,6 @@ jobs:
         run: pnpm lint
       - name: TypeScript
         run: pnpm typecheck
-
-  mobile:
-    name: App mobile (bundle Android e iOS)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Expo export (Metro empacota o app sem erros)
-        working-directory: apps/mobile
-        env:
-          CI: '1'
-          EXPO_OFFLINE: '1'
-        run: npx expo export --platform android --platform ios --output-dir dist
-
-  test:
-    name: Testes unitários e de integração
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v5
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
       - name: Vitest (com cobertura)
         run: pnpm test:coverage
       - name: Resumo da cobertura
@@ -94,23 +105,12 @@ jobs:
           path: coverage
           retention-days: 7
 
-  migrations:
-    name: Migrations (Postgres real)
+  mobile:
+    name: App mobile (bundle Android e iOS)
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true' || github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: boramarcar
-          POSTGRES_PASSWORD: boramarcar
-          POSTGRES_DB: boramarcar
-        ports: ['5432:5432']
-        options: >-
-          --health-cmd "pg_isready -U boramarcar"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v5
@@ -119,21 +119,17 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Migrations estão em dia com o schema
-        run: |
-          pnpm db:generate
-          if [ -n "$(git status --porcelain packages/db/drizzle)" ]; then
-            echo "::error::O schema mudou mas a migration não foi gerada. Rode 'pnpm db:generate' e faça commit."
-            git status --porcelain packages/db/drizzle
-            exit 1
-          fi
-      - name: Consistência das migrations
-        run: pnpm db:check
-      - name: Aplicar migrations
-        run: pnpm db:migrate
+      - name: Expo export (Metro empacota o app sem erros)
+        working-directory: apps/mobile
+        env:
+          CI: '1'
+          EXPO_OFFLINE: '1'
+        run: npx expo export --platform android --platform ios --output-dir dist
 
   build-e2e:
-    name: Build e testes E2E (inclui acessibilidade)
+    name: Migrations, build e testes E2E (inclui acessibilidade)
+    needs: changes
+    if: needs.changes.outputs.web == 'true' || github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     services:
@@ -161,7 +157,17 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Migrations
+      - name: Migrations estão em dia com o schema
+        run: |
+          pnpm db:generate
+          if [ -n "$(git status --porcelain packages/db/drizzle)" ]; then
+            echo "::error::O schema mudou mas a migration não foi gerada. Rode 'pnpm db:generate' e faça commit."
+            git status --porcelain packages/db/drizzle
+            exit 1
+          fi
+      - name: Consistência das migrations
+        run: pnpm db:check
+      - name: Aplicar migrations (Postgres real)
         run: pnpm db:migrate
       - name: Cache do Next.js
         uses: actions/cache@v6
@@ -205,7 +211,10 @@ jobs:
           done
           echo "::warning::Seguindo sem atualizar as dependências do sistema (apt indisponível)"
       - name: Playwright (smoke + acessibilidade WCAG 2.2 AA, claro/escuro, desktop/mobile)
-        run: pnpm test:e2e
+        env:
+          # PR: só computador (o celular roda na main ou com o rótulo `e2e-completo`).
+          E2E_PROJECTS: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'e2e-completo') && '--project=chromium' || '' }}
+        run: pnpm test:e2e $E2E_PROJECTS
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
