@@ -16,6 +16,7 @@ import { VisibilityBadge } from '@/components/deck-grid';
 import { compareWithCommanderDecks, getDeck } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import { ViewTransition } from 'react';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeleteButton } from '@/components/availability-forms';
 import { Icon } from '@/components/icons';
@@ -122,17 +123,19 @@ export default async function DeckPage({ params }: Props) {
         )}
         <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,15rem)_1fr] md:items-start">
           {hero?.card?.imageUri && (
-            <div className="relative mx-auto aspect-[488/680] w-48 overflow-hidden rounded-[4.5%/3.2%] shadow-xl sm:w-56 md:w-full">
-              <Image
-                src={hero.card.imageUri}
-                alt={hero.name}
-                fill
-                unoptimized
-                priority
-                sizes="(min-width: 768px) 15rem, 14rem"
-                className="object-cover"
-              />
-            </div>
+            <ViewTransition name={`deck-${deck.id}`} share="morph" default="none">
+              <div className="relative mx-auto aspect-[488/680] w-48 overflow-hidden rounded-[4.5%/3.2%] shadow-xl sm:w-56 md:w-full">
+                <Image
+                  src={hero.card.imageUri}
+                  alt={hero.name}
+                  fill
+                  unoptimized
+                  priority
+                  sizes="(min-width: 768px) 15rem, 14rem"
+                  className="object-cover"
+                />
+              </div>
+            </ViewTransition>
           )}
           <div className="min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2">

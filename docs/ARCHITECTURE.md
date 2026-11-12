@@ -273,6 +273,11 @@ Os cartões de deck (lista, perfil) e `GET /api/v1/decks` (app) trazem a nota e 
 
 Os testes verificam contraste AA (texto ≥ 4,5:1, bordas de campo e foco ≥ 3:1) em todos os pares usados nos dois temas, e que o `tokens.css` gerado está atualizado. E-mails usam o tema claro dos tokens; o QR do convite, a Noite. O vídeo do topo da página inicial é gerado com as cores da paleta (`apps/web/scripts/hero-video.py`).
 
+## Cartas holográficas e transições entre telas
+
+- **Holo** (`.holo` em `globals.css`, `HoloEffects` montado uma vez no layout do app, `HoloLayers` dentro da carta): a carta inclina em 3D e um reflexo segue a luz; nas **foil**, uma camada holográfica (degradê arco-íris com `color-dodge`) muda de cor com o ângulo. Com mouse, segue o ponteiro sobre a carta; **no celular (sem hover), segue a inclinação do aparelho** (`deviceorientation`, com a posição inicial de quem segura como referência e correção de retrato/paisagem; no iPhone a permissão é pedida no primeiro toque numa carta), só nas cartas à vista (`IntersectionObserver`). Na grade (deck e coleção), só as foil; no diálogo, toda carta inclina e a foil brilha. Com "reduzir movimento", nada é ligado. Implementação nossa, inspirada na técnica do pokemon-cards-css (GPL), sem código de lá.
+- **View Transitions** (`<ViewTransition>` do React 19.3, sem configuração no Next 16): ao abrir um deck pela lista, a arte "vira" a carta do comandante no topo (`name="deck-<id>"`, `share="morph"`); ao mudar de seção pelo menu (`transitionTypes={['nav-section']}`), o conteúdo esmaece; ao entrar num deck (`nav-forward`) ou voltar (`nav-back`), desliza 40 px. O cabeçalho fica parado. Curtas (≤ 400 ms), cliques passam para a página durante a transição, e com "reduzir movimento" a troca é instantânea. Sem suporte no navegador, nada muda.
+
 ## Tema claro/escuro
 
 Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pessoa pode fixar Claro ou Escuro: a escolha fica no `localStorage` (`bm-theme`) e vira `data-theme` no `<html>`, aplicado por um script inline antes da pintura. A variante `dark:` do Tailwind (`@custom-variant` em `globals.css`) vale com `data-theme="dark"` ou com o sistema escuro quando não há `data-theme="light"`.

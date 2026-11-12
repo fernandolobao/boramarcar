@@ -2,6 +2,7 @@
 
 import { ligaMagicCardUrl } from '@boramarcar/core';
 import Image from 'next/image';
+import { HoloLayers } from './holo-effects';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -88,7 +89,7 @@ export function CardDialog({
           <div className="space-y-2">
             {status === 'ready' &&
               (image ? (
-                <div className="relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] shadow-md">
+                <div className="holo relative aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] shadow-md">
                   <Image
                     src={image}
                     alt={alt}
@@ -98,6 +99,7 @@ export function CardDialog({
                     className="object-cover"
                   />
                   {foil && <span aria-hidden="true" className="foil-sheen" />}
+                  <HoloLayers foil={foil} />
                 </div>
               ) : (
                 <p className="muted grid aspect-[488/680] w-full place-items-center rounded-[4.5%/3.2%] bg-surface-muted p-2 text-center text-sm">

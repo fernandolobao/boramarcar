@@ -2,6 +2,7 @@
 
 import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@boramarcar/core';
 import Image from 'next/image';
+import { HoloLayers } from './holo-effects';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useRef, useState, type CSSProperties } from 'react';
 import { api } from '@/lib/api';
@@ -222,7 +223,9 @@ export function DeckCards({
                   <div className="relative transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
                     <button
                       type="button"
-                      className="relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 shadow-sm ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-ink-800"
+                      className={`relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-ink-200 shadow-sm ring-offset-2 focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-ink-800 ${
+                        foilsOf(line) > 0 && imageOf(line) ? 'holo' : ''
+                      }`}
                       aria-label={t(isOwner ? 'zoomEdit' : 'zoom', { name: line.name })}
                       aria-haspopup="dialog"
                       onClick={(e) => openZoom(line, e.currentTarget)}
@@ -245,6 +248,8 @@ export function DeckCards({
                               style={foilTiming(line.key)}
                             />
                           )}
+                          {/* Foil: inclina e brilha com o mouse ou com o celular. */}
+                          {foilsOf(line) > 0 && <HoloLayers foil />}
                         </>
                       ) : (
                         <span className="absolute inset-0 grid place-items-center p-2 text-center text-sm font-medium">

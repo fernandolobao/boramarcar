@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { ViewTransition } from 'react';
+import { HoloEffects } from '@/components/holo-effects';
 import { ManaFlow } from '@/components/mana-flow';
 import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
@@ -40,6 +42,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     // hidden) corta a lateral sem quebrar o `position: sticky` das seções empilhadas.
     <div className="relative isolate min-h-dvh overflow-x-clip">
       <ManaFlow />
+      <HoloEffects />
       <TimeZoneSync
         savedTimeZone={preferences.timeZoneIsDefault ? null : preferences.timeZone}
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}
@@ -71,7 +74,20 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       >
         {/* Páginas fora da navegação principal ganham "Voltar" (mesmo lugar em todas). */}
         <BackLink main={links.map((l) => l.href)} />
-        {children}
+        {/* Transição entre telas (View Transitions): o conteúdo troca com um esmaecer curto ao
+            mudar de seção e desliza um pouco ao entrar num deck ou voltar. O cabeçalho fica
+            parado. Sem suporte no navegador ou com "reduzir movimento", a troca é instantânea. */}
+        <ViewTransition
+          update={{
+            'nav-section': 'nav-fade',
+            'nav-forward': 'nav-forward',
+            'nav-back': 'nav-back',
+            default: 'none',
+          }}
+          default="none"
+        >
+          <div className="space-y-6">{children}</div>
+        </ViewTransition>
       </main>
       <footer className="mx-auto max-w-5xl px-4 pb-8 text-sm print:hidden">
         <Link href="/privacidade" className="muted underline underline-offset-2 hover:text-fg">
