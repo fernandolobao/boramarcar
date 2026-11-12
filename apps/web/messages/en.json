@@ -171,7 +171,11 @@
     "legendFull": "Pod is full ({min}+ people)",
     "legendMine": "You are available",
     "legendWeekly": "Weekly rule",
-    "legend": "Legend"
+    "legend": "Legend",
+    "welcomeTitle": "Welcome to {group}!",
+    "welcomeText": "Start by saying when you can play. That's how the app finds the times when the table comes together.",
+    "welcomeWeekly": "Add a weekly time",
+    "welcomeOnce": "Add a specific day"
   },
   "events": {
     "title": "Game nights",
@@ -683,7 +687,15 @@
     "signInToJoin": "Sign in with your Google account to join.",
     "alreadyMember": "You're already in this group.",
     "goToDashboard": "Go to dashboard",
-    "invalid": "This invite doesn't exist or was replaced. Ask whoever invited you for a new link."
+    "invalid": "This invite doesn't exist or was replaced. Ask whoever invited you for a new link.",
+    "whoIsIn": "Already in: {names}",
+    "andMore": "{names} and {count} more",
+    "nextEvent": "Next game night: {title} — {when}",
+    "noEvent": "No game night scheduled yet: the table comes together when enough people mark the same time.",
+    "howTitle": "How it works",
+    "how1": "Sign in with your Google account.",
+    "how2": "Say when you can usually play.",
+    "how3": "When the table is full, the group schedules the game night and you get notified."
   },
   "profile": {
     "title": "Profile",
@@ -1363,5 +1375,21 @@
       "title": "The table is full in {group}!",
       "body": "{count} players can play {when}. Shall we schedule it?"
     }
+  },
+  "onboarding": {
+    "title": "First steps",
+    "progress": "{done} of {total} done",
+    "done": "Done",
+    "todo": "To do",
+    "dismiss": "Dismiss",
+    "dismissLabel": "Dismiss first steps",
+    "availability": "Mark when you can play",
+    "availabilityHint": "A weekly time already helps the group fill the table.",
+    "invite": "Invite friends to the group",
+    "inviteHint": "{count} people make a Commander table. The group has {members} now.",
+    "rsvp": "Answer a game night",
+    "rsvpHint": "Say if you're going (or maybe) to the group's next game night.",
+    "deck": "Import a deck",
+    "deckHint": "From Archidekt, Moxfield or a pasted list, to see the analysis and use it in games."
   }
 }

@@ -275,3 +275,9 @@ sem rolagem horizontal em 320px.
 
 - **App**: "Avisos neste celular" é um `Switch` nativo com nome e dica acessíveis (`accessibilityLabel`/`accessibilityHint`); o texto da dica também aparece na tela. A permissão do sistema só é pedida quando a pessoa liga. Permissão negada e falhas aparecem como `accessibilityRole="alert"`, com botão para abrir as configurações do celular.
 - **Notificações**: título e texto curtos, sem depender de cor ou ícone; tocar abre a tela do encontro ou a disponibilidade. Sem som próprio com o app aberto.
+
+## Onboarding: convite e primeiros passos (12/11/2026)
+
+- **Primeiros passos**: seção com `h2`, progresso em texto ("1 de 4 feitos"; a barra é decorativa), lista ordenada de links em que cada passo diz "Feito"/"A fazer" para leitores de tela, além do ícone e do riscado. "Dispensar" tem nome com contexto ("Dispensar os primeiros passos", contendo o texto visível) e devolve o foco ao `<main>` quando a seção some.
+- **Convite**: um `h1`, contexto em texto simples, "Como funciona" com `h2` e lista ordenada. Boas-vindas na disponibilidade com `h2` e links-âncora para as seções do formulário.
+- axe em jsdom (componente) e no E2E (painel e convite, claro/escuro, desktop/celular) sem violações.

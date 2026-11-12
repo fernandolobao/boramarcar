@@ -2,7 +2,7 @@ import { getInvitePreview, isMember } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
-import { getTranslations } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { Logo } from '@/components/logo';
 import { SignInButton } from '@/components/auth-buttons';
 import { JoinInviteButton } from '@/components/invite';
@@ -32,6 +32,7 @@ export default async function InvitePage({ params }: Props) {
   ]);
   const t = await getTranslations('invite');
   const tc = await getTranslations('common');
+  const format = await getFormatter();
   const member = group && user ? await isMember(db, group.id, user.id) : false;
 
   return (
@@ -59,6 +60,33 @@ export default async function InvitePage({ params }: Props) {
             </h1>
             <p className="muted">{t('members', { count: group.members })}</p>
           </div>
+          {/* Contexto antes de entrar (onboarding 7.3): primeiros nomes e o próximo encontro. */}
+          <div className="card space-y-2">
+            {group.firstNames.length > 0 && (
+              <p>
+                {t('whoIsIn', {
+                  names:
+                    group.members > group.firstNames.length
+                      ? t('andMore', {
+                          names: format.list(group.firstNames),
+                          count: group.members - group.firstNames.length,
+                        })
+                      : format.list(group.firstNames),
+                })}
+              </p>
+            )}
+            <p className="muted">
+              {group.nextEvent
+                ? t('nextEvent', {
+                    title: group.nextEvent.title,
+                    when: format.dateTime(group.nextEvent.startsAt, {
+                      dateStyle: 'full',
+                      timeStyle: 'short',
+                    }),
+                  })
+                : t('noEvent')}
+            </p>
+          </div>
           {member ? (
             <div className="space-y-3">
               <p>{t('alreadyMember')}</p>
@@ -75,6 +103,18 @@ export default async function InvitePage({ params }: Props) {
               <p className="text-fg-muted">{t('signInToJoin')}</p>
               <SignInButton callbackURL={`/convite/${group.inviteCode}`} />
             </div>
+          )}
+          {!member && (
+            <section aria-labelledby="como-funciona" className="space-y-2">
+              <h2 id="como-funciona" className="font-semibold">
+                {t('howTitle')}
+              </h2>
+              <ol className="muted list-decimal space-y-1 ps-5">
+                <li>{t('how1')}</li>
+                <li>{t('how2')}</li>
+                <li>{t('how3')}</li>
+              </ol>
+            </section>
           )}
         </>
       )}

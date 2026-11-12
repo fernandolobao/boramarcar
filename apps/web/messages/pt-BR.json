@@ -171,7 +171,11 @@
     "legendFull": "A mesa fecha ({min}+ pessoas)",
     "legendMine": "Você está disponível",
     "legendWeekly": "Regra semanal",
-    "legend": "Legenda"
+    "legend": "Legenda",
+    "welcomeTitle": "Bem-vindo(a) a {group}!",
+    "welcomeText": "Comece dizendo quando você pode jogar. Assim o app encontra os horários em que a mesa fecha.",
+    "welcomeWeekly": "Marcar um horário semanal",
+    "welcomeOnce": "Marcar um dia específico"
   },
   "events": {
     "title": "Encontros",
@@ -683,7 +687,15 @@
     "signInToJoin": "Entre com sua conta Google para participar.",
     "alreadyMember": "Você já participa deste grupo.",
     "goToDashboard": "Ir para o painel",
-    "invalid": "Este convite não existe ou foi trocado. Peça um link novo para quem te convidou."
+    "invalid": "Este convite não existe ou foi trocado. Peça um link novo para quem te convidou.",
+    "whoIsIn": "Quem já está: {names}",
+    "andMore": "{names} e mais {count}",
+    "nextEvent": "Próximo encontro: {title} — {when}",
+    "noEvent": "Ainda não há encontro marcado: a mesa fecha quando bastante gente marca o mesmo horário.",
+    "howTitle": "Como funciona",
+    "how1": "Entre com a sua conta Google.",
+    "how2": "Diga quando você costuma poder jogar.",
+    "how3": "Quando a mesa fecha, o grupo marca o encontro e você recebe o aviso."
   },
   "profile": {
     "title": "Perfil",
@@ -1363,5 +1375,21 @@
       "title": "A mesa fechou em {group}!",
       "body": "{count} jogadores podem jogar {when}. Que tal marcar?"
     }
+  },
+  "onboarding": {
+    "title": "Primeiros passos",
+    "progress": "{done} de {total} feitos",
+    "done": "Feito",
+    "todo": "A fazer",
+    "dismiss": "Dispensar",
+    "dismissLabel": "Dispensar os primeiros passos",
+    "availability": "Marque quando você pode jogar",
+    "availabilityHint": "Um horário semanal já ajuda o grupo a fechar a mesa.",
+    "invite": "Convide amigos para o grupo",
+    "inviteHint": "Com {count} pessoas já dá uma mesa de Commander. Hoje o grupo tem {members}.",
+    "rsvp": "Responda a um encontro",
+    "rsvpHint": "Diga se vai (ou talvez) no próximo encontro do grupo.",
+    "deck": "Importe um deck",
+    "deckHint": "Do Archidekt, Moxfield ou de uma lista colada, para ver a análise e usar nas partidas."
   }
 }

@@ -21,7 +21,8 @@ export function JoinInviteButton({ inviteCode }: { inviteCode: string }) {
         onClick={() =>
           void run(
             () => api('/api/v1/groups/join', { method: 'POST', body: { inviteCode } }),
-            () => router.push('/painel'),
+            // Primeiro passo de quem acabou de entrar: dizer quando pode jogar (onboarding 7.3).
+            () => router.push('/disponibilidade?bemvindo=1'),
           )
         }
       >

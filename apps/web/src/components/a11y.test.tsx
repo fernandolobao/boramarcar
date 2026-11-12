@@ -34,6 +34,7 @@ import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
+import { FirstSteps } from './first-steps';
 
 vi.mock('./places/location-map', () => ({
   LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
@@ -423,5 +424,22 @@ describe('acessibilidade dos componentes (axe-core)', () => {
     );
     expect(getByRole('link', { name: 'Encontros' })).toHaveAttribute('aria-current', 'page');
     expect(getByRole('link', { name: 'Painel' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('primeiros passos (onboarding) sem violações', async () => {
+    expect(
+      await audit(
+        <FirstSteps
+          steps={[
+            { key: 'availability', done: true },
+            { key: 'invite', done: false },
+            { key: 'rsvp', done: false },
+            { key: 'deck', done: true },
+          ]}
+          members={2}
+          tableSize={3}
+        />,
+      ),
+    ).toEqual([]);
   });
 });

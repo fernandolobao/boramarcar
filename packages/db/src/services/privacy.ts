@@ -14,6 +14,7 @@ import {
   groupMembers,
   groups,
   locations,
+  onboardingSteps,
   pushTokens,
   session,
   user,
@@ -163,6 +164,10 @@ export async function exportUserData(db: Database, userId: string) {
     })
     .from(pushTokens)
     .where(eq(pushTokens.userId, userId));
+  const onboarding = await db
+    .select({ step: onboardingSteps.step, at: onboardingSteps.createdAt })
+    .from(onboardingSteps)
+    .where(eq(onboardingSteps.userId, userId));
 
   return {
     format: 'arcanakin-export',
@@ -171,6 +176,7 @@ export async function exportUserData(db: Database, userId: string) {
     profile: me,
     logins,
     pushDevices: devices,
+    onboarding,
     groups: memberships,
     hostedPlaces: hosted,
     availability: { slots, weekly: rules },
@@ -244,6 +250,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(groupMembers).where(eq(groupMembers.userId, userId));
     await tx.delete(session).where(eq(session.userId, userId));
     await tx.delete(pushTokens).where(eq(pushTokens.userId, userId));
+    await tx.delete(onboardingSteps).where(eq(onboardingSteps.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
     await tx
       .update(user)
