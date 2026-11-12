@@ -1,12 +1,14 @@
 import { Link, router } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { Aura } from '@/components/aura';
+import { BetaBanner } from '@/components/beta-banner';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
 import { formatDateTime, t } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
+import { NoGroup } from '@/components/no-group';
 
 /** Próximos encontros do grupo ativo. */
 export default function EventsScreen() {
@@ -20,7 +22,7 @@ export default function EventsScreen() {
   useRefreshOnFocus(events.refresh);
   if (loadingGroup) return <Loading />;
   if (groupError) return <ErrorState error={groupError} onRetry={() => void reload()} />;
-  if (!group) return <AppText style={{ padding: 24 }}>{t('noGroup')}</AppText>;
+  if (!group) return <NoGroup />;
   if (events.loading) return <Loading />;
   if (events.error) return <ErrorState error={events.error} onRetry={events.refresh} />;
 
@@ -39,6 +41,7 @@ export default function EventsScreen() {
             <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
               {group.name} · {t('upcoming')}
             </AppText>
+            <BetaBanner groupId={group.id} />
             <Button label={t('eventNew')} onPress={() => router.push('/encontros/novo')} />
           </View>
         }

@@ -6,6 +6,9 @@ import { z } from 'zod';
  */
 const date = z.coerce.date();
 
+/** Grupo recém-criado ou em que a pessoa acabou de entrar (sem o papel na resposta). */
+export const createdGroupSchema = z.object({ id: z.string(), name: z.string() }).loose();
+
 export const groupSchema = z
   .object({
     id: z.string(),

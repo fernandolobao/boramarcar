@@ -730,7 +730,9 @@
     "howTitle": "Como funciona",
     "how1": "Entre com a sua conta Google.",
     "how2": "Diga quando você costuma poder jogar.",
-    "how3": "Quando a mesa fecha, o grupo marca o encontro e você recebe o aviso."
+    "how3": "Quando a mesa fecha, o grupo marca o encontro e você recebe o aviso.",
+    "appHint": "Já tem o app do ArcanaKin? Use o código {code} ou",
+    "openInApp": "abra o convite no app"
   },
   "profile": {
     "title": "Perfil",

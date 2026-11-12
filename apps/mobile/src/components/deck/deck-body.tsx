@@ -1,9 +1,11 @@
 import type { DeckDetail, DeckLine } from '@boramarcar/api-client';
+import type { BracketEstimate } from '@boramarcar/core/analysis';
 import { groupEntriesByType } from '@boramarcar/core/decks';
 import type { GameFormat } from '@boramarcar/core/games';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
+import { BracketChecklist } from './bracket-checklist';
 import { CardViewer } from './card-viewer';
 import { formatLabel } from '@/components/table/labels';
 import { StackSection } from '@/components/stack';
@@ -24,6 +26,15 @@ const tKey = (prefix: string, code: string, values: Record<string, string | numb
 const CURVE = ['0', '1', '2', '3', '4', '5', '6', '7+'] as const;
 
 /** Seção do deck: cartão da pilha (ao rolar, desliza por cima da anterior). */
+/** Servidor antigo pode mandar só o número: a lista precisa dos motivos e da fonte. */
+const isBracketEstimate = (
+  b: DeckDetail['bracket'],
+): b is NonNullable<DeckDetail['bracket']> & {
+  minimum: 2 | 3 | 4;
+  reasons: BracketEstimate['reasons'];
+  source: 'spellbook' | 'local';
+} => Boolean(b && Array.isArray(b.reasons) && (b.source === 'spellbook' || b.source === 'local'));
+
 function Section({
   title,
   index,
@@ -178,6 +189,9 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
                     : deck.bracket.minimum,
               })}
             </AppText>
+          )}
+          {deck.bracket && isBracketEstimate(deck.bracket) && (
+            <BracketChecklist bracket={deck.bracket} />
           )}
         </Section>
       )}

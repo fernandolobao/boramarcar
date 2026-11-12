@@ -101,6 +101,18 @@ export default async function InvitePage({ params }: Props) {
             </div>
           )}
           {!member && (
+            // Quem já instalou o app entra por lá (o link abre o app; sem login, entra depois).
+            <p className="muted" data-testid="invite-app">
+              {t('appHint', { code: group.inviteCode })}{' '}
+              <a
+                href={`arcanakin://convite/${group.inviteCode}`}
+                className="text-link underline underline-offset-2"
+              >
+                {t('openInApp')}
+              </a>
+            </p>
+          )}
+          {!member && (
             <section aria-labelledby="como-funciona" className="space-y-2">
               <h2 id="como-funciona" className="font-semibold">
                 {t('howTitle')}
