@@ -247,6 +247,11 @@ sem rolagem horizontal em 320px.
 - **Estados vazios**: símbolos de mana decorativos (`aria-hidden`); a mensagem é o texto.
 - **Fonte de display**: só nos títulos; `font-display: swap` e fontes de reserva serifadas (Georgia).
 
+## Fechar diálogos clicando fora (11/11/2026)
+
+- Todos os `<dialog>` modais do site (carta, edição, opções do jogador na mesa) fecham com um clique no fundo escurecido (`useLightDismiss`), além do Esc e do botão "Fechar", que continuam sendo o caminho para teclado e leitor de tela. O clique só conta se começou e terminou fora da caixa: arrastar uma seleção de texto para fora não fecha. Ao fechar, o foco volta para o botão que abriu.
+- No app, os modais são de tela cheia (sem fundo à mostra); fecham pelo botão "Fechar" e pelo voltar do Android.
+
 ## Carregamento e ações (11/11/2026)
 
 - **Toda ação na API** (`useApiAction`) deixa o botão que a disparou com `aria-busy="true"`. O ícone do botão vira um indicador girando (parado com "reduzir movimento") e o botão fica desabilitado **durante a espera pelo servidor**; antes, só ficava desabilitado depois da resposta. Uma ação de cada vez: clique duplo e Enter + "perdeu o foco" não repetem a ação.
