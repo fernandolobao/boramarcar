@@ -35,6 +35,7 @@ import { DeckCards } from '@/components/deck-cards';
 import { DeckComparisonCard } from '@/components/deck-comparison';
 import { DeckRoles, RefreshAnalysis } from '@/components/deck-roles';
 import { DeckTools } from '@/components/deck-tools';
+import { canPrintProxies } from '@/server/features';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
 import { runAfterResponse } from '@/server/background';
 import { requireUser } from '@/server/current-user';
@@ -308,6 +309,7 @@ export default async function DeckPage({ params }: Props) {
         isOwner={deck.isOwner}
         source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
         proxyCount={deck.lines.reduce((sum, l) => sum + l.proxies, 0)}
+        canPrint={await canPrintProxies(user)}
         hasSourceUrl={
           Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
         }

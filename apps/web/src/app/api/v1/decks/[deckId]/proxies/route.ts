@@ -2,6 +2,7 @@ import { DomainError, slugify } from '@boramarcar/core';
 import { getDeck } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseQuery } from '@/server/http';
+import { canPrintProxies } from '@/server/features';
 import { buildProxySheet } from '@/server/proxy-sheet';
 
 // Baixar as imagens pode levar alguns segundos em decks grandes.
@@ -14,6 +15,8 @@ const schema = z.object({
 
 /** PDF para imprimir os proxies (3.10): cartas em tamanho real, 3×3 por página. */
 export const GET = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
+  // Atrás da flag `print-proxy` e só para admin: para os demais, a rota "não existe".
+  if (!(await canPrintProxies(user))) throw new DomainError('not_found', 'Não encontrado');
   const { which, page } = parseQuery(req, schema);
   const deck = await getDeck(db, { deckId: params.deckId, viewerId: user.id });
   const { pdf, cards, missingImages } = await buildProxySheet({
