@@ -11,6 +11,7 @@ import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { printLabel } from './print-picker';
 import { useLightDismiss } from './use-light-dismiss';
+import { flipCard } from './card-flip';
 import { openerImage, zoom } from './card-zoom';
 
 /** O que o diálogo precisa saber de uma carta (os campos vêm do cache do Scryfall). */
@@ -148,7 +149,14 @@ export function CardDialog({
                       type="button"
                       className={`${pressed ? 'btn-primary' : 'btn-secondary'} flex-1 px-2 text-sm`}
                       aria-pressed={pressed}
-                      onClick={() => onBackChange?.(face === 'back')}
+                      onClick={() => {
+                        const toBack = face === 'back';
+                        if (toBack === back) return;
+                        flipCard(imageRef.current, () => onBackChange?.(toBack), {
+                          toBack,
+                          preload: toBack ? card.backImageUri : card.imageUri,
+                        });
+                      }}
                     >
                       {t(face === 'front' ? 'faceFront' : 'faceBack')}
                     </button>
