@@ -152,6 +152,8 @@ Objetivo: quem chega (por convite ou pela página inicial) entende o app e faz a
 | 7.5 | **Onboarding do app**: entrar, escolher o grupo e oferecer os avisos no momento útil (ex.: ao confirmar presença no primeiro encontro), não ao abrir o app                                                               | P       |        |
 | 7.6 | **Medir a ativação**: quantas pessoas concluem cada passo (eventos agregados, sem dados pessoais) para saber onde travam                                                                                                 | P       |        |
 
+**Decidido — onde fica o progresso:** no servidor, calculado sempre que possível. Os passos que já deixam rastro no banco (grupo, disponibilidade, deck importado, push ligado) são consultados, não gravados; assim quem fez a ação fora do guia já aparece com o passo feito. Só o que não dá para deduzir vai para uma tabela `onboarding_steps` (pessoa, passo, data): "dispensou os primeiros passos", "pulou o guia", "viu a dica X". Vale no site e no app, não se perde em navegador ou endereço novo (lição do idioma nos previews), entra na exportação e na exclusão de conta (LGPD) e permite contar a ativação por passo (7.6) direto no banco. Exceção: o que é por aparelho (oferecer os avisos neste celular) continua no próprio aparelho.
+
 ## Transversal (contínuo)
 
 | Item                                                                                                                                                                                   | Tamanho |
@@ -191,7 +193,7 @@ Objetivo: quem chega (por convite ou pela página inicial) entende o app e faz a
 
 ## Decisões em aberto
 
-- **Onboarding (Fase 7):** o primeiro acesso guiado é opcional (recomendado) ou obrigatório? Onde guardar o progresso (perfil no servidor, para valer no site e no app)? Quais eventos de ativação medir.
+- **Onboarding (Fase 7):** o primeiro acesso guiado é opcional (recomendado) ou obrigatório? Quais eventos de ativação medir?
 
 - **Scan de cartas (5.9):** escolher a biblioteca de reconhecimento de texto no aparelho (ex.: ML Kit) e decidir se o scan também alimenta uma coleção (3.x) ou só decks; avaliar uma versão no site com a câmera do navegador.
 
