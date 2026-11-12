@@ -1,15 +1,17 @@
 # Arquitetura
 
+_Revisado em 12/11/2026._
+
 ## Visão geral
 
 ```mermaid
 flowchart LR
   subgraph Clientes
     W[Navegador<br/>Next.js RSC + componentes cliente]
-    M[App mobile<br/>Expo — planejado]
+    M[App mobile<br/>Expo + Expo Router]
   end
   subgraph Vercel
-    P[proxy.ts<br/>checagem otimista de sessão]
+    P[proxy.ts<br/>CSP com nonce + checagem otimista de sessão]
     R[Server Components<br/>páginas]
     A[Route handlers<br/>/api/v1/*]
     AU[Better Auth<br/>/api/auth/*]
@@ -25,7 +27,7 @@ flowchart LR
 
   W --> P --> R
   W --> A
-  M -. bearer token .-> A
+  M -- cookie da sessão (SecureStore) --> A
   W --> AU --> G
   R --> DB
   A --> DB
@@ -46,7 +48,7 @@ flowchart LR
 
 Por que assim:
 
-- **Mobile no futuro.** O app Expo vai consumir a mesma API REST (`/api/v1`) e importar `@boramarcar/core` para lógica de cliente (ex.: mostrar a curva de mana offline). Nada em `core` depende de Node, React ou banco.
+- **Web e mobile pela mesma API.** O app Expo (`apps/mobile`, ver "App mobile") consome a mesma API REST (`/api/v1`) pelo `@boramarcar/api-client` e importa `@boramarcar/core` para lógica de cliente. Nada em `core` depende de Node, React ou banco.
 - **Testabilidade.** Regras ficam em funções puras (testes unitários rápidos); serviços são testados contra Postgres real em memória (PGlite) com as migrations de verdade; route handlers são testados chamando as funções exportadas.
 - **Rotas finas.** Cada route handler só autentica, valida a entrada com Zod e chama um serviço. O wrapper `authed()` em `apps/web/src/server/http.ts` converte `DomainError` em status HTTP.
 
@@ -211,7 +213,7 @@ Cartas de transformar, MDFC e afins vêm do Scryfall sem `image_uris` no topo e 
 
 - **CSP** (`lib/csp.ts`, aplicada em `proxy.ts` em toda página): a cada requisição um _nonce_ novo; o Next põe o nonce nos scripts dele e o layout no script do tema (`x-nonce`). Scripts só com nonce (`'strict-dynamic'` deixa rodar o que eles carregam: Vercel Analytics/Speed Insights e Contentsquare); sem `<object>`, sem `<base>` de fora, formulários só para o próprio site, página fora de `<iframe>` alheio (`frame-ancestors 'none'`) e conexões só por HTTPS. Estilos precisam de `'unsafe-inline'` (atributos `style`). Uma segunda política, **só relatada** (`Content-Security-Policy-Report-Only`), tem a lista exata de destinos de conexão e imagem e manda as violações para `/api/csp-report`, que escreve uma linha `[csp] …` no log da Vercel; quando o log estiver limpo, dá para passar essa lista para a política aplicada. O Zod roda em modo `jitless` no navegador (sem testar `new Function`, que a CSP bloqueia). Teste E2E em `e2e/seguranca.spec.ts`: páginas sem violação nenhuma.
 - **Outros cabeçalhos** (`next.config.ts`): `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS de 2 anos e `Permissions-Policy` sem câmera, microfone, localização, pagamento e USB (a inclinação do celular das cartas holográficas continua liberada).
-- **Sentry** (`instrumentation.ts`, `instrumentation-client.ts`, `lib/sentry-options.ts`): erros do navegador, do servidor e da renderização (`onRequestError`). Só liga com `NEXT_PUBLIC_SENTRY_DSN`; sem dados pessoais (`sendDefaultPii: false`, sem gravação de tela) e 10% de rastreamento de desempenho. Os eventos passam pelo próprio site (`/monitoring`, fora do `proxy.ts`), então a CSP não precisa liberar o Sentry e bloqueadores de anúncio não cortam o envio. Mapas de código só sobem com `SENTRY_AUTH_TOKEN`. Projeto no Sentry: `arcanakin/arcanakin-web` (DSN em `NEXT_PUBLIC_SENTRY_DSN` na Vercel, Production e Preview). O IP não é guardado (`beforeSend: withoutIp` manda `ip_address: null`; no projeto, ligue também "Prevent Storing of IP Addresses" em Settings → Security & Privacy). Nos previews, o envio pelo túnel leva o cookie de acesso da proteção da Vercel (`credentials: 'same-origin'`); sem ele, os eventos viravam um redirecionamento para o login da Vercel. O app mobile ainda não manda erros.
+- **Sentry** (`instrumentation.ts`, `instrumentation-client.ts`, `lib/sentry-options.ts`): erros do navegador, do servidor e da renderização (`onRequestError`). Só liga com `NEXT_PUBLIC_SENTRY_DSN`; sem dados pessoais (`sendDefaultPii: false`, sem gravação de tela) e 10% de rastreamento de desempenho. Os eventos passam pelo próprio site (`/monitoring`, fora do `proxy.ts`), então a CSP não precisa liberar o Sentry e bloqueadores de anúncio não cortam o envio. Mapas de código só sobem com `SENTRY_AUTH_TOKEN`. Projeto no Sentry: `arcanakin/arcanakin-web` (DSN em `NEXT_PUBLIC_SENTRY_DSN` na Vercel, Production e Preview). O IP não é guardado (`beforeSend: withoutIp` manda `ip_address: null`; e o Sentry tem "Prevent Storing of IP Addresses" ligado em Settings → Security & Privacy). Nos previews, o envio pelo túnel leva o cookie de acesso da proteção da Vercel (`credentials: 'same-origin'`); sem ele, os eventos viravam um redirecionamento para o login da Vercel. O app mobile ainda não manda erros.
 - **Vercel Speed Insights** (`<SpeedInsights />` no layout): métricas de desempenho reais (Core Web Vitals), sem cookies; precisa ser ligado no painel da Vercel.
 
 ## Serviços externos: cache, tempo máximo e limites
