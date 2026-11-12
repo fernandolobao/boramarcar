@@ -7,6 +7,7 @@ import { getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
 import { PrintButton } from '@/components/print-button';
 import { requireUser } from '@/server/current-user';
+import { canPrintProxies } from '@/server/features';
 import { getDb } from '@/server/db';
 import { pageMetadata } from '@/server/seo';
 
@@ -38,6 +39,8 @@ export default async function PrintProxiesPage({ params, searchParams }: Props) 
   const { id } = await params;
   const query = await searchParams;
   const user = await requireUser();
+  // Atrás da flag `print-proxy` e só para admin.
+  if (!(await canPrintProxies(user))) notFound();
   const deck = await getDeck(getDb(), { deckId: id, viewerId: user.id }).catch((error: unknown) => {
     if (isDomainError(error) && (error.code === 'not_found' || error.code === 'forbidden'))
       notFound();

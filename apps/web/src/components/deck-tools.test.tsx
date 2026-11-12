@@ -64,7 +64,16 @@ describe('DeckTools', () => {
   });
 
   it('folha de proxies: escolhe cartas e papel', () => {
-    wrap(<DeckTools deckId="d1" isOwner source="Archidekt" hasSourceUrl={false} proxyCount={3} />);
+    wrap(
+      <DeckTools
+        deckId="d1"
+        isOwner
+        source="Archidekt"
+        hasSourceUrl={false}
+        proxyCount={3}
+        canPrint
+      />,
+    );
     const open = screen.getByRole('link', { name: 'Abrir folha para imprimir' });
     const link = screen.getByRole('link', { name: 'Baixar PDF pronto' });
     expect(open).toHaveAttribute('href', '/decks/d1/imprimir?which=proxies&page=a4');
@@ -77,13 +86,23 @@ describe('DeckTools', () => {
   });
 
   it('sem proxies, imprime o deck todo e explica', () => {
-    wrap(<DeckTools deckId="d1" isOwner={false} source="Archidekt" hasSourceUrl={false} />);
+    wrap(
+      <DeckTools deckId="d1" isOwner={false} source="Archidekt" hasSourceUrl={false} canPrint />,
+    );
     expect(screen.getByLabelText('Proxies (nenhuma marcada)')).toBeDisabled();
     expect(screen.getByRole('link', { name: 'Baixar PDF pronto' })).toHaveAttribute(
       'href',
       '/api/v1/decks/d1/proxies?which=all&page=a4',
     );
     expect(screen.getByText(/Nenhuma carta está marcada como proxy/)).toBeInTheDocument();
+  });
+
+  it('sem a flag `print-proxy` (ou sem ser admin), a impressão não aparece', () => {
+    wrap(<DeckTools deckId="d1" isOwner source="Archidekt" hasSourceUrl={false} proxyCount={3} />);
+    expect(
+      screen.queryByRole('link', { name: 'Abrir folha para imprimir' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Baixar PDF pronto' })).not.toBeInTheDocument();
   });
 
   it('quem não é dono só exporta', () => {
