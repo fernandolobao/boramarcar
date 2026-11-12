@@ -27,10 +27,12 @@ async function artDataUri(url: string | null) {
   }
 }
 
-const section = (key: Parameters<typeof isSection>[0]) =>
-  isSection(key) && key !== 'home'
-    ? renderOg({ title: t(`${key}.title`), subtitle: t(`${key}.description`) })
-    : new Response('Não encontrado', { status: 404 });
+const section = (key: string) => {
+  if (!isSection(key)) return new Response('Não encontrado', { status: 404 });
+  // Na home, a frase da marca no lugar do nome (o logotipo já está no cabeçalho do cartão).
+  if (key === 'home') return renderOg({ title: t('homeImage'), subtitle: t('homeImageSubtitle') });
+  return renderOg({ title: t(`${key}.title`), subtitle: t(`${key}.description`) });
+};
 
 export async function GET(_req: Request, ctx: { params: Promise<{ slug: string[] }> }) {
   const [kind, id] = (await ctx.params).slug;
@@ -42,7 +44,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ slug: string[]
       eyebrow: t('deck.title'),
       title: deck.name,
       subtitle: deck.commanders.length ? deck.commanders.join(' + ') : undefined,
-      background: await artDataUri(deck.artUri),
+      art: await artDataUri(deck.artUri),
     });
   }
   if (kind === 'convite' && id) {

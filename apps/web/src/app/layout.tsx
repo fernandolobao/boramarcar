@@ -30,9 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       title: t('appName'),
       description: t('tagline'),
-      images: [{ url: '/og/home.png', width: 1200, height: 630, alt: t('tagline') }],
+      images: [{ url: '/og/s/home', width: 1200, height: 630, alt: t('tagline') }],
     },
-    twitter: { card: 'summary_large_image', images: ['/og/home.png'] },
+    twitter: { card: 'summary_large_image', images: ['/og/s/home'] },
     appleWebApp: { title: t('appName'), statusBarStyle: 'black-translucent' },
     // O Safari/Chrome do iPhone transformava nomes ("Monteiro" é uma cidade), datas e números
     // em links de mapa, agenda e telefone. Endereços e datas reais já têm os nossos links.

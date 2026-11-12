@@ -1566,6 +1566,8 @@
     "admin": {
       "title": "Beta metrics",
       "description": "ArcanaKin beta metrics."
-    }
+    },
+    "homeImage": "Schedule your next Commander night.",
+    "homeImageSubtitle": "Times when everyone can play, meetups, rankings, decks and games in one place."
   }
 }

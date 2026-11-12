@@ -19,7 +19,7 @@ test.describe('metadados', () => {
 
   test('páginas públicas e o convite com o nome do grupo', async ({ page }) => {
     await page.goto('/');
-    await expectShareable(page, /\/og\/home\.png$/);
+    await expectShareable(page, /\/og\/s\/home$/);
     await page.goto('/privacidade');
     await expectShareable(page, /\/og\/s\/privacy$/);
     await page.goto(`/convite/${E2E_INVITE_CODE}`);
@@ -54,6 +54,7 @@ test.describe('metadados', () => {
       expect(response.headers()['content-type']).toBe('image/png');
     }
     expect((await request.get('/og/s/nada')).status()).toBe(404);
+    expect((await request.get('/og/s/home')).status()).toBe(200);
   });
 
   test.describe('logado', () => {

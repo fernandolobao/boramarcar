@@ -33,9 +33,8 @@ export type Section = (typeof SECTIONS)[number];
 export const isSection = (value: string): value is Section =>
   (SECTIONS as readonly string[]).includes(value);
 
-/** Imagem padrão de cada seção (a home usa a arte feita à mão, em `public/og`). */
-export const sectionImage = (section: Section) =>
-  section === 'home' ? '/og/home.png' : `/og/s/${section}`;
+/** Imagem padrão de cada seção. */
+export const sectionImage = (section: Section) => `/og/s/${section}`;
 
 export interface PageMeta {
   section: Section;

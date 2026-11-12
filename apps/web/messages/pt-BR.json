@@ -1566,6 +1566,8 @@
     "admin": {
       "title": "Métricas do beta",
       "description": "Métricas do beta do ArcanaKin."
-    }
+    },
+    "homeImage": "Marque o próximo Commander com a sua mesa.",
+    "homeImageSubtitle": "Horários em que todo mundo pode, encontros, ranking, decks e partidas num lugar só."
   }
 }
