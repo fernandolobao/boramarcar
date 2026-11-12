@@ -4,11 +4,13 @@ import { HoloEffects } from '@/components/holo-effects';
 import { ManaFlow } from '@/components/mana-flow';
 import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getUserPreferences } from '@boramarcar/db';
 import { cookies } from 'next/headers';
+import { LocaleSync } from '@/components/locale-sync';
 import { TimeZoneSync } from '@/components/time-zone-sync';
+import { isLocale } from '@/i18n/config';
 import { Logo } from '@/components/logo';
 import { UserMenu } from '@/components/user-menu';
 import { TIME_ZONE_COOKIE } from '@/i18n/config';
@@ -23,6 +25,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     getUserPreferences(getDb(), user.id),
     cookies(),
   ]);
+  const locale = await getLocale();
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
   const tl = await getTranslations('legal');
@@ -43,6 +46,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <div className="relative isolate min-h-dvh overflow-x-clip">
       <ManaFlow />
       <HoloEffects />
+      <LocaleSync
+        savedLocale={isLocale(preferences.locale) ? preferences.locale : null}
+        currentLocale={locale}
+      />
       <TimeZoneSync
         savedTimeZone={preferences.timeZoneIsDefault ? null : preferences.timeZone}
         cookieTimeZone={cookieStore.get(TIME_ZONE_COOKIE)?.value ?? null}
