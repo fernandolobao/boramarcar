@@ -192,6 +192,14 @@ Locais (`locations`) têm nome, endereço, complemento, coordenadas (`lat`/`lng`
 - **Consulta** (`db/services/metrics.ts`, `getProductMetrics`): só contagens agregadas, direto do banco, sem eventos de rastreamento nem dados de pessoas. Ativação de grupos novos (3+ pessoas, encontro marcado, entradas por convite), encontros (aconteceram, fecharam a mesa, viraram partida), pessoas (novas, com disponibilidade), decks importados e partidas com deck. Cobre também a medição de ativação do onboarding (7.6) por estes passos.
 - **Onde ver**: `/admin` (só para `ADMIN_EMAILS`; para os demais, 404 e fora da navegação; `noindex`), com o feedback recente. Toda segunda-feira (UTC) o cron diário (`/api/cron/reminders`) manda o resumo por e-mail para `ADMIN_EMAILS`, com o link da página.
 
+## Beta assistido (8.5)
+
+- **Quem decide quando começa**: quem está em `ADMIN_EMAILS`, no `/admin` (seção "Beta assistido"): escolhe os grupos e uma **data única de início** (0h no fuso de quem administra), ou "Começar agora"; sem data, fica em rascunho. Dá para adiar (mudar a data) ou encerrar antes (dois cliques). O beta dura 8 semanas (`BETA_WEEKS`, `core/beta`: fases `draft`, `scheduled`, `running`, `ended`).
+- **Banco**: `beta_program` (uma linha: `starts_at`, `ended_at`) e `beta_groups` (grupo e `welcomed_at`). Sem dados de pessoas; sai junto com o grupo.
+- **Para o grupo**, só depois do início: faixa "Seu grupo está no beta" no painel (semana N de 8, link do feedback; "Dispensar" guarda `beta-banner-dismissed` em `onboarding_steps`) e um e-mail de boas-vindas por pessoa (respeita quem desligou os e-mails). O envio marca `welcomed_at` antes de mandar (sem duplicar): sai ao salvar com o beta rodando e no cron diário (para a data marcada).
+- **Acompanhamento**: tabela por grupo do beta no `/admin` (pessoas, encontros, partidas e última partida desde o início; boas-vindas enviadas).
+- **API**: `GET`/`PUT /api/v1/admin/beta` e `POST /api/v1/admin/beta/encerrar`; 404 para quem não é admin.
+
 ## Onboarding (Fase 7)
 
 - **Progresso** (`db/services/onboarding.ts`): os passos são calculados dos dados — disponibilidade no grupo ativo (regra semanal ou horário futuro), grupo com 3+ pessoas (`TABLE_SIZE`, uma mesa de Commander), resposta a algum encontro, deck importado. Quem fez a ação por outro caminho já aparece com o passo feito. A tabela `onboarding_steps` guarda só o que não dá para deduzir (`checklist-dismissed`, `guide-skipped`), via `POST /api/v1/me/onboarding`; entra na exportação e sai na exclusão de conta.
