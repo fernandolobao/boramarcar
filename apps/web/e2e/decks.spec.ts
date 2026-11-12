@@ -95,6 +95,20 @@ test.describe('deck', () => {
     await expect(page.getByRole('heading', { name: /^Ramp/ })).toContainText('meta: 10');
     await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toBeVisible();
     await expect(page.getByTestId('deck-bracket')).toHaveText('1–2 · Exhibition ou Core');
+    // Lista de progresso: trilha com o deck no 1–2 e um card por critério oficial.
+    const trail = page.getByRole('list', { name: 'Trilha dos brackets' });
+    await expect(trail.locator('[aria-current="step"]')).toHaveCount(2);
+    await expect(
+      page.getByRole('meter', { name: /critérios contam para o cálculo/ }),
+    ).toBeVisible();
+    await expect(page.getByTestId('bracket-item-game_changers')).toHaveAttribute(
+      'data-status',
+      'clear',
+    );
+    await expect(page.getByTestId('bracket-item-game_changers')).toContainText(
+      'Com mais 1, o deck vai para o Bracket 3.',
+    );
+    await expect(page.getByTestId('bracket-item-two_card_combo')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Base de mana' })).toBeVisible();
     const drops = page.getByRole('table', { name: 'Ter terreno para jogar em todos os turnos' });
     await expect(drops.getByRole('row')).toHaveCount(5);

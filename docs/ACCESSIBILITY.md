@@ -123,7 +123,7 @@ sem rolagem horizontal em 320px.
 - **Formato na importação**: `select` com rótulo e dica ligada por `aria-describedby`; "Detectar automaticamente" explica o que acontece.
 - **Funções**: cada função é um `h3` com contagem e meta em texto (meta não atingida tem ícone de alerta **e** a palavra "meta"); "Ver cartas" é `details/summary` com o nome da função para leitores de tela.
 - **Alternativas**: botão com `aria-expanded`/`aria-controls` e nome com contexto ("Ver alternativas (Ramp)", contendo o texto visível — WCAG 2.5.3); a região de resultados é `aria-live="polite"`; imagens decorativas (`alt=""`) porque o nome da carta está em texto; link do Scryfall avisa que abre nova aba.
-- **Bracket**: valor e motivos em texto; a fonte dos dados (Spellbook ou só Game Changers) é dita na tela.
+- **Bracket**: valor e motivos em texto; a fonte dos dados (Spellbook ou só Game Changers) é dita na tela. Na lista de progresso, a trilha é uma `<ol>` com `aria-current="step"` nos brackets estimados (o número e o nome também em texto para leitor de tela), o total é um `role="meter"` e cada critério é um item com título `<h3>`, estado em texto ("Conta", "Livre", "Não conferido") e contador em texto — as casas coloridas são decorativas (`aria-hidden`). As animações (entrada dos cards, casas e trilha) só rodam sem `prefers-reduced-motion`. axe sem violações com critérios marcados, claro/escuro, 1280 e 360 px.
 - **Base de mana e mão inicial**: tabelas com `th scope="col"`/`scope="row"` e `caption`; situação com ícone **e** texto ("Suficiente"/"Poucas fontes"); barras de probabilidade decorativas, com o valor em texto ao lado.
 - **Atualizar análise**: resultado em `role="status"`; o ícone girando respeita `motion-reduce`.
 

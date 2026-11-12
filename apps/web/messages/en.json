@@ -600,15 +600,48 @@
     "bracketHint": "Minimum from the objective rules of the official brackets (Game Changers, mass land denial, extra turns and two-card combos). Intent and speed are for the conversation with your table.",
     "bracketSourceSpellbook": "Combos checked on Commander Spellbook.",
     "bracketSourceLocal": "Game Changers only for now: combos have not been checked on Commander Spellbook yet.",
-    "bracketReasons": {
-      "game_changers": "{count, plural, =1 {1 Game Changer} other {# Game Changers}}: <cards></cards>.",
-      "mass_land_denial": "Mass land denial: <cards></cards>.",
-      "extra_turns": "Extra turns: <cards></cards>.",
-      "extra_turns_chained": "Many extra turns (can be chained): <cards></cards>.",
-      "two_card_combo": "Two-card combo: <cards></cards> ({produces}).",
-      "arguable_combo": "Combo that may count as two cards: <cards></cards> ({produces}).",
-      "clean": "Nothing in the list requires bracket 3 or higher."
+    "bracketTrail": "Bracket trail",
+    "bracketStep": "Bracket {step}",
+    "bracketHere": "this deck is here",
+    "bracketLevels": {
+      "1": "Exhibition",
+      "2": "Core",
+      "3": "Upgraded",
+      "4": "Optimized",
+      "5": "cEDH"
     },
+    "bracketRange": {
+      "2": "Between 1 and 2, the deck's intent decides.",
+      "4": "Between 4 and 5, intent decides: optimized for the table or competitive (cEDH)."
+    },
+    "bracketCounted": "{counted} of {total} criteria count toward the estimate",
+    "bracketChecklist": "Bracket criteria",
+    "bracketCriteria": {
+      "game_changers": "Game Changers",
+      "mass_land_denial": "Mass land denial",
+      "extra_turns": "Extra turns",
+      "two_card_combo": "Two-card combos",
+      "arguable_combo": "Near two-card combos"
+    },
+    "bracketStatus": {
+      "counted": "Counts",
+      "clear": "Clear",
+      "unchecked": "Not checked"
+    },
+    "bracketImplies": "{bracket, select, 2 {doesn't raise the bracket} 3 {puts it at Bracket 3} other {puts it at Bracket 4+}}",
+    "bracketDecisive": "Sets the minimum",
+    "bracketCountCards": "{count, plural, =0 {No cards} =1 {1 card} other {# cards}}",
+    "bracketCountCombos": "{count, plural, =0 {No combos} =1 {1 combo} other {# combos}}",
+    "bracketLimits": {
+      "game_changers": "None in 1–2, up to 3 in 3, 4 or more in 4+.",
+      "mass_land_denial": "Any of them means 4+.",
+      "extra_turns": "Up to 2 don't weigh in; 3 or more (chainable) mean 4+.",
+      "two_card_combo": "Any of them means 4+.",
+      "arguable_combo": "Any of them means 3."
+    },
+    "bracketNextAdd": "With {amount} more, the deck moves to Bracket {bracket, select, 4 {4+} other {{bracket}}}.",
+    "bracketNextRemove": "Remove {amount} and this criterion {bracket, select, 2 {stops weighing in} other {drops to Bracket {bracket}}}.",
+    "bracketUnchecked": "Waiting for the Commander Spellbook check.",
     "manaBaseTitle": "Mana base",
     "manaBaseHint": "Lands producing each color compared to a target proportional to the mana symbols, with a minimum for splash colors.",
     "manaCols": {

@@ -198,3 +198,138 @@ export const parseBracketSignals = (value: unknown): BracketSignals | null => {
   const parsed = signalsSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
 };
+
+/** Critérios objetivos dos brackets que a lista permite conferir, na ordem da lista de progresso. */
+export const BRACKET_CRITERIA = [
+  'game_changers',
+  'mass_land_denial',
+  'extra_turns',
+  'two_card_combo',
+  'arguable_combo',
+] as const;
+export type BracketCriterion = (typeof BRACKET_CRITERIA)[number];
+
+/** A partir de quantas cartas (mais que `above`) o critério leva o deck a `bracket`. */
+interface BracketStep {
+  above: number;
+  bracket: 3 | 4;
+}
+
+const CRITERION_STEPS: Record<BracketCriterion, readonly BracketStep[]> = {
+  game_changers: [
+    { above: 0, bracket: 3 },
+    { above: 3, bracket: 4 },
+  ],
+  mass_land_denial: [{ above: 0, bracket: 4 }],
+  // Poucos turnos extras não sobem o bracket; 3 ou mais contam como encadeados.
+  extra_turns: [{ above: 2, bracket: 4 }],
+  two_card_combo: [{ above: 0, bracket: 4 }],
+  arguable_combo: [{ above: 0, bracket: 3 }],
+};
+
+export interface BracketChecklistItem {
+  code: BracketCriterion;
+  /**
+   * `counted`: o deck tem cartas deste critério e elas entram no cálculo; `clear`: nada no deck;
+   * `unchecked`: ainda não deu para conferir (sem o Commander Spellbook, só os Game Changers).
+   */
+  status: 'counted' | 'clear' | 'unchecked';
+  count: number;
+  /** O que conta: uma carta por entrada ou, nos combos, as peças e o que o combo produz. */
+  entries: { cards: string[]; produces: string[] }[];
+  /** Bracket a que este critério, sozinho, leva o deck (2 = não pesa). */
+  implies: 2 | 3 | 4;
+  /** Este critério é um dos que define o mínimo estimado. */
+  decisive: boolean;
+  /**
+   * Casas do contador: a cor de cada uma é o bracket que ela representa. Ex.: Game Changers
+   * = [3, 3, 3, 4] (até 3 ficam no Bracket 3, o 4º leva ao 4); turnos extras = [2, 2, 4].
+   */
+  slots: (2 | 3 | 4)[];
+  /** Quanto falta para o próximo degrau (`add`) ou quanto tirar para descer um (`remove`). */
+  next: { kind: 'add' | 'remove'; amount: number; bracket: 2 | 3 | 4 } | null;
+}
+
+export interface BracketChecklist {
+  minimum: 2 | 3 | 4;
+  items: BracketChecklistItem[];
+  /** Quantos critérios já contam para o cálculo. */
+  counted: number;
+}
+
+function itemFor(
+  code: BracketCriterion,
+  entries: BracketChecklistItem['entries'],
+  unchecked: boolean,
+  minimum: 2 | 3 | 4,
+): BracketChecklistItem {
+  const steps = CRITERION_STEPS[code];
+  const count = entries.length;
+  const reached = steps.filter((s) => count > s.above);
+  const implies = reached.length ? reached[reached.length - 1]!.bracket : 2;
+  const last = steps[steps.length - 1]!;
+  const slots = Array.from({ length: Math.max(count, last.above + 1) }, (_, i) => {
+    const step = steps.filter((s) => i + 1 > s.above);
+    return step.length ? step[step.length - 1]!.bracket : (2 as const);
+  });
+  const upcoming = steps.find((s) => count <= s.above);
+  const current = reached[reached.length - 1];
+  const previous = reached[reached.length - 2];
+  const next = unchecked
+    ? null
+    : upcoming
+      ? { kind: 'add' as const, amount: upcoming.above + 1 - count, bracket: upcoming.bracket }
+      : current
+        ? {
+            kind: 'remove' as const,
+            amount: count - current.above,
+            bracket: previous?.bracket ?? (2 as const),
+          }
+        : null;
+  return {
+    code,
+    status: unchecked ? 'unchecked' : count > 0 ? 'counted' : 'clear',
+    count,
+    entries,
+    implies,
+    decisive: !unchecked && implies > 2 && implies === minimum,
+    slots,
+    next,
+  };
+}
+
+/**
+ * Lista de progresso do bracket: cada critério objetivo, se já conta para o cálculo, a que bracket
+ * leva o deck e quanto falta para o próximo degrau. Sem os sinais do Spellbook (`source: 'local'`),
+ * só os Game Changers são conferidos; o resto fica como "não conferido".
+ */
+export function bracketChecklist(
+  estimate: BracketEstimate,
+  source: 'spellbook' | 'local',
+): BracketChecklist {
+  const entries: Record<BracketCriterion, BracketChecklistItem['entries']> = {
+    game_changers: [],
+    mass_land_denial: [],
+    extra_turns: [],
+    two_card_combo: [],
+    arguable_combo: [],
+  };
+  for (const reason of estimate.reasons) {
+    if (reason.code === 'clean') continue;
+    if (reason.code === 'two_card_combo' || reason.code === 'arguable_combo') {
+      entries[reason.code].push({ cards: reason.cards, produces: reason.produces });
+    } else {
+      for (const card of new Set(reason.cards)) {
+        entries[reason.code].push({ cards: [card], produces: [] });
+      }
+    }
+  }
+  const items = BRACKET_CRITERIA.map((code) =>
+    itemFor(code, entries[code], source === 'local' && code !== 'game_changers', estimate.minimum),
+  );
+  return {
+    minimum: estimate.minimum,
+    items,
+    counted: items.filter((i) => i.status === 'counted').length,
+  };
+}

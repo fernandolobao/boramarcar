@@ -5,7 +5,7 @@ import type {
   OpeningHandOdds,
   ColorSourceRow,
 } from '@boramarcar/core';
-import { deckFormatProfile } from '@boramarcar/core';
+import { bracketChecklist, deckFormatProfile } from '@boramarcar/core';
 import { ScoreBreakdown } from './analysis-charts';
 
 export { ManaCurve } from './analysis-charts';
@@ -184,49 +184,190 @@ function usePercent() {
       : format.number(value, { style: 'percent', maximumFractionDigits: 0 });
 }
 
-const join = (items: readonly string[]) => items.join(', ');
+const BRACKET_STEPS = [1, 2, 3, 4, 5] as const;
+/** Brackets que o mínimo estimado cobre: 1–2 e 4–5 dependem da intenção. */
+const BRACKET_RANGE: Record<2 | 3 | 4, readonly number[]> = { 2: [1, 2], 3: [3], 4: [4, 5] };
+/** Cor de cada degrau (casas do contador e trilha): verde, dourado, vermelho. */
+const SLOT_COLOR: Record<2 | 3 | 4, { on: string; off: string }> = {
+  2: { on: 'bg-success border-success', off: 'border-success' },
+  3: { on: 'bg-accent border-accent', off: 'border-accent' },
+  4: { on: 'bg-danger border-danger', off: 'border-danger' },
+};
+const STATUS_ICON = { counted: 'ok', clear: 'unmarked', unchecked: 'rsvpMaybe' } as const;
 
-/** Bracket mínimo (4.7) com os motivos. */
+/**
+ * Bracket estimado (4.7) como lista de progresso: a trilha de 1 a 5 com o deck posicionado e um
+ * card por critério oficial, marcado quando já conta para o cálculo, com o contador por degrau e
+ * quanto falta para subir (ou quanto tirar para descer).
+ */
 export function BracketCard({
   bracket,
 }: {
   bracket: BracketEstimate & { source: 'spellbook' | 'local' };
 }) {
   const t = useTranslations('analysis');
+  const list = bracketChecklist(bracket, bracket.source);
+  const range = BRACKET_RANGE[list.minimum];
+  const lastInRange = range[range.length - 1]!;
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <h2 className="section-title mb-0 flex items-center gap-2">
         <Icon name="bracket" />
         {t('bracketTitle')}
       </h2>
       <p className="text-2xl font-bold" data-testid="deck-bracket">
-        {t(`bracketValue.${bracket.minimum}`)}
+        {t(`bracketValue.${list.minimum}`)}
       </p>
-      <ul className="list-disc space-y-1 pl-5 text-sm">
-        {bracket.reasons.map((reason, index) => (
-          <li key={index}>
-            {reason.code === 'game_changers'
-              ? t.rich('bracketReasons.game_changers', {
-                  count: reason.count,
-                  cards: () => <CardNames names={reason.cards} />,
-                })
-              : reason.code === 'mass_land_denial'
-                ? t.rich('bracketReasons.mass_land_denial', {
-                    cards: () => <CardNames names={reason.cards} />,
-                  })
-                : reason.code === 'extra_turns'
-                  ? t.rich(
-                      reason.chained
-                        ? 'bracketReasons.extra_turns_chained'
-                        : 'bracketReasons.extra_turns',
-                      { cards: () => <CardNames names={reason.cards} /> },
-                    )
-                  : reason.code === 'clean'
-                    ? t('bracketReasons.clean')
-                    : t.rich(`bracketReasons.${reason.code}`, {
-                        cards: () => <CardNames names={reason.cards} separator=" + " />,
-                        produces: join(reason.produces),
-                      })}
+
+      <ol aria-label={t('bracketTrail')} className="bracket-trail relative grid grid-cols-5 gap-1">
+        {BRACKET_STEPS.map((step) => {
+          const here = range.includes(step);
+          const passed = step < range[0]!;
+          return (
+            <li
+              key={step}
+              aria-current={here ? 'step' : undefined}
+              className="relative z-10 flex flex-col items-center gap-1 text-center"
+            >
+              <span
+                aria-hidden="true"
+                className={`flex size-9 items-center justify-center rounded-full border-2 text-sm font-bold ${
+                  here
+                    ? 'bracket-here border-primary bg-primary text-on-primary'
+                    : passed
+                      ? 'border-primary bg-surface text-fg'
+                      : 'border-line-strong bg-surface text-fg-muted'
+                }`}
+              >
+                {step}
+              </span>
+              <span className={`text-xs ${here ? 'font-semibold text-fg' : 'text-fg-muted'}`}>
+                <span className="sr-only">{t('bracketStep', { step })} · </span>
+                <span className="hidden sm:inline">{t(`bracketLevels.${step}`)}</span>
+                {here && <span className="sr-only"> · {t('bracketHere')}</span>}
+              </span>
+            </li>
+          );
+        })}
+        <span
+          aria-hidden="true"
+          className="absolute top-[1.125rem] right-[10%] left-[10%] h-1 -translate-y-1/2 rounded-full bg-line"
+        >
+          <span
+            className="bracket-trail-fill block h-full rounded-full bg-primary"
+            style={{ width: `${((lastInRange - 1) / 4) * 100}%` }}
+          />
+        </span>
+      </ol>
+      {list.minimum !== 3 && <p className="muted">{t(`bracketRange.${list.minimum}`)}</p>}
+
+      <div className="space-y-1">
+        <p className="text-sm font-medium" id="bracket-progress-label">
+          {t('bracketCounted', { counted: list.counted, total: list.items.length })}
+        </p>
+        <div
+          role="meter"
+          aria-labelledby="bracket-progress-label"
+          aria-valuemin={0}
+          aria-valuemax={list.items.length}
+          aria-valuenow={list.counted}
+          className="h-2 overflow-hidden rounded-full bg-surface-muted"
+        >
+          <span
+            className="bracket-trail-fill block h-full rounded-full bg-primary"
+            style={{ width: `${(list.counted / list.items.length) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <ul className="grid gap-3 sm:grid-cols-2" aria-label={t('bracketChecklist')}>
+        {list.items.map((item, index) => (
+          <li
+            key={item.code}
+            data-testid={`bracket-item-${item.code}`}
+            data-status={item.status}
+            style={{ animationDelay: `${index * 60}ms` }}
+            className={`bracket-item flex flex-col gap-2 rounded-xl border p-3 ${
+              item.status === 'counted'
+                ? item.decisive
+                  ? 'border-primary bg-surface'
+                  : 'border-line-strong bg-surface'
+                : 'border-line bg-surface-muted'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              <span className={item.status === 'counted' ? 'text-primary' : 'text-fg-muted'}>
+                <Icon name={STATUS_ICON[item.status]} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-semibold">{t(`bracketCriteria.${item.code}`)}</h3>
+                <p className="muted text-xs">
+                  {t(`bracketStatus.${item.status}`)}
+                  {item.status === 'counted' && (
+                    <> · {t('bracketImplies', { bracket: item.implies })}</>
+                  )}
+                </p>
+              </div>
+              {item.decisive && (
+                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-on-primary">
+                  {t('bracketDecisive')}
+                </span>
+              )}
+            </div>
+            {item.status !== 'unchecked' && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span aria-hidden="true" className="flex flex-wrap gap-1">
+                  {item.slots.slice(0, 10).map((slot, i) => (
+                    <span
+                      key={i}
+                      style={{ animationDelay: `${index * 60 + i * 40}ms` }}
+                      className={`bracket-pip size-3 rounded-full border-2 ${
+                        i < item.count
+                          ? SLOT_COLOR[slot].on
+                          : `${SLOT_COLOR[slot].off} bg-transparent`
+                      }`}
+                    />
+                  ))}
+                </span>
+                <span className="text-xs font-medium">
+                  {t(item.code.endsWith('combo') ? 'bracketCountCombos' : 'bracketCountCards', {
+                    count: item.count,
+                  })}
+                </span>
+              </div>
+            )}
+            {item.entries.length > 0 &&
+              (item.code.endsWith('combo') ? (
+                <ul className="space-y-1 text-sm">
+                  {item.entries.map((combo, i) => (
+                    <li key={i}>
+                      <CardNames names={combo.cards} separator=" + " />
+                      {combo.produces.length > 0 && (
+                        <span className="muted text-xs"> ({combo.produces.join(', ')})</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm">
+                  <CardNames names={item.entries.flatMap((e) => e.cards)} />
+                </p>
+              ))}
+            <p className="muted text-xs">{t(`bracketLimits.${item.code}`)}</p>
+            {item.next ? (
+              <p className="text-xs font-medium">
+                {item.next.kind === 'add'
+                  ? t('bracketNextAdd', { amount: item.next.amount, bracket: item.next.bracket })
+                  : t('bracketNextRemove', {
+                      amount: item.next.amount,
+                      bracket: item.next.bracket,
+                    })}
+              </p>
+            ) : (
+              item.status === 'unchecked' && (
+                <p className="muted text-xs">{t('bracketUnchecked')}</p>
+              )
+            )}
           </li>
         ))}
       </ul>

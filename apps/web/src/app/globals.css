@@ -601,3 +601,47 @@ button[aria-busy='true']::before {
     display: none;
   }
 }
+
+/*
+ * Lista de progresso do bracket: os cards entram em sequência, as casas do contador "acendem" e a
+ * trilha enche. Sem animação para quem pede menos movimento.
+ */
+@keyframes bracket-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+@keyframes bracket-pip {
+  0% {
+    transform: scale(0.4);
+  }
+  70% {
+    transform: scale(1.25);
+  }
+}
+@keyframes bracket-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes bracket-glow {
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 25%, transparent);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bracket-item {
+    animation: bracket-pop 320ms ease-out both;
+  }
+  .bracket-pip {
+    animation: bracket-pip 360ms ease-out both;
+  }
+  .bracket-trail-fill {
+    transform-origin: left;
+    animation: bracket-fill 700ms ease-out both;
+  }
+  .bracket-here {
+    animation: bracket-glow 2.4s ease-in-out 700ms 2;
+  }
+}

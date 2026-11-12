@@ -600,15 +600,48 @@
     "bracketHint": "Mínimo pelas regras objetivas dos brackets oficiais (Game Changers, destruição em massa de terrenos, turnos extras e combos de duas cartas). A intenção e a velocidade do deck ficam para a conversa com a mesa.",
     "bracketSourceSpellbook": "Combos conferidos no Commander Spellbook.",
     "bracketSourceLocal": "Por enquanto só os Game Changers: os combos ainda não foram conferidos no Commander Spellbook.",
-    "bracketReasons": {
-      "game_changers": "{count, plural, =1 {1 Game Changer} other {# Game Changers}}: <cards></cards>.",
-      "mass_land_denial": "Destruição em massa de terrenos: <cards></cards>.",
-      "extra_turns": "Turnos extras: <cards></cards>.",
-      "extra_turns_chained": "Turnos extras em quantidade (dá para encadear): <cards></cards>.",
-      "two_card_combo": "Combo de duas cartas: <cards></cards> ({produces}).",
-      "arguable_combo": "Combo que pode contar como de duas cartas: <cards></cards> ({produces}).",
-      "clean": "Nada na lista exige bracket 3 ou acima."
+    "bracketTrail": "Trilha dos brackets",
+    "bracketStep": "Bracket {step}",
+    "bracketHere": "o deck está aqui",
+    "bracketLevels": {
+      "1": "Exhibition",
+      "2": "Core",
+      "3": "Upgraded",
+      "4": "Optimized",
+      "5": "cEDH"
     },
+    "bracketRange": {
+      "2": "Entre o 1 e o 2, quem decide é a intenção do deck.",
+      "4": "Entre o 4 e o 5, quem decide é a intenção: otimizado para a mesa ou competitivo (cEDH)."
+    },
+    "bracketCounted": "{counted} de {total} critérios contam para o cálculo",
+    "bracketChecklist": "Critérios do bracket",
+    "bracketCriteria": {
+      "game_changers": "Game Changers",
+      "mass_land_denial": "Destruição em massa de terrenos",
+      "extra_turns": "Turnos extras",
+      "two_card_combo": "Combos de duas cartas",
+      "arguable_combo": "Combos quase de duas cartas"
+    },
+    "bracketStatus": {
+      "counted": "Conta",
+      "clear": "Livre",
+      "unchecked": "Não conferido"
+    },
+    "bracketImplies": "{bracket, select, 2 {não sobe o bracket} 3 {leva ao Bracket 3} other {leva ao Bracket 4+}}",
+    "bracketDecisive": "Define o mínimo",
+    "bracketCountCards": "{count, plural, =0 {Nenhuma carta} =1 {1 carta} other {# cartas}}",
+    "bracketCountCombos": "{count, plural, =0 {Nenhum combo} =1 {1 combo} other {# combos}}",
+    "bracketLimits": {
+      "game_changers": "Nenhum no 1–2, até 3 no 3, 4 ou mais no 4+.",
+      "mass_land_denial": "Qualquer uma leva ao 4+.",
+      "extra_turns": "Até 2 não pesam; 3 ou mais (dá para encadear) levam ao 4+.",
+      "two_card_combo": "Qualquer um leva ao 4+.",
+      "arguable_combo": "Qualquer um leva ao 3."
+    },
+    "bracketNextAdd": "Com mais {amount}, o deck vai para o Bracket {bracket, select, 4 {4+} other {{bracket}}}.",
+    "bracketNextRemove": "Tirando {amount}, este critério {bracket, select, 2 {deixa de pesar} other {desce para o Bracket {bracket}}}.",
+    "bracketUnchecked": "Aguardando a conferência no Commander Spellbook.",
     "manaBaseTitle": "Base de mana",
     "manaBaseHint": "Terrenos que geram cada cor comparados a uma meta proporcional aos símbolos de mana, com um mínimo para cores de splash.",
     "manaCols": {

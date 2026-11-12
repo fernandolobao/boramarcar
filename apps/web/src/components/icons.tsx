@@ -7,6 +7,7 @@
  */
 import {
   Award,
+  Circle,
   Gamepad2,
   Skull,
   MapPin,
@@ -171,6 +172,8 @@ export const Icons = {
   warning: TriangleAlert,
   alternatives: Shuffle,
   bracket: Gauge,
+  /** Critério do bracket que ainda não conta (a marcação é `ok`). */
+  unmarked: Circle,
   openingHand: Hand,
   flip: FlipHorizontal2,
   location: MapPin,
