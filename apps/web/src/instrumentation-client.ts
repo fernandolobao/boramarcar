@@ -7,11 +7,15 @@ import { sentryOptions } from '@/lib/sentry-options';
 zodConfig({ jitless: true });
 
 // Erros no navegador (ver `lib/sentry-options.ts`).
-Sentry.init(
-  sentryOptions({
+Sentry.init({
+  ...sentryOptions({
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
   }),
-);
+  // O túnel (/monitoring) é do próprio site. Nos previews, a proteção da Vercel exige o cookie
+  // de acesso; sem ele (o padrão do Sentry é não mandar cookies), o envio virava um
+  // redirecionamento para o login da Vercel e o erro se perdia.
+  transportOptions: { fetchOptions: { credentials: 'same-origin' } },
+});
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
