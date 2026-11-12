@@ -8,6 +8,8 @@
  * - Coleção: a proporção das cores das cartas da coleção.
  * - Perfil: ouro líquido, em vários tons.
  */
+import { scales } from './index';
+
 export interface FlowStop {
   color: string;
   /** Parte da faixa ocupada pela cor (relativo; normalizado em `normalizeFlow`). */
@@ -167,10 +169,31 @@ export const MANA_BAR_COLORS: Record<'light' | 'dark', Record<ManaColor, string>
 };
 
 /** Dourado das barras para decks de três cores ou mais (≥ 3:1 com a superfície nos dois temas). */
-export const GOLD_BAR_COLORS: Record<'light' | 'dark', string> = {
-  light: '#a8700f',
-  dark: '#f6b944',
-};
+/**
+ * Barras douradas (decks de três cores ou mais): degradê metálico da escala `gold` (claro em cima,
+ * mais quente embaixo). No tema claro o dourado puro tem pouco contraste com o fundo (e o tom
+ * escuro o bastante parecia marrom), então a barra ganha um contorno de 1 px em `gold-700`, que
+ * dá os 3:1 (WCAG 1.4.11). No escuro, o próprio dourado já passa de 3:1.
+ */
+export const GOLD_BAR: Record<'light' | 'dark', { stops: readonly string[]; edge: string | null }> =
+  {
+    light: {
+      stops: [scales.gold[300], scales.gold[400], scales.gold[500]],
+      edge: scales.gold[700],
+    },
+    dark: { stops: [scales.gold[200], scales.gold[400], scales.gold[500]], edge: null },
+  };
+
+const goldFill = (theme: 'light' | 'dark') =>
+  `linear-gradient(180deg, ${GOLD_BAR[theme].stops.join(', ')})`;
+
+const manaCount = (identity: readonly string[]) =>
+  MANA_COLORS.filter((c) => c !== 'C' && identity.includes(c)).length;
+
+/** Contorno das barras (só nas douradas do tema claro); `transparent` nas outras. */
+export function deckBarEdge(identity: readonly string[], theme: 'light' | 'dark'): string {
+  return manaCount(identity) >= 3 ? (GOLD_BAR[theme].edge ?? 'transparent') : 'transparent';
+}
 
 /**
  * Fundo das barras nas cores de um deck: uma cor, ou um degradê das duas cores (na ordem WUBRG).
@@ -184,5 +207,5 @@ export function deckBarBackground(identity: readonly string[], theme: 'light' | 
   if (colors.length === 0) return MANA_BAR_COLORS[theme].C;
   if (colors.length === 1) return colors[0]!;
   if (colors.length === 2) return `linear-gradient(135deg, ${colors.join(', ')})`;
-  return GOLD_BAR_COLORS[theme];
+  return goldFill(theme);
 }
