@@ -12,6 +12,7 @@ import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { CardNames } from '@/components/card-dialog';
+import { StackSections } from '@/components/stack-sections';
 
 export const generateMetadata = navMetadata('ranking');
 
@@ -83,124 +84,140 @@ export default async function RankingPage({ searchParams }: Props) {
         </p>
       </div>
 
-      <form
-        method="get"
-        className="card grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
-        aria-label={t('filters')}
-      >
-        <div>
-          <label className="label" htmlFor="filtro-periodo">
-            {t('period')}
-          </label>
-          <select id="filtro-periodo" name="periodo" className="select" defaultValue={range.period}>
-            <option value="all">{t('periods.all')}</option>
-            <option value="last30">{t('periods.last30')}</option>
-            <option value="thisYear">{t('periods.thisYear')}</option>
-            {seasons.map((s) => (
-              <option key={s.id} value={`season:${s.id}`}>
-                {t('seasonOption', { name: s.name })}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="label" htmlFor="filtro-tipo">
-            {t('formatFilter')}
-          </label>
-          <select id="filtro-tipo" name="tipo" className="select" defaultValue={formatFilter ?? ''}>
-            <option value="">{t('allFormats')}</option>
-            {stats.formats.filter(isGameFormat).map((f) => (
-              <option key={f} value={f}>
-                {tf(f)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button className="btn-primary">
-          <Icon name="filter" />
-          {t('apply')}
-        </button>
-        <p className="muted text-sm sm:col-span-3" aria-live="polite">
-          {t('showing', { period: periodLabel, format: formatLabel })}
-        </p>
-      </form>
+      <StackSections>
+        <form
+          method="get"
+          className="card grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+          aria-label={t('filters')}
+        >
+          <div>
+            <label className="label" htmlFor="filtro-periodo">
+              {t('period')}
+            </label>
+            <select
+              id="filtro-periodo"
+              name="periodo"
+              className="select"
+              defaultValue={range.period}
+            >
+              <option value="all">{t('periods.all')}</option>
+              <option value="last30">{t('periods.last30')}</option>
+              <option value="thisYear">{t('periods.thisYear')}</option>
+              {seasons.map((s) => (
+                <option key={s.id} value={`season:${s.id}`}>
+                  {t('seasonOption', { name: s.name })}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label" htmlFor="filtro-tipo">
+              {t('formatFilter')}
+            </label>
+            <select
+              id="filtro-tipo"
+              name="tipo"
+              className="select"
+              defaultValue={formatFilter ?? ''}
+            >
+              <option value="">{t('allFormats')}</option>
+              {stats.formats.filter(isGameFormat).map((f) => (
+                <option key={f} value={f}>
+                  {tf(f)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button className="btn-primary">
+            <Icon name="filter" />
+            {t('apply')}
+          </button>
+          <p className="muted text-sm sm:col-span-3" aria-live="polite">
+            {t('showing', { period: periodLabel, format: formatLabel })}
+          </p>
+        </form>
 
-      <section className="card" aria-labelledby="standings-title">
-        <h2 id="standings-title" className="section-title">
-          {t('standings')}
-        </h2>
-        {ranking.standings.length === 0 ? (
-          <p className="muted">{t('empty')}</p>
-        ) : (
-          <ScrollTable label={t('standings')}>
-            <table className="w-full text-sm">
-              <caption className="sr-only">{t('caption', { group: group.name })}</caption>
-              <thead>
-                <tr className="text-left text-ink-600 dark:text-ink-400">
-                  <th scope="col" className="py-2 pr-2">
-                    {t('position')}
-                  </th>
-                  <th scope="col" className="py-2 pr-2">
-                    {t('player')}
-                  </th>
-                  <th scope="col" className="py-2 pr-2 text-right">
-                    {t('games')}
-                  </th>
-                  <th scope="col" className="py-2 pr-2 text-right">
-                    {t('wins')}
-                  </th>
-                  <th scope="col" className="py-2 pr-2 text-right">
-                    {t('losses')}
-                  </th>
-                  <th scope="col" className="py-2 pr-2 text-right">
-                    {t('draws')}
-                  </th>
-                  <th scope="col" className="py-2 pr-2 text-right">
-                    {t('winRate')}
-                  </th>
-                  <th scope="col" className="py-2 text-right">
-                    {t('points')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="tabular-nums">
-                {ranking.standings.map((s) => (
-                  <tr
-                    key={s.userId}
-                    className={`border-t border-ink-200 dark:border-ink-800 ${s.userId === user.id ? 'font-semibold' : ''}`}
-                  >
-                    <td className="py-2 pr-2">{s.position}</td>
-                    <th scope="row" className="py-2 pr-2 text-left font-[inherit]">
-                      <Link
-                        href={s.userId === user.id ? '/perfil' : `/jogadores/${s.userId}`}
-                        className="underline-offset-2 hover:underline"
-                      >
-                        {s.name}
-                      </Link>
+        <section className="card" aria-labelledby="standings-title">
+          <h2 id="standings-title" className="section-title">
+            {t('standings')}
+          </h2>
+          {ranking.standings.length === 0 ? (
+            <p className="muted">{t('empty')}</p>
+          ) : (
+            <ScrollTable label={t('standings')}>
+              <table className="w-full text-sm">
+                <caption className="sr-only">{t('caption', { group: group.name })}</caption>
+                <thead>
+                  <tr className="text-left text-ink-600 dark:text-ink-400">
+                    <th scope="col" className="py-2 pr-2">
+                      {t('position')}
                     </th>
-                    <td className="py-2 pr-2 text-right">{s.games}</td>
-                    <td className="py-2 pr-2 text-right">{s.wins}</td>
-                    <td className="py-2 pr-2 text-right">{s.losses}</td>
-                    <td className="py-2 pr-2 text-right">{s.draws}</td>
-                    <td className="py-2 pr-2 text-right">{percent(s.winRate)}</td>
-                    <td className="py-2 text-right font-semibold">{s.points}</td>
+                    <th scope="col" className="py-2 pr-2">
+                      {t('player')}
+                    </th>
+                    <th scope="col" className="py-2 pr-2 text-right">
+                      {t('games')}
+                    </th>
+                    <th scope="col" className="py-2 pr-2 text-right">
+                      {t('wins')}
+                    </th>
+                    <th scope="col" className="py-2 pr-2 text-right">
+                      {t('losses')}
+                    </th>
+                    <th scope="col" className="py-2 pr-2 text-right">
+                      {t('draws')}
+                    </th>
+                    <th scope="col" className="py-2 pr-2 text-right">
+                      {t('winRate')}
+                    </th>
+                    <th scope="col" className="py-2 text-right">
+                      {t('points')}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </ScrollTable>
-        )}
-      </section>
+                </thead>
+                <tbody className="tabular-nums">
+                  {ranking.standings.map((s) => (
+                    <tr
+                      key={s.userId}
+                      className={`border-t border-ink-200 dark:border-ink-800 ${s.userId === user.id ? 'font-semibold' : ''}`}
+                    >
+                      <td className="py-2 pr-2">{s.position}</td>
+                      <th scope="row" className="py-2 pr-2 text-left font-[inherit]">
+                        <Link
+                          href={s.userId === user.id ? '/perfil' : `/jogadores/${s.userId}`}
+                          className="underline-offset-2 hover:underline"
+                        >
+                          {s.name}
+                        </Link>
+                      </th>
+                      <td className="py-2 pr-2 text-right">{s.games}</td>
+                      <td className="py-2 pr-2 text-right">{s.wins}</td>
+                      <td className="py-2 pr-2 text-right">{s.losses}</td>
+                      <td className="py-2 pr-2 text-right">{s.draws}</td>
+                      <td className="py-2 pr-2 text-right">{percent(s.winRate)}</td>
+                      <td className="py-2 text-right font-semibold">{s.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </ScrollTable>
+          )}
+        </section>
 
-      <section className="space-y-6" aria-labelledby="stats-title">
-        <h2 id="stats-title" className="section-title">
-          {ts('title')}
-        </h2>
+        {/* Estatísticas: cada bloco é uma carta da pilha; o título fica na primeira. */}
         {stats.totalGames === 0 ? (
-          <p className="muted">{ts('empty')}</p>
+          <section className="card" aria-labelledby="stats-title">
+            <h2 id="stats-title" className="section-title">
+              {ts('title')}
+            </h2>
+            <p className="muted">{ts('empty')}</p>
+          </section>
         ) : (
           <>
-            <div className="card">
+            <section className="card" aria-labelledby="stats-title">
+              <h2 id="stats-title" className="section-title">
+                {ts('title')}
+              </h2>
               <h3 className="font-semibold">{ts('highlights')}</h3>
               <dl className="mt-3 grid gap-3 sm:grid-cols-3">
                 {[
@@ -248,7 +265,7 @@ export default async function RankingPage({ searchParams }: Props) {
                   </ul>
                 </>
               )}
-            </div>
+            </section>
 
             <div className="card">
               <h3 className="font-semibold">{ts('streaks')}</h3>
@@ -354,111 +371,109 @@ export default async function RankingPage({ searchParams }: Props) {
               </div>
             )}
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="card">
-                <h3 className="font-semibold">{ts('decks')}</h3>
-                {stats.decks.length === 0 ? (
-                  <p className="muted mt-2 text-sm">{ts('noDecks')}</p>
-                ) : (
-                  <ol className="mt-3 space-y-2">
-                    {stats.decks.slice(0, 10).map((d) => (
-                      <li key={d.deckId} className="flex items-center gap-3">
-                        <Art src={d.cover?.artUri ?? null} />
-                        <div className="min-w-0 text-sm">
-                          <Link
-                            href={`/decks/${d.deckId}`}
-                            className="inline-flex min-h-6 items-center font-medium underline-offset-2 hover:underline"
-                          >
-                            {d.name}
-                          </Link>
-                          <p className="muted">
-                            {ts.rich('deckLine', {
-                              owner: () => <PlayerLink userId={d.userId} name={d.ownerName} />,
-                              ownerName: d.ownerName,
-                              games: d.games,
-                              wins: d.wins,
-                              rate: percent(d.winRate),
-                            })}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </div>
-              <div className="card">
-                <h3 className="font-semibold">{ts('commanders')}</h3>
-                {stats.commanders.length === 0 ? (
-                  <p className="muted mt-2 text-sm">{ts('noDecks')}</p>
-                ) : (
-                  <ol className="mt-3 space-y-2">
-                    {stats.commanders.slice(0, 10).map((c) => (
-                      <li key={c.name} className="flex items-center gap-3">
-                        <Art src={c.artUri} />
-                        <div className="min-w-0 text-sm">
-                          <p className="font-medium">
-                            <CardNames names={c.name.split(' & ')} separator=" & " />
-                          </p>
-                          <p className="muted">
-                            {ts.rich('commanderLine', {
-                              players: () => <PlayerLinks players={c.players} />,
-                              games: c.games,
-                              rate: percent(c.winRate),
-                            })}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </div>
+            <div className="card">
+              <h3 className="font-semibold">{ts('decks')}</h3>
+              {stats.decks.length === 0 ? (
+                <p className="muted mt-2 text-sm">{ts('noDecks')}</p>
+              ) : (
+                <ol className="mt-3 space-y-2">
+                  {stats.decks.slice(0, 10).map((d) => (
+                    <li key={d.deckId} className="flex items-center gap-3">
+                      <Art src={d.cover?.artUri ?? null} />
+                      <div className="min-w-0 text-sm">
+                        <Link
+                          href={`/decks/${d.deckId}`}
+                          className="inline-flex min-h-6 items-center font-medium underline-offset-2 hover:underline"
+                        >
+                          {d.name}
+                        </Link>
+                        <p className="muted">
+                          {ts.rich('deckLine', {
+                            owner: () => <PlayerLink userId={d.userId} name={d.ownerName} />,
+                            ownerName: d.ownerName,
+                            games: d.games,
+                            wins: d.wins,
+                            rate: percent(d.winRate),
+                          })}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+            <div className="card">
+              <h3 className="font-semibold">{ts('commanders')}</h3>
+              {stats.commanders.length === 0 ? (
+                <p className="muted mt-2 text-sm">{ts('noDecks')}</p>
+              ) : (
+                <ol className="mt-3 space-y-2">
+                  {stats.commanders.slice(0, 10).map((c) => (
+                    <li key={c.name} className="flex items-center gap-3">
+                      <Art src={c.artUri} />
+                      <div className="min-w-0 text-sm">
+                        <p className="font-medium">
+                          <CardNames names={c.name.split(' & ')} separator=" & " />
+                        </p>
+                        <p className="muted">
+                          {ts.rich('commanderLine', {
+                            players: () => <PlayerLinks players={c.players} />,
+                            games: c.games,
+                            rate: percent(c.winRate),
+                          })}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </div>
           </>
         )}
-      </section>
 
-      <section className="card space-y-4" aria-labelledby="seasons-title">
-        <div>
-          <h2 id="seasons-title" className="section-title">
-            {tsn('title')}
-          </h2>
-          <p className="muted text-sm">{tsn('hint')}</p>
-        </div>
-        {seasons.length === 0 ? (
-          <p className="muted text-sm">{tsn('empty')}</p>
-        ) : (
-          <ul className="divide-y divide-ink-200 text-sm dark:divide-ink-800">
-            {seasons.map((s) => (
-              <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                <span>
-                  <Link
-                    href={`/ranking?periodo=season:${s.id}`}
-                    className="font-medium underline-offset-2 hover:underline"
-                  >
-                    {s.name}
-                  </Link>{' '}
-                  <span className="muted">
-                    ·{' '}
-                    {tsn('range', {
-                      start: format.dateTime(s.startsAt, { dateStyle: 'medium' }),
-                      end: format.dateTime(new Date(s.endsAt.getTime() - 1), {
-                        dateStyle: 'medium',
-                      }),
-                    })}
+        <section className="card space-y-4" aria-labelledby="seasons-title">
+          <div>
+            <h2 id="seasons-title" className="section-title">
+              {tsn('title')}
+            </h2>
+            <p className="muted text-sm">{tsn('hint')}</p>
+          </div>
+          {seasons.length === 0 ? (
+            <p className="muted text-sm">{tsn('empty')}</p>
+          ) : (
+            <ul className="divide-y divide-ink-200 text-sm dark:divide-ink-800">
+              {seasons.map((s) => (
+                <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                  <span>
+                    <Link
+                      href={`/ranking?periodo=season:${s.id}`}
+                      className="font-medium underline-offset-2 hover:underline"
+                    >
+                      {s.name}
+                    </Link>{' '}
+                    <span className="muted">
+                      ·{' '}
+                      {tsn('range', {
+                        start: format.dateTime(s.startsAt, { dateStyle: 'medium' }),
+                        end: format.dateTime(new Date(s.endsAt.getTime() - 1), {
+                          dateStyle: 'medium',
+                        }),
+                      })}
+                    </span>
                   </span>
-                </span>
-                {canManage && (
-                  <DeleteButton
-                    path={`/api/v1/seasons/${s.id}`}
-                    context={tsn('remove', { name: s.name })}
-                  />
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        {canManage && <SeasonForm groupId={group.id} />}
-      </section>
+                  {canManage && (
+                    <DeleteButton
+                      path={`/api/v1/seasons/${s.id}`}
+                      context={tsn('remove', { name: s.name })}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          {canManage && <SeasonForm groupId={group.id} />}
+        </section>
+      </StackSections>
     </>
   );
 }

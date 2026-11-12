@@ -7,6 +7,7 @@ import { EventStatusBadge } from '@/components/event-manage';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
+import { StackSections } from '@/components/stack-sections';
 
 export const generateMetadata = navMetadata('events');
 
@@ -49,27 +50,29 @@ export default async function EventsPage() {
   return (
     <>
       <h1 className="page-title">{t('title')}</h1>
-      <section className="card">
-        <h2 className="section-title">{t('new')}</h2>
-        <NewEventForm
-          groupId={group.id}
-          locations={locations.map((l) => ({ id: l.id, name: l.name }))}
-        />
-      </section>
-      <section className="card">
-        <h2 className="section-title">{t('upcoming')}</h2>
-        {list(upcoming)}
-      </section>
-      <section className="card">
-        <h2 className="section-title">{t('past')}</h2>
-        {list(past.slice(0, 5))}
-        <p className="mt-3">
-          <Link href="/eventos/historico" className="inline-flex items-center gap-1 underline">
-            {th('seeAll')}
-            <Icon name="next" />
-          </Link>
-        </p>
-      </section>
+      <StackSections>
+        <section className="card">
+          <h2 className="section-title">{t('new')}</h2>
+          <NewEventForm
+            groupId={group.id}
+            locations={locations.map((l) => ({ id: l.id, name: l.name }))}
+          />
+        </section>
+        <section className="card">
+          <h2 className="section-title">{t('upcoming')}</h2>
+          {list(upcoming)}
+        </section>
+        <section className="card">
+          <h2 className="section-title">{t('past')}</h2>
+          {list(past.slice(0, 5))}
+          <p className="mt-3">
+            <Link href="/eventos/historico" className="inline-flex items-center gap-1 underline">
+              {th('seeAll')}
+              <Icon name="next" />
+            </Link>
+          </p>
+        </section>
+      </StackSections>
     </>
   );
 }
