@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { themes } from '@boramarcar/tokens';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Suspense, type ReactNode } from 'react';
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <SessionInsights enabled={insights} consent={consent} />
         </NextIntlClientProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
