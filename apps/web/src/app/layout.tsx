@@ -11,6 +11,7 @@ import { SessionInsights } from '@/components/session-insights';
 import { CONSENT_COOKIE, parseConsent } from '@/lib/consent';
 import { sessionInsightsEnabled } from '@/lib/session-insights';
 import { THEME_STORAGE_KEY } from '@/lib/theme';
+import { display } from '@/fonts';
 import './globals.css';
 import '@/styles/mana.css';
 
@@ -44,7 +45,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const insights = sessionInsightsEnabled();
   return (
     // `data-theme` é definido pelo script antes da hidratação (preferência salva no navegador).
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className={display.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

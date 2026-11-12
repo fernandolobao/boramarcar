@@ -26,6 +26,7 @@ import { buildEventShareText, eventUrl } from '@/server/event-share';
 import { isDomainError } from '@boramarcar/core';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { StackSections } from '@/components/stack-sections';
+import { EmptyState } from '@/components/empty-state';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -79,18 +80,46 @@ export default async function EventPage({ params }: Props) {
     decks: decks.filter((d) => d.ownerId === p.userId).map((d) => ({ id: d.id, name: d.name })),
   }));
 
+  // Arte para o topo: o deck de quem venceu a última partida (ou de quem jogou).
+  const played = [...event.games].reverse().flatMap((g) => g.players);
+  const heroArt =
+    played.find((p) => p.result === 'win' && p.deck?.artUri)?.deck?.artUri ??
+    played.find((p) => p.deck?.artUri)?.deck?.artUri ??
+    null;
+
   return (
     <>
-      <div>
-        <h1 className="page-title flex flex-wrap items-center gap-3">
-          {event.title} <EventStatusBadge status={event.status} />
-        </h1>
-        <p className="muted">
-          {format.dateTime(event.startsAt, { dateStyle: 'full', timeStyle: 'short' })} ·{' '}
-          {event.location?.name ?? tc('locationTbd')}
-          {event.location?.address && ` (${event.location.address})`}
-        </p>
-      </div>
+      {heroArt ? (
+        // Com partidas: a arte do deck vencedor (ou de quem jogou) no topo, tingida na cor da
+        // marca; o texto fica sobre uma camada escura que garante o contraste com qualquer arte.
+        <div className="relative isolate overflow-hidden rounded-3xl bg-arcano p-6 text-pergaminho sm:p-8">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 bg-cover bg-[50%_30%] mix-blend-luminosity"
+            style={{ backgroundImage: `url(${JSON.stringify(heroArt)})` }}
+          />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-arcano/80" />
+          <h1 className="flex flex-wrap items-center gap-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            {event.title} <EventStatusBadge status={event.status} />
+          </h1>
+          <p className="mt-1 text-ink-200">
+            {format.dateTime(event.startsAt, { dateStyle: 'full', timeStyle: 'short' })} ·{' '}
+            {event.location?.name ?? tc('locationTbd')}
+            {event.location?.address && ` (${event.location.address})`}
+          </p>
+        </div>
+      ) : (
+        <div>
+          <h1 className="page-title flex flex-wrap items-center gap-3">
+            {event.title} <EventStatusBadge status={event.status} />
+          </h1>
+          <p className="muted">
+            {format.dateTime(event.startsAt, { dateStyle: 'full', timeStyle: 'short' })} ·{' '}
+            {event.location?.name ?? tc('locationTbd')}
+            {event.location?.address && ` (${event.location.address})`}
+          </p>
+        </div>
+      )}
 
       {event.status === 'cancelled' && (
         <p
@@ -157,7 +186,7 @@ export default async function EventPage({ params }: Props) {
         <section className="card">
           <h2 className="section-title">{t('games')}</h2>
           {event.games.length === 0 ? (
-            <p className="muted">{t('noGames')}</p>
+            <EmptyState>{t('noGames')}</EmptyState>
           ) : (
             <ol className="space-y-4">
               {event.games.map((game) => {

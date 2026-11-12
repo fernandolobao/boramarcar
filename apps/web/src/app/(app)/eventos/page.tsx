@@ -8,6 +8,7 @@ import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { StackSections } from '@/components/stack-sections';
+import { EmptyState } from '@/components/empty-state';
 
 export const generateMetadata = navMetadata('events');
 
@@ -27,7 +28,7 @@ export default async function EventsPage() {
 
   const list = (events: typeof upcoming) =>
     events.length === 0 ? (
-      <p className="muted">{t('empty')}</p>
+      <EmptyState>{t('empty')}</EmptyState>
     ) : (
       <ul className="divide-y divide-ink-200 dark:divide-ink-800">
         {events.map((event) => (

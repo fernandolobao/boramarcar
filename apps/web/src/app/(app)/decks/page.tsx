@@ -6,6 +6,7 @@ import { Icon } from '@/components/icons';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
+import { EmptyState } from '@/components/empty-state';
 
 export const generateMetadata = navMetadata('decks');
 
@@ -30,7 +31,7 @@ export default async function DecksPage() {
         </Link>
       </div>
       {decks.length === 0 ? (
-        <p className="muted">{t('empty')}</p>
+        <EmptyState>{t('empty')}</EmptyState>
       ) : (
         <DeckGrid decks={decks} covers={covers} ratings={ratings} />
       )}

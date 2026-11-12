@@ -49,9 +49,8 @@ export function ManaCurve({
               <span className="flex h-32 w-full items-end" aria-hidden="true">
                 <span
                   data-testid={`curve-bar-${bucket}`}
-                  className={`block w-full rounded-t-md transition-colors motion-reduce:transition-none ${
-                    pressed ? 'bg-brand-700 dark:bg-brand-400' : 'bg-brand-500'
-                  }`}
+                  data-pressed={pressed || undefined}
+                  className="deck-bar block w-full rounded-t-md"
                   style={{
                     height: `${(curve[bucket] / max) * 100}%`,
                     minHeight: curve[bucket] ? 4 : 0,
@@ -188,7 +187,7 @@ export function ScoreBreakdown({
                 aria-hidden="true"
               >
                 <span
-                  className="block h-2 rounded-full bg-brand-500"
+                  className="deck-bar block h-2 rounded-full"
                   style={{ width: `${(c.score / c.max) * 100}%` }}
                 />
               </span>

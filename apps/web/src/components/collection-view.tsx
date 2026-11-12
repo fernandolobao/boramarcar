@@ -29,6 +29,7 @@ import { Icon } from './icons';
 import { ManaSymbol, useColorName } from './mana';
 import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
+import { EmptyState } from './empty-state';
 
 export interface CollectionViewEntry {
   id: string;
@@ -144,7 +145,7 @@ export function CollectionView({
       <AddToCollection empty={entries.length === 0} />
 
       {entries.length === 0 ? (
-        <p className="muted">{t('empty')}</p>
+        <EmptyState>{t('empty')}</EmptyState>
       ) : (
         <>
           <Filters
