@@ -777,7 +777,15 @@
     "openEvent": "Abrir o encontro",
     "calendarHint": "O arquivo .ics anexo adiciona (ou atualiza) o encontro na sua agenda.",
     "footer": "Você recebe este e-mail porque participa de {group} no ArcanaKin. Para não receber mais avisos, desative-os nas configurações: {url}",
-    "feedbackSubject": "Feedback ({kind}): {name}"
+    "feedbackSubject": "Feedback ({kind}): {name}",
+    "beta": {
+      "subject": "{group} está no beta do ArcanaKin",
+      "intro": "{group} faz parte do beta do ArcanaKin: nas próximas {weeks} semanas (até {until}), vamos acompanhar de perto como o grupo usa o app para marcar encontros e registrar partidas.",
+      "use": "É só usar como sempre: marcar disponibilidade, confirmar presença e registrar as partidas.",
+      "feedback": "Achou algo estranho ou teve uma ideia? Mande pelo app (menu da conta → Enviar feedback).",
+      "cta": "Enviar feedback",
+      "note": "Acompanhamos só os números do grupo, como encontros e partidas registradas."
+    }
   },
   "formats": {
     "commander": "Commander",
@@ -1474,6 +1482,48 @@
     "noFeedback": "Nenhum feedback ainda.",
     "feedbackFrom": "{name} · {platform} · {date}",
     "metric": "Métrica",
-    "value": "Valor"
+    "value": "Valor",
+    "beta": {
+      "title": "Beta assistido",
+      "intro": "Escolha os grupos e decida quando começa. Até a data de início nada muda para eles; depois, quem é do grupo vê a faixa do beta no painel e recebe um e-mail de boas-vindas. O beta dura {weeks} semanas.",
+      "phase": {
+        "draft": "Ainda sem data de início.",
+        "scheduled": "Começa em {start} e vai até {end}.",
+        "running": "Em andamento: semana {week} de {weeks} (até {end}).",
+        "ended": "Encerrado em {end}."
+      },
+      "groups": "Grupos do beta",
+      "noGroups": "Nenhum grupo criado ainda.",
+      "members": "{count, plural, =1 {1 pessoa} other {# pessoas}}",
+      "selected": "{count, plural, =0 {Nenhum grupo escolhido} =1 {1 grupo escolhido} other {# grupos escolhidos}}",
+      "startDate": "Data de início",
+      "startHint": "Começa à 0h desta data no seu fuso. Deixe em branco para decidir depois.",
+      "save": "Salvar",
+      "startNow": "Começar agora",
+      "end": "Encerrar beta",
+      "endConfirm": "Confirmar: encerrar agora",
+      "saved": "Beta salvo.",
+      "started": "Beta começou. Os e-mails de boas-vindas estão sendo enviados.",
+      "ended": "Beta encerrado.",
+      "statsCaption": "Grupos do beta desde o início",
+      "cols": {
+        "group": "Grupo",
+        "members": "Pessoas",
+        "events": "Encontros",
+        "games": "Partidas",
+        "lastGame": "Última partida",
+        "welcome": "Boas-vindas"
+      },
+      "never": "Nenhuma ainda",
+      "welcomeSent": "Enviado",
+      "welcomePending": "Ainda não"
+    }
+  },
+  "beta": {
+    "title": "Seu grupo está no beta do ArcanaKin",
+    "body": "Semana {week} de {weeks}, até {until}. Conte o que funciona, o que trava e o que falta: cada mensagem é lida.",
+    "cta": "Enviar feedback",
+    "dismiss": "Dispensar",
+    "dismissLabel": "Dispensar o aviso do beta"
   }
 }

@@ -247,6 +247,25 @@ export const feedback = pgTable(
   (t) => [index('feedback_created_idx').on(t.createdAt)],
 );
 
+/* ---------- Beta assistido (8.5) ---------- */
+
+/** Configuração do beta: uma linha só (`id = 'beta'`), com a data única de início. */
+export const betaProgram = pgTable('beta_program', {
+  id: text('id').primaryKey().default('beta'),
+  startsAt: timestamp('starts_at', { withTimezone: true }),
+  endedAt: timestamp('ended_at', { withTimezone: true }),
+  updatedAt: updatedAt(),
+});
+
+/** Grupos do beta; `welcomed_at` marca o e-mail de boas-vindas já enviado. */
+export const betaGroups = pgTable('beta_groups', {
+  groupId: text('group_id')
+    .primaryKey()
+    .references(() => groups.id, { onDelete: 'cascade' }),
+  welcomedAt: timestamp('welcomed_at', { withTimezone: true }),
+  createdAt: createdAt(),
+});
+
 /* ---------- Eventos e partidas ---------- */
 
 export const events = pgTable(

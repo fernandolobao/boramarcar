@@ -14,3 +14,4 @@ export * from './places';
 export * from './table';
 export * from './collection';
 export * from './external';
+export * from './beta';
