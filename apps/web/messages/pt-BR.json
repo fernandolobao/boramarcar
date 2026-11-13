@@ -1416,7 +1416,27 @@
       "Planeswalker": "Planeswalker",
       "Land": "Terreno",
       "Battle": "Batalha"
-    }
+    },
+    "addPrint": "Edição",
+    "addPrintFirst": "Escolha a carta primeiro.",
+    "addPrintNone": "Nenhuma edição escolhida.",
+    "addPrintChoose": "Escolher edição",
+    "addPrintChange": "Trocar edição",
+    "addPrintUse": "Escolher esta edição",
+    "addedPrint": "{count, plural, =1 {1 cópia} other {# cópias}} de {name} ({print}) na coleção.",
+    "splitTitle": "Separar ou mudar cópias",
+    "splitHint": "As cópias escolhidas vão para outra pilha (outra edição e/ou acabamento); o resto fica nesta.",
+    "splitCopies": "Quantas (de {total})",
+    "splitFoil": "Foil",
+    "splitSamePrint": "Edição: {print} (a mesma)",
+    "splitDefaultPrint": "padrão",
+    "splitChoosePrint": "Outra edição",
+    "splitSave": "Mover {count, plural, =1 {1 cópia} other {# cópias}}",
+    "splitInvalid": "Informe quantas cópias",
+    "splitNothing": "Escolha outra edição ou mude o acabamento para separar.",
+    "splitDone": "{count, plural, =1 {1 cópia separada} other {# cópias separadas}}.",
+    "addPrintDefault": "edição padrão (troque depois em Separar ou mudar cópias)",
+    "addPrintSkip": "Seguir com a edição padrão"
   },
   "push": {
     "created": {
