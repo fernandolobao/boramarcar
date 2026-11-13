@@ -174,4 +174,90 @@ describe('CollectionView', () => {
       expect.objectContaining({ method: 'DELETE' }),
     );
   });
+
+  it('adicionar: escolhe a edição antes, e só então adiciona (com a impressão escolhida)', async () => {
+    const prints = [
+      {
+        scryfallId: 'mtn-ltr',
+        setCode: 'ltr',
+        setName: 'The Lord of the Rings',
+        collectorNumber: '268',
+        imageUri: null,
+        priceUsd: '0.10',
+      },
+      {
+        scryfallId: 'mtn-dmu',
+        setCode: 'dmu',
+        setName: 'Dominaria United',
+        collectorNumber: '269',
+        imageUri: null,
+        priceUsd: null,
+      },
+    ];
+    const fetchMock = vi.fn(async (url: string) => {
+      if (String(url).includes('/cards/prints')) return Response.json({ prints });
+      if (String(url).includes('/autocomplete')) return Response.json({ names: [] });
+      return Response.json({ added: true, name: 'Mountain' }, { status: 201 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const { container } = wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
+    const form = screen.getByRole('form', { name: 'Adicionar cartas' });
+    const add = within(form).getByRole('button', { name: 'Adicionar' });
+    fireEvent.change(within(form).getByRole('combobox', { name: 'Carta' }), {
+      target: { value: 'Mountain' },
+    });
+    // Sem edição escolhida, não adiciona.
+    expect(add).toBeDisabled();
+    await act(async () => {
+      fireEvent.click(within(form).getByRole('button', { name: /Escolher edição/ }));
+    });
+    const picker = document.querySelector('dialog[open]') as HTMLElement;
+    await act(async () => {
+      fireEvent.click(within(picker).getByRole('radio', { name: /Dominaria United/ }));
+    });
+    await act(async () => {
+      fireEvent.click(within(picker).getByRole('button', { name: 'Escolher esta edição' }));
+    });
+    // A escolha não envia nada; a edição aparece no formulário.
+    expect(fetchMock.mock.calls.filter(([u]) => String(u) === '/api/v1/collection')).toHaveLength(
+      0,
+    );
+    expect(within(form).getByText('Dominaria United')).toBeInTheDocument();
+    expect(within(form).getByRole('button', { name: /Trocar edição/ })).toBeInTheDocument();
+    fireEvent.change(within(form).getByLabelText('Cópias'), { target: { value: '2' } });
+    await act(async () => {
+      fireEvent.click(add);
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/collection',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ name: 'Mountain', scryfallId: 'mtn-dmu', quantity: 2, foil: false }),
+      }),
+    );
+    expect(await audit(container)).toEqual([]);
+  });
+
+  it('separar cópias: parte da pilha vai para outro acabamento (ou edição)', async () => {
+    const fetchMock = vi.fn(async () => Response.json({ removed: false }));
+    vi.stubGlobal('fetch', fetchMock);
+    wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
+    fireEvent.click(screen.getByRole('button', { name: /^Ver e editar Sol Ring/ }));
+    const dialog = document.querySelector('dialog')!;
+    const split = within(dialog).getByRole('form', { name: 'Separar ou mudar cópias' });
+    // Nada muda ainda: o botão espera outra edição ou outro acabamento.
+    expect(within(split).getByRole('button', { name: 'Mover 1 cópia' })).toBeDisabled();
+    fireEvent.change(within(split).getByLabelText('Quantas (de 3)'), { target: { value: '2' } });
+    fireEvent.click(within(split).getByLabelText(/Foil/));
+    await act(async () => {
+      fireEvent.click(within(split).getByRole('button', { name: 'Mover 2 cópias' }));
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/collection/e1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ foil: true, copies: 2 }),
+      }),
+    );
+  });
 });

@@ -605,14 +605,55 @@ function Filters({
   );
 }
 
+/** Edição escolhida para adicionar ou separar cópias: código, número, nome e imagem. */
+interface ChosenPrint {
+  scryfallId: string;
+  setCode: string;
+  setName: string;
+  collectorNumber: string;
+  imageUri: string | null;
+}
+
+function PrintSummary({ print }: { print: ChosenPrint }) {
+  return (
+    <span className="flex items-center gap-3">
+      {print.imageUri && (
+        <Image
+          src={print.imageUri}
+          alt=""
+          width={44}
+          height={61}
+          unoptimized
+          className="h-[61px] w-[44px] rounded-[4.5%/3.2%] object-cover"
+        />
+      )}
+      <span className="text-sm">
+        <span className="block font-medium">{print.setName}</span>
+        <span className="muted block">
+          {print.setCode.toUpperCase()} #{print.collectorNumber}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Adicionar cartas: nome, **edição** (escolhida antes de adicionar, como na mesa: cada edição é
+ * uma pilha), cópias e foil. Sem resposta do Scryfall para as edições, dá para adicionar sem
+ * escolher (fica a impressão padrão) e trocar depois.
+ */
 function AddToCollection({ empty }: { empty: boolean }) {
   const t = useTranslations('collection');
   const id = useId();
   const { run, error, pending } = useApiAction();
   const [name, setName] = useState('');
+  /** `default`: o Scryfall não listou as edições e a pessoa seguiu com a impressão padrão. */
+  const [print, setPrint] = useState<ChosenPrint | 'default' | null>(null);
   const [quantity, setQuantity] = useState('1');
   const [foil, setFoil] = useState(false);
   const [done, setDone] = useState<string | null>(null);
+  const trimmed = name.trim();
+  const chosen = print && print !== 'default' ? print : null;
   return (
     <details className="card" open={empty}>
       <summary className="cursor-pointer font-semibold">
@@ -620,30 +661,100 @@ function AddToCollection({ empty }: { empty: boolean }) {
         {t('addTitle')}
       </summary>
       <form
-        className="mt-4 space-y-3"
+        className="mt-4 space-y-4"
         aria-label={t('addTitle')}
         onSubmit={(e) => {
           e.preventDefault();
-          if (!name.trim()) return;
+          if (!trimmed || !print) return;
           setDone(null);
           void run(
             () =>
               api<{ name: string }>('/api/v1/collection', {
                 method: 'POST',
-                body: { name: name.trim(), quantity: Number(quantity) || 1, foil },
+                body: {
+                  name: trimmed,
+                  ...(chosen ? { scryfallId: chosen.scryfallId } : {}),
+                  quantity: Number(quantity) || 1,
+                  foil,
+                },
               }),
             (r) => {
-              setDone(t('added', { name: r.name }));
+              setDone(
+                t('addedPrint', {
+                  name: r.name,
+                  count: Number(quantity) || 1,
+                  print: chosen
+                    ? `${chosen.setCode.toUpperCase()} #${chosen.collectorNumber}`
+                    : t('addPrintDefault'),
+                }),
+              );
               setName('');
+              setPrint(null);
               setQuantity('1');
               setFoil(false);
             },
           );
         }}
       >
-        <div className="grid gap-3 sm:grid-cols-[1fr_6rem_auto_auto] sm:items-end">
-          <CardSearch id={`${id}-name`} label={t('addCard')} value={name} onChange={setName} />
-          <div>
+        <CardSearch
+          id={`${id}-name`}
+          label={t('addCard')}
+          value={name}
+          onChange={(value) => {
+            setName(value);
+            // Outra carta: a edição escolhida não vale mais.
+            if (value.trim().toLowerCase() !== trimmed.toLowerCase()) setPrint(null);
+          }}
+        />
+        <div>
+          <p className="label" id={`${id}-print-label`}>
+            {t('addPrint')}
+          </p>
+          <div
+            className="flex flex-wrap items-center gap-3"
+            role="group"
+            aria-labelledby={`${id}-print-label`}
+          >
+            {chosen ? (
+              <PrintSummary print={chosen} />
+            ) : (
+              <span className="muted text-sm">
+                {print === 'default'
+                  ? t('addPrintDefault')
+                  : trimmed
+                    ? t('addPrintNone')
+                    : t('addPrintFirst')}
+              </span>
+            )}
+            {trimmed && (
+              <PrintPicker
+                key={trimmed.toLowerCase()}
+                line={{
+                  name: trimmed,
+                  board: 'collection',
+                  quantity: 1,
+                  scryfallId: null,
+                  card: null,
+                }}
+                selected={chosen?.scryfallId ?? null}
+                openLabel={print ? t('addPrintChange') : t('addPrintChoose')}
+                saveLabel={t('addPrintUse')}
+                onSkip={{ label: t('addPrintSkip'), run: () => setPrint('default') }}
+                onSelect={(p) =>
+                  setPrint({
+                    scryfallId: p.scryfallId,
+                    setCode: p.setCode,
+                    setName: p.setName,
+                    collectorNumber: p.collectorNumber,
+                    imageUri: p.imageUri ?? null,
+                  })
+                }
+              />
+            )}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="w-24">
             <label className="label" htmlFor={`${id}-q`}>
               {t('addQuantity')}
             </label>
@@ -662,7 +773,7 @@ function AddToCollection({ empty }: { empty: boolean }) {
             <input type="checkbox" checked={foil} onChange={(e) => setFoil(e.target.checked)} />
             <span aria-hidden="true">✦</span> {t('addFoil')}
           </label>
-          <button type="submit" className="btn-primary" disabled={pending || !name.trim()}>
+          <button type="submit" className="btn-primary" disabled={pending || !trimmed || !print}>
             <Icon name="add" />
             {t('add')}
           </button>
@@ -676,6 +787,120 @@ function AddToCollection({ empty }: { empty: boolean }) {
   );
 }
 
+/**
+ * Separar ou mudar cópias de uma pilha: quantas, para qual edição e com qual acabamento. As que
+ * mudam formam outra pilha (ou somam numa que já existe); o resto fica onde está.
+ */
+function SplitCopies({ entry }: { entry: CollectionViewEntry }) {
+  const t = useTranslations('collection');
+  const id = useId();
+  const { run, error, pending } = useApiAction();
+  const [copies, setCopies] = useState(String(Math.min(1, entry.quantity)));
+  const [print, setPrint] = useState<ChosenPrint | null>(null);
+  const [foil, setFoil] = useState(entry.foil);
+  const [message, setMessage] = useState<string | null>(null);
+  const amount = Number(copies);
+  const validAmount = Number.isInteger(amount) && amount >= 1 && amount <= entry.quantity;
+  const target = print?.scryfallId ?? entry.scryfallId;
+  const changes = target !== entry.scryfallId || foil !== entry.foil;
+  const current = printLabel(entry.card);
+
+  return (
+    <form
+      className="space-y-3 rounded-xl border border-line p-3"
+      aria-labelledby={`${id}-title`}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!validAmount || !changes) return;
+        setMessage(null);
+        void run(
+          () =>
+            api(`/api/v1/collection/${entry.id}`, {
+              method: 'PATCH',
+              body: {
+                ...(print ? { scryfallId: print.scryfallId } : {}),
+                ...(foil !== entry.foil ? { foil } : {}),
+                copies: amount,
+              },
+            }),
+          () => setMessage(t('splitDone', { count: amount })),
+        );
+      }}
+    >
+      <div>
+        <h3 id={`${id}-title`} className="text-sm font-semibold">
+          {t('splitTitle')}
+        </h3>
+        <p className="muted text-xs">{t('splitHint')}</p>
+      </div>
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="w-28">
+          <label className="label" htmlFor={`${id}-n`}>
+            {t('splitCopies', { total: entry.quantity })}
+          </label>
+          <input
+            id={`${id}-n`}
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={entry.quantity}
+            className="input"
+            value={copies}
+            onChange={(e) => setCopies(e.target.value)}
+          />
+        </div>
+        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
+          <input type="checkbox" checked={foil} onChange={(e) => setFoil(e.target.checked)} />
+          <span aria-hidden="true">✦</span> {t('splitFoil')}
+        </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-sm">
+          {print ? (
+            <PrintSummary print={print} />
+          ) : (
+            t('splitSamePrint', { print: current ?? t('splitDefaultPrint') })
+          )}
+        </span>
+        <PrintPicker
+          line={{
+            name: entry.name,
+            board: 'collection',
+            quantity: entry.quantity,
+            scryfallId: entry.scryfallId,
+            card: entry.card,
+          }}
+          selected={print?.scryfallId ?? entry.scryfallId}
+          openLabel={t('splitChoosePrint')}
+          saveLabel={t('addPrintUse')}
+          onSelect={(p) =>
+            setPrint(
+              p.scryfallId === entry.scryfallId
+                ? null
+                : {
+                    scryfallId: p.scryfallId,
+                    setCode: p.setCode,
+                    setName: p.setName,
+                    collectorNumber: p.collectorNumber,
+                    imageUri: p.imageUri ?? null,
+                  },
+            )
+          }
+        />
+      </div>
+      <button type="submit" className="btn-primary" disabled={pending || !validAmount || !changes}>
+        <Icon name="save" />
+        {validAmount ? t('splitSave', { count: amount }) : t('splitInvalid')}
+      </button>
+      {!changes && <p className="muted text-xs">{t('splitNothing')}</p>}
+      <p role="status" className="text-sm text-success">
+        {message ?? ''}
+      </p>
+      <FormError message={error} />
+    </form>
+  );
+}
+
 function EntryDialog({
   entry,
   money,
@@ -686,7 +911,6 @@ function EntryDialog({
   onClose: () => void;
 }) {
   const t = useTranslations('collection');
-  const td = useTranslations('decks');
   const id = useId();
   const [back, setBack] = useState(false);
   const { run, error, pending } = useApiAction();
@@ -695,7 +919,7 @@ function EntryDialog({
   const [message, setMessage] = useState<string | null>(null);
   const price = unitPriceUsd(entry);
 
-  const patch = (body: { quantity?: number; foil?: boolean; scryfallId?: string }) =>
+  const patch = (body: { quantity: number }) =>
     run(
       () => api(`/api/v1/collection/${entry.id}`, { method: 'PATCH', body }),
       () => setMessage(t('saved', { name: entry.name })),
@@ -745,7 +969,6 @@ function EntryDialog({
         </div>
         <fieldset className="space-y-3 rounded-xl border border-line px-3 pt-1 pb-3">
           <legend className="px-1 text-sm font-semibold">{t('edit')}</legend>
-          {/* Linha 1: as cópias e o acabamento. Linha 2: as ações. */}
           <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
             <div className="w-24">
               <label className="label" htmlFor={`${id}-q`}>
@@ -770,36 +993,8 @@ function EntryDialog({
                 }}
               />
             </div>
-            <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
-              <input
-                type="checkbox"
-                checked={entry.foil}
-                disabled={pending}
-                onChange={(e) => void patch({ foil: e.target.checked })}
-              />
-              <span aria-hidden="true">✦</span> {td('foil')}
-            </label>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {entry.card && (
-              <PrintPicker
-                line={{
-                  name: entry.name,
-                  board: 'collection',
-                  quantity: entry.quantity,
-                  scryfallId: entry.scryfallId,
-                  card: entry.card,
-                }}
-                onPick={(toScryfallId, amount) =>
-                  // Uma chamada só: as cópias mudam de impressão na coleção e nos decks (senão a
-                  // sincronia com os decks traria a impressão antiga de volta).
-                  api(`/api/v1/collection/${entry.id}`, {
-                    method: 'PATCH',
-                    body: { scryfallId: toScryfallId, copies: amount },
-                  })
-                }
-              />
-            )}
             <button
               type="button"
               className={`${confirming ? 'btn-danger border border-danger' : 'btn-danger'} ms-auto`}
@@ -819,6 +1014,7 @@ function EntryDialog({
             </button>
           </div>
         </fieldset>
+        <SplitCopies key={entry.id} entry={entry} />
         <p role="status" className="text-sm text-success">
           {message ?? ''}
         </p>

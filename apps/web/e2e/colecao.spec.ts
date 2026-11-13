@@ -34,7 +34,16 @@ test.describe('coleção', () => {
       'href',
       `/decks/${E2E_IDS.deck}`,
     );
+    // Separar cópias (outra edição/acabamento) fica no próprio diálogo.
+    await expect(dialog.getByRole('form', { name: 'Separar ou mudar cópias' })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
+
+    // Adicionar: a edição é escolhida antes (o botão de adicionar espera por ela).
+    const add = page.getByRole('form', { name: 'Adicionar cartas' });
+    await page.getByText('Adicionar cartas', { exact: true }).click();
+    await add.getByRole('combobox', { name: 'Carta' }).fill('Mountain');
+    await expect(add.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
+    await expect(add.getByRole('button', { name: /Escolher edição/ })).toBeVisible();
   });
 });

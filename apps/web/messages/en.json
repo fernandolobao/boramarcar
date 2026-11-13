@@ -1420,7 +1420,27 @@
       "Planeswalker": "Planeswalker",
       "Land": "Land",
       "Battle": "Battle"
-    }
+    },
+    "addPrint": "Printing",
+    "addPrintFirst": "Choose the card first.",
+    "addPrintNone": "No printing chosen.",
+    "addPrintChoose": "Choose printing",
+    "addPrintChange": "Change printing",
+    "addPrintUse": "Choose this printing",
+    "addedPrint": "{count, plural, =1 {1 copy} other {# copies}} of {name} ({print}) added to the collection.",
+    "splitTitle": "Split or change copies",
+    "splitHint": "The chosen copies go to another stack (another printing and/or finish); the rest stay here.",
+    "splitCopies": "How many (of {total})",
+    "splitFoil": "Foil",
+    "splitSamePrint": "Printing: {print} (same)",
+    "splitDefaultPrint": "default",
+    "splitChoosePrint": "Another printing",
+    "splitSave": "Move {count, plural, =1 {1 copy} other {# copies}}",
+    "splitInvalid": "Enter how many copies",
+    "splitNothing": "Choose another printing or change the finish to split.",
+    "splitDone": "{count, plural, =1 {1 copy split off} other {# copies split off}}.",
+    "addPrintDefault": "default printing (change it later in Split or change copies)",
+    "addPrintSkip": "Continue with the default printing"
   },
   "push": {
     "created": {
