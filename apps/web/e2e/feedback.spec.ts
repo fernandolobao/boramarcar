@@ -26,5 +26,10 @@ test.describe('feedback', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Métricas do beta' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Métrica norte' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Feedback recente' })).toBeVisible();
+    // Lista de contas, com busca por nome ou e-mail.
+    const accounts = page.getByRole('region', { name: 'Contas' });
+    await accounts.getByLabel('Buscar por nome ou e-mail').fill('bia@e2e');
+    await expect(accounts.getByText('bia@e2e.test')).toBeVisible();
+    await expect(accounts.getByText('ana@e2e.test')).toHaveCount(0);
   });
 });
