@@ -173,7 +173,6 @@ export function createApiClient(options: ApiClientOptions) {
             }),
           )
         ).beta,
-      /** Entra num grupo pelo código do convite. */
       /** Membros do grupo (para filtros por jogador e escolha de participantes). */
       members: async (groupId: string) =>
         (
@@ -183,6 +182,39 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ members: z.array(memberSchema) }),
           )
         ).members,
+      /** Gera um novo código de convite (dono/admin); o link antigo deixa de funcionar. */
+      regenerateInvite: async (groupId: string) =>
+        (
+          await request(
+            'POST',
+            `/groups/${encodeURIComponent(groupId)}/invite`,
+            z.object({ inviteCode: z.string() }),
+          )
+        ).inviteCode,
+      /** Promove a admin ou rebaixa a membro. */
+      setRole: (groupId: string, userId: string, role: 'admin' | 'member') =>
+        request(
+          'PATCH',
+          `/groups/${encodeURIComponent(groupId)}/members/${encodeURIComponent(userId)}`,
+          z.object({ role: z.enum(['admin', 'member']) }),
+          { role },
+        ),
+      /** Remove um membro — ou sai do grupo, quando é o próprio usuário. */
+      removeMember: (groupId: string, userId: string) =>
+        request(
+          'DELETE',
+          `/groups/${encodeURIComponent(groupId)}/members/${encodeURIComponent(userId)}`,
+          z.object({ groupDeleted: z.boolean() }),
+        ),
+      /** Passa a posse do grupo (o dono atual vira admin). */
+      transfer: (groupId: string, userId: string) =>
+        request(
+          'POST',
+          `/groups/${encodeURIComponent(groupId)}/transfer`,
+          z.object({ ownerId: z.string() }),
+          { userId },
+        ),
+      /** Entra num grupo pelo código do convite. */
       join: async (inviteCode: string) =>
         (
           await request('POST', '/groups/join', z.object({ group: createdGroupSchema }), {
@@ -356,6 +388,21 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ locations: z.array(locationSchema) }),
           )
         ).locations,
+      create: async (groupId: string, input: { name: string; address?: string | null }) =>
+        (
+          await request(
+            'POST',
+            `/groups/${encodeURIComponent(groupId)}/locations`,
+            z.object({ location: locationSchema }),
+            input,
+          )
+        ).location,
+      remove: (groupId: string, locationId: string) =>
+        request(
+          'DELETE',
+          `/groups/${encodeURIComponent(groupId)}/locations/${encodeURIComponent(locationId)}`,
+          z.object({ deleted: z.boolean() }),
+        ),
     },
     games: {
       /** Registra uma partida no encontro. */
