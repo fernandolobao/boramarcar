@@ -26,6 +26,9 @@ export function printLabel(card: PrintLine['card']) {
   return `${card.setCode.toUpperCase()}${card.collectorNumber ? ` #${card.collectorNumber}` : ''}`;
 }
 
+/** Versão do formato das impressões (ver o pedido abaixo). */
+const PRINTS_VERSION = 2;
+
 /** Impressões desenhadas de cada vez (terrenos básicos têm mais de mil). */
 const PRINTS_PAGE = 60;
 
@@ -120,7 +123,11 @@ export function PrintPicker({
     setFilter('');
     if (prints) return;
     setLoadError(null);
-    api<{ prints: CardPrint[] }>(`/api/v1/cards/prints?name=${encodeURIComponent(line.name)}`)
+    // `v` muda quando o formato da resposta muda (v2: ilustrador): o navegador (1 h) e o CDN (1 dia,
+    // mais 7 de stale-while-revalidate) guardam a resposta por URL, e sem isso serviriam a lista antiga.
+    api<{ prints: CardPrint[] }>(
+      `/api/v1/cards/prints?name=${encodeURIComponent(line.name)}&v=${PRINTS_VERSION}`,
+    )
       .then((r) => setPrints(r.prints))
       .catch((e: unknown) =>
         setLoadError(
