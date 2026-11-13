@@ -6,12 +6,14 @@ import {
   deckSummarySchema,
   errorBodySchema,
   eventDetailSchema,
+  eventHistorySchema,
   eventStatusSchema,
   eventSummarySchema,
   gameWindowSchema,
   createdGroupSchema,
   groupSchema,
   locationSchema,
+  memberSchema,
   rankingSchema,
   rsvpSchema,
   tableSetupSchema,
@@ -171,6 +173,15 @@ export function createApiClient(options: ApiClientOptions) {
           )
         ).beta,
       /** Entra num grupo pelo código do convite. */
+      /** Membros do grupo (para filtros por jogador e escolha de participantes). */
+      members: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/members`,
+            z.object({ members: z.array(memberSchema) }),
+          )
+        ).members,
       join: async (inviteCode: string) =>
         (
           await request('POST', '/groups/join', z.object({ group: createdGroupSchema }), {
@@ -187,6 +198,28 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ events: z.array(eventSummarySchema) }),
           )
         ).events,
+      /** Histórico de encontros passados: busca, situação, jogador e página (20 por vez). */
+      history: async (
+        groupId: string,
+        filters: {
+          q?: string;
+          status?: 'scheduled' | 'finished' | 'cancelled';
+          playerId?: string;
+          page?: number;
+        } = {},
+      ) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/events/history${q({
+              q: filters.q || undefined,
+              status: filters.status,
+              playerId: filters.playerId,
+              page: filters.page && filters.page > 1 ? String(filters.page) : undefined,
+            })}`,
+            z.object({ history: eventHistorySchema }),
+          )
+        ).history,
       get: async (eventId: string) =>
         (
           await request(

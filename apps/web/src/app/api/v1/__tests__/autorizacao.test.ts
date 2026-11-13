@@ -51,6 +51,7 @@ const r = {
   availability: await import('../groups/[groupId]/availability/route'),
   windows: await import('../groups/[groupId]/availability/windows/route'),
   events: await import('../groups/[groupId]/events/route'),
+  history: await import('../groups/[groupId]/events/history/route'),
   invite: await import('../groups/[groupId]/invite/route'),
   location: await import('../groups/[groupId]/locations/[locationId]/route'),
   locations: await import('../groups/[groupId]/locations/route'),
@@ -292,6 +293,7 @@ const outsiderCases: Case[] = [
   ['GET grupo: configurações', r.settings.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: locais', r.locations.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: encontros', r.events.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
+  ['GET grupo: histórico', r.history.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   [
     'GET grupo: disponibilidade',
     r.availability.GET as Handler,

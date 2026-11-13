@@ -36,6 +36,39 @@ export const eventSummarySchema = z
   .loose();
 export type EventSummary = z.infer<typeof eventSummarySchema>;
 
+/** Encontro passado no histórico: quantas partidas e presenças e quem venceu. */
+export const eventHistoryItemSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    startsAt: date,
+    status: eventStatusSchema,
+    locationName: z.string().nullable(),
+    games: z.number(),
+    attendees: z.number(),
+    winners: z.array(z.string()),
+  })
+  .loose();
+export const eventHistorySchema = z.object({
+  page: z.number(),
+  pageSize: z.number(),
+  total: z.number(),
+  pages: z.number(),
+  items: z.array(eventHistoryItemSchema),
+});
+export type EventHistory = z.infer<typeof eventHistorySchema>;
+export type EventHistoryItem = z.infer<typeof eventHistoryItemSchema>;
+
+export const memberSchema = z
+  .object({
+    userId: z.string(),
+    name: z.string(),
+    image: z.string().nullish(),
+    role: z.enum(['owner', 'admin', 'member']),
+  })
+  .loose();
+export type Member = z.infer<typeof memberSchema>;
+
 const personSchema = z.object({
   userId: z.string(),
   name: z.string(),
