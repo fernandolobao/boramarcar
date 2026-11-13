@@ -309,9 +309,12 @@ describe('editor de deck', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Escolher edição ?\(Forest\)$/ }));
     const alpha = await screen.findByRole('radio', { name: /Limited Edition Alpha/ });
     expect(screen.getByText('2 edições')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Edição, código, número ou ilustrador (ex.: pca 137, Tedin)'), {
-      target: { value: 'alpha' },
-    });
+    fireEvent.change(
+      screen.getByLabelText('Edição, código, número ou ilustrador (ex.: pca 137, Tedin)'),
+      {
+        target: { value: 'alpha' },
+      },
+    );
     expect(screen.getByText('1 edição')).toBeInTheDocument();
     fireEvent.click(alpha);
     expect(
