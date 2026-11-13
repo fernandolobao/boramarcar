@@ -28,6 +28,10 @@ export const SECTIONS = [
   'feedback',
   'table',
   'recap',
+  'signIn',
+  'signUp',
+  'forgotPassword',
+  'resetPassword',
   'admin',
 ] as const;
 export type Section = (typeof SECTIONS)[number];

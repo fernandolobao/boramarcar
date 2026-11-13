@@ -6,10 +6,13 @@ test.describe('smoke', () => {
     await expect(page).toHaveTitle(/ArcanaKin/);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByRole('button', { name: /Google/ }).first()).toBeVisible();
-    // Menu superior leva ao painel (entrando com o Google).
+    // Menu superior leva à tela de entrada (Google ou e-mail e senha); o topo oferece criar conta.
     await expect(
-      page.getByRole('banner').getByRole('button', { name: 'Entrar no painel' }),
-    ).toBeVisible();
+      page.getByRole('banner').getByRole('link', { name: 'Entrar no painel' }),
+    ).toHaveAttribute('href', '/entrar');
+    await expect(
+      page.getByRole('link', { name: 'Criar conta com e-mail' }).first(),
+    ).toHaveAttribute('href', '/cadastro');
     for (const section of [
       'Funcionalidades',
       'De onde vêm as informações',
@@ -28,7 +31,9 @@ test.describe('smoke', () => {
     await expect(page.getByRole('img', { name: /Exemplo do ArcanaKin/ })).toBeVisible();
   });
 
-  test('áreas logadas redirecionam visitantes para a página inicial', async ({ page }) => {
+  test('áreas logadas levam visitantes para a tela de entrada (e voltam depois)', async ({
+    page,
+  }) => {
     for (const path of [
       '/painel',
       '/disponibilidade',
@@ -38,7 +43,7 @@ test.describe('smoke', () => {
       '/configuracoes',
     ]) {
       await page.goto(path);
-      await expect(page).toHaveURL(/\/$/);
+      await expect(page).toHaveURL(new RegExp(`/entrar\\?para=${encodeURIComponent(path)}$`));
     }
   });
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { EmailSignIn } from '@/components/email-sign-in';
 import { Logo } from '@/components/logo';
 import { AppText, Button, styles } from '@/components/ui';
 import { authClient } from '@/lib/auth';
@@ -69,47 +70,74 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={[styles.center, { backgroundColor: colors.background }]}>
-      <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
-        {/* Logotipo como título da tela (nome lido pelo leitor de tela). */}
-        <View accessible accessibilityRole="header" accessibilityLabel={t('appName')}>
-          <Logo height={44} color={colors.text} decorative />
-        </View>
-        <AppText muted style={{ textAlign: 'center' }}>
-          {t('signInTitle')}
-        </AppText>
-      </View>
-      <Button
-        label={pending ? t('signingIn') : t('signInGoogle')}
-        disabled={pending}
-        style={{ alignSelf: 'stretch', maxWidth: 360 }}
-        onPress={() => void signIn()}
-      />
-      {error && (
-        <AppText
-          accessibilityRole="alert"
-          style={{ color: colors.danger, textAlign: 'center', maxWidth: 360 }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={[styles.center, { flexGrow: 1 }]}
+          keyboardShouldPersistTaps="handled"
         >
-          {error === 'offline'
-            ? t('serverUnreachable', { url: API_URL })
-            : error === 'expoGo'
-              ? t('signInExpoGo')
-              : t('signInError')}
-          {detail ? `\n(${detail})` : ''}
-        </AppText>
-      )}
-      {status === 'offline' && !error && (
-        <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
-          <AppText accessibilityRole="alert" style={{ color: colors.danger, textAlign: 'center' }}>
-            {t('serverUnreachable', { url: API_URL })}
+          <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
+            {/* Logotipo como título da tela (nome lido pelo leitor de tela). */}
+            <View accessible accessibilityRole="header" accessibilityLabel={t('appName')}>
+              <Logo height={44} color={colors.text} decorative />
+            </View>
+            <AppText muted style={{ textAlign: 'center' }}>
+              {t('signInTitle')}
+            </AppText>
+          </View>
+          <Button
+            label={pending ? t('signingIn') : t('signInGoogle')}
+            disabled={pending}
+            style={{ alignSelf: 'stretch', maxWidth: 360 }}
+            onPress={() => void signIn()}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              maxWidth: 360,
+              width: '100%',
+            }}
+          >
+            <View style={{ flex: 1, height: 1, backgroundColor: colors.line }} />
+            <AppText muted>{t('authOr')}</AppText>
+            <View style={{ flex: 1, height: 1, backgroundColor: colors.line }} />
+          </View>
+          <EmailSignIn />
+          {error && (
+            <AppText
+              accessibilityRole="alert"
+              style={{ color: colors.danger, textAlign: 'center', maxWidth: 360 }}
+            >
+              {error === 'offline'
+                ? t('serverUnreachable', { url: API_URL })
+                : error === 'expoGo'
+                  ? t('signInExpoGo')
+                  : t('signInError')}
+              {detail ? `\n(${detail})` : ''}
+            </AppText>
+          )}
+          {status === 'offline' && !error && (
+            <View style={{ gap: 8, alignItems: 'center', maxWidth: 360 }}>
+              <AppText
+                accessibilityRole="alert"
+                style={{ color: colors.danger, textAlign: 'center' }}
+              >
+                {t('serverUnreachable', { url: API_URL })}
+              </AppText>
+              <Button label={t('retry')} variant="secondary" onPress={() => void check()} />
+            </View>
+          )}
+          <AppText muted style={{ fontSize: 13, textAlign: 'center' }}>
+            {t('serverLabel', { url: API_URL })}
+            {status === 'checking' ? ` · ${t('serverChecking')}` : ''}
           </AppText>
-          <Button label={t('retry')} variant="secondary" onPress={() => void check()} />
-        </View>
-      )}
-      <AppText muted style={{ fontSize: 13, textAlign: 'center' }}>
-        {t('serverLabel', { url: API_URL })}
-        {status === 'checking' ? ` · ${t('serverChecking')}` : ''}
-      </AppText>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

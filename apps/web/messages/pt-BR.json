@@ -719,7 +719,7 @@
     "heading": "Você foi convidado para o grupo {group}",
     "members": "{count, plural, =1 {1 membro} other {# membros}}",
     "join": "Entrar no grupo",
-    "signInToJoin": "Entre com sua conta Google para participar.",
+    "signInToJoin": "Entre (com o Google ou com e-mail e senha) para participar.",
     "alreadyMember": "Você já participa deste grupo.",
     "goToDashboard": "Ir para o painel",
     "invalid": "Este convite não existe ou foi trocado. Peça um link novo para quem te convidou.",
@@ -728,11 +728,12 @@
     "nextEvent": "Próximo encontro: {title} — {when}",
     "noEvent": "Ainda não há encontro marcado: a mesa fecha quando bastante gente marca o mesmo horário.",
     "howTitle": "Como funciona",
-    "how1": "Entre com a sua conta Google.",
+    "how1": "Entre com o Google ou crie uma conta com e-mail e senha.",
     "how2": "Diga quando você costuma poder jogar.",
     "how3": "Quando a mesa fecha, o grupo marca o encontro e você recebe o aviso.",
     "appHint": "Já tem o app do ArcanaKin? Use o código {code} ou",
-    "openInApp": "abra o convite no app"
+    "openInApp": "abra o convite no app",
+    "signInEmail": "Entrar com e-mail"
   },
   "profile": {
     "title": "Perfil",
@@ -795,6 +796,21 @@
       "gameDraw": "Partida {number}: empate",
       "top": "Destaque: {name}, com {wins, plural, =1 {1 vitória} other {# vitórias}}.",
       "cta": "Ver e compartilhar o resumo"
+    },
+    "account": {
+      "verify": {
+        "subject": "Confirme o seu e-mail no ArcanaKin",
+        "intro": "Falta só confirmar o seu e-mail para começar a usar o ArcanaKin.",
+        "cta": "Confirmar e-mail",
+        "note": "O link vale por 24 horas. Se você não criou uma conta, ignore este e-mail."
+      },
+      "reset": {
+        "subject": "Redefinir a sua senha do ArcanaKin",
+        "intro": "Recebemos um pedido para redefinir a senha da sua conta.",
+        "cta": "Criar uma senha nova",
+        "note": "O link vale por 1 hora. Se não foi você, ignore este e-mail: a senha continua a mesma."
+      },
+      "footer": "Você recebe este e-mail porque ele foi usado numa conta do ArcanaKin."
     }
   },
   "formats": {
@@ -1179,7 +1195,8 @@
       "windowBody": "4 jogadores podem no sábado, 15:00–19:00",
       "recap": "Placar da noite",
       "wins": "{wins, plural, =1 {1 vitória} other {# vitórias}}"
-    }
+    },
+    "signUpEmail": "Criar conta com e-mail"
   },
   "places": {
     "name": "Nome do local",
@@ -1641,7 +1658,23 @@
       "title": "Resumo do encontro",
       "description": "Quem jogou, quem venceu e com quais comandantes."
     },
-    "deckEyebrow": "Deck de {format}"
+    "deckEyebrow": "Deck de {format}",
+    "signIn": {
+      "title": "Entrar",
+      "description": "Entre no ArcanaKin com o Google ou com e-mail e senha."
+    },
+    "signUp": {
+      "title": "Criar conta",
+      "description": "Crie a sua conta no ArcanaKin para organizar os encontros do seu grupo de Magic."
+    },
+    "forgotPassword": {
+      "title": "Esqueci a senha",
+      "description": "Receba um link para criar uma senha nova."
+    },
+    "resetPassword": {
+      "title": "Nova senha",
+      "description": "Crie uma senha nova para a sua conta do ArcanaKin."
+    }
   },
   "beta": {
     "title": "Seu grupo está no beta do ArcanaKin",
@@ -1668,5 +1701,47 @@
     "ctaButton": "Conhecer o ArcanaKin",
     "link": "Resumo para compartilhar",
     "linkHint": "Primeiros nomes, comandantes e placar — sem local nem contatos."
+  },
+  "auth": {
+    "or": "ou",
+    "email": "E-mail",
+    "password": "Senha",
+    "name": "Seu nome",
+    "newPassword": "Nova senha",
+    "passwordHint": "Pelo menos 8 caracteres.",
+    "signInTitle": "Entrar",
+    "signInIntro": "Use a sua conta Google ou o e-mail e a senha que você cadastrou.",
+    "signInEmail": "Entrar com e-mail",
+    "signingIn": "Entrando…",
+    "forgot": "Esqueci a senha",
+    "noAccount": "Ainda não tem conta?",
+    "createAccount": "Criar conta",
+    "hasAccount": "Já tem conta?",
+    "signInLink": "Entrar",
+    "signUpTitle": "Criar conta",
+    "signUpIntro": "Com o Google, entra na hora. Com e-mail e senha, mandamos um link para confirmar o e-mail.",
+    "signUpGoogle": "Criar conta com Google",
+    "creating": "Criando…",
+    "checkInbox": "Quase lá! Enviamos um link para {email}. Abra o e-mail e confirme para entrar (veja também o spam).",
+    "forgotTitle": "Esqueci a senha",
+    "forgotIntro": "Informe o e-mail da conta e mandamos um link para criar uma senha nova.",
+    "sendReset": "Enviar o link",
+    "sending": "Enviando…",
+    "resetSent": "Se existir uma conta com esse e-mail, o link chega em instantes. Ele vale por 1 hora.",
+    "resetTitle": "Criar uma senha nova",
+    "saveNewPassword": "Salvar a nova senha",
+    "saving": "Salvando…",
+    "resetDone": "Senha alterada. Entre com a nova senha.",
+    "errors": {
+      "invalid": "E-mail ou senha incorretos.",
+      "notVerified": "Confirme o seu e-mail antes de entrar: acabamos de mandar o link de novo.",
+      "exists": "Já existe uma conta com esse e-mail. Entre ou use \"Esqueci a senha\".",
+      "short": "A senha precisa ter pelo menos 8 caracteres.",
+      "long": "A senha pode ter no máximo 128 caracteres.",
+      "email": "Confira o e-mail digitado.",
+      "token": "Este link venceu ou já foi usado. Peça um novo em \"Esqueci a senha\".",
+      "rateLimited": "Muitas tentativas. Espere um pouco e tente de novo.",
+      "generic": "Não foi possível concluir. Tente de novo."
+    }
   }
 }

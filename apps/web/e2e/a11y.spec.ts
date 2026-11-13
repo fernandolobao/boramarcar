@@ -23,6 +23,10 @@ const PUBLIC_PAGES = [
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,
+  '/entrar',
+  '/cadastro',
+  '/esqueci-senha',
+  '/redefinir-senha?token=x',
 ];
 const AUTH_PAGES = [
   '/',

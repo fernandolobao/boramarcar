@@ -265,3 +265,24 @@ export function buildRecapEmail(
 
 /** Página pública do resumo (só primeiros nomes, comandantes e placar). */
 export const recapUrl = (eventId: string) => `${getBaseUrl()}/resumo/${eventId}`;
+
+/** E-mails da conta com e-mail e senha: confirmar o e-mail e redefinir a senha. */
+export function buildAccountEmail(
+  recipient: { name: string; email: string; locale: string | null },
+  data: { kind: 'verify' | 'reset'; url: string },
+): EmailMessage {
+  const { locale, t } = tools({ ...recipient, timeZone: 'UTC' });
+  return {
+    to: recipient.email,
+    ...render({
+      locale,
+      subject: t(`account.${data.kind}.subject`),
+      greeting: t('greeting', { name: firstName(recipient.name) }),
+      intro: t(`account.${data.kind}.intro`),
+      lines: [],
+      cta: { label: t(`account.${data.kind}.cta`), url: data.url },
+      note: t(`account.${data.kind}.note`),
+      footer: t('account.footer'),
+    }),
+  };
+}

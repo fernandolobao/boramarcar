@@ -34,7 +34,7 @@ const isProtected = (path: string) =>
  * - Política de segurança de conteúdo com um _nonce_ novo (`lib/csp.ts`). O Next lê o nonce do
  *   cabeçalho da requisição e o põe nos scripts dele; o layout usa `x-nonce` no script do tema.
  * - Verificação otimista de login: sem cookie de sessão, as páginas da área logada redirecionam
- *   para a página inicial (robôs de prévia de link veem a prévia pública, `/previa/...`). A
+ *   para a tela de entrada (robôs de prévia de link veem a prévia pública, `/previa/...`). A
  *   validação real da sessão acontece nas páginas e na API.
  */
 export function proxy(request: NextRequest) {
@@ -42,7 +42,10 @@ export function proxy(request: NextRequest) {
   const anonymous = isProtected(pathname) && !getSessionCookie(request);
   const bot = anonymous && PREVIEW_BOT.test(request.headers.get('user-agent') ?? '');
   if (anonymous && !bot) {
-    return NextResponse.redirect(new URL('/', request.url));
+    // Para a tela de entrada, voltando para a página pedida depois do login.
+    const signIn = new URL('/entrar', request.url);
+    signIn.searchParams.set('para', `${pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(signIn);
   }
   const nonce = makeNonce();
   const csp = buildCsp({ nonce, dev: process.env.NODE_ENV === 'development' });

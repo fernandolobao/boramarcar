@@ -42,9 +42,9 @@ test.describe('metadados', () => {
     await context.close();
   });
 
-  test('quem não é robô e não entrou continua indo para a home', async ({ page }) => {
+  test('quem não é robô e não entrou vai para a tela de entrada', async ({ page }) => {
     await page.goto('/eventos');
-    expect(new URL(page.url()).pathname).toBe('/');
+    expect(new URL(page.url()).pathname).toBe('/entrar');
   });
 
   test('imagens de compartilhamento são PNG 1200×630', async ({ request }) => {

@@ -719,7 +719,7 @@
     "heading": "You've been invited to the group {group}",
     "members": "{count, plural, =1 {1 member} other {# members}}",
     "join": "Join group",
-    "signInToJoin": "Sign in with your Google account to join.",
+    "signInToJoin": "Sign in (with Google or e-mail and password) to join.",
     "alreadyMember": "You're already in this group.",
     "goToDashboard": "Go to dashboard",
     "invalid": "This invite doesn't exist or was replaced. Ask whoever invited you for a new link.",
@@ -728,11 +728,12 @@
     "nextEvent": "Next game night: {title} — {when}",
     "noEvent": "No game night scheduled yet: the table comes together when enough people mark the same time.",
     "howTitle": "How it works",
-    "how1": "Sign in with your Google account.",
+    "how1": "Sign in with Google or create an account with e-mail and password.",
     "how2": "Say when you can usually play.",
     "how3": "When the table is full, the group schedules the game night and you get notified.",
     "appHint": "Already have the ArcanaKin app? Use the code {code} or",
-    "openInApp": "open the invite in the app"
+    "openInApp": "open the invite in the app",
+    "signInEmail": "Sign in with e-mail"
   },
   "profile": {
     "title": "Profile",
@@ -795,6 +796,21 @@
       "gameDraw": "Game {number}: draw",
       "top": "Standout: {name}, with {wins, plural, =1 {1 win} other {# wins}}.",
       "cta": "See and share the recap"
+    },
+    "account": {
+      "verify": {
+        "subject": "Confirm your e-mail on ArcanaKin",
+        "intro": "Just confirm your e-mail to start using ArcanaKin.",
+        "cta": "Confirm e-mail",
+        "note": "The link is valid for 24 hours. If you didn't create an account, ignore this e-mail."
+      },
+      "reset": {
+        "subject": "Reset your ArcanaKin password",
+        "intro": "We received a request to reset your account password.",
+        "cta": "Create a new password",
+        "note": "The link is valid for 1 hour. If it wasn't you, ignore this e-mail: your password stays the same."
+      },
+      "footer": "You're receiving this e-mail because it was used for an ArcanaKin account."
     }
   },
   "formats": {
@@ -1179,7 +1195,8 @@
       "windowBody": "4 players are free on Saturday, 3–7 PM",
       "recap": "Tonight's standings",
       "wins": "{wins, plural, =1 {1 win} other {# wins}}"
-    }
+    },
+    "signUpEmail": "Create account with e-mail"
   },
   "places": {
     "name": "Location name",
@@ -1641,7 +1658,23 @@
       "title": "Meetup recap",
       "description": "Who played, who won and with which commanders."
     },
-    "deckEyebrow": "{format} deck"
+    "deckEyebrow": "{format} deck",
+    "signIn": {
+      "title": "Sign in",
+      "description": "Sign in to ArcanaKin with Google or with e-mail and password."
+    },
+    "signUp": {
+      "title": "Create account",
+      "description": "Create your ArcanaKin account to organize your Magic group's meetups."
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Get a link to create a new password."
+    },
+    "resetPassword": {
+      "title": "New password",
+      "description": "Create a new password for your ArcanaKin account."
+    }
   },
   "beta": {
     "title": "Your group is in the ArcanaKin beta",
@@ -1668,5 +1701,47 @@
     "ctaButton": "Discover ArcanaKin",
     "link": "Recap to share",
     "linkHint": "First names, commanders and score — no place or contacts."
+  },
+  "auth": {
+    "or": "or",
+    "email": "E-mail",
+    "password": "Password",
+    "name": "Your name",
+    "newPassword": "New password",
+    "passwordHint": "At least 8 characters.",
+    "signInTitle": "Sign in",
+    "signInIntro": "Use your Google account or the e-mail and password you registered.",
+    "signInEmail": "Sign in with e-mail",
+    "signingIn": "Signing in…",
+    "forgot": "Forgot password",
+    "noAccount": "No account yet?",
+    "createAccount": "Create account",
+    "hasAccount": "Already have an account?",
+    "signInLink": "Sign in",
+    "signUpTitle": "Create account",
+    "signUpIntro": "With Google you're in right away. With e-mail and password, we send a link to confirm your e-mail.",
+    "signUpGoogle": "Create account with Google",
+    "creating": "Creating…",
+    "checkInbox": "Almost there! We sent a link to {email}. Open the e-mail and confirm to sign in (check spam too).",
+    "forgotTitle": "Forgot password",
+    "forgotIntro": "Enter your account e-mail and we'll send a link to create a new password.",
+    "sendReset": "Send the link",
+    "sending": "Sending…",
+    "resetSent": "If an account exists for that e-mail, the link arrives shortly. It's valid for 1 hour.",
+    "resetTitle": "Create a new password",
+    "saveNewPassword": "Save new password",
+    "saving": "Saving…",
+    "resetDone": "Password changed. Sign in with the new password.",
+    "errors": {
+      "invalid": "Wrong e-mail or password.",
+      "notVerified": "Confirm your e-mail before signing in: we just sent the link again.",
+      "exists": "An account with that e-mail already exists. Sign in or use \"Forgot password\".",
+      "short": "The password needs at least 8 characters.",
+      "long": "The password can have at most 128 characters.",
+      "email": "Check the e-mail you typed.",
+      "token": "This link expired or was already used. Request a new one in \"Forgot password\".",
+      "rateLimited": "Too many attempts. Wait a little and try again.",
+      "generic": "Couldn't finish. Try again."
+    }
   }
 }
