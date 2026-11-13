@@ -9,6 +9,7 @@ import { getTranslations } from 'next-intl/server';
 export const SECTIONS = [
   'home',
   'privacy',
+  'help',
   'invite',
   'dashboard',
   'availability',

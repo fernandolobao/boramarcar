@@ -12,6 +12,7 @@ export * from './achievements';
 export * from './currency';
 export * from './places';
 export * from './table';
+export * from './help';
 export * from './collection';
 export * from './external';
 export * from './beta';

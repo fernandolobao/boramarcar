@@ -21,7 +21,8 @@
     "./places": "./src/places/index.ts",
     "./table": "./src/table/index.ts",
     "./push": "./src/push/index.ts",
-    "./beta": "./src/beta/index.ts"
+    "./beta": "./src/beta/index.ts",
+    "./help": "./src/help/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p contract",

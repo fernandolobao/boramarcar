@@ -35,7 +35,10 @@ export async function AuthShell({
         <span className="w-2 shrink-0 bg-primary" aria-hidden="true" />
         <div className="flex-1 space-y-5 p-5 sm:p-6">{children}</div>
       </div>
-      <p className="muted text-sm">
+      <p className="muted flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <Link href="/ajuda" className="underline underline-offset-2">
+          {tl('help')}
+        </Link>
         <Link href="/privacidade" className="underline underline-offset-2">
           {tl('privacy')}
         </Link>

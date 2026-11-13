@@ -20,6 +20,7 @@ async function expectNoViolations(page: Page) {
 const PUBLIC_PAGES = [
   '/',
   '/privacidade',
+  '/ajuda',
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,

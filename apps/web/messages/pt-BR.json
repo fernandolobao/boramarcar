@@ -1345,7 +1345,9 @@
     "accountDeleted": "Sua conta foi excluída. Obrigado por ter jogado com a gente."
   },
   "legal": {
-    "privacy": "Política de Privacidade"
+    "privacy": "Política de Privacidade",
+    "help": "Ajuda",
+    "feedback": "Feedback"
   },
   "collection": {
     "title": "Coleção",
@@ -1711,6 +1713,10 @@
     "resetPassword": {
       "title": "Nova senha",
       "description": "Crie uma senha nova para a sua conta do ArcanaKin."
+    },
+    "help": {
+      "title": "Ajuda",
+      "description": "Como usar o ArcanaKin passo a passo: grupo, disponibilidade, encontros, partidas, modo mesa, decks e ranking."
     }
   },
   "beta": {

@@ -64,6 +64,7 @@ export default function AccountScreen() {
         onPress={() => router.push('/configuracoes')}
       />
       <PushSetting />
+      <Button label={t('helpTitle')} variant="secondary" onPress={() => router.push('/ajuda')} />
       <Button
         label={t('feedbackTitle')}
         variant="secondary"

@@ -6,6 +6,7 @@ const base = () => process.env.BETTER_AUTH_URL ?? 'https://www.arcanakin.com.br'
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${base()}/`, changeFrequency: 'weekly', priority: 1 },
+    { url: `${base()}/ajuda`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base()}/privacidade`, changeFrequency: 'yearly', priority: 0.3 },
   ];
 }
