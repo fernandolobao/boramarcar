@@ -8,6 +8,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { getBaseUrl, getEnv } from '@/env';
 import { getDb } from './db';
+import { sendResetPasswordEmail, sendVerificationEmail } from './auth-emails';
 import { GOOGLE_SIGN_IN_OPTIONS, syncGoogleProfileImage } from './google-picture';
 
 function createAuth() {
@@ -28,6 +29,23 @@ function createAuth() {
         verification: schema.verification,
       },
     }),
+    // E-mail e senha, com o e-mail confirmado antes de entrar e "esqueci a senha".
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: true,
+      minPasswordLength: 8,
+      maxPasswordLength: 128,
+      revokeSessionsOnPasswordReset: true,
+      sendResetPassword: sendResetPasswordEmail,
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      // Tentou entrar sem confirmar: manda o link de novo.
+      sendOnSignIn: true,
+      autoSignInAfterVerification: true,
+      expiresIn: 60 * 60 * 24, // 24 horas
+      sendVerificationEmail,
+    },
     socialProviders: {
       google: {
         clientId: env.GOOGLE_CLIENT_ID,

@@ -125,11 +125,20 @@ export default async function HomePage({
         <Icon name="dashboard" />
         {t('goToDashboard')}
       </Link>
+    ) : size === 'sm' ? (
+      // Cabeçalho: a tela de entrada oferece Google ou e-mail e senha.
+      <Link href="/entrar" className="btn-primary">
+        <Icon name="signIn" />
+        {t('signInToDashboard')}
+      </Link>
     ) : (
-      <SignInButton
-        label={size === 'lg' ? undefined : t('signInToDashboard')}
-        compact={size === 'sm'}
-      />
+      <>
+        <SignInButton />
+        <Link href="/cadastro" className="btn-secondary px-6 text-base">
+          <Icon name="email" />
+          {t('signUpEmail')}
+        </Link>
+      </>
     );
 
   return (

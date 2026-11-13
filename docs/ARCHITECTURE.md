@@ -380,7 +380,12 @@ Por padrão segue o sistema (`prefers-color-scheme`). Em Configurações a pesso
 
 ## Autenticação
 
-Better Auth com o provedor Google e adaptador Drizzle. Sessões ficam no Postgres; o cookie é cacheado por 5 minutos (`cookieCache`) para evitar uma consulta por requisição. `proxy.ts` (antigo `middleware.ts` no Next 16) só verifica a presença do cookie; a validação real acontece nas páginas (`requireUser`) e na API (`authed`).
+Better Auth com o provedor Google **e e-mail e senha**, e adaptador Drizzle.
+
+- **E-mail e senha** (`emailAndPassword`): senha de 8 a 128 caracteres, guardada como hash (scrypt do Better Auth) em `account.password` (`providerId = credential`). O e-mail precisa ser **confirmado antes de entrar** (`requireEmailVerification`): o link (24 h) sai no cadastro e de novo a cada tentativa de entrar sem confirmar; confirmar já entra (`autoSignInAfterVerification`). "Esqueci a senha" manda um link de 1 h (`/redefinir-senha`) e redefinir derruba as outras sessões. Os e-mails (`server/auth-emails.ts`, Resend) saem sem `await` e com a mesma resposta exista ou não a conta.
+- **Telas**: `/entrar` (Google ou e-mail; `?para=` volta para a página pedida — só caminhos internos, `lib/safe-callback.ts`), `/cadastro`, `/esqueci-senha` e `/redefinir-senha`. Sem login, a área logada leva para `/entrar?para=…` (antes ia para a home). No app, a tela de entrada tem o mesmo formulário; "Esqueci a senha" abre o site.
+
+Sessões ficam no Postgres; o cookie é cacheado por 5 minutos (`cookieCache`) para evitar uma consulta por requisição. `proxy.ts` (antigo `middleware.ts` no Next 16) só verifica a presença do cookie; a validação real acontece nas páginas (`requireUser`) e na API (`authed`).
 
 **Escopos e foto do Google.** O login pede só `openid`, `email` e `profile` (`GOOGLE_SIGN_IN_OPTIONS`, com `disableDefaultScope`), sem Gmail, Drive ou outros. A foto do avatar é a claim `picture` do OpenID Connect:
 

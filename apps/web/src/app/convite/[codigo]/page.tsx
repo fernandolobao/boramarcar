@@ -97,7 +97,15 @@ export default async function InvitePage({ params }: Props) {
           ) : (
             <div className="space-y-3">
               <p className="text-fg-muted">{t('signInToJoin')}</p>
-              <SignInButton callbackURL={`/convite/${group.inviteCode}`} />
+              <div className="flex flex-wrap gap-3">
+                <SignInButton callbackURL={`/convite/${group.inviteCode}`} />
+                <Link
+                  href={`/entrar?para=${encodeURIComponent(`/convite/${group.inviteCode}`)}`}
+                  className="btn-secondary px-6 text-base"
+                >
+                  {t('signInEmail')}
+                </Link>
+              </div>
             </div>
           )}
           {!member && (
