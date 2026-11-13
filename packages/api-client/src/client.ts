@@ -14,6 +14,7 @@ import {
   groupSchema,
   locationSchema,
   memberSchema,
+  playerProfileSchema,
   rankingSchema,
   rsvpSchema,
   tableSetupSchema,
@@ -378,6 +379,17 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ table: tableSetupSchema }),
           )
         ).table,
+    },
+    players: {
+      /** Perfil: resumo, títulos, grupos em comum, conquistas e decks visíveis para quem pede. */
+      get: async (userId: string) =>
+        (
+          await request(
+            'GET',
+            `/players/${encodeURIComponent(userId)}`,
+            z.object({ player: playerProfileSchema }),
+          )
+        ).player,
     },
     ranking: {
       get: (groupId: string, filters: { from?: Date; to?: Date; format?: string } = {}) =>

@@ -149,6 +149,61 @@ export const deckSummarySchema = z
   })
   .loose();
 export type DeckSummary = z.infer<typeof deckSummarySchema>;
+export const ACHIEVEMENT_IDS = [
+  'first_game',
+  'first_win',
+  'games_10',
+  'games_50',
+  'wins_10',
+  'streak_3',
+  'streak_5',
+  'fast_win',
+  'first_player_win',
+  'deck_loyal',
+  'deck_variety',
+  'versatile',
+  'team_win',
+  'season_champion',
+] as const;
+export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
+
+export const achievementSchema = z
+  .object({
+    id: z.enum(ACHIEVEMENT_IDS),
+    unlocked: z.boolean(),
+    unlockedAt: date.nullable(),
+    progress: z.number(),
+    target: z.number(),
+    count: z.number().optional(),
+  })
+  .loose();
+export type Achievement = z.infer<typeof achievementSchema>;
+
+/** Perfil de um jogador (o próprio ou alguém de um grupo em comum). */
+export const playerProfileSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    image: z.string().nullish(),
+    email: z.string().nullable(),
+    isSelf: z.boolean(),
+    memberSince: date,
+    games: z.number(),
+    wins: z.number(),
+    winRate: z.number(),
+    groups: z.array(
+      z
+        .object({ id: z.string(), name: z.string(), role: z.enum(['owner', 'admin', 'member']) })
+        .loose(),
+    ),
+    decks: z.array(deckSummarySchema),
+    achievements: z.array(achievementSchema),
+    seasonTitles: z.array(
+      z.object({ seasonName: z.string(), groupName: z.string(), endsAt: date }).loose(),
+    ),
+  })
+  .loose();
+export type PlayerProfile = z.infer<typeof playerProfileSchema>;
 
 export const tableSetupSchema = z
   .object({

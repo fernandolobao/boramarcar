@@ -41,6 +41,15 @@ export default function AccountScreen() {
           ))}
         </View>
       )}
+      {session?.user.id && (
+        <Button
+          label={t('profileMine')}
+          variant="secondary"
+          onPress={() =>
+            router.push({ pathname: '/jogadores/[id]', params: { id: session.user.id } })
+          }
+        />
+      )}
       <Button
         label={t('groupsManage')}
         variant="secondary"
