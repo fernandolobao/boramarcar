@@ -459,4 +459,23 @@ describe('cliente da API', () => {
       role: 'admin',
     });
   });
+
+  it('preferências: lê e salva fuso, idioma e avisos por e-mail', async () => {
+    const prefs = { timeZone: 'America/Sao_Paulo', locale: 'pt-BR', emailNotifications: true };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ preferences: prefs }))
+      .mockResolvedValueOnce(json({ preferences: { ...prefs, emailNotifications: false } }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.me.preferences()).toEqual(prefs);
+    const saved = await api.me.updatePreferences({ emailNotifications: false });
+    expect(saved.emailNotifications).toBe(false);
+    const [url, init] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(url).toBe('https://www.arcanakin.com.br/api/v1/me/preferences');
+    expect(init.method).toBe('PUT');
+    expect(JSON.parse(String(init.body))).toEqual({ emailNotifications: false });
+  });
 });

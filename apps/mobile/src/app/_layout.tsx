@@ -39,6 +39,7 @@ export default function RootLayout() {
         <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
         <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />
         <Stack.Screen name="grupo" options={{ title: t('groupTitle') }} />
+        <Stack.Screen name="configuracoes" options={{ title: t('settingsTitle') }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="entrar" options={{ headerShown: false }} />
