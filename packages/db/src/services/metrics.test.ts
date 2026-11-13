@@ -1,11 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Database } from '../client';
-import { createTestDb } from '../testing';
+import { createTestDb, createTestUser } from '../testing';
+import { account } from '../schema';
+import { createGroup } from './groups';
 import { seedGroup } from '../test/helpers';
 import { addAvailability } from './availability';
 import { createEvent, recordGame, setRsvp } from './events';
 import { createFeedback } from './feedback';
-import { getProductMetrics } from './metrics';
+import { getProductMetrics, listUsersForAdmin } from './metrics';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -78,5 +80,28 @@ describe('métricas do produto', () => {
     const { db: empty, close: closeEmpty } = await createTestDb();
     expect((await getProductMetrics(empty)).activeGroups).toBe(0);
     await closeEmpty();
+  });
+});
+
+describe('contas para o /admin', () => {
+  it('lista as contas ativas com como entram, grupos e último acesso', async () => {
+    const { db, close: closeDb } = await createTestDb();
+    const ana = await createTestUser(db, { name: 'Ana', email: 'ana@admin.test' });
+    const bia = await createTestUser(db, { name: 'Bia', email: 'bia@admin.test' });
+    await createTestUser(db, { name: 'Excluída', deletedAt: new Date() });
+    await db.insert(account).values([
+      { id: 'a1', accountId: 'g-1', providerId: 'google', userId: ana.id },
+      { id: 'a2', accountId: bia.id, providerId: 'credential', userId: bia.id, password: 'x' },
+    ]);
+    await createGroup(db, { name: 'Mesa', userId: ana.id });
+    const list = await listUsersForAdmin(db);
+    expect(list.map((u) => u.name).sort()).toEqual(['Ana', 'Bia']);
+    expect(list.find((u) => u.name === 'Ana')).toMatchObject({ providers: ['google'], groups: 1 });
+    expect(list.find((u) => u.name === 'Bia')).toMatchObject({
+      providers: ['credential'],
+      groups: 0,
+      lastSeenAt: null,
+    });
+    await closeDb();
   });
 });

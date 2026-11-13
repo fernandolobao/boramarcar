@@ -1,4 +1,18 @@
-import { and, count, countDistinct, eq, gte, isNotNull, isNull, lt, ne, sql } from 'drizzle-orm';
+import {
+  and,
+  count,
+  countDistinct,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  max,
+  ne,
+  sql,
+} from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   availabilityRules,
@@ -12,6 +26,8 @@ import {
   groupMembers,
   groups,
   user,
+  account,
+  session,
 } from '../schema';
 
 /**
@@ -160,3 +176,52 @@ export async function getProductMetrics(db: Database, now = new Date()) {
 }
 
 export type ProductMetrics = Awaited<ReturnType<typeof getProductMetrics>>;
+
+/**
+ * Contas da aplicação para quem administra (`/admin`): nome, e-mail, como entra (Google,
+ * e-mail e senha), se confirmou o e-mail, quando criou, último acesso e em quantos grupos está.
+ * Contas excluídas (LGPD) ficam de fora.
+ */
+export async function listUsersForAdmin(db: Database, limit = 1000) {
+  const rows = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      emailVerified: user.emailVerified,
+      createdAt: user.createdAt,
+    })
+    .from(user)
+    .where(isNull(user.deletedAt))
+    .orderBy(desc(user.createdAt))
+    .limit(limit);
+  if (rows.length === 0) return [];
+  const ids = rows.map((r) => r.id);
+  const [providers, memberships, sessions] = await Promise.all([
+    db
+      .select({ userId: account.userId, providerId: account.providerId })
+      .from(account)
+      .where(inArray(account.userId, ids)),
+    db
+      .select({ userId: groupMembers.userId, n: count() })
+      .from(groupMembers)
+      .where(inArray(groupMembers.userId, ids))
+      .groupBy(groupMembers.userId),
+    db
+      .select({ userId: session.userId, last: max(session.updatedAt) })
+      .from(session)
+      .where(inArray(session.userId, ids))
+      .groupBy(session.userId),
+  ]);
+  const groupsOf = new Map(memberships.map((m) => [m.userId, Number(m.n)]));
+  const lastOf = new Map(sessions.map((s) => [s.userId, s.last]));
+  return rows.map((r) => ({
+    ...r,
+    providers: [
+      ...new Set(providers.filter((p) => p.userId === r.id).map((p) => p.providerId)),
+    ].sort(),
+    groups: groupsOf.get(r.id) ?? 0,
+    lastSeenAt: lastOf.get(r.id) ?? null,
+  }));
+}
+export type AdminUser = Awaited<ReturnType<typeof listUsersForAdmin>>[number];

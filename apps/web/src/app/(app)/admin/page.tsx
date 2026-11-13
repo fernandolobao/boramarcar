@@ -5,10 +5,12 @@ import {
   getProductMetrics,
   listGroupsForBeta,
   listRecentFeedback,
+  listUsersForAdmin,
 } from '@boramarcar/db';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { getDb } from '@/server/db';
 import { requireAdmin } from '@/server/admin';
+import { AdminUsers } from '@/components/admin-users';
 import { BetaControl } from '@/components/beta-control';
 import { sectionMetadata } from '@/server/seo';
 
@@ -19,11 +21,12 @@ export default async function AdminPage() {
   await requireAdmin();
   const db = getDb();
   const now = new Date();
-  const [m, recent, beta, betaGroups] = await Promise.all([
+  const [m, recent, beta, betaGroups, users] = await Promise.all([
     getProductMetrics(db, now),
     listRecentFeedback(db, 30),
     getBeta(db, now),
     listGroupsForBeta(db),
+    listUsersForAdmin(db),
   ]);
   const betaStats = await getBetaGroupStats(db, beta.state, now);
   const t = await getTranslations('admin');
@@ -188,6 +191,19 @@ export default async function AdminPage() {
           </section>
         ))}
       </div>
+
+      <section className="card space-y-3" aria-labelledby="admin-usuarios">
+        <h2 id="admin-usuarios" className="section-title mb-0">
+          {t('accounts.title')}
+        </h2>
+        <AdminUsers
+          users={users.map((u) => ({
+            ...u,
+            createdAt: u.createdAt.toISOString(),
+            lastSeenAt: u.lastSeenAt ? u.lastSeenAt.toISOString() : null,
+          }))}
+        />
+      </section>
 
       <section className="card space-y-3" aria-labelledby="admin-feedback">
         <div>

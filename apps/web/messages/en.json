@@ -1566,6 +1566,19 @@
       "never": "None yet",
       "welcomeSent": "Sent",
       "welcomePending": "Not yet"
+    },
+    "accounts": {
+      "title": "Accounts",
+      "search": "Search by name or e-mail",
+      "count": "{shown, plural, =1 {1 account} other {# accounts}} of {total}",
+      "unverified": "e-mail not confirmed",
+      "signIn": "Signs in with",
+      "google": "Google",
+      "password": "E-mail and password",
+      "groups": "Groups",
+      "created": "Created",
+      "lastSeen": "Last seen",
+      "never": "Never"
     }
   },
   "meta": {
