@@ -191,6 +191,11 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: ajuda / FAQ (13/11/2026)
+
+- Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).
+- App: cada pergunta é um botão com `accessibilityState.expanded`; os passos são numerados em texto.
+
 ### Revisão: configurações no app (13/11/2026)
 
 - Fuso em texto com rótulo ("Fuso horário: America/Sao_Paulo") e botão para usar o fuso do aparelho quando difere (sem lista nativa gigante); idioma como `radiogroup`/`radio`; avisos por e-mail como `Switch` com rótulo e dica. "Salvar" só habilita com mudança; resultado em região viva.

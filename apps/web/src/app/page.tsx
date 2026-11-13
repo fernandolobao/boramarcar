@@ -404,7 +404,10 @@ export default async function HomePage({
               {CONTACT_EMAIL}
             </a>
           </p>
-          <p>
+          <p className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/ajuda" className="underline underline-offset-2">
+              {tl('help')}
+            </Link>
             <Link href="/privacidade" className="underline underline-offset-2">
               {tl('privacy')}
             </Link>

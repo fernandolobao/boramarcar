@@ -1345,7 +1345,9 @@
     "accountDeleted": "Your account was deleted. Thanks for playing with us."
   },
   "legal": {
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "help": "Help",
+    "feedback": "Feedback"
   },
   "collection": {
     "title": "Collection",
@@ -1711,6 +1713,10 @@
     "resetPassword": {
       "title": "New password",
       "description": "Create a new password for your ArcanaKin account."
+    },
+    "help": {
+      "title": "Help",
+      "description": "How to use ArcanaKin step by step: group, availability, meetups, games, table mode, decks and ranking."
     }
   },
   "beta": {

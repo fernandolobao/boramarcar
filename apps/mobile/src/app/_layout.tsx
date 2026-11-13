@@ -37,6 +37,7 @@ export default function RootLayout() {
         <Stack.Screen name="decks/[id]" options={{ title: t('tabDecks') }} />
         <Stack.Screen name="jogadores/[id]" options={{ title: t('profileTitle') }} />
         <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
+        <Stack.Screen name="ajuda" options={{ title: t('helpTitle') }} />
         <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />
         <Stack.Screen name="grupo" options={{ title: t('groupTitle') }} />
         <Stack.Screen name="configuracoes" options={{ title: t('settingsTitle') }} />
