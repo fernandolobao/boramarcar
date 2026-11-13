@@ -34,16 +34,18 @@ const PRINTS_PAGE = 60;
  * colecionador ou parte do nome da edição: "pca 137", "pca #137", "lord of the rings 262".
  */
 export function matchesPrint(
-  p: { setCode: string; setName: string; collectorNumber: string },
+  p: { setCode: string; setName: string; collectorNumber: string; artist?: string | null },
   filter: string,
 ) {
   const tokens = filter.toLowerCase().replace(/#/g, ' ').split(/\s+/).filter(Boolean);
   const setName = p.setName.toLowerCase();
+  const artist = (p.artist ?? '').toLowerCase();
   const code = p.setCode.toLowerCase();
   const number = p.collectorNumber.toLowerCase();
-  // Palavras que não são código nem número precisam aparecer juntas no nome da edição.
-  const words = tokens.filter((t) => t !== code && t !== number);
-  return words.length === 0 || setName.includes(words.join(' '));
+  // Palavras que não são código nem número precisam aparecer juntas no nome da edição ou no
+  // nome do ilustrador (cartas antigas não têm código nem número impressos).
+  const words = tokens.filter((t) => t !== code && t !== number).join(' ');
+  return words.length === 0 || setName.includes(words) || (artist !== '' && artist.includes(words));
 }
 
 /**
@@ -312,6 +314,7 @@ export function PrintPicker({
                                   {p.priceUsd &&
                                     ` · ${format.number(Number(p.priceUsd), { style: 'currency', currency: 'USD' })}`}
                                 </span>
+                                {p.artist && <span className="muted block">{p.artist}</span>}
                                 {!onSelect && p.scryfallId === line.scryfallId && (
                                   <span className="block font-medium">{t('printInUse')}</span>
                                 )}

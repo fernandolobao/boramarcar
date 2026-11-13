@@ -13,6 +13,7 @@ import {
   type DeckImportInput,
   type FetchLike,
   type GameFormat,
+  dedupePrints,
 } from '@boramarcar/core';
 import {
   cachedExternal,
@@ -157,9 +158,15 @@ export async function resolveCardById(db: Database, id: string, fetchFn: FetchLi
 
 /** Impressões de uma carta (escolha da edição no editor). */
 /** Edições de uma carta (Scryfall), guardadas no cache compartilhado por 7 dias. */
-export const listCardPrints = (db: Database, name: string, fetchFn: FetchLike = fetch) =>
-  cachedExternal(db, `prints:${name.trim().toLowerCase()}`, 7 * DAY, () =>
-    scryfall(() => fetchScryfallPrints(name, { fetch: fetchFn })),
+/** Chave do cache das impressões; a versão muda quando o formato guardado muda (v2: ilustrador). */
+export const printsCacheKey = (name: string) => `prints:v2:${name.trim().toLowerCase()}`;
+
+export const listCardPrints = async (db: Database, name: string, fetchFn: FetchLike = fetch) =>
+  // `dedupePrints` também na leitura: listas guardadas antes da correção saram sem esperar o cache vencer.
+  dedupePrints(
+    await cachedExternal(db, printsCacheKey(name), 7 * DAY, () =>
+      scryfall(() => fetchScryfallPrints(name, { fetch: fetchFn })),
+    ),
   );
 
 const DAY = 24 * 60 * 60 * 1000;

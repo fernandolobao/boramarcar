@@ -8,6 +8,12 @@ const ltr = {
   collectorNumber: '262',
 };
 const other = { setCode: 'm21', setName: 'Core Set 2021', collectorNumber: '137' };
+const alpha = {
+  setCode: 'lea',
+  setName: 'Limited Edition Alpha',
+  collectorNumber: '270',
+  artist: 'Mark Tedin',
+};
 
 describe('filtro de impressões', () => {
   it('código + número, com ou sem #', () => {
@@ -24,5 +30,15 @@ describe('filtro de impressões', () => {
     expect(matchesPrint(other, '137')).toBe(true);
     expect(matchesPrint(ltr, 'ltr')).toBe(true);
     expect(matchesPrint(ltr, '  ')).toBe(true);
+  });
+
+  it('nome do ilustrador (cartas antigas não têm número na carta)', () => {
+    expect(matchesPrint(alpha, 'tedin')).toBe(true);
+    expect(matchesPrint(alpha, 'Mark Tedin')).toBe(true);
+    expect(matchesPrint(alpha, 'tedin 270')).toBe(true);
+    expect(matchesPrint(alpha, 'tedin 5')).toBe(false);
+    expect(matchesPrint(alpha, 'alpha tedin')).toBe(false);
+    expect(matchesPrint({ ...alpha, artist: null }, 'tedin')).toBe(false);
+    expect(matchesPrint(pca, 'tedin')).toBe(false);
   });
 });
