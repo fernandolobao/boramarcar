@@ -54,7 +54,8 @@ export function buildCsp({ nonce, dev = false }: { nonce: string; dev?: boolean 
     ],
     'style-src': ["'self'", "'unsafe-inline'"],
     'font-src': ["'self'", 'data:'],
-    'media-src': ["'self'"],
+    // data: para o vídeo embutido que mantém a tela acesa no modo mesa (`keep-awake-media.ts`).
+    'media-src': ["'self'", 'data:'],
     'worker-src': ["'self'", 'blob:'],
     'frame-src': ["'self'"],
     'object-src': ["'none'"],

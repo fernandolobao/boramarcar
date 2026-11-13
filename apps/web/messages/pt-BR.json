@@ -1295,7 +1295,11 @@
     "swapPick": "Escolher {name} para trocar de lugar",
     "swapSelected": "{name} escolhido; toque em outro jogador para trocar",
     "swapped": "{a} e {b} trocaram de lugar.",
-    "swapDone": "Pronto"
+    "swapDone": "Pronto",
+    "fullscreen": "Tela cheia",
+    "fullscreenInstallHint": "Para usar a tela toda no iPhone, adicione o ArcanaKin à tela inicial (botão Compartilhar → Adicionar à Tela de Início) e abra a mesa por lá.",
+    "awakeOn": "Tela acesa enquanto a mesa estiver aberta.",
+    "awakeUnavailable": "Não deu para manter a tela acesa: desligue o bloqueio automático nos ajustes do celular ou saia do modo de baixo consumo."
   },
   "consent": {
     "title": "Cookies e gravação de sessão",

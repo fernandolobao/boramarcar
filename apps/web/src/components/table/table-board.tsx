@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../icons';
 import { useLightDismiss } from '../use-light-dismiss';
+import { isStandalone, type KeepAwakeStatus } from './use-table';
 
 /** Toque = ±1; segurar = ±10 a cada 0,6 s (como nos contadores de mesa). */
 function useHold(onStep: (delta: number) => void, sign: 1 | -1) {
@@ -303,16 +304,24 @@ function Dialog({
  * Tabuleiro do modo mesa: uma área por jogador, virada para quem está daquele lado, e um botão
  * central com desfazer, dados, moeda, sorteio de quem começa e encerrar a partida.
  */
+export interface TableScreen {
+  awake: KeepAwakeStatus;
+  fullscreen: { supported: boolean; active: boolean; toggle: () => void };
+}
+
 export function TableBoard({
   state,
   dispatch,
   onFinish,
   onExit,
+  screen,
 }: {
   state: TableState;
   dispatch: (a: TableAction) => void;
   onFinish: () => void;
   onExit: () => void;
+  /** Tela acesa e tela cheia (ver `useKeepAwake`/`useFullscreen`). */
+  screen: TableScreen;
 }) {
   const t = useTranslations('table');
   const layout = tableLayout(state.players.length);
@@ -346,7 +355,14 @@ export function TableBoard({
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-ink-950">
+    <div
+      className="fixed inset-0 z-40 bg-ink-950"
+      // Como app instalado ou em tela cheia, não desenha sob o recorte da câmera nem a barra inferior.
+      style={{
+        padding:
+          'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
+      }}
+    >
       <h1 className="sr-only">{t('title')}</h1>
       <div
         className="grid h-full w-full gap-1 p-1"
@@ -547,6 +563,28 @@ export function TableBoard({
         <p role="status" className="min-h-6 text-center text-lg font-semibold">
           {roll}
         </p>
+        <div className="space-y-2 border-t border-ink-200 pt-4 dark:border-ink-800">
+          {screen.fullscreen.supported ? (
+            <button
+              type="button"
+              className="btn-secondary w-full"
+              aria-pressed={screen.fullscreen.active}
+              onClick={screen.fullscreen.toggle}
+            >
+              <Icon name={screen.fullscreen.active ? 'exitFullscreen' : 'fullscreen'} />
+              {t('fullscreen')}
+            </button>
+          ) : (
+            !isStandalone() && <p className="muted text-sm">{t('fullscreenInstallHint')}</p>
+          )}
+          <p className="muted text-sm" role="status">
+            {screen.awake === 'unavailable'
+              ? t('awakeUnavailable')
+              : screen.awake === 'pending'
+                ? ''
+                : t('awakeOn')}
+          </p>
+        </div>
         <div className="flex flex-wrap gap-2 border-t border-ink-200 pt-4 dark:border-ink-800">
           <button type="button" className="btn-primary" onClick={onFinish}>
             <Icon name="finish" />

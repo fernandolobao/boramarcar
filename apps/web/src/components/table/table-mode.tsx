@@ -14,12 +14,21 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon } from '../icons';
 import { FormError, useApiAction } from '../use-api-action';
 import { TableBoard } from './table-board';
-import { clearTable, useSavedTable, useTable, useWakeLock } from './use-table';
+import {
+  clearTable,
+  enterFullscreen,
+  exitFullscreen,
+  useFullscreen,
+  useKeepAwake,
+  useSavedTable,
+  useTable,
+} from './use-table';
+import { KEEP_AWAKE_MP4, KEEP_AWAKE_WEBM } from './keep-awake-media';
 
 export interface TablePlayerOption {
   userId: string;
@@ -95,7 +104,14 @@ function Setup({
             {t('savedHint', { players: saved.players.map((p) => p.name).join(', ') })}
           </p>
           <div className="flex flex-wrap gap-2">
-            <button type="button" className="btn-primary" onClick={() => onStart(saved)}>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => {
+                enterFullscreen();
+                onStart(saved);
+              }}
+            >
               <Icon name="play" />
               {t('resume')}
             </button>
@@ -111,6 +127,8 @@ function Setup({
         onSubmit={(e) => {
           e.preventDefault();
           if (!valid) return;
+          // Dentro do toque em "Começar": a tela cheia só pode ser pedida por um gesto do usuário.
+          enterFullscreen();
           onStart(
             createTable({
               format,
@@ -407,14 +425,33 @@ function Playing({
   onExit: () => void;
 }) {
   const [state, dispatch] = useTable(eventId, initial);
-  useWakeLock(true);
+  const { status: awake, videoRef } = useKeepAwake(true);
+  const fullscreen = useFullscreen();
+  // Ao sair do tabuleiro (registrar ou voltar), a página volta ao normal.
+  useEffect(() => exitFullscreen, []);
   return (
-    <TableBoard
-      state={state}
-      dispatch={dispatch}
-      onFinish={() => onFinish(state)}
-      onExit={onExit}
-    />
+    <>
+      <TableBoard
+        state={state}
+        dispatch={dispatch}
+        onFinish={() => onFinish(state)}
+        onExit={onExit}
+        screen={{ awake, fullscreen }}
+      />
+      {/* Vídeo mudo de poucos pixels, só para a tela não bloquear onde não há wake lock. */}
+      <video
+        ref={videoRef}
+        className="pointer-events-none fixed bottom-0 left-0 size-px opacity-0"
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        <source src={KEEP_AWAKE_WEBM} type="video/webm" />
+        <source src={KEEP_AWAKE_MP4} type="video/mp4" />
+      </video>
+    </>
   );
 }
 

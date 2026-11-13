@@ -11,6 +11,8 @@ import {
   Gamepad2,
   Skull,
   MapPin,
+  Maximize,
+  Minimize,
   Navigation,
   Accessibility,
   Mail,
@@ -190,6 +192,8 @@ export const Icons = {
   email: Mail,
   feedback: MessageSquareText,
   pause: Pause,
+  fullscreen: Maximize,
+  exitFullscreen: Minimize,
   play: Play,
   // Tema
   themeSystem: Monitor,

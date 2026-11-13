@@ -1,4 +1,5 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { themes } from '@boramarcar/tokens';
 import { isDomainError } from '@boramarcar/core';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -18,6 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: (await getTranslations('table'))('title'),
   });
 }
+
+/** Ocupa a tela toda (inclusive sob o recorte da câmera) e pinta as barras do sistema de escuro. */
+export const viewport: Viewport = { viewportFit: 'cover', themeColor: themes.dark.canvas };
 
 /** Modo mesa em tela cheia (fora do layout do app, para caber no celular deitado na mesa). */
 export default async function TablePage({ params }: Props) {
