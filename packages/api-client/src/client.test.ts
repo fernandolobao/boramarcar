@@ -330,4 +330,54 @@ describe('cliente da API', () => {
     });
     expect(fetchMock.mock.calls[1]![1]).toMatchObject({ method: 'DELETE' });
   });
+
+  it('histórico de encontros com filtros e membros do grupo', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json({
+          history: {
+            page: 2,
+            pageSize: 20,
+            total: 21,
+            pages: 2,
+            items: [
+              {
+                id: 'e9',
+                title: 'Commander na casa',
+                startsAt: '2026-10-01T22:00:00.000Z',
+                status: 'finished',
+                locationName: 'Casa da Ana',
+                games: 2,
+                attendees: 4,
+                winners: ['Bia'],
+              },
+            ],
+          },
+        }),
+      )
+      .mockResolvedValueOnce(
+        json({ members: [{ userId: 'u1', name: 'Ana', image: null, role: 'owner' }] }),
+      );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const history = await api.events.history('g1', {
+      q: 'casa',
+      status: 'finished',
+      playerId: 'u2',
+      page: 2,
+    });
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/events/history?q=casa&status=finished&playerId=u2&page=2',
+    );
+    expect(history.items[0]).toMatchObject({ winners: ['Bia'], games: 2 });
+    expect(history.items[0]!.startsAt).toBeInstanceOf(Date);
+    const members = await api.groups.members('g1');
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/members',
+    );
+    expect(members[0]).toMatchObject({ name: 'Ana', role: 'owner' });
+  });
 });

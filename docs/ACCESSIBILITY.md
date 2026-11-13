@@ -191,6 +191,12 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: histórico de encontros no app (13/11/2026)
+
+- Filtros como `radiogroup`/`radio` com estado (situação, jogador) e campo de busca com rótulo visível e dica; a busca espera meio segundo depois de digitar, sem botão extra. "Limpar filtros" só aparece quando há filtro.
+- Total de resultados em título com região viva (anuncia "12 encontros" ou "Nenhum encontro com esses filtros" a cada busca); cada encontro é um link com nome completo (título, situação, data, local, partidas, presenças e vencedores). Situação em texto, não só em cor.
+- Paginação como `toolbar` com Anterior/Próxima (desabilitados nas pontas) e "Página X de Y" em região viva.
+
 ### Revisão: app mobile (primeira versão)
 
 - Botões com alvo mínimo de 44 pt, `accessibilityRole="button"` e estado (`disabled`, `selected`/`checked`); escolhas únicas (presença, grupo ativo) como `radiogroup`/`radio`.

@@ -42,7 +42,14 @@ export default function EventsScreen() {
               {group.name} · {t('upcoming')}
             </AppText>
             <BetaBanner groupId={group.id} />
-            <Button label={t('eventNew')} onPress={() => router.push('/encontros/novo')} />
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              <Button label={t('eventNew')} onPress={() => router.push('/encontros/novo')} />
+              <Button
+                label={t('historyOpen')}
+                variant="secondary"
+                onPress={() => router.push('/encontros/historico')}
+              />
+            </View>
           </View>
         }
         ListEmptyComponent={<AppText muted>{t('noEvents')}</AppText>}
