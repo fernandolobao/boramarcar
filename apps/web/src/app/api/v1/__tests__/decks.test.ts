@@ -1,3 +1,4 @@
+import { cachedExternal } from '@boramarcar/db';
 import { createTestDb, createTestUser } from '@boramarcar/db/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { resetEnvCache } from '@/env';
@@ -341,6 +342,7 @@ describe('API v1 — decks', () => {
           collectorNumber: '270',
           imageUri: null,
           priceUsd: null,
+          artist: null,
         },
       ],
     });
@@ -351,6 +353,18 @@ describe('API v1 — decks', () => {
     const before = searches();
     expect((await call(prints.GET, { path: '/?name=sol%20ring' })).body).toEqual(list.body);
     expect(searches()).toBe(before);
+    // Lista já guardada com uma impressão repetida (fronteira de página do Scryfall): sai limpa.
+    const { printsCacheKey } = await import('@/server/deck-import');
+    const dup = list.body!.prints[0];
+    // `now` no futuro força a recarga e grava a lista repetida no cache.
+    await cachedExternal(
+      testState.db!,
+      printsCacheKey('Sol Ring'),
+      7 * 24 * 60 * 60 * 1000,
+      async () => [dup, dup],
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    );
+    expect((await call(prints.GET, { path: '/?name=Sol%20Ring' })).body).toEqual(list.body);
 
     const move = (body: Record<string, unknown>) =>
       call(linePrint.POST, {

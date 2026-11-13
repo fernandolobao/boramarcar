@@ -199,11 +199,50 @@ describe('fetchScryfallAutocomplete', () => {
         collectorNumber: '400',
         imageUri: null,
         priceUsd: '1.50',
+        artist: null,
       },
     ]);
     expect(decodeURIComponent(fetchMock.mock.calls[0]![0])).toContain(
       '!"Sol Ring" game:paper&unique=prints',
     );
+  });
+
+  it('não repete uma impressão que veio em duas páginas e traz o ilustrador', async () => {
+    const { fetchScryfallPrints } = await import('./scryfall');
+    // A fronteira entre páginas do Scryfall pode se mover entre um pedido e outro (empates na
+    // data de lançamento, índice atualizado): a mesma carta chega no fim de uma e no começo da outra.
+    const fetchMock = vi.fn(async (url: string) => {
+      const page = Number(new URL(url).searchParams.get('page') ?? '1');
+      const data =
+        page === 1
+          ? [
+              scryCard('Mountain', {
+                id: 'ltr-279',
+                collector_number: '279',
+                artist: 'Sarah Finnigan',
+              }),
+              scryCard('Mountain', { id: 'ltr-268', collector_number: '268' }),
+            ]
+          : [
+              scryCard('Mountain', { id: 'ltr-268', collector_number: '268' }),
+              scryCard('Mountain', {
+                id: 'lea-mtn',
+                collector_number: '291',
+                artist: 'Douglas Shuler',
+              }),
+            ];
+      return Response.json({
+        data,
+        has_more: page < 2,
+        next_page: `https://api.scryfall.com/cards/search?q=x&page=${page + 1}`,
+      });
+    });
+    const prints = await fetchScryfallPrints('Mountain', {
+      fetch: fetchMock as unknown as typeof fetch,
+      delayMs: 0,
+    });
+    expect(prints.map((p) => p.scryfallId)).toEqual(['ltr-279', 'ltr-268', 'lea-mtn']);
+    expect(prints.map((p) => p.artist)).toEqual(['Sarah Finnigan', null, 'Douglas Shuler']);
   });
 
   it('segue as próximas páginas das impressões (terrenos básicos têm mais de mil)', async () => {

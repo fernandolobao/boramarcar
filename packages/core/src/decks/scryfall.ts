@@ -307,6 +307,18 @@ export interface CardPrint {
   collectorNumber: string;
   imageUri: string | null;
   priceUsd: string | null;
+  /** Ilustrador: cartas antigas não trazem código nem número, então é por ele que se acha. */
+  artist: string | null;
+}
+
+/**
+ * Remove impressões repetidas (mesmo `scryfallId`), mantendo a primeira. A fronteira entre páginas
+ * do Scryfall pode se mover entre um pedido e outro, e a mesma carta vem no fim de uma página e no
+ * começo da seguinte.
+ */
+export function dedupePrints<T extends { scryfallId: string }>(prints: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return prints.filter((p) => !seen.has(p.scryfallId) && Boolean(seen.add(p.scryfallId)));
 }
 
 /**
@@ -351,11 +363,12 @@ export async function fetchScryfallPrints(
         collectorNumber: c.collectorNumber ?? '',
         imageUri: c.imageUri ?? null,
         priceUsd: c.priceUsd ?? null,
+        artist: c.artist ?? null,
       });
     }
     url = body.has_more ? body.next_page : undefined;
   }
-  return prints;
+  return dedupePrints(prints);
 }
 
 /** Uma carta pelo id do Scryfall; `null` se não existir. */

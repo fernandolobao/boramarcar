@@ -481,7 +481,7 @@
     "printCurrent": "Edição: {print}",
     "printChoose": "Escolher edição",
     "printTitle": "Edição de {name}",
-    "printFilter": "Edição, código ou número (ex.: pca 137)",
+    "printFilter": "Edição, código, número ou ilustrador (ex.: pca 137, Tedin)",
     "printCopies": "Quantas cópias mudam de edição (de {total})",
     "printsLoading": "Buscando edições no Scryfall…",
     "printsUnavailable": "O Scryfall não respondeu. Tente de novo em instantes.",
