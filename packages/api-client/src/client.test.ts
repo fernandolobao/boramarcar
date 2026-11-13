@@ -359,64 +359,69 @@ describe('cliente da API', () => {
       .mockResolvedValueOnce(
         json({ members: [{ userId: 'u1', name: 'Ana', image: null, role: 'owner' }] }),
       );
-    it('perfil do jogador: datas convertidas e conquistas tipadas', async () => {
-      const fetchMock = vi.fn(async () =>
-        json({
-          player: {
-            id: 'u2',
-            name: 'Bia',
-            image: null,
-            email: null,
-            isSelf: false,
-            memberSince: '2026-01-10T00:00:00.000Z',
-            games: 12,
-            wins: 4,
-            winRate: 0.3333,
-            groups: [{ id: 'g1', name: 'Mesa de Terça', role: 'member' }],
-            decks: [],
-            achievements: [
-              {
-                id: 'first_win',
-                unlocked: true,
-                unlockedAt: '2026-02-01T00:00:00.000Z',
-                progress: 1,
-                target: 1,
-                count: 4,
-              },
-              { id: 'games_50', unlocked: false, unlockedAt: null, progress: 12, target: 50 },
-            ],
-            seasonTitles: [
-              { seasonName: 'T1', groupName: 'Mesa de Terça', endsAt: '2026-03-31T00:00:00.000Z' },
-            ],
-          },
-        }),
-      );
-      const api = createApiClient({
-        baseUrl: 'https://www.arcanakin.com.br',
-        fetch: fetchMock as unknown as typeof fetch,
-      });
-      const history = await api.events.history('g1', {
-        q: 'casa',
-        status: 'finished',
-        playerId: 'u2',
-        page: 2,
-      });
-      expect(fetchMock.mock.calls[0]![0]).toBe(
-        'https://www.arcanakin.com.br/api/v1/groups/g1/events/history?q=casa&status=finished&playerId=u2&page=2',
-      );
-      expect(history.items[0]).toMatchObject({ winners: ['Bia'], games: 2 });
-      expect(history.items[0]!.startsAt).toBeInstanceOf(Date);
-      const members = await api.groups.members('g1');
-      expect(fetchMock.mock.calls[1]![0]).toBe(
-        'https://www.arcanakin.com.br/api/v1/groups/g1/members',
-      );
-      expect(members[0]).toMatchObject({ name: 'Ana', role: 'owner' });
-      const player = await api.players.get('u2');
-      expect(fetchMock.mock.calls[0]![0]).toBe('https://www.arcanakin.com.br/api/v1/players/u2');
-      expect(player.memberSince).toBeInstanceOf(Date);
-      expect(player.achievements[0]!.unlockedAt).toBeInstanceOf(Date);
-      expect(player.achievements[1]).toMatchObject({ unlocked: false, progress: 12 });
-      expect(player.seasonTitles[0]!.endsAt).toBeInstanceOf(Date);
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
     });
+    const history = await api.events.history('g1', {
+      q: 'casa',
+      status: 'finished',
+      playerId: 'u2',
+      page: 2,
+    });
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/events/history?q=casa&status=finished&playerId=u2&page=2',
+    );
+    expect(history.items[0]).toMatchObject({ winners: ['Bia'], games: 2 });
+    expect(history.items[0]!.startsAt).toBeInstanceOf(Date);
+    const members = await api.groups.members('g1');
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/members',
+    );
+    expect(members[0]).toMatchObject({ name: 'Ana', role: 'owner' });
+  });
+
+  it('perfil do jogador: datas convertidas e conquistas tipadas', async () => {
+    const fetchMock = vi.fn(async (_url: string) =>
+      json({
+        player: {
+          id: 'u2',
+          name: 'Bia',
+          image: null,
+          email: null,
+          isSelf: false,
+          memberSince: '2026-01-10T00:00:00.000Z',
+          games: 12,
+          wins: 4,
+          winRate: 0.3333,
+          groups: [{ id: 'g1', name: 'Mesa de Terça', role: 'member' }],
+          decks: [],
+          achievements: [
+            {
+              id: 'first_win',
+              unlocked: true,
+              unlockedAt: '2026-02-01T00:00:00.000Z',
+              progress: 1,
+              target: 1,
+              count: 4,
+            },
+            { id: 'games_50', unlocked: false, unlockedAt: null, progress: 12, target: 50 },
+          ],
+          seasonTitles: [
+            { seasonName: 'T1', groupName: 'Mesa de Terça', endsAt: '2026-03-31T00:00:00.000Z' },
+          ],
+        },
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const player = await api.players.get('u2');
+    expect(fetchMock.mock.calls[0]![0]).toBe('https://www.arcanakin.com.br/api/v1/players/u2');
+    expect(player.memberSince).toBeInstanceOf(Date);
+    expect(player.achievements[0]!.unlockedAt).toBeInstanceOf(Date);
+    expect(player.achievements[1]).toMatchObject({ unlocked: false, progress: 12 });
+    expect(player.seasonTitles[0]!.endsAt).toBeInstanceOf(Date);
   });
 });

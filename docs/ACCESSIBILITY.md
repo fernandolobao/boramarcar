@@ -191,6 +191,13 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: perfil do jogador no app (13/11/2026)
+
+- Aberto pelo ranking (cada linha é um botão com o resumo da posição e a dica "Ver perfil de …") e por "Meu perfil" na aba Conta. Foto/iniciais são decorativas (nome no título ao lado).
+- Resumo em caixas lidas como "Partidas: 12" (rótulo e valor num só elemento); títulos, grupos e papéis em texto.
+- Cada conquista é um elemento só, lido como "Nome. Descrição. Conquistada em … · 3 vezes" ou "Bloqueada · Progresso: 12 de 50"; a estrela cheia/vazia e a opacidade só reforçam o texto. Contraste AA (tokens `accent`/`onAccent`).
+- Decks visíveis como botões com nome ("Abrir deck …"); 404 (sem grupo em comum) vira um aviso em texto, não um erro genérico.
+
 ### Revisão: histórico de encontros no app (13/11/2026)
 
 - Filtros como `radiogroup`/`radio` com estado (situação, jogador) e campo de busca com rótulo visível e dica; a busca espera meio segundo depois de digitar, sem botão extra. "Limpar filtros" só aparece quando há filtro.
