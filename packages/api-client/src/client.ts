@@ -15,6 +15,7 @@ import {
   locationSchema,
   memberSchema,
   playerProfileSchema,
+  preferencesSchema,
   rankingSchema,
   rsvpSchema,
   tableSetupSchema,
@@ -124,6 +125,23 @@ export function createApiClient(options: ApiClientOptions) {
             }),
           )
         ).deletion,
+      /** Fuso, idioma e avisos por e-mail. */
+      preferences: async () =>
+        (await request('GET', '/me/preferences', z.object({ preferences: preferencesSchema })))
+          .preferences,
+      updatePreferences: async (input: {
+        timeZone?: string;
+        locale?: 'pt-BR' | 'en';
+        emailNotifications?: boolean;
+      }) =>
+        (
+          await request(
+            'PUT',
+            '/me/preferences',
+            z.object({ preferences: preferencesSchema }),
+            input,
+          )
+        ).preferences,
       /** Liga as notificações push neste aparelho (token do Expo). */
       registerPushToken: (token: string, platform: 'ios' | 'android') =>
         request('POST', '/me/push-tokens', z.object({ registered: z.literal(true) }), {

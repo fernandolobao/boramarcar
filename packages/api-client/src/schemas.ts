@@ -205,6 +205,16 @@ export const playerProfileSchema = z
   .loose();
 export type PlayerProfile = z.infer<typeof playerProfileSchema>;
 
+/** Preferências da pessoa: fuso, idioma (site e e-mails) e avisos por e-mail. */
+export const preferencesSchema = z
+  .object({
+    timeZone: z.string(),
+    locale: z.enum(['pt-BR', 'en']),
+    emailNotifications: z.boolean(),
+  })
+  .loose();
+export type Preferences = z.infer<typeof preferencesSchema>;
+
 export const tableSetupSchema = z
   .object({
     eventId: z.string(),

@@ -58,6 +58,11 @@ export default function AccountScreen() {
         variant="secondary"
         onPress={() => router.push('/grupos')}
       />
+      <Button
+        label={t('settingsTitle')}
+        variant="secondary"
+        onPress={() => router.push('/configuracoes')}
+      />
       <PushSetting />
       <Button
         label={t('feedbackTitle')}

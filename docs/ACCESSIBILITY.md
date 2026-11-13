@@ -191,6 +191,10 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: configurações no app (13/11/2026)
+
+- Fuso em texto com rótulo ("Fuso horário: America/Sao_Paulo") e botão para usar o fuso do aparelho quando difere (sem lista nativa gigante); idioma como `radiogroup`/`radio`; avisos por e-mail como `Switch` com rótulo e dica. "Salvar" só habilita com mudança; resultado em região viva.
+
 ### Revisão: seu grupo no app (13/11/2026)
 
 - Convite: link selecionável e código lidos com rótulo ("Código de convite: A B C D…", letra a letra); compartilhar usa a folha nativa do sistema. Gerar novo convite e todas as ações destrutivas (remover membro, sair, passar a posse, remover local) usam o `ConfirmButton` compartilhado em dois toques, com o nome do alvo no nome acessível; dono(a) com outras pessoas no grupo vê "Sair" desabilitado e o motivo em texto.
