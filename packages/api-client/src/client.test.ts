@@ -424,4 +424,39 @@ describe('cliente da API', () => {
     expect(player.achievements[1]).toMatchObject({ unlocked: false, progress: 12 });
     expect(player.seasonTitles[0]!.endsAt).toBeInstanceOf(Date);
   });
+
+  it('grupo: convite novo, papéis, remoção, posse e locais', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ inviteCode: 'NOVO1234' }))
+      .mockResolvedValueOnce(json({ role: 'admin' }))
+      .mockResolvedValueOnce(json({ groupDeleted: false }))
+      .mockResolvedValueOnce(json({ ownerId: 'u2' }))
+      .mockResolvedValueOnce(json({ location: { id: 'l1', name: 'Loja', address: null } }, 201))
+      .mockResolvedValueOnce(json({ deleted: true }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.groups.regenerateInvite('g1')).toBe('NOVO1234');
+    expect(await api.groups.setRole('g1', 'u2', 'admin')).toEqual({ role: 'admin' });
+    expect(await api.groups.removeMember('g1', 'u3')).toEqual({ groupDeleted: false });
+    expect(await api.groups.transfer('g1', 'u2')).toEqual({ ownerId: 'u2' });
+    expect(await api.locations.create('g1', { name: 'Loja' })).toMatchObject({ id: 'l1' });
+    expect(await api.locations.remove('g1', 'l1')).toEqual({ deleted: true });
+    const calls = (fetchMock.mock.calls as [string, RequestInit][]).map(
+      (c) => `${c[1].method} ${c[0].replace('https://www.arcanakin.com.br/api/v1', '')}`,
+    );
+    expect(calls).toEqual([
+      'POST /groups/g1/invite',
+      'PATCH /groups/g1/members/u2',
+      'DELETE /groups/g1/members/u3',
+      'POST /groups/g1/transfer',
+      'POST /groups/g1/locations',
+      'DELETE /groups/g1/locations/l1',
+    ]);
+    expect(JSON.parse(String((fetchMock.mock.calls[1] as [string, RequestInit])[1].body))).toEqual({
+      role: 'admin',
+    });
+  });
 });

@@ -11,39 +11,8 @@ import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { ConfirmButton } from '@/components/confirm-button';
 import { NoGroup } from '@/components/no-group';
-
-/** Ação destrutiva em dois toques (padrão do projeto): o primeiro pede confirmação. */
-function ConfirmButton({
-  label,
-  context,
-  onConfirm,
-}: {
-  label: string;
-  context: string;
-  onConfirm: () => Promise<void>;
-}) {
-  const [armed, setArmed] = useState(false);
-  const [busy, setBusy] = useState(false);
-  return (
-    <Button
-      label={armed ? t('availConfirm') : label}
-      accessibilityLabel={armed ? `${t('availConfirm')}: ${context}` : `${label}: ${context}`}
-      variant={armed ? 'primary' : 'secondary'}
-      disabled={busy}
-      onPress={async () => {
-        if (!armed) return setArmed(true);
-        setBusy(true);
-        try {
-          await onConfirm();
-        } finally {
-          setBusy(false);
-          setArmed(false);
-        }
-      }}
-    />
-  );
-}
 
 /** Disponibilidade (5.4): melhores horários, adicionar, regras semanais e o que o grupo marcou. */
 export default function AvailabilityScreen() {
@@ -196,6 +165,7 @@ export default function AvailabilityScreen() {
                 </View>
               )}
               <ConfirmButton
+                confirmLabel={t('availConfirm')}
                 label={t('availRemove')}
                 context={ruleSummary(rule)}
                 onConfirm={() => act(() => api.rules.remove(rule.id), t('availRemoved'))}
@@ -243,6 +213,7 @@ export default function AvailabilityScreen() {
                     />
                   ) : (
                     <ConfirmButton
+                      confirmLabel={t('availConfirm')}
                       label={t('availRemove')}
                       context={when}
                       onConfirm={() =>

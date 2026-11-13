@@ -191,6 +191,12 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: seu grupo no app (13/11/2026)
+
+- Convite: link selecionável e código lidos com rótulo ("Código de convite: A B C D…", letra a letra); compartilhar usa a folha nativa do sistema. Gerar novo convite e todas as ações destrutivas (remover membro, sair, passar a posse, remover local) usam o `ConfirmButton` compartilhado em dois toques, com o nome do alvo no nome acessível; dono(a) com outras pessoas no grupo vê "Sair" desabilitado e o motivo em texto.
+- Membros: o nome é um botão que abre o perfil ("Ver perfil de …"); papel em texto; só as ações permitidas aparecem (mesmas regras do site, conferidas de novo no servidor). Erros por membro em `alert`.
+- Locais: campos com rótulo visível; "Adicionar" desabilitado sem nome; resultado em região viva.
+
 ### Revisão: perfil do jogador no app (13/11/2026)
 
 - Aberto pelo ranking (cada linha é um botão com o resumo da posição e a dica "Ver perfil de …") e por "Meu perfil" na aba Conta. Foto/iniciais são decorativas (nome no título ao lado).

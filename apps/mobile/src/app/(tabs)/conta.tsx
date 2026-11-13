@@ -50,6 +50,9 @@ export default function AccountScreen() {
           }
         />
       )}
+      {group && (
+        <Button label={t('groupOpen')} variant="secondary" onPress={() => router.push('/grupo')} />
+      )}
       <Button
         label={t('groupsManage')}
         variant="secondary"
