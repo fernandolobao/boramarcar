@@ -159,3 +159,95 @@ describe('modo mesa', () => {
     vi.useRealTimers();
   });
 });
+
+describe('tela acesa e tela cheia', () => {
+  const start = () => {
+    const utils = render(
+      <NextIntlClientProvider locale="pt-BR" messages={messages} timeZone="America/Sao_Paulo">
+        <TableMode eventId="e1" players={players} defaultFormat="commander" />
+      </NextIntlClientProvider>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Começar' }));
+    return utils;
+  };
+
+  it('pede o wake lock ao começar e solta ao sair', async () => {
+    const release = vi.fn(async () => undefined);
+    const request = vi.fn(async () => ({ release, addEventListener: vi.fn() }));
+    vi.stubGlobal('navigator', { ...navigator, wakeLock: { request } });
+    start();
+    await waitFor(() => expect(request).toHaveBeenCalledWith('screen'));
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    expect(
+      await screen.findByText('Tela acesa enquanto a mesa estiver aberta.'),
+    ).toBeInTheDocument();
+    // Ao sair do tabuleiro (aqui, para registrar), solta o bloqueio.
+    fireEvent.click(screen.getByRole('button', { name: 'Encerrar e registrar' }));
+    await waitFor(() => expect(release).toHaveBeenCalled());
+  });
+
+  it('sem a API (Chrome no iPhone), toca um vídeo invisível em loop para a tela não bloquear', async () => {
+    const nav = { ...navigator };
+    Reflect.deleteProperty(nav, 'wakeLock');
+    vi.stubGlobal('navigator', nav);
+    const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+    const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
+    const { container } = start();
+    await waitFor(() => expect(play).toHaveBeenCalled());
+    const video = container.querySelector('video')!;
+    expect(video).toHaveAttribute('playsinline');
+    expect(video).toHaveAttribute('aria-hidden', 'true');
+    expect(video.muted).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    expect(screen.getByText('Tela acesa enquanto a mesa estiver aberta.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Encerrar e registrar' }));
+    expect(pause).toHaveBeenCalled();
+  });
+
+  it('quando o vídeo também é recusado, avisa para desligar o bloqueio automático', async () => {
+    const nav = { ...navigator };
+    Reflect.deleteProperty(nav, 'wakeLock');
+    vi.stubGlobal('navigator', nav);
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockRejectedValue(new Error('NotAllowedError'));
+    start();
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    expect(await screen.findByText(/Não deu para manter a tela acesa/)).toBeInTheDocument();
+  });
+
+  it('entra em tela cheia ao começar e dá para sair pelo menu', async () => {
+    const requestFullscreen = vi.fn(async () => undefined);
+    const exitFullscreen = vi.fn(async () => {
+      Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    document.documentElement.requestFullscreen = requestFullscreen;
+    document.exitFullscreen = exitFullscreen;
+    start();
+    expect(requestFullscreen).toHaveBeenCalled();
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: document.documentElement,
+      configurable: true,
+    });
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    const toggle = screen.getByRole('button', { name: 'Tela cheia' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(toggle);
+    await waitFor(() => expect(exitFullscreen).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: 'Tela cheia' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    Reflect.deleteProperty(document.documentElement, 'requestFullscreen');
+    Reflect.deleteProperty(document, 'exitFullscreen');
+  });
+
+  it('sem API de tela cheia (iPhone), explica como instalar na tela inicial', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    expect(screen.queryByRole('button', { name: 'Tela cheia' })).toBeNull();
+    expect(screen.getByText(/adicione o ArcanaKin à tela inicial/)).toBeInTheDocument();
+  });
+});

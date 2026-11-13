@@ -1,6 +1,7 @@
 import { tableReducer, type TableAction, type TableState } from '@boramarcar/core/table';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
+import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { AppText, ErrorState, Loading, styles } from '@/components/ui';
@@ -45,6 +46,8 @@ export default function TableScreen() {
       <>
         <Stack.Screen options={{ headerShown: false }} />
         <StatusBar hidden />
+        {/* Android: a barra de navegação some também (volta com um gesto da borda). */}
+        <NavigationBar hidden />
         <KeepAwake />
         <TableBoard
           state={state}

@@ -219,6 +219,7 @@ sem rolagem horizontal em 320px.
 - O número grande é decorativo (`aria-hidden`) porque está no anúncio e no nome dos botões; segurar tem alternativa (vários toques, ou o diálogo de marcadores).
 - Diálogos nativos (`<dialog>`) com nome, Esc fecha; marcadores com botões "Aumentar/Diminuir {nome}" e valor anunciado.
 - Cores das áreas com texto branco em contraste AA; a eliminação aparece com texto, não só escurecendo a área.
+- **Tela cheia e tela acesa (13/11/2026)**: a tela cheia é pedida no toque em "Começar" (gesto do usuário) e tem um botão no menu com `aria-pressed`; onde não há a API (Safari e Chrome do iPhone) o menu explica, em texto, como instalar na tela inicial. A tela acesa usa o wake lock ou, sem ele, um vídeo mudo de 1 px com `aria-hidden` e fora da ordem de foco; o resultado ("tela acesa" ou o que fazer quando não deu) fica numa região `status` do menu, sem modal. Como app instalado, o tabuleiro respeita as áreas seguras (`viewport-fit=cover` + `env(safe-area-inset-*)`).
 
 ### Pendências e limitações conhecidas
 

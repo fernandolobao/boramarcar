@@ -1,7 +1,7 @@
 'use client';
 
 import { tableReducer, type TableAction, type TableState } from '@boramarcar/core';
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 
 const key = (eventId: string) => `bm-mesa:${eventId}`;
 
@@ -75,29 +75,95 @@ export function useTable(eventId: string, initial: TableState) {
   return [state, dispatch] as const;
 }
 
-/** Mantém a tela acesa durante a partida, quando o navegador permite. */
-export function useWakeLock(active: boolean) {
+export type KeepAwakeStatus = 'pending' | 'native' | 'video' | 'unavailable';
+
+/**
+ * Mantém a tela acesa durante a partida. Usa a API de wake lock quando existe; onde não existe ou
+ * ela é recusada (Chrome no iPhone, modo de baixo consumo), toca em loop o vídeo invisível de
+ * `videoRef` — um vídeo em reprodução impede o bloqueio automático. Pede de novo ao voltar para a
+ * aba ou ao entrar/sair da tela cheia, porque o sistema solta o bloqueio nessas horas.
+ */
+export function useKeepAwake(active: boolean) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [status, setStatus] = useState<KeepAwakeStatus>('pending');
   useEffect(() => {
-    if (!active || !('wakeLock' in navigator)) return;
+    if (!active) return;
+    let cancelled = false;
     let lock: WakeLockSentinel | null = null;
-    let released = false;
-    const request = () =>
+    const video = videoRef.current;
+    const playVideo = () => {
+      if (!video) return setStatus('unavailable');
+      // `Promise.resolve().then` também cobre navegadores antigos em que `play()` não devolve promessa.
+      Promise.resolve()
+        .then(() => video.play())
+        .then(() => !cancelled && setStatus('video'))
+        .catch(() => !cancelled && setStatus('unavailable'));
+    };
+    const request = () => {
+      if (!('wakeLock' in navigator)) return playVideo();
       navigator.wakeLock
         .request('screen')
         .then((l) => {
-          if (released) void l.release();
-          else lock = l;
+          if (cancelled) return void l.release();
+          lock = l;
+          setStatus('native');
         })
-        .catch(() => undefined);
-    void request();
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void request();
+        .catch(playVideo);
     };
-    document.addEventListener('visibilitychange', onVisible);
+    request();
+    const again = () => {
+      if (document.visibilityState === 'visible') request();
+    };
+    document.addEventListener('visibilitychange', again);
+    document.addEventListener('fullscreenchange', again);
     return () => {
-      released = true;
-      document.removeEventListener('visibilitychange', onVisible);
+      cancelled = true;
+      document.removeEventListener('visibilitychange', again);
+      document.removeEventListener('fullscreenchange', again);
       void lock?.release();
+      video?.pause();
     };
   }, [active]);
+  return { status, videoRef };
+}
+
+/** Pede tela cheia (precisa vir de um toque do usuário); sem suporte, não faz nada. */
+export function enterFullscreen() {
+  if (typeof document === 'undefined') return;
+  document.documentElement.requestFullscreen?.({ navigationUI: 'hide' }).catch(() => undefined);
+}
+
+export function exitFullscreen() {
+  if (typeof document === 'undefined' || !document.fullscreenElement) return;
+  document.exitFullscreen?.().catch(() => undefined);
+}
+
+const subscribeFullscreen = (notify: () => void) => {
+  document.addEventListener('fullscreenchange', notify);
+  return () => document.removeEventListener('fullscreenchange', notify);
+};
+
+/** Aberto como app instalado (PWA): o navegador já não mostra barra nenhuma. */
+export function isStandalone() {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia?.('(display-mode: standalone)').matches === true ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  );
+}
+
+/**
+ * Tela cheia pela API do navegador (Android, desktop). O Safari e o Chrome do iPhone não têm essa
+ * API para páginas: lá, `supported` é falso e o caminho é instalar o app na tela inicial.
+ */
+export function useFullscreen() {
+  const active = useSyncExternalStore(
+    subscribeFullscreen,
+    () => Boolean(document.fullscreenElement),
+    () => false,
+  );
+  const supported =
+    typeof document !== 'undefined' &&
+    typeof document.documentElement.requestFullscreen === 'function';
+  return { supported, active, toggle: () => (active ? exitFullscreen() : enterFullscreen()) };
 }

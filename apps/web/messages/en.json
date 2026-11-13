@@ -1295,7 +1295,11 @@
     "swapPick": "Pick {name} to swap seats",
     "swapSelected": "{name} picked; tap another player to swap",
     "swapped": "{a} and {b} swapped seats.",
-    "swapDone": "Done"
+    "swapDone": "Done",
+    "fullscreen": "Full screen",
+    "fullscreenInstallHint": "To use the whole screen on iPhone, add ArcanaKin to your Home Screen (Share button → Add to Home Screen) and open the table from there.",
+    "awakeOn": "The screen stays on while the table is open.",
+    "awakeUnavailable": "Couldn't keep the screen on: turn off auto-lock in your phone's settings or leave Low Power Mode."
   },
   "consent": {
     "title": "Cookies and session recording",
