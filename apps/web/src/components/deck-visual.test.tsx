@@ -343,7 +343,7 @@ describe('editor de deck', () => {
         },
       }),
     );
-    expect(calls[0]!.url).toBe('/api/v1/cards/prints?name=Forest');
+    expect(calls[0]!.url).toBe('/api/v1/cards/prints?name=Forest&v=2');
   });
 });
 
