@@ -191,6 +191,12 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: coleção no app (14/11/2026)
+
+- Galeria em 3 colunas: cada carta é um botão com nome, cópias e acabamento/edição no rótulo; a quantidade também aparece sobre a imagem. Totais (linhas, cópias, valor) num título com região viva que muda com os filtros.
+- Adicionar: campo com sugestões do Scryfall como botões ("Usar Sol Ring"), cópias com −/+ (valor anunciado), foil como `checkbox`; erro em `alert`, confirmação em região viva.
+- Folha da carta: imagem com nome, edição e ilustrador em texto, −/+ de cópias com valor anunciado (0 remove), foil como `checkbox`, decks em que está, remover em dois toques com o nome da carta.
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).

@@ -478,4 +478,59 @@ describe('cliente da API', () => {
     expect(init.method).toBe('PUT');
     expect(JSON.parse(String(init.body))).toEqual({ emailNotifications: false });
   });
+
+  it('coleção: lista, sugestões, adicionar, editar e remover', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json({
+          cards: [
+            {
+              id: 'c1',
+              name: 'Sol Ring',
+              scryfallId: 's1',
+              quantity: 2,
+              foil: false,
+              card: {
+                scryfallId: 's1',
+                name: 'Sol Ring',
+                cmc: 1,
+                typeLine: 'Artifact',
+                priceUsd: '1.50',
+              },
+              addedAt: '2026-11-01T00:00:00.000Z',
+              decks: [{ deckId: 'd1', deckName: 'Omnath', quantity: 1, proxies: 0 }],
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(json({ names: ['Sol Ring', 'Solemn Simulacrum'] }))
+      .mockResolvedValueOnce(json({ added: true, name: 'Sol Ring' }, 201))
+      .mockResolvedValueOnce(json({ updated: true }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const cards = await api.collection.list();
+    expect(cards[0]!.addedAt).toBeInstanceOf(Date);
+    expect(cards[0]!.decks[0]).toMatchObject({ deckName: 'Omnath' });
+    expect(await api.cards.autocomplete('sol')).toEqual(['Sol Ring', 'Solemn Simulacrum']);
+    expect(await api.collection.add({ name: 'Sol Ring', quantity: 1 })).toEqual({
+      added: true,
+      name: 'Sol Ring',
+    });
+    await api.collection.update('c1', { quantity: 3 });
+    await expect(api.collection.remove('c1')).resolves.toBeNull();
+    const calls = (fetchMock.mock.calls as [string, RequestInit][]).map(
+      (c) => `${c[1].method ?? 'GET'} ${c[0].replace('https://www.arcanakin.com.br/api/v1', '')}`,
+    );
+    expect(calls).toEqual([
+      'GET /collection',
+      'GET /cards/autocomplete?q=sol',
+      'POST /collection',
+      'PATCH /collection/c1',
+      'DELETE /collection/c1',
+    ]);
+  });
 });

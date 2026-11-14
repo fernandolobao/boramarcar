@@ -3,6 +3,7 @@ import {
   availabilityRuleSchema,
   deckDetailSchema,
   availabilitySlotSchema,
+  collectionEntrySchema,
   deckSummarySchema,
   errorBodySchema,
   eventDetailSchema,
@@ -420,6 +421,48 @@ export function createApiClient(options: ApiClientOptions) {
           'DELETE',
           `/groups/${encodeURIComponent(groupId)}/locations/${encodeURIComponent(locationId)}`,
           z.object({ deleted: z.boolean() }),
+        ),
+    },
+    cards: {
+      /** Sugestões de nomes de carta (Scryfall), para adicionar à coleção ou a um deck. */
+      autocomplete: async (query: string) =>
+        (
+          await request(
+            'GET',
+            `/cards/autocomplete${q({ q: query })}`,
+            z.object({ names: z.array(z.string()) }),
+          )
+        ).names,
+    },
+    collection: {
+      /** A coleção inteira (filtros e ordem ficam no app). */
+      list: async () =>
+        (await request('GET', '/collection', z.object({ cards: z.array(collectionEntrySchema) })))
+          .cards,
+      /** Acrescenta cópias de uma carta pelo nome (ou pela impressão). */
+      add: (input: { name: string; quantity: number; foil?: boolean; scryfallId?: string }) =>
+        request(
+          'POST',
+          '/collection',
+          z.object({ added: z.literal(true), name: z.string() }),
+          input,
+        ),
+      /** Quantidade (0 remove), foil ou impressão de uma linha. */
+      update: (
+        entryId: string,
+        input: { quantity?: number; foil?: boolean; scryfallId?: string; copies?: number },
+      ) =>
+        request(
+          'PATCH',
+          `/collection/${encodeURIComponent(entryId)}`,
+          z.object({}).loose().or(z.null()),
+          input,
+        ),
+      remove: (entryId: string) =>
+        request(
+          'DELETE',
+          `/collection/${encodeURIComponent(entryId)}`,
+          z.null().or(z.object({}).loose()),
         ),
     },
     games: {
