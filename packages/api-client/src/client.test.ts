@@ -511,6 +511,16 @@ describe('cliente da API', () => {
         },
       }),
     );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const stats = await api.stats.get('g1');
+    expect(fetchMock.mock.calls[0]![0]).toBe('https://www.arcanakin.com.br/api/v1/groups/g1/stats');
+    expect(stats.commanders[0]).toMatchObject({ name: 'Omnath', winRate: 0.5 });
+    expect(stats.players[0]!.recent).toEqual(['win', 'win', 'loss']);
+  });
+
   it('edita o encontro e apaga uma partida (resposta vazia)', async () => {
     const fetchMock = vi
       .fn()
