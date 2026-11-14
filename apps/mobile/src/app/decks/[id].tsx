@@ -29,7 +29,7 @@ export default function DeckScreen() {
         refreshControl={<RefreshControl refreshing={deck.refreshing} onRefresh={deck.refresh} />}
       >
         <Stack.Screen options={{ title: deck.data.name }} />
-        <DeckBody deck={deck.data} />
+        <DeckBody deck={deck.data} onChanged={() => deck.refresh()} />
       </StackScrollView>
     </>
   );

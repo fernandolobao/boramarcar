@@ -8,7 +8,7 @@ import {
 } from '@boramarcar/core/games';
 import { tableSupportsFormat } from '@boramarcar/core/table';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { TextField } from '@/components/fields';
 import { formatLabel } from '@/components/table/labels';
@@ -60,9 +60,14 @@ function errorMessage(error: SimpleGameError): string {
  * no site.
  */
 export default function RecordGameScreen() {
-  const { eventId } = useLocalSearchParams<{ eventId: string }>();
+  const { eventId, gameId } = useLocalSearchParams<{ eventId: string; gameId?: string }>();
   const colors = useColors();
   const setup = useAsync(() => api.table.get(eventId), [eventId]);
+  // Editar: carrega a partida do encontro e preenche o formulário uma vez.
+  const existing = useAsync(
+    () => (gameId ? api.events.get(eventId) : Promise.resolve(null)),
+    [eventId, gameId],
+  );
   const [format, setFormat] = useState<GameFormat | null>(null);
   const [selected, setSelected] = useState<string[] | null>(null);
   const [decks, setDecks] = useState<Record<string, string | null>>({});
@@ -73,8 +78,23 @@ export default function RecordGameScreen() {
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [filled, setFilled] = useState(false);
+  useEffect(() => {
+    const game = existing.data?.games.find((g) => g.id === gameId);
+    if (!game || filled) return;
+    setFilled(true);
+    const ordered = [...game.players].sort((a, b) => (a.seat ?? 99) - (b.seat ?? 99));
+    if (isGameFormat(game.format)) setFormat(game.format);
+    setSelected(ordered.map((p) => p.userId));
+    setDecks(Object.fromEntries(ordered.map((p) => [p.userId, p.deckId ?? null])));
+    setWinner(game.isDraw ? 'draw' : (game.winners[0]?.userId ?? null));
+    setFirst(game.firstPlayerId ?? null);
+    setTurn(game.winningTurn ? String(game.winningTurn) : '');
+    setDuration(game.durationMinutes ? String(game.durationMinutes) : '');
+    setNotes(game.notes ?? '');
+  }, [existing.data, gameId, filled]);
 
-  if (setup.loading) return <Loading />;
+  if (setup.loading || (gameId && existing.loading)) return <Loading />;
   if (setup.error || !setup.data) return <ErrorState error={setup.error} onRetry={setup.refresh} />;
   const data = setup.data;
   if (data.status === 'cancelled') {
@@ -120,7 +140,8 @@ export default function RecordGameScreen() {
     if (!built.ok) return setError(errorMessage(built.error));
     setSaving(true);
     try {
-      await api.games.record(eventId, built.game);
+      if (gameId) await api.games.update(gameId, built.game);
+      else await api.games.record(eventId, built.game);
       // A tela do encontro recarrega ao voltar a ter o foco e mostra a partida nova.
       router.back();
     } catch (e) {
@@ -135,10 +156,10 @@ export default function RecordGameScreen() {
       contentContainerStyle={{ padding: 16, gap: 16 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Stack.Screen options={{ title: t('gameTitle') }} />
+      <Stack.Screen options={{ title: t(gameId ? 'gameEditTitle' : 'gameTitle') }} />
       <View>
         <AppText accessibilityRole="header" style={styles.title}>
-          {t('gameTitle')}
+          {t(gameId ? 'gameEditTitle' : 'gameTitle')}
         </AppText>
         <AppText muted>{data.title}</AppText>
       </View>
