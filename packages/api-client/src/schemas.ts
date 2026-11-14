@@ -334,6 +334,32 @@ export const deckLineSchema = z
   .loose();
 export type DeckLine = z.infer<typeof deckLineSchema>;
 
+/** Uma linha da coleção: cópias de uma impressão (foil ou não) e em que decks ela está. */
+export const collectionEntrySchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    scryfallId: z.string().nullable(),
+    quantity: z.number(),
+    foil: z.boolean(),
+    card: deckCardSchema
+      .extend({ artist: z.string().nullish(), rarity: z.string().nullish() })
+      .nullable(),
+    addedAt: date,
+    decks: z.array(
+      z
+        .object({
+          deckId: z.string(),
+          deckName: z.string(),
+          quantity: z.number(),
+          proxies: z.number(),
+        })
+        .loose(),
+    ),
+  })
+  .loose();
+export type CollectionEntry = z.infer<typeof collectionEntrySchema>;
+
 /** Deck com as linhas e a análise (o mesmo que o site mostra). */
 export const deckDetailSchema = z
   .object({

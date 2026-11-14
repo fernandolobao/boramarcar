@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { FlatList, Pressable, RefreshControl } from 'react-native';
-import { AppText, Card, ErrorState, Loading, styles } from '@/components/ui';
+import { FlatList, Pressable, RefreshControl, View } from 'react-native';
+import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
@@ -20,9 +20,16 @@ export default function DecksScreen() {
       contentContainerStyle={{ padding: 16, gap: 12 }}
       refreshControl={<RefreshControl refreshing={decks.refreshing} onRefresh={decks.refresh} />}
       ListHeaderComponent={
-        <AppText accessibilityRole="header" style={styles.title}>
-          {t('decksTitle')}
-        </AppText>
+        <View style={{ gap: 12, marginBottom: 4 }}>
+          <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
+            {t('decksTitle')}
+          </AppText>
+          <Button
+            label={t('collectionOpenScreen')}
+            variant="secondary"
+            onPress={() => router.push('/colecao')}
+          />
+        </View>
       }
       ListEmptyComponent={<AppText muted>{t('decksEmpty')}</AppText>}
       renderItem={({ item }) => (
