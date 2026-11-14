@@ -12,12 +12,14 @@ import {
   gameWindowSchema,
   createdGroupSchema,
   groupSchema,
+  groupSettingsSchema,
   locationSchema,
   memberSchema,
   playerProfileSchema,
   preferencesSchema,
   rankingSchema,
   rsvpSchema,
+  seasonSchema,
   tableSetupSchema,
   type GameInput,
   type Rsvp,
@@ -200,6 +202,34 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ members: z.array(memberSchema) }),
           )
         ).members,
+      /** Configurações do grupo (qualquer membro lê; dono/admin altera). */
+      settings: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/settings`,
+            z.object({ settings: groupSettingsSchema }),
+          )
+        ).settings,
+      updateSettings: async (
+        groupId: string,
+        input: Partial<{
+          tableSize: number;
+          minDurationMinutes: number;
+          pointsWin: number;
+          pointsDraw: number;
+          pointsLoss: number;
+          defaultFormat: string;
+        }>,
+      ) =>
+        (
+          await request(
+            'PATCH',
+            `/groups/${encodeURIComponent(groupId)}/settings`,
+            z.object({ settings: groupSettingsSchema }),
+            input,
+          )
+        ).settings,
       /** Gera um novo código de convite (dono/admin); o link antigo deixa de funcionar. */
       regenerateInvite: async (groupId: string) =>
         (
@@ -455,6 +485,36 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ player: playerProfileSchema }),
           )
         ).player,
+    },
+    seasons: {
+      list: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/seasons`,
+            z.object({ seasons: z.array(seasonSchema) }),
+          )
+        ).seasons,
+      /** Cria uma temporada (dono/admin); `endsAt` é exclusivo (dia seguinte ao último, 00:00). */
+      create: async (groupId: string, input: { name: string; startsAt: Date; endsAt: Date }) =>
+        (
+          await request(
+            'POST',
+            `/groups/${encodeURIComponent(groupId)}/seasons`,
+            z.object({ season: seasonSchema }),
+            {
+              name: input.name,
+              startsAt: input.startsAt.toISOString(),
+              endsAt: input.endsAt.toISOString(),
+            },
+          )
+        ).season,
+      remove: (seasonId: string) =>
+        request(
+          'DELETE',
+          `/seasons/${encodeURIComponent(seasonId)}`,
+          z.null().or(z.object({}).loose()),
+        ),
     },
     ranking: {
       get: (groupId: string, filters: { from?: Date; to?: Date; format?: string } = {}) =>

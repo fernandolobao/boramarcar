@@ -191,6 +191,12 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: configurações do grupo, temporadas e filtros do ranking no app (14/11/2026)
+
+- Números (mesa, duração, pontos) com −/+ e o valor no nome acessível ("Vitória: aumentar (agora 3)"), desabilitados nos limites e para quem não pode editar (com o motivo em texto); tipo de jogo padrão como `radiogroup`. "Salvar" só com mudança válida (vitória > empate ≥ derrota).
+- Temporadas: datas digitadas com dica de formato (sem relógio nativo), botão desabilitado até ficar válido; remover em dois toques com o nome.
+- Ranking: período (inclui temporadas) e tipo de jogo como `radiogroup` horizontais; total de partidas do período em região viva.
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).
