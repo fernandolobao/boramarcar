@@ -204,6 +204,12 @@ sem rolagem horizontal em 320px.
 - Importar: forma de importação, tipo de jogo como `radiogroup`/`radio`; campos com rótulo e dica; botão desabilitado até haver link ou lista; erro em `alert` e cartas não achadas em região viva.
 - Ferramentas do dono (seção da pilha): nome, tipo de jogo e visibilidade com dica do que cada opção significa; "Salvar" só com mudança; atualizar e exportar com resultado em região viva; exportar usa a folha nativa; excluir em dois toques com o nome do deck.
 
+### Revisão: coleção no app (14/11/2026)
+
+- Galeria em 3 colunas: cada carta é um botão com nome, cópias e acabamento/edição no rótulo; a quantidade também aparece sobre a imagem. Totais (linhas, cópias, valor) num título com região viva que muda com os filtros.
+- Adicionar: campo com sugestões do Scryfall como botões ("Usar Sol Ring"), cópias com −/+ (valor anunciado), foil como `checkbox`; erro em `alert`, confirmação em região viva.
+- Folha da carta: imagem com nome, edição e ilustrador em texto, −/+ de cópias com valor anunciado (0 remove), foil como `checkbox`, decks em que está, remover em dois toques com o nome da carta.
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).

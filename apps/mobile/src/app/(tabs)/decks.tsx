@@ -26,7 +26,14 @@ export default function DecksScreen() {
           <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
             {t('decksTitle')}
           </AppText>
-          <Button label={t('deckImportTitle')} onPress={() => router.push('/decks/importar')} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <Button label={t('deckImportTitle')} onPress={() => router.push('/decks/importar')} />
+            <Button
+              label={t('collectionOpenScreen')}
+              variant="secondary"
+              onPress={() => router.push('/colecao')}
+            />
+          </View>
         </View>
       }
       ListEmptyComponent={<AppText muted>{t('decksEmpty')}</AppText>}
