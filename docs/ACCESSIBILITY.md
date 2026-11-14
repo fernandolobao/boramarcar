@@ -199,6 +199,11 @@ sem rolagem horizontal em 320px.
 
 - Cartão "Organizar" só para quem pode: "Editar encontro" alterna o formulário (`expanded`); dia como `radiogroup` horizontal (inclui o dia atual do encontro, mesmo passado), horários com −/+ e local como `radio`; cancelar e remover partida em dois toques com o contexto no nome; reabrir simples. Resultado e erros em região viva. "Compartilhar" usa a folha nativa com o mesmo texto do site.
 
+### Revisão: decks no app, importar e ferramentas (14/11/2026)
+
+- Importar: forma de importação, tipo de jogo como `radiogroup`/`radio`; campos com rótulo e dica; botão desabilitado até haver link ou lista; erro em `alert` e cartas não achadas em região viva.
+- Ferramentas do dono (seção da pilha): nome, tipo de jogo e visibilidade com dica do que cada opção significa; "Salvar" só com mudança; atualizar e exportar com resultado em região viva; exportar usa a folha nativa; excluir em dois toques com o nome do deck.
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).
