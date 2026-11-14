@@ -511,6 +511,11 @@ describe('cliente da API', () => {
         },
       }),
     );
+  it('edita o encontro e apaga uma partida (resposta vazia)', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ event: { id: 'e1' } }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
     const api = createApiClient({
       baseUrl: 'https://www.arcanakin.com.br',
       fetch: fetchMock as unknown as typeof fetch,
@@ -519,5 +524,22 @@ describe('cliente da API', () => {
     expect(fetchMock.mock.calls[0]![0]).toBe('https://www.arcanakin.com.br/api/v1/groups/g1/stats');
     expect(stats.commanders[0]).toMatchObject({ name: 'Omnath', winRate: 0.5 });
     expect(stats.players[0]!.recent).toEqual(['win', 'win', 'loss']);
+    await api.events.update('e1', {
+      title: 'Commander',
+      startsAt: new Date('2026-11-20T22:00:00.000Z'),
+      endsAt: null,
+      locationId: 'l1',
+    });
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://www.arcanakin.com.br/api/v1/events/e1');
+    expect(init.method).toBe('PATCH');
+    expect(JSON.parse(String(init.body))).toEqual({
+      title: 'Commander',
+      startsAt: '2026-11-20T22:00:00.000Z',
+      endsAt: null,
+      locationId: 'l1',
+    });
+    await expect(api.games.remove('g1')).resolves.toBeNull();
+    expect((fetchMock.mock.calls[1] as [string, RequestInit])[1].method).toBe('DELETE');
   });
 });
