@@ -216,6 +216,12 @@ sem rolagem horizontal em 320px.
 - Temporadas: datas digitadas com dica de formato (sem relógio nativo), botão desabilitado até ficar válido; remover em dois toques com o nome.
 - Ranking: período (inclui temporadas) e tipo de jogo como `radiogroup` horizontais; total de partidas do período em região viva.
 
+### Revisão: editar cartas do deck e partidas no app (14/11/2026)
+
+- "Editar cartas" alterna o modo (`expanded`); cada linha vira cópias e proxies com −/+ (nome e valor atual no rótulo, limites respeitados), "Edição" com o nome da carta no rótulo e "Remover" em dois toques. Adicionar carta: nome com sugestões como botões, board como `radiogroup`, cópias com −/+. Resultado de cada ação em região viva; cartas não achadas em `alert`.
+- Seletor de edição: lista com filtro (mesma regra do site, inclusive ilustrador), contagem anunciada, cada impressão é um botão com edição, código, número e ilustrador, e "Em uso" marcado em texto e borda.
+- Editar partida reaproveita o formulário de registrar, preenchido com a partida; título da tela muda para "Editar partida".
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).

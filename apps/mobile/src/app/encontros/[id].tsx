@@ -155,6 +155,20 @@ export default function EventScreen() {
                   ? t('draw')
                   : t('winner', { names: g.winners.map((w) => w.name).join(', ') })}
               </AppText>
+              {g.canEdit && (
+                <Button
+                  label={t('gameEdit')}
+                  variant="secondary"
+                  accessibilityLabel={`${t('gameEdit')}: ${t('game', { number: g.number })}`}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/partida/[eventId]',
+                      params: { eventId: e.id, gameId: g.id },
+                    })
+                  }
+                  style={{ alignSelf: 'flex-start' }}
+                />
+              )}
               {e.canManage && (
                 <View style={{ alignSelf: 'flex-start' }}>
                   <ConfirmButton
