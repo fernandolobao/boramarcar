@@ -2,15 +2,14 @@ import type { DeckDetail, DeckLine } from '@boramarcar/api-client';
 import type { BracketEstimate } from '@boramarcar/core/analysis';
 import { groupEntriesByType } from '@boramarcar/core/decks';
 import type { GameFormat } from '@boramarcar/core/games';
-import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { BracketChecklist } from './bracket-checklist';
 import { CardViewer } from './card-viewer';
+import { AddCardForm, LineEditor, usePrintPicker } from './deck-edit';
 import { formatLabel } from '@/components/table/labels';
 import { StackSection } from '@/components/stack';
 import { AppText, Button, styles } from '@/components/ui';
-import { API_URL } from '@/lib/config';
 import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
@@ -109,9 +108,35 @@ function LineRow({ line, onOpen }: { line: DeckLine; onOpen: () => void }) {
 }
 
 /** Conteúdo do deck (5.8): resumo, nota, validação, curva, funções e cartas por tipo. */
-export function DeckBody({ deck }: { deck: DeckDetail }) {
+export function DeckBody({
+  deck,
+  onChanged,
+}: {
+  deck: DeckDetail;
+  /** Depois de editar cartas (dono): recarrega o deck. */
+  onChanged?: () => Promise<void> | void;
+}) {
   const colors = useColors();
   const [open, setOpen] = useState<DeckLine | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editMessage, setEditMessage] = useState('');
+  const changed = async (message?: string) => {
+    if (message) setEditMessage(message);
+    await onChanged?.();
+  };
+  const printPicker = usePrintPicker(deck.id, changed);
+  const row = (line: DeckLine) =>
+    editing ? (
+      <LineEditor
+        key={line.key}
+        deckId={deck.id}
+        line={line}
+        onChanged={changed}
+        onPickPrint={printPicker.open}
+      />
+    ) : (
+      <LineRow key={line.key} line={line} onOpen={() => setOpen(line)} />
+    );
   const a = deck.analysis;
   const commanders = deck.lines.filter((l) => l.board === 'commander');
   const art = commanders.find((l) => l.card?.imageUri)?.card?.imageUri;
@@ -249,6 +274,21 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
       )}
 
       <Section title={t('deckCardsTitle')} index={next()}>
+        {deck.isOwner && onChanged && (
+          <View style={{ gap: 8 }}>
+            <Button
+              label={editing ? t('deckEditDone') : t('deckEditCards')}
+              variant="secondary"
+              accessibilityState={{ expanded: editing }}
+              onPress={() => setEditing((e) => !e)}
+              style={{ alignSelf: 'flex-start' }}
+            />
+            <AppText muted accessibilityLiveRegion="polite">
+              {editMessage}
+            </AppText>
+            {editing && <AddCardForm deckId={deck.id} onChanged={changed} />}
+          </View>
+        )}
         {commanders.length > 0 && (
           <View>
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 4 }}>
@@ -257,9 +297,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
                 count: count(commanders),
               })}
             </AppText>
-            {commanders.map((line) => (
-              <LineRow key={line.key} line={line} onOpen={() => setOpen(line)} />
-            ))}
+            {commanders.map(row)}
           </View>
         )}
         {groups.map(({ group, entries, count: total }) => (
@@ -267,9 +305,7 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
               {t('deckGroupCount', { group: tKey('deckType', group), count: total })}
             </AppText>
-            {entries.map((line) => (
-              <LineRow key={line.key} line={line} onOpen={() => setOpen(line)} />
-            ))}
+            {entries.map(row)}
           </View>
         ))}
         {others.map(({ board, lines }) => (
@@ -277,21 +313,12 @@ export function DeckBody({ deck }: { deck: DeckDetail }) {
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
               {t('deckGroupCount', { group: tKey('deckBoard', board), count: count(lines) })}
             </AppText>
-            {lines.map((line) => (
-              <LineRow key={line.key} line={line} onOpen={() => setOpen(line)} />
-            ))}
+            {lines.map(row)}
           </View>
         ))}
       </Section>
 
-      {deck.isOwner && (
-        <Button
-          label={t('deckEditWeb')}
-          variant="secondary"
-          accessibilityRole="link"
-          onPress={() => void WebBrowser.openBrowserAsync(`${API_URL}/decks/${deck.id}`)}
-        />
-      )}
+      {printPicker.picker}
       <CardViewer line={open} onClose={() => setOpen(null)} />
     </>
   );

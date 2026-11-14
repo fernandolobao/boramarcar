@@ -93,12 +93,21 @@ export const eventDetailSchema = z
           number: z.number(),
           format: z.string(),
           isDraw: z.boolean(),
+          /** Quem registrou ou admins podem editar e remover. */
+          canEdit: z.boolean().optional(),
+          firstPlayerId: z.string().nullish(),
+          winningTurn: z.number().nullish(),
+          durationMinutes: z.number().nullish(),
+          notes: z.string().nullish(),
           winners: z.array(personSchema.loose()),
           players: z.array(
             personSchema
               .extend({
                 result: z.enum(['win', 'loss', 'draw']),
                 deckName: z.string().nullable(),
+                deckId: z.string().nullish(),
+                seat: z.number().nullish(),
+                team: z.number().nullish(),
               })
               .loose(),
           ),
@@ -333,6 +342,21 @@ export const deckLineSchema = z
   })
   .loose();
 export type DeckLine = z.infer<typeof deckLineSchema>;
+
+/** Uma impressão (edição) de uma carta, para trocar no editor de deck. */
+export const cardPrintSchema = z
+  .object({
+    scryfallId: z.string(),
+    name: z.string(),
+    setCode: z.string(),
+    setName: z.string(),
+    collectorNumber: z.string(),
+    imageUri: z.string().nullable(),
+    priceUsd: z.string().nullable(),
+    artist: z.string().nullish(),
+  })
+  .loose();
+export type CardPrint = z.infer<typeof cardPrintSchema>;
 
 /** Deck com as linhas e a análise (o mesmo que o site mostra). */
 export const deckDetailSchema = z

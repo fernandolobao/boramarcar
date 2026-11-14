@@ -3,6 +3,7 @@ import {
   availabilityRuleSchema,
   deckDetailSchema,
   availabilitySlotSchema,
+  cardPrintSchema,
   deckSummarySchema,
   errorBodySchema,
   eventDetailSchema,
@@ -422,6 +423,26 @@ export function createApiClient(options: ApiClientOptions) {
           z.object({ deleted: z.boolean() }),
         ),
     },
+    cards: {
+      /** Sugestões de nomes de carta (Scryfall). */
+      autocomplete: async (query: string) =>
+        (
+          await request(
+            'GET',
+            `/cards/autocomplete${q({ q: query })}`,
+            z.object({ names: z.array(z.string()) }),
+          )
+        ).names,
+      /** Edições (impressões) de uma carta, mais novas primeiro. */
+      prints: async (name: string) =>
+        (
+          await request(
+            'GET',
+            `/cards/prints${q({ name, v: '2' })}`,
+            z.object({ prints: z.array(cardPrintSchema) }),
+          )
+        ).prints,
+    },
     games: {
       /** Registra uma partida no encontro. */
       record: async (eventId: string, game: GameInput) =>
@@ -429,6 +450,16 @@ export function createApiClient(options: ApiClientOptions) {
           await request(
             'POST',
             `/events/${encodeURIComponent(eventId)}/games`,
+            z.object({ game: z.object({ id: z.string() }).loose() }),
+            game,
+          )
+        ).game,
+      /** Edita a partida inteira (quem registrou ou admins). */
+      update: async (gameId: string, game: GameInput) =>
+        (
+          await request(
+            'PUT',
+            `/games/${encodeURIComponent(gameId)}`,
             z.object({ game: z.object({ id: z.string() }).loose() }),
             game,
           )
@@ -471,6 +502,51 @@ export function createApiClient(options: ApiClientOptions) {
     decks: {
       list: async () =>
         (await request('GET', '/decks', z.object({ decks: z.array(deckSummarySchema) }))).decks,
+      /** Quantidade (0 remove), proxies e edição de uma carta num board; `found` avisa se a carta existe. */
+      setLine: (
+        deckId: string,
+        input: {
+          name: string;
+          board: string;
+          quantity: number;
+          proxies: number;
+          scryfallId?: string | null;
+        },
+      ) =>
+        request(
+          'PUT',
+          `/decks/${encodeURIComponent(deckId)}/lines`,
+          z.object({ found: z.boolean() }).loose(),
+          input,
+        ),
+      /** Adiciona cópias de uma carta pelo nome (impressão padrão do Scryfall). */
+      addCard: (
+        deckId: string,
+        input: { name: string; board: string; quantity: number; proxies: number },
+      ) =>
+        request(
+          'POST',
+          `/decks/${encodeURIComponent(deckId)}/lines`,
+          z.object({ found: z.boolean() }).loose(),
+          input,
+        ),
+      /** Troca a edição de parte das cópias de uma linha. */
+      changePrint: (
+        deckId: string,
+        input: {
+          name: string;
+          board: string;
+          fromScryfallId: string | null;
+          toScryfallId: string;
+          quantity: number;
+        },
+      ) =>
+        request(
+          'POST',
+          `/decks/${encodeURIComponent(deckId)}/lines/print`,
+          z.object({}).loose().or(z.null()),
+          input,
+        ),
       /** Deck com cartas e análise (quem pode ver o deck). */
       get: async (deckId: string) =>
         (

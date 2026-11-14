@@ -478,4 +478,73 @@ describe('cliente da API', () => {
     expect(init.method).toBe('PUT');
     expect(JSON.parse(String(init.body))).toEqual({ emailNotifications: false });
   });
+
+  it('editar cartas do deck, edições e editar partida', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ line: { name: 'Sol Ring' }, found: true }))
+      .mockResolvedValueOnce(json({ line: { name: 'Forest' }, found: true }))
+      .mockResolvedValueOnce(
+        json({
+          prints: [
+            {
+              scryfallId: 'p1',
+              name: 'Sol Ring',
+              setCode: 'cmm',
+              setName: 'Commander Masters',
+              collectorNumber: '400',
+              imageUri: null,
+              priceUsd: '1.50',
+              artist: 'Mike Bierek',
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(json({ moved: true }))
+      .mockResolvedValueOnce(json({ game: { id: 'g1' } }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(
+      await api.decks.setLine('d1', {
+        name: 'Sol Ring',
+        board: 'mainboard',
+        quantity: 1,
+        proxies: 0,
+      }),
+    ).toMatchObject({ found: true });
+    expect(
+      await api.decks.addCard('d1', {
+        name: 'Forest',
+        board: 'mainboard',
+        quantity: 2,
+        proxies: 0,
+      }),
+    ).toMatchObject({ found: true });
+    expect((await api.cards.prints('Sol Ring'))[0]).toMatchObject({
+      setCode: 'cmm',
+      artist: 'Mike Bierek',
+    });
+    await api.decks.changePrint('d1', {
+      name: 'Sol Ring',
+      board: 'mainboard',
+      fromScryfallId: null,
+      toScryfallId: 'p1',
+      quantity: 1,
+    });
+    expect(await api.games.update('g1', { players: [{ userId: 'u1', result: 'win' }] })).toEqual({
+      id: 'g1',
+    });
+    const calls = (fetchMock.mock.calls as [string, RequestInit][]).map(
+      (c) => `${c[1].method ?? 'GET'} ${c[0].replace('https://www.arcanakin.com.br/api/v1', '')}`,
+    );
+    expect(calls).toEqual([
+      'PUT /decks/d1/lines',
+      'POST /decks/d1/lines',
+      'GET /cards/prints?name=Sol+Ring&v=2',
+      'POST /decks/d1/lines/print',
+      'PUT /games/g1',
+    ]);
+  });
 });
