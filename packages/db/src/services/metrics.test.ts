@@ -59,7 +59,9 @@ describe('métricas do produto', () => {
       platform: 'web',
     });
 
-    const m = await getProductMetrics(db, new Date());
+    // `now` um pouco à frente: o `created_at` do banco tem microssegundos e pode ficar depois do
+    // relógio do JS (milissegundos) no mesmo instante, e a janela é fechada em `now` (`<`).
+    const m = await getProductMetrics(db, new Date(Date.now() + 1000));
     expect(m).toMatchObject({
       windowDays: 28,
       activeGroups: 1,
