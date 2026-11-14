@@ -4,6 +4,7 @@ import { deckFlow } from '@boramarcar/tokens/flow';
 import { Aura } from '@/components/aura';
 import { StackScrollView } from '@/components/stack';
 import { DeckBody } from '@/components/deck/deck-body';
+import { DeckTools } from '@/components/deck/deck-tools';
 import { ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAsync } from '@/lib/use-async';
@@ -30,6 +31,14 @@ export default function DeckScreen() {
       >
         <Stack.Screen options={{ title: deck.data.name }} />
         <DeckBody deck={deck.data} />
+        {deck.data.isOwner && (
+          <DeckTools
+            key={`${deck.data.name}-${deck.data.format}-${deck.data.visibility}`}
+            deck={deck.data}
+            index={99}
+            onChanged={() => void deck.refresh()}
+          />
+        )}
       </StackScrollView>
     </>
   );

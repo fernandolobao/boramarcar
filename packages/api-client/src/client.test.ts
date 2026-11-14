@@ -478,4 +478,37 @@ describe('cliente da API', () => {
     expect(init.method).toBe('PUT');
     expect(JSON.parse(String(init.body))).toEqual({ emailNotifications: false });
   });
+
+  it('deck: importar, configurar, sincronizar, exportar texto e apagar', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ deck: { id: 'd1' }, notFound: ['Carta Inventada'] }, 201))
+      .mockResolvedValueOnce(json({ deck: { id: 'd1', visibility: 'public' } }))
+      .mockResolvedValueOnce(json({ added: ['Sol Ring'], removed: [], changed: ['Forest'] }))
+      .mockResolvedValueOnce(new Response('1 Sol Ring\n31 Forest', { status: 200 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const imported = await api.decks.import({ kind: 'text', text: '1 Sol Ring', name: 'Teste' });
+    expect(imported).toEqual({ deck: { id: 'd1' }, notFound: ['Carta Inventada'] });
+    expect(await api.decks.update('d1', { visibility: 'public' })).toMatchObject({ id: 'd1' });
+    expect(await api.decks.sync('d1')).toMatchObject({ added: ['Sol Ring'] });
+    expect(await api.decks.exportText('d1', 'proxies')).toBe('1 Sol Ring\n31 Forest');
+    await expect(api.decks.remove('d1')).resolves.toBeNull();
+    const calls = (fetchMock.mock.calls as [string, RequestInit][]).map(
+      (c) => `${c[1].method ?? 'GET'} ${c[0].replace('https://www.arcanakin.com.br/api/v1', '')}`,
+    );
+    expect(calls).toEqual([
+      'POST /decks',
+      'PATCH /decks/d1',
+      'POST /decks/d1/sync',
+      'GET /decks/d1/export?format=proxies',
+      'DELETE /decks/d1',
+    ]);
+    expect(JSON.parse(String((fetchMock.mock.calls[2] as [string, RequestInit])[1].body))).toEqual(
+      {},
+    );
+  });
 });

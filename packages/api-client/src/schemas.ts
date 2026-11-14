@@ -343,6 +343,9 @@ export const deckDetailSchema = z
     visibility: z.string(),
     ownerName: z.string(),
     isOwner: z.boolean(),
+    /** Origem da importação (archidekt, moxfield, text…) e o link, quando houver. */
+    source: z.string().nullish(),
+    sourceUrl: z.string().nullish(),
     lines: z.array(deckLineSchema),
     analysis: z
       .object({
