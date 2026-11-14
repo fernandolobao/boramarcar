@@ -191,6 +191,11 @@ sem rolagem horizontal em 320px.
 - Dia, frequência, dias da semana e locais como `radio`/`checkbox` com estado; horários com botões −/+ de meia em meia hora (sem relógio nativo), com nome que diz o horário atual e valor anunciado.
 - Remover pede confirmação em dois toques ("Confirmar remoção") com o contexto no nome do botão; "Não posso nesta data" e "voltar a poder" dizem a data. Mensagens de resultado em região viva; erros como alerta.
 
+### Revisão: decks no app, importar e ferramentas (14/11/2026)
+
+- Importar: forma de importação, tipo de jogo como `radiogroup`/`radio`; campos com rótulo e dica; botão desabilitado até haver link ou lista; erro em `alert` e cartas não achadas em região viva.
+- Ferramentas do dono (seção da pilha): nome, tipo de jogo e visibilidade com dica do que cada opção significa; "Salvar" só com mudança; atualizar e exportar com resultado em região viva; exportar usa a folha nativa; excluir em dois toques com o nome do deck.
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).

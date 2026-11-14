@@ -102,6 +102,27 @@ export function createApiClient(options: ApiClientOptions) {
     return parsed.data;
   }
 
+  /** Pedido cuja resposta é texto puro (ex.: lista do deck para exportar). */
+  async function requestText(path: string): Promise<string> {
+    const headers: Record<string, string> = {
+      Accept: 'text/plain',
+      ...(await options.getHeaders?.()),
+    };
+    let response: Response;
+    try {
+      response = await fetchFn(`${base}/api/v1${path}`, { headers, credentials: 'omit' });
+    } catch (error) {
+      throw new ApiError('network_error', 'Sem conexão com o servidor', 0, error);
+    }
+    if (!response.ok) {
+      const parsed = errorBodySchema.safeParse(await response.json().catch(() => null));
+      throw parsed.success
+        ? new ApiError(parsed.data.error.code, parsed.data.error.message, response.status)
+        : new ApiError('internal_error', `Erro ${response.status}`, response.status);
+    }
+    return response.text();
+  }
+
   const q = (params: Record<string, string | undefined>) => {
     const search = new URLSearchParams(
       Object.entries(params).filter((e): e is [string, string] => e[1] !== undefined),
@@ -471,6 +492,55 @@ export function createApiClient(options: ApiClientOptions) {
     decks: {
       list: async () =>
         (await request('GET', '/decks', z.object({ decks: z.array(deckSummarySchema) }))).decks,
+      /** Importa pelo link (Archidekt) ou por uma lista colada; devolve o deck e as cartas não achadas. */
+      import: (
+        input:
+          | { kind: 'url'; url: string; name?: string; format?: string }
+          | { kind: 'text'; text: string; name?: string; format?: string },
+      ) =>
+        request(
+          'POST',
+          '/decks',
+          z.object({ deck: z.object({ id: z.string() }).loose(), notFound: z.array(z.string()) }),
+          input,
+        ),
+      /** Nome, tipo de jogo e quem vê (dono). */
+      update: async (
+        deckId: string,
+        input: { name?: string; format?: string; visibility?: 'private' | 'group' | 'public' },
+      ) =>
+        (
+          await request(
+            'PATCH',
+            `/decks/${encodeURIComponent(deckId)}`,
+            z.object({ deck: z.object({ id: z.string() }).loose() }),
+            input,
+          )
+        ).deck,
+      /** Apaga o deck (dono); resposta vazia. */
+      remove: (deckId: string) =>
+        request(
+          'DELETE',
+          `/decks/${encodeURIComponent(deckId)}`,
+          z.null().or(z.object({}).loose()),
+        ),
+      /** Atualiza pela origem ou por uma lista colada; proxies continuam marcados. */
+      sync: (deckId: string, text?: string) =>
+        request(
+          'POST',
+          `/decks/${encodeURIComponent(deckId)}/sync`,
+          z
+            .object({
+              added: z.array(z.string()),
+              removed: z.array(z.string()),
+              changed: z.array(z.string()),
+            })
+            .loose(),
+          text ? { text } : {},
+        ),
+      /** Lista em texto (Moxfield/Archidekt/Arena); `proxies` marca cópias proxy com #proxy. */
+      exportText: (deckId: string, format: 'plain' | 'proxies' = 'plain') =>
+        requestText(`/decks/${encodeURIComponent(deckId)}/export${q({ format })}`),
       /** Deck com cartas e análise (quem pode ver o deck). */
       get: async (deckId: string) =>
         (
