@@ -302,6 +302,30 @@ export function createApiClient(options: ApiClientOptions) {
             },
           )
         ).event,
+      /** Edita título, horário e local (quem criou ou admins). */
+      update: async (
+        eventId: string,
+        input: {
+          title?: string;
+          startsAt?: Date;
+          endsAt?: Date | null;
+          locationId?: string | null;
+        },
+      ) =>
+        (
+          await request(
+            'PATCH',
+            `/events/${encodeURIComponent(eventId)}`,
+            z.object({ event: z.object({ id: z.string() }).loose() }),
+            {
+              ...input,
+              ...(input.startsAt ? { startsAt: input.startsAt.toISOString() } : {}),
+              ...(input.endsAt !== undefined
+                ? { endsAt: input.endsAt ? input.endsAt.toISOString() : null }
+                : {}),
+            },
+          )
+        ).event,
       /** Muda a situação do encontro: finalizar (dispara o resumo da noite), cancelar ou reabrir. */
       setStatus: async (eventId: string, status: 'scheduled' | 'cancelled' | 'finished') =>
         (
@@ -434,6 +458,13 @@ export function createApiClient(options: ApiClientOptions) {
             game,
           )
         ).game,
+      /** Apaga uma partida (quem registrou ou admins); a resposta vem vazia (204). */
+      remove: (gameId: string) =>
+        request(
+          'DELETE',
+          `/games/${encodeURIComponent(gameId)}`,
+          z.null().or(z.object({}).loose()),
+        ),
     },
     table: {
       /** Jogadores, decks e formato padrão para o modo mesa. */

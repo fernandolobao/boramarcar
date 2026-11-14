@@ -2,7 +2,9 @@ import type { Rsvp } from '@boramarcar/api-client';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
+import { ConfirmButton } from '@/components/confirm-button';
 import { EventRecap, FinishEvent } from '@/components/event-finish';
+import { EventManage, ShareEvent } from '@/components/event-manage';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
@@ -66,6 +68,9 @@ export default function EventScreen() {
             {t(e.status === 'cancelled' ? 'statusCancelled' : 'statusFinished')}
           </AppText>
         )}
+        <View style={{ marginTop: 8, alignSelf: 'flex-start' }}>
+          <ShareEvent event={e} />
+        </View>
       </View>
 
       {e.status === 'scheduled' && (
@@ -121,6 +126,9 @@ export default function EventScreen() {
       {e.canManage && e.status === 'scheduled' && e.startsAt.getTime() <= Date.now() && (
         <FinishEvent event={e} onDone={() => void event.refresh()} />
       )}
+      {e.canManage && (
+        <EventManage key={e.id + e.status} event={e} onDone={() => void event.refresh()} />
+      )}
       {e.status === 'finished' && e.games.length > 0 && <EventRecap event={e} />}
 
       <Card>
@@ -140,15 +148,36 @@ export default function EventScreen() {
             {t('games')}
           </AppText>
           {e.games.map((g) => (
-            <View key={g.id} style={{ gap: 2 }}>
+            <View key={g.id} style={{ gap: 6 }}>
               <AppText style={{ fontWeight: '600' }}>{t('game', { number: g.number })}</AppText>
               <AppText muted>
                 {g.isDraw
                   ? t('draw')
                   : t('winner', { names: g.winners.map((w) => w.name).join(', ') })}
               </AppText>
+              {e.canManage && (
+                <View style={{ alignSelf: 'flex-start' }}>
+                  <ConfirmButton
+                    label={t('gameRemove')}
+                    confirmLabel={t('gameRemoveConfirm')}
+                    context={t('game', { number: g.number })}
+                    onConfirm={async () => {
+                      try {
+                        await api.games.remove(g.id);
+                        setMessage(t('gameRemoved', { number: g.number }));
+                        await event.refresh();
+                      } catch {
+                        setMessage(t('loadError'));
+                      }
+                    }}
+                  />
+                </View>
+              )}
             </View>
           ))}
+          <AppText muted accessibilityLiveRegion="polite">
+            {message}
+          </AppText>
         </Card>
       )}
     </ScrollView>

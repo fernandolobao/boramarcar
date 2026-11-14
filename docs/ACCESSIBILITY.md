@@ -195,6 +195,10 @@ sem rolagem horizontal em 320px.
 
 - Aba inicial "Início": cartões com título (`header`); números lidos como "Aproveitamento: 50%, 2 vitórias em 4 partidas" (rótulo, valor e dica num só elemento); forma recente em letras com o nome completo no rótulo acessível (V/D/E → Vitória/Derrota/Empate). Próximo encontro é um link com título, data e local; pódio são botões que abrem o perfil; comandantes com arte decorativa e texto completo.
 
+### Revisão: organizar encontro no app (14/11/2026)
+
+- Cartão "Organizar" só para quem pode: "Editar encontro" alterna o formulário (`expanded`); dia como `radiogroup` horizontal (inclui o dia atual do encontro, mesmo passado), horários com −/+ e local como `radio`; cancelar e remover partida em dois toques com o contexto no nome; reabrir simples. Resultado e erros em região viva. "Compartilhar" usa a folha nativa com o mesmo texto do site.
+
 ### Revisão: ajuda / FAQ (13/11/2026)
 
 - Site: cada pergunta é um `<details>/<summary>` nativo (abre com Enter/Espaço, estado anunciado, sem JavaScript), com âncora por seção e índice no topo; seta decorativa gira com `motion-reduce`. Texto fixo em dois idiomas, sem dados de pessoa. Rota na lista do E2E (`/ajuda`, pública).
