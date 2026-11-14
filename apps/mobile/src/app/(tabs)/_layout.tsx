@@ -19,7 +19,10 @@ const icon =
     />
   );
 
-/** Abas principais (5.4): encontros, disponibilidade, ranking, decks e conta. */
+/** A aba inicial é o painel (as outras continuam acessíveis pela barra e pelos links). */
+export const unstable_settings = { initialRouteName: 'painel' };
+
+/** Abas principais (5.4): início (painel), encontros, disponibilidade, ranking, decks e conta. */
 export default function TabsLayout() {
   const colors = useColors();
   return (
@@ -34,13 +37,17 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="painel"
         options={{
-          title: t('tabEvents'),
-          tabBarIcon: icon('calendar-month'),
+          title: t('tabHome'),
+          tabBarIcon: icon('view-dashboard-outline'),
           // Na aba inicial, o cabeçalho mostra o logotipo (a tela tem o próprio título).
           headerTitle: () => <Logo height={20} />,
         }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{ title: t('tabEvents'), tabBarIcon: icon('calendar-month') }}
       />
       <Tabs.Screen
         name="disponibilidade"

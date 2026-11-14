@@ -215,6 +215,42 @@ export const preferencesSchema = z
   .loose();
 export type Preferences = z.infer<typeof preferencesSchema>;
 
+/** Estatísticas do grupo (só o que o app usa; o resto passa por `loose`). */
+export const groupStatsSchema = z
+  .object({
+    totalGames: z.number(),
+    averageWinningTurn: z.number().nullable().optional(),
+    averageDurationMinutes: z.number().nullable().optional(),
+    players: z.array(
+      z
+        .object({
+          userId: z.string(),
+          name: z.string(),
+          games: z.number(),
+          wins: z.number(),
+          currentStreak: z.number(),
+          bestStreak: z.number(),
+          recent: z.array(z.enum(['win', 'loss', 'draw'])),
+        })
+        .loose(),
+    ),
+    commanders: z.array(
+      z
+        .object({
+          name: z.string(),
+          games: z.number(),
+          wins: z.number(),
+          winRate: z.number(),
+          artUri: z.string().nullable().optional(),
+          players: z.array(z.object({ userId: z.string(), name: z.string() })),
+        })
+        .loose(),
+    ),
+    activity: z.array(z.object({ month: z.string(), games: z.number() })),
+  })
+  .loose();
+export type GroupStats = z.infer<typeof groupStatsSchema>;
+
 export const tableSetupSchema = z
   .object({
     eventId: z.string(),
