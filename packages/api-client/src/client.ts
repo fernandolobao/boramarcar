@@ -12,6 +12,7 @@ import {
   gameWindowSchema,
   createdGroupSchema,
   groupSchema,
+  groupStatsSchema,
   locationSchema,
   memberSchema,
   playerProfileSchema,
@@ -455,6 +456,21 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ player: playerProfileSchema }),
           )
         ).player,
+    },
+    stats: {
+      /** Estatísticas do grupo: sequências, comandantes em alta, atividade por mês. */
+      get: async (groupId: string, filters: { from?: Date; to?: Date; format?: string } = {}) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/stats${q({
+              from: filters.from?.toISOString(),
+              to: filters.to?.toISOString(),
+              format: filters.format,
+            })}`,
+            z.object({ stats: groupStatsSchema }),
+          )
+        ).stats,
     },
     ranking: {
       get: (groupId: string, filters: { from?: Date; to?: Date; format?: string } = {}) =>

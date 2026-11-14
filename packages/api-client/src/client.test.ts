@@ -478,4 +478,46 @@ describe('cliente da API', () => {
     expect(init.method).toBe('PUT');
     expect(JSON.parse(String(init.body))).toEqual({ emailNotifications: false });
   });
+
+  it('estatísticas do grupo', async () => {
+    const fetchMock = vi.fn(async (_url: string) =>
+      json({
+        stats: {
+          totalGames: 3,
+          averageWinningTurn: 8.5,
+          players: [
+            {
+              userId: 'u1',
+              name: 'Ana',
+              games: 3,
+              wins: 2,
+              currentStreak: 2,
+              bestStreak: 2,
+              recent: ['win', 'win', 'loss'],
+            },
+          ],
+          commanders: [
+            {
+              name: 'Omnath',
+              games: 2,
+              wins: 1,
+              winRate: 0.5,
+              artUri: null,
+              players: [{ userId: 'u1', name: 'Ana' }],
+            },
+          ],
+          activity: [{ month: '2026-11', games: 3 }],
+          headToHead: [],
+        },
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const stats = await api.stats.get('g1');
+    expect(fetchMock.mock.calls[0]![0]).toBe('https://www.arcanakin.com.br/api/v1/groups/g1/stats');
+    expect(stats.commanders[0]).toMatchObject({ name: 'Omnath', winRate: 0.5 });
+    expect(stats.players[0]!.recent).toEqual(['win', 'win', 'loss']);
+  });
 });
