@@ -478,4 +478,70 @@ describe('cliente da API', () => {
     expect(init.method).toBe('PUT');
     expect(JSON.parse(String(init.body))).toEqual({ emailNotifications: false });
   });
+
+  it('configurações do grupo e temporadas', async () => {
+    const settings = {
+      tableSize: 4,
+      minDurationMinutes: 180,
+      pointsWin: 3,
+      pointsDraw: 1,
+      pointsLoss: 0,
+      defaultFormat: 'commander',
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ settings }))
+      .mockResolvedValueOnce(json({ settings: { ...settings, tableSize: 5 } }))
+      .mockResolvedValueOnce(
+        json({
+          seasons: [
+            {
+              id: 's1',
+              name: 'T1',
+              startsAt: '2026-01-01T03:00:00.000Z',
+              endsAt: '2026-04-01T03:00:00.000Z',
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        json(
+          {
+            season: {
+              id: 's2',
+              name: 'T2',
+              startsAt: '2026-04-01T03:00:00.000Z',
+              endsAt: '2026-07-01T03:00:00.000Z',
+            },
+          },
+          201,
+        ),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.groups.settings('g1')).toEqual(settings);
+    expect((await api.groups.updateSettings('g1', { tableSize: 5 })).tableSize).toBe(5);
+    const seasons = await api.seasons.list('g1');
+    expect(seasons[0]!.startsAt).toBeInstanceOf(Date);
+    const created = await api.seasons.create('g1', {
+      name: 'T2',
+      startsAt: new Date('2026-04-01T03:00:00.000Z'),
+      endsAt: new Date('2026-07-01T03:00:00.000Z'),
+    });
+    expect(created.id).toBe('s2');
+    await expect(api.seasons.remove('s1')).resolves.toBeNull();
+    const calls = (fetchMock.mock.calls as [string, RequestInit][]).map(
+      (c) => `${c[1].method ?? 'GET'} ${c[0].replace('https://www.arcanakin.com.br/api/v1', '')}`,
+    );
+    expect(calls).toEqual([
+      'GET /groups/g1/settings',
+      'PATCH /groups/g1/settings',
+      'GET /groups/g1/seasons',
+      'POST /groups/g1/seasons',
+      'DELETE /seasons/s1',
+    ]);
+  });
 });

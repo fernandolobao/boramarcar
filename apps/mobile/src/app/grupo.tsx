@@ -3,6 +3,7 @@ import { Stack, router } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, Share, View } from 'react-native';
 import { ConfirmButton } from '@/components/confirm-button';
+import { GroupSettingsCard, SeasonsCard } from '@/components/group-settings';
 import { TextField } from '@/components/fields';
 import { NoGroup } from '@/components/no-group';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
@@ -308,6 +309,9 @@ export default function GroupScreen() {
           {locationMessage}
         </AppText>
       </Card>
+
+      <GroupSettingsCard groupId={group.id} canManage={canManage} />
+      <SeasonsCard groupId={group.id} canManage={canManage} />
 
       {groups.length > 0 && (
         <Button
