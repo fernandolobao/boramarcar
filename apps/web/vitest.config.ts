@@ -14,7 +14,7 @@ export default defineProject({
   test: {
     name: 'web',
     environment: 'node',
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
     setupFiles: ['./src/test/setup.ts'],
     testTimeout: 20_000,
     hookTimeout: 30_000,

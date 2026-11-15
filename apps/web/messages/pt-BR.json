@@ -1016,6 +1016,7 @@
     "nav": {
       "label": "Seções da página",
       "features": "Funcionalidades",
+      "tour": "Veja por dentro",
       "sources": "De onde vêm os dados",
       "method": "Metodologia",
       "values": "Valores",
@@ -1078,6 +1079,43 @@
         "mobile": {
           "title": "App para Android e iOS",
           "body": "Em desenvolvimento: encontros, presença, ranking e decks no bolso, com login pelo Google."
+        }
+      }
+    },
+    "tour": {
+      "title": "Veja por dentro",
+      "subtitle": "Telas de verdade, com um grupo de exemplo. Os nomes e as partidas são inventados.",
+      "tabsLabel": "Telas do ArcanaKin",
+      "items": {
+        "painel": {
+          "tab": "Painel",
+          "caption": "O próximo encontro, quem confirmou e os seus números no grupo.",
+          "alt": "Painel da Ana no grupo Mesa de Quinta: próximo encontro na quinta às 19h30 com 5 confirmados, 1º lugar no ranking, 15 pontos, 42% de aproveitamento e a sequência das últimas partidas."
+        },
+        "disponibilidade": {
+          "tab": "Agenda",
+          "caption": "Cada pessoa marca quando pode jogar, e o ArcanaKin mostra os horários em que a mesa fecha.",
+          "alt": "Lista de horários em que a mesa fecha: quintas das 20h às 23h na Casa da Ana ou na loja, com os 5 jogadores disponíveis e um botão para marcar o encontro."
+        },
+        "deck": {
+          "tab": "Análise de deck",
+          "caption": "Nota do deck pelas metas de Commander: terrenos, ramp, compra, remoção e curva de mana.",
+          "alt": "Análise do deck Ezuri Elfos com nota 83 de 100: terrenos, ramp, compra e curva completos, remoção pela metade, nenhum board wipe, e o gráfico da curva de mana."
+        },
+        "colecao": {
+          "tab": "Coleção",
+          "caption": "As cartas que você tem, com o valor estimado em reais e em quais decks cada uma está.",
+          "alt": "Coleção com 136 cópias de 84 cartas, valor estimado de R$ 16.178,39, e a galeria das cartas com quantidade, foil e em quantos decks cada uma está."
+        },
+        "mesa": {
+          "tab": "Modo mesa",
+          "caption": "O contador de vida da partida, num tablet no meio da mesa, com a tela sempre acesa.",
+          "alt": "Modo mesa num tablet com 4 jogadores em cruz: Ana com 31 de vida e a coroa de monarca, Bruno com 18 e 3 de veneno, Carla com 24 começando a partida, Diego com 9 e 14 de dano de comandante."
+        },
+        "ranking": {
+          "tab": "Ranking",
+          "caption": "A classificação do grupo, com jogos, vitórias e pontos, por temporada e tipo de jogo.",
+          "alt": "Ranking do grupo após 15 partidas: Ana Lima em 1º com 5 vitórias em 12 jogos e 15 pontos, seguida de Diego, Felipe, Bruno, Carla e Elisa."
         }
       }
     },
