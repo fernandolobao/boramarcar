@@ -181,8 +181,20 @@ export function createApiClient(options: ApiClientOptions) {
       removePushToken: (token: string) =>
         request('DELETE', '/me/push-tokens', z.object({ removed: z.literal(true) }), { token }),
       /** Guarda uma escolha do onboarding (ex.: dispensar a faixa do beta). */
-      markOnboarding: (flag: 'checklist-dismissed' | 'guide-skipped' | 'beta-banner-dismissed') =>
-        request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
+      /** Estado do guia do primeiro acesso: abre sozinho? já foi feito? já está num grupo? */
+      onboarding: async () =>
+        (
+          await request(
+            'GET',
+            '/me/onboarding',
+            z.object({
+              guide: z.object({ show: z.boolean(), done: z.boolean(), hasGroup: z.boolean() }),
+            }),
+          )
+        ).guide,
+      markOnboarding: (
+        flag: 'checklist-dismissed' | 'guide-skipped' | 'guide-completed' | 'beta-banner-dismissed',
+      ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
       /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
       deleteAccount: () =>
         request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {
