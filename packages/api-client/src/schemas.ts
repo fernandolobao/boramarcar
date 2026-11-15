@@ -491,3 +491,21 @@ export const partnerHintSchema = z.object({
   confirmedNext: z.boolean(),
 });
 export type PartnerHint = z.infer<typeof partnerHintSchema>;
+
+/** "Quem anda sumido" (só dono e admins). */
+export const groupAttendanceSchema = z.object({
+  members: z.array(
+    z.object({
+      userId: z.string(),
+      name: z.string(),
+      attended: z.number(),
+      of: z.number(),
+      lastGameAt: date.nullable(),
+      awaySince: date.nullable(),
+    }),
+  ),
+  nextEvent: z.object({ id: z.string(), title: z.string(), startsAt: date }).nullable(),
+  nudged: z.array(z.string()),
+  confirmedNext: z.array(z.string()),
+});
+export type GroupAttendance = z.infer<typeof groupAttendanceSchema>;

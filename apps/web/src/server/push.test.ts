@@ -39,6 +39,18 @@ describe('textos do push', () => {
     expect(message.body).toContain('Location TBD');
   });
 
+  it('chamado para o próximo encontro, abrindo o encontro', () => {
+    const message = buildEventPush(target, {
+      kind: 'invite',
+      groupName: 'Mesa de Quinta',
+      event,
+      locationName: 'Casa da Ana',
+    });
+    expect(message.title).toBe('Mesa de Quinta sente sua falta!');
+    expect(message.body).toContain('Commander de sexta');
+    expect(message.data).toEqual({ url: '/encontros/ev1' });
+  });
+
   it('"a mesa fechou!" abre a disponibilidade', () => {
     const message = buildWindowPush(target, {
       groupName: 'Mesa de Quinta',

@@ -11,6 +11,7 @@ import {
   eventHistorySchema,
   eventPairingsSchema,
   partnerHintSchema,
+  groupAttendanceSchema,
   eventStatusSchema,
   eventSummarySchema,
   gameWindowSchema,
@@ -220,6 +221,17 @@ export function createApiClient(options: ApiClientOptions) {
           )
         ).beta,
       /** Membros do grupo (para filtros por jogador e escolha de participantes). */
+      /** Presença de cada membro e quem anda sumido (só dono e admins). */
+      attendance: (groupId: string) =>
+        request('GET', `/groups/${encodeURIComponent(groupId)}/attendance`, groupAttendanceSchema),
+      /** Chama a pessoa para o próximo encontro (um aviso por pessoa por encontro). */
+      nudge: (groupId: string, userId: string, eventId: string) =>
+        request(
+          'POST',
+          `/groups/${encodeURIComponent(groupId)}/members/${encodeURIComponent(userId)}/nudge`,
+          z.object({ nudged: z.boolean() }),
+          { eventId },
+        ),
       /** Até 3 membros com quem você ainda não jogou (ou não joga há 30+ dias). */
       partners: async (groupId: string) =>
         (

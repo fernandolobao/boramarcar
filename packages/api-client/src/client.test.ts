@@ -822,4 +822,39 @@ describe('cliente da API', () => {
     expect(hints[0]!.lastPlayedAt).toBeNull();
     expect(hints[1]!.lastPlayedAt).toBeInstanceOf(Date);
   });
+
+  it('presença do grupo e chamar para o próximo', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json({
+          members: [
+            {
+              userId: 'u2',
+              name: 'Bia',
+              attended: 1,
+              of: 8,
+              lastGameAt: null,
+              awaySince: '2026-09-01T22:00:00.000Z',
+            },
+          ],
+          nextEvent: { id: 'e1', title: 'Quinta', startsAt: '2026-11-20T22:30:00.000Z' },
+          nudged: [],
+          confirmedNext: ['u1'],
+        }),
+      )
+      .mockResolvedValueOnce(json({ nudged: true }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const attendance = await api.groups.attendance('g1');
+    expect(attendance.members[0]!.awaySince).toBeInstanceOf(Date);
+    expect(attendance.nextEvent!.startsAt).toBeInstanceOf(Date);
+    await api.groups.nudge('g1', 'u2', 'e1');
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/members/u2/nudge',
+    );
+    expect(JSON.parse(fetchMock.mock.calls[1]![1].body)).toEqual({ eventId: 'e1' });
+  });
 });

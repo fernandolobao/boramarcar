@@ -57,6 +57,8 @@ const r = {
   location: await import('../groups/[groupId]/locations/[locationId]/route'),
   locations: await import('../groups/[groupId]/locations/route'),
   member: await import('../groups/[groupId]/members/[userId]/route'),
+  nudge: await import('../groups/[groupId]/members/[userId]/nudge/route'),
+  attendance: await import('../groups/[groupId]/attendance/route'),
   members: await import('../groups/[groupId]/members/route'),
   ranking: await import('../groups/[groupId]/ranking/route'),
   seasons: await import('../groups/[groupId]/seasons/route'),
@@ -291,6 +293,15 @@ const outsiderCases: Case[] = [
   ['GET grupo: ranking', r.ranking.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: estatísticas', r.stats.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: com quem jogar', r.partners.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
+  [
+    'POST chamar para o próximo',
+    r.nudge.POST as Handler,
+    'POST',
+    () => ({ groupId: ids.group!, userId: bia.id }),
+    () => ({ eventId: ids.event! }),
+  ],
+  ['GET presença do grupo', r.attendance.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
+
   ['GET grupo: faixa do beta', r.beta.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: temporadas', r.seasons.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: configurações', r.settings.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
@@ -493,6 +504,14 @@ const outsiderCases: Case[] = [
 
 /** O que só a dona (ou admin) pode fazer, visto por um membro comum do mesmo grupo (Bia). */
 const memberCases: Case[] = [
+  [
+    'POST chamar para o próximo',
+    r.nudge.POST as Handler,
+    'POST',
+    () => ({ groupId: ids.group!, userId: bia.id }),
+    () => ({ eventId: ids.event! }),
+  ],
+  ['GET presença do grupo', r.attendance.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   [
     'PATCH configurações',
     r.settings.PATCH as Handler,

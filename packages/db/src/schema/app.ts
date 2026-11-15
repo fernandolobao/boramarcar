@@ -310,6 +310,25 @@ export const eventParticipants = pgTable(
   (t) => [primaryKey({ columns: [t.eventId, t.userId] })],
 );
 
+/**
+ * "Chamar para o próximo" (integração do grupo): quem foi chamado para qual encontro e por quem.
+ * Um chamado por pessoa por encontro (a chave primária impede repetir o aviso).
+ */
+export const eventNudges = pgTable(
+  'event_nudges',
+  {
+    eventId: text('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    sentBy: text('sent_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.eventId, t.userId] })],
+);
+
 export const games = pgTable(
   'games',
   {

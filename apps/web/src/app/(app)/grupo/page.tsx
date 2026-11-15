@@ -1,7 +1,8 @@
 import { isGameFormat } from '@boramarcar/core';
-import { listLocations, listMembers } from '@boramarcar/db';
+import { getGroupAttendance, listLocations, listMembers } from '@boramarcar/db';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { AttendanceCard } from '@/components/attendance-card';
 import { CreateGroupForm, JoinGroupForm, SwitchGroupButton } from '@/components/group-forms';
 import { GroupSettingsForm } from '@/components/group-settings-form';
 import { RegenerateInviteButton } from '@/components/invite';
@@ -27,6 +28,12 @@ export default async function GroupPage() {
   const [members, locations] = active
     ? await Promise.all([listMembers(db, active.id), listLocations(db, active.id)])
     : [[], []];
+  // "Quem anda sumido": só dono e admins.
+  const now = new Date();
+  const attendance =
+    active && active.role !== 'member'
+      ? await getGroupAttendance(db, { groupId: active.id, userId: user.id, now })
+      : null;
   const ts = await getTranslations('share');
   const invite = active
     ? await (async () => {
@@ -124,6 +131,28 @@ export default async function GroupPage() {
                 ))}
               </ul>
             </section>
+            {attendance && (
+              <AttendanceCard
+                groupId={active.id}
+                members={attendance.members.map((m) => ({
+                  ...m,
+                  lastGameAt: m.lastGameAt?.toISOString() ?? null,
+                  awaySince: m.awaySince?.toISOString() ?? null,
+                }))}
+                nextEvent={
+                  attendance.nextEvent
+                    ? {
+                        ...attendance.nextEvent,
+                        startsAt: attendance.nextEvent.startsAt.toISOString(),
+                      }
+                    : null
+                }
+                nudged={attendance.nudged}
+                confirmedNext={attendance.confirmedNext}
+                viewerId={user.id}
+                now={now.toISOString()}
+              />
+            )}
             <section className="card" aria-labelledby="group-locations-title">
               <h2 id="group-locations-title" className="section-title">
                 {t('locations')}

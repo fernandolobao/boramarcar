@@ -30,13 +30,17 @@ const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
 /** Push do encontro para os aparelhos de quem deve saber (mesma regra do e-mail, sem o opt-out dele). */
-async function pushEvent(
-  db: Database,
-  input: { eventId: string; kind: EventEmailKind; actorId?: string },
-) {
+type EventNotice = { eventId: string; kind: EventEmailKind; actorId?: string; userIds?: string[] };
+
+/** Quem recebe: o grupo (encontro novo), só os chamados (`invite`) ou quem não recusou. */
+const audienceFor = (input: EventNotice) =>
+  input.kind === 'created' ? 'group' : input.kind === 'invite' ? 'users' : 'participants';
+
+async function pushEvent(db: Database, input: EventNotice) {
   const data = await getEventForNotification(db, {
     eventId: input.eventId,
-    audience: input.kind === 'created' ? 'group' : 'participants',
+    audience: audienceFor(input),
+    userIds: input.userIds,
     excludeUserId: input.actorId,
     channel: 'push',
   });
@@ -58,11 +62,11 @@ async function pushEvent(
   );
 }
 
-/** Avisa sobre um encontro: novo (grupo todo), alterado/cancelado (quem não recusou) ou lembrete. */
-export async function notifyEvent(
-  db: Database,
-  input: { eventId: string; kind: EventEmailKind; actorId?: string },
-) {
+/**
+ * Avisa sobre um encontro: novo (grupo todo), alterado/cancelado (quem não recusou), lembrete ou
+ * chamado para o próximo (só as pessoas chamadas).
+ */
+export async function notifyEvent(db: Database, input: EventNotice) {
   const [emails] = await Promise.all([
     safely('email', () => emailEvent(db, input)),
     safely('push', () => pushEvent(db, input)),
@@ -70,13 +74,11 @@ export async function notifyEvent(
   return emails ?? [];
 }
 
-async function emailEvent(
-  db: Database,
-  input: { eventId: string; kind: EventEmailKind; actorId?: string },
-) {
+async function emailEvent(db: Database, input: EventNotice) {
   const data = await getEventForNotification(db, {
     eventId: input.eventId,
-    audience: input.kind === 'created' ? 'group' : 'participants',
+    audience: audienceFor(input),
+    userIds: input.userIds,
     excludeUserId: input.actorId,
   });
   if (!data || data.recipients.length === 0) return [];

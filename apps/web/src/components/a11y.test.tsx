@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { ProductTour } from './home/product-tour';
+import { AttendanceCard } from './attendance-card';
 import { TableSuggestions } from './table-suggestions';
 import { DeckImportForm } from './deck-forms';
 import { EmptyState } from './empty-state';
@@ -489,6 +490,39 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('formulário de feedback sem violações', async () => {
     expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
+  });
+
+  it('quem anda sumido (presença do grupo) sem violações', async () => {
+    expect(
+      await audit(
+        <AttendanceCard
+          groupId="g1"
+          members={[
+            {
+              userId: 'u2',
+              name: 'Bia',
+              attended: 1,
+              of: 8,
+              lastGameAt: null,
+              awaySince: '2026-10-01T12:00:00.000Z',
+            },
+            {
+              userId: 'u3',
+              name: 'Caio',
+              attended: 7,
+              of: 8,
+              lastGameAt: '2026-11-10T22:00:00.000Z',
+              awaySince: null,
+            },
+          ]}
+          nextEvent={{ id: 'e1', title: 'Quinta', startsAt: '2026-11-20T22:30:00.000Z' }}
+          nudged={['u3']}
+          confirmedNext={[]}
+          viewerId="u1"
+          now="2026-11-15T12:00:00.000Z"
+        />,
+      ),
+    ).toEqual([]);
   });
 
   it('sugestão de mesas sem violações', async () => {

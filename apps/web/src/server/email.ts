@@ -21,7 +21,8 @@ export interface EmailRecipient {
   timeZone: string;
 }
 
-export type EventEmailKind = 'created' | 'updated' | 'cancelled' | 'reminder';
+/** `invite` = "Chamar para o próximo" (só para a pessoa chamada). */
+export type EventEmailKind = 'created' | 'updated' | 'cancelled' | 'reminder' | 'invite';
 
 export interface EventEmailData {
   kind: EventEmailKind;
@@ -127,7 +128,11 @@ export function buildEventEmail(recipient: EmailRecipient, data: EventEmailData)
 
   const rendered = render({
     locale,
-    subject: t(`${data.kind}.subject`, { title: event.title, when: shortWhen }),
+    subject: t(`${data.kind}.subject`, {
+      title: event.title,
+      when: shortWhen,
+      group: data.groupName,
+    }),
     greeting: t('greeting', { name: firstName(recipient.name) }),
     intro: t(`${data.kind}.intro`, { group: data.groupName }),
     lines: [

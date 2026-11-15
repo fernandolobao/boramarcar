@@ -66,7 +66,9 @@ export async function getEventForNotification(
   db: Database,
   input: {
     eventId: string;
-    audience: 'group' | 'participants';
+    /** Grupo todo, quem não recusou o encontro, ou só as pessoas de `userIds` (ex.: chamado). */
+    audience: 'group' | 'participants' | 'users';
+    userIds?: string[];
     excludeUserId?: string;
     channel?: 'email' | 'push';
   },
@@ -88,19 +90,25 @@ export async function getEventForNotification(
     .orderBy(asc(user.name));
 
   const recipients =
-    input.audience === 'group'
+    input.audience === 'users'
       ? await listGroupRecipients(db, {
           groupId: row.event.groupId,
-          excludeUserId: input.excludeUserId,
+          onlyUserIds: input.userIds ?? [],
           channel: input.channel,
         })
-      : (
-          await listGroupRecipients(db, {
+      : input.audience === 'group'
+        ? await listGroupRecipients(db, {
             groupId: row.event.groupId,
-            onlyUserIds: participants.filter((p) => p.rsvp !== 'no').map((p) => p.userId),
+            excludeUserId: input.excludeUserId,
             channel: input.channel,
           })
-        ).filter((r) => r.userId !== input.excludeUserId);
+        : (
+            await listGroupRecipients(db, {
+              groupId: row.event.groupId,
+              onlyUserIds: participants.filter((p) => p.rsvp !== 'no').map((p) => p.userId),
+              channel: input.channel,
+            })
+          ).filter((r) => r.userId !== input.excludeUserId);
 
   return {
     event: row.event,

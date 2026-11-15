@@ -134,6 +134,18 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
             notes: ['É só uma sugestão: nada muda nas presenças nem nas partidas.'],
           },
+          {
+            id: 'quem-anda-sumido',
+            question: 'Como chamo de volta quem anda sumido?',
+            intro: [
+              'O dono e os admins do grupo veem, na tela do Grupo, a lista "Quem anda sumido": a presença de cada pessoa nos últimos 8 encontros, a última partida e há quantas semanas ela não aparece (quem faltou os 4 últimos encontros e não joga há um mês). Os outros membros não veem essa lista.',
+            ],
+            steps: [
+              'Marque o próximo encontro.',
+              'No Grupo, em "Quem anda sumido", toque em "Chamar" ao lado da pessoa.',
+              'Ela recebe um convite para o próximo encontro, por notificação ou e-mail, conforme a preferência dela. Dá para chamar cada pessoa uma vez por encontro.',
+            ],
+          },
         ],
       },
       {
@@ -387,6 +399,18 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Don\'t like it? Tap "Shuffle again" for another split.',
             ],
             notes: ["It's only a suggestion: nothing changes in the RSVPs or the games."],
+          },
+          {
+            id: 'quem-anda-sumido',
+            question: "How do I bring back someone who's been missing?",
+            intro: [
+              "The group owner and admins see, on the Group screen, the \"Who's been missing\" list: each person's attendance at the last 8 meetups, their last game and how many weeks they haven't shown up (whoever missed the last 4 meetups and hasn't played for a month). Other members don't see this list.",
+            ],
+            steps: [
+              'Schedule the next meetup.',
+              'On Group, under "Who\'s been missing", tap "Invite" next to the person.',
+              'They get an invite to the next meetup, by notification or email, depending on their preference. You can invite each person once per meetup.',
+            ],
           },
         ],
       },

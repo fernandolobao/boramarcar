@@ -7,6 +7,7 @@ import {
   availabilitySlots,
   deckCards,
   decks,
+  eventNudges,
   eventParticipants,
   events,
   feedback,
@@ -179,6 +180,19 @@ export async function exportUserData(db: Database, userId: string) {
     .select({ step: onboardingSteps.step, at: onboardingSteps.createdAt })
     .from(onboardingSteps)
     .where(eq(onboardingSteps.userId, userId));
+  // "Chamar para o próximo": para quais encontros a pessoa foi chamada (sem quem chamou).
+  const invitations = await db
+    .select({
+      event: events.title,
+      group: groups.name,
+      startsAt: events.startsAt,
+      at: eventNudges.createdAt,
+    })
+    .from(eventNudges)
+    .innerJoin(events, eq(events.id, eventNudges.eventId))
+    .innerJoin(groups, eq(groups.id, events.groupId))
+    .where(eq(eventNudges.userId, userId))
+    .orderBy(asc(eventNudges.createdAt));
 
   return {
     format: 'arcanakin-export',
@@ -193,6 +207,7 @@ export async function exportUserData(db: Database, userId: string) {
     hostedPlaces: hosted,
     availability: { slots, weekly: rules },
     events: rsvps,
+    invitations,
     games: played,
     decks: ownDecks.map(({ id, ...deck }) => ({
       ...deck,
@@ -263,6 +278,9 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(session).where(eq(session.userId, userId));
     await tx.delete(pushTokens).where(eq(pushTokens.userId, userId));
     await tx.delete(onboardingSteps).where(eq(onboardingSteps.userId, userId));
+    // Chamados recebidos são da pessoa; os que ela mandou ficam para o grupo, sem autor.
+    await tx.delete(eventNudges).where(eq(eventNudges.userId, userId));
+    await tx.update(eventNudges).set({ sentBy: null }).where(eq(eventNudges.sentBy, userId));
     await tx.delete(feedback).where(eq(feedback.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
     await tx

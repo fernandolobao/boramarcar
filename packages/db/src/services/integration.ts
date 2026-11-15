@@ -2,10 +2,11 @@
  * Integração do grupo: dados para misturar a mesa e trazer de volta quem sumiu. As regras ficam
  * no core (`@boramarcar/core/integration`); aqui só as consultas.
  */
-import { partnerHints, type PairCount } from '@boramarcar/core';
-import { and, asc, eq, gt, inArray } from 'drizzle-orm';
+import { attendanceSummary, DomainError, partnerHints, type PairCount } from '@boramarcar/core';
+import { and, asc, desc, eq, gt, inArray, lt, max, ne } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
+  eventNudges,
   eventParticipants,
   events,
   gamePlayers,
@@ -144,4 +145,155 @@ export async function listPartnerHints(
     now,
   });
   return { hints: hints.map((h) => ({ ...h, confirmedNext: confirmedNext.includes(h.userId) })) };
+}
+
+/** Dono ou admin do grupo; membro comum recebe `forbidden`. */
+async function requireManager(db: Database, groupId: string, userId: string) {
+  const membership = await requireMembership(db, groupId, userId);
+  if (membership.role === 'member') {
+    throw new DomainError('forbidden', 'Só o dono ou um admin do grupo vê a presença');
+  }
+  return membership;
+}
+
+/** Próximo encontro marcado do grupo (o primeiro depois de `now`). */
+async function nextScheduledEvent(db: Database, groupId: string, now: Date) {
+  const [next] = await db
+    .select({ id: events.id, title: events.title, startsAt: events.startsAt })
+    .from(events)
+    .where(
+      and(eq(events.groupId, groupId), eq(events.status, 'scheduled'), gt(events.startsAt, now)),
+    )
+    .orderBy(asc(events.startsAt))
+    .limit(1);
+  return next ?? null;
+}
+
+/**
+ * "Quem anda sumido" (só dono e admins): presença de cada membro nos últimos 8 encontros que já
+ * aconteceram, última partida, quem está sumido, o próximo encontro e quem já foi chamado para ele.
+ */
+export async function getGroupAttendance(
+  db: Database,
+  input: { groupId: string; userId: string; now?: Date },
+) {
+  await requireManager(db, input.groupId, input.userId);
+  const now = input.now ?? new Date();
+  const members = await db
+    .select({ userId: user.id, name: user.name, joinedAt: groupMembers.joinedAt })
+    .from(groupMembers)
+    .innerJoin(user, eq(user.id, groupMembers.userId))
+    .where(eq(groupMembers.groupId, input.groupId));
+
+  const recent = await db
+    .select({ id: events.id, startsAt: events.startsAt })
+    .from(events)
+    .where(
+      and(
+        eq(events.groupId, input.groupId),
+        ne(events.status, 'cancelled'),
+        lt(events.startsAt, now),
+      ),
+    )
+    .orderBy(desc(events.startsAt))
+    .limit(8);
+  const confirmations = recent.length
+    ? await db
+        .select({ eventId: eventParticipants.eventId, userId: eventParticipants.userId })
+        .from(eventParticipants)
+        .where(
+          and(
+            inArray(
+              eventParticipants.eventId,
+              recent.map((e) => e.id),
+            ),
+            eq(eventParticipants.rsvp, 'yes'),
+          ),
+        )
+    : [];
+
+  const lastGames = await db
+    .select({ userId: gamePlayers.userId, at: max(games.playedAt) })
+    .from(gamePlayers)
+    .innerJoin(games, eq(games.id, gamePlayers.gameId))
+    .where(eq(games.groupId, input.groupId))
+    .groupBy(gamePlayers.userId);
+  const lastGame = Object.fromEntries(lastGames.map((g) => [g.userId, g.at]));
+
+  const nextEvent = await nextScheduledEvent(db, input.groupId, now);
+  const nudged = nextEvent
+    ? (
+        await db
+          .select({ userId: eventNudges.userId })
+          .from(eventNudges)
+          .where(eq(eventNudges.eventId, nextEvent.id))
+      ).map((n) => n.userId)
+    : [];
+  // Quem já confirmou o próximo encontro não precisa ser chamado.
+  const confirmedNext = nextEvent
+    ? (
+        await db
+          .select({ userId: eventParticipants.userId })
+          .from(eventParticipants)
+          .where(
+            and(eq(eventParticipants.eventId, nextEvent.id), eq(eventParticipants.rsvp, 'yes')),
+          )
+      ).map((r) => r.userId)
+    : [];
+
+  return {
+    members: attendanceSummary({
+      members,
+      events: recent.map((e) => ({
+        startsAt: e.startsAt,
+        confirmed: confirmations.filter((c) => c.eventId === e.id).map((c) => c.userId),
+      })),
+      lastGame,
+      now,
+    }),
+    nextEvent,
+    nudged,
+    confirmedNext,
+  };
+}
+
+/**
+ * "Chamar para o próximo": registra o chamado de um membro para um encontro marcado e futuro do
+ * grupo (dono ou admin). Um por pessoa por encontro: repetir dá `conflict`. Quem chama manda o aviso.
+ */
+export async function nudgeMember(
+  db: Database,
+  input: { groupId: string; actorId: string; targetUserId: string; eventId: string; now?: Date },
+) {
+  await requireManager(db, input.groupId, input.actorId);
+  const now = input.now ?? new Date();
+  const [target] = await db
+    .select({ userId: groupMembers.userId })
+    .from(groupMembers)
+    .where(
+      and(eq(groupMembers.groupId, input.groupId), eq(groupMembers.userId, input.targetUserId)),
+    )
+    .limit(1);
+  if (!target) throw new DomainError('not_found', 'Membro não encontrado');
+  const [event] = await db
+    .select({ id: events.id })
+    .from(events)
+    .where(
+      and(
+        eq(events.id, input.eventId),
+        eq(events.groupId, input.groupId),
+        eq(events.status, 'scheduled'),
+        gt(events.startsAt, now),
+      ),
+    )
+    .limit(1);
+  if (!event) throw new DomainError('not_found', 'Encontro não encontrado');
+  const inserted = await db
+    .insert(eventNudges)
+    .values({ eventId: event.id, userId: input.targetUserId, sentBy: input.actorId })
+    .onConflictDoNothing()
+    .returning({ userId: eventNudges.userId });
+  if (inserted.length === 0) {
+    throw new DomainError('conflict', 'Essa pessoa já foi chamada para este encontro');
+  }
 }
