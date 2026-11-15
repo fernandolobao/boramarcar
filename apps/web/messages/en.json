@@ -1592,7 +1592,8 @@
     "rsvp": "Answer a game night",
     "rsvpHint": "Say if you're going (or maybe) to the group's next game night.",
     "deck": "Import a deck",
-    "deckHint": "From Archidekt, Moxfield or a pasted list, to see the analysis and use it in games."
+    "deckHint": "From Archidekt, Moxfield or a pasted list, to see the analysis and use it in games.",
+    "guideAgain": "See the guide again"
   },
   "feedback": {
     "title": "Send feedback",
@@ -1880,5 +1881,27 @@
   "ds": {
     "decrease": "{label}: decrease (now {value})",
     "increase": "{label}: increase (now {value})"
+  },
+  "guide": {
+    "metaTitle": "Welcome",
+    "step": "Step {current} of {total}",
+    "skip": "Skip the guide",
+    "continue": "Continue",
+    "skipStep": "Skip this step",
+    "groupTitle": "Your group",
+    "groupBody": "ArcanaKin revolves around your table’s group. Join with the invite code you got, or create your group.",
+    "groupIn": "You're in the {group} group.",
+    "joinTitle": "I have an invite",
+    "createTitle": "I want to create a group",
+    "prefsTitle": "Time zone and language",
+    "prefsBody": "Meetup times and notifications use your time zone and language. Check, save and continue.",
+    "availabilityTitle": "When can you play?",
+    "availabilityBody": "Pick a day and time you can usually play, every week. When enough people overlap, ArcanaKin lets you know the table is set.",
+    "availabilityNoGroup": "To mark when you can play, join a group first.",
+    "doneTitle": "You're all set!",
+    "doneNext": "Next {group} meetup: {title}, {when}.",
+    "doneNoEvent": "No meetup scheduled in {group} yet. When the table is set, you get a notification.",
+    "doneNoGroup": "Once you join a group, the dashboard shows the next meetup.",
+    "finish": "Go to the dashboard"
   }
 }

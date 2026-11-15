@@ -12,6 +12,7 @@ import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { ProductTour } from './home/product-tour';
 import { AttendanceCard } from './attendance-card';
+import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
 import { TableSuggestions } from './table-suggestions';
 import { DeckImportForm } from './deck-forms';
 import { EmptyState } from './empty-state';
@@ -490,6 +491,18 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('formulário de feedback sem violações', async () => {
     expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
+  });
+
+  it('guia do primeiro acesso (título, pular, concluir) sem violações', async () => {
+    expect(
+      await audit(
+        <>
+          <GuideHeading>Seu grupo</GuideHeading>
+          <GuideSkip hasGroup />
+          <GuideFinish />
+        </>,
+      ),
+    ).toEqual([]);
   });
 
   it('quem anda sumido (presença do grupo) sem violações', async () => {

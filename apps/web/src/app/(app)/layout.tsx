@@ -6,7 +6,8 @@ import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
-import { getUserPreferences } from '@boramarcar/db';
+import { getGuideState, getUserPreferences } from '@boramarcar/db';
+import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { LocaleSync } from '@/components/locale-sync';
 import { TimeZoneSync } from '@/components/time-zone-sync';
@@ -21,11 +22,14 @@ import { getDb } from '@/server/db';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
-  const [{ active }, preferences, cookieStore] = await Promise.all([
+  const [{ active }, preferences, cookieStore, guide] = await Promise.all([
     getActiveGroup(user.id),
     getUserPreferences(getDb(), user.id),
     cookies(),
+    getGuideState(getDb(), { userId: user.id }),
   ]);
+  // Primeiro acesso de conta nova: o guia (7.1) abre sozinho, uma vez; pular ou concluir encerra.
+  if (guide.show) redirect('/boas-vindas');
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
   const tl = await getTranslations('legal');

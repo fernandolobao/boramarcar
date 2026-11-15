@@ -36,9 +36,15 @@ export async function seedE2E(databaseUrl: string) {
       { id: 'e2e-caio', name: 'Caio', email: 'caio@e2e.test' },
       { id: 'e2e-duda', name: 'Duda', email: 'duda@e2e.test' },
     ];
-    await db
-      .insert(s.user)
-      .values(users.map((u) => ({ ...u, emailVerified: true, timeZone: 'America/Sao_Paulo' })));
+    await db.insert(s.user).values(
+      users.map((u) => ({
+        ...u,
+        emailVerified: true,
+        timeZone: 'America/Sao_Paulo',
+        // Contas "antigas": o guia do primeiro acesso não abre sozinho nos testes.
+        createdAt: new Date('2026-01-01T12:00:00Z'),
+      })),
+    );
     await db.insert(s.session).values({
       id: 'e2e-session',
       token: E2E_SESSION_TOKEN,

@@ -1592,7 +1592,8 @@
     "rsvp": "Responda a um encontro",
     "rsvpHint": "Diga se vai (ou talvez) no próximo encontro do grupo.",
     "deck": "Importe um deck",
-    "deckHint": "Do Archidekt, Moxfield ou de uma lista colada, para ver a análise e usar nas partidas."
+    "deckHint": "Do Archidekt, Moxfield ou de uma lista colada, para ver a análise e usar nas partidas.",
+    "guideAgain": "Ver o guia de novo"
   },
   "feedback": {
     "title": "Enviar feedback",
@@ -1880,5 +1881,27 @@
   "ds": {
     "decrease": "{label}: diminuir (agora {value})",
     "increase": "{label}: aumentar (agora {value})"
+  },
+  "guide": {
+    "metaTitle": "Boas-vindas",
+    "step": "Passo {current} de {total}",
+    "skip": "Pular o guia",
+    "continue": "Continuar",
+    "skipStep": "Pular este passo",
+    "groupTitle": "Seu grupo",
+    "groupBody": "O ArcanaKin gira em torno do grupo da sua mesa. Entre com o código do convite que você recebeu ou crie o grupo de vocês.",
+    "groupIn": "Você está no grupo {group}.",
+    "joinTitle": "Tenho um convite",
+    "createTitle": "Quero criar um grupo",
+    "prefsTitle": "Fuso e idioma",
+    "prefsBody": "Os horários dos encontros e os avisos usam o seu fuso e o seu idioma. Confira, salve e continue.",
+    "availabilityTitle": "Quando você pode jogar?",
+    "availabilityBody": "Marque um dia e um horário em que você costuma poder jogar, toda semana. Quando gente suficiente coincidir, o ArcanaKin avisa que a mesa fechou.",
+    "availabilityNoGroup": "Para marcar quando você pode jogar, entre num grupo primeiro.",
+    "doneTitle": "Tudo pronto!",
+    "doneNext": "Próximo encontro de {group}: {title}, {when}.",
+    "doneNoEvent": "Ainda não há encontro marcado em {group}. Quando a mesa fechar, você recebe um aviso.",
+    "doneNoGroup": "Quando você entrar num grupo, o painel mostra o próximo encontro.",
+    "finish": "Ir para o painel"
   }
 }

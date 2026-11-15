@@ -32,6 +32,10 @@ const PUBLIC_PAGES = [
 const AUTH_PAGES = [
   '/',
   '/painel',
+  '/boas-vindas?passo=1',
+  '/boas-vindas?passo=2',
+  '/boas-vindas?passo=3',
+  '/boas-vindas?passo=fim',
   '/disponibilidade',
   '/eventos',
   `/eventos/${E2E_IDS.upcomingEvent}`,
