@@ -24,7 +24,8 @@ export async function seedShowcase(databaseUrl: string) {
   const s = schema;
   const sessions: Record<string, string> = {};
   try {
-    await pool.query('truncate table "user", groups, cards restart identity cascade');
+    // O cache de cartas (Scryfall) fica: não é dado de ninguém e evita bater no limite de consultas.
+    await pool.query('truncate table "user", groups restart identity cascade');
     await db
       .insert(s.user)
       .values(
