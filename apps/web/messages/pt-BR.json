@@ -85,7 +85,14 @@
     "noCommanders": "Ainda não há partidas com decks registrados.",
     "commanderStats": "{games, plural, =1 {1 partida} other {# partidas}} · {rate} de vitórias",
     "moreEvents": "Próximos encontros",
-    "topPlayers": "Topo do ranking"
+    "topPlayers": "Topo do ranking",
+    "partners": {
+      "title": "Com quem jogar",
+      "hint": "Que tal dividir a mesa com quem você ainda não enfrentou?",
+      "never": "Você ainda não jogou com <name></name>.",
+      "since": "Sua última partida com <name></name> foi {when}.",
+      "goingNext": "vai no próximo encontro"
+    }
   },
   "group": {
     "title": "Seu grupo",

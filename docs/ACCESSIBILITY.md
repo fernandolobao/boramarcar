@@ -388,3 +388,8 @@ sem rolagem horizontal em 320px.
 - Site: `<section>` com `<h2>`; mesas numa lista, cada uma com `<h3>` ("Mesa 1") e os nomes em lista; "N duplas que nunca jogaram juntas" em texto. "Sortear de novo" é `<button type="button">` com ícone decorativo e anuncia "Nova sugestão de mesas." numa região `role="status"`.
 - App: cartão com cabeçalhos (`accessibilityRole="header"`), nomes em texto e o aviso do novo sorteio em `accessibilityLiveRegion="polite"`.
 - axe sem violações no componente (`a11y.test.tsx`).
+
+## Painel: com quem jogar (15/11/2026)
+
+- Site: `<section>` com `<h2>`, lista `<ul>`; o nome é link para o perfil (texto do link = nome); "vai no próximo encontro" em texto, não só cor; ícone decorativo ao lado do texto também em 320 px.
+- App: cada linha é um link (`accessibilityRole="link"`, alvo de 44 pt) com o texto completo, incluindo "vai no próximo encontro", no nome acessível.

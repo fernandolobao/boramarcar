@@ -85,7 +85,14 @@
     "noCommanders": "No games with registered decks yet.",
     "commanderStats": "{games, plural, =1 {1 game} other {# games}} · {rate} win rate",
     "moreEvents": "Upcoming meetups",
-    "topPlayers": "Top of the ranking"
+    "topPlayers": "Top of the ranking",
+    "partners": {
+      "title": "Who to play with",
+      "hint": "How about sharing a table with someone you haven't faced yet?",
+      "never": "You haven't played with <name></name> yet.",
+      "since": "Your last game with <name></name> was {when}.",
+      "goingNext": "going to the next meetup"
+    }
   },
   "group": {
     "title": "Your group",

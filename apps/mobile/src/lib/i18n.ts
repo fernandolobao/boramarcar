@@ -307,6 +307,11 @@ const pt = {
     'No sentido horário, começando por quem fica no canto de cima, à esquerda do celular.',
   tableDeck: 'deck',
   tableNoDeck: 'Sem deck',
+  partnersTitle: 'Com quem jogar',
+  partnersHint: 'Que tal dividir a mesa com quem você ainda não enfrentou?',
+  partnersNever: 'Você ainda não jogou com {name}.',
+  partnersSince: 'Sua última partida com {name} foi em {date}.',
+  partnersGoingNext: 'vai no próximo encontro',
   tablesTitle: 'Sugestão de mesas',
   tablesHint:
     'Para misturar a mesa: junta quem menos jogou junto. É só uma sugestão, nada muda nas presenças.',
@@ -1036,6 +1041,11 @@ const en: Messages = {
   tableSeatOrderHint: 'Clockwise, starting with whoever sits at the top-left corner of the phone.',
   tableDeck: 'deck',
   tableNoDeck: 'No deck',
+  partnersTitle: 'Who to play with',
+  partnersHint: "How about sharing a table with someone you haven't faced yet?",
+  partnersNever: "You haven't played with {name} yet.",
+  partnersSince: 'Your last game with {name} was on {date}.',
+  partnersGoingNext: 'going to the next meetup',
   tablesTitle: 'Suggested tables',
   tablesHint:
     "To mix things up: puts together people who have played together the least. It's only a suggestion; nothing changes in the RSVPs.",
