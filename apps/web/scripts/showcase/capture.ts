@@ -32,6 +32,9 @@ const IPAD = { width: 1180, height: 820 };
 
 type Theme = 'light' | 'dark';
 
+/** Progresso no terminal (script de linha de comando). */
+const log = (message: string) => process.stdout.write(`${message}\n`);
+
 async function startServer(databaseUrl: string): Promise<ChildProcess> {
   const server = spawn('pnpm', ['start', '--port', String(PORT)], {
     cwd: path.resolve(import.meta.dirname, '../..'),
@@ -73,7 +76,7 @@ function api(token: string) {
     const text = res.ok ? '' : await res.text();
     // Scryfall limitou as consultas: espera e tenta de novo (o import é idempotente para a pessoa).
     if (!res.ok && text.includes('429') && attempt < 6) {
-      console.log(`Scryfall limitou (${url}); nova tentativa em ${15 * attempt}s`);
+      log(`Scryfall limitou (${url}); nova tentativa em ${15 * attempt}s`);
       await new Promise((r) => setTimeout(r, 15_000 * attempt));
       return call<T>(method, url, body, attempt + 1);
     }
@@ -98,7 +101,7 @@ async function fillThroughApi(sessions: Record<string, string>) {
       },
     );
     deckOf[deck.owner] = created.id;
-    console.log(`deck ${deck.name}: ${created.id}`);
+    log(`deck ${deck.name}: ${created.id}`);
   }
   const ana = api(sessions[SHOWCASE_VIEWER]!);
   // A análise roda em segundo plano depois do import; aqui ela é refeita até vir completa.
@@ -111,7 +114,7 @@ async function fillThroughApi(sessions: Record<string, string>) {
     if (result.errors.length === 0) break;
     if (attempt === 6)
       throw new Error(`Análise incompleta (${result.errors.join(', ')}): Scryfall indisponível?`);
-    console.log(`análise incompleta (${result.errors.join(', ')}); nova tentativa`);
+    log(`análise incompleta (${result.errors.join(', ')}); nova tentativa`);
   }
   for (const item of SHOWCASE_COLLECTION) {
     await ana('POST', '/collection', {
@@ -190,7 +193,7 @@ async function save(page: Page, name: string, theme: Theme) {
   const png = await page.screenshot({ type: 'png' });
   const file = path.join(OUT, `${name}-${theme}.webp`);
   await sharp(png).resize({ width: 1280 }).webp({ quality: 78 }).toFile(file);
-  console.log(`${path.basename(file)}: ${Math.round((await stat(file)).size / 1024)} KB`);
+  log(`${path.basename(file)}: ${Math.round((await stat(file)).size / 1024)} KB`);
 }
 
 async function main() {

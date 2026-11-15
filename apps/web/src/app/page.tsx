@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { SignInButton } from '@/components/auth-buttons';
 import { AppPreview } from '@/components/home/app-preview';
+import { ProductTour } from '@/components/home/product-tour';
 import { Icon, type IconName } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
@@ -117,7 +118,7 @@ export default async function HomePage({
   const t = await getTranslations('home');
   const tc = await getTranslations('common');
   const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t('join.emailSubject'))}`;
-  const sections = ['features', 'sources', 'method', 'values', 'join'] as const;
+  const sections = ['features', 'tour', 'sources', 'method', 'values', 'join'] as const;
 
   const dashboardButton = (size: 'sm' | 'lg') =>
     user ? (
@@ -258,11 +259,23 @@ export default async function HomePage({
           </div>
         </section>
 
+        <section aria-labelledby="tour" className="scroll-mt-20 py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <SectionHeading
+              id="tour"
+              index="02"
+              title={t('tour.title')}
+              subtitle={t('tour.subtitle')}
+            />
+            <ProductTour />
+          </div>
+        </section>
+
         <section aria-labelledby="sources" className="scroll-mt-20 py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <SectionHeading
               id="sources"
-              index="02"
+              index="03"
               title={t('sources.title')}
               subtitle={t('sources.subtitle')}
             />
@@ -298,7 +311,7 @@ export default async function HomePage({
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <SectionHeading
               id="method"
-              index="03"
+              index="04"
               title={t('method.title')}
               subtitle={t('method.subtitle')}
             />
@@ -343,7 +356,7 @@ export default async function HomePage({
 
         <section aria-labelledby="values" className="scroll-mt-20 py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading id="values" index="04" title={t('values.title')} />
+            <SectionHeading id="values" index="05" title={t('values.title')} />
             <ul className="grid gap-6 md:grid-cols-2">
               {(['accessible', 'privacy'] as const).map((key) => (
                 <li key={key} className="card flex gap-4 p-6">

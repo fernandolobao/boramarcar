@@ -1016,6 +1016,7 @@
     "nav": {
       "label": "Page sections",
       "features": "Features",
+      "tour": "Take a look",
       "sources": "Where data comes from",
       "method": "Methodology",
       "values": "Values",
@@ -1078,6 +1079,43 @@
         "mobile": {
           "title": "Android and iOS app",
           "body": "In development: meetups, RSVPs, ranking and decks in your pocket, with Google sign-in."
+        }
+      }
+    },
+    "tour": {
+      "title": "Take a look inside",
+      "subtitle": "Real screens, with a sample group. The names and games are made up.",
+      "tabsLabel": "ArcanaKin screens",
+      "items": {
+        "painel": {
+          "tab": "Dashboard",
+          "caption": "The next meetup, who confirmed, and your numbers in the group.",
+          "alt": "Ana's dashboard in the Mesa de Quinta group: next meetup on Thursday at 7:30 PM with 5 confirmed, 1st place in the ranking, 15 points, 42% win rate and the streak of recent games."
+        },
+        "disponibilidade": {
+          "tab": "Schedule",
+          "caption": "Everyone marks when they can play, and ArcanaKin shows the times when a table comes together.",
+          "alt": "List of times when a table comes together: Thursdays from 8 to 11 PM at Ana's place or at the store, with the 5 available players and a button to schedule the meetup."
+        },
+        "deck": {
+          "tab": "Deck analysis",
+          "caption": "A deck score based on Commander targets: lands, ramp, card draw, removal and mana curve.",
+          "alt": "Analysis of the Ezuri Elves deck scoring 83 out of 100: lands, ramp, draw and curve complete, removal at half, no board wipes, and the mana curve chart."
+        },
+        "colecao": {
+          "tab": "Collection",
+          "caption": "The cards you own, with the estimated value and which decks each one is in.",
+          "alt": "Collection with 136 copies of 84 cards, estimated value of R$ 16,178.39, and the card gallery with quantity, foil and how many decks each card is in."
+        },
+        "mesa": {
+          "tab": "Table mode",
+          "caption": "The game life counter, on a tablet in the middle of the table, with the screen always on.",
+          "alt": "Table mode on a tablet with 4 players in a cross: Ana at 31 life with the monarch crown, Bruno at 18 with 3 poison, Carla at 24 starting the game, Diego at 9 with 14 commander damage."
+        },
+        "ranking": {
+          "tab": "Ranking",
+          "caption": "The group standings, with games, wins and points, by season and game type.",
+          "alt": "Group ranking after 15 games: Ana Lima in 1st with 5 wins in 12 games and 15 points, followed by Diego, Felipe, Bruno, Carla and Elisa."
         }
       }
     },

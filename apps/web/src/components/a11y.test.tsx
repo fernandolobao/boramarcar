@@ -10,6 +10,7 @@ import type { ReactElement } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
+import { ProductTour } from './home/product-tour';
 import { DeckImportForm } from './deck-forms';
 import { EmptyState } from './empty-state';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
@@ -487,5 +488,9 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('formulário de feedback sem violações', async () => {
     expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
+  });
+
+  it('telas do produto na página inicial (abas) sem violações', async () => {
+    expect(await audit(<ProductTour />)).toEqual([]);
   });
 });

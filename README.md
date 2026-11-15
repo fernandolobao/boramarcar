@@ -120,17 +120,32 @@ pnpm dev
 
 ### Scripts
 
-| Comando                                        | O que faz                                                   |
-| ---------------------------------------------- | ----------------------------------------------------------- |
-| `pnpm dev`                                     | Sobe o app em modo desenvolvimento                          |
-| `pnpm build`                                   | Build de produção                                           |
-| `pnpm test`                                    | Testes unitários e de integração (Vitest)                   |
-| `pnpm test:coverage`                           | Testes com relatório de cobertura (com limites mínimos)     |
-| `pnpm test:e2e`                                | Testes ponta a ponta (Playwright) — rode `pnpm build` antes |
-| `pnpm lint` / `pnpm format` / `pnpm typecheck` | Qualidade de código                                         |
-| `pnpm db:generate`                             | Gera migration SQL a partir do schema                       |
-| `pnpm db:migrate`                              | Aplica migrations no `DATABASE_URL`                         |
-| `pnpm db:studio`                               | Abre o Drizzle Studio                                       |
+| Comando                                        | O que faz                                                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `pnpm dev`                                     | Sobe o app em modo desenvolvimento                                                               |
+| `pnpm build`                                   | Build de produção                                                                                |
+| `pnpm test`                                    | Testes unitários e de integração (Vitest)                                                        |
+| `pnpm test:coverage`                           | Testes com relatório de cobertura (com limites mínimos)                                          |
+| `pnpm test:e2e`                                | Testes ponta a ponta (Playwright) — rode `pnpm build` antes                                      |
+| `pnpm lint` / `pnpm format` / `pnpm typecheck` | Qualidade de código                                                                              |
+| `pnpm db:generate`                             | Gera migration SQL a partir do schema                                                            |
+| `pnpm db:migrate`                              | Aplica migrations no `DATABASE_URL`                                                              |
+| `pnpm db:studio`                               | Abre o Drizzle Studio                                                                            |
+| `pnpm --filter @boramarcar/web showcase`       | Refaz as capturas da página inicial (`public/showcase`) num banco local descartável — ver abaixo |
+
+### Capturas da página inicial
+
+A seção "Veja por dentro" usa capturas reais de um grupo **fictício** (nada de produção). Quando a interface mudar, refaça:
+
+```bash
+# Postgres local, banco chamado "showcase…" (o script recusa qualquer outro, e apaga tudo nele)
+createdb -h 127.0.0.1 -p 5433 showcase
+export DATABASE_URL=postgres://<usuário>@127.0.0.1:5433/showcase
+pnpm db:migrate && pnpm build
+pnpm --filter @boramarcar/web showcase
+```
+
+O script semeia o grupo, importa os decks pelo Scryfall (precisa de rede; espera e tenta de novo se o Scryfall limitar), registra as partidas e grava 6 telas em tema claro e escuro (`apps/web/public/showcase/*.webp`). Confira as imagens antes de comitar.
 
 ## App mobile (Expo)
 
