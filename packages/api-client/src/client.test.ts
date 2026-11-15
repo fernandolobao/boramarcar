@@ -774,4 +774,26 @@ describe('cliente da API', () => {
       'PUT /games/g1',
     ]);
   });
+
+  it('pares do encontro (sugestão de mesas)', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      json({
+        format: 'commander',
+        players: [
+          { userId: 'u1', name: 'Ana' },
+          { userId: 'u2', name: 'Bia' },
+        ],
+        pairs: [{ a: 'u1', b: 'u2', recent: 1, older: 2 }],
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const result = await api.events.pairings('e 1');
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/events/e%201/pairings',
+    );
+    expect(result.pairs[0]).toEqual({ a: 'u1', b: 'u2', recent: 1, older: 2 });
+  });
 });

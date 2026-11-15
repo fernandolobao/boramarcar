@@ -122,7 +122,7 @@ export async function listEvents(
     .orderBy(input.when === 'past' ? desc(events.startsAt) : asc(events.startsAt));
 }
 
-async function requireEvent(db: Database, eventId: string, userId: string) {
+export async function requireEvent(db: Database, eventId: string, userId: string) {
   const [event] = await db.select().from(events).where(eq(events.id, eventId)).limit(1);
   if (!event) throw new DomainError('not_found', 'Evento não encontrado');
   const membership = await requireMembership(db, event.groupId, userId);

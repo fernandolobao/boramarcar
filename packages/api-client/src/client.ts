@@ -9,6 +9,7 @@ import {
   errorBodySchema,
   eventDetailSchema,
   eventHistorySchema,
+  eventPairingsSchema,
   eventStatusSchema,
   eventSummarySchema,
   gameWindowSchema,
@@ -325,6 +326,9 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ history: eventHistorySchema }),
           )
         ).history,
+      /** Confirmados e partidas de cada dupla (sugestão de mesas). */
+      pairings: (eventId: string) =>
+        request('GET', `/events/${encodeURIComponent(eventId)}/pairings`, eventPairingsSchema),
       get: async (eventId: string) =>
         (
           await request(

@@ -474,3 +474,11 @@ export type DeckDetail = z.infer<typeof deckDetailSchema>;
 export const errorBodySchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), details: z.unknown().optional() }),
 });
+
+/** Confirmados do encontro e partidas de cada dupla, para a sugestão de mesas. */
+export const eventPairingsSchema = z.object({
+  format: z.string(),
+  players: z.array(z.object({ userId: z.string(), name: z.string() })),
+  pairs: z.array(z.object({ a: z.string(), b: z.string(), recent: z.number(), older: z.number() })),
+});
+export type EventPairings = z.infer<typeof eventPairingsSchema>;
