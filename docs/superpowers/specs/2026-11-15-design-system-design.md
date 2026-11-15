@@ -1,6 +1,6 @@
 # Design system de componentes (site e app)
 
-Data: 15/11/2026 · Status: **proposta, aguardando aprovação**
+Data: 15/11/2026 · Status: **aprovado pelo dono do projeto em 15/11/2026** (React Aria no site; filtros `GET` podem depender de JavaScript)
 
 ## Por quê
 
@@ -36,7 +36,7 @@ Como construir B:
 
 1. **Uma implementação só, com React Native Web no site.** Descartada: o site é Next.js com Tailwind e componentes de servidor; trazer o RNW para ele muda a base inteira por causa de meia dúzia de controles.
 2. **Contrato e lógica compartilhados; implementação web e nativa separadas, tudo nosso.** Viável, mas recriar calendário, lista de seleção e campo numérico acessíveis no navegador (padrões ARIA de grid, combobox e spinbutton) é onde mais se erra.
-3. **Contrato e lógica compartilhados; no site, os controles sobre o React Aria (`react-aria-components`), estilizados com os nossos tokens; no app, componentes nossos.** _Escolhida pelo construtor (pode ser vetada na aprovação)._ O React Aria (Adobe) entrega teclado, leitor de tela e foco dos padrões ARIA prontos e testados, sem impor visual; o HTML que sai é nosso. No app não há equivalente maduro e os controles nativos de toque já resolvem bem.
+3. **Contrato e lógica compartilhados; no site, os controles sobre o React Aria (`react-aria-components`), estilizados com os nossos tokens; no app, componentes nossos.** _Escolhida e aprovada._ O React Aria (Adobe) entrega teclado, leitor de tela e foco dos padrões ARIA prontos e testados, sem impor visual; o HTML que sai é nosso. No app não há equivalente maduro e os controles nativos de toque já resolvem bem.
 
 ## Desenho
 
@@ -86,7 +86,7 @@ Um PR por família, sempre com as telas migradas no mesmo PR:
 
 Testes: lógica no `shared` (vitest); componentes web em jsdom com Testing Library e axe (como `a11y.test.tsx`); E2E de acessibilidade das páginas como hoje; app com `tsc` e capturas pela prévia web temporária quando a mudança for visual.
 
-## Decisões do construtor (para conferir na aprovação)
+## Decisões confirmadas na aprovação
 
 - React Aria só no site (abordagem 3).
 - Valores de data e hora como texto, convertidos para UTC fora do componente, pela regra do projeto.
