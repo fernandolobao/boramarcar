@@ -631,7 +631,7 @@ export function TableBoard({
   const layout = tableLayout(state.players.length, state.layoutId, state.rotations);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#09090b' }}>
+    <View style={[StyleSheet.absoluteFill, { backgroundColor: '#09090b' }]}>
       <SafeAreaView style={{ flex: 1, gap: 4, padding: 4 }}>
         {tableRows(state.players.length, layout).map((row, r) => (
           <View key={r} style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
