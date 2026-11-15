@@ -1,7 +1,16 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Database } from '../client';
-import { account, decks, groupMembers, groups, locations, session, user } from '../schema';
+import {
+  account,
+  decks,
+  eventNudges,
+  groupMembers,
+  groups,
+  locations,
+  session,
+  user,
+} from '../schema';
 import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { addAvailability } from './availability';
@@ -93,8 +102,14 @@ async function seedPlayer() {
 
 describe('exportUserData', () => {
   it('traz os dados da pessoa, sem tokens nem dados de outras pessoas', async () => {
-    const { a, b } = await seedPlayer();
+    const { a, b, future } = await seedPlayer();
+    await db.insert(eventNudges).values({ eventId: future.id, userId: a, sentBy: b });
     const data = await exportUserData(db, a);
+    // Chamados para encontros: o encontro e quando, sem dizer quem chamou (dado de outra pessoa).
+    expect(data.invitations).toEqual([
+      expect.objectContaining({ event: 'Encontro futuro', group: 'Mesa de Quinta' }),
+    ]);
+    expect(Object.keys(data.invitations[0]!)).not.toContain('sentBy');
     expect(data.profile).toMatchObject({ id: a, name: 'P1' });
     expect(data.logins).toEqual([expect.objectContaining({ provider: 'google' })]);
     expect(data.groups).toEqual([
@@ -128,8 +143,17 @@ describe('deleteUserAccount', () => {
       deletions: [],
     });
 
+    await db.insert(eventNudges).values([
+      { eventId: future.id, userId: a, sentBy: b },
+      { eventId: future.id, userId: c, sentBy: a },
+    ]);
     const result = await deleteUserAccount(db, a, new Date('2026-11-11T12:00:00Z'));
     expect(result.transferredGroups).toEqual([group.id]);
+    // Chamados recebidos somem; os enviados ficam para o grupo, sem autor.
+    expect(await db.select().from(eventNudges).where(eq(eventNudges.userId, a))).toEqual([]);
+    expect(await db.select().from(eventNudges).where(eq(eventNudges.userId, c))).toEqual([
+      expect.objectContaining({ sentBy: null }),
+    ]);
 
     const [gone] = await db.select().from(user).where(eq(user.id, a));
     expect(gone).toMatchObject({
