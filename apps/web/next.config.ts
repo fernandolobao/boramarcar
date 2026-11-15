@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   // Os pacotes do monorepo são consumidos direto do código-fonte TypeScript.
-  transpilePackages: ['@boramarcar/core', '@boramarcar/db', '@boramarcar/tokens'],
+  transpilePackages: ['@boramarcar/core', '@boramarcar/db', '@boramarcar/tokens', '@boramarcar/ui'],
   serverExternalPackages: ['pg'],
   // Endereço antigo (Vercel) e domínio sem "www" levam ao endereço oficial, mantendo o caminho.
   async redirects() {

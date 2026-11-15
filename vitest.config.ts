@@ -21,6 +21,7 @@ export default defineConfig({
         branches: 60,
         statements: 60,
         'packages/core/src/**': { lines: 90, functions: 90, branches: 80, statements: 90 },
+        'packages/ui/src/**': { lines: 90, functions: 90, branches: 80, statements: 90 },
         'packages/db/src/services/**': { lines: 85, functions: 85, branches: 70, statements: 85 },
       },
     },
