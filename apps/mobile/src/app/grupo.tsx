@@ -3,6 +3,7 @@ import { Stack, router } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, Share, View } from 'react-native';
 import { ConfirmButton } from '@/components/confirm-button';
+import { AttendanceCard } from '@/components/attendance-card';
 import { GroupSettingsCard, SeasonsCard } from '@/components/group-settings';
 import { TextField } from '@/components/fields';
 import { NoGroup } from '@/components/no-group';
@@ -248,6 +249,8 @@ export default function GroupScreen() {
           ))
         )}
       </Card>
+
+      {canManage && <AttendanceCard groupId={group.id} viewerId={me} />}
 
       <Card style={{ gap: 10 }}>
         <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>

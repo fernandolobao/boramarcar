@@ -393,3 +393,10 @@ sem rolagem horizontal em 320px.
 
 - Site: `<section>` com `<h2>`, lista `<ul>`; o nome é link para o perfil (texto do link = nome); "vai no próximo encontro" em texto, não só cor; ícone decorativo ao lado do texto também em 320 px.
 - App: cada linha é um link (`accessibilityRole="link"`, alvo de 44 pt) com o texto completo, incluindo "vai no próximo encontro", no nome acessível.
+
+## Grupo: quem anda sumido (15/11/2026)
+
+- Site: só para dono e admins. `<table>` com `<caption>` (oculta visualmente), `th scope="col"` e o nome em `th scope="row"`; "Sem aparecer há N semanas" em texto com ícone decorativo (não só cor). "Chamar" tem nome com contexto ("Chamar Bia para o próximo encontro", contém o texto visível); depois do envio vira "Chamado" desabilitado e o aviso vai para `role="status"`. Erros em `FormError`. Em 320 px a tabela cabe sem rolagem horizontal.
+- App: cartão para dono e admins com cabeçalho, linhas em texto e o mesmo nome acessível nos botões; aviso em região viva.
+- O botão só aparece para quem ainda não confirmou o próximo encontro (e nunca para você).
+- axe sem violações no componente (`a11y.test.tsx`).

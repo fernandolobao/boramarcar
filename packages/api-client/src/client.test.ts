@@ -840,6 +840,7 @@ describe('cliente da API', () => {
           ],
           nextEvent: { id: 'e1', title: 'Quinta', startsAt: '2026-11-20T22:30:00.000Z' },
           nudged: [],
+          confirmedNext: ['u1'],
         }),
       )
       .mockResolvedValueOnce(json({ nudged: true }));

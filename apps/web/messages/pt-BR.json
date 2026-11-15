@@ -132,7 +132,25 @@
     "leaveLastHint": "Você é a única pessoa no grupo: sair apaga o grupo.",
     "you": "você",
     "memberActions": "Ações para {name}",
-    "manage": "Gerenciar"
+    "manage": "Gerenciar",
+    "attendance": {
+      "title": "Quem anda sumido",
+      "hint": "Só o dono e os admins veem esta lista. Presença nos últimos 8 encontros que já aconteceram.",
+      "caption": "Presença nos últimos encontros",
+      "person": "Pessoa",
+      "attendance": "Presença",
+      "lastGame": "Última partida",
+      "attended": "{attended} de {of}",
+      "never": "Nunca jogou",
+      "away": "Sem aparecer há {weeks, plural, one {1 semana} other {# semanas}}",
+      "next": "Próximo encontro: {title}, {when}.",
+      "nudge": "Chamar",
+      "nudgeLabel": "Chamar {name} para o próximo encontro",
+      "nudged": "Chamado",
+      "nudgedLabel": "{name}: chamado",
+      "sent": "Aviso enviado para {name}.",
+      "noNext": "Marque um encontro para poder chamar alguém."
+    }
   },
   "availability": {
     "title": "Disponibilidade",

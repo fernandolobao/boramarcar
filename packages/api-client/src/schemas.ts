@@ -506,5 +506,6 @@ export const groupAttendanceSchema = z.object({
   ),
   nextEvent: z.object({ id: z.string(), title: z.string(), startsAt: date }).nullable(),
   nudged: z.array(z.string()),
+  confirmedNext: z.array(z.string()),
 });
 export type GroupAttendance = z.infer<typeof groupAttendanceSchema>;

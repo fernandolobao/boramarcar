@@ -5,7 +5,6 @@ describe('e-mail de encontro', () => {
   it('chamado para o próximo: assunto e texto com o grupo, no idioma de quem recebe', () => {
     const message = buildEventEmail(
       {
-        userId: 'u1',
         name: 'Bia Souza',
         email: 'bia@example.test',
         locale: 'pt-BR',
@@ -22,7 +21,6 @@ describe('e-mail de encontro', () => {
         },
         location: null,
         confirmed: ['Ana'],
-        ics: null,
       },
     );
     expect(message.subject).toContain('Mesa de Quinta sente sua falta: Commander');

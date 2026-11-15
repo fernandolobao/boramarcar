@@ -195,6 +195,13 @@ describe('quem anda sumido e chamar para o próximo', () => {
     });
     expect(result.nextEvent).toMatchObject({ id: next.id, title: 'Próximo' });
     expect(result.nudged).toEqual([away.id]);
+    // Quem cria o encontro já entra confirmado.
+    expect(result.confirmedNext).toEqual([owner.id]);
+    await setRsvp(db, { eventId: next.id, userId: member.id, rsvp: 'yes' });
+    expect(
+      (await getGroupAttendance(db, { groupId: group.id, userId: owner.id, now: later }))
+        .confirmedNext,
+    ).toEqual(expect.arrayContaining([owner.id, member.id]));
     const by = Object.fromEntries(result.members.map((m) => [m.userId, m]));
     expect(by[member.id]).toMatchObject({ attended: 1, of: 1 });
     expect(by[member.id]!.lastGameAt).toBeInstanceOf(Date);

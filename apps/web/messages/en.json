@@ -132,7 +132,25 @@
     "leaveLastHint": "You are the only member: leaving deletes the group.",
     "you": "you",
     "memberActions": "Actions for {name}",
-    "manage": "Manage"
+    "manage": "Manage",
+    "attendance": {
+      "title": "Who's been missing",
+      "hint": "Only the owner and admins see this list. Attendance at the last 8 meetups that already happened.",
+      "caption": "Attendance at recent meetups",
+      "person": "Person",
+      "attendance": "Attendance",
+      "lastGame": "Last game",
+      "attended": "{attended} of {of}",
+      "never": "Never played",
+      "away": "Not around for {weeks, plural, one {1 week} other {# weeks}}",
+      "next": "Next meetup: {title}, {when}.",
+      "nudge": "Invite",
+      "nudgeLabel": "Invite {name} to the next meetup",
+      "nudged": "Invited",
+      "nudgedLabel": "{name}: invited",
+      "sent": "Invite sent to {name}.",
+      "noNext": "Schedule a meetup to be able to invite someone."
+    }
   },
   "availability": {
     "title": "Availability",

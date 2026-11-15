@@ -229,6 +229,17 @@ export async function getGroupAttendance(
           .where(eq(eventNudges.eventId, nextEvent.id))
       ).map((n) => n.userId)
     : [];
+  // Quem já confirmou o próximo encontro não precisa ser chamado.
+  const confirmedNext = nextEvent
+    ? (
+        await db
+          .select({ userId: eventParticipants.userId })
+          .from(eventParticipants)
+          .where(
+            and(eq(eventParticipants.eventId, nextEvent.id), eq(eventParticipants.rsvp, 'yes')),
+          )
+      ).map((r) => r.userId)
+    : [];
 
   return {
     members: attendanceSummary({
@@ -242,6 +253,7 @@ export async function getGroupAttendance(
     }),
     nextEvent,
     nudged,
+    confirmedNext,
   };
 }
 
