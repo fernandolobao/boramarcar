@@ -20,13 +20,15 @@ const icon =
   );
 
 /** A aba inicial é o painel (as outras continuam acessíveis pela barra e pelos links). */
-export const unstable_settings = { initialRouteName: 'painel' };
+export const unstable_settings = { anchor: 'painel' };
 
 /** Abas principais (5.4): início (painel), encontros, disponibilidade, ranking, decks e conta. */
 export default function TabsLayout() {
   const colors = useColors();
   return (
     <Tabs
+      // "Voltar" numa aba leva ao painel (a âncora), não à primeira aba da lista.
+      backBehavior="initialRoute"
       screenOptions={{
         tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.muted,
