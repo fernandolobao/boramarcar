@@ -826,6 +826,10 @@
         "note": "The link is valid for 1 hour. If it wasn't you, ignore this e-mail: your password stays the same."
       },
       "footer": "You're receiving this e-mail because it was used for an ArcanaKin account."
+    },
+    "invite": {
+      "subject": "{group} misses you: {title} — {when}",
+      "intro": "The {group} crew missed you and invited you to the next meetup. Coming?"
     }
   },
   "formats": {
@@ -1540,6 +1544,10 @@
       "title": "How it went: {title}",
       "body": "{name} won {wins} out of {count}. See the recap and send it to the group.",
       "bodyDraw": "{count, plural, =1 {1 game} other {# games}} recorded. See the recap and send it to the group."
+    },
+    "invite": {
+      "title": "{group} misses you!",
+      "body": "Join the next one? {title} · {when}. Tap to RSVP."
     }
   },
   "onboarding": {

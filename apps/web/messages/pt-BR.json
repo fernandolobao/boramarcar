@@ -826,6 +826,10 @@
         "note": "O link vale por 1 hora. Se não foi você, ignore este e-mail: a senha continua a mesma."
       },
       "footer": "Você recebe este e-mail porque ele foi usado numa conta do ArcanaKin."
+    },
+    "invite": {
+      "subject": "{group} sente sua falta: {title} — {when}",
+      "intro": "O pessoal de {group} sentiu sua falta e te chamou para o próximo encontro. Bora?"
     }
   },
   "formats": {
@@ -1540,6 +1544,10 @@
       "title": "Como foi: {title}",
       "body": "{name} venceu {wins} de {count}. Veja o resumo e mande no grupo.",
       "bodyDraw": "{count, plural, =1 {1 partida} other {# partidas}} registradas. Veja o resumo e mande no grupo."
+    },
+    "invite": {
+      "title": "{group} sente sua falta!",
+      "body": "Bora para o próximo? {title} · {when}. Toque para confirmar."
     }
   },
   "onboarding": {

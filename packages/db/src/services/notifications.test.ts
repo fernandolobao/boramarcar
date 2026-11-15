@@ -74,6 +74,27 @@ describe('notificações', () => {
     expect(forParticipants!.recipients.map((r) => r.name)).toEqual(['P1']);
     expect(forParticipants!.confirmed).toEqual(['P1', 'P2', 'P4']);
     expect(await getEventForNotification(db, { eventId: 'nope', audience: 'group' })).toBeNull();
+
+    // Chamado para o próximo: só a pessoa chamada (e-mail só se ela aceita e-mails).
+    const forP3 = await getEventForNotification(db, {
+      eventId: event.id,
+      audience: 'users',
+      userIds: [p3.id],
+    });
+    expect(forP3!.recipients.map((r) => r.name)).toEqual(['P3']);
+    const forP4 = await getEventForNotification(db, {
+      eventId: event.id,
+      audience: 'users',
+      userIds: [p4.id],
+    });
+    expect(forP4!.recipients).toEqual([]);
+    const pushP4 = await getEventForNotification(db, {
+      eventId: event.id,
+      audience: 'users',
+      userIds: [p4.id],
+      channel: 'push',
+    });
+    expect(pushP4!.recipients.map((r) => r.name)).toEqual(['P4']);
   });
 
   it('lembrete: lista, marca uma única vez e volta a valer se remarcar', async () => {
