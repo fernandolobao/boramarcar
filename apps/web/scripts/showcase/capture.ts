@@ -21,7 +21,7 @@ import {
   SHOWCASE_VIEWER,
 } from './data';
 import { assertDisposableDatabase } from './guard';
-import { seedShowcase } from './seed';
+import { seedShowcase, thursdays } from './seed';
 
 const PORT = 3100;
 const BASE = `http://localhost:${PORT}`;
@@ -123,9 +123,14 @@ async function fillThroughApi(sessions: Record<string, string>) {
       foil: item.foil ?? false,
     });
   }
+  const { past } = thursdays();
   for (const [i, game] of SHOWCASE_GAMES.entries()) {
+    // Na noite do encontro (a segunda partida da noite, uma hora e meia depois).
+    const sameNight = SHOWCASE_GAMES.slice(0, i).filter((g) => g.week === game.week).length;
+    const playedAt = new Date(past(game.week).getTime() + (60 + sameNight * 90) * 60_000);
     await ana('POST', `/events/sc-event-w${game.week}/games`, {
       format: 'commander',
+      playedAt: playedAt.toISOString(),
       winningTurn: game.turn,
       durationMinutes: game.minutes,
       firstPlayerId: game.players[i % game.players.length],
