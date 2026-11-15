@@ -36,6 +36,7 @@ import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
 import { FirstSteps } from './first-steps';
 import { FeedbackForm } from './feedback-form';
+import { NumberField } from './ds/number-field';
 
 vi.mock('./places/location-map', () => ({
   LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
@@ -405,6 +406,18 @@ const cases: [string, ReactElement][] = [
   [
     'ShareButtons',
     <ShareButtons key="s" text="t" url="https://x.app" title="Grupo" icsHref="/x.ics" />,
+  ],
+  [
+    'NumberField',
+    <NumberField
+      key="n"
+      label="Cópias"
+      value={2}
+      min={1}
+      max={10}
+      description="Quantas cópias"
+      onChange={() => undefined}
+    />,
   ],
 ];
 
