@@ -133,8 +133,9 @@ const pt = {
   groupSettingsPointsDraw: 'Empate',
   groupSettingsPointsLoss: 'Derrota',
   groupSettingsSaved: 'Configurações salvas.',
-  stepDown: '{label}: diminuir (agora {value})',
-  stepUp: '{label}: aumentar (agora {value})',
+  dsDecrease: '{label}: diminuir (agora {value})',
+  dsIncrease: '{label}: aumentar (agora {value})',
+  dsEditHint: 'Toque duas vezes para digitar um valor.',
   seasonsTitle: 'Temporadas',
   seasonsHint: 'Temporadas aparecem no filtro de período do ranking.',
   seasonsEmpty: 'Nenhuma temporada criada.',
@@ -660,8 +661,6 @@ const pt = {
   collectionAddCard: 'Carta',
   collectionUseSuggestion: 'Usar {name}',
   collectionQuantity: 'Cópias',
-  collectionFewer: 'Menos uma cópia (agora {count})',
-  collectionMore: 'Mais uma cópia (agora {count})',
   collectionFoil: 'Foil',
   collectionAdd: 'Adicionar',
   collectionAdding: 'Adicionando…',
@@ -854,8 +853,9 @@ const en: Messages = {
   groupSettingsPointsDraw: 'Draw',
   groupSettingsPointsLoss: 'Loss',
   groupSettingsSaved: 'Settings saved.',
-  stepDown: '{label}: decrease (now {value})',
-  stepUp: '{label}: increase (now {value})',
+  dsDecrease: '{label}: decrease (now {value})',
+  dsIncrease: '{label}: increase (now {value})',
+  dsEditHint: 'Double-tap to type a value.',
   seasonsTitle: 'Seasons',
   seasonsHint: 'Seasons show up in the ranking period filter.',
   seasonsEmpty: 'No seasons yet.',
@@ -1379,8 +1379,6 @@ const en: Messages = {
   collectionAddCard: 'Card',
   collectionUseSuggestion: 'Use {name}',
   collectionQuantity: 'Copies',
-  collectionFewer: 'One copy fewer (now {count})',
-  collectionMore: 'One more copy (now {count})',
   collectionFoil: 'Foil',
   collectionAdd: 'Add',
   collectionAdding: 'Adding…',
@@ -1444,6 +1442,11 @@ export const locale = getLocales()[0]?.languageCode === 'en' ? 'en' : 'pt-BR';
 const messages: Messages = locale === 'en' ? en : pt;
 
 /** Texto traduzido com `{variáveis}`. */
+/** Texto cru, com os `{marcadores}` intactos (para modelos preenchidos depois, ex.: design system). */
+export function tRaw(key: MessageKey): string {
+  return messages[key];
+}
+
 export function t(key: MessageKey, values: Record<string, string | number> = {}) {
   return messages[key].replace(/\{(\w+)\}/g, (_, name: string) => String(values[name] ?? ''));
 }

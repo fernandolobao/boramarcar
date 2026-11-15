@@ -24,6 +24,7 @@ import { AppText, Button, styles as ui } from '@/components/ui';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { counterLabel, defeatLabel } from './labels';
+import { NumberField } from '@/components/ds/number-field';
 
 /** Soma das mudanças recentes ("−3"), que some 1,5 s depois da última (como no Lotus). */
 function useRecentDelta(value: number) {
@@ -96,53 +97,6 @@ function Rotated({
   );
 }
 
-/** Linha de −/+ do painel de opções (texto claro sobre o fundo escuro da área). */
-function PanelStepper({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (delta: number) => void;
-}) {
-  return (
-    <View style={board.panelRow}>
-      <Text style={board.panelLabel} numberOfLines={2} maxFontSizeMultiplier={1.4}>
-        {label}
-      </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('tableDecrease', { label })}
-        accessibilityState={{ disabled: value <= 0 }}
-        disabled={value <= 0}
-        onPress={() => onChange(-1)}
-        style={({ pressed }) => [
-          board.panelStep,
-          { opacity: value <= 0 ? 0.35 : pressed ? 0.6 : 1 },
-        ]}
-      >
-        <Text style={board.panelStepText}>−</Text>
-      </Pressable>
-      <Text
-        style={board.panelValue}
-        accessibilityLabel={`${label}: ${value}`}
-        accessibilityLiveRegion="polite"
-      >
-        {value}
-      </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('tableIncrease', { label })}
-        onPress={() => onChange(1)}
-        style={({ pressed }) => [board.panelStep, { opacity: pressed ? 0.6 : 1 }]}
-      >
-        <Text style={board.panelStepText}>+</Text>
-      </Pressable>
-    </View>
-  );
-}
-
 /**
  * Opções do jogador dentro da própria área (como no Lotus), já viradas para ele: dano de
  * comandante por oponente, marcadores, monarca, desistir e girar a área.
@@ -205,16 +159,19 @@ function PlayerOptions({
             {state.players
               .filter((p) => p.userId !== player.userId)
               .map((p) => (
-                <PanelStepper
+                <NumberField
                   key={p.userId}
+                  tone="onDark"
+                  compact
+                  min={0}
                   label={t('tableFrom', { name: p.name })}
                   value={player.commanderDamage[p.userId] ?? 0}
-                  onChange={(delta) =>
+                  onChange={(v) =>
                     dispatch({
                       type: 'commander',
                       userId: player.userId,
                       fromUserId: p.userId,
-                      delta,
+                      delta: (v ?? 0) - (player.commanderDamage[p.userId] ?? 0),
                     })
                   }
                 />
@@ -224,12 +181,20 @@ function PlayerOptions({
         <View style={{ gap: 6 }}>
           <Text style={board.panelSection}>{t('tableCountersTitle')}</Text>
           {TABLE_COUNTERS.map((counter) => (
-            <PanelStepper
+            <NumberField
               key={counter}
+              tone="onDark"
+              compact
+              min={0}
               label={counterLabel(counter)}
               value={player.counters[counter]}
-              onChange={(delta) =>
-                dispatch({ type: 'counter', userId: player.userId, counter, delta })
+              onChange={(v) =>
+                dispatch({
+                  type: 'counter',
+                  userId: player.userId,
+                  counter,
+                  delta: (v ?? 0) - player.counters[counter],
+                })
               }
             />
           ))}
