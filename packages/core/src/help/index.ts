@@ -138,7 +138,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'quem-anda-sumido',
             question: 'Como chamo de volta quem anda sumido?',
             intro: [
-              'O dono e os admins do grupo veem, na tela do Grupo, a lista "Quem anda sumido": a presença de cada pessoa nos últimos 8 encontros, a última partida e há quantas semanas ela não aparece (quem faltou os 4 últimos encontros e não joga há um mês). Os outros membros não veem essa lista.',
+              'O dono e os admins do grupo veem, na tela do Grupo, a lista "Quem anda sumido": a presença de cada pessoa nos últimos 8 encontros (conta quem marcou "Vou" ou jogou alguma partida), a última partida e há quantas semanas ela não aparece (quem faltou os 4 últimos encontros e não joga há um mês). Os outros membros não veem essa lista.',
             ],
             steps: [
               'Marque o próximo encontro.',
@@ -404,7 +404,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'quem-anda-sumido',
             question: "How do I bring back someone who's been missing?",
             intro: [
-              "The group owner and admins see, on the Group screen, the \"Who's been missing\" list: each person's attendance at the last 8 meetups, their last game and how many weeks they haven't shown up (whoever missed the last 4 meetups and hasn't played for a month). Other members don't see this list.",
+              "The group owner and admins see, on the Group screen, the \"Who's been missing\" list: each person's attendance at the last 8 meetups (counting whoever said \"Going\" or played a game), their last game and how many weeks they haven't shown up (whoever missed the last 4 meetups and hasn't played for a month). Other members don't see this list.",
             ],
             steps: [
               'Schedule the next meetup.',

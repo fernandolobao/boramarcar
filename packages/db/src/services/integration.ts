@@ -197,20 +197,24 @@ export async function getGroupAttendance(
     )
     .orderBy(desc(events.startsAt))
     .limit(8);
-  const confirmations = recent.length
-    ? await db
-        .select({ eventId: eventParticipants.eventId, userId: eventParticipants.userId })
-        .from(eventParticipants)
-        .where(
-          and(
-            inArray(
-              eventParticipants.eventId,
-              recent.map((e) => e.id),
-            ),
-            eq(eventParticipants.rsvp, 'yes'),
+  // Esteve no encontro: marcou "Vou" ou jogou alguma partida dele (muita gente só joga).
+  const recentIds = recent.map((e) => e.id);
+  const [confirmations, players] = recentIds.length
+    ? await Promise.all([
+        db
+          .select({ eventId: eventParticipants.eventId, userId: eventParticipants.userId })
+          .from(eventParticipants)
+          .where(
+            and(inArray(eventParticipants.eventId, recentIds), eq(eventParticipants.rsvp, 'yes')),
           ),
-        )
-    : [];
+        db
+          .select({ eventId: games.eventId, userId: gamePlayers.userId })
+          .from(gamePlayers)
+          .innerJoin(games, eq(games.id, gamePlayers.gameId))
+          .where(inArray(games.eventId, recentIds)),
+      ])
+    : [[], []];
+  const presence = [...confirmations, ...players];
 
   const lastGames = await db
     .select({ userId: gamePlayers.userId, at: max(games.playedAt) })
@@ -246,7 +250,7 @@ export async function getGroupAttendance(
       members,
       events: recent.map((e) => ({
         startsAt: e.startsAt,
-        confirmed: confirmations.filter((c) => c.eventId === e.id).map((c) => c.userId),
+        present: [...new Set(presence.filter((p) => p.eventId === e.id).map((p) => p.userId))],
       })),
       lastGame,
       now,
