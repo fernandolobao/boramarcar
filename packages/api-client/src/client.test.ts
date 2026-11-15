@@ -861,8 +861,13 @@ describe('cliente da API', () => {
   it('estado do guia do primeiro acesso', async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce(json({ guide: { show: true, done: false, hasGroup: false } }))
-      .mockResolvedValueOnce(json({ flag: 'guide-completed' }));
+      .mockResolvedValueOnce(
+        json({ guide: { show: true, done: false, hasGroup: false }, tips: [] }),
+      )
+      .mockResolvedValueOnce(json({ flag: 'guide-completed' }))
+      .mockResolvedValueOnce(
+        json({ guide: { show: false, done: true, hasGroup: true }, tips: ['table'] }),
+      );
     const api = createApiClient({
       baseUrl: 'https://www.arcanakin.com.br',
       fetch: fetchMock as unknown as typeof fetch,
@@ -870,5 +875,6 @@ describe('cliente da API', () => {
     expect(await api.me.onboarding()).toEqual({ show: true, done: false, hasGroup: false });
     await api.me.markOnboarding('guide-completed');
     expect(JSON.parse(fetchMock.mock.calls[1]![1].body)).toEqual({ flag: 'guide-completed' });
+    expect(await api.me.dismissedTips()).toEqual(['table']);
   });
 });

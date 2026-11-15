@@ -142,6 +142,15 @@ const pt = {
     'Ainda não há encontro marcado em {group}. Quando a mesa fechar, você recebe um aviso.',
   guideDoneNoGroup: 'Quando você entrar num grupo, o painel mostra o próximo encontro.',
   guideFinish: 'Ir para o painel',
+  tipLabel: 'Dica',
+  tipDismiss: 'Entendi',
+  tipDismissLabel: 'Entendi, dispensar a dica',
+  tipDeckAnalysis:
+    'A nota compara o deck com metas de referência de Commander (terrenos, ramp, compra, remoção, board wipes e curva). Toque num item para ver como ele é calculado e quais cartas contam. É um guia, não uma regra.',
+  tipTable:
+    'Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer e trocar lugares.',
+  tipCollection:
+    'As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.',
   helpTitle: 'Ajuda',
   groupTitle: 'Seu grupo',
   groupSettingsTitle: 'Configurações do grupo',
@@ -915,6 +924,15 @@ const en: Messages = {
     'No meetup scheduled in {group} yet. When the table is set, you get a notification.',
   guideDoneNoGroup: 'Once you join a group, the dashboard shows the next meetup.',
   guideFinish: 'Go to the dashboard',
+  tipLabel: 'Tip',
+  tipDismiss: 'Got it',
+  tipDismissLabel: 'Got it, dismiss the tip',
+  tipDeckAnalysis:
+    'The score compares the deck with Commander reference targets (lands, ramp, card draw, removal, board wipes and curve). Tap an item to see how it is calculated and which cards count. It’s a guide, not a rule.',
+  tipTable:
+    'Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.',
+  tipCollection:
+    'Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.',
   helpTitle: 'Help',
   groupTitle: 'Your group',
   groupSettingsTitle: 'Group settings',

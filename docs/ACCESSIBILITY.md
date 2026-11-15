@@ -411,3 +411,8 @@ sem rolagem horizontal em 320px.
 - Site (`/boas-vindas`): um `<h1>` por passo, que recebe o foco ao abrir (o leitor de tela anuncia o passo novo); "Passo N de 3" em texto; "Pular o guia" sempre visível como `<button>`; "Continuar" e "Pular este passo" como links; formulários reaproveitados (já auditados). `generateMetadata` com título e `noindex`. Conferido em 1280 e 320 px, sem rolagem horizontal; no E2E de acessibilidade entram os quatro passos.
 - App: título com `accessibilityRole="header"`, passo em texto, "Pular o guia" em todas as telas e aviso de disponibilidade salva em região viva.
 - Nunca bloqueia: sem rede, o app segue sem abrir o guia; pular grava a escolha e não pergunta de novo.
+
+## Dicas nas telas densas (15/11/2026)
+
+- Site: `<section>` com título "Dica" (`<h2>`), texto e "Entendi" como `<button>` com nome "Entendi, dispensar a dica" (contém o texto visível). Não é modal, não rouba o foco ao aparecer e não some sozinha; ao dispensar, o foco vai para o conteúdo principal. Ícone decorativo. axe sem violações (`a11y.test.tsx`).
+- App: o mesmo cartão com cabeçalho e o mesmo nome acessível no botão; sem rede, não aparece (nunca atrapalha a tela).

@@ -31,6 +31,7 @@ import {
 import { KEEP_AWAKE_MP4, KEEP_AWAKE_WEBM } from './keep-awake-media';
 import { NumberField } from '../ds/number-field';
 import { Choices } from '../ds/choices';
+import { Tip } from '../tip';
 
 export interface TablePlayerOption {
   userId: string;
@@ -45,11 +46,13 @@ function Setup({
   eventId,
   players,
   defaultFormat,
+  showTip,
   onStart,
 }: {
   eventId: string;
   players: readonly TablePlayerOption[];
   defaultFormat: GameFormat;
+  showTip: boolean;
   onStart: (state: TableState) => void;
 }) {
   const t = useTranslations('table');
@@ -97,6 +100,7 @@ function Setup({
     >
       <h1 className="page-title">{t('title')}</h1>
       <p className="muted">{t('intro')}</p>
+      {showTip && <Tip id="table" />}
       {saved && (
         <section className="card space-y-3" aria-labelledby={`${id}-saved`}>
           <h2 id={`${id}-saved`} className="section-title mb-0">
@@ -437,10 +441,13 @@ export function TableMode({
   eventId,
   players,
   defaultFormat,
+  showTip = false,
 }: {
   eventId: string;
   players: readonly TablePlayerOption[];
   defaultFormat: GameFormat;
+  /** Dica do modo mesa (7.4), enquanto a pessoa não a dispensar. */
+  showTip?: boolean;
 }) {
   const router = useRouter();
   const [phase, setPhase] = useState<
@@ -473,6 +480,7 @@ export function TableMode({
       eventId={eventId}
       players={players}
       defaultFormat={defaultFormat}
+      showTip={showTip}
       onStart={(state) => setPhase({ kind: 'playing', state })}
     />
   );

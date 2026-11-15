@@ -6,6 +6,7 @@ import { FlatList, Image, Modal, Pressable, RefreshControl, ScrollView, View } f
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmButton } from '@/components/confirm-button';
 import { TextField } from '@/components/fields';
+import { Tip } from '@/components/tip';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
@@ -308,6 +309,7 @@ export default function CollectionScreen() {
               {t('collectionTitle')}
             </AppText>
             <AppText muted>{t('collectionIntro')}</AppText>
+            <Tip id="collection" />
             <AddCard
               onAdded={(m) => {
                 setMessage(m);

@@ -1,4 +1,4 @@
-import { getGuideState, markOnboarding, ONBOARDING_FLAGS } from '@boramarcar/db';
+import { getGuideState, listDismissedTips, markOnboarding, ONBOARDING_FLAGS } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
 
@@ -11,7 +11,9 @@ export const POST = authed(async ({ req, db, user }) => {
   return { flag };
 });
 
-/** Estado do guia do primeiro acesso (7.1): se abre sozinho, se já foi feito e se há grupo. */
+/** Estado do onboarding: guia do primeiro acesso (7.1) e dicas dispensadas (7.4). */
 export const GET = authed(async ({ db, user }) => ({
   guide: await getGuideState(db, { userId: user.id }),
+  /** Dicas das telas (7.4) que a pessoa já dispensou. */
+  tips: await listDismissedTips(db, { userId: user.id }),
 }));

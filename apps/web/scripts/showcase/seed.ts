@@ -45,6 +45,15 @@ export async function seedShowcase(databaseUrl: string) {
         expiresAt: new Date(Date.now() + 2 * DAY),
       });
     }
+    // Quem aparece nas capturas já usa o app: dicas das telas dispensadas.
+    await db.insert(s.onboardingSteps).values(
+      SHOWCASE_USERS.flatMap((u) =>
+        (['tip-deck-analysis', 'tip-table', 'tip-collection'] as const).map((step) => ({
+          userId: u.id,
+          step,
+        })),
+      ),
+    );
     await db.insert(s.groups).values({ ...SHOWCASE_GROUP, createdBy: 'sc-ana' });
     await db.insert(s.groupMembers).values(
       SHOWCASE_USERS.map((u, i) => ({

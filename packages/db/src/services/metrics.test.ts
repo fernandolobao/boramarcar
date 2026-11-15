@@ -7,6 +7,7 @@ import { seedGroup } from '../test/helpers';
 import { addAvailability } from './availability';
 import { createEvent, recordGame, setRsvp } from './events';
 import { createFeedback } from './feedback';
+import { markOnboarding } from './onboarding';
 import { getProductMetrics, listUsersForAdmin } from './metrics';
 
 let db: Database;
@@ -76,6 +77,25 @@ describe('métricas do produto', () => {
     });
     // Nada de nomes, e-mails ou IDs no resultado.
     expect(JSON.stringify(m)).not.toMatch(/@|P1|Mesa de Quinta/);
+  });
+
+  it('ativação do onboarding: guias concluídos e pulados e dicas dispensadas, só contagens', async () => {
+    const { db: fresh, close: closeFresh } = await createTestDb();
+    const people = await Promise.all(
+      ['A', 'B', 'C'].map((name) => createTestUser(fresh, { name })),
+    );
+    await markOnboarding(fresh, { userId: people[0]!.id, flag: 'guide-completed' });
+    await markOnboarding(fresh, { userId: people[1]!.id, flag: 'guide-completed' });
+    await markOnboarding(fresh, { userId: people[2]!.id, flag: 'guide-skipped' });
+    await markOnboarding(fresh, { userId: people[0]!.id, flag: 'tip-table' });
+    await markOnboarding(fresh, { userId: people[1]!.id, flag: 'tip-table' });
+    await markOnboarding(fresh, { userId: people[1]!.id, flag: 'tip-collection' });
+    expect((await getProductMetrics(fresh)).onboarding).toEqual({
+      guideCompleted: 2,
+      guideSkipped: 1,
+      tipsDismissed: { 'deck-analysis': 0, table: 2, collection: 1 },
+    });
+    await closeFresh();
   });
 
   it('banco vazio não quebra', async () => {

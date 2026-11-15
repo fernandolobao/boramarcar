@@ -192,8 +192,24 @@ export function createApiClient(options: ApiClientOptions) {
             }),
           )
         ).guide,
+      /** Dicas das telas (análise de deck, modo mesa, coleção) que a pessoa já dispensou. */
+      dismissedTips: async () =>
+        (
+          await request(
+            'GET',
+            '/me/onboarding',
+            z.object({ tips: z.array(z.enum(['deck-analysis', 'table', 'collection'])) }),
+          )
+        ).tips,
       markOnboarding: (
-        flag: 'checklist-dismissed' | 'guide-skipped' | 'guide-completed' | 'beta-banner-dismissed',
+        flag:
+          | 'checklist-dismissed'
+          | 'guide-skipped'
+          | 'guide-completed'
+          | 'beta-banner-dismissed'
+          | 'tip-deck-analysis'
+          | 'tip-table'
+          | 'tip-collection',
       ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
       /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
       deleteAccount: () =>

@@ -19,6 +19,9 @@ export const ONBOARDING_FLAGS = [
   'checklist-dismissed',
   'guide-skipped',
   'guide-completed',
+  'tip-deck-analysis',
+  'tip-table',
+  'tip-collection',
   'beta-banner-dismissed',
 ] as const;
 export type OnboardingFlag = (typeof ONBOARDING_FLAGS)[number];
@@ -116,4 +119,17 @@ export async function getGuideState(db: Database, input: { userId: string }) {
   const done = flags.some((f) => f.step === 'guide-completed' || f.step === 'guide-skipped');
   const isNew = Boolean(account && account.createdAt >= GUIDE_LAUNCH);
   return { show: !done && isNew, done, hasGroup: (memberships[0]?.n ?? 0) > 0 };
+}
+
+/** Dicas das telas densas (7.4): uma vez por pessoa, dispensadas com "Entendi" (marca `tip-<id>`). */
+export const TIP_IDS = ['deck-analysis', 'table', 'collection'] as const;
+export type TipId = (typeof TIP_IDS)[number];
+
+/** Dicas que a pessoa já dispensou. */
+export async function listDismissedTips(db: Database, input: { userId: string }) {
+  const rows = await db
+    .select({ step: onboardingSteps.step })
+    .from(onboardingSteps)
+    .where(eq(onboardingSteps.userId, input.userId));
+  return TIP_IDS.filter((id) => rows.some((r) => r.step === `tip-${id}`));
 }

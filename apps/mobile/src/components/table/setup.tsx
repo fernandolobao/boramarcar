@@ -13,6 +13,7 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { formatLabel } from './labels';
 import { Choices } from '@/components/ds/choices';
+import { Tip } from '@/components/tip';
 
 const MAX_PLAYERS = 6;
 const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
@@ -84,6 +85,7 @@ export function TableSetupScreen({
         </AppText>
         <AppText muted>{t('tableIntro')}</AppText>
       </View>
+      <Tip id="table" />
 
       {saved && (
         <Section title={t('tableSavedTitle')}>

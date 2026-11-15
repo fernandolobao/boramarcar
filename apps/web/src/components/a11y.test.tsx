@@ -13,6 +13,7 @@ import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './a
 import { ProductTour } from './home/product-tour';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
+import { Tip } from './tip';
 import { TableSuggestions } from './table-suggestions';
 import { DeckImportForm } from './deck-forms';
 import { EmptyState } from './empty-state';
@@ -491,6 +492,10 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('formulário de feedback sem violações', async () => {
     expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
+  });
+
+  it('dica de tela densa sem violações', async () => {
+    expect(await audit(<Tip id="deck-analysis" />)).toEqual([]);
   });
 
   it('guia do primeiro acesso (título, pular, concluir) sem violações', async () => {
