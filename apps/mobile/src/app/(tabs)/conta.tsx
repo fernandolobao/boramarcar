@@ -7,6 +7,7 @@ import { authClient } from '@/lib/auth';
 import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { disablePush } from '@/lib/push';
+import { Choices } from '@/components/ds/choices';
 
 /** Conta: quem está conectado, grupo ativo, avisos neste celular, sair e privacidade (LGPD). */
 export default function AccountScreen() {
@@ -20,25 +21,18 @@ export default function AccountScreen() {
         <AppText muted>{session?.user.email}</AppText>
       </Card>
       {groups.length > 0 && (
-        <View
-          style={{ gap: 8 }}
-          accessibilityRole="radiogroup"
-          accessibilityLabel={t('activeGroup')}
-        >
+        <View style={{ gap: 8 }}>
           <AppText accessibilityRole="header" style={styles.title}>
             {t('activeGroup')}
           </AppText>
-          {groups.map((g) => (
-            <Button
-              key={g.id}
-              label={g.name}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: g.id === group?.id }}
-              selected={g.id === group?.id}
-              onPress={() => void select(g.id)}
-            />
-          ))}
+          <Choices
+            label={t('activeGroup')}
+            hideLabel
+            orientation="vertical"
+            value={group?.id ?? null}
+            onChange={(id) => void select(id)}
+            options={groups.map((g) => ({ value: g.id, label: g.name }))}
+          />
         </View>
       )}
       {session?.user.id && (

@@ -12,6 +12,7 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { NumberField } from '@/components/ds/number-field';
+import { Choices } from '@/components/ds/choices';
 
 type Sort = 'name' | 'value' | 'recent';
 type FoilFilter = 'all' | 'foil' | 'nonfoil';
@@ -20,41 +21,6 @@ const CARD_RATIO = 63 / 88;
 const usd = (value: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 const price = (e: CollectionEntry) => (e.card?.priceUsd ? Number(e.card.priceUsd) : null);
-
-function Choices<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: readonly { value: T; label: string }[];
-  onChange: (v: T) => void;
-}) {
-  return (
-    <View style={{ gap: 6 }}>
-      <AppText style={{ fontWeight: '600' }}>{label}</AppText>
-      <View
-        style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-        accessibilityRole="radiogroup"
-        accessibilityLabel={label}
-      >
-        {options.map((o) => (
-          <Button
-            key={o.value}
-            label={o.label}
-            variant="secondary"
-            accessibilityRole="radio"
-            accessibilityState={{ checked: o.value === value }}
-            selected={o.value === value}
-            onPress={() => onChange(o.value)}
-          />
-        ))}
-      </View>
-    </View>
-  );
-}
 
 /** Adicionar cartas: nome com sugestões do Scryfall, cópias e foil. */
 function AddCard({ onAdded }: { onAdded: (message: string) => void }) {

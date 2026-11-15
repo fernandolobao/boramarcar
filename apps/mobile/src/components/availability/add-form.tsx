@@ -1,6 +1,6 @@
 import type { Location } from '@boramarcar/api-client';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -14,6 +14,7 @@ import {
 } from '@/lib/dates';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Choices } from '@/components/ds/choices';
 
 const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
 
@@ -88,42 +89,26 @@ export function AddAvailability({
         {t('availAdd')}
       </AppText>
 
-      <View style={row} accessibilityRole="radiogroup" accessibilityLabel={t('availFrequency')}>
-        {(['once', 'weekly'] as const).map((value) => (
-          <Button
-            key={value}
-            label={t(value === 'once' ? 'availOnce' : 'availWeekly')}
-            variant="secondary"
-            accessibilityRole="radio"
-            accessibilityState={{ checked: frequency === value }}
-            selected={frequency === value}
-            onPress={() => setFrequency(value)}
-          />
-        ))}
-      </View>
+      <Choices
+        label={t('availFrequency')}
+        hideLabel
+        value={frequency}
+        onChange={setFrequency}
+        options={(['once', 'weekly'] as const).map((value) => ({
+          value: value,
+          label: t(value === 'once' ? 'availOnce' : 'availWeekly'),
+        }))}
+      />
 
       {frequency === 'once' ? (
         <View style={{ gap: 6 }}>
-          <AppText style={{ fontWeight: '600' }}>{t('availDay')}</AppText>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 8 }}
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('availDay')}
-          >
-            {days.map((d) => (
-              <Button
-                key={d}
-                label={dayLabel(d)}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: day === d }}
-                selected={day === d}
-                onPress={() => setDay(d)}
-              />
-            ))}
-          </ScrollView>
+          <Choices
+            label={t('availDay')}
+            value={day}
+            onChange={setDay}
+            scroll
+            options={days.map((d) => ({ value: d, label: dayLabel(d) }))}
+          />
         </View>
       ) : (
         <View style={{ gap: 6 }}>

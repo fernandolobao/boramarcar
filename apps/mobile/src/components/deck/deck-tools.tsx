@@ -12,6 +12,7 @@ import { formatLabel } from '@/components/table/labels';
 import { AppText, Button } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t, type MessageKey } from '@/lib/i18n';
+import { Choices } from '@/components/ds/choices';
 
 const VISIBILITY_LABEL: Record<DeckVisibility, MessageKey> = {
   private: 'deckVisibilityPrivate',
@@ -84,42 +85,18 @@ export function DeckTools({
             {t('deckSettings')}
           </AppText>
           <TextField label={t('deckName')} value={name} onChangeText={setName} maxLength={120} />
-          <AppText style={{ fontWeight: '600' }}>{t('deckFormat')}</AppText>
-          <View
-            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('deckFormat')}
-          >
-            {GAME_FORMATS.map((f) => (
-              <Button
-                key={f}
-                label={formatLabel(f)}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: format === f }}
-                selected={format === f}
-                onPress={() => setFormat(f)}
-              />
-            ))}
-          </View>
-          <AppText style={{ fontWeight: '600' }}>{t('deckVisibility')}</AppText>
-          <View
-            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('deckVisibility')}
-          >
-            {DECK_VISIBILITIES.map((v) => (
-              <Button
-                key={v}
-                label={t(VISIBILITY_LABEL[v])}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: visibility === v }}
-                selected={visibility === v}
-                onPress={() => setVisibility(v)}
-              />
-            ))}
-          </View>
+          <Choices
+            label={t('deckFormat')}
+            value={format}
+            onChange={setFormat}
+            options={GAME_FORMATS.map((f) => ({ value: f, label: formatLabel(f) }))}
+          />
+          <Choices
+            label={t('deckVisibility')}
+            value={visibility}
+            onChange={setVisibility}
+            options={DECK_VISIBILITIES.map((v) => ({ value: v, label: t(VISIBILITY_LABEL[v]) }))}
+          />
           <AppText muted>{t(VISIBILITY_HINT[visibility])}</AppText>
           <Button
             label={busy ? t('settingsSaving') : t('deckSave')}

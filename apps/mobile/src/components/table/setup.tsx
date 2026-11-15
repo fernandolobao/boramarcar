@@ -12,6 +12,7 @@ import { AppText, Button, Card, styles as ui } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { formatLabel } from './labels';
+import { Choices } from '@/components/ds/choices';
 
 const MAX_PLAYERS = 6;
 const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
@@ -97,25 +98,16 @@ export function TableSetupScreen({
       )}
 
       <Section title={t('tableFormat')}>
-        <View
-          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-          accessibilityRole="radiogroup"
-        >
-          {FORMATS.map((f) => (
-            <Button
-              key={f}
-              label={formatLabel(f)}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: format === f }}
-              selected={format === f}
-              onPress={() => {
-                setFormat(f);
-                setLife(String(startingLifeFor(f)));
-              }}
-            />
-          ))}
-        </View>
+        <Choices
+          label={t('tableFormat')}
+          hideLabel
+          value={format}
+          onChange={(f) => {
+            setFormat(f);
+            setLife(String(startingLifeFor(f)));
+          }}
+          options={FORMATS.map((f) => ({ value: f, label: formatLabel(f) }))}
+        />
       </Section>
 
       <Section title={t('tableStartingLife')}>
@@ -197,23 +189,17 @@ export function TableSetupScreen({
                   />
                 </View>
                 {p.decks.length > 0 && (
-                  <View
-                    style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}
-                    accessibilityRole="radiogroup"
-                    accessibilityLabel={`${p.name} · ${t('tableDeck')}`}
-                  >
-                    {[{ id: null, name: t('tableNoDeck') }, ...p.decks].map((d) => (
-                      <Button
-                        key={d.id ?? 'none'}
-                        label={d.name}
-                        variant="secondary"
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: chosen === d.id }}
-                        selected={chosen === d.id}
-                        onPress={() => setDecks((all) => ({ ...all, [userId]: d.id }))}
-                      />
-                    ))}
-                  </View>
+                  <Choices
+                    label={`${p.name} · ${t('tableDeck')}`}
+                    hideLabel
+                    // '' = sem deck.
+                    value={chosen ?? ''}
+                    onChange={(v) => setDecks((all) => ({ ...all, [userId]: v === '' ? null : v }))}
+                    options={[{ id: null, name: t('tableNoDeck') }, ...p.decks].map((d) => ({
+                      value: d.id ?? '',
+                      label: d.name,
+                    }))}
+                  />
                 )}
               </View>
             );

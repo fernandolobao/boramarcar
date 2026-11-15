@@ -11,6 +11,7 @@ import { authClient } from '@/lib/auth';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
+import { Choices } from '@/components/ds/choices';
 
 const RSVP_LABEL: Record<Rsvp, MessageKey> = { yes: 'rsvpYes', maybe: 'rsvpMaybe', no: 'rsvpNo' };
 
@@ -78,23 +79,17 @@ export default function EventScreen() {
           <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
             {t('rsvpTitle')}
           </AppText>
-          <View
-            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-            accessibilityRole="radiogroup"
-          >
-            {(['yes', 'maybe', 'no'] as const).map((value) => (
-              <Button
-                key={value}
-                label={t(RSVP_LABEL[value])}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: mine === value, disabled: saving }}
-                selected={mine === value}
-                disabled={saving}
-                onPress={() => void answer(value)}
-              />
-            ))}
-          </View>
+          <Choices
+            label={t('rsvpTitle')}
+            hideLabel
+            value={mine ?? null}
+            disabled={saving}
+            onChange={(value) => void answer(value)}
+            options={(['yes', 'maybe', 'no'] as const).map((value) => ({
+              value,
+              label: t(RSVP_LABEL[value]),
+            }))}
+          />
           <AppText muted accessibilityLiveRegion="polite">
             {message}
           </AppText>

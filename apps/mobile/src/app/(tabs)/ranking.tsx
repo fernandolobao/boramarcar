@@ -2,15 +2,16 @@ import { GAME_FORMATS, type GameFormat } from '@boramarcar/core/games';
 import { resolvePeriod } from '@boramarcar/core/stats';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { formatLabel } from '@/components/table/labels';
-import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
+import { AppText, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { deviceTimeZone } from '@/lib/dates';
 import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { NoGroup } from '@/components/no-group';
+import { Choices } from '@/components/ds/choices';
 
 /** Ranking do grupo ativo (todas as partidas). */
 export default function RankingScreen() {
@@ -58,48 +59,26 @@ export default function RankingScreen() {
             {t('rankingTitle')}
           </AppText>
           <View style={{ gap: 6 }}>
-            <AppText style={{ fontWeight: '600' }}>{t('rankingPeriod')}</AppText>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 8 }}
-              accessibilityRole="radiogroup"
-              accessibilityLabel={t('rankingPeriod')}
-            >
-              {periods.map((p) => (
-                <Button
-                  key={p.value}
-                  label={p.label}
-                  variant="secondary"
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: period === p.value }}
-                  selected={period === p.value}
-                  onPress={() => setPeriod(p.value)}
-                />
-              ))}
-            </ScrollView>
+            <Choices
+              label={t('rankingPeriod')}
+              value={period}
+              onChange={setPeriod}
+              scroll
+              options={periods.map((p) => ({ value: p.value, label: p.label }))}
+            />
           </View>
           <View style={{ gap: 6 }}>
-            <AppText style={{ fontWeight: '600' }}>{t('rankingFormat')}</AppText>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 8 }}
-              accessibilityRole="radiogroup"
-              accessibilityLabel={t('rankingFormat')}
-            >
-              {[undefined, ...GAME_FORMATS].map((f) => (
-                <Button
-                  key={f ?? 'all'}
-                  label={f ? formatLabel(f) : t('rankingFormatAll')}
-                  variant="secondary"
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: format === f }}
-                  selected={format === f}
-                  onPress={() => setFormat(f)}
-                />
-              ))}
-            </ScrollView>
+            <Choices
+              label={t('rankingFormat')}
+              // '' = todos os tipos de jogo.
+              value={format ?? ''}
+              onChange={(v) => setFormat(v === '' ? undefined : v)}
+              scroll
+              options={[
+                { value: '' as const, label: t('rankingFormatAll') },
+                ...GAME_FORMATS.map((f) => ({ value: f, label: formatLabel(f) })),
+              ]}
+            />
           </View>
           <AppText muted accessibilityLiveRegion="polite">
             {ranking.loading

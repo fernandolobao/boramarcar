@@ -12,8 +12,7 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { NoGroup } from '@/components/no-group';
-
-const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
+import { Choices } from '@/components/ds/choices';
 
 /**
  * Criar encontro pelo app (5.4): título, dia, horário de início (e de término, opcional) e local
@@ -87,26 +86,13 @@ export default function NewEventScreen() {
         />
 
         <View style={{ gap: 6 }}>
-          <AppText style={{ fontWeight: '600' }}>{t('eventDay')}</AppText>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 8 }}
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('eventDay')}
-          >
-            {days.map((d) => (
-              <Button
-                key={d}
-                label={dayLabel(d)}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: day === d }}
-                selected={day === d}
-                onPress={() => setDay(d)}
-              />
-            ))}
-          </ScrollView>
+          <Choices
+            label={t('eventDay')}
+            value={day}
+            onChange={setDay}
+            scroll
+            options={days.map((d) => ({ value: d, label: dayLabel(d) }))}
+          />
         </View>
 
         <TimeStepper label={t('eventStart')} value={start} onChange={setStart} />
@@ -127,23 +113,16 @@ export default function NewEventScreen() {
         )}
 
         <View style={{ gap: 6 }}>
-          <AppText style={{ fontWeight: '600' }}>{t('eventLocation')}</AppText>
-          <View style={row} accessibilityRole="radiogroup" accessibilityLabel={t('eventLocation')}>
-            {[
+          <Choices
+            label={t('eventLocation')}
+            // '' = nenhum (sem local / não sei).
+            value={locationId ?? ''}
+            onChange={(v) => setLocationId(v === '' ? null : v)}
+            options={[
               { id: null as string | null, name: t('eventNoLocation') },
               ...(locations.data ?? []),
-            ].map((l) => (
-              <Button
-                key={l.id ?? 'none'}
-                label={l.name}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: locationId === l.id }}
-                selected={locationId === l.id}
-                onPress={() => setLocationId(l.id)}
-              />
-            ))}
-          </View>
+            ].map((l) => ({ value: l.id ?? '', label: l.name }))}
+          />
         </View>
       </Card>
 

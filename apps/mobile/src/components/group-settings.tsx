@@ -13,6 +13,7 @@ import { addDays, deviceTimeZone, localDate } from '@/lib/dates';
 import { formatDateMedium, t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { NumberField } from '@/components/ds/number-field';
+import { Choices } from '@/components/ds/choices';
 
 const isFormat = (v: string): v is GameFormat => (GAME_FORMATS as readonly string[]).includes(v);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -60,24 +61,14 @@ export function GroupSettingsCard({ groupId, canManage }: { groupId: string; can
       />
       <View style={{ gap: 6 }}>
         <AppText style={{ fontWeight: '600' }}>{t('groupSettingsDefaultFormat')}</AppText>
-        <View
-          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-          accessibilityRole="radiogroup"
-          accessibilityLabel={t('groupSettingsDefaultFormat')}
-        >
-          {GAME_FORMATS.map((f) => (
-            <Button
-              key={f}
-              label={formatLabel(f)}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: form.defaultFormat === f, disabled: !canManage }}
-              selected={form.defaultFormat === f}
-              disabled={!canManage}
-              onPress={() => set('defaultFormat', f)}
-            />
-          ))}
-        </View>
+        <Choices
+          label={t('groupSettingsDefaultFormat')}
+          hideLabel
+          value={isFormat(form.defaultFormat) ? form.defaultFormat : null}
+          disabled={!canManage}
+          onChange={(f) => set('defaultFormat', f)}
+          options={GAME_FORMATS.map((f) => ({ value: f, label: formatLabel(f) }))}
+        />
       </View>
       <AppText style={{ fontWeight: '600' }}>{t('groupSettingsPoints')}</AppText>
       <AppText muted>{t('groupSettingsPointsHint')}</AppText>

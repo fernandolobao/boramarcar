@@ -7,6 +7,7 @@ import { deviceTimeZone } from '@/lib/dates';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { Choices } from '@/components/ds/choices';
 
 type Locale = 'pt-BR' | 'en';
 const LOCALES: readonly Locale[] = ['pt-BR', 'en'];
@@ -75,23 +76,13 @@ export default function SettingsScreen() {
           {t('settingsLanguage')}
         </AppText>
         <AppText muted>{t('settingsLanguageHint')}</AppText>
-        <View
-          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-          accessibilityRole="radiogroup"
-          accessibilityLabel={t('settingsLanguage')}
-        >
-          {LOCALES.map((l) => (
-            <Button
-              key={l}
-              label={LOCALE_LABEL[l]}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: locale === l }}
-              selected={locale === l}
-              onPress={() => setLocale(l)}
-            />
-          ))}
-        </View>
+        <Choices
+          label={t('settingsLanguage')}
+          hideLabel
+          value={locale}
+          onChange={setLocale}
+          options={LOCALES.map((l) => ({ value: l, label: LOCALE_LABEL[l] }))}
+        />
       </Card>
 
       <Card style={{ gap: 8 }}>

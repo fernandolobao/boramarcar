@@ -2,7 +2,7 @@ import type { EventDetail } from '@boramarcar/api-client';
 import { ApiError } from '@boramarcar/api-client';
 import { localRangeToUtc, utcToZonedLocalInput } from '@boramarcar/core/time';
 import { useState } from 'react';
-import { ScrollView, Share, View } from 'react-native';
+import { Share, View } from 'react-native';
 import { ConfirmButton } from '@/components/confirm-button';
 import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card } from '@/components/ui';
@@ -12,6 +12,7 @@ import { dayLabel, deviceTimeZone, localDate, nextDays, rangeLabel } from '@/lib
 import { formatDateTime, t } from '@/lib/i18n';
 import { useGroup } from '@/lib/group';
 import { useAsync } from '@/lib/use-async';
+import { Choices } from '@/components/ds/choices';
 
 /** Texto para compartilhar o encontro, igual ao do site (WhatsApp, folha nativa). */
 export function eventShareText(event: EventDetail, timeZone: string) {
@@ -135,26 +136,13 @@ export function EventManage({ event, onDone }: { event: EventDetail; onDone: () 
             onChangeText={setTitle}
           />
           <View style={{ gap: 6 }}>
-            <AppText style={{ fontWeight: '600' }}>{t('eventDay')}</AppText>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 8 }}
-              accessibilityRole="radiogroup"
-              accessibilityLabel={t('eventDay')}
-            >
-              {days.map((d) => (
-                <Button
-                  key={d}
-                  label={dayLabel(d)}
-                  variant="secondary"
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: day === d }}
-                  selected={day === d}
-                  onPress={() => setDay(d)}
-                />
-              ))}
-            </ScrollView>
+            <Choices
+              label={t('eventDay')}
+              value={day}
+              onChange={setDay}
+              scroll
+              options={days.map((d) => ({ value: d, label: dayLabel(d) }))}
+            />
           </View>
           <TimeStepper label={t('eventStart')} value={start} onChange={setStart} />
           <Button
@@ -168,27 +156,16 @@ export function EventManage({ event, onDone }: { event: EventDetail; onDone: () 
           />
           {hasEnd && <TimeStepper label={t('eventEnd')} value={end} onChange={setEnd} />}
           <View style={{ gap: 6 }}>
-            <AppText style={{ fontWeight: '600' }}>{t('eventLocation')}</AppText>
-            <View
-              style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-              accessibilityRole="radiogroup"
-              accessibilityLabel={t('eventLocation')}
-            >
-              {[
+            <Choices
+              label={t('eventLocation')}
+              // '' = nenhum (sem local / não sei).
+              value={locationId ?? ''}
+              onChange={(v) => setLocationId(v === '' ? null : v)}
+              options={[
                 { id: null as string | null, name: t('eventNoLocation') },
                 ...(locations.data ?? []),
-              ].map((l) => (
-                <Button
-                  key={l.id ?? 'none'}
-                  label={l.name}
-                  variant="secondary"
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: locationId === l.id }}
-                  selected={locationId === l.id}
-                  onPress={() => setLocationId(l.id)}
-                />
-              ))}
-            </View>
+              ].map((l) => ({ value: l.id ?? '', label: l.name }))}
+            />
           </View>
           <Button
             label={saving ? t('settingsSaving') : t('eventSave')}

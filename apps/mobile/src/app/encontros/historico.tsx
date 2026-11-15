@@ -10,6 +10,7 @@ import { useGroup } from '@/lib/group';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { Choices } from '@/components/ds/choices';
 
 type Status = EventHistoryItem['status'];
 const STATUSES: readonly Status[] = ['finished', 'scheduled', 'cancelled'];
@@ -18,42 +19,6 @@ const STATUS_LABEL: Record<Status, MessageKey> = {
   scheduled: 'statusScheduled',
   cancelled: 'statusCancelled',
 };
-
-/** Linha de escolhas exclusivas (situação, jogador), lida como um grupo de rádio. */
-function Choices<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T | undefined;
-  options: readonly { value: T | undefined; label: string }[];
-  onChange: (value: T | undefined) => void;
-}) {
-  return (
-    <View style={{ gap: 6 }}>
-      <AppText style={{ fontWeight: '600' }}>{label}</AppText>
-      <View
-        style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-        accessibilityRole="radiogroup"
-        accessibilityLabel={label}
-      >
-        {options.map((o) => (
-          <Button
-            key={o.value ?? ''}
-            label={o.label}
-            variant="secondary"
-            accessibilityRole="radio"
-            accessibilityState={{ checked: o.value === value }}
-            selected={o.value === value}
-            onPress={() => onChange(o.value)}
-          />
-        ))}
-      </View>
-    </View>
-  );
-}
 
 function summary(item: EventHistoryItem) {
   const games =
@@ -137,22 +102,23 @@ export default function HistoryScreen() {
               />
               <Choices
                 label={t('historyStatus')}
-                value={status}
+                // '' = todas as situações.
+                value={status ?? ''}
                 options={[
-                  { value: undefined, label: t('historyAll') },
+                  { value: '' as const, label: t('historyAll') },
                   ...STATUSES.map((s) => ({ value: s, label: t(STATUS_LABEL[s]) })),
                 ]}
-                onChange={setStatus}
+                onChange={(v) => setStatus(v === '' ? undefined : v)}
               />
               {(members.data?.length ?? 0) > 0 && (
                 <Choices
                   label={t('historyPlayer')}
-                  value={playerId}
+                  value={playerId ?? ''}
                   options={[
-                    { value: undefined, label: t('historyAll') },
+                    { value: '', label: t('historyAll') },
                     ...(members.data ?? []).map((m) => ({ value: m.userId, label: m.name })),
                   ]}
-                  onChange={setPlayerId}
+                  onChange={(v) => setPlayerId(v === '' ? undefined : v)}
                 />
               )}
               {filtered && (

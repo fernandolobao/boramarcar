@@ -50,6 +50,12 @@ sem rolagem horizontal em 320px.
 | Placeholder com contraste baixo                                                                       | 1.4.3 (boa prática) | `placeholder:text-zinc-500` / `zinc-400` no escuro                                   |
 | Falha do Moxfield mostrava só um erro genérico                                                        | 3.3.3 (AA)          | Passo a passo em `role="alert"`, troca para "Colar lista" e foco no campo de texto   |
 
+### Revisão: Choices do design system (15/11/2026)
+
+- **Site** (React Aria `RadioGroup`): rádio de verdade por baixo (teclado com setas, nome e estado anunciados, `name` envia em formulários); variantes `chips` e `cards`; rótulo do grupo visível ou só para leitor de tela quando já há título ao lado; dica e erro ligados ao grupo. Substitui 8 grupos de rádio (tema, visibilidade do deck, imprimir, modo de cor da coleção, tipo de feedback, vencedor no modo mesa, time vencedor, consentimento). Entrou em `a11y.test.tsx`.
+- **App**: `radiogroup` com nome e opções `radio` com `checked` (em `accessibilityState` e em `aria-checked`, que o React Native Web atual exige); linha rolável para listas longas (dias, tipos de jogo); opções com nome acessível próprio quando o texto não basta ("Deck de Ana: Omnath"). Substitui 26 grupos, inclusive as duas cópias locais de `Choices`; títulos repetidos acima dos grupos foram unificados no rótulo do componente.
+- Ficam fora: o "Venceu" por linha do formulário de partida no site (rádio embutido numa linha com deck e ordem), a grade de imagens do seletor de edição e as miniaturas de disposição da mesa.
+
 ### Revisão: NumberField do design system (15/11/2026)
 
 - **Site** (React Aria): rótulo visível associado; dica e erro ligados por `aria-describedby`/`aria-invalid`; setas ↑/↓ no campo mudam o valor e os botões −/+ ficam fora da ordem de Tab (padrão ARIA spinbutton); o nome dos botões diz rótulo e valor atual ("Cópias: aumentar (agora 3)"), sem repetir o rótulo; desabilitados nos limites. Sem separador de milhar. Entrou em `a11y.test.tsx`.

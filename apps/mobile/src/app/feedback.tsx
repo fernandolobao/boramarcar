@@ -5,6 +5,7 @@ import { AppText, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Choices } from '@/components/ds/choices';
 
 type Kind = 'problem' | 'idea' | 'other';
 const KINDS: { kind: Kind; label: () => string }[] = [
@@ -40,24 +41,13 @@ export default function FeedbackScreen() {
       <AppText muted>{t('feedbackIntro')}</AppText>
       <Card>
         <View style={{ gap: 12 }}>
-          <View
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('feedbackKind')}
-            style={{ gap: 8 }}
-          >
-            <AppText style={{ fontWeight: '600' }}>{t('feedbackKind')}</AppText>
-            {KINDS.map((k) => (
-              <Button
-                key={k.kind}
-                label={k.label()}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: kind === k.kind }}
-                selected={kind === k.kind}
-                onPress={() => setKind(k.kind)}
-              />
-            ))}
-          </View>
+          <Choices
+            label={t('feedbackKind')}
+            orientation="vertical"
+            value={kind}
+            onChange={setKind}
+            options={KINDS.map((k) => ({ value: k.kind, label: k.label() }))}
+          />
           <TextField
             label={t('feedbackMessage')}
             hint={t('feedbackHint')}
