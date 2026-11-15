@@ -6,6 +6,8 @@ import {
   rollDie,
   SEAT_COLORS,
   tableLayout,
+  tableRowWeights,
+  type SeatRotation,
   TABLE_COUNTERS,
   tableResult,
   type TableAction,
@@ -261,13 +263,17 @@ function Dialog({
   open,
   title,
   onClose,
+  rotate,
   children,
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
+  /** Gira o diálogo para quem o abriu (o aparelho fica no meio da mesa). */
+  rotate?: SeatRotation;
   children: React.ReactNode;
 }) {
+  const sideways = rotate === 90 || rotate === 270;
   const t = useTranslations('table');
   const ref = useRef<HTMLDialogElement>(null);
   useLightDismiss(ref);
@@ -282,6 +288,15 @@ function Dialog({
       ref={ref}
       aria-label={title}
       onClose={onClose}
+      style={
+        rotate === undefined
+          ? undefined
+          : {
+              rotate: `${rotate}deg`,
+              // De lado, a largura do diálogo corre na altura da tela (e vice-versa).
+              ...(sideways ? { width: 'min(94dvh, 28rem)', maxHeight: '90dvw' } : {}),
+            }
+      }
       className="m-auto max-h-[90dvh] w-[min(94vw,28rem)] overflow-y-auto rounded-2xl bg-surface p-5 text-ink-900 shadow-2xl backdrop:bg-ink-950/70 dark:bg-ink-900 dark:text-ink-100"
     >
       {open && (
@@ -369,7 +384,10 @@ export function TableBoard({
         style={{
           gridTemplateAreas: layout.areas,
           gridTemplateColumns: `repeat(${layout.columns}, minmax(0, 1fr))`,
-          gridAutoRows: 'minmax(0, 1fr)',
+          // Alturas que dão a mesma área a todos (ex.: faixa mais baixa para quem ocupa a largura).
+          gridTemplateRows: tableRowWeights(layout)
+            .map((w) => `minmax(0, ${w}fr)`)
+            .join(' '),
         }}
       >
         {state.players.map((player, i) => {
@@ -424,6 +442,7 @@ export function TableBoard({
         open={selected !== null}
         title={selected ? t('playerTitle', { name: selected.name }) : ''}
         onClose={() => setPlayerOpen(null)}
+        rotate={selected ? layout.seats[state.players.indexOf(selected)]?.rotate : undefined}
       >
         {selected && (
           <>
