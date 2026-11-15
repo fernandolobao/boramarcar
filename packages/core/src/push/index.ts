@@ -79,3 +79,18 @@ export async function sendPush(
   }
   return result;
 }
+
+/** Estado dos avisos num aparelho (app). */
+export type DevicePushState = 'on' | 'off' | 'denied' | 'unavailable';
+
+/**
+ * Onboarding 7.5: oferecer os avisos na hora útil — ao responder "Vou" ou "Talvez" num encontro,
+ * com os avisos desligados, uma vez por aparelho. Sem push no aparelho ou já negado: não insiste.
+ */
+export function shouldOfferPush(input: {
+  rsvp: 'yes' | 'maybe' | 'no';
+  state: DevicePushState;
+  offered: boolean;
+}): boolean {
+  return input.rsvp !== 'no' && input.state === 'off' && !input.offered;
+}

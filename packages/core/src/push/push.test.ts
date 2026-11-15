@@ -43,3 +43,17 @@ describe('push (Expo)', () => {
     expect(result).toEqual({ sent: 0, failed: 1, invalidTokens: [] });
   });
 });
+
+describe('oferecer avisos ao confirmar presença (7.5)', () => {
+  it('oferece uma vez, ao responder Vou ou Talvez, com os avisos desligados', async () => {
+    const { shouldOfferPush } = await import('./index');
+    expect(shouldOfferPush({ rsvp: 'yes', state: 'off', offered: false })).toBe(true);
+    expect(shouldOfferPush({ rsvp: 'maybe', state: 'off', offered: false })).toBe(true);
+    expect(shouldOfferPush({ rsvp: 'no', state: 'off', offered: false })).toBe(false);
+    expect(shouldOfferPush({ rsvp: 'yes', state: 'off', offered: true })).toBe(false);
+    expect(shouldOfferPush({ rsvp: 'yes', state: 'on', offered: false })).toBe(false);
+    // Sem push neste aparelho (ex.: Expo Go) ou já negado no sistema: não insiste.
+    expect(shouldOfferPush({ rsvp: 'yes', state: 'unavailable', offered: false })).toBe(false);
+    expect(shouldOfferPush({ rsvp: 'yes', state: 'denied', offered: false })).toBe(false);
+  });
+});

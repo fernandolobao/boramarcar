@@ -258,6 +258,9 @@ export const HELP: Record<HelpLocale, HelpContent> = {
           {
             id: 'avisos-celular',
             question: 'Como recebo avisos no celular?',
+            intro: [
+              'Na primeira vez que você confirma presença num encontro pelo app, ele pergunta se quer ligar os avisos. Se preferir depois:',
+            ],
             steps: [
               'No app, abra Conta e ligue "Avisos neste celular".',
               'Aceite a permissão do sistema. Você passa a receber encontro novo, mudança, cancelamento, lembrete no dia e "a mesa fechou!".',
@@ -524,6 +527,9 @@ export const HELP: Record<HelpLocale, HelpContent> = {
           {
             id: 'avisos-celular',
             question: 'How do I get notifications on my phone?',
+            intro: [
+              'The first time you RSVP to a meetup in the app, it asks whether you want to turn on notifications. If you prefer to do it later:',
+            ],
             steps: [
               'In the app, open Account and turn on "Notifications on this phone".',
               'Accept the system permission. You’ll get new meetup, changes, cancellation, a reminder on the day and "the table filled up!".',

@@ -16,6 +16,8 @@ import { api } from './api';
  * - Tocar no aviso abre a tela dele (`data.url`, ex.: `/encontros/123`).
  */
 const ENABLED_KEY = 'arcanakin.push-enabled';
+/** A oferta de avisos ao confirmar presença (7.5) já apareceu neste aparelho. */
+const OFFERED_KEY = 'arcanakin.push-offered';
 const CHANNEL = 'default';
 
 export type PushState = 'on' | 'off' | 'denied' | 'unavailable';
@@ -125,4 +127,13 @@ export function usePushNotifications() {
       subscription.remove();
     };
   }, []);
+}
+
+/** A oferta de avisos ao confirmar presença já apareceu neste aparelho? (uma vez por aparelho) */
+export async function wasPushOffered() {
+  return (await SecureStore.getItemAsync(OFFERED_KEY)) === '1';
+}
+
+export async function markPushOffered() {
+  await SecureStore.setItemAsync(OFFERED_KEY, '1');
 }

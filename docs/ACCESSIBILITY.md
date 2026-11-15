@@ -405,3 +405,7 @@ sem rolagem horizontal em 320px.
 - App: cartão para dono e admins com cabeçalho, linhas em texto e o mesmo nome acessível nos botões; aviso em região viva.
 - O botão só aparece para quem ainda não confirmou o próximo encontro (e nunca para você).
 - axe sem violações no componente (`a11y.test.tsx`).
+
+## App: oferta de avisos ao confirmar presença (15/11/2026)
+
+- Cartão dentro do encontro (não é pop-up): título como cabeçalho, texto que explica o que chega, "Ligar avisos" e "Agora não" como botões com nome; o pedido de permissão do sistema só vem depois de a pessoa tocar em "Ligar avisos". Resultado em região viva; negado no sistema vira alerta com "Abrir configurações do celular".

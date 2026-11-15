@@ -6,6 +6,9 @@ import { ConfirmButton } from '@/components/confirm-button';
 import { EventRecap, FinishEvent } from '@/components/event-finish';
 import { EventManage, ShareEvent } from '@/components/event-manage';
 import { TableSuggestions } from '@/components/table-suggestions';
+import { PushOffer } from '@/components/push-offer';
+import { shouldOfferPush } from '@boramarcar/core/push';
+import { getPushState, markPushOffered, wasPushOffered } from '@/lib/push';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
@@ -24,6 +27,7 @@ export default function EventScreen() {
   const event = useAsync(() => api.events.get(id), [id]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [offerPush, setOfferPush] = useState(false);
   // Partida registrada (formulário ou modo mesa) aparece ao voltar para cá.
   useRefreshOnFocus(event.refresh);
 
@@ -40,6 +44,15 @@ export default function EventScreen() {
     try {
       await api.events.rsvp(e.id, rsvp);
       setMessage(t('rsvpSaved'));
+      // Hora útil para oferecer os avisos (7.5): uma vez por aparelho, com os avisos desligados.
+      const [state, offered] = await Promise.all([
+        getPushState().catch(() => 'unavailable' as const),
+        wasPushOffered().catch(() => true),
+      ]);
+      if (shouldOfferPush({ rsvp, state, offered })) {
+        await markPushOffered().catch(() => undefined);
+        setOfferPush(true);
+      }
       await event.refresh();
     } catch {
       setMessage(t('loadError'));
@@ -96,6 +109,7 @@ export default function EventScreen() {
           </AppText>
         </Card>
       )}
+      {offerPush && <PushOffer onClose={() => setOfferPush(false)} />}
 
       {e.status !== 'cancelled' && (
         <Card style={{ gap: 10 }}>

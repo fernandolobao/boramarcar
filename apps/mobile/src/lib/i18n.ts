@@ -267,6 +267,14 @@ const pt = {
   feedbackPrivacy:
     'Guardamos o texto, o tipo e a plataforma, junto com a sua conta, para responder e melhorar o app.',
   pushTitle: 'Avisos',
+  pushOfferTitle: 'Quer saber quando este encontro mudar?',
+  pushOfferBody:
+    'Ligue os avisos e o celular avisa se o encontro mudar ou for cancelado, no dia do encontro e quando a mesa fechar.',
+  pushOfferEnable: 'Ligar avisos',
+  pushOfferLater: 'Agora não',
+  pushOfferClose: 'Fechar',
+  pushOfferOn: 'Avisos ligados neste celular.',
+  pushOfferLaterNote: 'Tudo bem. Dá para ligar depois em Conta → Avisos.',
   pushToggle: 'Avisos neste celular',
   pushHint:
     'Encontro novo, alterado ou cancelado, lembrete no dia e “a mesa fechou!”. Os e-mails continuam como estão nas configurações do site.',
@@ -1017,6 +1025,14 @@ const en: Messages = {
   feedbackPrivacy:
     'We keep the text, the type and the platform, with your account, to reply and improve the app.',
   pushTitle: 'Notifications',
+  pushOfferTitle: 'Want to know when this meetup changes?',
+  pushOfferBody:
+    'Turn on notifications and your phone lets you know if the meetup changes or is cancelled, on the day of the meetup and when the table is set.',
+  pushOfferEnable: 'Turn on notifications',
+  pushOfferLater: 'Not now',
+  pushOfferClose: 'Close',
+  pushOfferOn: 'Notifications are on for this phone.',
+  pushOfferLaterNote: 'No problem. You can turn them on later in Account → Notifications.',
   pushToggle: 'Notifications on this phone',
   pushHint:
     'New, changed or cancelled game nights, same-day reminder and “the table is full!”. E-mails stay as set on the website.',
