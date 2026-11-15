@@ -382,3 +382,8 @@ sem rolagem horizontal em 320px.
 - Cada captura tem texto alternativo que descreve o que a tela mostra (números, nomes, estado), não "captura de tela"; a legenda visível fica em `<figcaption>`. A versão do outro tema fica com `display: none`, fora da árvore de acessibilidade.
 - Celular: as abas rolam na horizontal dentro da seção, sem rolagem horizontal da página em 320 px; alvos com 44 px de altura. Transição com `motion-reduce:`.
 - axe sem violações no componente (`a11y.test.tsx`); a página inicial já está no `a11y.spec.ts` (claro e escuro, desktop e celular).
+
+## Página inicial: valores (15/11/2026)
+
+- Os quatro valores são uma lista (`<ul>`) com títulos `<h3>` sob o `<h2>` da seção; ícones decorativos (`aria-hidden`), o texto carrega o sentido. O destaque da diversão é só visual (faixa e tamanho), sem depender de cor.
+- "Ver a metodologia" é um link âncora para a seção da metodologia, com texto que diz o destino. 320 px sem rolagem horizontal, temas claro e escuro conferidos.

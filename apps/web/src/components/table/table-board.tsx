@@ -6,6 +6,7 @@ import {
   rollDie,
   SEAT_COLORS,
   tableLayout,
+  tableRowWeights,
   type SeatRotation,
   TABLE_COUNTERS,
   tableResult,
@@ -383,7 +384,10 @@ export function TableBoard({
         style={{
           gridTemplateAreas: layout.areas,
           gridTemplateColumns: `repeat(${layout.columns}, minmax(0, 1fr))`,
-          gridAutoRows: 'minmax(0, 1fr)',
+          // Alturas que dão a mesma área a todos (ex.: faixa mais baixa para quem ocupa a largura).
+          gridTemplateRows: tableRowWeights(layout)
+            .map((w) => `minmax(0, ${w}fr)`)
+            .join(' '),
         }}
       >
         {state.players.map((player, i) => {
