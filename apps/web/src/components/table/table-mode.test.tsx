@@ -66,7 +66,7 @@ describe('modo mesa', () => {
     );
 
     // Configuração: confirmados já marcados, vida 40 em Commander, deck escolhido.
-    expect(screen.getByLabelText('Vida inicial')).toHaveValue(40);
+    expect(screen.getByLabelText('Vida inicial')).toHaveValue('40');
     expect(screen.getByRole('checkbox', { name: /Ana/ })).toBeChecked();
     expect(screen.getByRole('checkbox', { name: /Caio/ })).not.toBeChecked();
     fireEvent.change(screen.getByLabelText('1. Ana · deck'), { target: { value: 'd1' } });
@@ -143,6 +143,7 @@ describe('modo mesa', () => {
     fireEvent.change(screen.getByLabelText('Turno da vitória (opcional)'), {
       target: { value: '7' },
     });
+    fireEvent.blur(screen.getByLabelText('Turno da vitória (opcional)'));
     fireEvent.click(screen.getByRole('button', { name: 'Salvar partida' }));
     await waitFor(() => expect(push).toHaveBeenCalledWith('/eventos/e1'));
     const [url, init] = fetchMock.mock.calls[0]!;

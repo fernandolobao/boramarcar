@@ -9,6 +9,7 @@ import { api, ApiError } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
 import { useLightDismiss } from './use-light-dismiss';
+import { NumberField } from './ds/number-field';
 
 export interface PrintLine {
   name: string;
@@ -105,7 +106,7 @@ export function PrintPicker({
   const [filter, setFilter] = useState('');
   const [limit, setLimit] = useState(PRINTS_PAGE);
   const [chosen, setChosen] = useState<string | null>(line.scryfallId);
-  const [copies, setCopies] = useState(String(line.quantity));
+  const [copies, setCopies] = useState<number | null>(line.quantity);
   const current = printLabel(line.card);
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export function PrintPicker({
     setMounted(true);
     setOpen(true);
     setChosen(onSelect ? (selected ?? null) : line.scryfallId);
-    setCopies(String(line.quantity));
+    setCopies(line.quantity);
     setFilter('');
     if (prints) return;
     setLoadError(null);
@@ -140,7 +141,7 @@ export function PrintPicker({
 
   const visible = (prints ?? []).filter((p) => matchesPrint(p, filter));
   const shown = visible.slice(0, limit);
-  const amount = onSelect ? line.quantity : Number(copies);
+  const amount = onSelect ? line.quantity : (copies ?? 0);
   const valid = Number.isInteger(amount) && amount >= 1 && amount <= Math.max(1, line.quantity);
 
   return (
@@ -237,24 +238,18 @@ export function PrintPicker({
                   </div>
                   {!onSelect && line.quantity > 1 && (
                     <div>
-                      <label className="label" htmlFor={`${id}-copies`}>
-                        {t('printCopies', { total: line.quantity })}
-                      </label>
-                      <input
+                      <NumberField
                         id={`${id}-copies`}
-                        className="input w-28"
-                        type="number"
-                        inputMode="numeric"
+                        label={t('printCopies', { total: line.quantity })}
+                        value={copies}
+                        onChange={setCopies}
                         min={1}
                         max={line.quantity}
-                        value={copies}
-                        aria-describedby={`${id}-copies-hint`}
-                        onChange={(e) => setCopies(e.target.value)}
+                        // Diz o que acontece com o resto: separar cópias de edição é isto.
+                        description={
+                          valid ? t('printCopiesRest', { rest: line.quantity - amount }) : undefined
+                        }
                       />
-                      {/* Diz o que acontece com o resto: separar cópias de edição é isto. */}
-                      <p id={`${id}-copies-hint`} className="muted mt-1 max-w-56 text-xs">
-                        {valid ? t('printCopiesRest', { rest: line.quantity - amount }) : null}
-                      </p>
                     </div>
                   )}
                 </div>

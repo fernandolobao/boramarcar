@@ -39,6 +39,8 @@ test.describe('partidas', () => {
     await form.getByRole('radio', { name: 'Venceu: Bia' }).check();
     await form.getByText('Mais detalhes (opcional)').click();
     await form.getByLabel('Turno em que acabou').fill('11');
+    // O campo numérico confirma o valor ao sair dele.
+    await form.getByLabel('Turno em que acabou').blur();
     await form.getByRole('button', { name: 'Salvar partida' }).click();
 
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');

@@ -6,6 +6,7 @@ import { useId, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { NumberField } from './ds/number-field';
 
 export interface GamePlayerOption {
   userId: string;
@@ -78,8 +79,8 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
     ),
   );
   const [firstPlayerId, setFirstPlayerId] = useState(initial?.firstPlayerId ?? '');
-  const [winningTurn, setWinningTurn] = useState(initial?.winningTurn?.toString() ?? '');
-  const [duration, setDuration] = useState(initial?.durationMinutes?.toString() ?? '');
+  const [winningTurn, setWinningTurn] = useState<number | null>(initial?.winningTurn ?? null);
+  const [duration, setDuration] = useState<number | null>(initial?.durationMinutes ?? null);
   const [notes, setNotes] = useState(initial?.notes ?? '');
   const [saved, setSaved] = useState(false);
 
@@ -95,8 +96,8 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
     () => ({
       format,
       firstPlayerId: playing.includes(firstPlayerId) ? firstPlayerId : null,
-      winningTurn: toNumber(winningTurn),
-      durationMinutes: toNumber(duration),
+      winningTurn,
+      durationMinutes: duration,
       notes: notes || null,
       players: playing.map((userId, index) => {
         const team = isTeams ? (teamBy[userId] ?? 1) : null;
@@ -178,8 +179,8 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
               setWinningTeam(null);
               setIsDraw(false);
               setNotes('');
-              setWinningTurn('');
-              setDuration('');
+              setWinningTurn(null);
+              setDuration(null);
               setEliminatedBy({});
               setFirstPlayerId('');
             }
@@ -356,33 +357,23 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
             </select>
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-turn`}>
-              {t('winningTurn')}
-            </label>
-            <input
+            <NumberField
               id={`${id}-turn`}
-              className="input"
-              type="number"
-              inputMode="numeric"
+              label={t('winningTurn')}
+              value={winningTurn}
+              onChange={setWinningTurn}
               min={1}
               max={99}
-              value={winningTurn}
-              onChange={(e) => setWinningTurn(e.target.value)}
             />
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-duration`}>
-              {t('duration')}
-            </label>
-            <input
+            <NumberField
               id={`${id}-duration`}
-              className="input"
-              type="number"
-              inputMode="numeric"
+              label={t('duration')}
+              value={duration}
+              onChange={setDuration}
               min={1}
               max={1440}
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
             />
           </div>
         </div>

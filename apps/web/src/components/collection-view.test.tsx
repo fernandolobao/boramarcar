@@ -225,6 +225,7 @@ describe('CollectionView', () => {
     expect(within(form).getByText('Dominaria United')).toBeInTheDocument();
     expect(within(form).getByRole('button', { name: /Trocar edição/ })).toBeInTheDocument();
     fireEvent.change(within(form).getByLabelText('Cópias'), { target: { value: '2' } });
+    fireEvent.blur(within(form).getByLabelText('Cópias'));
     await act(async () => {
       fireEvent.click(add);
     });
@@ -248,6 +249,7 @@ describe('CollectionView', () => {
     // Nada muda ainda: o botão espera outra edição ou outro acabamento.
     expect(within(split).getByRole('button', { name: 'Mover 1 cópia' })).toBeDisabled();
     fireEvent.change(within(split).getByLabelText('Quantas (de 3)'), { target: { value: '2' } });
+    fireEvent.blur(within(split).getByLabelText('Quantas (de 3)'));
     fireEvent.click(within(split).getByLabelText(/Foil/));
     await act(async () => {
       fireEvent.click(within(split).getByRole('button', { name: 'Mover 2 cópias' }));

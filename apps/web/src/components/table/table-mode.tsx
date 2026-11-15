@@ -29,6 +29,7 @@ import {
   useTable,
 } from './use-table';
 import { KEEP_AWAKE_MP4, KEEP_AWAKE_WEBM } from './keep-awake-media';
+import { NumberField } from '../ds/number-field';
 
 export interface TablePlayerOption {
   userId: string;
@@ -57,7 +58,7 @@ function Setup({
   const [format, setFormat] = useState<GameFormat>(
     tableSupportsFormat(defaultFormat) ? defaultFormat : 'commander',
   );
-  const [life, setLife] = useState(String(startingLifeFor(format)));
+  const [life, setLife] = useState<number | null>(startingLifeFor(format));
   const [seats, setSeats] = useState<string[]>(
     players
       .filter((p) => p.confirmed)
@@ -83,7 +84,7 @@ function Setup({
       return next;
     });
   const byId = new Map(players.map((p) => [p.userId, p]));
-  const lifeValue = Number(life);
+  const lifeValue = life ?? 0;
   const valid =
     seats.length >= 2 && Number.isInteger(lifeValue) && lifeValue > 0 && lifeValue <= 999;
 
@@ -154,7 +155,7 @@ function Setup({
               onChange={(e) => {
                 const f = e.target.value as GameFormat;
                 setFormat(f);
-                setLife(String(startingLifeFor(f)));
+                setLife(startingLifeFor(f));
               }}
             >
               {formats.map((f) => (
@@ -165,19 +166,13 @@ function Setup({
             </select>
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-life`}>
-              {t('startingLife')}
-            </label>
-            <input
+            <NumberField
               id={`${id}-life`}
-              className="input"
-              type="number"
-              inputMode="numeric"
+              label={t('startingLife')}
+              value={life}
+              onChange={setLife}
               min={1}
               max={999}
-              required
-              value={life}
-              onChange={(e) => setLife(e.target.value)}
             />
           </div>
         </div>
@@ -293,7 +288,7 @@ function Finish({
   const result = tableResult(state);
   const [winner, setWinner] = useState<string>(result.winnerId ?? '');
   const [first, setFirst] = useState(state.firstPlayerId ?? '');
-  const [turn, setTurn] = useState('');
+  const [turn, setTurn] = useState<number | null>(null);
   const order = new Map(result.eliminated.map((e) => [e.userId, e.order]));
 
   return (
@@ -314,7 +309,7 @@ function Finish({
                 body: {
                   format: state.format,
                   firstPlayerId: first || null,
-                  winningTurn: turn ? Number(turn) : null,
+                  winningTurn: turn,
                   durationMinutes: tableDurationMinutes(state),
                   players: tableGamePlayers(state, winner === 'draw' ? null : winner),
                 },
@@ -381,18 +376,13 @@ function Finish({
             </select>
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-turn`}>
-              {t('winningTurn')}
-            </label>
-            <input
+            <NumberField
               id={`${id}-turn`}
-              className="input"
-              type="number"
-              inputMode="numeric"
+              label={t('winningTurn')}
+              value={turn}
+              onChange={setTurn}
               min={1}
               max={99}
-              value={turn}
-              onChange={(e) => setTurn(e.target.value)}
             />
           </div>
         </div>

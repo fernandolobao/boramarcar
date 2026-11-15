@@ -31,6 +31,7 @@ import { ManaSymbol, useColorName } from './mana';
 import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 import { EmptyState } from './empty-state';
+import { NumberField } from './ds/number-field';
 
 export interface CollectionViewEntry {
   id: string;
@@ -649,7 +650,7 @@ function AddToCollection({ empty }: { empty: boolean }) {
   const [name, setName] = useState('');
   /** `default`: o Scryfall não listou as edições e a pessoa seguiu com a impressão padrão. */
   const [print, setPrint] = useState<ChosenPrint | 'default' | null>(null);
-  const [quantity, setQuantity] = useState('1');
+  const [quantity, setQuantity] = useState<number | null>(1);
   const [foil, setFoil] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const trimmed = name.trim();
@@ -674,7 +675,7 @@ function AddToCollection({ empty }: { empty: boolean }) {
                 body: {
                   name: trimmed,
                   ...(chosen ? { scryfallId: chosen.scryfallId } : {}),
-                  quantity: Number(quantity) || 1,
+                  quantity: quantity ?? 1,
                   foil,
                 },
               }),
@@ -682,7 +683,7 @@ function AddToCollection({ empty }: { empty: boolean }) {
               setDone(
                 t('addedPrint', {
                   name: r.name,
-                  count: Number(quantity) || 1,
+                  count: quantity ?? 1,
                   print: chosen
                     ? `${chosen.setCode.toUpperCase()} #${chosen.collectorNumber}`
                     : t('addPrintDefault'),
@@ -690,7 +691,7 @@ function AddToCollection({ empty }: { empty: boolean }) {
               );
               setName('');
               setPrint(null);
-              setQuantity('1');
+              setQuantity(1);
               setFoil(false);
             },
           );
@@ -754,19 +755,14 @@ function AddToCollection({ empty }: { empty: boolean }) {
           </div>
         </div>
         <div className="flex flex-wrap items-end gap-4">
-          <div className="w-24">
-            <label className="label" htmlFor={`${id}-q`}>
-              {t('addQuantity')}
-            </label>
-            <input
+          <div>
+            <NumberField
               id={`${id}-q`}
-              type="number"
-              inputMode="numeric"
+              label={t('addQuantity')}
+              value={quantity}
+              onChange={setQuantity}
               min={1}
               max={999}
-              className="input"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
             />
           </div>
           <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
@@ -795,12 +791,12 @@ function SplitCopies({ entry }: { entry: CollectionViewEntry }) {
   const t = useTranslations('collection');
   const id = useId();
   const { run, error, pending } = useApiAction();
-  const [copies, setCopies] = useState(String(Math.min(1, entry.quantity)));
+  const [copies, setCopies] = useState<number | null>(Math.min(1, entry.quantity));
   const [print, setPrint] = useState<ChosenPrint | null>(null);
   const [foil, setFoil] = useState(entry.foil);
   const [message, setMessage] = useState<string | null>(null);
-  const amount = Number(copies);
-  const validAmount = Number.isInteger(amount) && amount >= 1 && amount <= entry.quantity;
+  const amount = copies ?? 0;
+  const validAmount = amount >= 1 && amount <= entry.quantity;
   const target = print?.scryfallId ?? entry.scryfallId;
   const changes = target !== entry.scryfallId || foil !== entry.foil;
   const current = printLabel(entry.card);
@@ -834,19 +830,14 @@ function SplitCopies({ entry }: { entry: CollectionViewEntry }) {
         <p className="muted text-xs">{t('splitHint')}</p>
       </div>
       <div className="flex flex-wrap items-end gap-4">
-        <div className="w-28">
-          <label className="label" htmlFor={`${id}-n`}>
-            {t('splitCopies', { total: entry.quantity })}
-          </label>
-          <input
+        <div>
+          <NumberField
             id={`${id}-n`}
-            type="number"
-            inputMode="numeric"
+            label={t('splitCopies', { total: entry.quantity })}
+            value={copies}
+            onChange={setCopies}
             min={1}
             max={entry.quantity}
-            className="input"
-            value={copies}
-            onChange={(e) => setCopies(e.target.value)}
           />
         </div>
         <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
@@ -914,7 +905,7 @@ function EntryDialog({
   const id = useId();
   const [back, setBack] = useState(false);
   const { run, error, pending } = useApiAction();
-  const [quantity, setQuantity] = useState(String(entry.quantity));
+  const [quantity, setQuantity] = useState<number | null>(entry.quantity);
   const [confirming, setConfirming] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const price = unitPriceUsd(entry);
@@ -924,9 +915,8 @@ function EntryDialog({
       () => api(`/api/v1/collection/${entry.id}`, { method: 'PATCH', body }),
       () => setMessage(t('saved', { name: entry.name })),
     );
-  const commitQuantity = () => {
-    const n = Number(quantity);
-    if (!Number.isInteger(n) || n < 1 || n > 999 || n === entry.quantity) return;
+  const commitQuantity = (n: number | null) => {
+    if (n === null || n < 1 || n > 999 || n === entry.quantity) return;
     void patch({ quantity: n });
   };
 
@@ -970,26 +960,17 @@ function EntryDialog({
         <fieldset className="space-y-3 rounded-xl border border-line px-3 pt-1 pb-3">
           <legend className="px-1 text-sm font-semibold">{t('edit')}</legend>
           <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
-            <div className="w-24">
-              <label className="label" htmlFor={`${id}-q`}>
-                {t('quantity')}
-              </label>
-              <input
+            <div>
+              <NumberField
                 id={`${id}-q`}
-                type="number"
-                inputMode="numeric"
+                label={t('quantity')}
+                value={quantity}
                 min={1}
                 max={999}
-                className="input"
-                value={quantity}
                 disabled={pending}
-                onChange={(e) => setQuantity(e.target.value)}
-                onBlur={commitQuantity}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    commitQuantity();
-                  }
+                onChange={(v) => {
+                  setQuantity(v);
+                  commitQuantity(v);
                 }}
               />
             </div>
