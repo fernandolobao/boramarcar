@@ -72,7 +72,8 @@ export function NumberField({
         >
           −
         </Button>
-        <Input className="input w-20 text-center tabular-nums" />
+        {/* Classes do `input` sem a largura total (a classe `input` tem w-full e brigaria com w-20). */}
+        <Input className="min-h-10 w-20 rounded-xl border border-line-strong bg-surface px-2 text-center text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark]" />
         <Button
           slot="increment"
           aria-labelledby=""
