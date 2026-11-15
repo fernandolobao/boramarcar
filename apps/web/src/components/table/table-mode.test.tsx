@@ -172,6 +172,23 @@ describe('tela acesa e tela cheia', () => {
     return utils;
   };
 
+  it('as opções do jogador abrem viradas para ele (o aparelho fica no meio da mesa)', () => {
+    render(
+      <NextIntlClientProvider locale="pt-BR" messages={messages} timeZone="America/Sao_Paulo">
+        <TableMode eventId="e1" players={players} defaultFormat="commander" />
+      </NextIntlClientProvider>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Começar' }));
+    // Duas pessoas frente a frente: Ana em cima (180°), Bia embaixo (0°).
+    fireEvent.click(screen.getByRole('button', { name: /opções de Ana/ }));
+    expect(screen.getByRole('dialog', { name: 'Ana' }).style.rotate).toBe('180deg');
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Ana' })).getByRole('button', { name: 'Fechar' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    expect(screen.getByRole('dialog', { name: 'Bia' }).style.rotate).toBe('0deg');
+  });
+
   it('pede o wake lock ao começar e solta ao sair', async () => {
     const release = vi.fn(async () => undefined);
     const request = vi.fn(async () => ({ release, addEventListener: vi.fn() }));
