@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import {
   getEventDetail,
+  getEventPairings,
   getGroupSettings,
   listDecksForUsers,
   listLocations,
   listMembers,
 } from '@boramarcar/db';
-import { formatRules, isGameFormat } from '@boramarcar/core';
+import { formatRules, isGameFormat, MIN_PLAYERS_FOR_TABLES } from '@boramarcar/core';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -26,6 +27,7 @@ import { buildEventShareText, eventUrl } from '@/server/event-share';
 import { isDomainError } from '@boramarcar/core';
 import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { StackSections } from '@/components/stack-sections';
+import { TableSuggestions } from '@/components/table-suggestions';
 import { EmptyState } from '@/components/empty-state';
 import { pageMetadata } from '@/server/seo';
 
@@ -60,6 +62,22 @@ export default async function EventPage({ params }: Props) {
     buildEventShareText(event),
     getGroupSettings(db, { groupId: event.groupId, userId: user.id }),
   ]);
+  // Sugestão de mesas: encontro marcado, formato todos contra todos e 6+ confirmados.
+  const tableRules = isGameFormat(settings.defaultFormat)
+    ? formatRules(settings.defaultFormat)
+    : null;
+  const tableLimits =
+    tableRules?.structure === 'free_for_all'
+      ? { min: Math.max(3, tableRules.minPlayers), max: Math.min(5, tableRules.maxPlayers) }
+      : null;
+  const confirmedCount = event.participants.filter((p) => p.rsvp === 'yes').length;
+  const pairings =
+    event.status === 'scheduled' &&
+    tableLimits &&
+    tableLimits.min <= tableLimits.max &&
+    confirmedCount >= MIN_PLAYERS_FOR_TABLES
+      ? await getEventPairings(db, { eventId: event.id, userId: user.id })
+      : null;
   const decks = await listDecksForUsers(
     db,
     members.map((m) => m.userId),
@@ -197,6 +215,15 @@ export default async function EventPage({ params }: Props) {
             ))}
           </ul>
         </section>
+
+        {pairings && tableLimits && (
+          <TableSuggestions
+            players={pairings.players}
+            pairs={pairings.pairs}
+            min={tableLimits.min}
+            max={tableLimits.max}
+          />
+        )}
 
         <section className="card">
           <h2 className="section-title">{t('games')}</h2>
