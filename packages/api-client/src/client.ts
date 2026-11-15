@@ -502,14 +502,21 @@ export function createApiClient(options: ApiClientOptions) {
     },
     cards: {
       /** Sugestões de nomes de carta (Scryfall), para adicionar à coleção ou a um deck. */
-      autocomplete: async (query: string) =>
-        (
-          await request(
-            'GET',
-            `/cards/autocomplete${q({ q: query })}`,
-            z.object({ names: z.array(z.string()) }),
-          )
-        ).names,
+      /**
+       * Sugestões: nome em inglês (o que se guarda) e, quando a sugestão veio da busca em
+       * português, o nome impresso ("Anel Solar" para Sol Ring).
+       */
+      autocomplete: async (query: string) => {
+        const { names, printed } = await request(
+          'GET',
+          `/cards/autocomplete${q({ q: query })}`,
+          z.object({
+            names: z.array(z.string()),
+            printed: z.record(z.string(), z.string()).optional(),
+          }),
+        );
+        return names.map((name) => ({ name, printedName: printed?.[name] ?? null }));
+      },
       /** Edições (impressões) de uma carta, mais novas primeiro. */
       prints: async (name: string) =>
         (
