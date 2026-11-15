@@ -69,6 +69,24 @@ export const memberSchema = z
   .loose();
 export type Member = z.infer<typeof memberSchema>;
 
+/** Configurações do grupo (mesa, duração mínima, pontos do ranking e tipo de jogo padrão). */
+export const groupSettingsSchema = z
+  .object({
+    tableSize: z.number(),
+    minDurationMinutes: z.number(),
+    pointsWin: z.number(),
+    pointsDraw: z.number(),
+    pointsLoss: z.number(),
+    defaultFormat: z.string(),
+  })
+  .loose();
+export type GroupSettings = z.infer<typeof groupSettingsSchema>;
+
+export const seasonSchema = z
+  .object({ id: z.string(), name: z.string(), startsAt: date, endsAt: date })
+  .loose();
+export type Season = z.infer<typeof seasonSchema>;
+
 const personSchema = z.object({
   userId: z.string(),
   name: z.string(),
