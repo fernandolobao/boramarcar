@@ -40,18 +40,17 @@ Como construir B:
 
 ## Desenho
 
-### Pacote `packages/ui`
+### Pacote `packages/ui` e implementações nos apps
+
+_Ajuste do construtor (15/11/2026), mantendo a decisão aprovada_: o site usa React 19.3.1 e o app React 19.3.0. Um pacote com componentes React DOM ou React Native dentro dele faria o Metro resolver `react`/`react-native` a partir do pacote e arriscaria dois Reacts no app. Por isso:
 
 ```
-packages/ui/
-  src/
-    shared/      contratos (tipos das props), lógica pura e testes (vitest)
-    web/         componentes React DOM + react-aria-components + classes Tailwind
-    native/      componentes React Native + tokens via useColors
+packages/ui/src/            contratos (tipos das props) e lógica pura, com testes (vitest); sem React em tempo de execução
+apps/web/src/components/ds/      componentes do site: React Aria + classes Tailwind
+apps/mobile/src/components/ds/   componentes do app: React Native + tokens via useColors
 ```
 
-- Exporta `@boramarcar/ui` (shared), `@boramarcar/ui/web` e `@boramarcar/ui/native`. O site só importa `web`; o app só importa `native`. Assim o Metro nunca vê código de DOM e o Next nunca vê React Native.
-- O site precisa de `@source "../../../../packages/ui/src/web";` no `globals.css` para o Tailwind gerar as classes do pacote.
+- Os dois apps importam os contratos de `@boramarcar/ui`; os componentes de cada lado implementam exatamente esses tipos (`satisfies`), então a API é a mesma.
 - **Textos**: o pacote não tem textos próprios. Cada componente recebe `label` e, quando precisa (mês anterior, fechar…), um objeto `labels`; os apps passam os seus textos (`messages/*.json` no site, `i18n.ts` no app), mantendo os testes de paridade. Nomes de meses e dias vêm de `Intl` com a prop `locale`.
 
 ### Componentes (mesma API nos dois lados)
@@ -79,12 +78,12 @@ Regras comuns: rótulo visível sempre associado; `description` (dica) e `error`
 
 Um PR por família, sempre com as telas migradas no mesmo PR:
 
-1. Pacote, `shared` com testes, `NumberField` e `Choices` (os que mais se repetem no app), e o `@source` no site.
+1. Pacote `packages/ui` com testes, `NumberField` (um PR) e `Choices` (outro PR), que são os que mais se repetem.
 2. `DateField`, `TimeField`, `DateTimeField` (site: encontros, disponibilidade, organizar encontro, temporadas, beta; app: novo encontro, organizar encontro, disponibilidade, temporadas).
 3. `Select` (29 usos no site; no app, onde houver lista longa) e ajuste dos 3 testes E2E que usam `selectOption`.
 4. `Checkbox`/`Switch` e `Stat`; remoção das cópias locais restantes no app.
 
-Testes: lógica no `shared` (vitest); componentes web em jsdom com Testing Library e axe (como `a11y.test.tsx`); E2E de acessibilidade das páginas como hoje; app com `tsc` e capturas pela prévia web temporária quando a mudança for visual.
+Testes: lógica em `packages/ui` (vitest); componentes web em jsdom com Testing Library e axe (como `a11y.test.tsx`); E2E de acessibilidade das páginas como hoje; app com `tsc` e capturas pela prévia web temporária quando a mudança for visual.
 
 ## Decisões confirmadas na aprovação
 
