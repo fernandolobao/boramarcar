@@ -10,6 +10,7 @@ import { AppText, Button, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { NumberField } from '@/components/ds/number-field';
 
 const CARD_RATIO = 63 / 88;
 const BOARD_LABEL: Record<DeckBoard, MessageKey> = {
@@ -153,52 +154,6 @@ function PrintPicker({
   );
 }
 
-function Counter({
-  label,
-  value,
-  min,
-  max,
-  disabled,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  disabled?: boolean;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-      <AppText muted style={{ fontSize: 12 }}>
-        {label}
-      </AppText>
-      <Button
-        label="−"
-        variant="secondary"
-        accessibilityLabel={t('stepDown', { label, value })}
-        disabled={disabled || value <= min}
-        onPress={() => onChange(value - 1)}
-        style={{ width: 40, minHeight: 36, paddingHorizontal: 0, paddingVertical: 6 }}
-      />
-      <AppText
-        style={{ minWidth: 24, textAlign: 'center', fontWeight: '700' }}
-        accessibilityLiveRegion="polite"
-      >
-        {value}
-      </AppText>
-      <Button
-        label="+"
-        variant="secondary"
-        accessibilityLabel={t('stepUp', { label, value })}
-        disabled={disabled || value >= max}
-        onPress={() => onChange(value + 1)}
-        style={{ width: 40, minHeight: 36, paddingHorizontal: 0, paddingVertical: 6 }}
-      />
-    </View>
-  );
-}
-
 /** Uma linha em modo de edição: cópias, proxies, edição e remover. */
 export function LineEditor({
   deckId,
@@ -238,21 +193,23 @@ export function LineEditor({
         {line.card?.setCode ? ` · ${line.card.setCode.toUpperCase()}` : ''}
       </AppText>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-        <Counter
+        <NumberField
+          compact
           label={t('deckCopies')}
           value={line.quantity}
           min={1}
           max={250}
           disabled={busy}
-          onChange={(q) => void save(q, line.proxies)}
+          onChange={(q) => q !== null && void save(q, line.proxies)}
         />
-        <Counter
+        <NumberField
+          compact
           label={t('deckProxyTag')}
           value={line.proxies}
           min={0}
           max={line.quantity}
           disabled={busy}
-          onChange={(p) => void save(line.quantity, p)}
+          onChange={(p) => p !== null && void save(line.quantity, p)}
         />
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -376,7 +333,13 @@ export function AddCardForm({
           />
         ))}
       </View>
-      <Counter label={t('deckCopies')} value={quantity} min={1} max={250} onChange={setQuantity} />
+      <NumberField
+        label={t('deckCopies')}
+        value={quantity}
+        min={1}
+        max={250}
+        onChange={(q) => setQuantity(q ?? 1)}
+      />
       <Button
         label={busy ? t('collectionAdding') : t('deckAddCard')}
         disabled={busy || name.trim().length === 0}

@@ -50,6 +50,7 @@ describe('GameForm', () => {
     });
     fireEvent.change(screen.getByLabelText('Quem começou'), { target: { value: 'caio' } });
     fireEvent.change(screen.getByLabelText('Turno em que acabou'), { target: { value: '9' } });
+    fireEvent.blur(screen.getByLabelText('Turno em que acabou'));
     fireEvent.change(screen.getByRole('combobox', { name: 'Caio' }), { target: { value: '1' } });
     fireEvent.click(submit);
 

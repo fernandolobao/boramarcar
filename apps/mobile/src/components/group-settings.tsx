@@ -12,57 +12,10 @@ import { api } from '@/lib/api';
 import { addDays, deviceTimeZone, localDate } from '@/lib/dates';
 import { formatDateMedium, t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
+import { NumberField } from '@/components/ds/number-field';
 
 const isFormat = (v: string): v is GameFormat => (GAME_FORMATS as readonly string[]).includes(v);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-/** Número com −/+ (sem teclado), com o valor atual no nome acessível. */
-function Stepper({
-  label,
-  value,
-  min,
-  max,
-  step = 1,
-  disabled,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step?: number;
-  disabled?: boolean;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <AppText style={{ flex: 1, fontWeight: '600' }}>{label}</AppText>
-      <Button
-        label="−"
-        variant="secondary"
-        accessibilityLabel={t('stepDown', { label, value })}
-        disabled={disabled || value - step < min}
-        onPress={() => onChange(value - step)}
-        style={{ width: 48, paddingHorizontal: 0 }}
-      />
-      <AppText
-        style={{ minWidth: 48, textAlign: 'center', fontSize: 20, fontWeight: '700' }}
-        accessibilityLabel={`${label}: ${value}`}
-        accessibilityLiveRegion="polite"
-      >
-        {value}
-      </AppText>
-      <Button
-        label="+"
-        variant="secondary"
-        accessibilityLabel={t('stepUp', { label, value })}
-        disabled={disabled || value + step > max}
-        onPress={() => onChange(value + step)}
-        style={{ width: 48, paddingHorizontal: 0 }}
-      />
-    </View>
-  );
-}
 
 /** Configurações do grupo (paridade com o site): mesa, duração mínima, pontos e tipo de jogo padrão. */
 export function GroupSettingsCard({ groupId, canManage }: { groupId: string; canManage: boolean }) {
@@ -87,23 +40,23 @@ export function GroupSettingsCard({ groupId, canManage }: { groupId: string; can
         {t('groupSettingsTitle')}
       </AppText>
       {!canManage && <AppText muted>{t('groupSettingsReadOnly')}</AppText>}
-      <Stepper
+      <NumberField
         label={t('groupSettingsTableSize')}
         value={form.tableSize}
         min={2}
         max={8}
         disabled={!canManage}
-        onChange={(v) => set('tableSize', v)}
+        onChange={(v) => v !== null && set('tableSize', v)}
       />
       <AppText muted>{t('groupSettingsTableSizeHint')}</AppText>
-      <Stepper
+      <NumberField
         label={t('groupSettingsMinDuration')}
         value={form.minDurationMinutes}
         min={30}
         max={720}
         step={30}
         disabled={!canManage}
-        onChange={(v) => set('minDurationMinutes', v)}
+        onChange={(v) => v !== null && set('minDurationMinutes', v)}
       />
       <View style={{ gap: 6 }}>
         <AppText style={{ fontWeight: '600' }}>{t('groupSettingsDefaultFormat')}</AppText>
@@ -128,29 +81,29 @@ export function GroupSettingsCard({ groupId, canManage }: { groupId: string; can
       </View>
       <AppText style={{ fontWeight: '600' }}>{t('groupSettingsPoints')}</AppText>
       <AppText muted>{t('groupSettingsPointsHint')}</AppText>
-      <Stepper
+      <NumberField
         label={t('groupSettingsPointsWin')}
         value={form.pointsWin}
         min={0}
         max={20}
         disabled={!canManage}
-        onChange={(v) => set('pointsWin', v)}
+        onChange={(v) => v !== null && set('pointsWin', v)}
       />
-      <Stepper
+      <NumberField
         label={t('groupSettingsPointsDraw')}
         value={form.pointsDraw}
         min={0}
         max={20}
         disabled={!canManage}
-        onChange={(v) => set('pointsDraw', v)}
+        onChange={(v) => v !== null && set('pointsDraw', v)}
       />
-      <Stepper
+      <NumberField
         label={t('groupSettingsPointsLoss')}
         value={form.pointsLoss}
         min={-20}
         max={20}
         disabled={!canManage}
-        onChange={(v) => set('pointsLoss', v)}
+        onChange={(v) => v !== null && set('pointsLoss', v)}
       />
       {canManage && (
         <Button

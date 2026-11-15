@@ -50,6 +50,12 @@ sem rolagem horizontal em 320px.
 | Placeholder com contraste baixo                                                                       | 1.4.3 (boa prática) | `placeholder:text-zinc-500` / `zinc-400` no escuro                                   |
 | Falha do Moxfield mostrava só um erro genérico                                                        | 3.3.3 (AA)          | Passo a passo em `role="alert"`, troca para "Colar lista" e foco no campo de texto   |
 
+### Revisão: NumberField do design system (15/11/2026)
+
+- **Site** (React Aria): rótulo visível associado; dica e erro ligados por `aria-describedby`/`aria-invalid`; setas ↑/↓ no campo mudam o valor e os botões −/+ ficam fora da ordem de Tab (padrão ARIA spinbutton); o nome dos botões diz rótulo e valor atual ("Cópias: aumentar (agora 3)"), sem repetir o rótulo; desabilitados nos limites. Sem separador de milhar. Entrou em `a11y.test.tsx`.
+- **App**: os mesmos nomes nos botões −/+ (desabilitados nos limites); o valor é um botão "Rótulo: valor" com dica "toque duas vezes para digitar", que abre o teclado numérico e confirma ao sair, ajustado aos limites; variante escura para o painel da mesa.
+- Substitui os 11 campos numéricos do site e as quatro cópias de "−/+" do app (configurações do grupo, painel do jogador na mesa, edição de deck, coleção).
+
 ### Revisão: agenda madura (grade semanal, regras semanais, membros)
 
 - **Grade semanal**: padrão ARIA _grid_ — uma parada de Tab, setas, Home/End, PageUp/PageDown; cada célula tem nome completo ("quinta-feira, 12 de novembro, 19h: 3 pessoas disponíveis (…). Você está disponível."), `aria-pressed` para o próprio horário e `aria-disabled` quando o horário vem de regra semanal. A cor (mesa fechada) sempre acompanha o número e a legenda; o próprio horário tem contorno, e a regra semanal tem o símbolo ↻.

@@ -77,7 +77,7 @@ test.describe('deck', () => {
     // Editar é no diálogo da carta (visualização e edição unificadas).
     await page.getByRole('button', { name: 'Ver e editar Forest' }).click();
     const dialog = page.getByRole('dialog', { name: 'Forest' });
-    const proxies = dialog.getByRole('spinbutton', { name: 'Cópias proxy' });
+    const proxies = dialog.getByRole('textbox', { name: 'Cópias proxy' });
     await proxies.fill('5');
     await proxies.press('Enter');
     await expect(page.getByText('Forest salva.')).toBeVisible();

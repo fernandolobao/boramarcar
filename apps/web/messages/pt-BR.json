@@ -1786,5 +1786,9 @@
       "rateLimited": "Muitas tentativas. Espere um pouco e tente de novo.",
       "generic": "Não foi possível concluir. Tente de novo."
     }
+  },
+  "ds": {
+    "decrease": "{label}: diminuir (agora {value})",
+    "increase": "{label}: aumentar (agora {value})"
   }
 }

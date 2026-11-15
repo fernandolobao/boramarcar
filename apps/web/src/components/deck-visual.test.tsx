@@ -166,7 +166,7 @@ describe('editor de deck', () => {
     expect(within(dialog).getByRole('group', { name: 'Editar no deck' })).toBeInTheDocument();
     expect(await audit(container)).toEqual([]);
 
-    const proxies = within(dialog).getByRole('spinbutton', { name: 'Cópias proxy' });
+    const proxies = within(dialog).getByRole('textbox', { name: 'Cópias proxy' });
     fireEvent.change(proxies, { target: { value: '12' } });
     fireEvent.blur(proxies);
     await within(dialog).findByText('Forest salva.');
@@ -191,7 +191,7 @@ describe('editor de deck', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Elvish Mystic' }));
     dialog = screen.getByRole('dialog', { name: 'Elvish Mystic' });
-    const qty = within(dialog).getByRole('spinbutton', { name: 'Quantidade' });
+    const qty = within(dialog).getByRole('textbox', { name: 'Quantidade' });
     fireEvent.change(qty, { target: { value: '0' } });
     fireEvent.keyDown(qty, { key: 'Enter' });
     expect(
@@ -238,6 +238,7 @@ describe('editor de deck', () => {
     expect(input).toHaveAttribute('aria-expanded', 'false');
 
     fireEvent.change(screen.getByLabelText('Cópias'), { target: { value: '2' } });
+    fireEvent.blur(screen.getByLabelText('Cópias'));
     fireEvent.click(screen.getByLabelText('Como proxy'));
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar carta' }));
     await screen.findByText('Sol Ring adicionada.');
@@ -325,6 +326,7 @@ describe('editor de deck', () => {
     const copies = screen.getByLabelText('Quantas cópias mudam de edição (de 30)');
     expect(copies).toHaveAccessibleDescription('Todas as cópias mudam.');
     fireEvent.change(copies, { target: { value: '5' } });
+    fireEvent.blur(copies);
     expect(copies).toHaveAccessibleDescription(
       'As outras 25 cópias continuam na edição atual, numa pilha separada.',
     );

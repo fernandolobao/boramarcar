@@ -11,6 +11,7 @@ import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { NumberField } from '@/components/ds/number-field';
 
 type Sort = 'name' | 'value' | 'recent';
 type FoilFilter = 'all' | 'foil' | 'nonfoil';
@@ -124,27 +125,13 @@ function AddCard({ onAdded }: { onAdded: (message: string) => void }) {
           })}
         </View>
       )}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <AppText style={{ flex: 1, fontWeight: '600' }}>{t('collectionQuantity')}</AppText>
-        <Button
-          label="−"
-          variant="secondary"
-          accessibilityLabel={t('collectionFewer', { count: quantity })}
-          disabled={quantity <= 1}
-          onPress={() => setQuantity((q) => Math.max(1, q - 1))}
-          style={{ width: 48, paddingHorizontal: 0 }}
-        />
-        <AppText style={{ minWidth: 40, textAlign: 'center', fontSize: 20, fontWeight: '700' }}>
-          {quantity}
-        </AppText>
-        <Button
-          label="+"
-          variant="secondary"
-          accessibilityLabel={t('collectionMore', { count: quantity })}
-          onPress={() => setQuantity((q) => Math.min(999, q + 1))}
-          style={{ width: 48, paddingHorizontal: 0 }}
-        />
-      </View>
+      <NumberField
+        label={t('collectionQuantity')}
+        value={quantity}
+        min={1}
+        max={999}
+        onChange={(q) => setQuantity(q ?? 1)}
+      />
       <Button
         label={t('collectionFoil')}
         variant="secondary"
@@ -229,43 +216,23 @@ function EntrySheet({
                 ? t('collectionUnitPrice', { price: usd(price(entry)!) })
                 : t('collectionNoPrice')}
             </AppText>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <AppText style={{ flex: 1, fontWeight: '600' }}>{t('collectionQuantity')}</AppText>
-              <Button
-                label="−"
-                variant="secondary"
-                accessibilityLabel={t('collectionFewer', { count: entry.quantity })}
-                disabled={busy}
-                onPress={() =>
-                  void run(
-                    () => api.collection.update(entry.id, { quantity: entry.quantity - 1 }),
-                    entry.quantity - 1 === 0
-                      ? t('collectionRemoved', { name: entry.name })
-                      : t('collectionSaved', { name: entry.name }),
-                  )
-                }
-                style={{ width: 48, paddingHorizontal: 0 }}
-              />
-              <AppText
-                style={{ minWidth: 40, textAlign: 'center', fontSize: 20, fontWeight: '700' }}
-                accessibilityLiveRegion="polite"
-              >
-                {entry.quantity}
-              </AppText>
-              <Button
-                label="+"
-                variant="secondary"
-                accessibilityLabel={t('collectionMore', { count: entry.quantity })}
-                disabled={busy || entry.quantity >= 999}
-                onPress={() =>
-                  void run(
-                    () => api.collection.update(entry.id, { quantity: entry.quantity + 1 }),
-                    t('collectionSaved', { name: entry.name }),
-                  )
-                }
-                style={{ width: 48, paddingHorizontal: 0 }}
-              />
-            </View>
+            <NumberField
+              label={t('collectionQuantity')}
+              value={entry.quantity}
+              // 0 tira a carta da coleção.
+              min={0}
+              max={999}
+              disabled={busy}
+              onChange={(q) => {
+                if (q === null || q === entry.quantity) return;
+                void run(
+                  () => api.collection.update(entry.id, { quantity: q }),
+                  q === 0
+                    ? t('collectionRemoved', { name: entry.name })
+                    : t('collectionSaved', { name: entry.name }),
+                );
+              }}
+            />
             <Button
               label={t('collectionFoil')}
               variant="secondary"

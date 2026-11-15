@@ -13,6 +13,7 @@ import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
+import { NumberField } from './ds/number-field';
 
 export interface DeckLineView {
   key: string;
@@ -453,8 +454,8 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
   const group = tile.group;
   const isFoil = tile.finish === 'foil';
   const groupFoils = foilsOf(group);
-  const [quantity, setQuantity] = useState(String(tile.quantity));
-  const [proxies, setProxies] = useState(String(tile.proxies));
+  const [quantity, setQuantity] = useState<number | null>(tile.quantity);
+  const [proxies, setProxies] = useState<number | null>(tile.proxies);
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState('');
   const real = tile.quantity - tile.proxies;
@@ -488,10 +489,11 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
     isFoil
       ? save(group.quantity - groupFoils + n, group.proxies, n, message)
       : save(n + groupFoils, px, groupFoils, message);
-  const commit = () => {
-    const n = Number(quantity);
-    const px = isFoil ? 0 : Number(proxies);
-    if (!Number.isInteger(n) || !Number.isInteger(px) || px > n) {
+  /** Salva ao mudar um dos números (sair do campo, Enter ou −/+), com os valores novos. */
+  const commit = (next: { quantity: number | null; proxies: number | null }) => {
+    const n = next.quantity;
+    const px = isFoil ? 0 : next.proxies;
+    if (n === null || px === null || px > n) {
       setStatus(t('invalidCopies'));
       return;
     }
@@ -500,12 +502,6 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
       px,
       n === 0 ? t('cardRemoved', { name: tile.name }) : t('lineSaved', { name: tile.name }),
     );
-  };
-  const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      commit();
-    }
   };
   /** Passa `n` cópias reais desta carta para o outro acabamento. */
   const moveFinish = (n: number) => {
@@ -520,41 +516,33 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
       </legend>
       {/* Linha 1: as cópias (quantidade, proxies e acabamento). Linha 2: as ações. */}
       <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
-        <div className="w-24">
-          <label className="label" htmlFor={`${id}-q`}>
-            {t('quantityLabel')}
-          </label>
-          <input
+        <div>
+          <NumberField
             id={`${id}-q`}
-            type="number"
-            inputMode="numeric"
+            label={t('quantityLabel')}
+            value={quantity}
             min={0}
             max={MAX_COPIES}
-            className="input"
-            value={quantity}
             disabled={pending}
-            onChange={(e) => setQuantity(e.target.value)}
-            onBlur={commit}
-            onKeyDown={onKey}
+            onChange={(v) => {
+              setQuantity(v);
+              commit({ quantity: v, proxies });
+            }}
           />
         </div>
         {!isFoil && (
-          <div className="w-28">
-            <label className="label" htmlFor={`${id}-p`}>
-              {t('proxiesLabel')}
-            </label>
-            <input
+          <div>
+            <NumberField
               id={`${id}-p`}
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={Number(quantity) || 0}
-              className="input"
+              label={t('proxiesLabel')}
               value={proxies}
+              min={0}
+              max={quantity ?? 0}
               disabled={pending}
-              onChange={(e) => setProxies(e.target.value)}
-              onBlur={commit}
-              onKeyDown={onKey}
+              onChange={(v) => {
+                setProxies(v);
+                commit({ quantity, proxies: v });
+              }}
             />
           </div>
         )}
@@ -614,19 +602,19 @@ function AddCardForm({ deckId }: { deckId: string }) {
   const { run, error, pending } = useApiAction();
   const [name, setName] = useState('');
   const [board, setBoard] = useState<DeckBoard>('mainboard');
-  const [quantity, setQuantity] = useState('1');
+  const [quantity, setQuantity] = useState<number | null>(1);
   const [proxy, setProxy] = useState(false);
   const [status, setStatus] = useState('');
   const id = useId();
 
   return (
     <form
-      className="grid gap-3 rounded-xl bg-ink-50 p-4 sm:grid-cols-[2fr_1fr_6rem] lg:grid-cols-[2fr_1fr_6rem_auto_auto] lg:items-end dark:bg-ink-800/60"
+      className="grid gap-3 rounded-xl bg-ink-50 p-4 sm:grid-cols-[2fr_1fr_auto] lg:grid-cols-[2fr_1fr_auto_auto_auto] lg:items-end dark:bg-ink-800/60"
       aria-labelledby={`${id}-title`}
       onSubmit={(e) => {
         e.preventDefault();
-        const add = Number(quantity);
-        if (!name.trim() || !Number.isInteger(add) || add < 1) return;
+        const add = quantity ?? 0;
+        if (!name.trim() || add < 1) return;
         setStatus('');
         void run(
           () =>
@@ -642,7 +630,7 @@ function AddCardForm({ deckId }: { deckId: string }) {
                 : t('cardAddedNotFound', { name: result.line.name }),
             );
             setName('');
-            setQuantity('1');
+            setQuantity(1);
             setProxy(false);
           },
         );
@@ -670,19 +658,13 @@ function AddCardForm({ deckId }: { deckId: string }) {
         </select>
       </div>
       <div>
-        <label className="label" htmlFor={`${id}-qty`}>
-          {t('copies')}
-        </label>
-        <input
+        <NumberField
           id={`${id}-qty`}
-          className="input"
-          type="number"
-          inputMode="numeric"
+          label={t('copies')}
+          value={quantity}
+          onChange={setQuantity}
           min={1}
           max={MAX_COPIES}
-          required
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
         />
       </div>
       <label className="flex min-h-10 items-center gap-2 text-sm">
