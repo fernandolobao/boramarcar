@@ -16,6 +16,7 @@
     "next-env.d.ts",
     "src",
     "e2e",
+    "scripts",
     "messages",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
