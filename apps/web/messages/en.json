@@ -1213,15 +1213,25 @@
       "points": "{count} points"
     },
     "values": {
-      "title": "Our values",
+      "title": "What we believe in",
+      "subtitle": "ArcanaKin was born at a table of friends who wanted to round out their decks and understand the game better. That guides every choice.",
       "items": {
-        "accessible": {
-          "title": "Accessible to everyone",
-          "body": "We follow WCAG 2.2 level AA: everything works with keyboard and screen readers, with proper contrast, in light and dark themes. Every new screen is audited before it ships."
+        "fun": {
+          "title": "Fun above all",
+          "body": "Magic is about getting together with friends. Everything here exists to leave more time to play: plan the night without polls, track life without paper and keep the ranking lighthearted. If something makes the table less fun, it stays out."
         },
-        "privacy": {
-          "title": "Privacy and open data",
-          "body": "We don't sell data. We only use sources that allow it, credit each one, and you decide who sees your decks."
+        "learn": {
+          "title": "Better decks, better games",
+          "body": "It all started with one question: what is my deck missing? The analysis shows lands, ramp, card draw, removal and curve, and explains every score so you can understand and decide. It's a guide, not a rule."
+        },
+        "transparency": {
+          "title": "Transparency",
+          "body": "You know where every number comes from: the methodology is open, sources are credited and prices say they are estimates. We don't sell data, and you decide who sees your decks.",
+          "link": "See the methodology"
+        },
+        "accessible": {
+          "title": "Everyone at the table",
+          "body": "No one is left out: we follow WCAG 2.2 level AA, with keyboard, screen reader and good contrast in light and dark themes. Every new screen is audited before it ships."
         }
       }
     },

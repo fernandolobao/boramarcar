@@ -1,6 +1,6 @@
 # Integração do grupo: métricas que aproximam as pessoas
 
-Data: 15/11/2026 · Status: **proposta, aguardando aprovação** (lista e ordem aprovadas pelo dono do projeto em 15/11/2026)
+Data: 15/11/2026 · Status: **aprovado** (merge do #126) (lista e ordem aprovadas pelo dono do projeto em 15/11/2026)
 
 ## Por quê
 

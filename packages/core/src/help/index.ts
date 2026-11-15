@@ -163,8 +163,8 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             steps: [
               'No encontro, toque em "Abrir modo mesa".',
               'Escolha o tipo de jogo (a vida inicial já vem certa: 40 no Commander), marque quem está jogando e, se quiser, o deck de cada um. Toque em "Começar".',
-              'Deite o celular no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida, segure para 10.',
-              'O botão do centro tem dado, moeda, sorteio de quem começa, desfazer e trocar lugares. O botão de cada jogador abre dano de comandante, veneno e outros marcadores.',
+              'Deite o celular no meio da mesa: cada um tem uma área do mesmo tamanho, virada para quem está daquele lado (com 3 ou 5 jogadores sobra um canto vazio, como um lugar livre na mesa). Toque para tirar ou somar 1 de vida, segure para 10.',
+              'O botão do centro tem dado, moeda, sorteio de quem começa, desfazer e trocar lugares. O botão de cada jogador abre, virados para ele, dano de comandante, veneno e outros marcadores.',
               'Quando sobrar um jogador, o app sugere o vencedor. Toque em "Encerrar e registrar", confira e salve.',
             ],
             notes: [
@@ -417,8 +417,8 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             steps: [
               'In the meetup, tap "Open table mode".',
               'Choose the game type (starting life is already right: 40 in Commander), mark who is playing and, optionally, each deck. Tap "Start".',
-              'Lay the phone in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life, hold for 10.',
-              'The centre button has a die, a coin, a first-player draw, undo and swap seats. Each player’s button opens commander damage, poison and other counters.',
+              'Lay the phone in the middle of the table: everyone gets an area of the same size, facing the person on that side (with 3 or 5 players one corner stays empty, like a free seat). Tap to lose or gain 1 life, hold for 10.',
+              'The centre button has a die, a coin, a first-player draw, undo and swap seats. Each player’s button opens commander damage, poison and other counters, facing that player.',
               'When one player is left, the app suggests the winner. Tap "End and record", check and save.',
             ],
             notes: [

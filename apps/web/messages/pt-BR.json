@@ -1213,15 +1213,25 @@
       "points": "{count} pontos"
     },
     "values": {
-      "title": "Nossos valores",
+      "title": "No que a gente acredita",
+      "subtitle": "O ArcanaKin nasceu numa mesa de amigos que queria completar os próprios decks e entender melhor o jogo. É isso que guia cada escolha.",
       "items": {
-        "accessible": {
-          "title": "Acessível para todos",
-          "body": "Seguimos as diretrizes WCAG 2.2 nível AA: tudo funciona com teclado e leitor de tela, com contraste adequado, nos temas claro e escuro. Cada tela nova passa por auditoria antes de ir ao ar."
+        "fun": {
+          "title": "Diversão acima de tudo",
+          "body": "Magic é encontro de amigos. Tudo aqui existe para sobrar mais tempo para jogar: marcar a noite sem enquete, contar a vida sem papel e levar o ranking na brincadeira. Se algo deixa a mesa mais chata, não entra."
         },
-        "privacy": {
-          "title": "Privacidade e dados abertos",
-          "body": "Não vendemos dados. Usamos só fontes que permitem o uso, damos o crédito a cada uma e você decide quem vê os seus decks."
+        "learn": {
+          "title": "Decks melhores, jogo melhor",
+          "body": "Tudo começou com uma pergunta: o que falta no meu deck? A análise mostra terrenos, ramp, compra, remoção e curva, e explica cada nota, para você entender e decidir. É um guia, não uma regra."
+        },
+        "transparency": {
+          "title": "Transparência",
+          "body": "Você sabe de onde vem cada número: a metodologia é aberta, as fontes recebem crédito e os preços avisam que são estimativas. Não vendemos dados, e você decide quem vê os seus decks.",
+          "link": "Ver a metodologia"
+        },
+        "accessible": {
+          "title": "Todo mundo na mesa",
+          "body": "Ninguém fica de fora: seguimos a WCAG 2.2 nível AA, com teclado, leitor de tela e bom contraste nos temas claro e escuro. Cada tela nova passa por auditoria antes de ir ao ar."
         }
       }
     },
