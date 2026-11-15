@@ -796,4 +796,30 @@ describe('cliente da API', () => {
     );
     expect(result.pairs[0]).toEqual({ a: 'u1', b: 'u2', recent: 1, older: 2 });
   });
+
+  it('com quem você ainda não jogou', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      json({
+        hints: [
+          { userId: 'u2', name: 'Bia', lastPlayedAt: null, confirmedNext: true },
+          {
+            userId: 'u3',
+            name: 'Caio',
+            lastPlayedAt: '2026-09-01T22:00:00.000Z',
+            confirmedNext: false,
+          },
+        ],
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const hints = await api.groups.partners('g1');
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/partners',
+    );
+    expect(hints[0]!.lastPlayedAt).toBeNull();
+    expect(hints[1]!.lastPlayedAt).toBeInstanceOf(Date);
+  });
 });

@@ -4,7 +4,7 @@ import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { createEvent, recordGame, setRsvp } from './events';
 import { leaveGroup } from './groups';
-import { getEventPairings } from './integration';
+import { getEventPairings, listPartnerHints } from './integration';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -79,6 +79,59 @@ describe('getEventPairings', () => {
     const stranger = await createTestUser(db, { name: 'Fora' });
     await expect(
       getEventPairings(db, { eventId: event.id, userId: stranger.id }),
+    ).rejects.toMatchObject({
+      code: 'forbidden',
+    });
+  });
+});
+
+describe('listPartnerHints', () => {
+  it('usa a última partida de cada um com você no grupo e os confirmados do próximo encontro', async () => {
+    const { group, players, owner } = await seedGroup(db, 4);
+    const [me, ana, bia, caio] = players as [
+      typeof owner,
+      typeof owner,
+      typeof owner,
+      typeof owner,
+    ];
+    const past = await createEvent(db, {
+      groupId: group.id,
+      userId: owner.id,
+      title: 'Antigo',
+      startsAt: new Date(now.getTime() - 300 * DAY),
+    });
+    const play = (playedAt: Date, ids: string[]) =>
+      recordGame(db, {
+        eventId: past.id,
+        userId: owner.id,
+        playedAt,
+        players: ids.map((userId, i) => ({ userId, result: i === 0 ? 'win' : 'loss' })),
+      });
+    await play(new Date(now.getTime() - 100 * DAY), [me.id, ana.id]);
+    await play(new Date(now.getTime() - 50 * DAY), [me.id, ana.id]);
+    await play(new Date(now.getTime() - 5 * DAY), [me.id, bia.id]);
+    // Partida sem você não conta.
+    await play(new Date(now.getTime() - 2 * DAY), [ana.id, caio.id]);
+    const next = await createEvent(db, {
+      groupId: group.id,
+      userId: owner.id,
+      title: 'Quinta',
+      startsAt: new Date(now.getTime() + 2 * DAY),
+    });
+    await setRsvp(db, { eventId: next.id, userId: ana.id, rsvp: 'yes' });
+
+    const { hints } = await listPartnerHints(db, { groupId: group.id, userId: me.id, now });
+    expect(hints.map((h) => h.userId)).toEqual([ana.id, caio.id]);
+    expect(hints[0]!.lastPlayedAt).toEqual(new Date(now.getTime() - 50 * DAY));
+    expect(hints[0]!.confirmedNext).toBe(true);
+    expect(hints[1]).toMatchObject({ lastPlayedAt: null, confirmedNext: false });
+  });
+
+  it('quem não é do grupo não vê', async () => {
+    const { group } = await seedGroup(db, 2);
+    const stranger = await createTestUser(db, { name: 'Fora' });
+    await expect(
+      listPartnerHints(db, { groupId: group.id, userId: stranger.id }),
     ).rejects.toMatchObject({
       code: 'forbidden',
     });
