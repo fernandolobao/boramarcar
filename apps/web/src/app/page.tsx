@@ -356,10 +356,33 @@ export default async function HomePage({
 
         <section aria-labelledby="values" className="scroll-mt-20 py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading id="values" index="05" title={t('values.title')} />
-            <ul className="grid gap-6 md:grid-cols-2">
-              {(['accessible', 'privacy'] as const).map((key) => (
-                <li key={key} className="card flex gap-4 p-6">
+            <SectionHeading
+              id="values"
+              index="05"
+              title={t('values.title')}
+              subtitle={t('values.subtitle')}
+            />
+            <ul className="grid gap-6 md:grid-cols-3">
+              {/* O valor que vem primeiro, em destaque. */}
+              <li className="flex overflow-hidden rounded-2xl border border-line bg-surface shadow-sm md:col-span-3">
+                <span className="w-2 shrink-0 bg-accent" aria-hidden="true" />
+                <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:p-8">
+                  <span
+                    className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-accent text-on-accent"
+                    aria-hidden="true"
+                  >
+                    <Icon name="fun" className="size-7" />
+                  </span>
+                  <div>
+                    <h3 className="mb-2 font-display text-2xl font-semibold sm:text-3xl">
+                      {t('values.items.fun.title')}
+                    </h3>
+                    <p className="muted max-w-3xl text-lg">{t('values.items.fun.body')}</p>
+                  </div>
+                </div>
+              </li>
+              {(['learn', 'transparency', 'accessible'] as const).map((key) => (
+                <li key={key} className="card flex flex-col gap-4 p-6">
                   <span
                     className="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300"
                     aria-hidden="true"
@@ -369,6 +392,14 @@ export default async function HomePage({
                   <div>
                     <h3 className="mb-2 text-xl font-semibold">{t(`values.items.${key}.title`)}</h3>
                     <p className="muted">{t(`values.items.${key}.body`)}</p>
+                    {key === 'transparency' && (
+                      <a
+                        href="#method"
+                        className="mt-3 inline-flex items-center gap-1 font-medium text-link underline underline-offset-4"
+                      >
+                        {t('values.items.transparency.link')}
+                      </a>
+                    )}
                   </div>
                 </li>
               ))}

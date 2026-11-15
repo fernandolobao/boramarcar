@@ -15,9 +15,10 @@ test.describe('smoke', () => {
     ).toHaveAttribute('href', '/cadastro');
     for (const section of [
       'Funcionalidades',
+      'Veja por dentro',
       'De onde vêm as informações',
       'Como avaliamos e sugerimos',
-      'Nossos valores',
+      'No que a gente acredita',
       'Participe dos testes',
     ]) {
       await expect(page.getByRole('heading', { level: 2, name: section })).toBeVisible();
