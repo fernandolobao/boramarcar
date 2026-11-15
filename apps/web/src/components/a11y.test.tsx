@@ -37,6 +37,7 @@ import { ShareButtons } from './share-buttons';
 import { FirstSteps } from './first-steps';
 import { FeedbackForm } from './feedback-form';
 import { NumberField } from './ds/number-field';
+import { Choices } from './ds/choices';
 
 vi.mock('./places/location-map', () => ({
   LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
@@ -406,6 +407,33 @@ const cases: [string, ReactElement][] = [
   [
     'ShareButtons',
     <ShareButtons key="s" text="t" url="https://x.app" title="Grupo" icsHref="/x.ics" />,
+  ],
+  [
+    'Choices',
+    <Choices
+      key="c"
+      label="Tipo de jogo"
+      value="a"
+      onChange={() => undefined}
+      options={[
+        { value: 'a', label: 'Commander' },
+        { value: 'b', label: 'Modern' },
+      ]}
+    />,
+  ],
+  [
+    'Choices (cartões)',
+    <Choices
+      key="cc"
+      variant="cards"
+      label="Vencedor"
+      value={null}
+      onChange={() => undefined}
+      options={[
+        { value: 'a', label: 'Ana', description: 'vida 12' },
+        { value: 'b', label: 'Bia' },
+      ]}
+    />,
   ],
   [
     'NumberField',
