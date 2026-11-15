@@ -79,6 +79,29 @@ body {
 @utility input {
   @apply min-h-10 w-full rounded-xl border border-line-strong bg-surface px-3 text-sm placeholder:text-fg-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus dark:[color-scheme:dark];
 }
+/*
+ * Campos de data e hora: o WebKit (Safari e Chrome no iPhone/iPad) desenha o controle nativo com
+ * altura, fonte e largura mínima próprias, que ignoram a classe `input` e estouram a coluna da grade
+ * (o rótulo desce e o campo invade o vizinho). Sem a aparência nativa, valem a altura, a fonte e a
+ * largura do `input`; o seletor do sistema continua abrindo ao tocar.
+ */
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-width: 0;
+  height: 2.5rem;
+  line-height: normal;
+}
+input[type='date']::-webkit-date-and-time-value,
+input[type='time']::-webkit-date-and-time-value,
+input[type='datetime-local']::-webkit-date-and-time-value {
+  margin: 0;
+  text-align: start;
+}
+
 /* Select com seta própria: espaço à direita para a seta não colar na borda. */
 @utility select {
   @apply input cursor-pointer appearance-none bg-no-repeat pr-10;
