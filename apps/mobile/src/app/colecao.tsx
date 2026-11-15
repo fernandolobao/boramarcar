@@ -58,7 +58,9 @@ function Choices<T extends string>({
 /** Adicionar cartas: nome com sugestões do Scryfall, cópias e foil. */
 function AddCard({ onAdded }: { onAdded: (message: string) => void }) {
   const [name, setName] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<{ name: string; printedName: string | null }[]>(
+    [],
+  );
   const [quantity, setQuantity] = useState(1);
   const [foil, setFoil] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -69,7 +71,7 @@ function AddCard({ onAdded }: { onAdded: (message: string) => void }) {
     const timer = setTimeout(() => {
       api.cards
         .autocomplete(query)
-        .then((names) => setSuggestions(names.filter((n) => n !== query).slice(0, 6)))
+        .then((found) => setSuggestions(found.filter((s) => s.name !== query).slice(0, 6)))
         .catch(() => setSuggestions([]));
     }, 400);
     return () => clearTimeout(timer);
@@ -105,18 +107,21 @@ function AddCard({ onAdded }: { onAdded: (message: string) => void }) {
       />
       {suggestions.length > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }} accessibilityRole="list">
-          {suggestions.map((n) => (
-            <Button
-              key={n}
-              label={n}
-              variant="secondary"
-              accessibilityLabel={t('collectionUseSuggestion', { name: n })}
-              onPress={() => {
-                setName(n);
-                setSuggestions([]);
-              }}
-            />
-          ))}
+          {suggestions.map((s) => {
+            const label = s.printedName ? `${s.printedName} (${s.name})` : s.name;
+            return (
+              <Button
+                key={s.name}
+                label={label}
+                variant="secondary"
+                accessibilityLabel={t('collectionUseSuggestion', { name: label })}
+                onPress={() => {
+                  setName(s.name);
+                  setSuggestions([]);
+                }}
+              />
+            );
+          })}
         </View>
       )}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>

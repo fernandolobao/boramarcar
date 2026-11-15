@@ -266,6 +266,57 @@ export async function fetchScryfallAutocomplete(
   return autocompleteSchema.parse(await response.json()).data;
 }
 
+/**
+ * Cartas cujo nome impresso em português contém as palavras digitadas (busca do Scryfall com
+ * `lang:pt`), mais jogadas primeiro: devolve o nome em inglês (o que o app guarda) e o impresso.
+ * O autocomplete do Scryfall só conhece nomes em inglês; isto cobre "anel solar" → Sol Ring.
+ * Só acha cartas que o Scryfall tem impressas em português.
+ */
+export async function fetchScryfallPrintedNames(
+  query: string,
+  {
+    fetch: fetchFn,
+    userAgent = 'ArcanaKin/0.1',
+    lang = 'pt',
+    limit = 10,
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'> & { lang?: string; limit?: number },
+): Promise<{ name: string; printedName: string }[]> {
+  // Só palavras: nada da sintaxe de busca do Scryfall (aspas, parênteses, operadores).
+  const words = query
+    .normalize('NFC')
+    .replace(/[^\p{L}\p{N}\s'-]/gu, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !w.startsWith('-'));
+  if (words.join('').length < 3) return [];
+  const q = `lang:${lang} ${words.join(' ')}`;
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.scryfall,
+    'Scryfall',
+  )(
+    `${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&include_multilingual=true&unique=cards&order=edhrec`,
+    { headers: { Accept: 'application/json', 'User-Agent': userAgent } },
+  );
+  if (response.status === 404) return [];
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  const body = z
+    .object({
+      data: z.array(z.object({ name: z.string(), printed_name: z.string().optional() }).loose()),
+    })
+    .parse(await response.json());
+  const seen = new Set<string>();
+  const out: { name: string; printedName: string }[] = [];
+  for (const card of body.data) {
+    if (!card.printed_name || seen.has(card.name)) continue;
+    seen.add(card.name);
+    out.push({ name: card.name, printedName: card.printed_name });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 const searchSchema = z.object({
   data: z.array(z.unknown()),
   has_more: z.boolean().optional(),

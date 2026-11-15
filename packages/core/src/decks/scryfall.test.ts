@@ -111,6 +111,33 @@ describe('fetchScryfallAutocomplete', () => {
     ).rejects.toMatchObject({ code: 'upstream_error' });
   });
 
+  it('acha cartas pelo nome impresso em português', async () => {
+    const { fetchScryfallPrintedNames } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json({
+        data: [
+          { name: 'Sol Ring', printed_name: 'Anel Solar', lang: 'pt' },
+          { name: 'Sol Ring', printed_name: 'Anel Solar', lang: 'pt' },
+          { name: 'Lightning Bolt', lang: 'pt' },
+        ],
+      }),
+    );
+    expect(await fetchScryfallPrintedNames('anel "sol" (x)', { fetch: fetchMock })).toEqual([
+      { name: 'Sol Ring', printedName: 'Anel Solar' },
+    ]);
+    const url = decodeURIComponent(fetchMock.mock.calls[0]![0]);
+    expect(url).toContain('q=lang:pt anel sol x&include_multilingual=true');
+    // Curto demais, só sintaxe, ou sem resultados (404): lista vazia.
+    expect(await fetchScryfallPrintedNames('an', { fetch: fetchMock })).toEqual([]);
+    expect(await fetchScryfallPrintedNames('"()"', { fetch: fetchMock })).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(
+      await fetchScryfallPrintedNames('xyzw', {
+        fetch: async () => new Response('', { status: 404 }),
+      }),
+    ).toEqual([]);
+  });
+
   it('busca cartas e trata "sem resultados"', async () => {
     const { fetchScryfallSearch } = await import('./scryfall');
     const fetchMock = vi.fn(async (_url: string) =>

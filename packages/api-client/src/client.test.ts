@@ -618,7 +618,10 @@ describe('cliente da API', () => {
     const cards = await api.collection.list();
     expect(cards[0]!.addedAt).toBeInstanceOf(Date);
     expect(cards[0]!.decks[0]).toMatchObject({ deckName: 'Omnath' });
-    expect(await api.cards.autocomplete('sol')).toEqual(['Sol Ring', 'Solemn Simulacrum']);
+    expect(await api.cards.autocomplete('sol')).toEqual([
+      { name: 'Sol Ring', printedName: null },
+      { name: 'Solemn Simulacrum', printedName: null },
+    ]);
     expect(await api.collection.add({ name: 'Sol Ring', quantity: 1 })).toEqual({
       added: true,
       name: 'Sol Ring',

@@ -289,7 +289,9 @@ export function AddCardForm({
   onChanged: (message?: string) => Promise<void>;
 }) {
   const [name, setName] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<{ name: string; printedName: string | null }[]>(
+    [],
+  );
   const [board, setBoard] = useState<DeckBoard>('mainboard');
   const [quantity, setQuantity] = useState(1);
   const [busy, setBusy] = useState(false);
@@ -300,7 +302,7 @@ export function AddCardForm({
     const timer = setTimeout(() => {
       api.cards
         .autocomplete(query)
-        .then((names) => setSuggestions(names.filter((n) => n !== query).slice(0, 6)))
+        .then((found) => setSuggestions(found.filter((s) => s.name !== query).slice(0, 6)))
         .catch(() => setSuggestions([]));
     }, 400);
     return () => clearTimeout(timer);
@@ -340,18 +342,21 @@ export function AddCardForm({
       />
       {suggestions.length > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {suggestions.map((n) => (
-            <Button
-              key={n}
-              label={n}
-              variant="secondary"
-              accessibilityLabel={t('collectionUseSuggestion', { name: n })}
-              onPress={() => {
-                setName(n);
-                setSuggestions([]);
-              }}
-            />
-          ))}
+          {suggestions.map((s) => {
+            const label = s.printedName ? `${s.printedName} (${s.name})` : s.name;
+            return (
+              <Button
+                key={s.name}
+                label={label}
+                variant="secondary"
+                accessibilityLabel={t('collectionUseSuggestion', { name: label })}
+                onPress={() => {
+                  setName(s.name);
+                  setSuggestions([]);
+                }}
+              />
+            );
+          })}
         </View>
       )}
       <View

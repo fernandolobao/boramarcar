@@ -298,8 +298,30 @@ describe('API v1 — decks', () => {
     delete process.env.ADMIN_EMAILS;
     resetEnvCache();
     const suggestions = await call(autocomplete.GET, { path: '/?q=sol' });
-    expect(suggestions.body).toEqual({ names: ['Sol Ring', 'Solemn Simulacrum'] });
-    expect((await call(autocomplete.GET, { path: '/?q=s' })).body).toEqual({ names: [] });
+    expect(suggestions.body).toEqual({ names: ['Sol Ring', 'Solemn Simulacrum'], printed: {} });
+    expect((await call(autocomplete.GET, { path: '/?q=s' })).body).toEqual({
+      names: [],
+      printed: {},
+    });
+    // Nome em português: o autocomplete em inglês não acha; a busca com lang:pt acha.
+    const base = vi.mocked(fetch);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+        const url = decodeURIComponent(String(input));
+        if (url.startsWith('https://api.scryfall.com/cards/autocomplete')) {
+          return Response.json({ data: [] });
+        }
+        if (url.includes('q=lang:pt anel solar')) {
+          return Response.json({ data: [{ name: 'Sol Ring', printed_name: 'Anel Solar' }] });
+        }
+        return base(input, init);
+      }),
+    );
+    expect((await call(autocomplete.GET, { path: '/?q=anel%20solar' })).body).toEqual({
+      names: ['Sol Ring'],
+      printed: { 'Sol Ring': 'Anel Solar' },
+    });
   });
 
   it('lista edições e troca a edição de cópias de uma carta', async () => {

@@ -22,6 +22,8 @@ export function CardSearch({
   const t = useTranslations('decks');
   const listId = useId();
   const [options, setOptions] = useState<string[]>([]);
+  /** Nome impresso em português das sugestões que vieram da busca em português. */
+  const [printed, setPrinted] = useState<Record<string, string>>({});
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [loading, setLoading] = useState(false);
@@ -34,11 +36,12 @@ export function CardSearch({
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const { names } = await api<{ names: string[] }>(
+        const result = await api<{ names: string[]; printed?: Record<string, string> }>(
           `/api/v1/cards/autocomplete?q=${encodeURIComponent(q)}`,
         );
         if (!cancelled) {
-          setOptions(names.slice(0, 10));
+          setOptions(result.names.slice(0, 10));
+          setPrinted(result.printed ?? {});
           setActive(-1);
         }
       } catch {
@@ -125,7 +128,13 @@ export function CardSearch({
               choose(name);
             }}
           >
-            {name}
+            {printed[name] ? (
+              <>
+                {printed[name]} <span className="muted">({name})</span>
+              </>
+            ) : (
+              name
+            )}
           </div>
         ))}
       </div>
