@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  nextRotation,
+  seatSwipe,
+  tableLayout,
+  tableLayouts,
   tableRows,
   alivePlayers,
   createTable,
@@ -154,5 +158,67 @@ describe('trocar lugares', () => {
     expect(tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'a' })).toBe(s);
     expect(tableReducer(s, { type: 'swap', userId: 'a', withUserId: 'x' })).toBe(s);
     expect(tableReducer(s, { type: 'undo' }).players.map((p) => p.userId)).toEqual(['a', 'b', 'c']);
+  });
+});
+
+describe('disposição da mesa', () => {
+  it('cada disposição tem um assento por jogador, áreas válidas e uma linha por faixa', () => {
+    for (let count = 2; count <= 6; count++) {
+      const layouts = tableLayouts(count);
+      expect(layouts.length).toBeGreaterThan(1);
+      expect(new Set(layouts.map((l) => l.id)).size).toBe(layouts.length);
+      for (const layout of layouts) {
+        expect(layout.seats).toHaveLength(count);
+        const areas = new Set(layout.areas.match(/[a-z]/g));
+        expect(new Set(layout.seats.map((s) => s.area))).toEqual(areas);
+        const rows = tableRows(count, layout);
+        expect(rows.flat().sort()).toEqual([...Array(count).keys()]);
+        for (const row of rows) expect(row.length).toBeLessThanOrEqual(layout.columns);
+      }
+    }
+  });
+
+  it('a padrão continua a mesma; layoutId e giros por assento mudam a disposição', () => {
+    expect(tableLayout(4).id).toBe('4-sides');
+    expect(tableLayout(4, 'nao-existe').id).toBe('4-sides');
+    const cross = tableLayout(4, '4-cross');
+    expect(cross.seats.map((s) => s.rotate)).toEqual([180, 270, 0, 90]);
+    expect(tableLayout(4, '4-cross', { 2: 90 }).seats.map((s) => s.rotate)).toEqual([
+      180, 270, 90, 90,
+    ]);
+    expect(nextRotation(270)).toBe(0);
+    expect(nextRotation(0)).toBe(90);
+  });
+
+  it('mudar a disposição ou girar uma área não entra no desfazer', () => {
+    let state = createTable({ format: 'commander', players });
+    state = tableReducer(state, { type: 'life', userId: 'a', delta: -3 });
+    state = tableReducer(state, { type: 'layout', layoutId: '2-sides' });
+    state = tableReducer(state, { type: 'rotate', seat: 1, rotate: 180 });
+    expect(state.undo).toHaveLength(1);
+    expect(state.step).toBe(1);
+    state = tableReducer(state, { type: 'undo' });
+    expect(state.players[0]!.life).toBe(40);
+    expect(state.layoutId).toBe('2-sides');
+    expect(state.rotations).toEqual({ 1: 180 });
+    expect(tableReducer(state, { type: 'rotate', seat: 9, rotate: 90 })).toBe(state);
+    // Nova disposição zera os giros.
+    expect(tableReducer(state, { type: 'layout', layoutId: '2-face' }).rotations).toEqual({});
+  });
+});
+
+describe('deslizar na área do jogador', () => {
+  it('"para cima" depende de onde a pessoa está sentada', () => {
+    expect(seatSwipe(0, -100, 0)).toBe('up'); // embaixo: para cima na tela
+    expect(seatSwipe(0, 100, 180)).toBe('up'); // em cima: para baixo na tela
+    expect(seatSwipe(-100, 0, 270)).toBe('up'); // à direita: para a esquerda na tela
+    expect(seatSwipe(100, 0, 90)).toBe('up'); // à esquerda: para a direita na tela
+    expect(seatSwipe(0, 100, 0)).toBe('down');
+  });
+
+  it('ignora toques curtos e gestos mais "de lado" que "para cima"', () => {
+    expect(seatSwipe(0, -20, 0)).toBeNull();
+    expect(seatSwipe(60, -150, 90)).toBeNull();
+    expect(seatSwipe(-150, -60, 0)).toBeNull();
   });
 });

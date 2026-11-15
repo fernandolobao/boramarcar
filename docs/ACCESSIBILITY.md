@@ -272,6 +272,12 @@ sem rolagem horizontal em 320px.
 - Endereço como `combobox` (setas, Enter, Esc) com dica ligada por `aria-describedby` e número de sugestões anunciado; também aceita texto livre.
 - Botões "Editar" e "Remover" com o nome do local para leitores de tela; links de rota avisam que abrem em nova aba e dizem o destino.
 
+### Revisão: disposição da mesa e opções na área do jogador, no app (15/11/2026)
+
+- As opções de cada jogador (dano de comandante, marcadores, monarca, desistir, girar a área) abrem **dentro da área dele**, já viradas para quem está sentado ali. Dois caminhos: deslizar "para cima" do lado do jogador (o gesto só conta se for mais "para cima" que "para o lado", para não abrir sem querer) ou tocar no nome (botão com nome acessível "Dano de comandante, marcadores e opções de …"). A área tem dica de acessibilidade explicando o gesto; o painel tem botão "Fechar as opções de …".
+- Leitor de tela: o painel é `accessibilityViewIsModal` dentro da área; −/+ com nome e valor, monarca e desistir como `switch`.
+- Disposição da mesa no menu central: miniaturas como `radiogroup`/`radio`, cada uma lida como "Disposição 2: em cima, à direita, embaixo, à esquerda" (o lado de cada jogador, em texto); "Desfazer os giros individuais" aparece quando há giro.
+
 ### Revisão: modo mesa
 
 - Cada área é uma `region` com nome; "−" e "+" são botões com nome completo ("Tirar 1 de vida de Ana (vida 38). Segure para tirar 10.") e a vida é anunciada numa região viva, com o motivo da eliminação.

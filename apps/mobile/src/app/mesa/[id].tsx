@@ -44,7 +44,11 @@ export default function TableScreen() {
   if (phase === 'playing' && state) {
     return (
       <>
-        <Stack.Screen options={{ headerShown: false }} />
+        {/* Fundo da tela inteira escuro: nenhuma faixa clara aparece se o tabuleiro não cobrir tudo
+            (ex.: altura ainda não recalculada ao esconder a barra de status no iPad). */}
+        <Stack.Screen
+          options={{ headerShown: false, contentStyle: { backgroundColor: '#09090b' } }}
+        />
         <StatusBar hidden />
         {/* Android: a barra de navegação some também (volta com um gesto da borda). */}
         <NavigationBar hidden />

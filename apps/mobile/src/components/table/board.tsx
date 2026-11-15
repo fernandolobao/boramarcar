@@ -1,22 +1,27 @@
 import { formatRules } from '@boramarcar/core/games';
 import {
   defeatReason,
+  nextRotation,
+  seatSwipe,
   rollDie,
   SEAT_COLORS,
   TABLE_COUNTERS,
+  tableLayouts,
   tableResult,
   tableRows,
   tableLayout,
+  type SeatRotation,
   type TableAction,
+  type TableLayout,
   type TablePlayer,
   type TableState,
 } from '@boramarcar/core/table';
 import * as Haptics from 'expo-haptics';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppText, Button, Card, styles as ui } from '@/components/ui';
-import { t } from '@/lib/i18n';
+import { AppText, Button, styles as ui } from '@/components/ui';
+import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { counterLabel, defeatLabel } from './labels';
 
@@ -91,24 +96,210 @@ function Rotated({
   );
 }
 
+/** Linha de −/+ do painel de opções (texto claro sobre o fundo escuro da área). */
+function PanelStepper({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (delta: number) => void;
+}) {
+  return (
+    <View style={board.panelRow}>
+      <Text style={board.panelLabel} numberOfLines={2} maxFontSizeMultiplier={1.4}>
+        {label}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('tableDecrease', { label })}
+        accessibilityState={{ disabled: value <= 0 }}
+        disabled={value <= 0}
+        onPress={() => onChange(-1)}
+        style={({ pressed }) => [
+          board.panelStep,
+          { opacity: value <= 0 ? 0.35 : pressed ? 0.6 : 1 },
+        ]}
+      >
+        <Text style={board.panelStepText}>−</Text>
+      </Pressable>
+      <Text
+        style={board.panelValue}
+        accessibilityLabel={`${label}: ${value}`}
+        accessibilityLiveRegion="polite"
+      >
+        {value}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('tableIncrease', { label })}
+        onPress={() => onChange(1)}
+        style={({ pressed }) => [board.panelStep, { opacity: pressed ? 0.6 : 1 }]}
+      >
+        <Text style={board.panelStepText}>+</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/**
+ * Opções do jogador dentro da própria área (como no Lotus), já viradas para ele: dano de
+ * comandante por oponente, marcadores, monarca, desistir e girar a área.
+ */
+function PlayerOptions({
+  player,
+  state,
+  seat,
+  rotate,
+  dispatch,
+  onClose,
+}: {
+  player: TablePlayer;
+  state: TableState;
+  seat: number;
+  rotate: SeatRotation;
+  dispatch: (action: TableAction) => void;
+  onClose: () => void;
+}) {
+  const usesCommander = formatRules(state.format).usesCommander;
+  const toggle = (label: string, on: boolean, onPress: () => void) => (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityState={{ checked: on }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        board.panelToggle,
+        on && board.panelToggleOn,
+        { opacity: pressed ? 0.7 : 1 },
+      ]}
+    >
+      <Text
+        style={[board.panelToggleText, on && board.panelToggleTextOn]}
+        maxFontSizeMultiplier={1.4}
+      >
+        {on ? `✓ ${label}` : label}
+      </Text>
+    </Pressable>
+  );
+  return (
+    <View style={[StyleSheet.absoluteFill, board.options]} accessibilityViewIsModal>
+      <View style={board.optionsHeader}>
+        <Text style={board.optionsTitle} numberOfLines={1} accessibilityRole="header">
+          {player.name}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('tableOptionsClose', { name: player.name })}
+          onPress={onClose}
+          hitSlop={8}
+          style={board.optionsClose}
+        >
+          <Text style={board.optionsCloseText}>×</Text>
+        </Pressable>
+      </View>
+      <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 8 }}>
+        {usesCommander && (
+          <View style={{ gap: 6 }}>
+            <Text style={board.panelSection}>{t('tableCommanderDamage')}</Text>
+            {state.players
+              .filter((p) => p.userId !== player.userId)
+              .map((p) => (
+                <PanelStepper
+                  key={p.userId}
+                  label={t('tableFrom', { name: p.name })}
+                  value={player.commanderDamage[p.userId] ?? 0}
+                  onChange={(delta) =>
+                    dispatch({
+                      type: 'commander',
+                      userId: player.userId,
+                      fromUserId: p.userId,
+                      delta,
+                    })
+                  }
+                />
+              ))}
+          </View>
+        )}
+        <View style={{ gap: 6 }}>
+          <Text style={board.panelSection}>{t('tableCountersTitle')}</Text>
+          {TABLE_COUNTERS.map((counter) => (
+            <PanelStepper
+              key={counter}
+              label={counterLabel(counter)}
+              value={player.counters[counter]}
+              onChange={(delta) =>
+                dispatch({ type: 'counter', userId: player.userId, counter, delta })
+              }
+            />
+          ))}
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {toggle(t('tableMonarch'), state.monarchId === player.userId, () =>
+            dispatch({
+              type: 'monarch',
+              userId: state.monarchId === player.userId ? null : player.userId,
+            }),
+          )}
+          {toggle(t('tableConcede'), player.conceded, () =>
+            dispatch({ type: 'concede', userId: player.userId, conceded: !player.conceded }),
+          )}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('tableRotateArea', { name: player.name })}
+            onPress={() => dispatch({ type: 'rotate', seat, rotate: nextRotation(rotate) })}
+            style={({ pressed }) => [board.panelToggle, { opacity: pressed ? 0.7 : 1 }]}
+          >
+            <Text style={board.panelToggleText} maxFontSizeMultiplier={1.4}>
+              ⟳ {t('tableRotate')}
+            </Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
 function PlayerPanel({
   player,
   state,
   color,
   size,
+  seat,
+  rotate,
   swap,
   dispatch,
-  onOpen,
 }: {
   player: TablePlayer;
   state: TableState;
   color: string;
   size: { w: number; h: number };
+  /** Posição na mesa (índice no estado) e rotação atual da área. */
+  seat: number;
+  rotate: SeatRotation;
   /** Modo "trocar lugares": a área inteira vira um botão para escolher o jogador. */
   swap: { selected: boolean; onPick: () => void } | null;
   dispatch: (action: TableAction) => void;
-  onOpen: () => void;
 }) {
+  const [options, setOptions] = useState(false);
+  const onOpen = () => setOptions(true);
+  // Deslizar para cima (do lado do jogador) abre as opções; para baixo fecha.
+  const rotateRef = useRef(rotate);
+  rotateRef.current = rotate;
+  const swipe = useMemo(
+    () =>
+      PanResponder.create({
+        // Só toma o toque (dos botões de vida) quando o gesto já é claramente "para cima/baixo".
+        onMoveShouldSetPanResponderCapture: (_e, g) =>
+          seatSwipe(g.dx, g.dy, rotateRef.current, 24) !== null,
+        onPanResponderRelease: (_e, g) => {
+          const direction = seatSwipe(g.dx, g.dy, rotateRef.current);
+          if (direction === 'up') setOptions(true);
+          else if (direction === 'down') setOptions(false);
+        },
+      }),
+    [],
+  );
   const step = (delta: number) => {
     void Haptics.selectionAsync();
     dispatch({ type: 'life', userId: player.userId, delta });
@@ -129,8 +320,10 @@ function PlayerPanel({
 
   return (
     <View
-      style={[board.panel, { backgroundColor: color, opacity: reason ? 0.55 : 1 }]}
+      style={[board.panel, { backgroundColor: color, opacity: reason && !options ? 0.55 : 1 }]}
       accessibilityLabel={t('tablePlayerArea', { name: player.name })}
+      accessibilityHint={t('tableSwipeHint')}
+      {...(swap ? {} : swipe.panHandlers)}
     >
       <Pressable
         accessibilityRole="button"
@@ -140,7 +333,7 @@ function PlayerPanel({
         hitSlop={8}
       >
         <Text style={board.nameText} numberOfLines={1} maxFontSizeMultiplier={1.5}>
-          {player.name} ⋯
+          {player.name} ⌃
         </Text>
       </Pressable>
       <View style={board.lifeRow}>
@@ -188,6 +381,16 @@ function PlayerPanel({
       <Text style={board.badges} numberOfLines={2} maxFontSizeMultiplier={1.5}>
         {reason ? defeatLabel(reason) : badges.join(' · ') || ' '}
       </Text>
+      {options && !swap && (
+        <PlayerOptions
+          player={player}
+          state={state}
+          seat={seat}
+          rotate={rotate}
+          dispatch={dispatch}
+          onClose={() => setOptions(false)}
+        />
+      )}
       {swap && (
         <Pressable
           accessibilityRole="button"
@@ -211,132 +414,67 @@ function PlayerPanel({
   );
 }
 
-function Stepper({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (delta: number) => void;
-}) {
-  return (
-    <View style={board.stepper}>
-      <AppText style={{ flex: 1 }}>{label}</AppText>
-      <Button
-        label="−"
-        variant="secondary"
-        accessibilityLabel={t('tableDecrease', { label })}
-        disabled={value <= 0}
-        onPress={() => onChange(-1)}
-        style={board.stepButton}
-      />
-      <AppText
-        style={board.stepValue}
-        accessibilityLabel={`${label}: ${value}`}
-        accessibilityLiveRegion="polite"
-      >
-        {value}
-      </AppText>
-      <Button
-        label="+"
-        variant="secondary"
-        accessibilityLabel={t('tableIncrease', { label })}
-        onPress={() => onChange(1)}
-        style={board.stepButton}
-      />
-    </View>
-  );
-}
+const SIDE_LABEL: Record<SeatRotation, MessageKey> = {
+  180: 'tableSideTop',
+  270: 'tableSideRight',
+  0: 'tableSideBottom',
+  90: 'tableSideLeft',
+};
 
-/** Folha de um jogador: dano de comandante por oponente, marcadores, monarca e desistir. */
-function PlayerSheet({
-  player,
-  state,
-  dispatch,
-  onClose,
+/** Miniatura de uma disposição: as áreas com "40" virado para o lado de cada jogador. */
+function LayoutPreview({
+  layout,
+  count,
+  selected,
+  index,
+  onPick,
 }: {
-  player: TablePlayer;
-  state: TableState;
-  dispatch: (action: TableAction) => void;
-  onClose: () => void;
+  layout: TableLayout;
+  count: number;
+  selected: boolean;
+  index: number;
+  onPick: () => void;
 }) {
   const colors = useColors();
-  const usesCommander = formatRules(state.format).usesCommander;
+  const rows = tableRows(count, layout);
+  const sides = layout.seats.map((s) => t(SIDE_LABEL[s.rotate])).join(', ');
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-        <AppText accessibilityRole="header" style={ui.title}>
-          {player.name}
-        </AppText>
-        {usesCommander && (
-          <Card>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-              {t('tableCommanderDamage')}
-            </AppText>
-            <AppText muted>{t('tableCommanderDamageHint')}</AppText>
-            {state.players
-              .filter((p) => p.userId !== player.userId)
-              .map((p) => (
-                <Stepper
-                  key={p.userId}
-                  label={t('tableFrom', { name: p.name })}
-                  value={player.commanderDamage[p.userId] ?? 0}
-                  onChange={(delta) =>
-                    dispatch({
-                      type: 'commander',
-                      userId: player.userId,
-                      fromUserId: p.userId,
-                      delta,
-                    })
-                  }
-                />
-              ))}
-          </Card>
-        )}
-        <Card>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-            {t('tableCountersTitle')}
-          </AppText>
-          {TABLE_COUNTERS.map((counter) => (
-            <Stepper
-              key={counter}
-              label={counterLabel(counter)}
-              value={player.counters[counter]}
-              onChange={(delta) =>
-                dispatch({ type: 'counter', userId: player.userId, counter, delta })
-              }
-            />
-          ))}
-        </Card>
-        <View style={{ gap: 8 }}>
-          <Button
-            label={t('tableMonarch')}
-            variant="secondary"
-            accessibilityRole="switch"
-            accessibilityState={{ checked: state.monarchId === player.userId }}
-            selected={state.monarchId === player.userId}
-            onPress={() =>
-              dispatch({
-                type: 'monarch',
-                userId: state.monarchId === player.userId ? null : player.userId,
-              })
-            }
-          />
-          <Button
-            label={t('tableConcede')}
-            variant="secondary"
-            accessibilityRole="switch"
-            accessibilityState={{ checked: player.conceded }}
-            selected={player.conceded}
-            onPress={() =>
-              dispatch({ type: 'concede', userId: player.userId, conceded: !player.conceded })
-            }
-          />
-          <Button label={t('tableClose')} onPress={onClose} />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ checked: selected }}
+      accessibilityLabel={t('tableLayoutOption', { number: index + 1, sides })}
+      onPress={onPick}
+      style={({ pressed }) => [
+        board.preview,
+        { borderColor: selected ? colors.brand : 'transparent', opacity: pressed ? 0.7 : 1 },
+      ]}
+    >
+      <View style={{ flex: 1, gap: 3 }} importantForAccessibility="no-hide-descendants">
+        {rows.map((row, r) => (
+          <View key={r} style={{ flex: 1, flexDirection: 'row', gap: 3 }}>
+            {row.map((i) => (
+              <View
+                key={i}
+                style={[
+                  board.previewCell,
+                  { backgroundColor: SEAT_COLORS[i % SEAT_COLORS.length] },
+                ]}
+              >
+                <Text
+                  style={[
+                    board.previewText,
+                    { transform: [{ rotate: `${layout.seats[i]!.rotate}deg` }] },
+                  ]}
+                  allowFontScaling={false}
+                >
+                  40
+                </Text>
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
+    </Pressable>
   );
 }
 
@@ -411,6 +549,42 @@ function TableMenu({
           accessibilityHint={t('tableSwapHint')}
           onPress={onSwap}
         />
+        <View style={{ gap: 8, paddingVertical: 4 }}>
+          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+            {t('tableLayoutTitle')}
+          </AppText>
+          <AppText muted>{t('tableLayoutHint')}</AppText>
+          <View
+            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+            accessibilityRole="radiogroup"
+            accessibilityLabel={t('tableLayoutTitle')}
+          >
+            {tableLayouts(state.players.length).map((layout, i) => (
+              <LayoutPreview
+                key={layout.id}
+                layout={layout}
+                count={state.players.length}
+                index={i}
+                selected={
+                  (state.layoutId ?? tableLayouts(state.players.length)[0]!.id) === layout.id
+                }
+                onPick={() => dispatch({ type: 'layout', layoutId: layout.id })}
+              />
+            ))}
+          </View>
+          {Object.keys(state.rotations ?? {}).length > 0 && (
+            <Button
+              label={t('tableLayoutResetRotations')}
+              variant="secondary"
+              onPress={() =>
+                dispatch({
+                  type: 'layout',
+                  layoutId: state.layoutId ?? tableLayouts(state.players.length)[0]!.id,
+                })
+              }
+            />
+          )}
+        </View>
         <Button label={t('tableFinish')} onPress={onFinish} />
         <Button label={t('tableExit')} variant="secondary" onPress={onExit} />
         <AppText muted>{t('tableExitHint')}</AppText>
@@ -432,7 +606,6 @@ export function TableBoard({
   onFinish: () => void;
   onExit: () => void;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
   /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
   const [swapping, setSwapping] = useState<string | null>(null);
@@ -452,17 +625,15 @@ export function TableBoard({
   if (winnerId !== lastWinner) {
     setLastWinner(winnerId);
     if (winnerId) {
-      setOpen(null);
       setMenu(true);
     }
   }
-  const layout = tableLayout(state.players.length);
-  const openPlayer = state.players.find((p) => p.userId === open);
+  const layout = tableLayout(state.players.length, state.layoutId, state.rotations);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#09090b' }}>
+    <View style={[StyleSheet.absoluteFill, { backgroundColor: '#09090b' }]}>
       <SafeAreaView style={{ flex: 1, gap: 4, padding: 4 }}>
-        {tableRows(state.players.length).map((row, r) => (
+        {tableRows(state.players.length, layout).map((row, r) => (
           <View key={r} style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
             {row.map((index) => {
               const player = state.players[index]!;
@@ -474,6 +645,8 @@ export function TableBoard({
                       state={state}
                       color={SEAT_COLORS[index % SEAT_COLORS.length]!}
                       size={size}
+                      seat={index}
+                      rotate={layout.seats[index]!.rotate}
                       swap={
                         swapping === null
                           ? null
@@ -483,7 +656,6 @@ export function TableBoard({
                             }
                       }
                       dispatch={dispatch}
-                      onOpen={() => setOpen(player.userId)}
                     />
                   )}
                 </Rotated>
@@ -523,20 +695,6 @@ export function TableBoard({
       >
         {swapMessage}
       </Text>
-      <Modal
-        visible={Boolean(openPlayer)}
-        animationType="slide"
-        onRequestClose={() => setOpen(null)}
-      >
-        {openPlayer && (
-          <PlayerSheet
-            player={openPlayer}
-            state={state}
-            dispatch={dispatch}
-            onClose={() => setOpen(null)}
-          />
-        )}
-      </Modal>
       <Modal visible={menu} animationType="slide" onRequestClose={() => setMenu(false)}>
         <TableMenu
           state={state}
@@ -605,6 +763,57 @@ const board = StyleSheet.create({
   },
   swapDoneText: { color: '#09090b', fontSize: 16, fontWeight: '700' },
   srOnly: { position: 'absolute', width: 1, height: 1, opacity: 0 },
+  options: {
+    borderRadius: 18,
+    padding: 12,
+    gap: 8,
+    backgroundColor: 'rgba(9,9,11,0.92)',
+  },
+  optionsHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  optionsTitle: { flex: 1, color: '#ffffff', fontSize: 18, fontWeight: '800' },
+  optionsClose: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  optionsCloseText: { color: '#ffffff', fontSize: 26, fontWeight: '700', lineHeight: 28 },
+  panelSection: { color: '#ffffff', fontSize: 13, fontWeight: '800', opacity: 0.8 },
+  panelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  panelLabel: { flex: 1, color: '#ffffff', fontSize: 15 },
+  panelStep: {
+    width: 44,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  panelStepText: { color: '#ffffff', fontSize: 22, fontWeight: '800' },
+  panelValue: {
+    minWidth: 32,
+    textAlign: 'center',
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '800',
+    fontVariant: ['tabular-nums'],
+  },
+  panelToggle: {
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 22,
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
+  },
+  panelToggleOn: { backgroundColor: '#ffffff', borderColor: '#ffffff' },
+  panelToggleText: { color: '#ffffff', fontSize: 15, fontWeight: '700' },
+  panelToggleTextOn: { color: '#09090b' },
+  preview: { width: 84, height: 112, padding: 4, borderRadius: 12, borderWidth: 3 },
+  previewCell: { flex: 1, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
+  previewText: { color: '#ffffff', fontSize: 13, fontWeight: '800' },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   stepButton: { width: 48, paddingHorizontal: 0 },
   stepValue: { minWidth: 32, textAlign: 'center', fontSize: 18, fontWeight: '700' },

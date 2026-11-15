@@ -1,4 +1,5 @@
 import { formatRules, type GameFormat, type GamePlayerInput } from '../games';
+import type { SeatRotation } from './layout';
 
 /**
  * Modo mesa (5.6): contador de vida no estilo dos apps de mesa (Lotus) e o resultado da partida.
@@ -32,6 +33,10 @@ export interface TableState {
   step: number;
   /** Estados anteriores para desfazer (os últimos 100). */
   undo: Omit<TableState, 'undo'>[];
+  /** Disposição escolhida (`tableLayouts`); sem valor, a padrão para o número de jogadores. */
+  layoutId?: string | null;
+  /** Giro individual por posição na mesa, por cima da disposição. */
+  rotations?: Record<number, SeatRotation>;
 }
 
 export type TableAction =
@@ -43,6 +48,10 @@ export type TableAction =
   | { type: 'first'; userId: string | null }
   /** Troca dois jogadores de lugar na mesa (as áreas acompanham onde cada um está sentado). */
   | { type: 'swap'; userId: string; withUserId: string }
+  /** Muda a disposição das áreas (zera os giros individuais). Não entra no "desfazer". */
+  | { type: 'layout'; layoutId: string }
+  /** Gira a área de uma posição da mesa. Não entra no "desfazer". */
+  | { type: 'rotate'; seat: number; rotate: SeatRotation }
   | { type: 'undo' };
 
 /** Vida inicial por formato: 40 em Commander e Brawl, 20 nos demais. */
@@ -121,7 +130,20 @@ const updatePlayer = (state: TableState, userId: string, fn: (p: TablePlayer) =>
 export function tableReducer(state: TableState, action: TableAction): TableState {
   if (action.type === 'undo') {
     const previous = state.undo.at(-1);
-    return previous ? { ...previous, undo: state.undo.slice(0, -1) } : state;
+    // A disposição é da tela, não da partida: desfazer não a muda.
+    return previous
+      ? {
+          ...previous,
+          layoutId: state.layoutId,
+          rotations: state.rotations,
+          undo: state.undo.slice(0, -1),
+        }
+      : state;
+  }
+  if (action.type === 'layout') return { ...state, layoutId: action.layoutId, rotations: {} };
+  if (action.type === 'rotate') {
+    if (action.seat < 0 || action.seat >= state.players.length) return state;
+    return { ...state, rotations: { ...state.rotations, [action.seat]: action.rotate } };
   }
   const { undo, ...snapshot } = state;
   const base: TableState = {
