@@ -115,6 +115,16 @@ export function FirstSteps({
           );
         })}
       </ol>
+      {/* Retomar o guia do primeiro acesso (7.1), pulado ou já feito. */}
+      <p className="text-sm">
+        <Link
+          href="/boas-vindas"
+          className="inline-flex items-center gap-1 font-medium text-link underline underline-offset-2"
+        >
+          <Icon name="guide" />
+          {t('guideAgain')}
+        </Link>
+      </p>
       <FormError message={error} />
     </section>
   );

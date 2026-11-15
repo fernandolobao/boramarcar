@@ -1,4 +1,6 @@
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
+import { useEffect } from 'react';
+import { api } from '@/lib/api';
 import { StatusBar } from 'expo-status-bar';
 import { authClient } from '@/lib/auth';
 import { GroupProvider } from '@/lib/group';
@@ -10,6 +12,22 @@ import { Loading } from '@/components/ui';
 /** Na área logada: renova o token de push e abre a tela de um aviso tocado. */
 function PushNotifications() {
   usePushNotifications();
+  return null;
+}
+
+/**
+ * Primeiro acesso de conta nova: abre o guia (7.1) uma vez. Sem rede ou com erro, segue sem guia
+ * (nunca bloqueia o app).
+ */
+function GuideLauncher() {
+  useEffect(() => {
+    api.me
+      .onboarding()
+      .then((guide) => {
+        if (guide.show) router.push('/boas-vindas');
+      })
+      .catch(() => undefined);
+  }, []);
   return null;
 }
 
@@ -40,6 +58,7 @@ export default function RootLayout() {
         <Stack.Screen name="jogadores/[id]" options={{ title: t('profileTitle') }} />
         <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
         <Stack.Screen name="ajuda" options={{ title: t('helpTitle') }} />
+        <Stack.Screen name="boas-vindas" options={{ title: t('guideTitle') }} />
         <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />
         <Stack.Screen name="grupo" options={{ title: t('groupTitle') }} />
         <Stack.Screen name="configuracoes" options={{ title: t('settingsTitle') }} />
@@ -58,6 +77,7 @@ export default function RootLayout() {
         <GroupProvider>
           {content}
           <PushNotifications />
+          <GuideLauncher />
         </GroupProvider>
       ) : (
         content

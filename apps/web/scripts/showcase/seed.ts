@@ -26,11 +26,15 @@ export async function seedShowcase(databaseUrl: string) {
   try {
     // O cache de cartas (Scryfall) fica: não é dado de ninguém e evita bater no limite de consultas.
     await pool.query('truncate table "user", groups restart identity cascade');
-    await db
-      .insert(s.user)
-      .values(
-        SHOWCASE_USERS.map((u) => ({ ...u, emailVerified: true, timeZone: 'America/Sao_Paulo' })),
-      );
+    await db.insert(s.user).values(
+      SHOWCASE_USERS.map((u) => ({
+        ...u,
+        emailVerified: true,
+        timeZone: 'America/Sao_Paulo',
+        // Contas "antigas": o guia do primeiro acesso não abre por cima das capturas.
+        createdAt: new Date('2026-01-01T12:00:00Z'),
+      })),
+    );
     for (const u of SHOWCASE_USERS) {
       const token = `showcase-${u.id}-${randomBytes(6).toString('hex')}`;
       sessions[u.id] = token;

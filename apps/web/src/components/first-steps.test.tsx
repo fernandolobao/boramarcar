@@ -48,6 +48,14 @@ describe('FirstSteps', () => {
     );
   });
 
+  it('leva de volta ao guia do primeiro acesso', () => {
+    render(ui);
+    expect(screen.getByRole('link', { name: 'Ver o guia de novo' })).toHaveAttribute(
+      'href',
+      '/boas-vindas',
+    );
+  });
+
   it('dispensar grava no servidor, esconde a lista e devolve o foco ao conteúdo', async () => {
     render(ui);
     fireEvent.click(screen.getByRole('button', { name: 'Dispensar os primeiros passos' }));

@@ -17,16 +17,19 @@ interface LocationOption {
 export function AvailabilityForm({
   groupId,
   locations,
+  initialFrequency = 'once',
 }: {
   groupId: string;
   locations: LocationOption[];
+  /** O guia do primeiro acesso começa em "toda semana". */
+  initialFrequency?: 'once' | 'weekly';
 }) {
   const t = useTranslations('availability');
   const tc = useTranslations('common');
   const locale = useLocale();
   const timeZone = useTimeZone() ?? 'America/Sao_Paulo';
   const { run, error, pending } = useApiAction();
-  const [frequency, setFrequency] = useState<'once' | 'weekly'>('once');
+  const [frequency, setFrequency] = useState<'once' | 'weekly'>(initialFrequency);
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
   const [weekdays, setWeekdays] = useState<number[]>([]);
