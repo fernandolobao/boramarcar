@@ -10,6 +10,7 @@ import {
   eventDetailSchema,
   eventHistorySchema,
   eventPairingsSchema,
+  partnerHintSchema,
   eventStatusSchema,
   eventSummarySchema,
   gameWindowSchema,
@@ -219,6 +220,15 @@ export function createApiClient(options: ApiClientOptions) {
           )
         ).beta,
       /** Membros do grupo (para filtros por jogador e escolha de participantes). */
+      /** Até 3 membros com quem você ainda não jogou (ou não joga há 30+ dias). */
+      partners: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/partners`,
+            z.object({ hints: z.array(partnerHintSchema) }),
+          )
+        ).hints,
       members: async (groupId: string) =>
         (
           await request(

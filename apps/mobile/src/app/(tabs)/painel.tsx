@@ -1,4 +1,10 @@
-import type { EventSummary, GameWindow, GroupStats, Ranking } from '@boramarcar/api-client';
+import type {
+  EventSummary,
+  GameWindow,
+  GroupStats,
+  PartnerHint,
+  Ranking,
+} from '@boramarcar/api-client';
 import { Link, router } from 'expo-router';
 import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { Aura } from '@/components/aura';
@@ -8,7 +14,7 @@ import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
 import { useGroup } from '@/lib/group';
-import { formatDateTime, formatPercent, t } from '@/lib/i18n';
+import { formatDate, formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 
@@ -240,6 +246,40 @@ function Commanders({ stats }: { stats: GroupStats | null }) {
   );
 }
 
+/** "Com quem você ainda não jogou" (como no site): até 3 pessoas, primeiro quem vai no próximo. */
+function Partners({ hints }: { hints: PartnerHint[] | null }) {
+  if (!hints || hints.length === 0) return null;
+  return (
+    <Card style={{ gap: 8 }}>
+      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        {t('partnersTitle')}
+      </AppText>
+      <AppText muted>{t('partnersHint')}</AppText>
+      {hints.map((h) => {
+        const text = h.lastPlayedAt
+          ? t('partnersSince', { name: h.name, date: formatDate(h.lastPlayedAt) })
+          : t('partnersNever', { name: h.name });
+        return (
+          <Pressable
+            key={h.userId}
+            accessibilityRole="link"
+            accessibilityLabel={h.confirmedNext ? `${text} ${t('partnersGoingNext')}` : text}
+            onPress={() => router.push({ pathname: '/jogadores/[id]', params: { id: h.userId } })}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.7 : 1,
+              minHeight: 44,
+              justifyContent: 'center',
+            })}
+          >
+            <AppText>{text}</AppText>
+            {h.confirmedNext && <AppText muted>{t('partnersGoingNext')}</AppText>}
+          </Pressable>
+        );
+      })}
+    </Card>
+  );
+}
+
 /** Painel (paridade com /painel do site): próximo encontro, seus números, pódio, horários e comandantes. */
 export default function DashboardScreen() {
   const { group, loading: loadingGroup, error: groupError, reload } = useGroup();
@@ -260,8 +300,18 @@ export default function DashboardScreen() {
     () => (group ? api.availability.windows(group.id) : Promise.resolve(null)),
     [group?.id],
   );
+  const partners = useAsync(
+    () => (group ? api.groups.partners(group.id) : Promise.resolve(null)),
+    [group?.id],
+  );
   const refresh = () => {
-    void Promise.all([events.refresh(), ranking.refresh(), stats.refresh(), windows.refresh()]);
+    void Promise.all([
+      events.refresh(),
+      ranking.refresh(),
+      stats.refresh(),
+      windows.refresh(),
+      partners.refresh(),
+    ]);
   };
   useRefreshOnFocus(refresh);
 
@@ -292,6 +342,7 @@ export default function DashboardScreen() {
         <BetaBanner groupId={group.id} />
         <NextEvent event={upcoming[0]} />
         <MyNumbers ranking={ranking.data} stats={stats.data} userId={session?.user.id ?? ''} />
+        <Partners hints={partners.data} />
         <Podium ranking={ranking.data} />
         <Windows windows={windows.data} />
         <Commanders stats={stats.data} />

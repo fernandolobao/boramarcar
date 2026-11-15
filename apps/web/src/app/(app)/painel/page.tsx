@@ -5,6 +5,7 @@ import {
   getGroupRanking,
   getGroupStats,
   listEvents,
+  listPartnerHints,
   suggestGameWindows,
   TABLE_SIZE,
 } from '@boramarcar/db';
@@ -123,7 +124,7 @@ export default async function DashboardPage() {
   const db = getDb();
   const now = new Date();
   const timeZone = await getTimeZone();
-  const [events, windows, ranking, stats, onboarding, beta] = await Promise.all([
+  const [events, windows, ranking, stats, onboarding, beta, partners] = await Promise.all([
     listEvents(db, {
       groupId: group.id,
       userId: user.id,
@@ -141,6 +142,7 @@ export default async function DashboardPage() {
     getGroupStats(db, { groupId: group.id, userId: user.id, now, timeZone }),
     getOnboardingChecklist(db, { userId: user.id, groupId: group.id, now }),
     getBetaBanner(db, { userId: user.id, groupId: group.id, now }),
+    listPartnerHints(db, { groupId: group.id, userId: user.id, now }),
   ]);
   const showFirstSteps = !onboarding.dismissed && onboarding.completed < onboarding.steps.length;
   const next = events[0]
@@ -381,6 +383,40 @@ export default async function DashboardPage() {
             </ol>
           )}
         </section>
+
+        {/* Com quem você ainda não jogou: misturar a mesa. */}
+        {partners.hints.length > 0 && (
+          <section className="card" aria-labelledby="painel-parceiros">
+            <h2 id="painel-parceiros" className="section-title">
+              {t('partners.title')}
+            </h2>
+            <p className="muted mb-3">{t('partners.hint')}</p>
+            <ul className="space-y-2">
+              {partners.hints.map((h) => (
+                <li key={h.userId} className="flex items-start gap-2">
+                  <Icon name="group" className="mt-0.5 shrink-0 text-fg-muted" />
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span>
+                      {h.lastPlayedAt
+                        ? t.rich('partners.since', {
+                            when: format.relativeTime(h.lastPlayedAt, now),
+                            name: () => <PlayerLink userId={h.userId} name={h.name} />,
+                          })
+                        : t.rich('partners.never', {
+                            name: () => <PlayerLink userId={h.userId} name={h.name} />,
+                          })}
+                    </span>
+                    {h.confirmedNext && (
+                      <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium">
+                        {t('partners.goingNext')}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Atividade do grupo. */}
         <section className="card" aria-labelledby="painel-atividade">

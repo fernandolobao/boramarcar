@@ -482,3 +482,12 @@ export const eventPairingsSchema = z.object({
   pairs: z.array(z.object({ a: z.string(), b: z.string(), recent: z.number(), older: z.number() })),
 });
 export type EventPairings = z.infer<typeof eventPairingsSchema>;
+
+/** "Com quem você ainda não jogou" (painel). */
+export const partnerHintSchema = z.object({
+  userId: z.string(),
+  name: z.string(),
+  lastPlayedAt: date.nullable(),
+  confirmedNext: z.boolean(),
+});
+export type PartnerHint = z.infer<typeof partnerHintSchema>;

@@ -230,6 +230,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada e outros. Abra o perfil (toque no seu nome no ranking) para ver o progresso de cada uma.',
             ],
           },
+          {
+            id: 'com-quem-jogar',
+            question: 'O que é "Com quem jogar" no painel?',
+            intro: [
+              'Até 3 pessoas do grupo com quem você nunca jogou, ou não joga há mais de um mês. Quem já confirmou o próximo encontro aparece primeiro. Toque no nome para ver o perfil. Ninguém mais vê essa lista: ela é só sua.',
+            ],
+          },
         ],
       },
       {
@@ -475,6 +482,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'What are achievements?',
             intro: [
               'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion and more. Open a profile (tap a name in the ranking) to see the progress of each one.',
+            ],
+          },
+          {
+            id: 'com-quem-jogar',
+            question: 'What is "Who to play with" on the dashboard?',
+            intro: [
+              "Up to 3 people in the group you have never played with, or haven't played with for over a month. Whoever already confirmed the next meetup shows up first. Tap a name to see the profile. Nobody else sees this list: it's just for you.",
             ],
           },
         ],
