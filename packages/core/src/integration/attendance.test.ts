@@ -4,8 +4,8 @@ import { attendanceSummary } from './attendance';
 const now = new Date('2026-11-15T12:00:00Z');
 const daysAgo = (n: number) => new Date(now.getTime() - n * 24 * 3600_000);
 // Últimos 8 encontros realizados, um por semana, o mais recente primeiro.
-const events = (confirmed: string[][]) =>
-  confirmed.map((ids, i) => ({ startsAt: daysAgo(7 * (i + 1)), confirmed: ids }));
+const events = (present: string[][]) =>
+  present.map((ids, i) => ({ startsAt: daysAgo(7 * (i + 1)), present: ids }));
 
 describe('attendanceSummary', () => {
   it('conta presenças nos encontros depois da entrada e marca quem sumiu', () => {

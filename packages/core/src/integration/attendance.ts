@@ -6,18 +6,18 @@
 export interface AttendanceRow {
   userId: string;
   name: string;
-  /** Encontros da janela em que confirmou presença. */
+  /** Encontros da janela em que esteve: marcou "Vou" ou jogou alguma partida dele. */
   attended: number;
   /** Encontros da janela que aconteceram depois de a pessoa entrar no grupo. */
   of: number;
   lastGameAt: Date | null;
-  /** Desde quando está sumida (última partida, última presença ou entrada); `null` = não está. */
+  /** Desde quando está sumida (última partida, último encontro em que esteve ou entrada); `null` = não está. */
   awaySince: Date | null;
 }
 
 /** Janela de frequência: os últimos 8 encontros realizados. */
 export const ATTENDANCE_WINDOW = 8;
-/** Sumido: não confirmou nenhum dos 4 mais recentes... */
+/** Sumido: não esteve em nenhum dos 4 mais recentes... */
 export const AWAY_RECENT_EVENTS = 4;
 /** ...e não joga (nem entrou no grupo) há 30 dias. */
 export const AWAY_DAYS = 30;
@@ -25,8 +25,11 @@ const DAY = 24 * 3600_000;
 
 export function attendanceSummary(input: {
   members: { userId: string; name: string; joinedAt: Date }[];
-  /** Encontros realizados, o mais recente primeiro (usa os 8 primeiros). */
-  events: { startsAt: Date; confirmed: string[] }[];
+  /**
+   * Encontros realizados, o mais recente primeiro (usa os 8 primeiros), com quem esteve neles:
+   * marcou "Vou" ou jogou alguma partida (muita gente joga sem responder à presença).
+   */
+  events: { startsAt: Date; present: string[] }[];
   lastGame: Record<string, Date | null | undefined>;
   now: Date;
 }): AttendanceRow[] {
@@ -36,9 +39,9 @@ export function attendanceSummary(input: {
 
   const rows = input.members.map((m) => {
     const eligible = window.filter((e) => e.startsAt >= m.joinedAt);
-    const attendedEvents = eligible.filter((e) => e.confirmed.includes(m.userId));
+    const attendedEvents = eligible.filter((e) => e.present.includes(m.userId));
     const lastGameAt = input.lastGame[m.userId] ?? null;
-    const missedRecent = recent.length > 0 && !recent.some((e) => e.confirmed.includes(m.userId));
+    const missedRecent = recent.length > 0 && !recent.some((e) => e.present.includes(m.userId));
     const away =
       m.joinedAt.getTime() <= cutoff &&
       missedRecent &&
