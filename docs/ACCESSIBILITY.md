@@ -382,3 +382,9 @@ sem rolagem horizontal em 320px.
 - Cada captura tem texto alternativo que descreve o que a tela mostra (números, nomes, estado), não "captura de tela"; a legenda visível fica em `<figcaption>`. A versão do outro tema fica com `display: none`, fora da árvore de acessibilidade.
 - Celular: as abas rolam na horizontal dentro da seção, sem rolagem horizontal da página em 320 px; alvos com 44 px de altura. Transição com `motion-reduce:`.
 - axe sem violações no componente (`a11y.test.tsx`); a página inicial já está no `a11y.spec.ts` (claro e escuro, desktop e celular).
+
+## Encontro: sugestão de mesas (15/11/2026)
+
+- Site: `<section>` com `<h2>`; mesas numa lista, cada uma com `<h3>` ("Mesa 1") e os nomes em lista; "N duplas que nunca jogaram juntas" em texto. "Sortear de novo" é `<button type="button">` com ícone decorativo e anuncia "Nova sugestão de mesas." numa região `role="status"`.
+- App: cartão com cabeçalhos (`accessibilityRole="header"`), nomes em texto e o aviso do novo sorteio em `accessibilityLiveRegion="polite"`.
+- axe sem violações no componente (`a11y.test.tsx`).

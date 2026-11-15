@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { ProductTour } from './home/product-tour';
+import { TableSuggestions } from './table-suggestions';
 import { DeckImportForm } from './deck-forms';
 import { EmptyState } from './empty-state';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
@@ -488,6 +489,23 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('formulário de feedback sem violações', async () => {
     expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
+  });
+
+  it('sugestão de mesas sem violações', async () => {
+    const players = ['Ana', 'Bia', 'Caio', 'Duda', 'Edu', 'Fê', 'Gabi'].map((name, i) => ({
+      userId: `u${i}`,
+      name,
+    }));
+    expect(
+      await audit(
+        <TableSuggestions
+          players={players}
+          pairs={[{ a: 'u0', b: 'u1', recent: 2, older: 0 }]}
+          min={3}
+          max={5}
+        />,
+      ),
+    ).toEqual([]);
   });
 
   it('telas do produto na página inicial (abas) sem violações', async () => {

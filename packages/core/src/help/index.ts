@@ -121,6 +121,19 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Quem criou o encontro, ou um admin do grupo, pode cancelar (o botão pede confirmação em dois toques) ou marcar como finalizado depois do início. Finalizar manda o resumo da noite para o grupo. Um encontro cancelado pode ser reaberto.',
             ],
           },
+          {
+            id: 'sugestao-mesas',
+            question: 'Como dividir a turma em mesas?',
+            intro: [
+              'Com 6 ou mais confirmados num encontro de Commander (ou outro formato todos contra todos), o encontro mostra a "Sugestão de mesas": divide quem confirmou em mesas de 3 a 5 pessoas, juntando quem menos jogou junto (as partidas dos últimos 3 meses pesam mais).',
+            ],
+            steps: [
+              'Abra o encontro e veja a "Sugestão de mesas", logo depois da lista de presença.',
+              'Cada mesa mostra quantas duplas ali nunca jogaram juntas.',
+              'Não gostou? Toque em "Sortear de novo" para outra divisão.',
+            ],
+            notes: ['É só uma sugestão: nada muda nas presenças nem nas partidas.'],
+          },
         ],
       },
       {
@@ -354,6 +367,19 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             intro: [
               'Whoever created the meetup, or a group admin, can cancel it (the button asks for a two-tap confirmation) or mark it as finished after it starts. Finishing sends the night’s recap to the group. A cancelled meetup can be reopened.',
             ],
+          },
+          {
+            id: 'sugestao-mesas',
+            question: 'How do I split everyone into tables?',
+            intro: [
+              'With 6 or more confirmed for a Commander meetup (or another free-for-all format), the meetup shows "Suggested tables": it splits the confirmed players into tables of 3 to 5, putting together people who have played together the least (games from the last 3 months count more).',
+            ],
+            steps: [
+              'Open the meetup and look for "Suggested tables", right after the RSVP list.',
+              'Each table shows how many pairs there have never played together.',
+              'Don\'t like it? Tap "Shuffle again" for another split.',
+            ],
+            notes: ["It's only a suggestion: nothing changes in the RSVPs or the games."],
           },
         ],
       },
