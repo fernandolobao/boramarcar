@@ -11,6 +11,7 @@ import { api } from '@/lib/api';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { NumberField } from '@/components/ds/number-field';
+import { Choices } from '@/components/ds/choices';
 
 const CARD_RATIO = 63 / 88;
 const BOARD_LABEL: Record<DeckBoard, MessageKey> = {
@@ -316,23 +317,13 @@ export function AddCardForm({
           })}
         </View>
       )}
-      <View
-        style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-        accessibilityRole="radiogroup"
-        accessibilityLabel={t('deckBoard')}
-      >
-        {DECK_BOARDS.map((b) => (
-          <Button
-            key={b}
-            label={t(BOARD_LABEL[b])}
-            variant="secondary"
-            accessibilityRole="radio"
-            accessibilityState={{ checked: board === b }}
-            selected={board === b}
-            onPress={() => setBoard(b)}
-          />
-        ))}
-      </View>
+      <Choices
+        label={t('deckBoard')}
+        hideLabel
+        value={board}
+        onChange={setBoard}
+        options={DECK_BOARDS.map((b) => ({ value: b, label: t(BOARD_LABEL[b]) }))}
+      />
       <NumberField
         label={t('deckCopies')}
         value={quantity}

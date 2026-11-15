@@ -6,6 +6,7 @@ import { useId, useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
+import { Choices } from './ds/choices';
 
 /** Exportar a lista (copiar/baixar) e, para o dono, atualizar o deck pela origem ou por texto. */
 export function DeckTools({
@@ -104,30 +105,19 @@ export function DeckTools({
           <h3 className="font-semibold">{t('print')}</h3>
           <p className="muted text-sm">{t('printHint')}</p>
           <div className="flex flex-wrap items-end gap-4">
-            <fieldset>
-              <legend className="label">{t('printWhich')}</legend>
-              <div className="flex flex-wrap gap-4">
-                <label className="flex min-h-6 items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name={`${id}-which`}
-                    checked={which === 'proxies'}
-                    disabled={proxyCount === 0}
-                    onChange={() => setWhich('proxies')}
-                  />
-                  {t('printProxies', { count: proxyCount })}
-                </label>
-                <label className="flex min-h-6 items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name={`${id}-which`}
-                    checked={which === 'all'}
-                    onChange={() => setWhich('all')}
-                  />
-                  {t('printAll')}
-                </label>
-              </div>
-            </fieldset>
+            <Choices<'proxies' | 'all'>
+              label={t('printWhich')}
+              value={which}
+              onChange={setWhich}
+              options={[
+                {
+                  value: 'proxies',
+                  label: t('printProxies', { count: proxyCount }),
+                  disabled: proxyCount === 0,
+                },
+                { value: 'all', label: t('printAll') },
+              ]}
+            />
             <div>
               <label className="label" htmlFor={`${id}-paper`}>
                 {t('paper')}

@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { NumberField } from './ds/number-field';
+import { Choices } from './ds/choices';
 
 export interface GamePlayerOption {
   userId: string;
@@ -301,30 +302,23 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
       </fieldset>
 
       {isTeams && (
-        <fieldset>
-          <legend className="label">{t('winningTeam')}</legend>
-          <div className="flex flex-wrap gap-4">
-            {Array.from({ length: teamCount }, (_, i) => {
-              const team = i + 1;
-              const names = ordered
-                .filter((p) => (teamBy[p.userId] ?? 1) === team)
-                .map((p) => p.name);
-              return (
-                <label key={team} className="flex min-h-6 items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name={`${id}-team`}
-                    disabled={isDraw}
-                    checked={winningTeam === team}
-                    onChange={() => setWinningTeam(team)}
-                  />
-                  {t('teamName', { number: team })}
-                  {names.length > 0 && <span className="muted">({names.join(', ')})</span>}
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
+        <Choices
+          label={t('winningTeam')}
+          value={winningTeam === null ? null : String(winningTeam)}
+          onChange={(v) => setWinningTeam(Number(v))}
+          options={Array.from({ length: teamCount }, (_, i) => {
+            const team = i + 1;
+            const names = ordered
+              .filter((p) => (teamBy[p.userId] ?? 1) === team)
+              .map((p) => p.name);
+            return {
+              value: String(team),
+              label: t('teamName', { number: team }),
+              description: names.length > 0 ? `(${names.join(', ')})` : undefined,
+              disabled: isDraw,
+            };
+          })}
+        />
       )}
 
       <label className="flex items-center gap-2 text-sm">

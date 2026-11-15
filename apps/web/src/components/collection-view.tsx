@@ -32,6 +32,7 @@ import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 import { EmptyState } from './empty-state';
 import { NumberField } from './ds/number-field';
+import { Choices } from './ds/choices';
 
 export interface CollectionViewEntry {
   id: string;
@@ -496,19 +497,16 @@ function Filters({
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {(['any', 'exact'] as const).map((mode) => (
-              <label key={mode} className="inline-flex min-h-6 items-center gap-1.5">
-                <input
-                  type="radio"
-                  name={`${id}-mode`}
-                  checked={(filters.colorMode ?? 'any') === mode}
-                  onChange={() => update({ colorMode: mode })}
-                />
-                {t(mode === 'any' ? 'colorModeAny' : 'colorModeExact')}
-              </label>
-            ))}
-          </div>
+          <Choices
+            label={t('colorMode')}
+            hideLabel
+            value={filters.colorMode ?? 'any'}
+            onChange={(mode) => update({ colorMode: mode })}
+            options={[
+              { value: 'any', label: t('colorModeAny') },
+              { value: 'exact', label: t('colorModeExact') },
+            ]}
+          />
         </fieldset>
 
         <fieldset className="space-y-2">

@@ -5,11 +5,12 @@ import {
   type TableState,
 } from '@boramarcar/core/table';
 import { useState } from 'react';
-import { ScrollView, TextInput, View } from 'react-native';
+import { ScrollView, TextInput } from 'react-native';
 import { AppText, Button, Card, styles as ui } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Choices } from '@/components/ds/choices';
 
 /** Conferir o resultado sugerido pelo contador e registrar a partida no encontro. */
 export function TableFinishScreen({
@@ -64,57 +65,43 @@ export function TableFinishScreen({
           {t('tableWinner')}
         </AppText>
         <AppText muted>{t('tableWinnerHint')}</AppText>
-        <View style={{ gap: 8 }} accessibilityRole="radiogroup">
-          {state.players.map((p) => (
-            <Button
-              key={p.userId}
-              label={[
-                p.name,
+        <Choices
+          label={t('tableWinner')}
+          hideLabel
+          orientation="vertical"
+          value={winner || null}
+          onChange={setWinner}
+          options={[
+            ...state.players.map((p) => ({
+              value: p.userId,
+              label: p.name,
+              description: [
                 t('tableLifeShort', { life: p.life }),
                 order.has(p.userId) ? t('tableOutOrder', { order: order.get(p.userId)! }) : '',
               ]
                 .filter(Boolean)
-                .join(' · ')}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: winner === p.userId }}
-              selected={winner === p.userId}
-              onPress={() => setWinner(p.userId)}
-              style={{ alignItems: 'flex-start' }}
-            />
-          ))}
-          <Button
-            label={t('tableDraw')}
-            variant="secondary"
-            accessibilityRole="radio"
-            accessibilityState={{ checked: winner === 'draw' }}
-            selected={winner === 'draw'}
-            onPress={() => setWinner('draw')}
-            style={{ alignItems: 'flex-start' }}
-          />
-        </View>
+                .join(' · '),
+            })),
+            { value: 'draw', label: t('tableDraw') },
+          ]}
+        />
       </Card>
 
       <Card>
         <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
           {t('tableFirstPlayer')}
         </AppText>
-        <View
-          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-          accessibilityRole="radiogroup"
-        >
-          {[{ userId: '', name: t('tableUnknown') }, ...state.players].map((p) => (
-            <Button
-              key={p.userId || 'unknown'}
-              label={p.name}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: first === p.userId }}
-              selected={first === p.userId}
-              onPress={() => setFirst(p.userId)}
-            />
-          ))}
-        </View>
+        <Choices
+          label={t('tableFirstPlayer')}
+          hideLabel
+          // '' = não sei quem começou.
+          value={first}
+          onChange={setFirst}
+          options={[{ userId: '', name: t('tableUnknown') }, ...state.players].map((p) => ({
+            value: p.userId,
+            label: p.name,
+          }))}
+        />
       </Card>
 
       <Card>

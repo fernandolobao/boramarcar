@@ -8,6 +8,7 @@ import { formatLabel } from '@/components/table/labels';
 import { AppText, Button, Card, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
+import { Choices } from '@/components/ds/choices';
 
 type Mode = 'url' | 'text';
 
@@ -54,23 +55,16 @@ export default function ImportDeckScreen() {
         {t('deckImportTitle')}
       </AppText>
       <Card style={{ gap: 14 }}>
-        <View
-          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-          accessibilityRole="radiogroup"
-          accessibilityLabel={t('deckImportMode')}
-        >
-          {(['url', 'text'] as const).map((m) => (
-            <Button
-              key={m}
-              label={t(m === 'url' ? 'deckImportFromUrl' : 'deckImportFromText')}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: mode === m }}
-              selected={mode === m}
-              onPress={() => setMode(m)}
-            />
-          ))}
-        </View>
+        <Choices
+          label={t('deckImportMode')}
+          hideLabel
+          value={mode}
+          onChange={setMode}
+          options={(['url', 'text'] as const).map((m) => ({
+            value: m,
+            label: t(m === 'url' ? 'deckImportFromUrl' : 'deckImportFromText'),
+          }))}
+        />
         {mode === 'url' ? (
           <TextField
             label={t('deckImportUrl')}
@@ -102,24 +96,15 @@ export default function ImportDeckScreen() {
           maxLength={120}
         />
         <View style={{ gap: 6 }}>
-          <AppText style={{ fontWeight: '600' }}>{t('deckFormat')}</AppText>
-          <View
-            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('deckFormat')}
-          >
-            {(['auto', ...GAME_FORMATS] as const).map((f) => (
-              <Button
-                key={f}
-                label={f === 'auto' ? t('deckFormatAuto') : formatLabel(f)}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: format === f }}
-                selected={format === f}
-                onPress={() => setFormat(f)}
-              />
-            ))}
-          </View>
+          <Choices
+            label={t('deckFormat')}
+            value={format}
+            onChange={setFormat}
+            options={(['auto', ...GAME_FORMATS] as const).map((f) => ({
+              value: f,
+              label: f === 'auto' ? t('deckFormatAuto') : formatLabel(f),
+            }))}
+          />
           <AppText muted>{t('deckFormatHint')}</AppText>
         </View>
         <Button

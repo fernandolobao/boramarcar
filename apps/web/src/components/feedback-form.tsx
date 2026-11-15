@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
+import { Choices } from './ds/choices';
 
 const KINDS = ['problem', 'idea', 'other'] as const;
 type Kind = (typeof KINDS)[number];
@@ -59,22 +60,12 @@ export function FeedbackForm({ page }: { page: string | null }) {
         );
       }}
     >
-      <fieldset className="space-y-2">
-        <legend className="mb-1 font-medium">{t('kind')}</legend>
-        {KINDS.map((k) => (
-          <label key={k} className="flex cursor-pointer items-center gap-2">
-            <input
-              type="radio"
-              name={`${id}-kind`}
-              value={k}
-              checked={kind === k}
-              onChange={() => setKind(k)}
-              className="size-5"
-            />
-            {t(`kinds.${k}`)}
-          </label>
-        ))}
-      </fieldset>
+      <Choices<(typeof KINDS)[number]>
+        label={t('kind')}
+        value={kind}
+        onChange={setKind}
+        options={KINDS.map((k) => ({ value: k, label: t(`kinds.${k}`) }))}
+      />
       <div className="space-y-1">
         <label htmlFor={`${id}-message`} className="font-medium">
           {t('message')}

@@ -8,9 +8,9 @@ export interface ChoiceOption<T extends string> {
 /** Contrato do Choices (escolha única: chips ou cartões), site e app. */
 export interface ChoicesProps<T extends string> {
   label: string;
-  /** `null` = nenhuma escolhida ainda. */
-  value: T | null;
-  onChange(value: T): void;
+  /** `null` = nenhuma escolhida ainda. `NoInfer`: o tipo vem das opções, não do estado. */
+  value: NoInfer<T> | null;
+  onChange(value: NoInfer<T>): void;
   options: readonly ChoiceOption<T>[];
   description?: string;
   error?: string;

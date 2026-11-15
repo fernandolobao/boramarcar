@@ -17,10 +17,10 @@ import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { Choices } from '@/components/ds/choices';
 
 /** Formatos do formulário simples: todos contra todos e duelo (times seguem no site). */
 const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
-const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
@@ -165,19 +165,13 @@ export default function RecordGameScreen() {
       </View>
 
       <Section title={t('tableFormat')} hint={t('gameTeamsWeb')}>
-        <View style={row} accessibilityRole="radiogroup" accessibilityLabel={t('tableFormat')}>
-          {FORMATS.map((f) => (
-            <Button
-              key={f}
-              label={formatLabel(f)}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: chosenFormat === f }}
-              selected={chosenFormat === f}
-              onPress={() => setFormat(f)}
-            />
-          ))}
-        </View>
+        <Choices
+          label={t('tableFormat')}
+          hideLabel
+          value={chosenFormat}
+          onChange={setFormat}
+          options={FORMATS.map((f) => ({ value: f, label: formatLabel(f) }))}
+        />
       </Section>
 
       <Section title={t('gamePlayers')} hint={t('gamePlayersHint')}>
@@ -199,26 +193,21 @@ export default function RecordGameScreen() {
                 style={{ alignItems: 'flex-start' }}
               />
               {checked && p.decks.length > 0 && (
-                <View
-                  style={[row, { paddingStart: 12 }]}
-                  accessibilityRole="radiogroup"
-                  accessibilityLabel={t('gameDeckOf', { name: p.name })}
-                >
-                  {[{ id: null, name: t('tableNoDeck') }, ...p.decks].map((d) => {
-                    const on = (decks[p.userId] ?? null) === d.id;
-                    return (
-                      <Button
-                        key={d.id ?? 'none'}
-                        label={d.name}
-                        accessibilityLabel={`${t('gameDeckOf', { name: p.name })}: ${d.name}`}
-                        variant="secondary"
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: on }}
-                        selected={on}
-                        onPress={() => setDecks((all) => ({ ...all, [p.userId]: d.id }))}
-                      />
-                    );
-                  })}
+                <View style={{ paddingStart: 12 }}>
+                  <Choices
+                    label={t('gameDeckOf', { name: p.name })}
+                    hideLabel
+                    // '' = sem deck.
+                    value={decks[p.userId] ?? ''}
+                    onChange={(v) =>
+                      setDecks((all) => ({ ...all, [p.userId]: v === '' ? null : v }))
+                    }
+                    options={[{ id: null, name: t('tableNoDeck') }, ...p.decks].map((d) => ({
+                      value: d.id ?? '',
+                      label: d.name,
+                    }))}
+                    optionLabel={(o) => `${t('gameDeckOf', { name: p.name })}: ${o.label}`}
+                  />
                 </View>
               )}
             </View>
@@ -230,54 +219,34 @@ export default function RecordGameScreen() {
         {players.length === 0 ? (
           <AppText muted>{t('gameChoosePlayers')}</AppText>
         ) : (
-          <View
-            style={{ gap: 8 }}
-            accessibilityRole="radiogroup"
-            accessibilityLabel={t('gameResult')}
-          >
-            {players.map((userId) => (
-              <Button
-                key={userId}
-                label={t('gameWinnerOption', { name: nameOf(userId) })}
-                variant="secondary"
-                accessibilityRole="radio"
-                accessibilityState={{ checked: winner === userId }}
-                selected={winner === userId}
-                onPress={() => setWinner(userId)}
-                style={{ alignItems: 'flex-start' }}
-              />
-            ))}
-            <Button
-              label={t('tableDraw')}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: winner === 'draw' }}
-              selected={winner === 'draw'}
-              onPress={() => setWinner('draw')}
-              style={{ alignItems: 'flex-start' }}
-            />
-          </View>
+          <Choices
+            label={t('gameResult')}
+            hideLabel
+            orientation="vertical"
+            value={winner}
+            onChange={setWinner}
+            options={[
+              ...players.map((userId) => ({
+                value: userId,
+                label: t('gameWinnerOption', { name: nameOf(userId) }),
+              })),
+              { value: 'draw', label: t('tableDraw') },
+            ]}
+          />
         )}
       </Section>
 
       <Section title={t('gameDetails')}>
-        <AppText style={{ fontWeight: '600' }}>{t('tableFirstPlayer')}</AppText>
-        <View style={row} accessibilityRole="radiogroup" accessibilityLabel={t('tableFirstPlayer')}>
-          {[
+        <Choices
+          label={t('tableFirstPlayer')}
+          // '' = nenhum (sem local / não sei).
+          value={first ?? ''}
+          onChange={(v) => setFirst(v === '' ? null : v)}
+          options={[
             { id: null as string | null, name: t('tableUnknown') },
             ...players.map((id) => ({ id, name: nameOf(id) })),
-          ].map((p) => (
-            <Button
-              key={p.id ?? 'unknown'}
-              label={p.name}
-              variant="secondary"
-              accessibilityRole="radio"
-              accessibilityState={{ checked: first === p.id }}
-              selected={first === p.id}
-              onPress={() => setFirst(p.id)}
-            />
-          ))}
-        </View>
+          ].map((p) => ({ value: p.id ?? '', label: p.name }))}
+        />
         <TextField
           label={t('tableWinningTurn')}
           keyboardType="number-pad"

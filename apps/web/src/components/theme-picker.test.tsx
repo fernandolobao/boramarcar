@@ -34,6 +34,6 @@ describe('ThemePicker', () => {
     document.documentElement.dataset.theme = 'light';
     renderPicker();
     expect(screen.getByRole('radio', { name: 'Claro' })).toBeChecked();
-    expect(screen.getByRole('group', { name: 'Tema' })).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup', { name: 'Tema' })).toBeInTheDocument();
   });
 });

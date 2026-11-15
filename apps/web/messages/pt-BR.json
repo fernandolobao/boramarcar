@@ -1459,7 +1459,8 @@
     "splitNothing": "Escolha outra edição ou mude o acabamento para separar.",
     "splitDone": "{count, plural, =1 {1 cópia separada} other {# cópias separadas}}.",
     "addPrintDefault": "edição padrão (troque depois em Separar ou mudar cópias)",
-    "addPrintSkip": "Seguir com a edição padrão"
+    "addPrintSkip": "Seguir com a edição padrão",
+    "colorMode": "Como combinar as cores"
   },
   "push": {
     "created": {
