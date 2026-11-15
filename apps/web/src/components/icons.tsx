@@ -88,6 +88,9 @@ import {
   Users,
   X,
   type LucideIcon,
+  Dices,
+  Eye,
+  Lightbulb,
 } from 'lucide-react';
 
 export type { LucideIcon };
@@ -189,6 +192,9 @@ export const Icons = {
   mobile: Smartphone,
   accessible: Accessibility,
   privacy: ShieldCheck,
+  fun: Dices,
+  learn: Lightbulb,
+  transparency: Eye,
   email: Mail,
   feedback: MessageSquareText,
   pause: Pause,
