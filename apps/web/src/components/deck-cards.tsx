@@ -609,7 +609,7 @@ function AddCardForm({ deckId }: { deckId: string }) {
 
   return (
     <form
-      className="grid gap-3 rounded-xl bg-ink-50 p-4 sm:grid-cols-[2fr_1fr_6rem] lg:grid-cols-[2fr_1fr_6rem_auto_auto] lg:items-end dark:bg-ink-800/60"
+      className="grid gap-3 rounded-xl bg-ink-50 p-4 sm:grid-cols-[2fr_1fr_auto] lg:grid-cols-[2fr_1fr_auto_auto_auto] lg:items-end dark:bg-ink-800/60"
       aria-labelledby={`${id}-title`}
       onSubmit={(e) => {
         e.preventDefault();

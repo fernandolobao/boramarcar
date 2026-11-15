@@ -38,9 +38,10 @@ test.describe('partidas', () => {
     await form.getByLabel('A partida terminou empatada').uncheck();
     await form.getByRole('radio', { name: 'Venceu: Bia' }).check();
     await form.getByText('Mais detalhes (opcional)').click();
-    await form.getByLabel('Turno em que acabou').fill('11');
-    // O campo numérico confirma o valor ao sair dele.
-    await form.getByLabel('Turno em que acabou').blur();
+    // Pelo papel: os botões −/+ também têm o rótulo no nome. O valor é confirmado ao sair do campo.
+    const turn = form.getByRole('textbox', { name: 'Turno em que acabou' });
+    await turn.fill('11');
+    await turn.blur();
     await form.getByRole('button', { name: 'Salvar partida' }).click();
 
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
