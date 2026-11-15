@@ -21,7 +21,8 @@ test.describe('privacidade e dados', () => {
     const section = page.getByRole('region', { name: 'Privacidade e dados' });
     await expect(section.getByRole('link', { name: 'Baixar meus dados' })).toBeVisible();
     await expect(section.getByRole('button', { name: 'Excluir minha conta' })).toBeVisible();
-    await section.getByRole('radio', { name: 'Não permitir' }).check();
+    // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
+    await section.getByRole('radio', { name: 'Não permitir' }).check({ force: true });
     await expect(section.getByText('Escolha salva.')).toBeVisible();
 
     const download = page.waitForEvent('download');

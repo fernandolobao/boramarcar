@@ -163,7 +163,8 @@ test.describe('deck', () => {
     page,
   }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    await page.getByLabel('O deck todo').check();
+    // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
+    await page.getByLabel('O deck todo').check({ force: true });
     await page.getByRole('link', { name: 'Abrir folha para imprimir' }).click();
     await expect(page).toHaveURL(/imprimir\?which=all&page=a4/);
     await expect(page.getByRole('heading', { level: 1, name: 'Imprimir proxies' })).toBeVisible();

@@ -86,14 +86,15 @@ test.describe('tema', () => {
     await page.goto('/configuracoes');
     const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     const light = await bg();
-    await page.getByRole('radio', { name: 'Escuro' }).check();
+    // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
+    await page.getByRole('radio', { name: 'Escuro' }).check({ force: true });
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     expect(await bg()).not.toBe(light);
     await page.goto('/painel');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await page.goto('/configuracoes');
     await expect(page.getByRole('radio', { name: 'Escuro' })).toBeChecked();
-    await page.getByRole('radio', { name: 'Automático' }).check();
+    await page.getByRole('radio', { name: 'Automático' }).check({ force: true });
     await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.+/);
   });
 });

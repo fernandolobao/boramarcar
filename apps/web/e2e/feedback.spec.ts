@@ -13,7 +13,8 @@ test.describe('feedback', () => {
     await page.locator('a[href^="/feedback?de="]').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Enviar feedback' })).toBeVisible();
     await expect(page.getByText('Enviado a partir de: /ranking')).toBeVisible();
-    await page.getByLabel('Ideia ou sugestão').check();
+    // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
+    await page.getByLabel('Ideia ou sugestão').check({ force: true });
     await page.getByLabel('Mensagem').fill('Seria ótimo ver o ranking por temporada no celular.');
     await page.getByRole('button', { name: 'Enviar', exact: true }).click();
     await expect(page.getByText('Obrigado! Recebemos o seu feedback.')).toBeFocused();

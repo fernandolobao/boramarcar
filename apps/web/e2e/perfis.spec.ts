@@ -32,7 +32,8 @@ test.describe('perfis e conquistas', () => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto(`/decks/${E2E_IDS.deck}`);
     await page.getByText('Editar deck').click();
-    await page.getByRole('radio', { name: /Privado/ }).check();
+    // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
+    await page.getByRole('radio', { name: /Privado/ }).check({ force: true });
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Deck salvo.')).toBeVisible();
     await expect(page.getByText('Privado', { exact: true }).first()).toBeVisible();
@@ -40,7 +41,7 @@ test.describe('perfis e conquistas', () => {
     const decks = (await api.json()).player.decks as { id: string; visibility: string }[];
     expect(decks.find((d) => d.id === E2E_IDS.deck)?.visibility).toBe('private');
     // Volta ao padrão para não afetar os outros testes.
-    await page.getByRole('radio', { name: /Grupo/ }).check();
+    await page.getByRole('radio', { name: /Grupo/ }).check({ force: true });
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Deck salvo.')).toBeVisible();
   });
