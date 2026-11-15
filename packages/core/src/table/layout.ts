@@ -8,8 +8,11 @@ export type SeatRotation = 0 | 90 | 180 | 270;
 export interface TableLayout {
   /** Identificador estável (guardado no estado da mesa). */
   id: string;
+  /** Grade CSS (`grid-template-areas`); `.` é um canto vazio da mesa. */
   areas: string;
   columns: number;
+  /** Altura relativa de cada linha (padrão: todas iguais), para todos terem a mesma área. */
+  rows?: number[];
   /** Para cada jogador (na ordem da mesa): área da grade e rotação em graus. */
   seats: { area: string; rotate: SeatRotation }[];
 }
@@ -58,10 +61,45 @@ const LAYOUTS: Record<number, TableLayout[]> = {
     },
   ],
   3: [
+    // Como no Lotus: a grade de 4 com um canto vazio. Cada um tem um quarto da tela e os lados
+    // continuam alinhados com o meio do aparelho.
+    {
+      id: '3-sides-open-left',
+      areas: '". a" "c b"',
+      columns: 2,
+      seats: [
+        { area: 'a', rotate: RIGHT },
+        { area: 'b', rotate: RIGHT },
+        { area: 'c', rotate: LEFT },
+      ],
+    },
+    {
+      id: '3-sides-open-right',
+      areas: '"a ." "c b"',
+      columns: 2,
+      seats: [
+        { area: 'a', rotate: LEFT },
+        { area: 'b', rotate: RIGHT },
+        { area: 'c', rotate: LEFT },
+      ],
+    },
+    // Quem ocupa a largura toda fica com uma faixa mais baixa: a área é a mesma dos outros.
+    {
+      id: '3-top-sides',
+      areas: '"a a" "b c"',
+      columns: 2,
+      rows: [1, 2],
+      seats: [
+        { area: 'a', rotate: TOP },
+        { area: 'c', rotate: RIGHT },
+        { area: 'b', rotate: LEFT },
+      ],
+    },
     {
       id: '3-sides-bottom',
       areas: '"a b" "c c"',
       columns: 2,
+      rows: [2, 1],
       seats: [
         { area: 'a', rotate: LEFT },
         { area: 'b', rotate: RIGHT },
@@ -72,20 +110,11 @@ const LAYOUTS: Record<number, TableLayout[]> = {
       id: '3-top-bottom',
       areas: '"a a" "b c"',
       columns: 2,
+      rows: [1, 2],
       seats: [
         { area: 'a', rotate: TOP },
         { area: 'c', rotate: BOTTOM },
         { area: 'b', rotate: BOTTOM },
-      ],
-    },
-    {
-      id: '3-top-sides',
-      areas: '"a a" "b c"',
-      columns: 2,
-      seats: [
-        { area: 'a', rotate: TOP },
-        { area: 'c', rotate: RIGHT },
-        { area: 'b', rotate: LEFT },
       ],
     },
   ],
@@ -105,6 +134,7 @@ const LAYOUTS: Record<number, TableLayout[]> = {
       id: '4-cross',
       areas: '"a a" "b c" "d d"',
       columns: 2,
+      rows: [1, 2, 1],
       seats: [
         { area: 'a', rotate: TOP },
         { area: 'c', rotate: RIGHT },
@@ -125,10 +155,36 @@ const LAYOUTS: Record<number, TableLayout[]> = {
     },
   ],
   5: [
+    // Grade de 6 com um canto vazio, como no Lotus.
+    {
+      id: '5-sides-open-left',
+      areas: '"a b" "e c" ". d"',
+      columns: 2,
+      seats: [
+        { area: 'a', rotate: LEFT },
+        { area: 'b', rotate: RIGHT },
+        { area: 'c', rotate: RIGHT },
+        { area: 'd', rotate: RIGHT },
+        { area: 'e', rotate: LEFT },
+      ],
+    },
+    {
+      id: '5-sides-open-right',
+      areas: '"a b" "e c" "d ."',
+      columns: 2,
+      seats: [
+        { area: 'a', rotate: LEFT },
+        { area: 'b', rotate: RIGHT },
+        { area: 'c', rotate: RIGHT },
+        { area: 'd', rotate: LEFT },
+        { area: 'e', rotate: LEFT },
+      ],
+    },
     {
       id: '5-sides-bottom',
       areas: '"a b" "c d" "e e"',
       columns: 2,
+      rows: [2, 2, 1],
       seats: [
         { area: 'a', rotate: LEFT },
         { area: 'b', rotate: RIGHT },
@@ -141,6 +197,7 @@ const LAYOUTS: Record<number, TableLayout[]> = {
       id: '5-top-sides',
       areas: '"a a" "b c" "d e"',
       columns: 2,
+      rows: [1, 2, 2],
       seats: [
         { area: 'a', rotate: TOP },
         { area: 'c', rotate: RIGHT },
@@ -168,6 +225,7 @@ const LAYOUTS: Record<number, TableLayout[]> = {
       id: '6-ends-sides',
       areas: '"a a" "b c" "d e" "f f"',
       columns: 2,
+      rows: [1, 2, 2, 1],
       seats: [
         { area: 'a', rotate: TOP },
         { area: 'c', rotate: RIGHT },
@@ -245,12 +303,20 @@ export const SEAT_COLORS = ['#5b21b6', '#1d4ed8', '#047857', '#b91c1c', '#b45309
 
 /**
  * A mesma disposição em linhas, para telas sem grade CSS (app): cada linha lista os índices dos
- * jogadores da esquerda para a direita.
+ * jogadores da esquerda para a direita; `-1` é um canto vazio.
  */
 export function tableRows(count: number, layout: TableLayout = tableLayout(count)): number[][] {
-  return [...layout.areas.matchAll(/"([^"]*)"/g)].map((match) =>
-    [...new Set(match[1]!.trim().split(/\s+/))].map((area) =>
-      layout.seats.findIndex((s) => s.area === area),
-    ),
-  );
+  return [...layout.areas.matchAll(/"([^"]*)"/g)].map((match) => {
+    const cells = match[1]!.trim().split(/\s+/);
+    // Uma área que ocupa várias colunas vira um item só; cada `.` é um vazio.
+    return cells
+      .filter((area, i) => area === '.' || cells.indexOf(area) === i)
+      .map((area) => (area === '.' ? -1 : layout.seats.findIndex((s) => s.area === area)));
+  });
+}
+
+/** Altura relativa de cada linha da disposição (todas iguais quando a disposição não diz). */
+export function tableRowWeights(layout: TableLayout): number[] {
+  const count = [...layout.areas.matchAll(/"([^"]*)"/g)].length;
+  return layout.rows ?? Array.from({ length: count }, () => 1);
 }

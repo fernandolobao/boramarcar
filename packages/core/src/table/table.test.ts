@@ -5,6 +5,7 @@ import {
   tableLayout,
   tableLayouts,
   tableRows,
+  tableRowWeights,
   alivePlayers,
   createTable,
   defeatReason,
@@ -126,12 +127,20 @@ describe('modo mesa', () => {
 describe('disposição em linhas (app)', () => {
   it('segue a mesma grade do site, em sentido horário', () => {
     expect(tableRows(2)).toEqual([[0], [1]]);
-    expect(tableRows(3)).toEqual([[0, 1], [2]]);
+    // 3 jogadores, como no Lotus: grade 2×2 com um canto vazio (-1).
+    expect(tableRows(3)).toEqual([
+      [-1, 0],
+      [2, 1],
+    ]);
     expect(tableRows(4)).toEqual([
       [0, 1],
       [3, 2],
     ]);
-    expect(tableRows(5)).toEqual([[0, 1], [4, 2], [3]]);
+    expect(tableRows(5)).toEqual([
+      [0, 1],
+      [4, 2],
+      [-1, 3],
+    ]);
     expect(tableRows(6)).toEqual([
       [0, 1],
       [5, 2],
@@ -172,10 +181,46 @@ describe('disposição da mesa', () => {
         const areas = new Set(layout.areas.match(/[a-z]/g));
         expect(new Set(layout.seats.map((s) => s.area))).toEqual(areas);
         const rows = tableRows(count, layout);
-        expect(rows.flat().sort()).toEqual([...Array(count).keys()]);
+        expect(
+          rows
+            .flat()
+            .filter((i) => i >= 0)
+            .sort(),
+        ).toEqual([...Array(count).keys()]);
+        expect(tableRowWeights(layout)).toHaveLength(rows.length);
         for (const row of rows) expect(row.length).toBeLessThanOrEqual(layout.columns);
       }
     }
+  });
+
+  it('ninguém tem área maior que os outros (o aparelho fica no meio da mesa)', () => {
+    for (const count of [2, 3, 4, 5, 6]) {
+      for (const layout of tableLayouts(count)) {
+        const weights = tableRowWeights(layout);
+        const rows = [...layout.areas.matchAll(/"([^"]*)"/g)].map((m) => m[1]!.trim().split(/\s+/));
+        const area = (name: string) =>
+          rows.reduce(
+            (sum, cells, r) =>
+              sum + (cells.filter((c) => c === name).length * weights[r]!) / cells.length,
+            0,
+          );
+        const sizes = layout.seats.map((s) => area(s.area));
+        expect(new Set(sizes.map((x) => x.toFixed(6))).size, layout.id).toBe(1);
+      }
+    }
+  });
+
+  it('3 jogadores: a padrão é a grade 2×2 com um canto vazio, e as antigas continuam válidas', () => {
+    expect(tableLayout(3).id).toBe('3-sides-open-left');
+    expect(tableLayouts(3).map((l) => l.id)).toEqual(
+      expect.arrayContaining([
+        '3-sides-open-right',
+        '3-sides-bottom',
+        '3-top-bottom',
+        '3-top-sides',
+      ]),
+    );
+    expect(tableRowWeights(tableLayout(3, '3-sides-bottom'))).toEqual([2, 1]);
   });
 
   it('a padrão continua a mesma; layoutId e giros por assento mudam a disposição', () => {
