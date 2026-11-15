@@ -9,6 +9,7 @@ import {
   tableLayouts,
   tableResult,
   tableRows,
+  tableRowWeights,
   tableLayout,
   type SeatRotation,
   type TableAction,
@@ -402,6 +403,7 @@ function LayoutPreview({
 }) {
   const colors = useColors();
   const rows = tableRows(count, layout);
+  const weights = tableRowWeights(layout);
   const sides = layout.seats.map((s) => t(SIDE_LABEL[s.rotate])).join(', ');
   return (
     <Pressable
@@ -416,26 +418,31 @@ function LayoutPreview({
     >
       <View style={{ flex: 1, gap: 3 }} importantForAccessibility="no-hide-descendants">
         {rows.map((row, r) => (
-          <View key={r} style={{ flex: 1, flexDirection: 'row', gap: 3 }}>
-            {row.map((i) => (
-              <View
-                key={i}
-                style={[
-                  board.previewCell,
-                  { backgroundColor: SEAT_COLORS[i % SEAT_COLORS.length] },
-                ]}
-              >
-                <Text
+          <View key={r} style={{ flex: weights[r], flexDirection: 'row', gap: 3 }}>
+            {row.map((i, c) =>
+              i < 0 ? (
+                // Canto vazio da mesa.
+                <View key={`vazio-${c}`} style={board.previewCell} />
+              ) : (
+                <View
+                  key={i}
                   style={[
-                    board.previewText,
-                    { transform: [{ rotate: `${layout.seats[i]!.rotate}deg` }] },
+                    board.previewCell,
+                    { backgroundColor: SEAT_COLORS[i % SEAT_COLORS.length] },
                   ]}
-                  allowFontScaling={false}
                 >
-                  40
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={[
+                      board.previewText,
+                      { transform: [{ rotate: `${layout.seats[i]!.rotate}deg` }] },
+                    ]}
+                    allowFontScaling={false}
+                  >
+                    40
+                  </Text>
+                </View>
+              ),
+            )}
           </View>
         ))}
       </View>
@@ -599,8 +606,10 @@ export function TableBoard({
     <View style={[StyleSheet.absoluteFill, { backgroundColor: '#09090b' }]}>
       <SafeAreaView style={{ flex: 1, gap: 4, padding: 4 }}>
         {tableRows(state.players.length, layout).map((row, r) => (
-          <View key={r} style={{ flex: 1, flexDirection: 'row', gap: 4 }}>
-            {row.map((index) => {
+          <View key={r} style={{ flex: tableRowWeights(layout)[r], flexDirection: 'row', gap: 4 }}>
+            {row.map((index, c) => {
+              // Canto vazio da mesa (ex.: 3 jogadores na grade de 4).
+              if (index < 0) return <View key={`vazio-${c}`} style={{ flex: 1 }} />;
               const player = state.players[index]!;
               return (
                 <Rotated key={player.userId} rotate={layout.seats[index]!.rotate}>
