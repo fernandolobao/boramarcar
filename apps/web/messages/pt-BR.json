@@ -135,7 +135,7 @@
     "manage": "Gerenciar",
     "attendance": {
       "title": "Quem anda sumido",
-      "hint": "Só o dono e os admins veem esta lista. Presença nos últimos 8 encontros que já aconteceram.",
+      "hint": "Só o dono e os admins veem esta lista. Presença nos últimos 8 encontros que já aconteceram: conta quem marcou \"Vou\" ou jogou alguma partida.",
       "caption": "Presença nos últimos encontros",
       "person": "Pessoa",
       "attendance": "Presença",

@@ -135,7 +135,7 @@
     "manage": "Manage",
     "attendance": {
       "title": "Who's been missing",
-      "hint": "Only the owner and admins see this list. Attendance at the last 8 meetups that already happened.",
+      "hint": "Only the owner and admins see this list. Attendance at the last 8 meetups that already happened: counts whoever said \"Going\" or played a game.",
       "caption": "Attendance at recent meetups",
       "person": "Person",
       "attendance": "Attendance",

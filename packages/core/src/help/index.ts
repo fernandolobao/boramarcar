@@ -152,7 +152,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'quem-anda-sumido',
             question: 'Como chamo de volta quem anda sumido?',
             intro: [
-              'O dono e os admins do grupo veem, na tela do Grupo, a lista "Quem anda sumido": a presença de cada pessoa nos últimos 8 encontros, a última partida e há quantas semanas ela não aparece (quem faltou os 4 últimos encontros e não joga há um mês). Os outros membros não veem essa lista.',
+              'O dono e os admins do grupo veem, na tela do Grupo, a lista "Quem anda sumido": a presença de cada pessoa nos últimos 8 encontros (conta quem marcou "Vou" ou jogou alguma partida), a última partida e há quantas semanas ela não aparece (quem faltou os 4 últimos encontros e não joga há um mês). Os outros membros não veem essa lista.',
             ],
             steps: [
               'Marque o próximo encontro.',
@@ -272,6 +272,9 @@ export const HELP: Record<HelpLocale, HelpContent> = {
           {
             id: 'avisos-celular',
             question: 'Como recebo avisos no celular?',
+            intro: [
+              'Na primeira vez que você confirma presença num encontro pelo app, ele pergunta se quer ligar os avisos. Se preferir depois:',
+            ],
             steps: [
               'No app, abra Conta e ligue "Avisos neste celular".',
               'Aceite a permissão do sistema. Você passa a receber encontro novo, mudança, cancelamento, lembrete no dia e "a mesa fechou!".',
@@ -432,7 +435,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'quem-anda-sumido',
             question: "How do I bring back someone who's been missing?",
             intro: [
-              "The group owner and admins see, on the Group screen, the \"Who's been missing\" list: each person's attendance at the last 8 meetups, their last game and how many weeks they haven't shown up (whoever missed the last 4 meetups and hasn't played for a month). Other members don't see this list.",
+              "The group owner and admins see, on the Group screen, the \"Who's been missing\" list: each person's attendance at the last 8 meetups (counting whoever said \"Going\" or played a game), their last game and how many weeks they haven't shown up (whoever missed the last 4 meetups and hasn't played for a month). Other members don't see this list.",
             ],
             steps: [
               'Schedule the next meetup.',
@@ -552,6 +555,9 @@ export const HELP: Record<HelpLocale, HelpContent> = {
           {
             id: 'avisos-celular',
             question: 'How do I get notifications on my phone?',
+            intro: [
+              'The first time you RSVP to a meetup in the app, it asks whether you want to turn on notifications. If you prefer to do it later:',
+            ],
             steps: [
               'In the app, open Account and turn on "Notifications on this phone".',
               'Accept the system permission. You’ll get new meetup, changes, cancellation, a reminder on the day and "the table filled up!".',

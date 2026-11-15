@@ -219,6 +219,26 @@ describe('quem anda sumido e chamar para o próximo', () => {
     ).resolves.toBeTruthy();
   });
 
+  it('quem jogou uma partida do encontro conta como presente, mesmo sem ter confirmado', async () => {
+    const { group, owner, away, past, later } = await setup();
+    await recordGame(db, {
+      eventId: past.id,
+      userId: owner.id,
+      playedAt: new Date(past.startsAt.getTime() + 3600_000),
+      players: [
+        { userId: owner.id, result: 'loss' },
+        { userId: away.id, result: 'win' },
+      ],
+    });
+    const result = await getGroupAttendance(db, {
+      groupId: group.id,
+      userId: owner.id,
+      now: later,
+    });
+    const row = result.members.find((m) => m.userId === away.id)!;
+    expect(row).toMatchObject({ attended: 1, of: 1 });
+  });
+
   it('chama uma vez por pessoa por encontro, só para encontro marcado e futuro do grupo', async () => {
     const { group, owner, member, away, past, next, later } = await setup();
     const call = (over: Partial<Parameters<typeof nudgeMember>[1]> = {}) =>
