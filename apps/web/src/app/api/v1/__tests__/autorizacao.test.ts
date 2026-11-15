@@ -42,6 +42,7 @@ const r = {
   sync: await import('../decks/[deckId]/sync/route'),
   eventGames: await import('../events/[eventId]/games/route'),
   ics: await import('../events/[eventId]/ics/route'),
+  pairings: await import('../events/[eventId]/pairings/route'),
   event: await import('../events/[eventId]/route'),
   rsvp: await import('../events/[eventId]/rsvp/route'),
   table: await import('../events/[eventId]/table/route'),
@@ -410,6 +411,7 @@ const outsiderCases: Case[] = [
   ],
   ['GET encontro: .ics', r.ics.GET as Handler, 'GET', () => ({ eventId: ids.event! })],
   ['GET encontro: mesa', r.table.GET as Handler, 'GET', () => ({ eventId: ids.event! })],
+  ['GET encontro: pares', r.pairings.GET as Handler, 'GET', () => ({ eventId: ids.event! })],
   [
     'PUT encontro: presença',
     r.rsvp.PUT as Handler,

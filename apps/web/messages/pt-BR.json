@@ -252,7 +252,15 @@
     "durationSummary": "{minutes} min",
     "firstSummary": "{name} começou",
     "commanderArt": "Arte de {name}",
-    "winnersLabel": "{count, plural, =1 {Vencedor} other {Vencedores}}:"
+    "winnersLabel": "{count, plural, =1 {Vencedor} other {Vencedores}}:",
+    "tables": {
+      "title": "Sugestão de mesas",
+      "hint": "Para misturar a mesa: junta quem menos jogou junto. É só uma sugestão, nada muda nas presenças.",
+      "table": "Mesa {number}",
+      "newPairs": "{count, plural, =0 {Todos já jogaram juntos} one {1 dupla que nunca jogou junta} other {# duplas que nunca jogaram juntas}}",
+      "reroll": "Sortear de novo",
+      "rerolled": "Nova sugestão de mesas."
+    }
   },
   "ranking": {
     "title": "Ranking",

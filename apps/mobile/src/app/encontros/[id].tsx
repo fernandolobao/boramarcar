@@ -5,6 +5,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { ConfirmButton } from '@/components/confirm-button';
 import { EventRecap, FinishEvent } from '@/components/event-finish';
 import { EventManage, ShareEvent } from '@/components/event-manage';
+import { TableSuggestions } from '@/components/table-suggestions';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
@@ -136,6 +137,13 @@ export default function EventScreen() {
           </AppText>
         ))}
       </Card>
+
+      {e.status === 'scheduled' && (
+        <TableSuggestions
+          eventId={e.id}
+          confirmed={e.participants.filter((p) => p.rsvp === 'yes').length}
+        />
+      )}
 
       {e.games.length > 0 && (
         <Card>

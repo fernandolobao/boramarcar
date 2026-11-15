@@ -387,3 +387,9 @@ sem rolagem horizontal em 320px.
 
 - Os quatro valores são uma lista (`<ul>`) com títulos `<h3>` sob o `<h2>` da seção; ícones decorativos (`aria-hidden`), o texto carrega o sentido. O destaque da diversão é só visual (faixa e tamanho), sem depender de cor.
 - "Ver a metodologia" é um link âncora para a seção da metodologia, com texto que diz o destino. 320 px sem rolagem horizontal, temas claro e escuro conferidos.
+
+## Encontro: sugestão de mesas (15/11/2026)
+
+- Site: `<section>` com `<h2>`; mesas numa lista, cada uma com `<h3>` ("Mesa 1") e os nomes em lista; "N duplas que nunca jogaram juntas" em texto. "Sortear de novo" é `<button type="button">` com ícone decorativo e anuncia "Nova sugestão de mesas." numa região `role="status"`.
+- App: cartão com cabeçalhos (`accessibilityRole="header"`), nomes em texto e o aviso do novo sorteio em `accessibilityLiveRegion="polite"`.
+- axe sem violações no componente (`a11y.test.tsx`).

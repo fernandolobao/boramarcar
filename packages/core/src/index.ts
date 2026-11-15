@@ -16,3 +16,4 @@ export * from './help';
 export * from './collection';
 export * from './external';
 export * from './beta';
+export * from './integration';
