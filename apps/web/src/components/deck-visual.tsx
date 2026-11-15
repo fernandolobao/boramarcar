@@ -12,6 +12,7 @@ import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { ManaSymbol } from './mana';
+import { Choices } from './ds/choices';
 
 const COLOR_ORDER = ['W', 'U', 'B', 'R', 'G'] as const;
 
@@ -98,32 +99,20 @@ export function DeckSettingsForm({
           ))}
         </select>
       </div>
-      <fieldset className="sm:col-span-3">
-        <legend className="label">{t('visibilityLabel')}</legend>
-        <div className="grid gap-2 sm:grid-cols-3">
-          {DECK_VISIBILITIES.map((v) => (
-            <label
-              key={v}
-              className="flex items-start gap-2 rounded-xl border border-ink-300 p-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20"
-            >
-              <input
-                type="radio"
-                name="deck-visibility"
-                className="mt-0.5"
-                checked={values.visibility === v}
-                onChange={() => setValues((s) => ({ ...s, visibility: v }))}
-              />
-              <span>
-                <span className="flex items-center gap-1.5 font-medium">
-                  <Icon name={v} />
-                  {t(`visibility.${v}`)}
-                </span>
-                <span className="muted block">{t(`visibilityHint.${v}`)}</span>
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <Choices
+        className="sm:col-span-3"
+        label={t('visibilityLabel')}
+        variant="cards"
+        name="deck-visibility"
+        value={values.visibility}
+        onChange={(v) => setValues((s) => ({ ...s, visibility: v }))}
+        options={DECK_VISIBILITIES.map((v) => ({
+          value: v,
+          label: t(`visibility.${v}`),
+          description: t(`visibilityHint.${v}`),
+        }))}
+        icons={Object.fromEntries(DECK_VISIBILITIES.map((v) => [v, <Icon key={v} name={v} />]))}
+      />
       <button className="btn-primary" disabled={pending}>
         <Icon name="save" />
         {tc('save')}

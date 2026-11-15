@@ -1,6 +1,7 @@
 'use client';
 
 import type { ChoicesProps } from '@boramarcar/ui';
+import type { ReactNode } from 'react';
 import { FieldError, Label, Radio, RadioGroup, Text } from 'react-aria-components';
 
 /**
@@ -19,8 +20,11 @@ export function Choices<T extends string>({
   name,
   variant = 'chips',
   hideLabel = false,
+  icons,
   className,
 }: ChoicesProps<T> & {
+  /** Ícone decorativo antes do texto de cada opção (só no site; o texto continua sendo o nome). */
+  icons?: Partial<Record<T, ReactNode>>;
   name?: string;
   variant?: 'chips' | 'cards';
   /** Rótulo só para leitor de tela (quando já há um título visível ao lado). */
@@ -64,6 +68,7 @@ export function Choices<T extends string>({
                     className={`size-4 shrink-0 rounded-full border-2 ${isSelected ? 'border-primary bg-primary ring-2 ring-inset ring-surface' : 'border-line-strong'}`}
                   />
                 )}
+                {icons?.[o.value]}
                 <span>
                   {o.label}
                   {o.description && (

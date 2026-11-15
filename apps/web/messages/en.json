@@ -1459,7 +1459,8 @@
     "splitNothing": "Choose another printing or change the finish to split.",
     "splitDone": "{count, plural, =1 {1 copy split off} other {# copies split off}}.",
     "addPrintDefault": "default printing (change it later in Split or change copies)",
-    "addPrintSkip": "Continue with the default printing"
+    "addPrintSkip": "Continue with the default printing",
+    "colorMode": "How to match colors"
   },
   "push": {
     "created": {

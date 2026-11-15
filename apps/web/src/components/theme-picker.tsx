@@ -1,9 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useId, useState, useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { THEME_STORAGE_KEY } from '@/lib/theme';
 import { Icon, type IconName } from './icons';
+import { Choices } from './ds/choices';
 
 export const THEMES = ['system', 'light', 'dark'] as const;
 export type Theme = (typeof THEMES)[number];
@@ -35,7 +36,6 @@ export function applyTheme(theme: Theme) {
 /** Escolha do tema (Automático/Claro/Escuro) como grupo de rádios nativo. */
 export function ThemePicker() {
   const t = useTranslations('settings');
-  const id = useId();
   // No servidor não há preferência: mostra "Automático" até hidratar.
   const initial = useSyncExternalStore(
     () => () => {},
@@ -45,31 +45,17 @@ export function ThemePicker() {
   const [chosen, setChosen] = useState<Theme | null>(null);
   const theme = chosen ?? initial;
   return (
-    <fieldset aria-describedby={`${id}-hint`}>
-      <legend className="section-title">{t('theme')}</legend>
-      <p className="muted mb-3 text-sm" id={`${id}-hint`}>
-        {t('themeHint')}
-      </p>
-      <div className="grid gap-2 sm:grid-cols-3">
-        {THEMES.map((value) => (
-          <label
-            key={value}
-            className="flex items-center gap-2 rounded-xl border border-ink-300 p-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20"
-          >
-            <input
-              type="radio"
-              name={`${id}-theme`}
-              checked={theme === value}
-              onChange={() => {
-                applyTheme(value);
-                setChosen(value);
-              }}
-            />
-            <Icon name={ICON[value]} />
-            {t(`themes.${value}`)}
-          </label>
-        ))}
-      </div>
-    </fieldset>
+    <Choices
+      label={t('theme')}
+      description={t('themeHint')}
+      variant="cards"
+      value={theme}
+      onChange={(value) => {
+        applyTheme(value);
+        setChosen(value);
+      }}
+      options={THEMES.map((value) => ({ value, label: t(`themes.${value}`) }))}
+      icons={Object.fromEntries(THEMES.map((v) => [v, <Icon key={v} name={ICON[v]} />]))}
+    />
   );
 }

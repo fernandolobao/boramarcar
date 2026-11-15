@@ -30,6 +30,7 @@ import {
 } from './use-table';
 import { KEEP_AWAKE_MP4, KEEP_AWAKE_WEBM } from './keep-awake-media';
 import { NumberField } from '../ds/number-field';
+import { Choices } from '../ds/choices';
 
 export interface TablePlayerOption {
   userId: string;
@@ -321,41 +322,27 @@ function Finish({
           );
         }}
       >
-        <fieldset>
-          <legend className="label">{t('winner')}</legend>
-          <p className="muted mb-2 text-sm">{t('winnerHint')}</p>
-          <ul className="space-y-2">
-            {state.players.map((p) => (
-              <li key={p.userId}>
-                <label className="flex min-h-11 items-center gap-2 rounded-xl border border-ink-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20">
-                  <input
-                    type="radio"
-                    name={`${id}-winner`}
-                    required
-                    checked={winner === p.userId}
-                    onChange={() => setWinner(p.userId)}
-                  />
-                  <span className="font-medium">{p.name}</span>
-                  <span className="muted">
-                    · {t('lifeShort', { life: p.life })}
-                    {order.has(p.userId) && ` · ${t('outOrder', { order: order.get(p.userId)! })}`}
-                  </span>
-                </label>
-              </li>
-            ))}
-            <li>
-              <label className="flex min-h-11 items-center gap-2 rounded-xl border border-ink-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20">
-                <input
-                  type="radio"
-                  name={`${id}-winner`}
-                  checked={winner === 'draw'}
-                  onChange={() => setWinner('draw')}
-                />
-                {t('draw')}
-              </label>
-            </li>
-          </ul>
-        </fieldset>
+        <Choices
+          label={t('winner')}
+          description={t('winnerHint')}
+          variant="cards"
+          orientation="vertical"
+          value={winner || null}
+          onChange={setWinner}
+          options={[
+            ...state.players.map((p) => ({
+              value: p.userId,
+              label: p.name,
+              description: [
+                t('lifeShort', { life: p.life }),
+                order.has(p.userId) ? t('outOrder', { order: order.get(p.userId)! }) : null,
+              ]
+                .filter(Boolean)
+                .join(' · '),
+            })),
+            { value: 'draw', label: t('draw') },
+          ]}
+        />
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="label" htmlFor={`${id}-first`}>

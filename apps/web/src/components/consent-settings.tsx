@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useState, useSyncExternalStore } from 'react';
 import { CONSENT_EVENT, consentFromCookies, saveConsent, type Consent } from '@/lib/consent';
+import { Choices } from './ds/choices';
 
 function subscribe(onChange: () => void) {
   window.addEventListener(CONSENT_EVENT, onChange);
@@ -33,21 +34,19 @@ export function ConsentSettings() {
           ),
         })}
       </p>
-      {(['accepted', 'rejected'] as const).map((value) => (
-        <label key={value} className="flex min-h-6 items-center gap-2 text-sm">
-          <input
-            type="radio"
-            name="consent"
-            value={value}
-            checked={consent === value}
-            onChange={() => {
-              saveConsent(value);
-              setSaved(true);
-            }}
-          />
-          {t(value === 'accepted' ? 'optionAccept' : 'optionReject')}
-        </label>
-      ))}
+      <Choices
+        label={t('settingsTitle')}
+        hideLabel
+        value={consent ?? null}
+        onChange={(value) => {
+          saveConsent(value);
+          setSaved(true);
+        }}
+        options={[
+          { value: 'accepted', label: t('optionAccept') },
+          { value: 'rejected', label: t('optionReject') },
+        ]}
+      />
       <p role="status" className="text-sm text-success">
         {saved ? t('saved') : ''}
       </p>
