@@ -406,6 +406,12 @@ sem rolagem horizontal em 320px.
 - O botão só aparece para quem ainda não confirmou o próximo encontro (e nunca para você).
 - axe sem violações no componente (`a11y.test.tsx`).
 
+## Guia do primeiro acesso (15/11/2026)
+
+- Site (`/boas-vindas`): um `<h1>` por passo, que recebe o foco ao abrir (o leitor de tela anuncia o passo novo); "Passo N de 3" em texto; "Pular o guia" sempre visível como `<button>`; "Continuar" e "Pular este passo" como links; formulários reaproveitados (já auditados). `generateMetadata` com título e `noindex`. Conferido em 1280 e 320 px, sem rolagem horizontal; no E2E de acessibilidade entram os quatro passos.
+- App: título com `accessibilityRole="header"`, passo em texto, "Pular o guia" em todas as telas e aviso de disponibilidade salva em região viva.
+- Nunca bloqueia: sem rede, o app segue sem abrir o guia; pular grava a escolha e não pergunta de novo.
+
 ## App: oferta de avisos ao confirmar presença (15/11/2026)
 
 - Cartão dentro do encontro (não é pop-up): título como cabeçalho, texto que explica o que chega, "Ligar avisos" e "Agora não" como botões com nome; o pedido de permissão do sistema só vem depois de a pessoa tocar em "Ligar avisos". Resultado em região viva; negado no sistema vira alerta com "Abrir configurações do celular".

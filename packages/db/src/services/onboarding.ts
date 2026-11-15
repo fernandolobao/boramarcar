@@ -1,6 +1,7 @@
 import { and, count, eq, gt } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
+  user,
   availabilityRules,
   availabilitySlots,
   decks,
@@ -17,6 +18,7 @@ import {
 export const ONBOARDING_FLAGS = [
   'checklist-dismissed',
   'guide-skipped',
+  'guide-completed',
   'beta-banner-dismissed',
 ] as const;
 export type OnboardingFlag = (typeof ONBOARDING_FLAGS)[number];
@@ -89,4 +91,29 @@ export async function markOnboarding(
     .insert(onboardingSteps)
     .values({ userId: input.userId, step: input.flag })
     .onConflictDoNothing();
+}
+
+/**
+ * Lançamento do guia do primeiro acesso (7.1): só contas criadas a partir daqui são levadas a ele
+ * sozinhas; quem já usava o app abre pelo "Ver o guia de novo".
+ */
+export const GUIDE_LAUNCH = new Date('2026-11-16T03:00:00Z');
+
+/** Se o guia deve abrir sozinho, se a pessoa já o concluiu ou pulou e se já está num grupo. */
+export async function getGuideState(db: Database, input: { userId: string }) {
+  const [account] = await db
+    .select({ createdAt: user.createdAt })
+    .from(user)
+    .where(eq(user.id, input.userId))
+    .limit(1);
+  const [flags, memberships] = await Promise.all([
+    db
+      .select({ step: onboardingSteps.step })
+      .from(onboardingSteps)
+      .where(eq(onboardingSteps.userId, input.userId)),
+    db.select({ n: count() }).from(groupMembers).where(eq(groupMembers.userId, input.userId)),
+  ]);
+  const done = flags.some((f) => f.step === 'guide-completed' || f.step === 'guide-skipped');
+  const isNew = Boolean(account && account.createdAt >= GUIDE_LAUNCH);
+  return { show: !done && isNew, done, hasGroup: (memberships[0]?.n ?? 0) > 0 };
 }

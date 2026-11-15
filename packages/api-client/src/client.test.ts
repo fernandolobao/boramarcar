@@ -857,4 +857,18 @@ describe('cliente da API', () => {
     );
     expect(JSON.parse(fetchMock.mock.calls[1]![1].body)).toEqual({ eventId: 'e1' });
   });
+
+  it('estado do guia do primeiro acesso', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ guide: { show: true, done: false, hasGroup: false } }))
+      .mockResolvedValueOnce(json({ flag: 'guide-completed' }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.me.onboarding()).toEqual({ show: true, done: false, hasGroup: false });
+    await api.me.markOnboarding('guide-completed');
+    expect(JSON.parse(fetchMock.mock.calls[1]![1].body)).toEqual({ flag: 'guide-completed' });
+  });
 });

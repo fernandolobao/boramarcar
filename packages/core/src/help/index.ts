@@ -65,6 +65,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Quem cria o grupo vira dono(a) e pode promover admins, remover pessoas e passar a posse. Se o link vazar, gere um novo convite: o antigo deixa de funcionar.',
             ],
           },
+          {
+            id: 'guia',
+            question: 'Como vejo o guia de boas-vindas de novo?',
+            intro: [
+              'O guia abre sozinho no seu primeiro acesso: seu grupo, fuso e idioma, e quando você pode jogar. Dá para pular em qualquer passo. Para ver de novo: no site, "Ver o guia de novo" nos primeiros passos do painel; no app, Conta → "Ver o guia de novo".',
+            ],
+          },
         ],
       },
       {
@@ -332,6 +339,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
             notes: [
               'Whoever creates the group becomes the owner and can promote admins, remove people and transfer ownership. If the link leaks, generate a new invite: the old one stops working.',
+            ],
+          },
+          {
+            id: 'guia',
+            question: 'How do I see the welcome guide again?',
+            intro: [
+              'The guide opens by itself the first time you sign in: your group, time zone and language, and when you can play. You can skip it at any step. To see it again: on the website, "See the guide again" in the first steps on the dashboard; in the app, Account → "See the guide again".',
             ],
           },
         ],

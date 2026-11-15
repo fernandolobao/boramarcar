@@ -23,15 +23,18 @@ export function AddAvailability({
   groupId,
   locations,
   onAdded,
+  initialFrequency = 'once',
 }: {
   groupId: string;
   locations: Location[];
   onAdded: () => void;
+  /** O guia do primeiro acesso começa em "toda semana". */
+  initialFrequency?: 'once' | 'weekly';
 }) {
   const colors = useColors();
   const timeZone = deviceTimeZone();
   const days = nextDays(14, timeZone);
-  const [frequency, setFrequency] = useState<'once' | 'weekly'>('once');
+  const [frequency, setFrequency] = useState<'once' | 'weekly'>(initialFrequency);
   const [day, setDay] = useState(days[0]!);
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [start, setStart] = useState('19:00');

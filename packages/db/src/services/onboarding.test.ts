@@ -4,7 +4,10 @@ import { createTestDb } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { createEvent, setRsvp } from './events';
 import { getInvitePreview } from './groups';
-import { getOnboardingChecklist, markOnboarding } from './onboarding';
+import { eq } from 'drizzle-orm';
+import { user } from '../schema';
+import { createTestUser } from '../testing';
+import { getGuideState, getOnboardingChecklist, GUIDE_LAUNCH, markOnboarding } from './onboarding';
 import { deleteUserAccount, exportUserData } from './privacy';
 
 let db: Database;
@@ -66,5 +69,45 @@ describe('onboarding', () => {
     expect(preview!.nextEvent).toMatchObject({ title: 'Sexta de Commander' });
     expect(JSON.stringify(preview)).not.toContain('@');
     expect(await getInvitePreview(db, 'NAOEXISTE')).toBeNull();
+  });
+});
+
+describe('guia do primeiro acesso', () => {
+  const after = new Date(GUIDE_LAUNCH.getTime() + 3600_000);
+  const before = new Date(GUIDE_LAUNCH.getTime() - 3600_000);
+  const userCreatedAt = (id: string, at: Date) =>
+    db.update(user).set({ createdAt: at }).where(eq(user.id, id));
+
+  it('abre sozinho para conta nova até ela concluir ou pular', async () => {
+    const fresh = await createTestUser(db, { name: 'Nova' });
+    await userCreatedAt(fresh.id, after);
+    expect(await getGuideState(db, { userId: fresh.id })).toEqual({
+      show: true,
+      done: false,
+      hasGroup: false,
+    });
+    await markOnboarding(db, { userId: fresh.id, flag: 'guide-skipped' });
+    expect(await getGuideState(db, { userId: fresh.id })).toMatchObject({
+      show: false,
+      done: true,
+    });
+
+    const other = await createTestUser(db, { name: 'Outra' });
+    await userCreatedAt(other.id, after);
+    await markOnboarding(db, { userId: other.id, flag: 'guide-completed' });
+    expect(await getGuideState(db, { userId: other.id })).toMatchObject({
+      show: false,
+      done: true,
+    });
+  });
+
+  it('conta de antes do lançamento não é levada ao guia; hasGroup segue a participação', async () => {
+    const { owner } = await seedGroup(db, 1);
+    await userCreatedAt(owner.id, before);
+    expect(await getGuideState(db, { userId: owner.id })).toEqual({
+      show: false,
+      done: false,
+      hasGroup: true,
+    });
   });
 });

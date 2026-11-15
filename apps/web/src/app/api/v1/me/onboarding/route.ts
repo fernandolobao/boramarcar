@@ -1,4 +1,4 @@
-import { markOnboarding, ONBOARDING_FLAGS } from '@boramarcar/db';
+import { getGuideState, markOnboarding, ONBOARDING_FLAGS } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
 
@@ -10,3 +10,8 @@ export const POST = authed(async ({ req, db, user }) => {
   await markOnboarding(db, { userId: user.id, flag });
   return { flag };
 });
+
+/** Estado do guia do primeiro acesso (7.1): se abre sozinho, se já foi feito e se há grupo. */
+export const GET = authed(async ({ db, user }) => ({
+  guide: await getGuideState(db, { userId: user.id }),
+}));
