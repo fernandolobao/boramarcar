@@ -1689,6 +1689,15 @@
       "created": "Created",
       "lastSeen": "Last seen",
       "never": "Never"
+    },
+    "onboarding": "Onboarding (all time)",
+    "guideCompleted": "Guides completed",
+    "guideSkipped": "Guides skipped",
+    "tipDismissed": "Tip dismissed: {tip}",
+    "tipNames": {
+      "deck-analysis": "deck analysis",
+      "table": "table mode",
+      "collection": "collection"
     }
   },
   "meta": {
@@ -1903,5 +1912,13 @@
     "doneNoEvent": "No meetup scheduled in {group} yet. When the table is set, you get a notification.",
     "doneNoGroup": "Once you join a group, the dashboard shows the next meetup.",
     "finish": "Go to the dashboard"
+  },
+  "tips": {
+    "label": "Tip",
+    "dismiss": "Got it",
+    "dismissLabel": "Got it, dismiss the tip",
+    "deck-analysis": "The score compares the deck with Commander reference targets (lands, ramp, card draw, removal, board wipes and curve). Tap an item to see how it is calculated and which cards count. It’s a guide, not a rule.",
+    "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.",
+    "collection": "Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate."
   }
 }

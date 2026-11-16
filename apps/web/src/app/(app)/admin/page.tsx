@@ -3,6 +3,7 @@ import {
   getBeta,
   getBetaGroupStats,
   getProductMetrics,
+  type TipId,
   listGroupsForBeta,
   listRecentFeedback,
   listUsersForAdmin,
@@ -63,6 +64,16 @@ export default async function AdminPage() {
         [t('newUsers'), m.users.new],
         [t('withAvailability'), m.users.withAvailability],
         [t('decks'), m.decks.new],
+      ],
+    },
+    {
+      title: t('onboarding'),
+      rows: [
+        [t('guideCompleted'), m.onboarding.guideCompleted],
+        [t('guideSkipped'), m.onboarding.guideSkipped],
+        ...(Object.entries(m.onboarding.tipsDismissed) as [TipId, number][]).map(
+          ([tip, n]): [string, number] => [t('tipDismissed', { tip: t(`tipNames.${tip}`) }), n],
+        ),
       ],
     },
   ];

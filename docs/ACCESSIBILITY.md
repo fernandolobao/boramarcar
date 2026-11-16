@@ -415,3 +415,8 @@ sem rolagem horizontal em 320px.
 ## App: oferta de avisos ao confirmar presença (15/11/2026)
 
 - Cartão dentro do encontro (não é pop-up): título como cabeçalho, texto que explica o que chega, "Ligar avisos" e "Agora não" como botões com nome; o pedido de permissão do sistema só vem depois de a pessoa tocar em "Ligar avisos". Resultado em região viva; negado no sistema vira alerta com "Abrir configurações do celular".
+
+## Dicas nas telas densas (15/11/2026)
+
+- Site: `<section>` com título "Dica" (`<h2>`), texto e "Entendi" como `<button>` com nome "Entendi, dispensar a dica" (contém o texto visível). Não é modal, não rouba o foco ao aparecer e não some sozinha; ao dispensar, o foco vai para o conteúdo principal. Ícone decorativo. axe sem violações (`a11y.test.tsx`).
+- App: o mesmo cartão com cabeçalho e o mesmo nome acessível no botão; sem rede, não aparece (nunca atrapalha a tela).

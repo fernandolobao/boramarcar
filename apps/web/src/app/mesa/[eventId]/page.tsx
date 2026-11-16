@@ -1,3 +1,4 @@
+import { listDismissedTips } from '@boramarcar/db';
 import type { Metadata, Viewport } from 'next';
 import { themes } from '@boramarcar/tokens';
 import { isDomainError } from '@boramarcar/core';
@@ -36,11 +37,13 @@ export default async function TablePage({ params }: Props) {
     },
   );
   if (setup.status === 'cancelled') notFound();
+  const dismissed = await listDismissedTips(getDb(), { userId: user.id });
   return (
     <TableMode
       eventId={setup.eventId}
       players={setup.players}
       defaultFormat={setup.defaultFormat}
+      showTip={!dismissed.includes('table')}
     />
   );
 }

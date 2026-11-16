@@ -72,6 +72,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'O guia abre sozinho no seu primeiro acesso: seu grupo, fuso e idioma, e quando você pode jogar. Dá para pular em qualquer passo. Para ver de novo: no site, "Ver o guia de novo" nos primeiros passos do painel; no app, Conta → "Ver o guia de novo".',
             ],
           },
+          {
+            id: 'dicas',
+            question: 'O que são as dicas no topo de algumas telas?',
+            intro: [
+              'A análise de deck, o modo mesa e a coleção mostram uma dica curta nas primeiras vezes. Toque em "Entendi" e ela some de vez (no site e no app).',
+            ],
+          },
         ],
       },
       {
@@ -346,6 +353,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'How do I see the welcome guide again?',
             intro: [
               'The guide opens by itself the first time you sign in: your group, time zone and language, and when you can play. You can skip it at any step. To see it again: on the website, "See the guide again" in the first steps on the dashboard; in the app, Account → "See the guide again".',
+            ],
+          },
+          {
+            id: 'dicas',
+            question: 'What are the tips at the top of some screens?',
+            intro: [
+              'Deck analysis, table mode and the collection show a short tip the first few times. Tap "Got it" and it goes away for good (on the website and in the app).',
             ],
           },
         ],

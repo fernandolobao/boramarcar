@@ -14,6 +14,7 @@ import {
   sql,
 } from 'drizzle-orm';
 import type { Database } from '../client';
+import { TIP_IDS, type TipId } from './onboarding';
 import {
   availabilityRules,
   availabilitySlots,
@@ -28,6 +29,7 @@ import {
   user,
   account,
   session,
+  onboardingSteps,
 } from '../schema';
 
 /**
@@ -148,6 +150,13 @@ export async function getProductMetrics(db: Database, now = new Date()) {
       n(db.select({ n: count() }).from(groups)),
     ]);
 
+  // Ativação do onboarding (7.7): quantas pessoas concluíram ou pularam o guia e dispensaram cada dica.
+  const steps = await db
+    .select({ step: onboardingSteps.step, n: count() })
+    .from(onboardingSteps)
+    .groupBy(onboardingSteps.step);
+  const stepCount = (step: string) => Number(steps.find((r) => r.step === step)?.n ?? 0);
+
   return {
     windowDays: METRICS_WINDOW_DAYS,
     from,
@@ -172,6 +181,13 @@ export async function getProductMetrics(db: Database, now = new Date()) {
     users: { total: users, new: newUsers, withAvailability },
     decks: { new: newDecks },
     feedback: feedbackCount,
+    onboarding: {
+      guideCompleted: stepCount('guide-completed'),
+      guideSkipped: stepCount('guide-skipped'),
+      tipsDismissed: Object.fromEntries(
+        TIP_IDS.map((id) => [id, stepCount(`tip-${id}`)]),
+      ) as Record<TipId, number>,
+    },
   };
 }
 

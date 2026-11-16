@@ -13,7 +13,7 @@ import {
 } from '@boramarcar/core';
 import Link from 'next/link';
 import { VisibilityBadge } from '@/components/deck-grid';
-import { compareWithCommanderDecks, getDeck } from '@boramarcar/db';
+import { compareWithCommanderDecks, getDeck, listDismissedTips } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { ViewTransition } from 'react';
@@ -39,6 +39,7 @@ import { canPrintProxies } from '@/server/features';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
 import { runAfterResponse } from '@/server/background';
 import { requireUser } from '@/server/current-user';
+import { Tip } from '@/components/tip';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
@@ -66,6 +67,10 @@ export default async function DeckPage({ params }: Props) {
       notFound();
     throw error;
   });
+  // Dica da análise (7.4), enquanto a pessoa não a dispensar.
+  const showTip = !(await listDismissedTips(getDb(), { userId: user.id })).includes(
+    'deck-analysis',
+  );
   const t = await getTranslations('decks');
   const ta = await getTranslations('analysis');
   const tc = await getTranslations('common');
@@ -244,6 +249,7 @@ export default async function DeckPage({ params }: Props) {
       <StackSections>
         <section className="card space-y-4">
           <h2 className="section-title mb-0">{ta('title')}</h2>
+          {showTip && <Tip id="deck-analysis" />}
           <DeckScore analysis={analysis} formatName={formatName} />
           <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
         </section>

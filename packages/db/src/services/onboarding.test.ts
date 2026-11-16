@@ -7,7 +7,13 @@ import { getInvitePreview } from './groups';
 import { eq } from 'drizzle-orm';
 import { user } from '../schema';
 import { createTestUser } from '../testing';
-import { getGuideState, getOnboardingChecklist, GUIDE_LAUNCH, markOnboarding } from './onboarding';
+import {
+  getGuideState,
+  getOnboardingChecklist,
+  GUIDE_LAUNCH,
+  listDismissedTips,
+  markOnboarding,
+} from './onboarding';
 import { deleteUserAccount, exportUserData } from './privacy';
 
 let db: Database;
@@ -109,5 +115,15 @@ describe('guia do primeiro acesso', () => {
       done: false,
       hasGroup: true,
     });
+  });
+});
+
+describe('dicas das telas', () => {
+  it('lista só as dicas que a pessoa dispensou', async () => {
+    const person = await createTestUser(db, { name: 'Dica' });
+    expect(await listDismissedTips(db, { userId: person.id })).toEqual([]);
+    await markOnboarding(db, { userId: person.id, flag: 'tip-table' });
+    await markOnboarding(db, { userId: person.id, flag: 'guide-skipped' });
+    expect(await listDismissedTips(db, { userId: person.id })).toEqual(['table']);
   });
 });

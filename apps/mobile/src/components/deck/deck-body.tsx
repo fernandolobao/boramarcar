@@ -9,6 +9,7 @@ import { CardViewer } from './card-viewer';
 import { AddCardForm, LineEditor, usePrintPicker } from './deck-edit';
 import { formatLabel } from '@/components/table/labels';
 import { StackSection } from '@/components/stack';
+import { Tip } from '@/components/tip';
 import { AppText, Button, styles } from '@/components/ui';
 import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -184,6 +185,7 @@ export function DeckBody({
 
       {(a.score !== null || deck.bracket) && (
         <Section title={t('deckScore')} index={next()}>
+          {a.score !== null && <Tip id="deck-analysis" />}
           {a.score !== null && (
             <>
               <AppText style={{ fontSize: 28, fontWeight: '800' }}>
