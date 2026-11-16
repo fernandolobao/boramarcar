@@ -79,6 +79,40 @@ describe('métricas do produto', () => {
     expect(JSON.stringify(m)).not.toMatch(/@|P1|Mesa de Quinta/);
   });
 
+  it('registro pós-jogo: tempo até a primeira partida e quantos encontros registram em 24 h', async () => {
+    const { db: fresh, close: closeFresh } = await createTestDb();
+    const now = new Date();
+    const g = await seedGroup(fresh, 2);
+    const [p1, p2] = g.players as unknown as [P, P];
+    const event = (hoursAgo: number) =>
+      createEvent(fresh, {
+        groupId: g.group.id,
+        userId: p1.id,
+        title: 'Commander',
+        startsAt: new Date(now.getTime() - hoursAgo * 3600_000),
+      });
+    const quick = await event(1);
+    const late = await event(48);
+    await event(72); // sem partida
+    for (const e of [quick, late]) {
+      await recordGame(fresh, {
+        eventId: e.id,
+        userId: p1.id,
+        players: [
+          { userId: p1.id, result: 'win' },
+          { userId: p2.id, result: 'loss' },
+        ],
+      });
+    }
+    const m = await getProductMetrics(fresh, now);
+    expect(m.postGame.withGame).toBe(2);
+    expect(m.postGame.within24h).toBe(1);
+    // Mediana entre ~1 h e ~48 h depois do início.
+    expect(m.postGame.medianMinutes).toBeGreaterThan(60 * 20);
+    expect(m.postGame.medianMinutes).toBeLessThan(60 * 30);
+    await closeFresh();
+  });
+
   it('ativação do onboarding: guias concluídos e pulados e dicas dispensadas, só contagens', async () => {
     const { db: fresh, close: closeFresh } = await createTestDb();
     const people = await Promise.all(

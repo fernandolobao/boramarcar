@@ -6,7 +6,7 @@ import { dbMock, testState } from '@/test/api';
 vi.mock('@/server/db', () => dbMock);
 
 const cron = await import('../../cron/reminders/route');
-const { sendMetricsEmail, metricsSummary } = await import('@/server/metrics-email');
+const { sendMetricsEmail, metricsSummary, formatMinutes } = await import('@/server/metrics-email');
 
 let close: () => Promise<void>;
 const sent: { to: string[]; subject: string; text: string }[] = [];
@@ -59,5 +59,12 @@ describe('resumo semanal das métricas (8.3)', () => {
     expect(monday.metricsEmails).toBe(1);
     vi.useRealTimers();
     expect(metricsSummary).toBeTypeOf('function');
+  });
+
+  it('tempo do registro pós-jogo em texto curto', () => {
+    expect(formatMinutes(45)).toBe('45 min');
+    expect(formatMinutes(200)).toBe('3 h 20 min');
+    expect(formatMinutes(120)).toBe('2 h');
+    expect(formatMinutes(3120)).toBe('2 d 4 h');
   });
 });

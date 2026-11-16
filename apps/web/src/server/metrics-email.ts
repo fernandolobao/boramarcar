@@ -5,12 +5,24 @@ import { adminEmails, getBaseUrl } from '@/env';
 import { deliverEmails } from './email';
 
 /** Texto do resumo semanal (só números agregados). */
+/** Minutos em texto curto: "45 min", "3 h 20 min", "2 d 4 h". */
+export function formatMinutes(minutes: number) {
+  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 24 * 60) {
+    const m = minutes % 60;
+    return `${Math.floor(minutes / 60)} h${m ? ` ${m} min` : ''}`;
+  }
+  const h = Math.floor(minutes / 60) % 24;
+  return `${Math.floor(minutes / 1440)} d${h ? ` ${h} h` : ''}`;
+}
+
 export function metricsSummary(m: ProductMetrics) {
   return [
     `Métrica norte: ${m.activeGroups} de ${m.totalGroups} grupos com partida registrada nos últimos ${m.windowDays} dias.`,
     `Retenção: ${m.retention.retained} de ${m.retention.previous} grupos ativos no período anterior continuam ativos.`,
     `Grupos novos: ${m.newGroups.count} (com 3+ pessoas: ${m.newGroups.withThreeMembers}; com encontro: ${m.newGroups.withEvent}). Entradas por convite: ${m.invites.joins}.`,
     `Encontros: ${m.events.held} aconteceram, ${m.events.tableFilled} fecharam a mesa, ${m.events.withGame} viraram partida. Participações com deck: ${m.games.withDeck} de ${m.games.playerSlots}.`,
+    `Registro pós-jogo: ${m.postGame.within24h} de ${m.postGame.withGame} encontros com partida registraram em até 24 h; mediana de ${m.postGame.medianMinutes === null ? '—' : formatMinutes(m.postGame.medianMinutes)} do início até a primeira partida.`,
     `Pessoas: ${m.users.total} contas (${m.users.new} novas), ${m.users.withAvailability} com disponibilidade. Decks importados: ${m.decks.new}. Feedback: ${m.feedback}.`,
   ];
 }

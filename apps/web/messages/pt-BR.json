@@ -1698,7 +1698,11 @@
       "deck-analysis": "análise de deck",
       "table": "modo mesa",
       "collection": "coleção"
-    }
+    },
+    "postGame": "Registro pós-jogo",
+    "within24h": "Encontros que registraram em até 24 h",
+    "within24hValue": "{within} de {total}",
+    "medianDelay": "Do início à primeira partida (mediana)"
   },
   "meta": {
     "ogLocale": "pt_BR",

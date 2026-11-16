@@ -1698,7 +1698,11 @@
       "deck-analysis": "deck analysis",
       "table": "table mode",
       "collection": "collection"
-    }
+    },
+    "postGame": "Post-game recording",
+    "within24h": "Meetups recorded within 24 h",
+    "within24hValue": "{within} of {total}",
+    "medianDelay": "From start to first game (median)"
   },
   "meta": {
     "ogLocale": "en_US",
