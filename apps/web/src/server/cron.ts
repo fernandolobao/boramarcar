@@ -1,6 +1,9 @@
 import 'server-only';
 import { timingSafeEqual } from 'node:crypto';
-import { getEnv } from '@/env';
+import * as Sentry from '@sentry/nextjs';
+import { adminEmails, getBaseUrl, getEnv } from '@/env';
+import { deliverEmails } from './email';
+import { errorResponse } from './http';
 
 const matches = (given: string, expected: string) => {
   const a = Buffer.from(given);
@@ -21,3 +24,59 @@ export function rejectUnauthorizedCron(req: Request): Response | null {
     { status: 401 },
   );
 }
+
+/**
+ * Roda um cron monitorado (alertas, 8.7): dentro de um monitor de cron do Sentry, que avisa
+ * quando ele falha **ou nem roda** no horário; se falhar, o erro também vai para o Sentry e um
+ * e-mail curto vai para ADMIN_EMAILS (funciona mesmo sem alerta configurado no Sentry).
+ * `slug` é o nome do monitor; `schedule`, o mesmo crontab do `vercel.json` (UTC).
+ */
+export async function runCron(
+  req: Request,
+  slug: string,
+  schedule: string,
+  task: () => Promise<unknown>,
+): Promise<Response> {
+  const rejected = rejectUnauthorizedCron(req);
+  if (rejected) return rejected;
+  try {
+    const result = await Sentry.withMonitor(slug, task, {
+      schedule: { type: 'crontab', value: schedule },
+      timezone: 'Etc/UTC',
+      // Atraso aceito para começar e tempo máximo, em minutos.
+      checkinMargin: 10,
+      maxRuntime: 5,
+    });
+    return Response.json(result);
+  } catch (error) {
+    Sentry.captureException(error, { tags: { cron: slug } });
+    await notifyCronFailure(slug, error).catch((mailError: unknown) =>
+      console.error('[cron] aviso por e-mail falhou', mailError),
+    );
+    return errorResponse(error);
+  }
+}
+
+/** E-mail curto para o dono do projeto: qual cron falhou, quando e a mensagem do erro. */
+async function notifyCronFailure(slug: string, error: unknown) {
+  const to = adminEmails();
+  if (to.length === 0) return;
+  const message = error instanceof Error ? error.message : String(error);
+  const lines = [
+    `O cron "${slug}" falhou em ${new Date().toISOString()}.`,
+    `Erro: ${message}`,
+    'Detalhes no Sentry (tag cron) e nos logs da Vercel.',
+  ];
+  await deliverEmails(
+    to.map((address) => ({
+      to: address,
+      subject: `ArcanaKin: o cron "${slug}" falhou`,
+      text: lines.join('\n'),
+      html: `<div style="font-family:system-ui,sans-serif;line-height:1.5">${lines
+        .map((l) => `<p style="margin:0 0 8px">${escapeHtml(l)}</p>`)
+        .join('')}<p><a href="${getBaseUrl()}/admin">${getBaseUrl()}/admin</a></p></div>`,
+    })),
+  );
+}
+
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
