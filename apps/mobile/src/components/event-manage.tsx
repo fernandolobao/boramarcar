@@ -8,11 +8,12 @@ import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import { dayLabel, deviceTimeZone, localDate, nextDays, rangeLabel } from '@/lib/dates';
+import { deviceTimeZone, localDate, nextDays, rangeLabel } from '@/lib/dates';
 import { formatDateTime, t } from '@/lib/i18n';
 import { useGroup } from '@/lib/group';
 import { useAsync } from '@/lib/use-async';
 import { Choices } from '@/components/ds/choices';
+import { DateField } from '@/components/ds/date-field';
 
 /** Texto para compartilhar o encontro, igual ao do site (WhatsApp, folha nativa). */
 export function eventShareText(event: EventDetail, timeZone: string) {
@@ -135,15 +136,13 @@ export function EventManage({ event, onDone }: { event: EventDetail; onDone: () 
             value={title}
             onChangeText={setTitle}
           />
-          <View style={{ gap: 6 }}>
-            <Choices
-              label={t('eventDay')}
-              value={day}
-              onChange={setDay}
-              scroll
-              options={days.map((d) => ({ value: d, label: dayLabel(d) }))}
-            />
-          </View>
+          <DateField
+            label={t('eventDay')}
+            value={day}
+            onChange={setDay}
+            min={days[0]}
+            max={days[days.length - 1]}
+          />
           <TimeStepper label={t('eventStart')} value={start} onChange={setStart} />
           <Button
             label={t('eventSetEnd')}

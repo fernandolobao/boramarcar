@@ -1889,7 +1889,15 @@
   },
   "ds": {
     "decrease": "{label}: diminuir (agora {value})",
-    "increase": "{label}: aumentar (agora {value})"
+    "increase": "{label}: aumentar (agora {value})",
+    "dateOpen": "{label}: escolher data",
+    "previousMonth": "Mês anterior",
+    "nextMonth": "Próximo mês",
+    "timeDecrease": "{label}: menos {step} minutos (agora {value})",
+    "timeIncrease": "{label}: mais {step} minutos (agora {value})",
+    "day": "Dia",
+    "time": "Horário",
+    "dateRequired": "Escolha o dia."
   },
   "guide": {
     "metaTitle": "Boas-vindas",

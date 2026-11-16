@@ -1889,7 +1889,15 @@
   },
   "ds": {
     "decrease": "{label}: decrease (now {value})",
-    "increase": "{label}: increase (now {value})"
+    "increase": "{label}: increase (now {value})",
+    "dateOpen": "{label}: pick a date",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "timeDecrease": "{label}: {step} minutes earlier (now {value})",
+    "timeIncrease": "{label}: {step} minutes later (now {value})",
+    "day": "Date",
+    "time": "Time",
+    "dateRequired": "Pick the date."
   },
   "guide": {
     "metaTitle": "Welcome",

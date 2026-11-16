@@ -19,6 +19,7 @@
     "@boramarcar/tokens": "workspace:*",
     "@boramarcar/ui": "workspace:*",
     "@flags-sdk/vercel": "^1.6.0",
+    "@internationalized/date": "3.12.4",
     "@sentry/nextjs": "11.12.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.1.0",

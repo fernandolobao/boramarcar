@@ -14,6 +14,7 @@ import { formatDateMedium, t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { NumberField } from '@/components/ds/number-field';
 import { Choices } from '@/components/ds/choices';
+import { DateField } from '@/components/ds/date-field';
 
 const isFormat = (v: string): v is GameFormat => (GAME_FORMATS as readonly string[]).includes(v);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -201,22 +202,8 @@ export function SeasonsCard({ groupId, canManage }: { groupId: string; canManage
       {canManage && (
         <>
           <TextField label={t('seasonName')} value={name} onChangeText={setName} maxLength={60} />
-          <TextField
-            label={t('seasonStart')}
-            hint={t('seasonDateHint')}
-            value={start}
-            onChangeText={setStart}
-            autoCorrect={false}
-            keyboardType="numbers-and-punctuation"
-          />
-          <TextField
-            label={t('seasonEnd')}
-            hint={t('seasonDateHint')}
-            value={end}
-            onChangeText={setEnd}
-            autoCorrect={false}
-            keyboardType="numbers-and-punctuation"
-          />
+          <DateField label={t('seasonStart')} value={start} onChange={setStart} />
+          <DateField label={t('seasonEnd')} value={end} onChange={setEnd} min={start} />
           <Button
             label={busy ? t('settingsSaving') : t('seasonCreate')}
             variant="secondary"

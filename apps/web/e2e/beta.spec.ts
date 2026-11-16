@@ -1,3 +1,4 @@
+import { fillDate } from './support/fill-date';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
@@ -21,7 +22,7 @@ test.describe('beta assistido', () => {
       .check();
 
     // Data no futuro: fica marcado e nada muda para o grupo.
-    await beta.getByLabel('Data de início').fill('2099-01-04');
+    await fillDate(beta, 'Data de início', '2099-01-04');
     await beta.getByRole('button', { name: 'Salvar' }).click();
     await expect(beta.getByText('Beta salvo.')).toBeFocused();
     await expect(page.getByTestId('beta-status')).toContainText('Começa em');

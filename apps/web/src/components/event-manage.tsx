@@ -1,5 +1,6 @@
 'use client';
 
+import { DateTimeField, fromLocalDateTime, toLocalDateTime } from './ds/date-time-field';
 import { utcToZonedLocalInput, zonedLocalToUtc } from '@boramarcar/core/time';
 import { useTimeZone, useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -52,6 +53,8 @@ export function EventManage(props: Props) {
         onSubmit={(e) => {
           e.preventDefault();
           setSaved(false);
+          // Sem dia de início não há encontro (o campo antigo era obrigatório).
+          if (!startsAt) return;
           void patch({
             title,
             startsAt: zonedLocalToUtc(startsAt, timeZone).toISOString(),
@@ -73,32 +76,19 @@ export function EventManage(props: Props) {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-        <div>
-          <label className="label" htmlFor="edit-start">
-            {t('when')}
-          </label>
-          <input
-            id="edit-start"
-            type="datetime-local"
-            className="input"
-            required
-            value={startsAt}
-            onChange={(e) => setStartsAt(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="label" htmlFor="edit-end">
-            {t('end')} <span className="muted">({tc('optional')})</span>
-          </label>
-          <input
-            id="edit-end"
-            type="datetime-local"
-            className="input"
-            min={startsAt}
-            value={endsAt}
-            onChange={(e) => setEndsAt(e.target.value)}
-          />
-        </div>
+        <DateTimeField
+          legend={t('when')}
+          value={fromLocalDateTime(startsAt)}
+          onChange={(v) => setStartsAt(toLocalDateTime(v))}
+          className="sm:col-span-2"
+        />
+        <DateTimeField
+          legend={`${t('end')} (${tc('optional')})`}
+          value={fromLocalDateTime(endsAt, startsAt.slice(11, 16) || '23:00')}
+          onChange={(v) => setEndsAt(toLocalDateTime(v))}
+          min={startsAt.slice(0, 10) || undefined}
+          className="sm:col-span-2"
+        />
         <div className="sm:col-span-2">
           <label className="label" htmlFor="edit-location">
             {t('where')}
