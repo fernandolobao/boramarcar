@@ -1,6 +1,5 @@
-import { rejectUnauthorizedCron } from '@/server/cron';
+import { runCron } from '@/server/cron';
 import { getDb } from '@/server/db';
-import { errorResponse } from '@/server/http';
 import { sendBetaWelcomes } from '@/server/beta';
 import { sendMetricsEmail } from '@/server/metrics-email';
 import { sendDueReminders } from '@/server/notify';
@@ -13,16 +12,12 @@ export const dynamic = 'force-dynamic';
  * métricas para ADMIN_EMAILS (sem cron novo).
  */
 export async function GET(req: Request) {
-  const rejected = rejectUnauthorizedCron(req);
-  if (rejected) return rejected;
-  try {
+  return runCron(req, 'lembretes-diarios', '17 11 * * *', async () => {
     const db = getDb();
     const reminders = await sendDueReminders(db);
     const now = new Date();
     const metrics = now.getUTCDay() === 1 ? (await sendMetricsEmail(db, now)).length : 0;
     const betaWelcomes = await sendBetaWelcomes(db, now);
-    return Response.json({ ...reminders, metricsEmails: metrics, betaWelcomes });
-  } catch (error) {
-    return errorResponse(error);
-  }
+    return { ...reminders, metricsEmails: metrics, betaWelcomes };
+  });
 }
