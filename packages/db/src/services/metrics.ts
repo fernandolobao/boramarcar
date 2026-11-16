@@ -92,12 +92,17 @@ export async function getProductMetrics(db: Database, now = new Date()) {
       tableSize: groups.tableSize,
       yes: sql<number>`count(${eventParticipants.userId}) filter (where ${eventParticipants.rsvp} = 'yes')`,
       games: sql<number>`(select count(*) from ${games} where ${games.eventId} = ${events.id})`,
+      // Primeira partida registrada do encontro (8.8: quanto tempo depois do início).
+      firstGameAt: sql<
+        string | null
+      >`(select min(${games.createdAt}) from ${games} where ${games.eventId} = ${events.id})`,
+      startsAt: events.startsAt,
     })
     .from(events)
     .innerJoin(groups, eq(groups.id, events.groupId))
     .leftJoin(eventParticipants, eq(eventParticipants.eventId, events.id))
     .where(and(...inWindow(events.startsAt), ne(events.status, 'cancelled')))
-    .groupBy(events.id, groups.tableSize);
+    .groupBy(events.id, groups.tableSize, events.startsAt);
 
   const [players, withDeck] = await Promise.all([
     n(
@@ -157,6 +162,18 @@ export async function getProductMetrics(db: Database, now = new Date()) {
     .groupBy(onboardingSteps.step);
   const stepCount = (step: string) => Number(steps.find((r) => r.step === step)?.n ?? 0);
 
+  // Registro pós-jogo (8.8): minutos do início do encontro até a primeira partida registrada.
+  const delays = held
+    .filter((e) => e.firstGameAt !== null)
+    .map((e) => Math.max(0, (new Date(e.firstGameAt!).getTime() - e.startsAt.getTime()) / 60_000))
+    .sort((a, b) => a - b);
+  const median =
+    delays.length === 0
+      ? null
+      : delays.length % 2
+        ? delays[(delays.length - 1) / 2]!
+        : (delays[delays.length / 2 - 1]! + delays[delays.length / 2]!) / 2;
+
   return {
     windowDays: METRICS_WINDOW_DAYS,
     from,
@@ -178,6 +195,11 @@ export async function getProductMetrics(db: Database, now = new Date()) {
       withGame: held.filter((e) => Number(e.games) > 0).length,
     },
     games: { playerSlots: players, withDeck },
+    postGame: {
+      withGame: delays.length,
+      within24h: delays.filter((d) => d <= 24 * 60).length,
+      medianMinutes: median === null ? null : Math.round(median),
+    },
     users: { total: users, new: newUsers, withAvailability },
     decks: { new: newDecks },
     feedback: feedbackCount,

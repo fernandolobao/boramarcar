@@ -10,6 +10,7 @@ import {
 } from '@boramarcar/db';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { getDb } from '@/server/db';
+import { formatMinutes } from '@/server/metrics-email';
 import { requireAdmin } from '@/server/admin';
 import { AdminUsers } from '@/components/admin-users';
 import { BetaControl } from '@/components/beta-control';
@@ -54,6 +55,19 @@ export default async function AdminPage() {
         [
           t('deckLinked'),
           t('deckLinkedValue', { withDeck: m.games.withDeck, slots: m.games.playerSlots }),
+        ],
+      ],
+    },
+    {
+      title: t('postGame'),
+      rows: [
+        [
+          t('within24h'),
+          t('within24hValue', { within: m.postGame.within24h, total: m.postGame.withGame }),
+        ],
+        [
+          t('medianDelay'),
+          m.postGame.medianMinutes === null ? '—' : formatMinutes(m.postGame.medianMinutes),
         ],
       ],
     },
