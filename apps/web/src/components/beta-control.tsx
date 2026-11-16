@@ -1,5 +1,6 @@
 'use client';
 
+import { DateField } from './ds/date-field';
 import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { useTimeZone, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
@@ -94,22 +95,13 @@ export function BetaControl({
         <p className="muted">{t('selected', { count: selected.size })}</p>
       </fieldset>
 
-      <div className="max-w-xs">
-        <label htmlFor="beta-inicio" className="label">
-          {t('startDate')}
-        </label>
-        <input
-          id="beta-inicio"
-          type="date"
-          className="input"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          aria-describedby="beta-inicio-dica"
-        />
-        <p id="beta-inicio-dica" className="muted mt-1">
-          {t('startHint')}
-        </p>
-      </div>
+      <DateField
+        className="max-w-xs"
+        label={t('startDate')}
+        value={date || null}
+        onChange={(v) => setDate(v ?? '')}
+        description={t('startHint')}
+      />
 
       <div className="flex flex-wrap gap-2">
         <button type="submit" className="btn-primary" disabled={pending}>

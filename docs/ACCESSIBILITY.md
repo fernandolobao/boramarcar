@@ -420,3 +420,8 @@ sem rolagem horizontal em 320px.
 
 - Site: `<section>` com título "Dica" (`<h2>`), texto e "Entendi" como `<button>` com nome "Entendi, dispensar a dica" (contém o texto visível). Não é modal, não rouba o foco ao aparecer e não some sozinha; ao dispensar, o foco vai para o conteúdo principal. Ícone decorativo. axe sem violações (`a11y.test.tsx`).
 - App: o mesmo cartão com cabeçalho e o mesmo nome acessível no botão; sem rede, não aparece (nunca atrapalha a tela).
+
+## Design system: datas e horários (15/11/2026)
+
+- Site: `DateField` (React Aria `DatePicker`) com dia, mês e ano como `spinbutton` nomeados, no idioma do site (ordem e nomes vindos do `I18nProvider`), e um botão "{rótulo}: escolher data" que abre o calendário em popover; dias fora de `min`/`max` com `aria-disabled`. `TimeField` com hora e minuto como `spinbutton` e −/+ de 30 min com nome de contexto ("Das: mais 30 minutos (agora 19:00)"). `DateTimeField` é um `<fieldset>` com `<legend>`. Substituem os 10 campos nativos (`date`, `time`, `datetime-local`), que cada navegador desenhava de um jeito (o do iPad saía desalinhado). axe sem violações; E2E digita a data nos segmentos.
+- App: `DateField` como campo-botão com a data por extenso no nome acessível; o calendário abre numa folha com cabeçalho, mês anterior/próximo nomeados, mês anunciado em região viva e cada dia como botão com o nome completo (fora do limite desabilitado). `TimeField` com −/+ nomeados e o valor em região viva. Substituem os dias em botões e as datas digitadas das temporadas.

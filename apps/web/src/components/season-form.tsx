@@ -1,5 +1,6 @@
 'use client';
 
+import { DateField } from './ds/date-field';
 import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { useTimeZone, useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -30,6 +31,8 @@ export function SeasonForm({ groupId }: { groupId: string }) {
       onSubmit={(e) => {
         e.preventDefault();
         setCreated(false);
+        // Os campos antigos eram obrigatórios: sem as duas datas, não envia.
+        if (!start || !end) return;
         void run(
           () =>
             api(`/api/v1/groups/${groupId}/seasons`, {
@@ -63,33 +66,13 @@ export function SeasonForm({ groupId }: { groupId: string }) {
           onChange={(e) => setName(e.target.value)}
         />
       </div>
-      <div>
-        <label className="label" htmlFor="season-start">
-          {t('start')}
-        </label>
-        <input
-          id="season-start"
-          className="input"
-          type="date"
-          required
-          value={start}
-          onChange={(e) => setStart(e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="label" htmlFor="season-end">
-          {t('end')}
-        </label>
-        <input
-          id="season-end"
-          className="input"
-          type="date"
-          required
-          min={start || undefined}
-          value={end}
-          onChange={(e) => setEnd(e.target.value)}
-        />
-      </div>
+      <DateField label={t('start')} value={start || null} onChange={(v) => setStart(v ?? '')} />
+      <DateField
+        label={t('end')}
+        value={end || null}
+        onChange={(v) => setEnd(v ?? '')}
+        min={start || undefined}
+      />
       <button className="btn-primary" disabled={pending}>
         <Icon name="add" />
         {t('create')}
