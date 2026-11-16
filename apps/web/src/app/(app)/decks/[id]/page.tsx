@@ -39,7 +39,7 @@ import { canPrintProxies } from '@/server/features';
 import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
 import { runAfterResponse } from '@/server/background';
 import { requireUser } from '@/server/current-user';
-import { Tip } from '@/components/tip';
+import { TitleWithTip } from '@/components/tip';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
@@ -248,8 +248,9 @@ export default async function DeckPage({ params }: Props) {
       {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}
       <StackSections>
         <section className="card space-y-4">
-          <h2 className="section-title mb-0">{ta('title')}</h2>
-          {showTip && <Tip id="deck-analysis" />}
+          <TitleWithTip id="deck-analysis" dismissed={!showTip}>
+            <h2 className="section-title mb-0">{ta('title')}</h2>
+          </TitleWithTip>
           <DeckScore analysis={analysis} formatName={formatName} />
           <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
         </section>

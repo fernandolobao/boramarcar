@@ -76,7 +76,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'dicas',
             question: 'O que são as dicas no topo de algumas telas?',
             intro: [
-              'A análise de deck, o modo mesa e a coleção mostram uma dica curta nas primeiras vezes. Toque em "Entendi" e ela some de vez (no site e no app).',
+              'A análise de deck, o modo mesa e a coleção mostram uma dica curta na primeira vez. "Entendi" fecha a dica; para ver de novo, toque no botão ⓘ ao lado do título (no site e no app).',
             ],
           },
         ],
@@ -359,7 +359,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'dicas',
             question: 'What are the tips at the top of some screens?',
             intro: [
-              'Deck analysis, table mode and the collection show a short tip the first few times. Tap "Got it" and it goes away for good (on the website and in the app).',
+              'Deck analysis, table mode and the collection show a short tip the first time. "Got it" closes it; to see it again, tap the ⓘ button next to the title (on the website and in the app).',
             ],
           },
         ],

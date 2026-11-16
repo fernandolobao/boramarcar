@@ -420,3 +420,7 @@ sem rolagem horizontal em 320px.
 
 - Site: `<section>` com título "Dica" (`<h2>`), texto e "Entendi" como `<button>` com nome "Entendi, dispensar a dica" (contém o texto visível). Não é modal, não rouba o foco ao aparecer e não some sozinha; ao dispensar, o foco vai para o conteúdo principal. Ícone decorativo. axe sem violações (`a11y.test.tsx`).
 - App: o mesmo cartão com cabeçalho e o mesmo nome acessível no botão; sem rede, não aparece (nunca atrapalha a tela).
+
+## Dicas: botão de informação (15/11/2026)
+
+- A dica deixou de sumir de vez: um botão ⓘ ao lado do título (site) ou no topo da seção (app) abre e fecha a dica (`aria-expanded`, `aria-controls`; nome "Dica sobre esta tela" e a mesma dica visível no `title`). Na primeira vez ela vem aberta, sem roubar o foco; "Entendi" fecha, grava que a pessoa já viu e devolve o foco ao ⓘ. Alvo de 40 px no site e 44 pt no app. Mais espaço entre o título e o quadro da dica.

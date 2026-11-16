@@ -4,7 +4,7 @@ import { CollectionView } from '@/components/collection-view';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { collectionFlow } from '@boramarcar/tokens/flow';
 import { requireUser } from '@/server/current-user';
-import { Tip } from '@/components/tip';
+import { TitleWithTip } from '@/components/tip';
 import { getDb } from '@/server/db';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { navMetadata } from '@/server/metadata';
@@ -28,11 +28,10 @@ export default async function CollectionPage() {
           entries.map((e) => ({ colors: e.card?.colorIdentity, quantity: e.quantity })),
         )}
       />
-      <div>
+      <TitleWithTip id="collection" dismissed={dismissed.includes('collection')}>
         <h1 className="page-title">{t('title')}</h1>
         <p className="muted max-w-3xl">{t('intro')}</p>
-      </div>
-      {!dismissed.includes('collection') && <Tip id="collection" />}
+      </TitleWithTip>
       <CollectionView
         entries={entries.map((e) => ({ ...e, addedAt: e.addedAt.toISOString() }))}
         brlRate={rate?.rate ?? null}
