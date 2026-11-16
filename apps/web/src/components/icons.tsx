@@ -92,6 +92,7 @@ import {
   Eye,
   Lightbulb,
   Compass,
+  Info,
 } from 'lucide-react';
 
 export type { LucideIcon };
@@ -195,6 +196,7 @@ export const Icons = {
   privacy: ShieldCheck,
   fun: Dices,
   guide: Compass,
+  info: Info,
   learn: Lightbulb,
   transparency: Eye,
   email: Mail,

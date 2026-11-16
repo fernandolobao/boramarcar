@@ -1927,6 +1927,7 @@
     "dismissLabel": "Entendi, dispensar a dica",
     "deck-analysis": "A nota compara o deck com metas de referência de Commander (terrenos, ramp, compra, remoção, board wipes e curva). Toque num item para ver como ele é calculado e quais cartas contam. É um guia, não uma regra.",
     "table": "Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer e trocar lugares.",
-    "collection": "As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central."
+    "collection": "As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.",
+    "toggle": "Dica sobre esta tela"
   }
 }

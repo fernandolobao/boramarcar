@@ -144,6 +144,7 @@ const pt = {
   guideFinish: 'Ir para o painel',
   tipLabel: 'Dica',
   tipDismiss: 'Entendi',
+  tipToggle: 'Dica sobre esta tela',
   tipDismissLabel: 'Entendi, dispensar a dica',
   tipDeckAnalysis:
     'A nota compara o deck com metas de referência de Commander (terrenos, ramp, compra, remoção, board wipes e curva). Toque num item para ver como ele é calculado e quais cartas contam. É um guia, não uma regra.',
@@ -940,6 +941,7 @@ const en: Messages = {
   guideFinish: 'Go to the dashboard',
   tipLabel: 'Tip',
   tipDismiss: 'Got it',
+  tipToggle: 'Tip about this screen',
   tipDismissLabel: 'Got it, dismiss the tip',
   tipDeckAnalysis:
     'The score compares the deck with Commander reference targets (lands, ramp, card draw, removal, board wipes and curve). Tap an item to see how it is calculated and which cards count. It’s a guide, not a rule.',

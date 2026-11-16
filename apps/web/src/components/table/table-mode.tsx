@@ -31,7 +31,7 @@ import {
 import { KEEP_AWAKE_MP4, KEEP_AWAKE_WEBM } from './keep-awake-media';
 import { NumberField } from '../ds/number-field';
 import { Choices } from '../ds/choices';
-import { Tip } from '../tip';
+import { TitleWithTip } from '../tip';
 
 export interface TablePlayerOption {
   userId: string;
@@ -98,9 +98,10 @@ function Setup({
       tabIndex={-1}
       className="mx-auto max-w-2xl space-y-6 px-4 py-8 focus:outline-none"
     >
-      <h1 className="page-title">{t('title')}</h1>
-      <p className="muted">{t('intro')}</p>
-      {showTip && <Tip id="table" />}
+      <TitleWithTip id="table" dismissed={!showTip}>
+        <h1 className="page-title">{t('title')}</h1>
+        <p className="muted">{t('intro')}</p>
+      </TitleWithTip>
       {saved && (
         <section className="card space-y-3" aria-labelledby={`${id}-saved`}>
           <h2 id={`${id}-saved`} className="section-title mb-0">

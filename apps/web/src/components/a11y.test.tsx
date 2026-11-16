@@ -13,7 +13,7 @@ import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './a
 import { ProductTour } from './home/product-tour';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
-import { Tip } from './tip';
+import { TitleWithTip } from './tip';
 import { DateField } from './ds/date-field';
 import { DateTimeField } from './ds/date-time-field';
 import { TimeField } from './ds/time-field';
@@ -514,7 +514,13 @@ describe('acessibilidade dos componentes (axe-core)', () => {
   });
 
   it('dica de tela densa sem violações', async () => {
-    expect(await audit(<Tip id="deck-analysis" />)).toEqual([]);
+    expect(
+      await audit(
+        <TitleWithTip id="deck-analysis" dismissed={false}>
+          <h1>Análise</h1>
+        </TitleWithTip>,
+      ),
+    ).toEqual([]);
   });
 
   it('guia do primeiro acesso (título, pular, concluir) sem violações', async () => {

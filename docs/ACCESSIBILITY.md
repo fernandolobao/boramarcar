@@ -425,3 +425,7 @@ sem rolagem horizontal em 320px.
 
 - Site: `DateField` (React Aria `DatePicker`) com dia, mês e ano como `spinbutton` nomeados, no idioma do site (ordem e nomes vindos do `I18nProvider`), e um botão "{rótulo}: escolher data" que abre o calendário em popover; dias fora de `min`/`max` com `aria-disabled`. `TimeField` com hora e minuto como `spinbutton` e −/+ de 30 min com nome de contexto ("Das: mais 30 minutos (agora 19:00)"). `DateTimeField` é um `<fieldset>` com `<legend>`. Substituem os 10 campos nativos (`date`, `time`, `datetime-local`), que cada navegador desenhava de um jeito (o do iPad saía desalinhado). axe sem violações; E2E digita a data nos segmentos.
 - App: `DateField` como campo-botão com a data por extenso no nome acessível; o calendário abre numa folha com cabeçalho, mês anterior/próximo nomeados, mês anunciado em região viva e cada dia como botão com o nome completo (fora do limite desabilitado). `TimeField` com −/+ nomeados e o valor em região viva. Substituem os dias em botões e as datas digitadas das temporadas.
+
+## Dicas: botão de informação (15/11/2026)
+
+- A dica deixou de sumir de vez: um botão ⓘ ao lado do título (site) ou no topo da seção (app) abre e fecha a dica (`aria-expanded`, `aria-controls`; nome "Dica sobre esta tela" e a mesma dica visível no `title`). Na primeira vez ela vem aberta, sem roubar o foco; "Entendi" fecha, grava que a pessoa já viu e devolve o foco ao ⓘ. Alvo de 40 px no site e 44 pt no app. Mais espaço entre o título e o quadro da dica.
