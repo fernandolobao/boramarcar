@@ -6,13 +6,14 @@ import { ScrollView, View } from 'react-native';
 import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
-import { dayLabel, deviceTimeZone, nextDays } from '@/lib/dates';
+import { deviceTimeZone, nextDays } from '@/lib/dates';
 import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { NoGroup } from '@/components/no-group';
 import { Choices } from '@/components/ds/choices';
+import { DateField } from '@/components/ds/date-field';
 
 /**
  * Criar encontro pelo app (5.4): título, dia, horário de início (e de término, opcional) e local
@@ -85,15 +86,13 @@ export default function NewEventScreen() {
           onChangeText={setTitle}
         />
 
-        <View style={{ gap: 6 }}>
-          <Choices
-            label={t('eventDay')}
-            value={day}
-            onChange={setDay}
-            scroll
-            options={days.map((d) => ({ value: d, label: dayLabel(d) }))}
-          />
-        </View>
+        <DateField
+          label={t('eventDay')}
+          value={day}
+          onChange={setDay}
+          min={days[0]}
+          max={days[days.length - 1]}
+        />
 
         <TimeStepper label={t('eventStart')} value={start} onChange={setStart} />
         <Button

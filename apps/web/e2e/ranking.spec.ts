@@ -1,3 +1,4 @@
+import { fillDate } from './support/fill-date';
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
 
@@ -38,8 +39,8 @@ test.describe('ranking e estatísticas', () => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto('/ranking');
     await page.getByLabel('Nome').fill('Temporada E2E');
-    await page.getByLabel('Primeiro dia').fill('2026-01-01');
-    await page.getByLabel('Último dia').fill('2026-12-31');
+    await fillDate(page, 'Primeiro dia', '2026-01-01');
+    await fillDate(page, 'Último dia', '2026-12-31');
     await page.getByRole('button', { name: 'Criar temporada' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Temporada criada.' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Temporada E2E' })).toBeVisible();

@@ -4,17 +4,11 @@ import { View } from 'react-native';
 import { TextField, TimeStepper } from '@/components/fields';
 import { AppText, Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
-import {
-  dayLabel,
-  deviceTimeZone,
-  nextDays,
-  slotRange,
-  WEEKDAY_ORDER,
-  weekdayName,
-} from '@/lib/dates';
+import { deviceTimeZone, nextDays, slotRange, WEEKDAY_ORDER, weekdayName } from '@/lib/dates';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Choices } from '@/components/ds/choices';
+import { DateField } from '@/components/ds/date-field';
 
 const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
 
@@ -104,15 +98,13 @@ export function AddAvailability({
       />
 
       {frequency === 'once' ? (
-        <View style={{ gap: 6 }}>
-          <Choices
-            label={t('availDay')}
-            value={day}
-            onChange={setDay}
-            scroll
-            options={days.map((d) => ({ value: d, label: dayLabel(d) }))}
-          />
-        </View>
+        <DateField
+          label={t('availDay')}
+          value={day}
+          onChange={setDay}
+          min={days[0]}
+          max={days[days.length - 1]}
+        />
       ) : (
         <View style={{ gap: 6 }}>
           <AppText style={{ fontWeight: '600' }}>{t('availWeekdays')}</AppText>

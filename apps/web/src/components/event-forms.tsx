@@ -1,5 +1,6 @@
 'use client';
 
+import { DateTimeField, fromLocalDateTime, toLocalDateTime } from './ds/date-time-field';
 import { useTimeZone, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -22,13 +23,16 @@ export function NewEventForm({
   const { run, error, pending } = useApiAction();
   const [title, setTitle] = useState(t('defaultTitle'));
   const [startsAt, setStartsAt] = useState('');
+  const [dateError, setDateError] = useState<string | null>(null);
+  const tds = useTranslations('ds');
   const [locationId, setLocationId] = useState('');
 
   return (
     <form
-      className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end"
+      className="grid gap-3 sm:grid-cols-2 sm:items-end"
       onSubmit={(e) => {
         e.preventDefault();
+        if (!startsAt) return setDateError(tds('dateRequired'));
         void run(
           () =>
             api<{ event: { id: string } }>(`/api/v1/groups/${groupId}/events`, {
@@ -55,19 +59,16 @@ export function NewEventForm({
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
-      <div>
-        <label className="label" htmlFor="event-start">
-          {t('when')}
-        </label>
-        <input
-          id="event-start"
-          type="datetime-local"
-          className="input"
-          required
-          value={startsAt}
-          onChange={(e) => setStartsAt(e.target.value)}
-        />
-      </div>
+      <DateTimeField
+        legend={t('when')}
+        value={fromLocalDateTime(startsAt)}
+        onChange={(v) => {
+          setStartsAt(toLocalDateTime(v));
+          setDateError(null);
+        }}
+        error={dateError ?? undefined}
+        className="sm:col-span-2"
+      />
       <div>
         <label className="label" htmlFor="event-location">
           {t('where')}

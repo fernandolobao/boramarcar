@@ -14,6 +14,9 @@ import { ProductTour } from './home/product-tour';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
 import { Tip } from './tip';
+import { DateField } from './ds/date-field';
+import { DateTimeField } from './ds/date-time-field';
+import { TimeField } from './ds/time-field';
 import { TableSuggestions } from './table-suggestions';
 import { DeckImportForm } from './deck-forms';
 import { EmptyState } from './empty-state';
@@ -492,6 +495,22 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('formulário de feedback sem violações', async () => {
     expect(await audit(<FeedbackForm page="/eventos" />)).toEqual([]);
+  });
+
+  it('campos de data e horário do design system sem violações', async () => {
+    expect(
+      await audit(
+        <>
+          <DateField label="Primeiro dia" value="2026-11-15" onChange={() => {}} />
+          <TimeField label="Das" value="19:00" onChange={() => {}} />
+          <DateTimeField
+            legend="Quando"
+            value={{ date: null, time: '19:00' }}
+            onChange={() => {}}
+          />
+        </>,
+      ),
+    ).toEqual([]);
   });
 
   it('dica de tela densa sem violações', async () => {

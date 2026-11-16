@@ -1,5 +1,7 @@
 'use client';
 
+import { DateTimeField, fromLocalDateTime, toLocalDateTime } from './ds/date-time-field';
+import { TimeField } from './ds/time-field';
 import { useLocale, useTimeZone, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -25,6 +27,7 @@ export function AvailabilityForm({
   initialFrequency?: 'once' | 'weekly';
 }) {
   const t = useTranslations('availability');
+  const tds = useTranslations('ds');
   const tc = useTranslations('common');
   const locale = useLocale();
   const timeZone = useTimeZone() ?? 'America/Sao_Paulo';
@@ -48,6 +51,11 @@ export function AvailabilityForm({
         setLocalError(null);
         if (frequency === 'weekly' && weekdays.length === 0) {
           setLocalError(t('chooseWeekday'));
+          return;
+        }
+        // Os campos antigos eram obrigatórios: sem os dois dias, não envia.
+        if (frequency === 'once' && (!startsAt || !endsAt)) {
+          setLocalError(tds('dateRequired'));
           return;
         }
         void run(
@@ -96,34 +104,18 @@ export function AvailabilityForm({
       </div>
 
       {frequency === 'once' ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label className="label" htmlFor="slot-start">
-              {t('start')}
-            </label>
-            <input
-              id="slot-start"
-              type="datetime-local"
-              className="input"
-              required
-              value={startsAt}
-              onChange={(e) => setStartsAt(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="label" htmlFor="slot-end">
-              {t('end')}
-            </label>
-            <input
-              id="slot-end"
-              type="datetime-local"
-              className="input"
-              required
-              min={startsAt}
-              value={endsAt}
-              onChange={(e) => setEndsAt(e.target.value)}
-            />
-          </div>
+        <div className="space-y-4">
+          <DateTimeField
+            legend={t('start')}
+            value={fromLocalDateTime(startsAt)}
+            onChange={(v) => setStartsAt(toLocalDateTime(v))}
+          />
+          <DateTimeField
+            legend={t('end')}
+            value={fromLocalDateTime(endsAt, '23:00')}
+            onChange={(v) => setEndsAt(toLocalDateTime(v))}
+            min={startsAt.slice(0, 10) || undefined}
+          />
         </div>
       ) : (
         <>
@@ -150,36 +142,13 @@ export function AvailabilityForm({
             </div>
           </fieldset>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className="label" htmlFor="rule-start">
-                {t('startTime')}
-              </label>
-              <input
-                id="rule-start"
-                type="time"
-                className="input"
-                required
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="rule-end">
-                {t('endTime')}
-              </label>
-              <input
-                id="rule-end"
-                type="time"
-                className="input"
-                required
-                aria-describedby="rule-end-hint"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
-              <p id="rule-end-hint" className="muted mt-1">
-                {t('overnightHint')}
-              </p>
-            </div>
+            <TimeField label={t('startTime')} value={startTime} onChange={setStartTime} />
+            <TimeField
+              label={t('endTime')}
+              value={endTime}
+              onChange={setEndTime}
+              description={t('overnightHint')}
+            />
           </div>
         </>
       )}
