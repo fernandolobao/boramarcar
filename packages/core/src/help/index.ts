@@ -293,7 +293,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'fuso-idioma',
             question: 'Como mudo fuso horário e idioma?',
             intro: [
-              'Em Configurações. O fuso vale para todas as datas e horários que você vê e digita; o idioma vale para o site e os e-mails (o app segue o idioma do aparelho).',
+              'Em Configurações. O fuso vale para todas as datas e horários que você vê e digita; o idioma vale para o site e os e-mails (o app segue o idioma do aparelho). Na página inicial, o seletor PT | EN no topo também troca o idioma.',
             ],
           },
           {
@@ -576,7 +576,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'fuso-idioma',
             question: 'How do I change time zone and language?',
             intro: [
-              'In Settings. The time zone applies to every date and time you see and type; the language applies to the website and e-mails (the app follows the device language).',
+              'In Settings. The time zone applies to every date and time you see and type; the language applies to the website and e-mails (the app follows the device language). On the home page, the PT | EN switch at the top also changes the language.',
             ],
           },
           {

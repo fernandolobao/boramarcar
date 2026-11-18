@@ -26,6 +26,17 @@ describe('resolveLocale', () => {
     expect(resolveLocale(null, 'en-US')).toBe('en');
     expect(resolveLocale(null, 'pt-PT,en;q=0.8')).toBe('pt-BR');
   });
+  it('quem tem português em qualquer posição do navegador vê português', () => {
+    // Navegador em inglês de quem também lê português (comum no Brasil).
+    expect(resolveLocale(null, 'en-US,en;q=0.9,pt-BR;q=0.8')).toBe('pt-BR');
+    expect(resolveLocale(null, 'en-GB,pt;q=0.5')).toBe('pt-BR');
+  });
+  it('no Brasil, sem escolha salva, começa em português', () => {
+    expect(resolveLocale(null, 'en-US,en;q=0.9', 'BR')).toBe('pt-BR');
+    expect(resolveLocale(null, 'en-US', 'US')).toBe('en');
+    // A escolha feita no seletor (cookie) sempre manda.
+    expect(resolveLocale('en', 'pt-BR', 'BR')).toBe('en');
+  });
   it('cai no padrão', () => {
     expect(resolveLocale('xx', 'fr-FR')).toBe(DEFAULT_LOCALE);
   });

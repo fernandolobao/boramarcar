@@ -79,7 +79,7 @@ export function DateField({
             {(segment) => (
               <DateSegment
                 segment={segment}
-                className="rounded px-0.5 outline-none focus:bg-primary focus:text-on-primary data-[placeholder]:text-fg-muted data-[type=literal]:px-0"
+                className="min-w-6 rounded px-0.5 text-center tabular-nums outline-none focus:bg-primary focus:text-on-primary data-[placeholder]:text-fg-muted data-[type=literal]:min-w-0 data-[type=literal]:px-0"
               />
             )}
           </DateInput>

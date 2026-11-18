@@ -429,3 +429,9 @@ sem rolagem horizontal em 320px.
 ## Dicas: botão de informação (15/11/2026)
 
 - A dica deixou de sumir de vez: um botão ⓘ ao lado do título (site) ou no topo da seção (app) abre e fecha a dica (`aria-expanded`, `aria-controls`; nome "Dica sobre esta tela" e a mesma dica visível no `title`). Na primeira vez ela vem aberta, sem roubar o foco; "Entendi" fecha, grava que a pessoa já viu e devolve o foco ao ⓘ. Alvo de 40 px no site e 44 pt no app. Mais espaço entre o título e o quadro da dica.
+
+## Seletor de idioma na página inicial (18/11/2026)
+
+- "PT | EN" no topo é um `role="group"` ("Idioma") com dois botões `aria-pressed`. O nome acessível começa pelo texto visível ("PT — Português (Brasil)", WCAG 2.5.3) e cada botão tem `lang` do próprio idioma. Alvos com 24 px no mínimo e foco visível.
+- Abaixo de 400 px o botão do topo usa o texto curto ("Entrar"/"Painel") e o ícone do seletor some, para não haver rolagem horizontal em 320 px. O menu de seções aparece só a partir de 1280 px, sem quebrar linha.
+- Campos de data e hora: cada segmento (dia, mês, hora…) tem largura mínima de 24 px. Uma hora de um dígito ("9") deixava o alvo menor que 24 px (2.5.8), e o E2E só pegava isso em certas horas do dia.
