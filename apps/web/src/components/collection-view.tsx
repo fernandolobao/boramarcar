@@ -307,14 +307,11 @@ function GalleryTile({
             <span aria-hidden="true">✦</span> {td('foil')}
           </span>
         )}
-        {entry.decks.length > 0 ? (
-          <span className="inline-flex items-center gap-0.5 font-medium">
-            <Icon name="decks" className="size-3.5 shrink-0" />
-            {t('inDecks', { count: entry.decks.length })}
-          </span>
-        ) : (
-          <span className="muted">{t('notInDecks')}</span>
-        )}
+        {/* Mesmo tamanho, peso e cor nos dois casos: o texto já diz se está em algum deck. */}
+        <span className="inline-flex items-center gap-0.5 font-medium text-fg-muted">
+          <Icon name="decks" className="size-3.5 shrink-0" />
+          {entry.decks.length > 0 ? t('inDecks', { count: entry.decks.length }) : t('notInDecks')}
+        </span>
       </p>
     </div>
   );
