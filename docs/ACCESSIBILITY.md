@@ -503,3 +503,8 @@ sem rolagem horizontal em 320px.
 
 - `/grupo/recordes`: `h1`, duas seções com `h2`; cada recorde com título e frase completa (quem, o quê, em qual encontro e quando), com links para o perfil e o encontro; ícones decorativos. As cores aparecem com o símbolo de mana (decorativo) **e** o nome por extenso com a porcentagem — cor não é a única pista. Página no E2E de acessibilidade.
 - App: tela com cada recorde como item acessível (título e frase).
+
+## Retrospectiva do mês (19/11/2026)
+
+- `/retrospectiva/<grupo>/<mês>` (pública, como o resumo da noite): `main#conteudo`, um `h1` com o mês, seções com `h2` (feitos do mês, duelo, compartilhar). "Recorde do grupo" é texto num selo, não só cor; ícone do destaque decorativo. Página no E2E de acessibilidade (sem login).
+- Aviso no sino com texto completo; no app, o aviso e o botão na tela do grupo abrem a página no navegador.

@@ -1,6 +1,7 @@
 import { fillDate } from './support/fill-date';
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
+import { E2E_IDS } from './support/seed';
 
 test.describe('ranking e estatísticas', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
@@ -58,5 +59,32 @@ test.describe('ranking e estatísticas', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Recordes do grupo' })).toBeVisible();
     await expect(page.getByText('Noite com mais partidas')).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: 'A cara do grupo' })).toBeVisible();
+  });
+
+  test('retrospectiva do mês: pública, só primeiros nomes e com compartilhar', async ({
+    browser,
+  }) => {
+    const month = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+    })
+      .format(new Date(Date.now() - 7 * 86_400_000))
+      .slice(0, 7);
+    // Sem login: a página é pública para quem tem o link.
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+    const page = await context.newPage();
+    await page.goto(`/retrospectiva/${E2E_IDS.group}/${month}`);
+    await expect(page.getByText('Retrospectiva do mês')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Compartilhar' })).toBeVisible();
+    // Nada de e-mail nem nome do grupo no conteúdo da página.
+    const main = page.locator('main');
+    await expect(main).not.toContainText('@e2e.test');
+    await expect(main).not.toContainText('Mesa de Quinta');
+    await expect(page.getByRole('link', { name: 'Conhecer o ArcanaKin' })).toBeVisible();
+    // Mês inválido: página não encontrada.
+    const missing = await page.goto(`/retrospectiva/${E2E_IDS.group}/2026-13`);
+    expect(missing?.status()).toBe(404);
+    await context.close();
   });
 });

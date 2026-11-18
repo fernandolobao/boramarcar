@@ -273,6 +273,9 @@ export function buildRecapEmail(
 
 /** Página pública do resumo (só primeiros nomes, comandantes e placar). */
 export const recapUrl = (eventId: string) => `${getBaseUrl()}/resumo/${eventId}`;
+/** Retrospectiva do mês do grupo (pública para quem tem o link). */
+export const monthlyUrl = (groupId: string, month: string) =>
+  `${getBaseUrl()}/retrospectiva/${groupId}/${month}`;
 
 /** E-mails da conta com e-mail e senha: confirmar o e-mail e redefinir a senha. */
 export function buildAccountEmail(

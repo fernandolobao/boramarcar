@@ -13,6 +13,7 @@ export const NOTIFICATION_KINDS = [
   'podium',
   'announcement',
   'nudge',
+  'monthly',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -34,4 +35,6 @@ export type NotificationData =
   /** Aviso da administração do ArcanaKin (ou as novidades da semana). */
   | { kind: 'announcement'; announcementId: string }
   /** "Chamar para o próximo": a pessoa foi chamada para um encontro. */
-  | { kind: 'nudge'; eventId: string };
+  | { kind: 'nudge'; eventId: string }
+  /** Retrospectiva do mês do grupo pronta (dia 1, só se o grupo jogou no mês). */
+  | { kind: 'monthly'; groupId: string; month: string };

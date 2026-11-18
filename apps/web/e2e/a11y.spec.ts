@@ -17,6 +17,15 @@ async function expectNoViolations(page: Page) {
   expect(summary, JSON.stringify(summary, null, 2)).toEqual([]);
 }
 
+/** Mês do encontro passado do seed (7 dias atrás), no fuso de São Paulo. */
+const PAST_MONTH = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Sao_Paulo',
+  year: 'numeric',
+  month: '2-digit',
+})
+  .format(new Date(Date.now() - 7 * 86_400_000))
+  .slice(0, 7);
+
 const PUBLIC_PAGES = [
   '/',
   '/privacidade',
@@ -24,6 +33,7 @@ const PUBLIC_PAGES = [
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,
+  `/retrospectiva/${E2E_IDS.group}/${PAST_MONTH}`,
   '/entrar',
   '/cadastro',
   '/esqueci-senha',

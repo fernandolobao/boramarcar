@@ -8,17 +8,8 @@ import { requireMembership } from './groups';
 /** Janela do "meta" (comandantes mais jogados) na cara do grupo. */
 export const META_DAYS = 90;
 
-/**
- * Recordes e "cara do grupo" (8.12), para quem é do grupo: vitória mais rápida, partida mais
- * longa, maior sequência, noite com mais partidas, comandante com mais vitórias, cores mais
- * jogadas e o meta dos últimos 90 dias. Com nomes e títulos dos encontros.
- */
-export async function getGroupRecords(
-  db: Database,
-  input: { groupId: string; userId: string; now?: Date },
-) {
-  await requireMembership(db, input.groupId, input.userId);
-  const now = input.now ?? new Date();
+/** Partidas do grupo (com jogadores e decks) no formato das regras de recordes. */
+export async function loadGroupGames(db: Database, groupId: string) {
   const gameRows = await db
     .select({
       gameId: games.id,
@@ -28,7 +19,7 @@ export async function getGroupRecords(
       durationMinutes: games.durationMinutes,
     })
     .from(games)
-    .where(eq(games.groupId, input.groupId));
+    .where(eq(games.groupId, groupId));
   const ids = gameRows.map((g) => g.gameId);
   const playerRows = ids.length
     ? await db
@@ -58,6 +49,21 @@ export async function getGroupRecords(
     ...g,
     players: playerRows.filter((p) => p.gameId === g.gameId),
   }));
+  return { list, decks };
+}
+
+/**
+ * Recordes e "cara do grupo" (8.12), para quem é do grupo: vitória mais rápida, partida mais
+ * longa, maior sequência, noite com mais partidas, comandante com mais vitórias, cores mais
+ * jogadas e o meta dos últimos 90 dias. Com nomes e títulos dos encontros.
+ */
+export async function getGroupRecords(
+  db: Database,
+  input: { groupId: string; userId: string; now?: Date },
+) {
+  await requireMembership(db, input.groupId, input.userId);
+  const now = input.now ?? new Date();
+  const { list, decks } = await loadGroupGames(db, input.groupId);
   const records = groupRecords(list, decks);
   const face = groupFace(list, decks, { since: new Date(now.getTime() - META_DAYS * 86_400_000) });
 

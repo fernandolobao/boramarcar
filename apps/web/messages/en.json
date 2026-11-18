@@ -2092,7 +2092,8 @@
     "markOneLabel": "Mark as read: {text}",
     "markAll": "Mark all as read",
     "unreadCount": "{count, plural, =0 {All read.} =1 {1 unread.} other {# unread.}}",
-    "nudge": "{group} invited you to the next meetup: {event}."
+    "nudge": "{group} invited you to the next meetup: {event}.",
+    "monthly": "{group}’s {month} recap is ready."
   },
   "records": {
     "title": "Group records",
@@ -2138,5 +2139,35 @@
     "metaGames": "{count, plural, =1 {1 game} other {# games}}",
     "link": "Records and group identity",
     "and": " and "
+  },
+  "monthly": {
+    "eyebrow": "Monthly recap",
+    "metaTitle": "{month} recap",
+    "summary": "{games, plural, =1 {1 game} other {# games}} over {nights, plural, =1 {1 night} other {# nights}}, with {players, plural, =1 {1 person} other {# people}} at the table.",
+    "empty": "No games this month.",
+    "winner": "Player of the month: {name}, with {wins, plural, =1 {1 win} other {# wins}} in {games, plural, =1 {1 game} other {# games}}.",
+    "debuts": "First games this month: {names}. Welcome to the table!",
+    "highlights": "This month’s feats",
+    "newRecord": "Group record",
+    "fastestWin": "Fastest win",
+    "fastestWinText": "{who} won on turn {turn}, at {event}.",
+    "longestGame": "Longest game",
+    "longestGameText": "A {minutes}-minute game, at {event}.",
+    "longestStreak": "Longest winning streak",
+    "longestStreakText": "{who} won {length} games in a row.",
+    "busiestNight": "Night with the most games",
+    "busiestNightText": "{games} games at {event}.",
+    "topCommander": "Commander with the most wins",
+    "topCommanderText": "{name}, with {wins, plural, =1 {1 win} other {# wins}}.",
+    "duel": "Duel of the month",
+    "duelText": "{a} and {b} faced off in {games} games: {aWins} to {bWins} in wins.",
+    "share": "Share",
+    "shareText": "{month} recap: {summary} {url}",
+    "openRecords": "See the group records",
+    "cta": "Organize your group’s Magic nights and keep every game.",
+    "ctaButton": "Discover ArcanaKin",
+    "someone": "someone",
+    "event": "a meetup",
+    "link": "{month} recap"
   }
 }

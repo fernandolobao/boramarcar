@@ -2092,7 +2092,8 @@
     "markOneLabel": "Marcar como lida: {text}",
     "markAll": "Marcar todas como lidas",
     "unreadCount": "{count, plural, =0 {Tudo lido.} =1 {1 não lida.} other {# não lidas.}}",
-    "nudge": "{group} chamou você para o próximo encontro: {event}."
+    "nudge": "{group} chamou você para o próximo encontro: {event}.",
+    "monthly": "A retrospectiva de {month} de {group} está pronta."
   },
   "records": {
     "title": "Recordes do grupo",
@@ -2138,5 +2139,35 @@
     "metaGames": "{count, plural, =1 {1 partida} other {# partidas}}",
     "link": "Recordes e a cara do grupo",
     "and": " e "
+  },
+  "monthly": {
+    "eyebrow": "Retrospectiva do mês",
+    "metaTitle": "Retrospectiva de {month}",
+    "summary": "{games, plural, =1 {1 partida} other {# partidas}} em {nights, plural, =1 {1 noite} other {# noites}}, com {players, plural, =1 {1 pessoa} other {# pessoas}} na mesa.",
+    "empty": "Nenhuma partida neste mês.",
+    "winner": "Destaque do mês: {name}, com {wins, plural, =1 {1 vitória} other {# vitórias}} em {games, plural, =1 {1 partida} other {# partidas}}.",
+    "debuts": "Estreias no mês: {names}. Boas-vindas à mesa!",
+    "highlights": "Os feitos do mês",
+    "newRecord": "Recorde do grupo",
+    "fastestWin": "Vitória mais rápida",
+    "fastestWinText": "{who} {count, plural, =1 {venceu} other {venceram}} no turno {turn}, em {event}.",
+    "longestGame": "Partida mais longa",
+    "longestGameText": "{minutes} minutos de partida, em {event}.",
+    "longestStreak": "Maior sequência de vitórias",
+    "longestStreakText": "{who} venceu {length} partidas seguidas.",
+    "busiestNight": "Noite com mais partidas",
+    "busiestNightText": "{games} partidas em {event}.",
+    "topCommander": "Comandante com mais vitórias",
+    "topCommanderText": "{name}, com {wins, plural, =1 {1 vitória} other {# vitórias}}.",
+    "duel": "O duelo do mês",
+    "duelText": "{a} e {b} se enfrentaram em {games} partidas: {aWins} a {bWins} em vitórias.",
+    "share": "Compartilhar",
+    "shareText": "Retrospectiva de {month}: {summary} {url}",
+    "openRecords": "Ver os recordes do grupo",
+    "cta": "Organize as noites de Magic do seu grupo e guarde cada partida.",
+    "ctaButton": "Conhecer o ArcanaKin",
+    "someone": "alguém",
+    "event": "um encontro",
+    "link": "Retrospectiva de {month}"
   }
 }

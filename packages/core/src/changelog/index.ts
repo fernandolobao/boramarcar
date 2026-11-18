@@ -109,6 +109,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Recordes do grupo: vitória mais rápida, partida mais longa, maior sequência e mais, além da cara do grupo (cores e comandantes).',
     en: 'Group records: fastest win, longest game, longest streak and more, plus the group’s identity (colors and commanders).',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Retrospectiva do mês: todo dia 1, o seu grupo recebe o resumo do mês que passou, com o destaque, as estreias, os recordes que caíram e o duelo do mês, pronto para compartilhar.',
+    en: 'Monthly recap: on the 1st of each month, your group gets a recap of the month before, with the player of the month, first-timers, records that fell and the duel of the month, ready to share.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

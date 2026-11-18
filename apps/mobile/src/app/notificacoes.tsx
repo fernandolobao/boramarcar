@@ -1,10 +1,11 @@
 import type { NotificationItem } from '@boramarcar/api-client';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Linking, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { AppText, Button, ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
-import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
+import { formatDateTime, formatMonthYear, t, type MessageKey } from '@/lib/i18n';
+import { monthlyRecapUrl } from '@/lib/config';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
@@ -34,6 +35,11 @@ function notificationText(item: NotificationItem) {
     }
     case 'nudge':
       return t('notifNudge', { event, group: item.groupName ?? '' });
+    case 'monthly':
+      return t('notifMonthly', {
+        group: item.groupName ?? '',
+        month: formatMonthYear(new Date(`${String(d.month)}-15T12:00:00Z`)),
+      });
     case 'achievement':
       return t('notifAchievement', {
         name: t(`achievement_${String(d.achievementId)}_name` as MessageKey),
@@ -60,6 +66,13 @@ function open(item: NotificationItem) {
     router.push({ pathname: '/encontros/[id]', params: { id: d.eventId } });
   } else if (item.kind === 'podium') {
     router.push('/ranking');
+  } else if (
+    item.kind === 'monthly' &&
+    typeof d.groupId === 'string' &&
+    typeof d.month === 'string'
+  ) {
+    // A retrospectiva do mês é uma página do site (a mesma que se compartilha).
+    void Linking.openURL(monthlyRecapUrl(d.groupId, d.month));
   }
 }
 
