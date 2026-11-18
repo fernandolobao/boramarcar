@@ -7,6 +7,9 @@ import { AppText, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDateMedium, formatMonthYear, formatPercent, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { useState } from 'react';
+import { splitAchievements } from '@boramarcar/core/achievements';
+import { Choices } from '@/components/ds/choices';
 import { useAsync } from '@/lib/use-async';
 
 const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = {
@@ -91,16 +94,34 @@ function achievementStatus(a: Achievement) {
 
 function Achievements({ achievements }: { achievements: readonly Achievement[] }) {
   const colors = useColors();
-  const unlocked = achievements.filter((a) => a.unlocked).length;
+  // "Para conquistar" abre por padrão (as mais perto de sair primeiro); "Conquistadas" ao lado.
+  const [tab, setTab] = useState<'pending' | 'done'>('pending');
+  const { pending, done } = splitAchievements(achievements);
+  const shown = tab === 'pending' ? pending : done;
   return (
     <Card style={{ gap: 10 }}>
       <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
         {t('achievementsTitle')}
       </AppText>
       <AppText muted>
-        {t('achievementsUnlocked', { count: unlocked, total: achievements.length })}
+        {t('achievementsUnlocked', { count: done.length, total: achievements.length })}
       </AppText>
-      {achievements.map((a) => {
+      <Choices
+        label={t('achievementsTitle')}
+        hideLabel
+        value={tab}
+        onChange={setTab}
+        options={[
+          { value: 'pending', label: t('achievementsTabPending', { count: pending.length }) },
+          { value: 'done', label: t('achievementsTabDone', { count: done.length }) },
+        ]}
+      />
+      {shown.length === 0 ? (
+        <AppText muted>
+          {tab === 'pending' ? t('achievementsAllDone') : t('achievementsNoneYet')}
+        </AppText>
+      ) : null}
+      {shown.map((a) => {
         const name = t(`achievement_${a.id}_name` as MessageKey);
         const description = t(`achievement_${a.id}_description` as MessageKey);
         const status = achievementStatus(a);

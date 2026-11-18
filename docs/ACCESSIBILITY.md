@@ -478,3 +478,8 @@ sem rolagem horizontal em 320px.
 
 - Site: cada notificação não lida tem o botão "Marcar como lida" com o texto da notificação no nome acessível ("Marcar como lida: …", começando pelo texto visível); em telas estreitas o texto vira só ícone, com o mesmo nome e `title`. "Marcar todas como lidas" no topo, e a contagem ("1 não lida.") em `role="status"`.
 - App: o item continua um botão (abrir marca como lida) e ganhou a ação de acessibilidade "Marcar como lida" (VoiceOver/TalkBack), além do botão visível.
+
+## Conquistas em abas no perfil (18/11/2026)
+
+- Site: abas do React Aria (`tablist`/`tab`/`tabpanel`, setas do teclado, `aria-selected`), "Para conquistar (N)" selecionada por padrão; o número está no nome da aba. Aba vazia mostra uma frase (não fica em branco).
+- App: as abas são o `Choices` do design system (`radiogroup` com nome "Conquistas"); cada conquista continua um item acessível com nome, descrição e situação.

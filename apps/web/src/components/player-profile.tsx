@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { AvatarImage } from './avatar-image';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { DeckGrid, type DeckRatings } from './deck-grid';
+import { splitAchievements } from '@boramarcar/core/achievements';
 import { ACHIEVEMENT_ICON } from './achievement-icons';
+import { AchievementTabs } from './achievement-tabs';
 import { Icon } from './icons';
 
 type Profile = Awaited<ReturnType<typeof getPlayerProfile>>;
@@ -12,7 +14,67 @@ type Profile = Awaited<ReturnType<typeof getPlayerProfile>>;
 export async function Achievements({ achievements }: { achievements: Profile['achievements'] }) {
   const t = await getTranslations('achievements');
   const format = await getFormatter();
-  const unlocked = achievements.filter((a) => a.unlocked).length;
+  const { pending, done } = splitAchievements(achievements);
+  const card = (a: Profile['achievements'][number]) => (
+    <li
+      key={a.id}
+      className={`flex items-start gap-3 rounded-xl border p-3 ${
+        a.unlocked
+          ? 'border-brand-400/60 bg-brand-50 dark:border-brand-400/40 dark:bg-brand-700/20'
+          : 'border-ink-200 dark:border-ink-800'
+      }`}
+    >
+      <span
+        className={`grid size-11 shrink-0 place-items-center rounded-full ${
+          a.unlocked
+            ? 'bg-brand-600 text-white'
+            : 'bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400'
+        }`}
+      >
+        <Icon name={a.unlocked ? ACHIEVEMENT_ICON[a.id] : 'private'} className="size-5" />
+      </span>
+      <div className="min-w-0 flex-1 text-sm">
+        <p className="font-semibold">
+          {t(`items.${a.id}.name`)}
+          {a.count !== undefined && a.count > 1 && (
+            <span className="muted font-normal"> · {t('times', { count: a.count })}</span>
+          )}
+        </p>
+        <p className="muted">{t(`items.${a.id}.description`)}</p>
+        {a.unlocked && a.unlockedAt ? (
+          <p className="mt-1 text-xs font-medium text-brand-700 dark:text-brand-400">
+            {t('unlockedOn', {
+              date: format.dateTime(a.unlockedAt, { dateStyle: 'medium' }),
+            })}
+          </p>
+        ) : (
+          <div className="mt-1.5">
+            <p className="muted text-xs">
+              <span className="sr-only">{t('locked')}. </span>
+              {t('progress', { current: a.progress, target: a.target })}
+            </p>
+            {a.target > 1 && (
+              <div
+                className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-200 dark:bg-ink-800"
+                aria-hidden="true"
+              >
+                <div
+                  className="h-full rounded-full bg-brand-500"
+                  style={{ width: `${(a.progress / a.target) * 100}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </li>
+  );
+  const list = (items: Profile['achievements'], empty: string) =>
+    items.length ? (
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{items.map(card)}</ul>
+    ) : (
+      <p className="muted">{empty}</p>
+    );
   return (
     <section className="card" aria-labelledby="achievements-title">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -20,65 +82,25 @@ export async function Achievements({ achievements }: { achievements: Profile['ac
           {t('title')}
         </h2>
         <p className="muted text-sm">
-          {t('unlocked', { count: unlocked, total: achievements.length })}
+          {t('unlocked', { count: done.length, total: achievements.length })}
         </p>
       </div>
-      <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {achievements.map((a) => (
-          <li
-            key={a.id}
-            className={`flex items-start gap-3 rounded-xl border p-3 ${
-              a.unlocked
-                ? 'border-brand-400/60 bg-brand-50 dark:border-brand-400/40 dark:bg-brand-700/20'
-                : 'border-ink-200 dark:border-ink-800'
-            }`}
-          >
-            <span
-              className={`grid size-11 shrink-0 place-items-center rounded-full ${
-                a.unlocked
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400'
-              }`}
-            >
-              <Icon name={a.unlocked ? ACHIEVEMENT_ICON[a.id] : 'private'} className="size-5" />
-            </span>
-            <div className="min-w-0 flex-1 text-sm">
-              <p className="font-semibold">
-                {t(`items.${a.id}.name`)}
-                {a.count !== undefined && a.count > 1 && (
-                  <span className="muted font-normal"> · {t('times', { count: a.count })}</span>
-                )}
-              </p>
-              <p className="muted">{t(`items.${a.id}.description`)}</p>
-              {a.unlocked && a.unlockedAt ? (
-                <p className="mt-1 text-xs font-medium text-brand-700 dark:text-brand-400">
-                  {t('unlockedOn', {
-                    date: format.dateTime(a.unlockedAt, { dateStyle: 'medium' }),
-                  })}
-                </p>
-              ) : (
-                <div className="mt-1.5">
-                  <p className="muted text-xs">
-                    <span className="sr-only">{t('locked')}. </span>
-                    {t('progress', { current: a.progress, target: a.target })}
-                  </p>
-                  {a.target > 1 && (
-                    <div
-                      className="mt-1 h-1.5 overflow-hidden rounded-full bg-ink-200 dark:bg-ink-800"
-                      aria-hidden="true"
-                    >
-                      <div
-                        className="h-full rounded-full bg-brand-500"
-                        style={{ width: `${(a.progress / a.target) * 100}%` }}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* "Para conquistar" abre por padrão (o que falta e quanto falta); "Conquistadas" ao lado. */}
+      <AchievementTabs
+        label={t('tabsLabel')}
+        tabs={[
+          {
+            id: 'pending',
+            title: t('tabPending', { count: pending.length }),
+            content: list(pending, t('allDone')),
+          },
+          {
+            id: 'done',
+            title: t('tabDone', { count: done.length }),
+            content: list(done, t('noneYet')),
+          },
+        ]}
+      />
     </section>
   );
 }

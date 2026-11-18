@@ -11,6 +11,11 @@ test.describe('perfis e conquistas', () => {
     await page.goto('/perfil');
     await expect(page.getByRole('heading', { level: 1, name: 'Ana Teste' })).toBeVisible();
     const achievements = page.getByRole('region', { name: 'Conquistas' });
+    // Abas: "Para conquistar" abre por padrão; "Conquistadas" ao lado.
+    const pending = achievements.getByRole('tab', { name: /^Para conquistar \(\d+\)$/ });
+    await expect(pending).toHaveAttribute('aria-selected', 'true');
+    await expect(achievements.getByText(/Progresso: \d+ de \d+/).first()).toBeVisible();
+    await achievements.getByRole('tab', { name: /^Conquistadas \(\d+\)$/ }).click();
     await expect(achievements.getByText('Primeira vitória')).toBeVisible();
     await expect(achievements.getByText(/Conquistada em/).first()).toBeVisible();
     await expect(achievements.getByText(/de 26 conquistadas/)).toBeVisible();
