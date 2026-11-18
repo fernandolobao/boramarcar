@@ -79,6 +79,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Notificações agora podem ser marcadas como lidas uma a uma, ou todas de uma vez.',
     en: 'Notifications can now be marked as read one by one, or all at once.',
   },
+  {
+    date: '2026-11-18',
+    pt: 'As conquistas no perfil ganharam abas: "Para conquistar", com as mais perto de sair primeiro, e "Conquistadas".',
+    en: 'Achievements on the profile now have tabs: "To earn", closest first, and "Earned".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

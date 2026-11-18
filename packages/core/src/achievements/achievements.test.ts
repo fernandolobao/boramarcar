@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { ACHIEVEMENT_IDS, computeAchievements, type AchievementGame } from '.';
+import {
+  ACHIEVEMENT_IDS,
+  computeAchievements,
+  splitAchievements,
+  type Achievement,
+  type AchievementGame,
+  type AchievementId,
+} from '.';
 
 let day = 0;
 const game = (
@@ -219,5 +226,27 @@ describe('conquistas novas', () => {
       byId(computeAchievements('me', [...eleven, lateNight], [], { timeZone: 'America/Sao_Paulo' }))
         .months_12!.unlocked,
     ).toBe(true);
+  });
+});
+
+describe('abas de conquistas', () => {
+  const a = (
+    id: AchievementId,
+    unlocked: boolean,
+    progress: number,
+    target: number,
+    unlockedAt: Date | null = null,
+  ): Achievement => ({ id, unlocked, progress, target, unlockedAt });
+
+  it('"para conquistar" mostra primeiro as mais perto de sair; "conquistadas", as mais recentes', () => {
+    const { pending, done } = splitAchievements([
+      a('games_100', false, 10, 100),
+      a('first_win', true, 1, 1, new Date('2026-01-02')),
+      a('wins_10', false, 9, 10),
+      a('streak_3', true, 3, 3, new Date('2026-03-01')),
+      a('fast_win', false, 0, 1),
+    ]);
+    expect(pending.map((x) => x.id)).toEqual(['wins_10', 'games_100', 'fast_win']);
+    expect(done.map((x) => x.id)).toEqual(['streak_3', 'first_win']);
   });
 });

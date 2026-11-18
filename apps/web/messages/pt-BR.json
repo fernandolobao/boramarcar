@@ -1045,7 +1045,12 @@
         "name": "O ano inteiro",
         "description": "Jogar em todos os 12 meses de um mesmo ano."
       }
-    }
+    },
+    "tabsLabel": "Conquistas",
+    "tabPending": "Para conquistar ({count})",
+    "tabDone": "Conquistadas ({count})",
+    "allDone": "Todas conquistadas! Não falta nenhuma.",
+    "noneYet": "Nenhuma conquista ainda. A primeira partida registrada já vale uma."
   },
   "player": {
     "decks": "Decks",

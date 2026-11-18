@@ -265,3 +265,22 @@ export function computeAchievements(
     };
   });
 }
+
+/**
+ * Abas do perfil: "para conquistar" (as mais perto de sair primeiro, pela fração do progresso;
+ * empate fica na ordem da lista) e "conquistadas" (as mais recentes primeiro).
+ */
+export function splitAchievements<
+  T extends Pick<Achievement, 'unlocked' | 'progress' | 'target' | 'unlockedAt'>,
+>(list: readonly T[]) {
+  const ratio = (a: T) => (a.target > 0 ? a.progress / a.target : 0);
+  const pending = list
+    .map((a, i) => ({ a, i }))
+    .filter(({ a }) => !a.unlocked)
+    .sort((x, y) => ratio(y.a) - ratio(x.a) || x.i - y.i)
+    .map(({ a }) => a);
+  const done = list
+    .filter((a) => a.unlocked)
+    .sort((x, y) => (y.unlockedAt?.getTime() ?? 0) - (x.unlockedAt?.getTime() ?? 0));
+  return { pending, done };
+}
