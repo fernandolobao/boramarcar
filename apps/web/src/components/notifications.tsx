@@ -3,7 +3,8 @@
 import type { InboxItem } from '@boramarcar/db';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon, type IconName } from './icons';
 
@@ -71,67 +72,113 @@ function useNotificationText() {
 }
 
 /**
- * Lista da central de notificações. Ao abrir, tudo passa a contar como lido (o selo "Nova"
- * continua nesta visita, para a pessoa ver o que chegou).
+ * Lista da central de notificações. Cada notificação não lida pode ser marcada como lida (e
+ * abrir uma também a marca); "Marcar todas como lidas" fica no topo. O sino do cabeçalho se
+ * atualiza em seguida.
  */
 export function NotificationList({ items }: { items: InboxEntry[] }) {
   const t = useTranslations('notifications');
   const format = useFormatter();
   const now = useNow({ updateInterval: 60_000 });
   const text = useNotificationText();
-  const hasUnread = items.some((i) => !i.readAt);
+  const router = useRouter();
+  const [read, setRead] = useState<Set<string>>(new Set());
+  const isUnread = (item: InboxEntry) => !item.readAt && !read.has(item.id);
+  const unread = items.filter(isUnread);
 
-  useEffect(() => {
-    if (hasUnread) void api('/api/v1/me/notifications/read', { method: 'POST' }).catch(() => {});
-  }, [hasUnread]);
+  const markOne = (item: InboxEntry) => {
+    if (!isUnread(item)) return;
+    setRead((prev) => new Set(prev).add(item.id));
+    // `keepalive`: continua mesmo se a pessoa sair da página ao abrir a notificação.
+    void fetch(`/api/v1/me/notifications/${item.id}/read`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      keepalive: true,
+    })
+      .then(() => router.refresh())
+      .catch(() => {});
+  };
+  const markAll = () => {
+    setRead(new Set(items.map((i) => i.id)));
+    void api('/api/v1/me/notifications/read', { method: 'POST' })
+      .then(() => router.refresh())
+      .catch(() => {});
+  };
 
   if (!items.length) return <p className="muted">{t('empty')}</p>;
   return (
-    <ul className="divide-y divide-line">
-      {items.map((item) => {
-        const href = notificationHref(item);
-        const body = (
-          <>
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-muted">
-              <Icon name={ICON[item.kind]} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className={`block ${item.announcement ? 'font-semibold' : ''}`}>
-                {text(item)}
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p role="status" className="muted text-sm">
+          {t('unreadCount', { count: unread.length })}
+        </p>
+        {unread.length > 0 && (
+          <button type="button" className="btn-secondary" onClick={markAll}>
+            <Icon name="done" />
+            {t('markAll')}
+          </button>
+        )}
+      </div>
+      <ul className="divide-y divide-line">
+        {items.map((item) => {
+          const href = notificationHref(item);
+          const fresh = isUnread(item);
+          const body = (
+            <>
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-muted">
+                <Icon name={ICON[item.kind]} />
               </span>
-              {item.announcement && (
-                // Texto simples do aviso, com as quebras de linha que o admin escreveu.
-                <span className="block whitespace-pre-line">{item.announcement.body}</span>
+              <span className="min-w-0 flex-1">
+                <span className={`block ${item.announcement ? 'font-semibold' : ''}`}>
+                  {text(item)}
+                </span>
+                {item.announcement && (
+                  // Texto simples do aviso, com as quebras de linha que o admin escreveu.
+                  <span className="block whitespace-pre-line">{item.announcement.body}</span>
+                )}
+                <span className="muted block text-sm">
+                  {item.groupName && item.kind !== 'podium' ? `${item.groupName} · ` : ''}
+                  <time dateTime={item.createdAt}>
+                    {format.relativeTime(new Date(item.createdAt), now)}
+                  </time>
+                </span>
+              </span>
+              {fresh && (
+                <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-on-accent">
+                  {t('new')}
+                </span>
               )}
-              <span className="muted block text-sm">
-                {item.groupName && item.kind !== 'podium' ? `${item.groupName} · ` : ''}
-                <time dateTime={item.createdAt}>
-                  {format.relativeTime(new Date(item.createdAt), now)}
-                </time>
-              </span>
-            </span>
-            {!item.readAt && (
-              <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-on-accent">
-                {t('new')}
-              </span>
-            )}
-          </>
-        );
-        return (
-          <li key={item.id}>
-            {href ? (
-              <Link
-                href={href}
-                className="flex items-start gap-3 rounded-lg px-2 py-3 hover:bg-surface-muted"
-              >
-                {body}
-              </Link>
-            ) : (
-              <div className="flex items-start gap-3 px-2 py-3">{body}</div>
-            )}
-          </li>
-        );
-      })}
-    </ul>
+            </>
+          );
+          return (
+            <li key={item.id} className="flex items-start gap-2 py-1">
+              {href ? (
+                <Link
+                  href={href}
+                  onClick={() => markOne(item)}
+                  className="flex min-w-0 flex-1 items-start gap-3 rounded-lg px-2 py-2 hover:bg-surface-muted"
+                >
+                  {body}
+                </Link>
+              ) : (
+                <div className="flex min-w-0 flex-1 items-start gap-3 px-2 py-2">{body}</div>
+              )}
+              {fresh && (
+                <button
+                  type="button"
+                  className="btn-secondary mt-1 shrink-0 px-3"
+                  onClick={() => markOne(item)}
+                  aria-label={t('markOneLabel', { text: text(item) })}
+                  title={t('markOne')}
+                >
+                  <Icon name="done" />
+                  <span className="sr-only sm:not-sr-only">{t('markOne')}</span>
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

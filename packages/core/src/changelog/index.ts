@@ -59,6 +59,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Chegou o sino de notificações: partidas suas e do grupo, conquistas, mudanças no pódio e avisos do ArcanaKin.',
     en: 'Meet the notifications bell: your games and your group’s, achievements, podium changes and ArcanaKin announcements.',
   },
+  {
+    date: '2026-11-18',
+    pt: 'Notificações agora podem ser marcadas como lidas uma a uma, ou todas de uma vez.',
+    en: 'Notifications can now be marked as read one by one, or all at once.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

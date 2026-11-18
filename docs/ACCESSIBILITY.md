@@ -473,3 +473,8 @@ sem rolagem horizontal em 320px.
 
 - `/admin`: formulário com rótulos (título, texto com dica associada por `aria-describedby`, público num `select`), status em `role="status"` e erros em `FormError`. "Publicar" e "Excluir" pedem confirmação em dois cliques; os botões repetidos levam o título do aviso em `sr-only`. Componente no `a11y.test.tsx`.
 - Na central, o aviso mostra o título em destaque e o texto com as quebras de linha (`whitespace-pre-line`); no app, título e texto entram no nome acessível do item.
+
+## Marcar notificação como lida (18/11/2026)
+
+- Site: cada notificação não lida tem o botão "Marcar como lida" com o texto da notificação no nome acessível ("Marcar como lida: …", começando pelo texto visível); em telas estreitas o texto vira só ícone, com o mesmo nome e `title`. "Marcar todas como lidas" no topo, e a contagem ("1 não lida.") em `role="status"`.
+- App: o item continua um botão (abrir marca como lida) e ganhou a ação de acessibilidade "Marcar como lida" (VoiceOver/TalkBack), além do botão visível.

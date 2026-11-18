@@ -1,8 +1,8 @@
 import type { NotificationItem } from '@boramarcar/api-client';
 import { router } from 'expo-router';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
-import { AppText, ErrorState, Loading } from '@/components/ui';
+import { AppText, Button, ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -62,27 +62,44 @@ function open(item: NotificationItem) {
 export default function NotificationsScreen() {
   const colors = useColors();
   const inbox = useAsync(() => api.me.notifications(), []);
-  const unread = inbox.data?.unread ?? 0;
+  // Lidas nesta visita (a lista não é recarregada a cada toque).
+  const [read, setRead] = useState<Set<string>>(new Set());
+  const isUnread = (item: NotificationItem) => !item.readAt && !read.has(item.id);
 
-  useEffect(() => {
-    if (unread > 0) api.me.markNotificationsRead().catch(() => {});
-  }, [unread]);
+  const markOne = (item: NotificationItem) => {
+    if (!isUnread(item)) return;
+    setRead((prev) => new Set(prev).add(item.id));
+    api.me.markNotificationRead(item.id).catch(() => {});
+  };
+  const markAll = () => {
+    setRead(new Set(inbox.data?.items.map((i) => i.id) ?? []));
+    api.me.markNotificationsRead().catch(() => {});
+  };
 
   if (inbox.loading) return <Loading />;
   if (inbox.error || !inbox.data) return <ErrorState error={inbox.error} onRetry={inbox.refresh} />;
   const items = inbox.data.items;
+  const unread = items.filter(isUnread).length;
 
   return (
     <ScrollView
       contentContainerStyle={{ padding: 16, gap: 8 }}
       refreshControl={<RefreshControl refreshing={inbox.refreshing} onRefresh={inbox.refresh} />}
     >
+      {unread > 0 ? (
+        <Button
+          label={t('notifMarkAll')}
+          variant="secondary"
+          onPress={markAll}
+          style={{ alignSelf: 'flex-start' }}
+        />
+      ) : null}
       {items.length === 0 ? (
         <AppText muted>{t('notifEmpty')}</AppText>
       ) : (
         items.map((item) => {
           const text = notificationText(item);
-          const isNew = !item.readAt;
+          const isNew = isUnread(item);
           const meta = [
             item.kind !== 'podium' ? item.groupName : null,
             formatDateTime(item.createdAt),
@@ -92,7 +109,16 @@ export default function NotificationsScreen() {
           return (
             <Pressable
               key={item.id}
-              onPress={() => open(item)}
+              onPress={() => {
+                markOne(item);
+                open(item);
+              }}
+              accessibilityActions={
+                isNew ? [{ name: 'markRead', label: t('notifMarkOne') }] : undefined
+              }
+              onAccessibilityAction={(e) => {
+                if (e.nativeEvent.actionName === 'markRead') markOne(item);
+              }}
               accessibilityRole="button"
               accessibilityLabel={`${isNew ? `${t('notifNew')}. ` : ''}${text}. ${
                 item.announcement ? `${item.announcement.body} ` : ''
@@ -115,6 +141,19 @@ export default function NotificationsScreen() {
                 {item.announcement ? <AppText>{item.announcement.body}</AppText> : null}
                 <AppText muted>{meta}</AppText>
               </View>
+              {isNew ? (
+                <Pressable
+                  onPress={() => markOne(item)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${t('notifMarkOne')}: ${text}`}
+                  hitSlop={8}
+                  style={{ padding: 4 }}
+                >
+                  <AppText style={{ color: colors.brand, fontWeight: '600' }}>
+                    {t('notifMarkOne')}
+                  </AppText>
+                </Pressable>
+              ) : null}
               {isNew ? (
                 <View
                   style={{

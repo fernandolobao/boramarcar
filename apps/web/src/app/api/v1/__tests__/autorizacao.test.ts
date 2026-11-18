@@ -5,7 +5,9 @@
  */
 import { mapScryfallCard, type ImportedDeck } from '@boramarcar/core';
 import {
+  addNotifications,
   createAnnouncement,
+  listNotifications,
   addAvailability,
   addAvailabilityRule,
   addCollectionCard,
@@ -71,6 +73,7 @@ const r = {
   activeGroup: await import('../me/active-group/route'),
   player: await import('../players/[userId]/route'),
   season: await import('../seasons/[seasonId]/route'),
+  notificationRead: await import('../me/notifications/[notificationId]/read/route'),
   announcements: await import('../admin/announcements/route'),
   announcement: await import('../admin/announcements/[announcementId]/route'),
   publish: await import('../admin/announcements/[announcementId]/publish/route'),
@@ -226,6 +229,14 @@ beforeAll(async () => {
   await addCollectionCard(db, { userId: ana.id, card: cards[0]!, quantity: 1, foil: false });
   const collection = await listCollection(db, ana.id);
   ids.collectionEntry = collection[0]!.id;
+  await addNotifications(db, [
+    {
+      userId: ana.id,
+      groupId: null,
+      data: { kind: 'podium', userIds: [ana.id] },
+    },
+  ]);
+  ids.notification = (await listNotifications(db, { userId: ana.id }))[0]!.id;
   ids.announcement = (
     await createAnnouncement(db, {
       title: 'Aviso secret',
@@ -512,6 +523,12 @@ const outsiderCases: Case[] = [
   ],
   ...deckCases('privateDeck'),
   ...deckCases('groupDeck'),
+  [
+    'POST marcar como lida a notificação de outra pessoa',
+    r.notificationRead.POST as Handler,
+    'POST',
+    () => ({ notificationId: ids.notification! }),
+  ],
   // Avisos do ArcanaKin: só admins da plataforma (ADMIN_EMAILS); para os outros, a rota não existe.
   ['GET avisos (admin)', r.announcements.GET as Handler, 'GET', () => ({})],
   [
