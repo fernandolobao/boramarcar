@@ -6,7 +6,8 @@
   "build": {
     "base": {
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://www.arcanakin.com.br"
+        "EXPO_PUBLIC_API_URL": "https://www.arcanakin.com.br",
+        "EXPO_PUBLIC_SENTRY_DSN": "https://f94dc9ad840cd86d2b601dea3b5cccf1@o4512417063108608.ingest.us.sentry.io/4512454039371776"
       }
     },
     "preview": {
