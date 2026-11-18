@@ -439,7 +439,14 @@ describe('análise (formato, Tagger e bracket)', () => {
     expect(saved.format).toBe('modern');
     const detail = await getDeck(db, { deckId: saved.id, viewerId: owner.id });
     expect(detail.analysis.kind).toBe('constructed');
-    expect(detail.analysis.score).toBeNull();
+    // Modern tem nota própria (terrenos, curva, interação e consistência).
+    expect(detail.analysis.score).toEqual(expect.any(Number));
+    expect(detail.analysis.scoreBreakdown.map((c) => c.key)).toEqual([
+      'lands',
+      'curve',
+      'interaction',
+      'consistency',
+    ]);
     expect(detail.bracket).toBeNull();
     await expect(
       saveImportedDeck(db, { ownerId: owner.id, deck, cards: [], format: 'xadrez' }),

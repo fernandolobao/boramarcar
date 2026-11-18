@@ -197,11 +197,10 @@ describe('análise por formato', () => {
     producedMana: ['R'],
   });
 
-  it('Modern: 60+ cartas, até 4 cópias (contando a reserva), reserva até 15, sem nota', () => {
+  it('Modern: 60+ cartas, até 4 cópias (contando a reserva), reserva até 15', () => {
     const deck = [entry(bolt, 4), entry(mountain, 20), entry(bolt, 1, 'sideboard')];
     const analysis = analyzeDeck(deck, 'modern');
     expect(analysis.kind).toBe('constructed');
-    expect(analysis.score).toBeNull();
     expect(analysis.validation).toEqual(
       expect.arrayContaining([
         { code: 'deck_size_min', min: 60, actual: 24 },
@@ -209,15 +208,56 @@ describe('análise por formato', () => {
       ]),
     );
     expect(analysis.validation.some((i) => i.code === 'no_commander')).toBe(false);
-    expect(analysis.suggestions).toEqual([{ code: 'more_lands', missing: 2 }]);
     expect(analysis.colorIdentity).toEqual(['R']);
     expect(analysis.handOdds?.library).toBe(24);
   });
 
-  it('Draft: 40 cartas, sem limite de cópias', () => {
+  it('construído (60): nota por terrenos, curva, interação e consistência', () => {
+    const goblin = makeCard({
+      name: 'Goblin Guide',
+      manaCost: '{R}',
+      cmc: 1,
+      typeLine: 'Creature — Goblin Scout',
+      colorIdentity: ['R'],
+    });
+    const deck = [entry(bolt, 4), entry(goblin, 2), entry(mountain, 20)];
+    const analysis = analyzeDeck(deck, 'modern');
+    const parts = Object.fromEntries(analysis.scoreBreakdown.map((c) => [c.key, c]));
+    expect(Object.keys(parts)).toEqual(['lands', 'curve', 'interaction', 'consistency']);
+    // 20 terrenos: 2 abaixo da faixa 22–26 → 30 − 2 × 5.
+    expect(parts.lands).toMatchObject({ score: 20, max: 30, target: { min: 22, max: 26 } });
+    expect(parts.curve).toMatchObject({ score: 30, max: 30, target: { ideal: 2.5, max: 3.5 } });
+    // 4 remoções de 8.
+    expect(parts.interaction).toMatchObject({ score: 10, max: 20, value: 4, target: { count: 8 } });
+    // 4 das 6 mágicas em cópias de 3–4 (67%) de 75% → 20 × 67/75.
+    expect(parts.consistency).toMatchObject({ value: 67, max: 20, target: { percent: 75 } });
+    expect(parts.consistency!.score).toBeCloseTo(17.8, 1);
+    expect(analysis.score).toBe(78);
+    expect(analysis.suggestions).toEqual([
+      { code: 'more_lands', missing: 2 },
+      {
+        code: 'more_interaction',
+        missing: 4,
+        scryfallQuery: 'id<=r otag:removal f:modern cmc<=3',
+      },
+      { code: 'low_consistency', percent: 67 },
+    ]);
+  });
+
+  it('limitado (40): criaturas no lugar da consistência', () => {
     const analysis = analyzeDeck([entry(bolt, 23), entry(mountain, 17)], 'draft');
     expect(analysis.validation).toEqual([]);
-    expect(analysis.suggestions).toEqual([]);
+    const parts = Object.fromEntries(analysis.scoreBreakdown.map((c) => [c.key, c]));
+    expect(Object.keys(parts)).toEqual(['lands', 'curve', 'interaction', 'creatures']);
+    expect(parts.lands).toMatchObject({ score: 30, target: { min: 16, max: 18 } });
+    expect(parts.interaction).toMatchObject({ score: 20, target: { count: 4 } });
+    expect(parts.creatures).toMatchObject({ score: 0, value: 0, target: { min: 15, max: 17 } });
+    expect(analysis.score).toBe(80);
+    expect(analysis.suggestions).toEqual([{ code: 'more_creatures', missing: 15 }]);
+  });
+
+  it('formato livre continua sem nota', () => {
+    expect(analyzeDeck([entry(bolt, 4)], 'other').score).toBeNull();
   });
 
   it('usa as funções do Tagger quando existem e conta a cobertura', () => {

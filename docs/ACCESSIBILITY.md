@@ -445,6 +445,11 @@ sem rolagem horizontal em 320px.
 - Abaixo de 400 px o botão do topo usa o texto curto ("Entrar"/"Painel") e o ícone do seletor some, para não haver rolagem horizontal em 320 px. O menu de seções aparece só a partir de 1280 px, sem quebrar linha.
 - Campos de data e hora: cada segmento (dia, mês, hora…) tem largura mínima de 24 px. Uma hora de um dígito ("9") deixava o alvo menor que 24 px (2.5.8), e o E2E só pegava isso em certas horas do dia.
 
+## Análise mais enxuta e nota em outros formatos (18/11/2026)
+
+- Funções das cartas, base de mana, comparação e mão inicial foram para "Mais detalhes da análise", um `<details>` fechado por padrão (com uma linha dizendo o que tem dentro). Os títulos `h2` das seções continuam iguais dentro dele.
+- A nota de 60 e 40 cartas usa o mesmo componente de itens expansíveis (`aria-expanded`, explicação em texto); "Interação" lista as remoções e board wipes que contam.
+
 ## Admin: nomes levam ao perfil (18/11/2026)
 
 - Na lista de contas do `/admin`, o nome de cada pessoa virou link sublinhado para o perfil (`/jogadores/:id`), que os admins da plataforma podem abrir mesmo sem dividir grupo.

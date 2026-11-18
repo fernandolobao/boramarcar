@@ -231,6 +231,19 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'nota-deck',
+            question: 'Como funciona a nota do deck?',
+            intro: [
+              'A nota (0 a 100) compara o deck com metas de referência do formato. É um guia, não uma regra.',
+            ],
+            steps: [
+              'Commander, Brawl e Oathbreaker: terrenos, ramp, compra, remoção, board wipes e curva.',
+              'Formatos de 60 cartas (Standard, Pioneer, Modern, Pauper…): terrenos (22 a 26), curva, interação (remoção e board wipes) e consistência (mágicas em 3 ou 4 cópias).',
+              'Draft e Sealed (40 cartas): terrenos (16 a 18), curva, interação e criaturas (15 a 17).',
+              'Toque num item da nota para ver o cálculo e as cartas que contam. Funções das cartas, base de mana e chances da mão inicial ficam em "Mais detalhes da análise".',
+            ],
+          },
+          {
             id: 'compartilhar-deck',
             question: 'Como compartilho um deck?',
             steps: [
@@ -523,6 +536,19 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Filter by set code and number ("ltr 268"), by part of the set name or by artist ("tedin"), handy for old cards without a number.',
               'Pick the printing and how many copies change. The rest keep the current edition.',
               'When adding to your collection, you pick the edition first; if the card has only one edition, it comes already picked.',
+            ],
+          },
+          {
+            id: 'nota-deck',
+            question: 'How does the deck score work?',
+            intro: [
+              'The score (0 to 100) compares the deck with the format’s reference targets. It’s a guide, not a rule.',
+            ],
+            steps: [
+              'Commander, Brawl and Oathbreaker: lands, ramp, card draw, removal, board wipes and curve.',
+              '60-card formats (Standard, Pioneer, Modern, Pauper…): lands (22 to 26), curve, interaction (removal and board wipes) and consistency (spells running 3 or 4 copies).',
+              'Draft and Sealed (40 cards): lands (16 to 18), curve, interaction and creatures (15 to 17).',
+              'Tap a score item to see the math and which cards count. Card roles, mana base and opening hand odds are under "More analysis details".',
             ],
           },
           {

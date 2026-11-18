@@ -313,34 +313,42 @@ export default async function DeckPage({ params }: Props) {
               <BracketCard bracket={deck.bracket} />
             </section>
           )}
-          <section className="card">
-            <DeckRoles
-              deckId={deck.id}
-              roles={analysis.roles}
-              cardsByRole={analysis.cardsByRole}
-              targets={profile.roleTargets}
-              tagged={analysis.rolesTagged}
-            />
-          </section>
-          <section className="card">
-            <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
-          </section>
-          {analysis.commanders.length > 0 && (
-            <section className="card">
-              <DeckComparisonCard
-                commanders={analysis.commanders}
-                comparison={comparison}
-                edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
-                leastPopular={leastPopularCards(deck.entries)}
+        </StackSections>
+
+        {/* Detalhes para quem quer ir fundo; fechados por padrão para a página não cansar. */}
+        <details className="card">
+          <summary className="cursor-pointer font-semibold">{ta('moreDetails')}</summary>
+          <p className="muted mt-2 text-sm">{ta('moreDetailsHint')}</p>
+          <div className="mt-6 space-y-6">
+            <section className="border-t border-line pt-6">
+              <DeckRoles
+                deckId={deck.id}
+                roles={analysis.roles}
+                cardsByRole={analysis.cardsByRole}
+                targets={profile.roleTargets}
+                tagged={analysis.rolesTagged}
               />
             </section>
-          )}
-          {analysis.handOdds && (
-            <section className="card">
-              <HandOdds odds={analysis.handOdds} />
+            <section className="border-t border-line pt-6">
+              <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
             </section>
-          )}
-        </StackSections>
+            {analysis.commanders.length > 0 && (
+              <section className="border-t border-line pt-6">
+                <DeckComparisonCard
+                  commanders={analysis.commanders}
+                  comparison={comparison}
+                  edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
+                  leastPopular={leastPopularCards(deck.entries)}
+                />
+              </section>
+            )}
+            {analysis.handOdds && (
+              <section className="border-t border-line pt-6">
+                <HandOdds odds={analysis.handOdds} />
+              </section>
+            )}
+          </div>
+        </details>
 
         <DeckCards
           deckId={deck.id}

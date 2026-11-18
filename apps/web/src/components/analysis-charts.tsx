@@ -128,12 +128,25 @@ export function ScoreBreakdown({
       return 'ok';
     }
     if ('count' in c.target) return c.value >= c.target.count ? 'ok' : 'below';
+    if ('percent' in c.target) return c.value >= c.target.percent ? 'ok' : 'below';
     return c.value <= c.target.ideal ? 'ok' : 'above';
   };
 
   const explain = (c: ScoreComponent) => {
     const points = { points: number(c.score), maxPoints: c.max, value: number(c.value) };
-    if ('min' in c.target) return t('explain.lands', { ...points, ...c.target });
+    if ('min' in c.target) {
+      return t(c.key === 'creatures' ? 'explain.creatures' : 'explain.lands', {
+        ...points,
+        ...c.target,
+        penalty: c.penalty ?? 3,
+      });
+    }
+    if ('percent' in c.target) {
+      return t('explain.consistency', { ...points, target: c.target.percent });
+    }
+    if (c.key === 'interaction' && 'count' in c.target) {
+      return t('explain.interaction', { ...points, target: c.target.count });
+    }
     if ('count' in c.target) {
       return t('explain.role', {
         ...points,
@@ -153,14 +166,22 @@ export function ScoreBreakdown({
       ? t('targetRange', c.target)
       : 'count' in c.target
         ? t('targetCount', { count: c.target.count })
-        : t('targetCmc', { ideal: number(c.target.ideal) });
+        : 'percent' in c.target
+          ? t('targetPercent', { percent: c.target.percent })
+          : t('targetCmc', { ideal: number(c.target.ideal) });
 
   return (
     <ul className="space-y-1">
       {components.map((c) => {
         const expanded = open === c.key;
         const state = status(c);
-        const cards = c.key in cardsByRole ? [...new Set(cardsByRole[c.key as CardRole])] : [];
+        // Interação conta remoção e board wipes juntos.
+        const cards =
+          c.key === 'interaction'
+            ? [...new Set([...cardsByRole.removal, ...cardsByRole.wipe])]
+            : c.key in cardsByRole
+              ? [...new Set(cardsByRole[c.key as CardRole])]
+              : [];
         return (
           <li key={c.key}>
             <button

@@ -63,15 +63,25 @@ export type Suggestion =
   | { code: 'more_lands'; missing: number }
   | { code: 'fewer_lands'; extra: number }
   | { code: 'more_role'; role: ScoredRole; missing: number; scryfallQuery: string }
-  | { code: 'lower_curve'; averageCmc: number };
+  | { code: 'lower_curve'; averageCmc: number }
+  | { code: 'more_interaction'; missing: number; scryfallQuery: string }
+  | { code: 'low_consistency'; percent: number }
+  | { code: 'more_creatures'; missing: number }
+  | { code: 'fewer_creatures'; extra: number };
 
 export interface ScoreComponent {
-  key: 'lands' | ScoredRole | 'curve';
+  key: 'lands' | ScoredRole | 'curve' | 'interaction' | 'consistency' | 'creatures';
   score: number;
   max: number;
   value: number;
   /** Meta usada no cálculo: faixa de terrenos, número de cartas da função ou CMC ideal/máximo. */
-  target: { min: number; max: number } | { count: number } | { ideal: number; max: number };
+  target:
+    | { min: number; max: number }
+    | { count: number }
+    | { ideal: number; max: number }
+    | { percent: number };
+  /** Faixas (terrenos, criaturas): pontos perdidos por unidade fora da faixa. */
+  penalty?: number;
 }
 
 export interface DeckAnalysis {
@@ -95,7 +105,7 @@ export interface DeckAnalysis {
   /** Game Changers da lista oficial (dado do Scryfall). */
   gameChangers: string[];
   validation: ValidationIssue[];
-  /** Nota de 0 a 100 — só nos formatos com comandante. */
+  /** Nota de 0 a 100 (formatos com comandante, construídos e limitados; não no livre). */
   score: number | null;
   scoreBreakdown: ScoreComponent[];
   suggestions: Suggestion[];
@@ -265,6 +275,9 @@ export const ROLE_POINTS: Record<ScoredRole, number> = {
   wipe: 10,
 };
 
+/** Construído: % das mágicas em 3–4 cópias para a nota cheia de consistência. */
+export const CONSISTENCY_TARGET = 75;
+
 const ratio = (value: number, target: number) => Math.min(1, target > 0 ? value / target : 1);
 
 /**
@@ -299,6 +312,9 @@ export function analyzeDeck(
   let tagged = 0;
   let analyzed = 0;
   let manaDataMissing = 0;
+  let creatures = 0;
+  /** Cópias de cada mágica (não terreno) do principal, somando as versões (edições, foil). */
+  const spellCopies = new Map<string, number>();
   let legalityMissing = 0;
   const gameChangers: string[] = [];
 
@@ -316,6 +332,8 @@ export function analyzeDeck(
     }
     nonLands += entry.quantity;
     if (entry.board === 'mainboard') {
+      spellCopies.set(entry.name, (spellCopies.get(entry.name) ?? 0) + entry.quantity);
+      if (/\bCreature\b/.test(card.typeLine)) creatures += entry.quantity;
       manaCurve[curveBucket(card.cmc)] += entry.quantity;
       cardsByCurve[curveBucket(card.cmc)].push(entry.name);
       cmcSum += card.cmc * entry.quantity;
@@ -373,6 +391,7 @@ export function analyzeDeck(
             value: lands,
             score: Math.max(0, 25 - landDistance * 3),
             target: { min: landTarget.min, max: landTarget.max },
+            penalty: 3,
           },
           ...SCORED_ROLES.map((role) => ({
             key: role,
@@ -402,6 +421,95 @@ export function analyzeDeck(
           scryfallQuery: buildReplacementQuery(role, colorIdentity, 3, profile.scryfallFormat),
         });
       }
+    }
+    if (averageCmc > cmc.ideal + 0.5) suggestions.push({ code: 'lower_curve', averageCmc });
+  }
+
+  // Formatos sem comandante (60 e 40 cartas): terrenos 30, curva 30, interação 20 e
+  // consistência (60: mágicas em 3–4 cópias) ou criaturas (40) 20.
+  if (profile.interaction !== null && landTarget && profile.averageCmc) {
+    const cmc = profile.averageCmc;
+    const landDistance =
+      lands < landTarget.min
+        ? landTarget.min - lands
+        : lands > landTarget.max
+          ? lands - landTarget.max
+          : 0;
+    const curveScore =
+      averageCmc <= cmc.ideal
+        ? 1
+        : Math.max(0, 1 - (averageCmc - cmc.ideal) / (cmc.max - cmc.ideal));
+    const interaction = roles.removal + roles.wipe;
+    const parts: ScoreComponent[] = [
+      {
+        key: 'lands',
+        max: 30,
+        value: lands,
+        score: Math.max(0, 30 - landDistance * 5),
+        target: { min: landTarget.min, max: landTarget.max },
+        penalty: 5,
+      },
+      {
+        key: 'curve',
+        max: 30,
+        value: averageCmc,
+        score: 30 * curveScore,
+        target: { ideal: cmc.ideal, max: cmc.max },
+      },
+      {
+        key: 'interaction',
+        max: 20,
+        value: interaction,
+        score: 20 * ratio(interaction, profile.interaction),
+        target: { count: profile.interaction },
+      },
+    ];
+    if (profile.creatures) {
+      const range = profile.creatures;
+      const distance =
+        creatures < range.min
+          ? range.min - creatures
+          : creatures > range.max
+            ? creatures - range.max
+            : 0;
+      parts.push({
+        key: 'creatures',
+        max: 20,
+        value: creatures,
+        score: Math.max(0, 20 - distance * 4),
+        target: { min: range.min, max: range.max },
+        penalty: 4,
+      });
+    } else {
+      const totalSpells = [...spellCopies.values()].reduce((a, b) => a + b, 0);
+      const steady = [...spellCopies.values()].filter((n) => n >= 3).reduce((a, b) => a + b, 0);
+      const share = totalSpells ? (steady / totalSpells) * 100 : 0;
+      parts.push({
+        key: 'consistency',
+        max: 20,
+        value: Math.round(share),
+        score: 20 * ratio(share, CONSISTENCY_TARGET),
+        target: { percent: CONSISTENCY_TARGET },
+      });
+    }
+    scoreBreakdown.push(...parts.map((c) => ({ ...c, score: Math.round(c.score * 10) / 10 })));
+    score = Math.round(scoreBreakdown.reduce((sum, c) => sum + c.score, 0));
+    if (interaction < profile.interaction) {
+      suggestions.push({
+        code: 'more_interaction',
+        missing: profile.interaction - interaction,
+        scryfallQuery: buildReplacementQuery('removal', colorIdentity, 3, profile.scryfallFormat),
+      });
+    }
+    const consistency = scoreBreakdown.find((c) => c.key === 'consistency');
+    if (consistency && consistency.value < CONSISTENCY_TARGET) {
+      suggestions.push({ code: 'low_consistency', percent: consistency.value });
+    }
+    if (profile.creatures && creatures < profile.creatures.min) {
+      suggestions.push({ code: 'more_creatures', missing: profile.creatures.min - creatures });
+    }
+    if (profile.creatures && creatures > profile.creatures.max) {
+      suggestions.push({ code: 'fewer_creatures', extra: creatures - profile.creatures.max });
     }
     if (averageCmc > cmc.ideal + 0.5) suggestions.push({ code: 'lower_curve', averageCmc });
   }

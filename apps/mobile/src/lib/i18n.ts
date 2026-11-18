@@ -147,7 +147,7 @@ const pt = {
   tipToggle: 'Dica sobre esta tela',
   tipDismissLabel: 'Entendi, dispensar a dica',
   tipDeckAnalysis:
-    'A nota compara o deck com metas de referência de Commander (terrenos, ramp, compra, remoção, board wipes e curva). Toque num item para ver como ele é calculado e quais cartas contam. É um guia, não uma regra.',
+    'A nota compara o deck com metas de referência do formato: em Commander, terrenos, ramp, compra, remoção, board wipes e curva; em 60 cartas, terrenos, curva, interação e consistência; em 40, criaturas no lugar da consistência. É um guia, não uma regra.',
   tipTable:
     'Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer e trocar lugares.',
   tipCollection:
@@ -970,7 +970,7 @@ const en: Messages = {
   tipToggle: 'Tip about this screen',
   tipDismissLabel: 'Got it, dismiss the tip',
   tipDeckAnalysis:
-    'The score compares the deck with Commander reference targets (lands, ramp, card draw, removal, board wipes and curve). Tap an item to see how it is calculated and which cards count. It’s a guide, not a rule.',
+    'The score compares the deck with the format’s reference targets: in Commander, lands, ramp, card draw, removal, board wipes and curve; in 60-card formats, lands, curve, interaction and consistency; in 40-card ones, creatures instead of consistency. It’s a guide, not a rule.',
   tipTable:
     'Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.',
   tipCollection:
