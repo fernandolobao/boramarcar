@@ -78,4 +78,17 @@ test.describe('perfis e conquistas', () => {
     await expect(page.locator('h1').first()).toBeVisible();
     await expect(page.getByRole('dialog', { name: 'Conquista nova!' })).toHaveCount(0);
   });
+
+  test('rivalidades: freguês no painel e o confronto no perfil de outra pessoa', async ({
+    page,
+  }) => {
+    await page.goto('/painel');
+    const card = page.getByRole('region', { name: 'Rivalidades' });
+    await expect(card.getByText(/^Seu freguês: você venceu/).first()).toBeVisible();
+    await page.goto('/jogadores/e2e-bia');
+    // Outros testes registram partidas em paralelo: só o formato do texto é conferido.
+    await expect(page.getByTestId('versus')).toHaveText(
+      /^Entre vocês: você venceu \d+, Bia venceu \d+ \(em \d+ partidas?\)\.$/,
+    );
+  });
 });

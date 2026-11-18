@@ -292,6 +292,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'rivalidades',
+            question: 'O que são "Rivalidades"?',
+            intro: [
+              'No painel, "Seu maior rival" é quem mais venceu você e "Seu freguês" é quem você mais venceu, entre as pessoas do grupo que jogaram com você pelo menos 3 vezes. No perfil de outra pessoa, aparece o placar entre vocês dois no grupo. É só brincadeira: ninguém vê as rivalidades dos outros.',
+            ],
+          },
+          {
             id: 'com-quem-jogar',
             question: 'O que é "Com quem jogar" no painel?',
             intro: [
@@ -607,6 +614,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
+            ],
+          },
+          {
+            id: 'rivalidades',
+            question: 'What are "Rivalries"?',
+            intro: [
+              'On the dashboard, "Your biggest rival" is who beat you the most and "Your favorite target" is who you beat the most, among group members who played with you at least 3 times. On someone else’s profile, you see the score between the two of you in the group. It’s just for fun: nobody sees other people’s rivalries.',
             ],
           },
           {

@@ -483,3 +483,8 @@ sem rolagem horizontal em 320px.
 
 - Site: abas do React Aria (`tablist`/`tab`/`tabpanel`, setas do teclado, `aria-selected`), "Para conquistar (N)" selecionada por padrão; o número está no nome da aba. Aba vazia mostra uma frase (não fica em branco).
 - App: as abas são o `Choices` do design system (`radiogroup` com nome "Conquistas"); cada conquista continua um item acessível com nome, descrição e situação.
+
+## Rivalidades (19/11/2026)
+
+- Painel: seção "Rivalidades" com `h2`, frases completas com o nome como link para o perfil (ícone decorativo). No app, cada linha é um link com a frase inteira como nome.
+- Perfil de outra pessoa: o placar entre vocês em texto comum, abaixo do "membro desde".

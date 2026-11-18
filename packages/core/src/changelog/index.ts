@@ -84,6 +84,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'As conquistas no perfil ganharam abas: "Para conquistar", com as mais perto de sair primeiro, e "Conquistadas".',
     en: 'Achievements on the profile now have tabs: "To earn", closest first, and "Earned".',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Rivalidades no painel: seu maior rival e o seu freguês no grupo, e o placar entre vocês no perfil de cada pessoa.',
+    en: 'Rivalries on the dashboard: your biggest rival and your favorite target in the group, plus your head-to-head score on each person’s profile.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
