@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  groupRecordsSchema,
   notificationSchema,
   achievementSchema,
   availabilityRuleSchema,
@@ -714,6 +715,9 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ stats: groupStatsSchema }),
           )
         ).stats,
+      /** Recordes e "cara do grupo" (8.12). */
+      records: (groupId: string) =>
+        request('GET', `/groups/${encodeURIComponent(groupId)}/records`, groupRecordsSchema),
     },
     seasons: {
       list: async (groupId: string) =>

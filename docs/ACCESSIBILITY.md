@@ -493,3 +493,8 @@ sem rolagem horizontal em 320px.
 
 - Painel: a frase de boas-vindas para quem entrou há menos de 30 dias é texto comum no destaque (pergaminho sobre a camada escura do destaque, o mesmo contraste do título), logo abaixo do `h1`.
 - Resumo da noite (`/resumo` e e-mail): "Primeira partida com o grupo: …" em texto, com os nomes numa lista natural ("Caio e Duda").
+
+## Recordes e a cara do grupo (19/11/2026)
+
+- `/grupo/recordes`: `h1`, duas seções com `h2`; cada recorde com título e frase completa (quem, o quê, em qual encontro e quando), com links para o perfil e o encontro; ícones decorativos. As cores aparecem com o símbolo de mana (decorativo) **e** o nome por extenso com a porcentagem — cor não é a única pista. Página no E2E de acessibilidade.
+- App: tela com cada recorde como item acessível (título e frase).

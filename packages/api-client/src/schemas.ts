@@ -563,3 +563,38 @@ export const notificationSchema = z
   })
   .loose();
 export type NotificationItem = z.infer<typeof notificationSchema>;
+
+/** Recordes e "cara do grupo" (8.12). */
+const recordAt = { eventId: z.string(), playedAt: date };
+export const groupRecordsSchema = z
+  .object({
+    totalGames: z.number(),
+    records: z.object({
+      fastestWin: z
+        .object({ ...recordAt, turn: z.number(), winnerIds: z.array(z.string()) })
+        .loose()
+        .nullable(),
+      longestGame: z
+        .object({ ...recordAt, minutes: z.number() })
+        .loose()
+        .nullable(),
+      longestStreak: z
+        .object({ ...recordAt, userId: z.string(), length: z.number() })
+        .loose()
+        .nullable(),
+      busiestNight: z
+        .object({ ...recordAt, games: z.number() })
+        .loose()
+        .nullable(),
+      topCommander: z.object({ name: z.string(), wins: z.number() }).nullable(),
+    }),
+    face: z.object({
+      colors: z.record(z.string(), z.number()),
+      commanders: z.number(),
+      meta: z.array(z.object({ name: z.string(), games: z.number() })),
+    }),
+    people: z.record(z.string(), z.string()),
+    eventTitles: z.record(z.string(), z.string()),
+  })
+  .loose();
+export type GroupRecordsView = z.infer<typeof groupRecordsSchema>;

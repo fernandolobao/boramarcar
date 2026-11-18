@@ -99,6 +99,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Rivalidades no painel: seu maior rival e o seu freguês no grupo, e o placar entre vocês no perfil de cada pessoa.',
     en: 'Rivalries on the dashboard: your biggest rival and your favorite target in the group, plus your head-to-head score on each person’s profile.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Recordes do grupo: vitória mais rápida, partida mais longa, maior sequência e mais, além da cara do grupo (cores e comandantes).',
+    en: 'Group records: fastest win, longest game, longest streak and more, plus the group’s identity (colors and commanders).',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

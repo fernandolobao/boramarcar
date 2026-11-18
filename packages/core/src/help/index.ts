@@ -292,6 +292,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'recordes',
+            question: 'Onde vejo os recordes do grupo?',
+            intro: [
+              'Na tela do grupo, em "Recordes e a cara do grupo": vitória mais rápida, partida mais longa, maior sequência de vitórias, noite com mais partidas e comandante com mais vitórias, cada um com o encontro e a data. Logo abaixo, a cara do grupo: as cores mais jogadas, quantos comandantes diferentes já apareceram e o meta dos últimos 90 dias.',
+            ],
+          },
+          {
             id: 'rivalidades',
             question: 'O que são "Rivalidades"?',
             intro: [
@@ -614,6 +621,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
+            ],
+          },
+          {
+            id: 'recordes',
+            question: 'Where do I see the group records?',
+            intro: [
+              'On the group screen, under "Records and group identity": fastest win, longest game, longest winning streak, night with the most games and the commander with the most wins, each with its meetup and date. Below, the group’s identity: the most played colors, how many different commanders have shown up and the meta of the last 90 days.',
             ],
           },
           {
