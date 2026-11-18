@@ -7,6 +7,7 @@ import { SignInButton } from '@/components/auth-buttons';
 import { AppPreview } from '@/components/home/app-preview';
 import { ProductTour } from '@/components/home/product-tour';
 import { Icon, type IconName } from '@/components/icons';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { Logo } from '@/components/logo';
 import { getSessionUser } from '@/server/session';
 import { CONTACT_EMAIL } from '@/lib/contact';
@@ -129,13 +130,22 @@ export default async function HomePage({
     user ? (
       <Link href="/painel" className={`btn-primary ${size === 'lg' ? 'px-6 text-base' : ''}`}>
         <Icon name="dashboard" />
-        {t('goToDashboard')}
+        {size === 'sm' ? (
+          <>
+            <span className="min-[400px]:hidden">{t('dashboardShort')}</span>
+            <span className="hidden min-[400px]:inline">{t('goToDashboard')}</span>
+          </>
+        ) : (
+          t('goToDashboard')
+        )}
       </Link>
     ) : size === 'sm' ? (
       // Cabeçalho: a tela de entrada oferece Google ou e-mail e senha.
       <Link href="/entrar" className="btn-primary">
         <Icon name="signIn" />
-        {t('signInToDashboard')}
+        {/* Em telas bem estreitas (320 px) o texto curto cabe ao lado do seletor de idioma. */}
+        <span className="min-[400px]:hidden">{t('signInShort')}</span>
+        <span className="hidden min-[400px]:inline">{t('signInToDashboard')}</span>
       </Link>
     ) : (
       <>
@@ -150,22 +160,31 @@ export default async function HomePage({
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" className="rounded-lg py-1">
-            <Logo title={tc('appName')} className="h-6 w-auto text-arcano dark:text-pergaminho" />
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 min-[400px]:gap-4 sm:px-6">
+          <Link href="/" className="shrink-0 rounded-lg py-1">
+            <Logo
+              title={tc('appName')}
+              className="h-5 w-auto text-arcano min-[400px]:h-6 dark:text-pergaminho"
+            />
           </Link>
-          <nav aria-label={t('nav.label')} className="hidden lg:block">
+          <nav aria-label={t('nav.label')} className="hidden xl:block">
             <ul className="flex gap-1 text-sm">
               {sections.map((s) => (
                 <li key={s}>
-                  <a href={`#${s}`} className="rounded-lg px-3 py-2 hover:bg-surface-muted">
+                  <a
+                    href={`#${s}`}
+                    className="rounded-lg px-3 py-2 whitespace-nowrap hover:bg-surface-muted"
+                  >
                     {t(`nav.${s}`)}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
-          {dashboardButton('sm')}
+          <div className="flex shrink-0 items-center gap-2 whitespace-nowrap sm:gap-3">
+            <LanguageSwitcher />
+            {dashboardButton('sm')}
+          </div>
         </div>
       </header>
 

@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { ProductTour } from './home/product-tour';
+import { LanguageSwitcher } from './language-switcher';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
 import { TitleWithTip } from './tip';
@@ -587,5 +588,12 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('telas do produto na página inicial (abas) sem violações', async () => {
     expect(await audit(<ProductTour />)).toEqual([]);
+  });
+
+  it('seletor de idioma sem violações e com o idioma atual marcado', async () => {
+    expect(await audit(<LanguageSwitcher />)).toEqual([]);
+    const group = document.querySelector('[role="group"]')!;
+    const pressed = group.querySelector('[aria-pressed="true"]')!;
+    expect(pressed.textContent).toBe('PT — Português (Brasil)');
   });
 });

@@ -34,6 +34,8 @@ export default getRequestConfig(async () => {
   const locale = resolveLocale(
     isLocale(fromCookie) ? fromCookie : await savedLocale(requestHeaders),
     requestHeaders.get('accept-language'),
+    // País do visitante, informado pela Vercel.
+    requestHeaders.get('x-vercel-ip-country'),
   );
   const tzCookie = cookieStore.get(TIME_ZONE_COOKIE)?.value;
   return {
