@@ -449,3 +449,11 @@ sem rolagem horizontal em 320px.
 
 - Funções das cartas, base de mana, comparação e mão inicial foram para "Mais detalhes da análise", um `<details>` fechado por padrão (com uma linha dizendo o que tem dentro). Os títulos `h2` das seções continuam iguais dentro dele.
 - A nota de 60 e 40 cartas usa o mesmo componente de itens expansíveis (`aria-expanded`, explicação em texto); "Interação" lista as remoções e board wipes que contam.
+
+## Admin: nomes levam ao perfil (18/11/2026)
+
+- Na lista de contas do `/admin`, o nome de cada pessoa virou link sublinhado para o perfil (`/jogadores/:id`), que os admins da plataforma podem abrir mesmo sem dividir grupo.
+
+## Compartilhar deck público (18/11/2026)
+
+- "Compartilhar deck" é um `<details>` (fechado por padrão), só em decks públicos. Dentro: QR Code (`role="img"` com nome "QR Code do deck …") com "Baixar QR Code" logo abaixo, o link num `CopyField` com "Copiar link" ao lado, e WhatsApp/menu do celular. Conferido em 360 px (tema escuro) e 1100 px (claro), sem rolagem horizontal; componente no `deck-share.test.tsx` com axe.

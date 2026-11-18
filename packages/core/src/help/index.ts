@@ -244,6 +244,17 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'compartilhar-deck',
+            question: 'Como compartilho um deck?',
+            steps: [
+              'No site, abra o deck e, em "Editar deck", mude a visibilidade para "Público".',
+              'Abra "Compartilhar deck": copie o link, mande pelo WhatsApp ou baixe o QR Code.',
+            ],
+            notes: [
+              'Quem recebe vê a lista e a análise; quem ainda não tem conta cria uma antes. Decks do grupo ou privados não têm esse bloco.',
+            ],
+          },
+          {
             id: 'proxies',
             question: 'Como marco e imprimo proxies?',
             intro: [
@@ -538,6 +549,17 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               '60-card formats (Standard, Pioneer, Modern, Pauper…): lands (22 to 26), curve, interaction (removal and board wipes) and consistency (spells running 3 or 4 copies).',
               'Draft and Sealed (40 cards): lands (16 to 18), curve, interaction and creatures (15 to 17).',
               'Tap a score item to see the math and which cards count. Card roles, mana base and opening hand odds are under "More analysis details".',
+            ],
+          },
+          {
+            id: 'compartilhar-deck',
+            question: 'How do I share a deck?',
+            steps: [
+              'On the website, open the deck and, in "Edit deck", set the visibility to "Public".',
+              'Open "Share deck": copy the link, send it on WhatsApp or download the QR code.',
+            ],
+            notes: [
+              'People who get it see the list and the analysis; anyone without an account creates one first. Group and private decks do not have this block.',
             ],
           },
           {

@@ -182,3 +182,30 @@ test.describe('deck', () => {
     await expect(page.getByRole('navigation', { name: 'Navegação principal' })).toBeHidden();
   });
 });
+
+test.describe('compartilhar deck público', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('só aparece em deck público, com link, copiar, QR Code e WhatsApp', async ({ page }) => {
+    const deck = `/decks/${E2E_IDS.deck}`;
+    await page.goto(deck);
+    await expect(page.getByText('Compartilhar deck')).toHaveCount(0);
+    const set = (visibility: string) =>
+      page.request.patch(`/api/v1/decks/${E2E_IDS.deck}`, { data: { visibility } });
+    expect((await set('public')).ok()).toBe(true);
+    try {
+      await page.reload();
+      await page.getByText('Compartilhar deck').click();
+      await expect(page.getByRole('textbox', { name: 'Link do deck' })).toHaveValue(
+        new RegExp(`${deck}$`),
+      );
+      await expect(page.getByRole('button', { name: 'Copiar link' })).toBeVisible();
+      await expect(page.getByRole('img', { name: /QR Code do deck/ })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Baixar QR Code' })).toBeVisible();
+      await expect(page.getByRole('link', { name: /WhatsApp/ })).toBeVisible();
+    } finally {
+      await set('group');
+    }
+  });
+});

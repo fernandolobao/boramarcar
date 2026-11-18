@@ -49,6 +49,9 @@ import { StackSections } from '@/components/stack-sections';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { deckBarBackground, deckBarEdge, deckFlow } from '@boramarcar/tokens/flow';
 import { deckMetadata } from '@/server/seo-pages';
+import { DeckShare } from '@/components/deck-share';
+import { getBaseUrl } from '@/env';
+import { linkQrCode } from '@/server/invite';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -115,6 +118,9 @@ export default async function DeckPage({ params }: Props) {
     identity,
     Object.fromEntries(analysis.manaBase.map((row) => [row.color, row.pips])),
   );
+  // Deck público: link e QR Code para compartilhar.
+  const shareUrl = `${getBaseUrl()}/decks/${deck.id}`;
+  const shareQr = deck.visibility === 'public' ? await linkQrCode(shareUrl) : null;
   // Nomes de carta na análise abrem a edição usada no deck (comandante e deck principal primeiro).
   const deckPrints = [...deck.lines]
     .sort((a, b) => DECK_BOARDS.indexOf(a.board) - DECK_BOARDS.indexOf(b.board))
@@ -267,6 +273,14 @@ export default async function DeckPage({ params }: Props) {
               />
             </div>
           </details>
+        )}
+
+        {shareQr && (
+          <DeckShare
+            deck={{ id: deck.id, name: deck.name, visibility: deck.visibility }}
+            url={shareUrl}
+            qr={shareQr}
+          />
         )}
 
         {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}

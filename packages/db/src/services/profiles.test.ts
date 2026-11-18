@@ -139,4 +139,22 @@ describe('perfil do jogador', () => {
       code: 'not_found',
     });
   });
+
+  it('admin da plataforma vê o perfil de qualquer pessoa, sem ver decks que não pode', async () => {
+    const { group, owner } = await seedGroup(db, 1);
+    const admin = await createTestUser(db);
+    await deckOf(owner.id, 'Deck do grupo');
+    await expect(
+      getPlayerProfile(db, { userId: owner.id, viewerId: admin.id }),
+    ).rejects.toMatchObject({ code: 'not_found' });
+    const seen = await getPlayerProfile(db, {
+      userId: owner.id,
+      viewerId: admin.id,
+      viewerIsAdmin: true,
+    });
+    expect(seen).toMatchObject({ isSelf: false, email: null });
+    expect(seen.groups.map((g) => g.id)).toEqual([group.id]);
+    // A visibilidade dos decks continua valendo: só os públicos.
+    expect(seen.decks).toEqual([]);
+  });
 });
