@@ -59,7 +59,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             steps: [
               'Toque em "Entrar ou criar grupo" e depois em "Criar grupo". Dê um nome (ex.: "Mesa de Terça").',
               'Abra "Seu grupo" (app) ou o menu Grupo (site): ali estão o link e o código de convite.',
-              'Toque em "Compartilhar convite" para mandar pelo WhatsApp ou por onde preferir. No site também há um QR Code para imprimir.',
+              'Toque em "Compartilhar convite" para mandar pelo WhatsApp ou por onde preferir. No site, "Copiar link" fica ao lado do link, e "Baixar QR Code" logo abaixo do QR Code, para imprimir.',
             ],
             notes: [
               'Quem cria o grupo vira dono(a) e pode promover admins, remover pessoas e passar a posse. Se o link vazar, gere um novo convite: o antigo deixa de funcionar.',
@@ -342,7 +342,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             steps: [
               'Tap "Join or create a group", then "Create group". Give it a name (e.g. "Tuesday Table").',
               'Open "Your group" (app) or the Group menu (website): the invite link and code are there.',
-              'Tap "Share invite" to send it on WhatsApp or wherever you like. The website also has a QR code to print.',
+              'Tap "Share invite" to send it on WhatsApp or wherever you like. On the website, "Copy link" sits next to the link and "Download QR code" right below the QR code, to print.',
             ],
             notes: [
               'Whoever creates the group becomes the owner and can promote admins, remove people and transfer ownership. If the link leaks, generate a new invite: the old one stops working.',

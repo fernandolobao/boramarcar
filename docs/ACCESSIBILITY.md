@@ -429,3 +429,8 @@ sem rolagem horizontal em 320px.
 ## Dicas: botão de informação (15/11/2026)
 
 - A dica deixou de sumir de vez: um botão ⓘ ao lado do título (site) ou no topo da seção (app) abre e fecha a dica (`aria-expanded`, `aria-controls`; nome "Dica sobre esta tela" e a mesma dica visível no `title`). Na primeira vez ela vem aberta, sem roubar o foco; "Entendi" fecha, grava que a pessoa já viu e devolve o foco ao ⓘ. Alvo de 40 px no site e 44 pt no app. Mais espaço entre o título e o quadro da dica.
+
+## Convite do grupo mais enxuto (18/11/2026)
+
+- O link de convite agora é um campo só de leitura com rótulo ("Link de convite") e o botão "Copiar link" ao lado (`CopyField`); o texto "Copiado!" é anunciado (`aria-live`). Focar o campo seleciona o link.
+- "Baixar QR Code" fica logo abaixo do QR Code, no mesmo `figure`. Os botões de compartilhar não repetem o "Copiar link".

@@ -7,7 +7,7 @@ import { CreateGroupForm, JoinGroupForm, SwitchGroupButton } from '@/components/
 import { GroupSettingsForm } from '@/components/group-settings-form';
 import { RegenerateInviteButton } from '@/components/invite';
 import { MemberActions } from '@/components/member-actions';
-import { ShareButtons } from '@/components/share-buttons';
+import { CopyField, ShareButtons } from '@/components/share-buttons';
 import { getActiveGroup } from '@/server/active-group';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
@@ -59,7 +59,8 @@ export default async function GroupPage() {
               <h3 className="section-title mt-4">{t('inviteTitle')}</h3>
               {invite && (
                 <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
-                  <figure className="mx-auto w-56 sm:mx-0">
+                  {/* QR Code com o botão de baixar logo abaixo. */}
+                  <figure className="mx-auto w-48 space-y-2 sm:mx-0">
                     <div
                       role="img"
                       aria-label={t('qrCode', { group: active.name })}
@@ -68,36 +69,39 @@ export default async function GroupPage() {
                       // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
                       dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
                     />
-                    <figcaption className="muted mt-2 text-center">{t('qrHint')}</figcaption>
+                    <a
+                      className="btn-secondary w-full"
+                      href={invite.qr.png}
+                      download={`convite-${active.inviteCode}.png`}
+                    >
+                      <Icon name="download" />
+                      {t('downloadQr')}
+                    </a>
+                    <figcaption className="muted text-center text-sm">{t('qrHint')}</figcaption>
                   </figure>
+                  {/* Link com o botão de copiar ao lado; depois, enviar pelo WhatsApp ou pelo
+                      menu do celular. */}
                   <div className="min-w-0 space-y-4">
                     <div>
-                      <p className="label">{t('inviteLink')}</p>
-                      <p
-                        className="break-all rounded-xl bg-ink-100 px-3 py-2 font-mono text-sm dark:bg-ink-800"
-                        data-testid="invite-url"
-                      >
-                        {invite.url}
-                      </p>
-                      <p className="muted mt-2">
+                      <CopyField label={t('inviteLink')} value={invite.url} />
+                      <p className="muted mt-2 text-sm">
                         {t('inviteCode')}:{' '}
                         <span className="font-mono tracking-widest" data-testid="invite-code">
                           {active.inviteCode}
                         </span>
                       </p>
                     </div>
-                    <ShareButtons text={invite.text} url={invite.url} title={active.name} />
-                    <div className="flex flex-wrap gap-2">
-                      <a
-                        className="btn-secondary"
-                        href={invite.qr.png}
-                        download={`convite-${active.inviteCode}.png`}
-                      >
-                        <Icon name="download" />
-                        {t('downloadQr')}
-                      </a>
-                      {active.role !== 'member' && <RegenerateInviteButton groupId={active.id} />}
-                    </div>
+                    <ShareButtons
+                      text={invite.text}
+                      url={invite.url}
+                      title={active.name}
+                      copy={false}
+                    />
+                    {active.role !== 'member' && (
+                      <div>
+                        <RegenerateInviteButton groupId={active.id} />
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
