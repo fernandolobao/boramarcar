@@ -574,7 +574,10 @@
       "draw": "Card draw",
       "removal": "Removal",
       "wipe": "Board wipes",
-      "curve": "Curve"
+      "curve": "Curve",
+      "interaction": "Interaction",
+      "consistency": "Consistency",
+      "creatures": "Creatures"
     },
     "validationTitle": "Validation · {format}",
     "valid": "Deck is valid for {format}.",
@@ -598,13 +601,17 @@
       "more_lands": "Add about {missing} lands.",
       "fewer_lands": "Consider cutting {extra} lands.",
       "more_role": "About {missing} more {role} cards needed.",
-      "lower_curve": "The curve is high (average MV {averageCmc}). Swap some expensive cards for cheaper ones."
+      "lower_curve": "The curve is high (average MV {averageCmc}). Swap some expensive cards for cheaper ones.",
+      "more_interaction": "Little interaction: about {missing} more removal spells or board wipes.",
+      "low_consistency": "Only {percent}% of the spells run 3 or 4 copies. Focusing the list on fewer cards with more copies makes the deck more consistent.",
+      "more_creatures": "About {missing} more creatures needed for the recommended range.",
+      "fewer_creatures": "Consider swapping {extra} creatures for other spells."
     },
     "searchScryfall": "Search replacements on Scryfall",
     "disclaimer": "Score based on {format} reference targets. It is a guide, not a rule.",
     "curveBucket": "Mana value {bucket}: {count, plural, =0 {no cards} =1 {1 card} other {# cards}}",
     "validationNote": "This format has no banned list to check.",
-    "noScore": "The role score applies to commander formats. For {format}, use the validation, mana base and opening hand odds.",
+    "noScore": "There are no reference targets for {format}, so there is no score. Use the validation, curve, mana base and opening hand odds.",
     "rolesSource": "{tagged} of {total} cards with roles from Scryfall Tagger; the rest from reading the card text.",
     "refresh": "Refresh analysis",
     "refreshing": "Refreshing…",
@@ -716,12 +723,18 @@
       "above": "Above target"
     },
     "explain": {
-      "lands": "The recommended range is {min} to {max} lands. Each land outside it costs 3 points. With {value}, the deck scores {points} of {maxPoints} points.",
+      "lands": "The recommended range is {min} to {max} lands. Each land outside it costs {penalty} points. With {value}, the deck scores {points} of {maxPoints} points.",
       "role": "The target is {target} {role} cards. Points grow proportionally up to the target: with {value}, the deck scores {points} of {maxPoints} points.",
-      "curve": "An average mana value up to {ideal} earns all {maxPoints} points; above that, points drop to zero at {limit}. With {value}, the deck scores {points} points."
+      "curve": "An average mana value up to {ideal} earns all {maxPoints} points; above that, points drop to zero at {limit}. With {value}, the deck scores {points} points.",
+      "creatures": "In 40-card decks, {min} to {max} creatures are recommended. Each one outside the range costs {penalty} points. With {value}, the deck scores {points} of {maxPoints} points.",
+      "interaction": "Interaction is removal plus board wipes. The target is {target}; points grow proportionally up to it: with {value}, the deck scores {points} of {maxPoints} points.",
+      "consistency": "Consistency is the share of spells running 3 or 4 copies (you draw them more often). {target}% or more earns all {maxPoints} points; with {value}%, the deck scores {points} points."
     },
     "legalityNote": "Banned and restricted cards checked with Scryfall legality data, updated daily.",
-    "legalityMissing": "{count, plural, =1 {1 card is} other {# cards are}} still missing legality data: refresh the analysis."
+    "legalityMissing": "{count, plural, =1 {1 card is} other {# cards are}} still missing legality data: refresh the analysis.",
+    "targetPercent": "target: {percent}%",
+    "moreDetails": "More analysis details",
+    "moreDetailsHint": "Card roles, mana base, opening hand odds and comparison with other decks."
   },
   "errors": {
     "invalid_input": "Please check the data you entered.",
@@ -1202,7 +1215,7 @@
         },
         "score": {
           "title": "3. A 0–100 score",
-          "body": "In commander formats, the score adds six parts with community reference targets. Roles earn points proportionally up to the target; lands lose 3 points per card outside the range; the curve earns everything up to an average mana value of 3 and drops to zero at 4.5."
+          "body": "In commander formats, the score adds six parts with community reference targets. Roles earn points proportionally up to the target; lands lose 3 points per card outside the range; the curve earns everything up to an average mana value of 3 and drops to zero at 4.5. In 60-card formats (Modern, Pauper…), the score looks at lands, curve, interaction and consistency (spells running 3 or 4 copies); in Draft and Sealed, creatures replace consistency."
         },
         "suggestions": {
           "title": "4. Suggestions and alternatives",
@@ -1225,7 +1238,7 @@
           "body": "Suggested times are the windows when at least a full table is free for the group's minimum duration. The ranking adds points for wins, draws and losses (3, 1 and 0 by default, adjustable by the group)."
         }
       },
-      "scoreCaption": "How the 100 points of the score are split",
+      "scoreCaption": "How the 100 points of the score are split (Commander)",
       "parts": {
         "lands": "Lands (36 to 38)",
         "ramp": "Ramp (target 10)",
@@ -1931,7 +1944,7 @@
     "label": "Tip",
     "dismiss": "Got it",
     "dismissLabel": "Got it, dismiss the tip",
-    "deck-analysis": "The score compares the deck with Commander reference targets (lands, ramp, card draw, removal, board wipes and curve). Tap an item to see how it is calculated and which cards count. It’s a guide, not a rule.",
+    "deck-analysis": "The score compares the deck with the format’s reference targets: in Commander, lands, ramp, card draw, removal, board wipes and curve; in 60-card formats, lands, curve, interaction and consistency; in 40-card ones, creatures instead of consistency. Tap an item to see the math and which cards count. Roles, mana base and opening hand are under \"More details\". It’s a guide, not a rule.",
     "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.",
     "collection": "Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.",
     "toggle": "Tip about this screen"

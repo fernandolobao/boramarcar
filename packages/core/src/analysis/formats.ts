@@ -19,6 +19,12 @@ export interface DeckFormatProfile {
   scryfallFormat: string | null;
   /** Brackets oficiais só existem em Commander. */
   brackets: boolean;
+  /**
+   * Nota dos formatos sem comandante (60 e 40 cartas): meta de interação (remoção + wipes) e,
+   * no limitado, a faixa de criaturas. `null` nos formatos com comandante e no livre.
+   */
+  interaction: number | null;
+  creatures: { min: number; max: number } | null;
 }
 
 const COMMANDER_ROLE_TARGETS = { ramp: 10, draw: 10, removal: 8, wipe: 2 };
@@ -32,9 +38,11 @@ const constructed = (format: GameFormat, scryfallFormat: string | null): DeckFor
   commanders: null,
   lands: { min: 22, max: 26 },
   roleTargets: null,
-  averageCmc: null,
+  averageCmc: { ideal: 2.5, max: 3.5 },
   scryfallFormat,
   brackets: false,
+  interaction: 8,
+  creatures: null,
 });
 
 const limited = (format: GameFormat): DeckFormatProfile => ({
@@ -46,9 +54,11 @@ const limited = (format: GameFormat): DeckFormatProfile => ({
   commanders: null,
   lands: { min: 16, max: 18 },
   roleTargets: null,
-  averageCmc: null,
+  averageCmc: { ideal: 3.0, max: 4.0 },
   scryfallFormat: null,
   brackets: false,
+  interaction: 4,
+  creatures: { min: 15, max: 17 },
 });
 
 export const DECK_FORMAT_PROFILES: Record<GameFormat, DeckFormatProfile> = {
@@ -64,6 +74,8 @@ export const DECK_FORMAT_PROFILES: Record<GameFormat, DeckFormatProfile> = {
     averageCmc: { ideal: 3.0, max: 4.5 },
     scryfallFormat: 'commander',
     brackets: true,
+    interaction: null,
+    creatures: null,
   },
   // Brawl do Arena: 100 cartas, um comandante (dois só com Partner e afins).
   brawl: {
@@ -78,6 +90,8 @@ export const DECK_FORMAT_PROFILES: Record<GameFormat, DeckFormatProfile> = {
     averageCmc: { ideal: 3.0, max: 4.5 },
     scryfallFormat: 'brawl',
     brackets: false,
+    interaction: null,
+    creatures: null,
   },
   // Oathbreaker: 60 cartas contando o planeswalker e a mágica de assinatura (zona de comando).
   oathbreaker: {
@@ -92,6 +106,8 @@ export const DECK_FORMAT_PROFILES: Record<GameFormat, DeckFormatProfile> = {
     averageCmc: { ideal: 2.8, max: 4 },
     scryfallFormat: 'oathbreaker',
     brackets: false,
+    interaction: null,
+    creatures: null,
   },
   two_headed_giant: constructed('two_headed_giant', null),
   standard: constructed('standard', 'standard'),
@@ -114,6 +130,8 @@ export const DECK_FORMAT_PROFILES: Record<GameFormat, DeckFormatProfile> = {
     averageCmc: null,
     scryfallFormat: null,
     brackets: false,
+    interaction: null,
+    creatures: null,
   },
 };
 

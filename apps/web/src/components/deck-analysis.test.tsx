@@ -83,8 +83,8 @@ describe('DeckScore / DeckValidation / DeckSuggestions', () => {
   });
 });
 
-describe('formatos sem nota', () => {
-  it('explica que a nota vale para formatos com comandante', () => {
+describe('nota por formato', () => {
+  it('Modern: nota com interação e consistência; validação pelas regras do formato', () => {
     const modern = analyzeDeck(
       [{ name: 'Big', quantity: 4, board: 'mainboard', card: card('Big', 3, 'Creature') }],
       'modern',
@@ -95,12 +95,21 @@ describe('formatos sem nota', () => {
         <DeckValidation analysis={modern} formatName="Modern" />
       </>,
     );
-    expect(screen.queryByTestId('deck-score')).toBeNull();
-    expect(
-      screen.getByText(/A nota por funções vale para formatos com comandante/),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('deck-score')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Interação/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Consistência/ })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Validação · Modern' })).toBeInTheDocument();
     expect(screen.getByText('O deck tem 4 cartas (mínimo: 60).')).toBeInTheDocument();
+  });
+
+  it('formato livre: sem nota, com a explicação', () => {
+    const free = analyzeDeck(
+      [{ name: 'Big', quantity: 4, board: 'mainboard', card: card('Big', 3, 'Creature') }],
+      'other',
+    );
+    wrap(<DeckScore analysis={free} formatName="Outro" />);
+    expect(screen.queryByTestId('deck-score')).toBeNull();
+    expect(screen.getByText(/Para Outro não há metas de referência/)).toBeInTheDocument();
   });
 });
 

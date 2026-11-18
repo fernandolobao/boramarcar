@@ -143,9 +143,11 @@ export function DeckSuggestions({ analysis }: { analysis: DeckAnalysis }) {
       <ul className="space-y-2 text-sm">
         {analysis.suggestions.map((s, index) => (
           <li key={index}>
-            {s.code === 'more_role' ? (
+            {s.code === 'more_role' || s.code === 'more_interaction' ? (
               <>
-                {t('suggestions.more_role', { missing: s.missing, role: t(`roles.${s.role}`) })}{' '}
+                {s.code === 'more_role'
+                  ? t('suggestions.more_role', { missing: s.missing, role: t(`roles.${s.role}`) })
+                  : t('suggestions.more_interaction', { missing: s.missing })}{' '}
                 <a
                   className="text-brand-600 underline dark:text-brand-400"
                   href={`https://scryfall.com/search?q=${encodeURIComponent(s.scryfallQuery)}&order=edhrec`}
@@ -157,7 +159,9 @@ export function DeckSuggestions({ analysis }: { analysis: DeckAnalysis }) {
                   {/* Contexto extra para leitores de tela, mantendo o texto visível no nome (WCAG 2.5.3). */}
                   <span className="sr-only">
                     {' '}
-                    ({t(`roles.${s.role}`)}) {tc('newTab')}
+                    ({s.code === 'more_role'
+                      ? t(`roles.${s.role}`)
+                      : t('components.interaction')}) {tc('newTab')}
                   </span>
                 </a>
               </>
@@ -165,6 +169,12 @@ export function DeckSuggestions({ analysis }: { analysis: DeckAnalysis }) {
               t('suggestions.more_lands', { missing: s.missing })
             ) : s.code === 'fewer_lands' ? (
               t('suggestions.fewer_lands', { extra: s.extra })
+            ) : s.code === 'low_consistency' ? (
+              t('suggestions.low_consistency', { percent: s.percent })
+            ) : s.code === 'more_creatures' ? (
+              t('suggestions.more_creatures', { missing: s.missing })
+            ) : s.code === 'fewer_creatures' ? (
+              t('suggestions.fewer_creatures', { extra: s.extra })
             ) : (
               t('suggestions.lower_curve', { averageCmc: s.averageCmc })
             )}

@@ -574,7 +574,10 @@
       "draw": "Compra",
       "removal": "Remoção",
       "wipe": "Board wipes",
-      "curve": "Curva"
+      "curve": "Curva",
+      "interaction": "Interação",
+      "consistency": "Consistência",
+      "creatures": "Criaturas"
     },
     "validationTitle": "Validação · {format}",
     "valid": "Deck válido para {format}.",
@@ -598,13 +601,17 @@
       "more_lands": "Adicione cerca de {missing} terrenos.",
       "fewer_lands": "Considere tirar {extra} terrenos.",
       "more_role": "Faltam ~{missing} cartas de {role}.",
-      "lower_curve": "A curva está alta (CMC médio {averageCmc}). Troque algumas cartas caras por mais baratas."
+      "lower_curve": "A curva está alta (CMC médio {averageCmc}). Troque algumas cartas caras por mais baratas.",
+      "more_interaction": "Pouca interação: faltam ~{missing} remoções ou board wipes.",
+      "low_consistency": "Só {percent}% das mágicas estão em 3 ou 4 cópias. Concentrar a lista em menos cartas, com mais cópias, deixa o deck mais consistente.",
+      "more_creatures": "Faltam ~{missing} criaturas para a faixa recomendada.",
+      "fewer_creatures": "Considere trocar {extra} criaturas por outras mágicas."
     },
     "searchScryfall": "Buscar substitutos no Scryfall",
     "disclaimer": "Nota pelas metas de referência de {format}. É um guia, não uma regra.",
     "curveBucket": "Custo {bucket}: {count, plural, =0 {nenhuma carta} =1 {1 carta} other {# cartas}}",
     "validationNote": "Este formato não tem lista de banidas para conferir.",
-    "noScore": "A nota por funções vale para formatos com comandante. Para {format}, use a validação, a base de mana e as chances da mão inicial.",
+    "noScore": "Para {format} não há metas de referência, então não damos nota. Use a validação, a curva, a base de mana e as chances da mão inicial.",
     "rolesSource": "{tagged} de {total} cartas com funções do Scryfall Tagger; as demais pela leitura do texto da carta.",
     "refresh": "Atualizar análise",
     "refreshing": "Atualizando…",
@@ -716,12 +723,18 @@
       "above": "Acima da meta"
     },
     "explain": {
-      "lands": "A faixa recomendada é de {min} a {max} terrenos. Cada terreno fora dela tira 3 pontos. Com {value}, o deck soma {points} de {maxPoints} pontos.",
+      "lands": "A faixa recomendada é de {min} a {max} terrenos. Cada terreno fora dela tira {penalty} pontos. Com {value}, o deck soma {points} de {maxPoints} pontos.",
       "role": "A meta é ter {target} cartas de {role}. Os pontos crescem proporcionalmente até a meta: com {value}, o deck soma {points} de {maxPoints} pontos.",
-      "curve": "Um CMC médio de até {ideal} vale os {maxPoints} pontos; acima disso os pontos caem até zero em {limit}. Com {value}, o deck soma {points} pontos."
+      "curve": "Um CMC médio de até {ideal} vale os {maxPoints} pontos; acima disso os pontos caem até zero em {limit}. Com {value}, o deck soma {points} pontos.",
+      "creatures": "Em decks de 40 cartas, o recomendado é de {min} a {max} criaturas. Cada uma fora da faixa tira {penalty} pontos. Com {value}, o deck soma {points} de {maxPoints} pontos.",
+      "interaction": "Interação é remoção mais board wipes. A meta é ter {target}; os pontos crescem proporcionalmente até ela: com {value}, o deck soma {points} de {maxPoints} pontos.",
+      "consistency": "Consistência é a parte das mágicas que estão em 3 ou 4 cópias (você as compra com mais frequência). {target}% ou mais vale os {maxPoints} pontos; com {value}%, o deck soma {points} pontos."
     },
     "legalityNote": "Banidas e restritas conferidas pelos dados de legalidade do Scryfall, atualizados todos os dias.",
-    "legalityMissing": "{count, plural, =1 {1 carta ainda está} other {# cartas ainda estão}} sem os dados de legalidade: atualize a análise."
+    "legalityMissing": "{count, plural, =1 {1 carta ainda está} other {# cartas ainda estão}} sem os dados de legalidade: atualize a análise.",
+    "targetPercent": "meta: {percent}%",
+    "moreDetails": "Mais detalhes da análise",
+    "moreDetailsHint": "Funções das cartas, base de mana, chances da mão inicial e comparação com outros decks."
   },
   "errors": {
     "invalid_input": "Confira os dados informados.",
@@ -1202,7 +1215,7 @@
         },
         "score": {
           "title": "3. Nota de 0 a 100",
-          "body": "Nos formatos com comandante, a nota soma seis partes com metas de referência da comunidade. As funções valem pontos proporcionais até a meta; os terrenos perdem 3 pontos por carta fora da faixa; a curva vale tudo até CMC médio 3 e cai até zero em 4,5."
+          "body": "Nos formatos com comandante, a nota soma seis partes com metas de referência da comunidade. As funções valem pontos proporcionais até a meta; os terrenos perdem 3 pontos por carta fora da faixa; a curva vale tudo até CMC médio 3 e cai até zero em 4,5. Em 60 cartas (Modern, Pauper…), a nota olha terrenos, curva, interação e consistência (mágicas em 3 ou 4 cópias); em Draft e Sealed, criaturas no lugar da consistência."
         },
         "suggestions": {
           "title": "4. Sugestões e alternativas",
@@ -1225,7 +1238,7 @@
           "body": "Os horários sugeridos são as janelas em que pelo menos o tamanho da mesa está livre pelo tempo mínimo do grupo. O ranking soma pontos por vitória, empate e derrota (3, 1 e 0 por padrão, ajustáveis pelo grupo)."
         }
       },
-      "scoreCaption": "Como os 100 pontos da nota se dividem",
+      "scoreCaption": "Como os 100 pontos da nota se dividem (Commander)",
       "parts": {
         "lands": "Terrenos (36 a 38)",
         "ramp": "Ramp (meta 10)",
@@ -1931,7 +1944,7 @@
     "label": "Dica",
     "dismiss": "Entendi",
     "dismissLabel": "Entendi, dispensar a dica",
-    "deck-analysis": "A nota compara o deck com metas de referência de Commander (terrenos, ramp, compra, remoção, board wipes e curva). Toque num item para ver como ele é calculado e quais cartas contam. É um guia, não uma regra.",
+    "deck-analysis": "A nota compara o deck com metas de referência do formato: em Commander, terrenos, ramp, compra, remoção, board wipes e curva; em 60 cartas, terrenos, curva, interação e consistência; em 40, criaturas no lugar da consistência. Toque num item para ver o cálculo e as cartas que contam. Funções, base de mana e mão inicial ficam em \"Mais detalhes\". É um guia, não uma regra.",
     "table": "Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer e trocar lugares.",
     "collection": "As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.",
     "toggle": "Dica sobre esta tela"

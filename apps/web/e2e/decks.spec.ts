@@ -91,6 +91,9 @@ test.describe('deck', () => {
 
   test('análise: funções, bracket, base de mana e mão inicial', async ({ page }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
+    // Funções, base de mana, mão inicial e comparação ficam em "Mais detalhes", fechado.
+    await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toBeHidden();
+    await page.getByText('Mais detalhes da análise').click();
     await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toBeVisible();
     await expect(page.getByRole('heading', { name: /^Ramp/ })).toContainText('meta: 10');
     await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toBeVisible();
@@ -126,9 +129,9 @@ test.describe('deck', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Teste Modern' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Validação · Modern' })).toBeVisible();
     await expect(page.getByText('O deck tem 24 cartas (mínimo: 60).')).toBeVisible();
-    await expect(
-      page.getByText(/A nota por funções vale para formatos com comandante/),
-    ).toBeVisible();
+    // Nota própria de 60 cartas: interação e consistência no lugar das funções de Commander.
+    await expect(page.getByTestId('deck-score')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Consistência/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toHaveCount(0);
   });
 
