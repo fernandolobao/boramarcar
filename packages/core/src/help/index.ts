@@ -265,7 +265,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'O que são as conquistas?',
             intro: [
-              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada e outros. Abra o perfil (toque no seu nome no ranking) para ver o progresso de cada uma.',
+              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano e outros. Abra o perfil (toque no seu nome no ranking) para ver o progresso de cada uma e o que falta.',
             ],
           },
           {
@@ -560,7 +560,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'What are achievements?',
             intro: [
-              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion and more. Open a profile (tap a name in the ranking) to see the progress of each one.',
+              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year and more. Open a profile (tap a name in the ranking) to see the progress of each one and what is left.',
             ],
           },
           {

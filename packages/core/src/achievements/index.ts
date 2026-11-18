@@ -6,7 +6,26 @@ export interface AchievementGame {
   format: string;
   firstPlayerId: string | null;
   winningTurn: number | null;
-  players: { userId: string; result: GameResult; deckId: string | null }[];
+  /** Grupo e encontro da partida (para "2 grupos", "Nêmesis" e "4 encontros seguidos"). */
+  groupId?: string | null;
+  eventId?: string | null;
+  players: {
+    userId: string;
+    result: GameResult;
+    deckId: string | null;
+    /** O deck usado tem proxies (hoje). */
+    deckHasProxies?: boolean;
+  }[];
+}
+
+/** Dados do grupo que algumas conquistas precisam além das partidas. */
+export interface AchievementContext {
+  /** Membros atuais de cada grupo do jogador (incluindo ele). */
+  groupMembers?: Record<string, readonly string[]>;
+  /** Encontros com partida registrada nos grupos do jogador. */
+  groupEvents?: readonly { groupId: string; eventId: string; startsAt: Date }[];
+  /** Fuso para "12 meses de um ano" (padrão: São Paulo). */
+  timeZone?: string;
 }
 
 export interface SeasonTitle {
@@ -30,6 +49,18 @@ export const ACHIEVEMENT_IDS = [
   'versatile',
   'team_win',
   'season_champion',
+  'games_100',
+  'wins_25',
+  'wins_50',
+  'decks_5',
+  'groups_2',
+  'opponents_10',
+  'nemesis',
+  'underdog_10',
+  'proxy_win',
+  'comeback',
+  'events_streak_4',
+  'months_12',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -56,6 +87,7 @@ export function computeAchievements(
   userId: string,
   games: readonly AchievementGame[],
   seasonTitles: readonly SeasonTitle[] = [],
+  context: AchievementContext = {},
 ): Achievement[] {
   const ordered = [...games]
     .filter((g) => g.players.some((p) => p.userId === userId))
@@ -73,12 +105,65 @@ export function computeAchievements(
   const gamesByDeck = new Map<string, number>();
   const winningDecks = new Set<string>();
   const formats = new Set<string>();
+  const decksPlayed = new Set<string>();
+  const groupsPlayed = new Set<string>();
+  const opponents = new Set<string>();
+  /** Em cada grupo, quem o jogador já venceu numa partida. */
+  const beaten = new Map<string, Set<string>>();
+  let underdogWins = 0;
+  let losingStreak = 0;
+  const monthKey = new Intl.DateTimeFormat('en-CA', {
+    timeZone: context.timeZone ?? 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+  });
+  const monthsByYear = new Map<string, Set<string>>();
+  /** Primeira partida do jogador em cada encontro. */
+  const firstGameInEvent = new Map<string, Date>();
 
   for (const game of ordered) {
     const me = game.players.find((p) => p.userId === userId)!;
     const won = me.result === 'win';
     played += 1;
     formats.add(game.format);
+    if (played >= 100) unlock('games_100', game.playedAt);
+    if (me.deckId) {
+      decksPlayed.add(me.deckId);
+      if (decksPlayed.size >= 5) unlock('decks_5', game.playedAt);
+    }
+    if (game.groupId) {
+      groupsPlayed.add(game.groupId);
+      if (groupsPlayed.size >= 2) unlock('groups_2', game.playedAt);
+    }
+    for (const p of game.players) if (p.userId !== userId) opponents.add(p.userId);
+    if (opponents.size >= 10) unlock('opponents_10', game.playedAt);
+    if (game.eventId && !firstGameInEvent.has(game.eventId)) {
+      firstGameInEvent.set(game.eventId, game.playedAt);
+    }
+    const [year, month] = monthKey.format(game.playedAt).split('-') as [string, string];
+    const months = monthsByYear.get(year) ?? new Set<string>();
+    months.add(month);
+    monthsByYear.set(year, months);
+    if (months.size >= 12) unlock('months_12', game.playedAt);
+    if (won) {
+      if (losingStreak >= 5) unlock('comeback', game.playedAt);
+      losingStreak = 0;
+      if (me.deckHasProxies) unlock('proxy_win', game.playedAt);
+      if (game.firstPlayerId && game.firstPlayerId !== userId) {
+        underdogWins += 1;
+        if (underdogWins >= 10) unlock('underdog_10', game.playedAt);
+      }
+      if (game.groupId) {
+        const set = beaten.get(game.groupId) ?? new Set<string>();
+        for (const p of game.players)
+          if (p.userId !== userId && p.result !== 'win') set.add(p.userId);
+        beaten.set(game.groupId, set);
+        const others = (context.groupMembers?.[game.groupId] ?? []).filter((u) => u !== userId);
+        if (others.length >= 2 && others.every((u) => set.has(u))) unlock('nemesis', game.playedAt);
+      }
+    } else if (me.result === 'loss') {
+      losingStreak += 1;
+    }
     unlock('first_game', game.playedAt);
     if (played >= 10) unlock('games_10', game.playedAt);
     if (played >= 50) unlock('games_50', game.playedAt);
@@ -94,6 +179,8 @@ export function computeAchievements(
       bestStreak = Math.max(bestStreak, streak);
       unlock('first_win', game.playedAt);
       if (wins >= 10) unlock('wins_10', game.playedAt);
+      if (wins >= 25) unlock('wins_25', game.playedAt);
+      if (wins >= 50) unlock('wins_50', game.playedAt);
       if (streak >= 3) unlock('streak_3', game.playedAt);
       if (streak >= 5) unlock('streak_5', game.playedAt);
       if (game.winningTurn !== null && game.winningTurn <= FAST_WIN_TURN) {
@@ -107,6 +194,31 @@ export function computeAchievements(
       }
     } else {
       streak = 0;
+    }
+  }
+  // Encontros seguidos do grupo (só os que tiveram partida) em que o jogador jogou.
+  let bestEventRun = 0;
+  const eventsByGroup = new Map<string, { eventId: string; startsAt: Date }[]>();
+  for (const e of context.groupEvents ?? []) {
+    eventsByGroup.set(e.groupId, [...(eventsByGroup.get(e.groupId) ?? []), e]);
+  }
+  for (const list of eventsByGroup.values()) {
+    let run = 0;
+    for (const e of [...list].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())) {
+      const when = firstGameInEvent.get(e.eventId);
+      run = when ? run + 1 : 0;
+      bestEventRun = Math.max(bestEventRun, run);
+      if (run >= 4 && when) unlock('events_streak_4', when);
+    }
+  }
+  // Nêmesis: o grupo em que o jogador está mais perto de ter vencido todo mundo.
+  let nemesis: [number, number] = [0, 1];
+  for (const [groupId, members] of Object.entries(context.groupMembers ?? {})) {
+    const others = members.filter((u) => u !== userId);
+    if (others.length < 2) continue;
+    const done = others.filter((u) => beaten.get(groupId)?.has(u)).length;
+    if (done / others.length > nemesis[0] / nemesis[1] || nemesis[0] === 0) {
+      nemesis = [done, others.length];
     }
   }
   const titles = [...seasonTitles].sort((a, b) => a.endsAt.getTime() - b.endsAt.getTime());
@@ -127,6 +239,18 @@ export function computeAchievements(
     versatile: [formats.size, 3],
     team_win: [unlockedAt.has('team_win') ? 1 : 0, 1],
     season_champion: [titles.length, 1],
+    games_100: [played, 100],
+    wins_25: [wins, 25],
+    wins_50: [wins, 50],
+    decks_5: [decksPlayed.size, 5],
+    groups_2: [groupsPlayed.size, 2],
+    opponents_10: [opponents.size, 10],
+    nemesis: unlockedAt.has('nemesis') ? [nemesis[1], nemesis[1]] : nemesis,
+    underdog_10: [underdogWins, 10],
+    proxy_win: [unlockedAt.has('proxy_win') ? 1 : 0, 1],
+    comeback: [unlockedAt.has('comeback') ? 1 : 0, 1],
+    events_streak_4: [bestEventRun, 4],
+    months_12: [Math.max(0, ...[...monthsByYear.values()].map((m) => m.size)), 12],
   };
 
   return ACHIEVEMENT_IDS.map((id) => {

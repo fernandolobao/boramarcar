@@ -406,6 +406,8 @@ describe('cliente da API', () => {
               count: 4,
             },
             { id: 'games_50', unlocked: false, unlockedAt: null, progress: 12, target: 50 },
+            // Conquista criada depois desta versão do app: ignorada, sem derrubar o perfil.
+            { id: 'futura', unlocked: true, unlockedAt: null, progress: 1, target: 1 },
           ],
           seasonTitles: [
             { seasonName: 'T1', groupName: 'Mesa de Terça', endsAt: '2026-03-31T00:00:00.000Z' },
@@ -422,6 +424,7 @@ describe('cliente da API', () => {
     expect(player.memberSince).toBeInstanceOf(Date);
     expect(player.achievements[0]!.unlockedAt).toBeInstanceOf(Date);
     expect(player.achievements[1]).toMatchObject({ unlocked: false, progress: 12 });
+    expect(player.achievements).toHaveLength(2);
     expect(player.seasonTitles[0]!.endsAt).toBeInstanceOf(Date);
   });
 

@@ -7,6 +7,12 @@
  */
 import {
   Award,
+  CalendarCheck,
+  CalendarRange,
+  Shield,
+  Target,
+  TrendingUp,
+  UsersRound,
   Circle,
   Gamepad2,
   Skull,
@@ -172,6 +178,12 @@ export const Icons = {
   team: Users,
   champion: Crown,
   veteran: Star,
+  crowd: UsersRound,
+  nemesis: Target,
+  underdog: Shield,
+  comeback: TrendingUp,
+  eventStreak: CalendarCheck,
+  allYear: CalendarRange,
   // Decks
   fromUrl: Link2,
   fromText: ClipboardPaste,

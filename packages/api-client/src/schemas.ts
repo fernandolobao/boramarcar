@@ -191,6 +191,18 @@ export const ACHIEVEMENT_IDS = [
   'versatile',
   'team_win',
   'season_champion',
+  'games_100',
+  'wins_25',
+  'wins_50',
+  'decks_5',
+  'groups_2',
+  'opponents_10',
+  'nemesis',
+  'underdog_10',
+  'proxy_win',
+  'comeback',
+  'events_streak_4',
+  'months_12',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -224,7 +236,14 @@ export const playerProfileSchema = z
         .loose(),
     ),
     decks: z.array(deckSummarySchema),
-    achievements: z.array(achievementSchema),
+    // Conquistas que esta versão do app não conhece (criadas depois) são ignoradas, em vez de
+    // derrubar o perfil inteiro.
+    achievements: z.array(z.unknown()).transform((list) =>
+      list.flatMap((a) => {
+        const parsed = achievementSchema.safeParse(a);
+        return parsed.success ? [parsed.data] : [];
+      }),
+    ),
     seasonTitles: z.array(
       z.object({ seasonName: z.string(), groupName: z.string(), endsAt: date }).loose(),
     ),

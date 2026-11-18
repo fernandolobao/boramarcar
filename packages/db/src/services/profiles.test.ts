@@ -124,6 +124,10 @@ describe('perfil do jogador', () => {
     expect(a.streak_3!.unlocked).toBe(true);
     expect(a.fast_win!.unlocked).toBe(true);
     expect(a.season_champion).toMatchObject({ unlocked: true, count: 1 });
+    // Contexto vindo do banco: um encontro com partida, um grupo, um adversário.
+    expect(a.events_streak_4!.progress).toBe(1);
+    expect(a.groups_2!.progress).toBe(1);
+    expect(a.opponents_10!.progress).toBe(1);
 
     const self = await getPlayerProfile(db, { userId: owner.id, viewerId: owner.id });
     expect(self.email).toContain('@example.com');
