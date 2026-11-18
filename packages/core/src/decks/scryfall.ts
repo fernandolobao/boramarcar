@@ -303,15 +303,30 @@ export async function fetchScryfallPrintedNames(
   }
   const body = z
     .object({
-      data: z.array(z.object({ name: z.string(), printed_name: z.string().optional() }).loose()),
+      data: z.array(
+        z
+          .object({
+            name: z.string(),
+            printed_name: z.string().optional(),
+            card_faces: z
+              .array(z.object({ printed_name: z.string().optional() }).loose())
+              .optional(),
+          })
+          .loose(),
+      ),
     })
     .parse(await response.json());
   const seen = new Set<string>();
   const out: { name: string; printedName: string }[] = [];
   for (const card of body.data) {
-    if (!card.printed_name || seen.has(card.name)) continue;
+    // Cartas de duas faces (transformar, adventure, MDFC…) só têm o nome impresso em cada face.
+    const faces = (card.card_faces ?? []).map((f) => f.printed_name);
+    const printedName =
+      card.printed_name ??
+      (faces.length > 0 && faces.every(Boolean) ? faces.join(' // ') : undefined);
+    if (!printedName || seen.has(card.name)) continue;
     seen.add(card.name);
-    out.push({ name: card.name, printedName: card.printed_name });
+    out.push({ name: card.name, printedName });
     if (out.length >= limit) break;
   }
   return out;
