@@ -12,6 +12,7 @@ import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { NoGroup } from '@/components/no-group';
 import { Choices } from '@/components/ds/choices';
+import { Select } from '@/components/ds/select';
 
 /** Ranking do grupo ativo (todas as partidas). */
 export default function RankingScreen() {
@@ -68,12 +69,12 @@ export default function RankingScreen() {
             />
           </View>
           <View style={{ gap: 6 }}>
-            <Choices
+            {/* Lista longa (13 tipos): Select, não chips. */}
+            <Select
               label={t('rankingFormat')}
               // '' = todos os tipos de jogo.
               value={format ?? ''}
               onChange={(v) => setFormat(v === '' ? undefined : v)}
-              scroll
               options={[
                 { value: '' as const, label: t('rankingFormatAll') },
                 ...GAME_FORMATS.map((f) => ({ value: f, label: formatLabel(f) })),

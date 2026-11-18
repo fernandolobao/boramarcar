@@ -7,6 +7,7 @@ import { Icon } from '../icons';
 import { FormError, useApiAction } from '../use-api-action';
 import { AddressSearch } from './address-search';
 import { LocationMap } from './location-map';
+import { Select } from '@/components/ds/select';
 
 export interface LocationView {
   id: string;
@@ -115,22 +116,16 @@ export function LocationForm({
           />
         </div>
         <div>
-          <label className="label" htmlFor={`${id}-host`}>
-            {t('host')} <span className="muted">({tc('optional')})</span>
-          </label>
-          <select
+          <Select
+            label={`${t('host')} <span className="muted">(${tc('optional')})</span>`}
             id={`${id}-host`}
-            className="select"
-            value={values.hostUserId}
-            onChange={(e) => set({ hostUserId: e.target.value })}
-          >
-            <option value="">{t('noHost')}</option>
-            {members.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+            value={String(values.hostUserId)}
+            onChange={(v) => set({ hostUserId: v })}
+            options={[
+              { value: '', label: t('noHost') },
+              ...members.map((m) => ({ value: String(m.userId), label: m.name })),
+            ]}
+          />
         </div>
         <div className="md:col-span-2">
           <AddressSearch

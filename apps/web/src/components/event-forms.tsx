@@ -8,6 +8,7 @@ import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Select } from '@/components/ds/select';
 
 export function NewEventForm({
   groupId,
@@ -70,22 +71,16 @@ export function NewEventForm({
         className="sm:col-span-2"
       />
       <div>
-        <label className="label" htmlFor="event-location">
-          {t('where')}
-        </label>
-        <select
+        <Select
+          label={t('where')}
           id="event-location"
-          className="select"
-          value={locationId}
-          onChange={(e) => setLocationId(e.target.value)}
-        >
-          <option value="">{tc('locationTbd')}</option>
-          {locations.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.name}
-            </option>
-          ))}
-        </select>
+          value={String(locationId)}
+          onChange={(v) => setLocationId(v)}
+          options={[
+            { value: '', label: tc('locationTbd') },
+            ...locations.map((l) => ({ value: String(l.id), label: l.name })),
+          ]}
+        />
       </div>
       <button className="btn-primary" disabled={pending}>
         <Icon name="add" />

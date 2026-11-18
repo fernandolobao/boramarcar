@@ -6,6 +6,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { DeckCards, foilTiming } from './deck-cards';
 import { ColorIdentity, DeckSettingsForm } from './deck-visual';
+import { pick } from '@/test/select';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 
@@ -481,7 +482,7 @@ describe('ColorIdentity e DeckSettingsForm', () => {
     vi.stubGlobal('fetch', fetchMock);
     const { container } = wrap(<DeckSettingsForm deckId="d1" name="Omnath" format="commander" />);
     expect(await audit(container)).toEqual([]);
-    fireEvent.change(screen.getByLabelText('Tipo de jogo'), { target: { value: 'brawl' } });
+    pick('Tipo de jogo', 'Brawl');
     expect(screen.getByRole('radio', { name: /Grupo/ })).toBeChecked();
     fireEvent.click(screen.getByRole('radio', { name: /Privado/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));

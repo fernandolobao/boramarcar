@@ -6,6 +6,7 @@ import { useId, useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
+import { Select } from '@/components/ds/select';
 
 export interface AnnouncementRow {
   id: string;
@@ -107,22 +108,16 @@ export function AnnouncementsAdmin({
           </p>
         </div>
         <div>
-          <label className="label" htmlFor={`${id}-audience`}>
-            {t('audience')}
-          </label>
-          <select
+          <Select
+            label={t('audience')}
             id={`${id}-audience`}
-            className="select"
-            value={groupId}
-            onChange={(e) => setGroupId(e.target.value)}
-          >
-            <option value="">{t('audienceAll')}</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
+            value={String(groupId)}
+            onChange={(v) => setGroupId(v)}
+            options={[
+              { value: '', label: t('audienceAll') },
+              ...groups.map((g) => ({ value: String(g.id), label: g.name })),
+            ]}
+          />
         </div>
         <div className="flex flex-wrap gap-2">
           <button className="btn-primary" disabled={pending}>

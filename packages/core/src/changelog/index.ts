@@ -114,6 +114,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Atualizamos a política de privacidade: a equipe do ArcanaKin pode ver decks privados só para suporte e moderação, e cada acesso fica registrado nos seus dados.',
     en: 'We updated the privacy policy: the ArcanaKin team can view private decks only for support and moderation, and each access is logged in your data.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'As listas de escolha (tipo de jogo, filtros, local, deck…) ganharam a cara do ArcanaKin: iguais em qualquer navegador, celular ou tablet, nos temas claro e escuro.',
+    en: 'Pick lists (game type, filters, place, deck…) now look like ArcanaKin: the same in any browser, phone or tablet, in light and dark themes.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

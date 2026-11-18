@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../../messages/pt-BR.json';
 import { LocationForm } from './location-form';
+import { pick } from '@/test/select';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 vi.mock('./location-map', () => ({
@@ -57,7 +58,7 @@ describe('LocationForm', () => {
     expect(screen.getByLabelText('Nome do local')).toHaveValue('PUCRS');
     expect(screen.getByRole('region', { name: 'Mapa: PUCRS' })).toHaveAttribute('data-points', '1');
 
-    fireEvent.change(screen.getByLabelText(/Anfitrião/), { target: { value: 'u1' } });
+    pick(/Anfitrião/, 'Ana');
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar local' }));
     await waitFor(() => expect(calls).toHaveLength(2));
     expect(calls[1]!.url).toBe('/api/v1/groups/g1/locations');

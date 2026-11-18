@@ -508,3 +508,9 @@ sem rolagem horizontal em 320px.
 
 - Deck aberto por admin sem ser visível para ele: aviso em texto no topo (`role="note"`), com ícone decorativo.
 - `/admin`: "Decks" e "Cartas na coleção" entram na lista de dados de cada conta (`dl` com `dt`/`dd`, como os outros).
+
+## Design system, fase 3: `Select` (19/11/2026)
+
+- Site: os 30 `<select>` nativos viraram o `Select` do React Aria. Botão com o valor e o rótulo no nome, lista (`listbox`) em popover, setas, digitar para achar, Esc fecha e o foco volta ao botão; opção desabilitada com `aria-disabled`; descrição e erro ligados ao campo; alvo ≥ 44 px. Nos filtros `GET` (ranking e histórico), o valor vai num campo oculto com `name`. Para quem já tinha rótulo visível só em outro lugar (custo máximo das funções), o nome acessível completo continua no campo (`hideLabel`).
+- App: o tipo de jogo (13 opções) no ranking, no grupo e no deck saiu dos chips para o `Select`: campo-botão com "rótulo: valor", folha com as opções como botões com estado `selected`.
+- Componente no teste de acessibilidade (axe) e testes de unidade do teclado e do envio em formulário.

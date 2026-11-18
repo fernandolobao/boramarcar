@@ -32,6 +32,7 @@ import { KEEP_AWAKE_MP4, KEEP_AWAKE_WEBM } from './keep-awake-media';
 import { NumberField } from '../ds/number-field';
 import { Choices } from '../ds/choices';
 import { TitleWithTip } from '../tip';
+import { Select } from '@/components/ds/select';
 
 export interface TablePlayerOption {
   userId: string;
@@ -151,25 +152,17 @@ function Setup({
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="label" htmlFor={`${id}-format`}>
-              {t('format')}
-            </label>
-            <select
+            <Select
+              label={t('format')}
               id={`${id}-format`}
-              className="select"
-              value={format}
-              onChange={(e) => {
-                const f = e.target.value as GameFormat;
+              value={String(format)}
+              onChange={(v) => {
+                const f = v as GameFormat;
                 setFormat(f);
                 setLife(startingLifeFor(f));
               }}
-            >
-              {formats.map((f) => (
-                <option key={f} value={f}>
-                  {tf(f)}
-                </option>
-              ))}
-            </select>
+              options={formats.map((f) => ({ value: String(f), label: tf(f) }))}
+            />
           </div>
           <div>
             <NumberField
@@ -218,22 +211,16 @@ function Setup({
                     className="grid gap-2 rounded-xl border border-ink-200 p-3 sm:grid-cols-[1fr_auto] sm:items-end dark:border-ink-800"
                   >
                     <div>
-                      <label className="label" htmlFor={`${id}-deck-${userId}`}>
-                        {i + 1}. {p.name} · {t('deck')}
-                      </label>
-                      <select
+                      <Select
+                        label={`${i + 1}. ${p.name} · ${t('deck')}`}
                         id={`${id}-deck-${userId}`}
-                        className="select"
-                        value={decks[userId] ?? ''}
-                        onChange={(e) => setDecks((d) => ({ ...d, [userId]: e.target.value }))}
-                      >
-                        <option value="">{t('noDeck')}</option>
-                        {p.decks.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.name}
-                          </option>
-                        ))}
-                      </select>
+                        value={String(decks[userId] ?? '')}
+                        onChange={(v) => setDecks((d) => ({ ...d, [userId]: v }))}
+                        options={[
+                          { value: '', label: t('noDeck') },
+                          ...p.decks.map((d) => ({ value: String(d.id), label: d.name })),
+                        ]}
+                      />
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -350,22 +337,16 @@ function Finish({
         />
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="label" htmlFor={`${id}-first`}>
-              {t('firstPlayer')}
-            </label>
-            <select
+            <Select
+              label={t('firstPlayer')}
               id={`${id}-first`}
-              className="select"
-              value={first}
-              onChange={(e) => setFirst(e.target.value)}
-            >
-              <option value="">{t('unknown')}</option>
-              {state.players.map((p) => (
-                <option key={p.userId} value={p.userId}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+              value={String(first)}
+              onChange={(v) => setFirst(v)}
+              options={[
+                { value: '', label: t('unknown') },
+                ...state.players.map((p) => ({ value: String(p.userId), label: p.name })),
+              ]}
+            />
           </div>
           <div>
             <NumberField

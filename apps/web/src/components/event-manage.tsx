@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Select } from '@/components/ds/select';
 
 type Status = 'scheduled' | 'cancelled' | 'finished';
 
@@ -90,22 +91,16 @@ export function EventManage(props: Props) {
           className="sm:col-span-2"
         />
         <div className="sm:col-span-2">
-          <label className="label" htmlFor="edit-location">
-            {t('where')}
-          </label>
-          <select
+          <Select
+            label={t('where')}
             id="edit-location"
-            className="select"
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
-          >
-            <option value="">{tc('locationTbd')}</option>
-            {props.locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
+            value={String(locationId)}
+            onChange={(v) => setLocationId(v)}
+            options={[
+              { value: '', label: tc('locationTbd') },
+              ...props.locations.map((l) => ({ value: String(l.id), label: l.name })),
+            ]}
+          />
         </div>
         <div className="flex items-center gap-3 sm:col-span-2">
           <button className="btn-primary" disabled={pending}>

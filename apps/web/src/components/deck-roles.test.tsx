@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { DeckRoles } from './deck-roles';
+import { pick } from '@/test/select';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 
@@ -60,7 +61,7 @@ describe('DeckRoles', () => {
     expect(screen.getByText(/1 de 2 cartas com funções do Scryfall Tagger/)).toBeInTheDocument();
 
     const button = screen.getByRole('button', { name: 'Ver alternativas (Ramp)' });
-    fireEvent.change(screen.getByLabelText('Custo até (Ramp)'), { target: { value: '2' } });
+    pick('Custo até (Ramp)', '2');
     fireEvent.click(button);
     expect(await screen.findByText('Arcane Signet')).toBeInTheDocument();
     expect(fetchMock.mock.calls[0]![0]).toBe('/api/v1/decks/d1/alternatives?role=ramp&maxCmc=2');

@@ -14,6 +14,7 @@ import { PlayerLink, PlayerLinks } from '@/components/player-link';
 import { CardNames } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
 import { EmptyState } from '@/components/empty-state';
+import { Select } from '@/components/ds/select';
 
 export const generateMetadata = navMetadata('ranking');
 
@@ -92,42 +93,35 @@ export default async function RankingPage({ searchParams }: Props) {
           aria-label={t('filters')}
         >
           <div>
-            <label className="label" htmlFor="filtro-periodo">
-              {t('period')}
-            </label>
-            <select
+            <Select
+              label={t('period')}
               id="filtro-periodo"
               name="periodo"
-              className="select"
-              defaultValue={range.period}
-            >
-              <option value="all">{t('periods.all')}</option>
-              <option value="last30">{t('periods.last30')}</option>
-              <option value="thisYear">{t('periods.thisYear')}</option>
-              {seasons.map((s) => (
-                <option key={s.id} value={`season:${s.id}`}>
-                  {t('seasonOption', { name: s.name })}
-                </option>
-              ))}
-            </select>
+              defaultValue={String(range.period)}
+              options={[
+                { value: 'all', label: t('periods.all') },
+                { value: 'last30', label: t('periods.last30') },
+                { value: 'thisYear', label: t('periods.thisYear') },
+                ...seasons.map((s) => ({
+                  value: String(`season:${s.id}`),
+                  label: `${t('seasonOption', { name: s.name })}`,
+                })),
+              ]}
+            />
           </div>
           <div>
-            <label className="label" htmlFor="filtro-tipo">
-              {t('formatFilter')}
-            </label>
-            <select
+            <Select
+              label={t('formatFilter')}
               id="filtro-tipo"
               name="tipo"
-              className="select"
-              defaultValue={formatFilter ?? ''}
-            >
-              <option value="">{t('allFormats')}</option>
-              {stats.formats.filter(isGameFormat).map((f) => (
-                <option key={f} value={f}>
-                  {tf(f)}
-                </option>
-              ))}
-            </select>
+              defaultValue={String(formatFilter ?? '')}
+              options={[
+                { value: '', label: t('allFormats') },
+                ...stats.formats
+                  .filter(isGameFormat)
+                  .map((f) => ({ value: String(f), label: tf(f) })),
+              ]}
+            />
           </div>
           <button className="btn-primary">
             <Icon name="filter" />

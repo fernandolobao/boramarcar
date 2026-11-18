@@ -9,6 +9,7 @@ import { Icon } from './icons';
 import { ManaCost } from './mana';
 import { FormError, useApiAction } from './use-api-action';
 import { CardNames } from './card-dialog';
+import { Select } from '@/components/ds/select';
 
 interface Alternative {
   name: string;
@@ -94,26 +95,23 @@ function RoleAlternatives({ deckId, role }: { deckId: string; role: CardRole }) 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <label className="text-sm" htmlFor={`${id}-cmc`}>
+        {/* Rótulo visível curto; o nome acessível leva a função (há uma lista por função). */}
+        <span aria-hidden="true" className="text-sm">
           {t('maxCmc')}
-          <span className="sr-only"> ({t(`roles.${role}`)})</span>
-        </label>
-        <select
+        </span>
+        <Select
+          label={`${t('maxCmc')} (${t(`roles.${role}`)})`}
+          hideLabel
           id={`${id}-cmc`}
-          className="select w-20 py-1.5"
-          value={maxCmc}
-          onChange={(e) => {
-            const value = Number(e.target.value);
+          value={String(maxCmc)}
+          onChange={(v) => {
+            const value = Number(v);
             setMaxCmc(value);
             if (open) load(value);
           }}
-        >
-          {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+          className="w-24"
+          options={[1, 2, 3, 4, 5, 6, 7].map((n) => ({ value: String(n), label: String(n) }))}
+        />
         <button
           type="button"
           className="btn-secondary py-1.5"

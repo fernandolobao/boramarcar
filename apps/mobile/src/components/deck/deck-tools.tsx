@@ -13,6 +13,7 @@ import { AppText, Button } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t, type MessageKey } from '@/lib/i18n';
 import { Choices } from '@/components/ds/choices';
+import { Select } from '@/components/ds/select';
 
 const VISIBILITY_LABEL: Record<DeckVisibility, MessageKey> = {
   private: 'deckVisibilityPrivate',
@@ -85,7 +86,7 @@ export function DeckTools({
             {t('deckSettings')}
           </AppText>
           <TextField label={t('deckName')} value={name} onChangeText={setName} maxLength={120} />
-          <Choices
+          <Select
             label={t('deckFormat')}
             value={format}
             onChange={setFormat}

@@ -6,6 +6,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../../messages/pt-BR.json';
 import { tableLayout } from '@boramarcar/core';
 import { TableMode } from './table-mode';
+import { pick, selectButton } from '@/test/select';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push, refresh: vi.fn() }) }));
@@ -69,9 +70,9 @@ describe('modo mesa', () => {
     expect(screen.getByLabelText('Vida inicial')).toHaveValue('40');
     expect(screen.getByRole('checkbox', { name: /Ana/ })).toBeChecked();
     expect(screen.getByRole('checkbox', { name: /Caio/ })).not.toBeChecked();
-    fireEvent.change(screen.getByLabelText('1. Ana · deck'), { target: { value: 'd1' } });
+    pick('1. Ana · deck', 'Omnath');
     fireEvent.click(screen.getByRole('button', { name: 'Descer Ana' }));
-    expect(screen.getByLabelText('2. Ana · deck')).toHaveValue('d1');
+    expect(selectButton('2. Ana · deck')).toHaveTextContent('Omnath');
     expect(await audit(container)).toEqual([]);
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }));
 

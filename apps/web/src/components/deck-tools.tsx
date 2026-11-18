@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
 import { Choices } from './ds/choices';
+import { Select } from '@/components/ds/select';
 
 /** Exportar a lista (copiar/baixar) e, para o dono, atualizar o deck pela origem ou por texto. */
 export function DeckTools({
@@ -119,18 +120,16 @@ export function DeckTools({
               ]}
             />
             <div>
-              <label className="label" htmlFor={`${id}-paper`}>
-                {t('paper')}
-              </label>
-              <select
+              <Select
+                label={t('paper')}
                 id={`${id}-paper`}
-                className="select"
                 value={paper}
-                onChange={(e) => setPaper(e.target.value as 'a4' | 'letter')}
-              >
-                <option value="a4">A4</option>
-                <option value="letter">{t('letter')}</option>
-              </select>
+                onChange={(v) => setPaper(v as 'a4' | 'letter')}
+                options={[
+                  { value: 'a4', label: 'A4' },
+                  { value: 'letter', label: t('letter') },
+                ]}
+              />
             </div>
             <Link
               className="btn-primary"

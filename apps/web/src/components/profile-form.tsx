@@ -6,6 +6,7 @@ import { LOCALES, type Locale } from '@/i18n/config';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Select } from '@/components/ds/select';
 
 function listTimeZones(current: string): string[] {
   const zones =
@@ -47,21 +48,15 @@ export function ProfileForm({ emailNotifications = true }: { emailNotifications?
       }}
     >
       <div>
-        <label className="label" htmlFor="profile-tz">
-          {t('timeZone')}
-        </label>
-        <select
+        <Select
+          label={t('timeZone')}
           id="profile-tz"
-          className="select"
-          value={timeZone}
-          onChange={(e) => setTimeZone(e.target.value)}
-        >
-          {zones.map((zone) => (
-            <option key={zone} value={zone}>
-              {zone.replaceAll('_', ' ')}
-            </option>
-          ))}
-        </select>
+          value={String(timeZone)}
+          onChange={(v) => setTimeZone(v)}
+          options={[
+            ...zones.map((zone) => ({ value: String(zone), label: zone.replaceAll('_', ' ') })),
+          ]}
+        />
         <p className="muted mt-1">{t('timeZoneHint')}</p>
         {browserTimeZone && browserTimeZone !== timeZone && (
           <p className="muted mt-1">
@@ -77,21 +72,13 @@ export function ProfileForm({ emailNotifications = true }: { emailNotifications?
         )}
       </div>
       <div>
-        <label className="label" htmlFor="profile-locale">
-          {t('language')}
-        </label>
-        <select
+        <Select
+          label={t('language')}
           id="profile-locale"
-          className="select"
-          value={locale}
-          onChange={(e) => setLocale(e.target.value as Locale)}
-        >
-          {LOCALES.map((l) => (
-            <option key={l} value={l}>
-              {t(`languages.${l}`)}
-            </option>
-          ))}
-        </select>
+          value={String(locale)}
+          onChange={(v) => setLocale(v as Locale)}
+          options={LOCALES.map((l) => ({ value: String(l), label: t(`languages.${l}`) }))}
+        />
       </div>
       <div>
         <label className="flex items-center gap-2 font-medium">

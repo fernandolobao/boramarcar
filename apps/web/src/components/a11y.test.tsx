@@ -48,6 +48,7 @@ import { FirstSteps } from './first-steps';
 import { FeedbackForm } from './feedback-form';
 import { NumberField } from './ds/number-field';
 import { Choices } from './ds/choices';
+import { Select } from './ds/select';
 
 vi.mock('./places/location-map', () => ({
   LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
@@ -454,6 +455,20 @@ const cases: [string, ReactElement][] = [
       min={1}
       max={10}
       description="Quantas cópias"
+      onChange={() => undefined}
+    />,
+  ],
+  [
+    'Select',
+    <Select
+      key="s"
+      label="Tipo de jogo"
+      value="modern"
+      description="Só partidas deste tipo"
+      options={[
+        { value: '', label: 'Todos' },
+        { value: 'modern', label: 'Modern' },
+      ]}
       onChange={() => undefined}
     />,
   ],
