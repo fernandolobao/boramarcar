@@ -22,7 +22,10 @@ import { getGroupRanking } from './ranking';
 import { getUserSummary } from './users';
 
 /** Partidas em que o jogador jogou, com todos os jogadores (para conquistas). */
-async function listPlayerGames(db: Database, userId: string): Promise<AchievementGame[]> {
+async function listPlayerGames(
+  db: Database,
+  userId: string,
+): Promise<(AchievementGame & { id: string })[]> {
   const mine = await db
     .select({ gameId: gamePlayers.gameId })
     .from(gamePlayers)
@@ -116,6 +119,34 @@ export async function getUserAchievements(db: Database, userId: string, now = ne
     achievementContext(db, userId),
   ]);
   return computeAchievements(userId, playerGames, titles, context);
+}
+
+/**
+ * Conquistas que uma partida desbloqueou para o jogador: as que ele tem com ela e não teria sem
+ * ela (partidas antigas registradas depois também contam).
+ */
+export async function achievementsUnlockedByGame(
+  db: Database,
+  input: { userId: string; gameId: string; now?: Date },
+) {
+  const [playerGames, titles, context] = await Promise.all([
+    listPlayerGames(db, input.userId),
+    listSeasonTitles(db, input.userId, input.now ?? new Date()),
+    achievementContext(db, input.userId),
+  ]);
+  const before = new Set(
+    computeAchievements(
+      input.userId,
+      playerGames.filter((g) => g.id !== input.gameId),
+      titles,
+      context,
+    )
+      .filter((a) => a.unlocked)
+      .map((a) => a.id),
+  );
+  return computeAchievements(input.userId, playerGames, titles, context)
+    .filter((a) => a.unlocked && !before.has(a.id))
+    .map((a) => a.id);
 }
 
 /** Temporadas encerradas em que o jogador terminou em 1º (empates no 1º lugar também contam). */

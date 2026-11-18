@@ -417,6 +417,7 @@ export async function updateGame(
 export async function deleteGame(db: Database, input: { gameId: string; userId: string }) {
   const { game } = await requireGameEditor(db, input.gameId, input.userId);
   await db.delete(games).where(eq(games.id, game.id));
+  return { groupId: game.groupId };
 }
 
 export const EVENT_HISTORY_PAGE_SIZE = 20;
