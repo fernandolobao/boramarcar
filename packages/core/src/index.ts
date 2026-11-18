@@ -10,6 +10,7 @@ export * from './games';
 export * from './stats';
 export * from './achievements';
 export * from './notifications';
+export * from './changelog';
 export * from './currency';
 export * from './places';
 export * from './table';

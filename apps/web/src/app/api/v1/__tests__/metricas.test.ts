@@ -61,6 +61,21 @@ describe('resumo semanal das métricas (8.3)', () => {
     expect(metricsSummary).toBeTypeOf('function');
   });
 
+  it('às segundas, o rascunho das novidades da semana e o e-mail para revisar', async () => {
+    sent.splice(0);
+    const { draftWeeklyNews } = await import('@/server/weekly-news');
+    const result = await draftWeeklyNews(testState.db!, new Date('2026-11-23T11:17:00Z'));
+    expect(result).toEqual({ drafted: true, emails: 1 });
+    expect(sent[0]!.subject).toBe('ArcanaKin: novidades da semana para revisar');
+    expect(sent[0]!.text).toContain('• Chegou o sino de notificações');
+    expect(sent[0]!.text).toContain('/admin');
+    // Rodar de novo no mesmo dia não cria outro rascunho nem manda e-mail.
+    expect(await draftWeeklyNews(testState.db!, new Date('2026-11-23T12:00:00Z'))).toEqual({
+      drafted: false,
+      emails: 0,
+    });
+  });
+
   it('tempo do registro pós-jogo em texto curto', () => {
     expect(formatMinutes(45)).toBe('45 min');
     expect(formatMinutes(200)).toBe('3 h 20 min');

@@ -1,4 +1,4 @@
-import { DomainError } from '@boramarcar/core';
+import { changelogDraft, changelogSince, DomainError, type ChangelogEntry } from '@boramarcar/core';
 import { desc, eq, isNull } from 'drizzle-orm';
 import type { Database } from '../client';
 import { announcements, groupMembers, groups, user } from '../schema';
@@ -135,3 +135,40 @@ export async function listAnnouncements(db: Database, limit = 50) {
     .limit(limit);
 }
 export type AdminAnnouncement = Awaited<ReturnType<typeof listAnnouncements>>[number];
+
+/** Dia (AAAA-MM-DD) de uma data no fuso dado. */
+const dayIn = (date: Date, timeZone: string) =>
+  new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+
+/**
+ * Novidades da semana (cron de segunda): junta as entradas do arquivo de novidades desde o último
+ * rascunho de novidades (ou dos últimos 7 dias, na primeira vez) e cria um rascunho para um admin
+ * revisar e publicar. Sem novidades, não cria nada.
+ */
+export async function createChangelogDraft(
+  db: Database,
+  input: { entries: readonly ChangelogEntry[]; now?: Date; timeZone?: string },
+) {
+  const now = input.now ?? new Date();
+  const timeZone = input.timeZone ?? 'America/Sao_Paulo';
+  const [last] = await db
+    .select({ createdAt: announcements.createdAt })
+    .from(announcements)
+    .where(eq(announcements.kind, 'changelog'))
+    .orderBy(desc(announcements.createdAt))
+    .limit(1);
+  const after = dayIn(last?.createdAt ?? new Date(now.getTime() - 7 * 86_400_000), timeZone);
+  const fresh = changelogSince(input.entries, after, dayIn(now, timeZone));
+  if (!fresh.length) return null;
+  const { title, body } = changelogDraft(fresh);
+  const [row] = await db
+    .insert(announcements)
+    .values({ kind: 'changelog', title, body, groupId: null, createdBy: null, createdAt: now })
+    .returning();
+  return row!;
+}

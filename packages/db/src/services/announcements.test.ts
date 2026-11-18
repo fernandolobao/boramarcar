@@ -4,6 +4,7 @@ import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import {
   createAnnouncement,
+  createChangelogDraft,
   deleteAnnouncement,
   listAnnouncements,
   publishAnnouncement,
@@ -80,5 +81,38 @@ describe('avisos do ArcanaKin', () => {
     const list = await listAnnouncements(db);
     expect(list.some((a) => a.id === extra.id)).toBe(false);
     expect(list.find((a) => a.id === draft.id)).toMatchObject({ groupName: 'Mesa de Quinta' });
+  });
+});
+
+describe('novidades da semana', () => {
+  it('rascunho com as novidades desde o último; sem novidades, nada', async () => {
+    const entries = [
+      { date: '2026-12-01', pt: 'Novidade de dezembro A.', en: 'December news A.' },
+      { date: '2026-12-03', pt: 'Novidade de dezembro B.', en: 'December news B.' },
+      { date: '2026-12-09', pt: 'Novidade da outra semana.', en: 'Next week news.' },
+    ];
+    // Segunda, 7/12 (10h em São Paulo): pega as dos últimos 7 dias.
+    const first = await createChangelogDraft(db, {
+      entries,
+      now: new Date('2026-12-07T13:00:00Z'),
+    });
+    expect(first).toMatchObject({
+      kind: 'changelog',
+      status: 'draft',
+      title: 'Novidades da semana',
+      body: '• Novidade de dezembro A.\n• Novidade de dezembro B.',
+    });
+    // Mesmo dia de novo: nada novo.
+    expect(
+      await createChangelogDraft(db, { entries, now: new Date('2026-12-07T15:00:00Z') }),
+    ).toBeNull();
+    // Semana seguinte: só a nova.
+    const second = await createChangelogDraft(db, {
+      entries,
+      now: new Date('2026-12-14T13:00:00Z'),
+    });
+    expect(second!.body).toBe('• Novidade da outra semana.');
+    // Rascunho de novidades aparece no /admin como os outros.
+    expect((await listAnnouncements(db)).some((a) => a.id === second!.id)).toBe(true);
   });
 });
