@@ -22,6 +22,7 @@ export default async function EventsPage() {
     listLocations(db, group.id),
   ]);
   const t = await getTranslations('events');
+  const tt9 = await getTranslations('tournaments');
   const th = await getTranslations('history');
   const tc = await getTranslations('common');
   const format = await getFormatter();
@@ -50,7 +51,14 @@ export default async function EventsPage() {
 
   return (
     <>
-      <h1 className="page-title">{t('title')}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="page-title">{t('title')}</h1>
+        {/* Torneios do grupo (9.1): cada um pertence a um encontro. */}
+        <Link href="/torneios" className="btn-secondary">
+          <Icon name="ranking" />
+          {tt9('listLink')}
+        </Link>
+      </div>
       <StackSections>
         <section className="card">
           <h2 className="section-title">{t('new')}</h2>

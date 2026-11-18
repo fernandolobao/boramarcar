@@ -14,6 +14,7 @@ export const E2E_IDS = {
   upcomingEvent: 'e2e-event-upcoming',
   pastEvent: 'e2e-event-past',
   deck: 'e2e-deck',
+  tournament: 'e2e-tournament',
 } as const;
 
 const HOUR = 3600_000;
@@ -272,6 +273,70 @@ export async function seedE2E(databaseUrl: string) {
         },
       },
     ]);
+    // Torneio de Modern (melhor de 3) em andamento: rodada 1 com uma mesa sem resultado (Ana x Bia)
+    // e outra registrada (Caio 2 x 1 Duda), para a página do torneio ter mesas, formulário e
+    // classificação.
+    await db.insert(s.tournaments).values({
+      id: E2E_IDS.tournament,
+      groupId: E2E_IDS.group,
+      eventId: E2E_IDS.pastEvent,
+      name: 'Copa de Modern',
+      format: 'modern',
+      tableKind: 'pair',
+      entrantSize: 1,
+      bestOf: 3,
+      rounds: 3,
+      countsInRanking: false,
+      status: 'running',
+      createdBy: 'e2e-ana',
+    });
+    await db.insert(s.tournamentEntrants).values(
+      users.map((u, i) => ({
+        id: `e2e-entrant-${i + 1}`,
+        tournamentId: E2E_IDS.tournament,
+        createdAt: new Date(Date.UTC(2026, 0, 1, 0, i)),
+      })),
+    );
+    await db.insert(s.tournamentEntrantMembers).values(
+      users.map((u, i) => ({
+        entrantId: `e2e-entrant-${i + 1}`,
+        tournamentId: E2E_IDS.tournament,
+        userId: u.id,
+      })),
+    );
+    await db
+      .insert(s.tournamentRounds)
+      .values({ id: 'e2e-round-1', tournamentId: E2E_IDS.tournament, number: 1 });
+    await db.insert(s.tournamentTables).values([
+      {
+        id: 'e2e-table-1',
+        roundId: 'e2e-round-1',
+        tournamentId: E2E_IDS.tournament,
+        number: 1,
+        entrantIds: ['e2e-entrant-1', 'e2e-entrant-2'],
+      },
+      {
+        id: 'e2e-table-2',
+        roundId: 'e2e-round-1',
+        tournamentId: E2E_IDS.tournament,
+        number: 2,
+        entrantIds: ['e2e-entrant-3', 'e2e-entrant-4'],
+        gameWins: { 'e2e-entrant-3': 2, 'e2e-entrant-4': 1 },
+        gameDraws: 0,
+        reportedBy: 'e2e-ana',
+        reportedAt: new Date(),
+      },
+    ]);
+    await db.insert(s.tournamentEvents).values([
+      { tournamentId: E2E_IDS.tournament, kind: 'started', data: { entrants: 4, rounds: 3 } },
+      { tournamentId: E2E_IDS.tournament, kind: 'round_started', data: { round: 1 } },
+      {
+        tournamentId: E2E_IDS.tournament,
+        kind: 'table_reported',
+        data: { round: 1, table: 2, corrected: false },
+      },
+    ]);
+
     // Todas as conquistas contam como vistas: a janela de conquistas novas não abre no meio de
     // outros testes (ela tem o próprio teste em `perfis.spec.ts`).
     await db

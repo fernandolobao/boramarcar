@@ -129,6 +129,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Caixas de marcar e interruptores com a cara do ArcanaKin, com um ✓ visível no app; a lista de escolha alinha com os campos e botões ao lado, e o selo Foil da coleção fica sobre a imagem da carta.',
     en: 'Checkboxes and switches now look like ArcanaKin, with a visible ✓ in the app; pick lists line up with the fields and buttons next to them, and the collection’s Foil tag sits on the card image.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Chegaram os torneios do grupo, em qualquer formato: pods no Commander, partidas um contra um em melhor de 3 e duplas no 2HG, com rodadas, mesas, classificação com desempates oficiais e linha do tempo.',
+    en: 'Group tournaments are here, in any format: Commander pods, best-of-3 one-on-one matches and Two-Headed Giant duos, with rounds, tables, standings with official tiebreakers and a timeline.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
