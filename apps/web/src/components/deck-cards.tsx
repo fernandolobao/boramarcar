@@ -4,7 +4,7 @@ import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@bo
 import Image from 'next/image';
 import { HoloLayers } from './holo-effects';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { api } from '@/lib/api';
 import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
@@ -447,6 +447,9 @@ export function DeckCards({
  * com Enter; "Foil" passa as cópias desta carta para o outro acabamento; "Separar 1 cópia" cria
  * a outra carta com uma cópia; a edição troca pelo seletor; remover pede confirmação.
  */
+/** Espera depois da última mudança nos números antes de gravar (junta os toques no −/+). */
+const SAVE_DELAY_MS = 700;
+
 function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
   const t = useTranslations('decks');
   const { run, error, pending } = useApiAction();
@@ -503,6 +506,29 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
       n === 0 ? t('cardRemoved', { name: tile.name }) : t('lineSaved', { name: tile.name }),
     );
   };
+  /**
+   * Os números gravam 0,7 s depois da última mudança: vários toques no −/+ viram uma gravação
+   * só, e os campos não travam esperando o servidor. Fechar a carta antes disso grava na hora.
+   */
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const queued = useRef<{ quantity: number | null; proxies: number | null } | null>(null);
+  const flush = useRef(() => {});
+  // A gravação usa a versão mais recente de `commit` (com os valores da linha atualizados).
+  useLayoutEffect(() => {
+    flush.current = () => {
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = null;
+      const next = queued.current;
+      queued.current = null;
+      if (next) commit(next);
+    };
+  });
+  const schedule = (next: { quantity: number | null; proxies: number | null }) => {
+    queued.current = next;
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => flush.current(), SAVE_DELAY_MS);
+  };
+  useEffect(() => () => flush.current(), []);
   /** Passa `n` cópias reais desta carta para o outro acabamento. */
   const moveFinish = (n: number) => {
     const f = isFoil ? groupFoils - n : groupFoils + n;
@@ -523,10 +549,9 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
             value={quantity}
             min={0}
             max={MAX_COPIES}
-            disabled={pending}
             onChange={(v) => {
               setQuantity(v);
-              commit({ quantity: v, proxies });
+              schedule({ quantity: v, proxies });
             }}
           />
         </div>
@@ -538,10 +563,9 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
               value={proxies}
               min={0}
               max={quantity ?? 0}
-              disabled={pending}
               onChange={(v) => {
                 setProxies(v);
-                commit({ quantity, proxies: v });
+                schedule({ quantity, proxies: v });
               }}
             />
           </div>

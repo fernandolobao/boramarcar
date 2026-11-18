@@ -19,6 +19,7 @@ const ICON: Record<InboxEntry['kind'], IconName> = {
   achievement: 'achievement',
   podium: 'ranking',
   announcement: 'info',
+  nudge: 'events',
 };
 
 /** Para onde a notificação leva. */
@@ -26,6 +27,7 @@ export function notificationHref(item: InboxEntry): string | null {
   switch (item.data.kind) {
     case 'game':
     case 'group_game':
+    case 'nudge':
       return `/eventos/${item.data.eventId}`;
     case 'achievement':
       return '/perfil';
@@ -59,6 +61,8 @@ function useNotificationText() {
           : t('group_game_draw', { event });
       case 'achievement':
         return t('achievement', { name: ta(`items.${d.achievementId}.name`) });
+      case 'nudge':
+        return t('nudge', { event, group: item.groupName ?? '' });
       case 'podium':
         return t('podium', {
           group: item.groupName ?? '',

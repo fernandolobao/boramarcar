@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  fieldDelta,
   nextRotation,
   seatSwipe,
   tableLayout,
@@ -265,5 +266,16 @@ describe('deslizar na área do jogador', () => {
     expect(seatSwipe(0, -20, 0)).toBeNull();
     expect(seatSwipe(60, -150, 90)).toBeNull();
     expect(seatSwipe(-150, -60, 0)).toBeNull();
+  });
+});
+
+describe('editar um marcador pelo campo', () => {
+  it('campo vazio (apagando para digitar outro número) não muda o marcador', () => {
+    expect(fieldDelta(null, 3)).toBeNull();
+  });
+  it('número novo vira a diferença para o valor atual', () => {
+    expect(fieldDelta(5, 3)).toBe(2);
+    expect(fieldDelta(0, 3)).toBe(-3);
+    expect(fieldDelta(3, 3)).toBeNull();
   });
 });

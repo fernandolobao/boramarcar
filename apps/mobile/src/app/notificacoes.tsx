@@ -32,6 +32,8 @@ function notificationText(item: NotificationItem) {
         winners: winners.join(t('notifAnd')),
       });
     }
+    case 'nudge':
+      return t('notifNudge', { event, group: item.groupName ?? '' });
     case 'achievement':
       return t('notifAchievement', {
         name: t(`achievement_${String(d.achievementId)}_name` as MessageKey),
@@ -51,7 +53,10 @@ function notificationText(item: NotificationItem) {
 /** Para onde a notificação leva (no app). */
 function open(item: NotificationItem) {
   const d = item.data as Record<string, unknown>;
-  if ((item.kind === 'game' || item.kind === 'group_game') && typeof d.eventId === 'string') {
+  if (
+    (item.kind === 'game' || item.kind === 'group_game' || item.kind === 'nudge') &&
+    typeof d.eventId === 'string'
+  ) {
     router.push({ pathname: '/encontros/[id]', params: { id: d.eventId } });
   } else if (item.kind === 'podium') {
     router.push('/ranking');

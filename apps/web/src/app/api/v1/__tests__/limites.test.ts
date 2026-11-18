@@ -51,6 +51,10 @@ describe('limites de uso (8.2)', () => {
 
   it('relatório de CSP: corpo grande e excesso por endereço são descartados sem log', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    // Relógio parado no começo de um minuto: a janela do limite (1 minuto) não vira no meio do
+    // teste (antes, às vezes o 61º relatório caía na janela seguinte e era registrado).
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-18T12:00:05Z'));
     const report = (ip: string, body = '{"csp-report":{"violated-directive":"img-src"}}') =>
       cspReport.POST(
         new Request('http://localhost/api/csp-report', {
@@ -70,5 +74,6 @@ describe('limites de uso (8.2)', () => {
     // Outro endereço continua sendo registrado.
     await report('10.0.0.3');
     expect(warn).toHaveBeenCalledTimes(61);
+    vi.useRealTimers();
   });
 });

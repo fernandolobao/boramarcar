@@ -59,6 +59,21 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Chegou o sino de notificações: partidas suas e do grupo, conquistas, mudanças no pódio e avisos do ArcanaKin.',
     en: 'Meet the notifications bell: your games and your group’s, achievements, podium changes and ArcanaKin announcements.',
   },
+  {
+    date: '2026-11-18',
+    pt: 'No editor de deck, vários toques no − ou + agora viram uma gravação só, sem travar o campo.',
+    en: 'In the deck editor, several taps on − or + now save once, without locking the field.',
+  },
+  {
+    date: '2026-11-18',
+    pt: 'No modo mesa do app, apagar o número de um marcador para digitar outro não zera mais o marcador.',
+    en: 'In the app’s table mode, clearing a counter to type another number no longer resets it.',
+  },
+  {
+    date: '2026-11-18',
+    pt: 'Quando alguém chama você para o próximo encontro, o convite também aparece no sino de notificações.',
+    en: 'When someone invites you to the next meetup, the invite also shows up in the notifications bell.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

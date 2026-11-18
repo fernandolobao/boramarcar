@@ -250,10 +250,10 @@ O beta assistido (8.5) começa em **fevereiro de 2027** e **precisa que lojas po
 
 ### Pendências conhecidas
 
-- Modo mesa: apagar o valor de um marcador (veneno, energia…) zera o marcador.
-- Editor de deck do site: cada toque no −/+ salva na hora (poderia agrupar os toques).
-- Teste do limite de relatórios de CSP falha de vez em quando (a janela de tempo vira no meio do teste).
-- "Chamar para o próximo": se o push e o e-mail falharem, o chamado fica registrado e não dá para chamar de novo no mesmo encontro.
+- ✅ Modo mesa (app): apagar o valor de um marcador (veneno, energia…) zerava o marcador; agora o campo vazio não muda nada.
+- ✅ Editor de deck do site: os toques no −/+ são agrupados numa gravação só (0,7 s depois do último; fechar a carta grava na hora).
+- ✅ Teste do limite de relatórios de CSP: relógio parado no teste (a janela não vira mais no meio).
+- ✅ "Chamar para o próximo": o chamado também vai para a central de notificações, gravado junto; push e e-mail são reforço.
 - App: várias telas novas só foram verificadas por tipos e testes, sem aparelho — entram no ensaio (passo 8).
 - App sem Sentry: erros do app mobile não chegam a lugar nenhum. Antes do beta, ligar o Sentry no app (`@sentry/react-native`, com o mesmo cuidado de privacidade do site).
 

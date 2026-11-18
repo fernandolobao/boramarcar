@@ -2064,6 +2064,7 @@
     "achievement": "Conquista nova: {name}.",
     "podium": "O pódio de {group} mudou: {podium}.",
     "announcement": "Aviso do ArcanaKin.",
-    "open": "Ver"
+    "open": "Ver",
+    "nudge": "{group} chamou você para o próximo encontro: {event}."
   }
 }

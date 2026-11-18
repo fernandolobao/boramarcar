@@ -12,6 +12,7 @@ export const NOTIFICATION_KINDS = [
   'achievement',
   'podium',
   'announcement',
+  'nudge',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -31,4 +32,6 @@ export type NotificationData =
   /** Pódio do grupo mudou (1º, 2º, 3º em ordem). */
   | { kind: 'podium'; userIds: string[] }
   /** Aviso da administração do ArcanaKin (ou as novidades da semana). */
-  | { kind: 'announcement'; announcementId: string };
+  | { kind: 'announcement'; announcementId: string }
+  /** "Chamar para o próximo": a pessoa foi chamada para um encontro. */
+  | { kind: 'nudge'; eventId: string };

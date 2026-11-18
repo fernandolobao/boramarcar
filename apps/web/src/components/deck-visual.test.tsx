@@ -216,6 +216,34 @@ describe('editor de deck', () => {
     });
   });
 
+  it('vários toques no + juntam numa gravação só; fechar a carta grava na hora', async () => {
+    const calls = stubApi();
+    wrap(<DeckCards deckId="d1" lines={lines} isOwner />);
+    fireEvent.click(screen.getByRole('button', { name: 'Ver e editar Forest' }));
+    const dialog = screen.getByRole('dialog', { name: 'Forest' });
+    for (const value of [30, 31, 32]) {
+      fireEvent.click(
+        within(dialog).getByRole('button', {
+          name: `Quantidade: aumentar (agora ${value})`,
+        }),
+      );
+    }
+    // Os toques não ficam presos esperando o servidor, e nada saiu ainda.
+    expect(calls.filter((c) => c.method === 'PUT')).toHaveLength(0);
+    await within(dialog).findByText('Forest salva.');
+    const puts = calls.filter((c) => c.method === 'PUT');
+    expect(puts).toHaveLength(1);
+    expect(puts[0]!.body).toMatchObject({ name: 'Forest', quantity: 33 });
+
+    // Mudou e fechou antes do tempo: grava ao fechar.
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Quantidade: aumentar (agora 33)' }),
+    );
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
+    await vi.waitFor(() => expect(calls.filter((c) => c.method === 'PUT')).toHaveLength(2));
+    expect(calls.filter((c) => c.method === 'PUT')[1]!.body).toMatchObject({ quantity: 34 });
+  });
+
   it('adiciona carta pela busca com autocompletar e teclado, somando ao que já existe', async () => {
     const calls = stubApi();
     const { container } = wrap(<DeckCards deckId="d1" lines={lines} isOwner />);

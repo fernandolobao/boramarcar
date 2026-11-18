@@ -2064,6 +2064,7 @@
     "achievement": "New achievement: {name}.",
     "podium": "The {group} podium changed: {podium}.",
     "announcement": "ArcanaKin announcement.",
-    "open": "Open"
+    "open": "Open",
+    "nudge": "{group} invited you to the next meetup: {event}."
   }
 }
