@@ -4,6 +4,7 @@ import { getDeckCovers, getDeckRatings, getPlayerProfile } from '@boramarcar/db'
 import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { PlayerProfile } from '@/components/player-profile';
+import { isAdmin } from '@/server/admin';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
 import { ManaFlowColors } from '@/components/mana-flow';
@@ -16,9 +17,11 @@ type Props = { params: Promise<{ id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await requireUser();
-  const profile = await getPlayerProfile(getDb(), { userId: id, viewerId: user.id }).catch(
-    () => null,
-  );
+  const profile = await getPlayerProfile(getDb(), {
+    userId: id,
+    viewerId: user.id,
+    viewerIsAdmin: isAdmin(user.email),
+  }).catch(() => null);
   // O nome aparece na aba de quem já entrou; a prévia de link (sem login) é genérica.
   return pageMetadata({
     section: 'player',
@@ -27,18 +30,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-/** Perfil de outro jogador: visível para quem divide um grupo com ele. */
+/** Perfil de outro jogador: visível para quem divide um grupo com ele e para os admins. */
 export default async function PlayerPage({ params }: Props) {
   const { id } = await params;
   const user = await requireUser();
   if (id === user.id) redirect('/perfil');
   const db = getDb();
-  const profile = await getPlayerProfile(db, { userId: id, viewerId: user.id }).catch(
-    (error: unknown) => {
-      if (isDomainError(error) && error.code === 'not_found') notFound();
-      throw error;
-    },
-  );
+  const profile = await getPlayerProfile(db, {
+    userId: id,
+    viewerId: user.id,
+    viewerIsAdmin: isAdmin(user.email),
+  }).catch((error: unknown) => {
+    if (isDomainError(error) && error.code === 'not_found') notFound();
+    throw error;
+  });
   const ids = profile.decks.map((d) => d.id);
   const [covers, ratings] = await Promise.all([getDeckCovers(db, ids), getDeckRatings(db, ids)]);
   return (
