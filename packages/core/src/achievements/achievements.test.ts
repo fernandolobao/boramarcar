@@ -249,4 +249,39 @@ describe('abas de conquistas', () => {
     expect(pending.map((x) => x.id)).toEqual(['wins_10', 'games_100', 'fast_win']);
     expect(done.map((x) => x.id)).toEqual(['streak_3', 'first_win']);
   });
+
+  it('Enturmado: jogou com cada pessoa de um grupo de 4+ (quem era membro na data da partida)', () => {
+    const day = (d: number) => new Date(Date.UTC(2026, 0, d, 22));
+    const memberSince = {
+      g1: { me: day(1), ana: day(1), bia: day(1), caio: day(1), novo: day(20) },
+    };
+    const vs = (d: number, opponents: string[]) =>
+      ({
+        playedAt: day(d),
+        format: 'commander',
+        firstPlayerId: null,
+        winningTurn: null,
+        groupId: 'g1',
+        eventId: null,
+        players: [
+          { userId: 'me', result: 'loss', deckId: null },
+          ...opponents.map((userId) => ({ userId, result: 'win', deckId: null })),
+        ],
+      }) as AchievementGame;
+    const games = [vs(2, ['ana', 'bia']), vs(3, ['caio'])];
+    const a = Object.fromEntries(
+      computeAchievements('me', games, [], { memberSince }).map((x) => [x.id, x]),
+    );
+    // No dia 3, os membros eram me, ana, bia e caio (o "novo" entrou depois): já jogou com todos.
+    expect(a.enturmado).toMatchObject({ unlocked: true, unlockedAt: day(3) });
+    // Grupo com menos de 4 pessoas não conta.
+    const small = { g1: { me: day(1), ana: day(1), bia: day(1) } };
+    const b = Object.fromEntries(
+      computeAchievements('me', [vs(2, ['ana', 'bia'])], [], { memberSince: small }).map((x) => [
+        x.id,
+        x,
+      ]),
+    );
+    expect(b.enturmado!.unlocked).toBe(false);
+  });
 });

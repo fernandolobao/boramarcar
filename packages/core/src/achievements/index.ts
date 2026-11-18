@@ -24,6 +24,8 @@ export interface AchievementContext {
   groupMembers?: Record<string, readonly string[]>;
   /** Encontros com partida registrada nos grupos do jogador. */
   groupEvents?: readonly { groupId: string; eventId: string; startsAt: Date }[];
+  /** Desde quando cada pessoa é membro de cada grupo (para "Enturmado"). */
+  memberSince?: Record<string, Record<string, Date>>;
   /** Fuso para "12 meses de um ano" (padrão: São Paulo). */
   timeZone?: string;
 }
@@ -61,6 +63,7 @@ export const ACHIEVEMENT_IDS = [
   'comeback',
   'events_streak_4',
   'months_12',
+  'enturmado',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -118,6 +121,8 @@ export function computeAchievements(
     month: '2-digit',
   });
   const monthsByYear = new Map<string, Set<string>>();
+  /** Em cada grupo, com quem o jogador já jogou (para "Enturmado"). */
+  const playedWith = new Map<string, Set<string>>();
   /** Primeira partida do jogador em cada encontro. */
   const firstGameInEvent = new Map<string, Date>();
 
@@ -136,6 +141,19 @@ export function computeAchievements(
       if (groupsPlayed.size >= 2) unlock('groups_2', game.playedAt);
     }
     for (const p of game.players) if (p.userId !== userId) opponents.add(p.userId);
+    if (game.groupId) {
+      const set = playedWith.get(game.groupId) ?? new Set<string>();
+      for (const p of game.players) if (p.userId !== userId) set.add(p.userId);
+      playedWith.set(game.groupId, set);
+      // Enturmado: jogou com cada pessoa que era membro do grupo na data da partida (grupo de 4+).
+      const since = context.memberSince?.[game.groupId] ?? {};
+      const members = Object.entries(since)
+        .filter(([id, joined]) => id !== userId && joined.getTime() <= game.playedAt.getTime())
+        .map(([id]) => id);
+      if (members.length >= 3 && members.every((id) => set.has(id))) {
+        unlock('enturmado', game.playedAt);
+      }
+    }
     if (opponents.size >= 10) unlock('opponents_10', game.playedAt);
     if (game.eventId && !firstGameInEvent.has(game.eventId)) {
       firstGameInEvent.set(game.eventId, game.playedAt);
@@ -221,6 +239,17 @@ export function computeAchievements(
       nemesis = [done, others.length];
     }
   }
+  // Enturmado: o grupo (de 4+) em que o jogador está mais perto de ter jogado com todo mundo.
+  let enturmado: [number, number] = [0, 1];
+  for (const [groupId, since] of Object.entries(context.memberSince ?? {})) {
+    const others = Object.keys(since).filter((id) => id !== userId);
+    if (others.length < 3) continue;
+    const done = others.filter((id) => playedWith.get(groupId)?.has(id)).length;
+    if (enturmado[0] === 0 || done / others.length > enturmado[0] / enturmado[1]) {
+      enturmado = [done, others.length];
+    }
+  }
+
   const titles = [...seasonTitles].sort((a, b) => a.endsAt.getTime() - b.endsAt.getTime());
   if (titles.length) unlock('season_champion', titles[0]!.endsAt);
 
@@ -250,6 +279,7 @@ export function computeAchievements(
     proxy_win: [unlockedAt.has('proxy_win') ? 1 : 0, 1],
     comeback: [unlockedAt.has('comeback') ? 1 : 0, 1],
     events_streak_4: [bestEventRun, 4],
+    enturmado: unlockedAt.has('enturmado') ? [enturmado[1], enturmado[1]] : enturmado,
     months_12: [Math.max(0, ...[...monthsByYear.values()].map((m) => m.size)), 12],
   };
 

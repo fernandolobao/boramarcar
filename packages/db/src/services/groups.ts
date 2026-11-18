@@ -65,6 +65,7 @@ export async function listGroupsForUser(db: Database, userId: string) {
       pointsDraw: groups.pointsDraw,
       pointsLoss: groups.pointsLoss,
       defaultFormat: groups.defaultFormat,
+      joinedAt: groupMembers.joinedAt,
     })
     .from(groupMembers)
     .innerJoin(groups, eq(groups.id, groupMembers.groupId))
