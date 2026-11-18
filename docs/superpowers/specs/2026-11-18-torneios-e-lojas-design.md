@@ -50,7 +50,7 @@ Aproveita o que já existe: grupo, encontros, partidas, ranking, conquistas e no
 
 - inscritos, com deck opcional ligado ao torneio;
 - rodada atual com mesas e assentos;
-- resultados lançados pelos próprios jogadores e confirmados pelo organizador;
+- resultado de cada mesa pelo **modo mesa** ("Abrir no modo mesa" já traz os jogadores do pod, os assentos e quem começa) ou pelo formulário rápido; vale na hora, e o organizador corrige quando precisar (ou liga "confirmar cada resultado"); a próxima rodada só sai quando todas as mesas têm resultado;
 - classificação ao vivo com desempates e uma explicação curta de cada critério;
 - **linha do tempo de acontecimentos**: "Rodada 2 começou", "Bia venceu a mesa 3", "Top 4 definido", "Campeão: Caio".
 
@@ -60,7 +60,7 @@ Aproveita o que já existe: grupo, encontros, partidas, ranking, conquistas e no
 - **Ranking próprio:** o torneio tem um ranking separado do ranking do grupo.
 - **Conquistas novas:** "Campeão de torneio", "Top 4" e "Jogou 3 torneios".
 - **Notificações:** "sua mesa saiu", "rodada começou", "você está no top 4".
-- **Modo mesa:** abre já com os jogadores do pod.
+- **Modo mesa:** é o caminho principal do resultado. Abre já com os jogadores do pod, e ao terminar a partida o resultado vai para a mesa do torneio (e vira partida do grupo, se o torneio conta no ranking).
 
 **Fora da primeira entrega:** lista de deck obrigatória com validação, cronômetro de rodada, desistência e reentrada no meio do evento, e rodada montada à mão. Rodada montada à mão é útil no casual, mas fica para depois, com registro de quem mudou o quê.
 
@@ -116,12 +116,12 @@ Aproveita o que já existe: grupo, encontros, partidas, ranking, conquistas e no
 - **10.4** Seguidores e avisos da loja.
 - **10.5** Piloto com 1 a 3 lojas (o 8.9).
 
-## Decisões para você (antes da 9.1)
+## Decisões (18/11/2026)
 
-1. **Pontuação padrão dos pods:** 3/1/0 (igual ao ranking do grupo) ou outra. É uma predefinição e o organizador sempre pode mudar.
-2. **Partidas do torneio contam no ranking do grupo por padrão?** Proposta: sim, com opção de desligar.
-3. **Quem lança o resultado:** os jogadores da mesa, com confirmação do organizador (proposta), ou só o organizador.
-4. **Torneio aberto a quem não é do grupo** (link de inscrição): fica para a Fase 10, com as lojas, ou já entra na 9?
+1. **Pontuação padrão dos pods:** 3/1/0, igual ao ranking do grupo. O organizador muda por torneio.
+2. **Partidas do torneio no ranking do grupo:** contam por padrão, com opção de desligar.
+3. **Resultado:** pela mesa, no modo mesa (principal) ou no formulário rápido, válido na hora. O organizador corrige quando precisar e pode ligar "confirmar cada resultado" (útil em eventos de loja com premiação).
+4. **Torneio aberto a quem não é do grupo:** chega com as lojas (Fase 10).
 
 ## Fontes
 
