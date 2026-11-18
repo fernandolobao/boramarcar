@@ -593,3 +593,21 @@ export const groupPodiums = pgTable('group_podiums', {
   userIds: jsonb('user_ids').notNull(),
   updatedAt: updatedAt(),
 });
+
+/**
+ * Avisos do ArcanaKin (admins) e novidades da semana: escritos como rascunho em `/admin` e, ao
+ * publicar, viram notificação para todos ou para um grupo. Texto simples (sem HTML).
+ */
+export const announcements = pgTable('announcements', {
+  id: id(),
+  /** `admin`: aviso escrito por um admin; `changelog`: novidades da semana. */
+  kind: text('kind').notNull().default('admin'),
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  /** Grupo do aviso; `null` = todas as pessoas. */
+  groupId: text('group_id').references(() => groups.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('draft'),
+  createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+  createdAt: createdAt(),
+  publishedAt: timestamp('published_at', { withTimezone: true }),
+});

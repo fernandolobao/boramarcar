@@ -468,3 +468,8 @@ sem rolagem horizontal em 320px.
 - Site: `<dialog>` modal com `aria-labelledby` no título ("2 conquistas novas!"), aberto com `showModal()` (o foco vai para dentro; Esc e clique no fundo fecham, e o foco do navegador volta à página). Ícones decorativos; nome, descrição e data em texto. axe no `new-achievements.test.tsx`.
 - App: `Modal` transparente com `accessibilityViewIsModal`, título como cabeçalho, cada conquista como um item acessível e o botão "Legal!"; o "voltar" do Android também fecha.
 - Nos E2E, o seed marca todas as conquistas como vistas para a janela não cobrir outras telas; ela tem o próprio teste.
+
+## Avisos do ArcanaKin (18/11/2026)
+
+- `/admin`: formulário com rótulos (título, texto com dica associada por `aria-describedby`, público num `select`), status em `role="status"` e erros em `FormError`. "Publicar" e "Excluir" pedem confirmação em dois cliques; os botões repetidos levam o título do aviso em `sr-only`. Componente no `a11y.test.tsx`.
+- Na central, o aviso mostra o título em destaque e o texto com as quebras de linha (`whitespace-pre-line`); no app, título e texto entram no nome acessível do item.

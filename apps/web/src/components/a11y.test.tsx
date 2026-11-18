@@ -12,6 +12,7 @@ import messages from '../../messages/pt-BR.json';
 import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './availability-forms';
 import { ProductTour } from './home/product-tour';
 import { LanguageSwitcher } from './language-switcher';
+import { AnnouncementsAdmin } from './announcements-admin';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
 import { TitleWithTip } from './tip';
@@ -588,6 +589,38 @@ describe('acessibilidade dos componentes (axe-core)', () => {
 
   it('telas do produto na página inicial (abas) sem violações', async () => {
     expect(await audit(<ProductTour />)).toEqual([]);
+  });
+
+  it('avisos do ArcanaKin (admin) sem violações', async () => {
+    expect(
+      await audit(
+        <AnnouncementsAdmin
+          groups={[{ id: 'g1', name: 'Mesa de Quinta' }]}
+          announcements={[
+            {
+              id: 'a1',
+              kind: 'admin',
+              title: 'Rascunho',
+              body: 'Texto',
+              groupId: null,
+              groupName: null,
+              status: 'draft',
+              publishedAt: null,
+            },
+            {
+              id: 'a2',
+              kind: 'changelog',
+              title: 'Novidades',
+              body: 'Texto',
+              groupId: 'g1',
+              groupName: 'Mesa de Quinta',
+              status: 'published',
+              publishedAt: '2026-11-17T12:00:00Z',
+            },
+          ]}
+        />,
+      ),
+    ).toEqual([]);
   });
 
   it('seletor de idioma sem violações e com o idioma atual marcado', async () => {

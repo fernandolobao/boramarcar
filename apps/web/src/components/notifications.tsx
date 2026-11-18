@@ -65,7 +65,7 @@ function useNotificationText() {
           podium: d.userIds.map((id, i) => `${i + 1}º ${name(id)}`).join(', '),
         });
       default:
-        return t('announcement');
+        return item.announcement?.title ?? t('announcement');
     }
   };
 }
@@ -96,7 +96,13 @@ export function NotificationList({ items }: { items: InboxEntry[] }) {
               <Icon name={ICON[item.kind]} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block">{text(item)}</span>
+              <span className={`block ${item.announcement ? 'font-semibold' : ''}`}>
+                {text(item)}
+              </span>
+              {item.announcement && (
+                // Texto simples do aviso, com as quebras de linha que o admin escreveu.
+                <span className="block whitespace-pre-line">{item.announcement.body}</span>
+              )}
               <span className="muted block text-sm">
                 {item.groupName && item.kind !== 'podium' ? `${item.groupName} · ` : ''}
                 <time dateTime={item.createdAt}>
