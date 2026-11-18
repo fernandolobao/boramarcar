@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 import axe from 'axe-core';
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { NotificationList, type InboxEntry } from './notifications';
+
+const refresh = vi.fn();
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh, push: vi.fn() }) }));
 
 afterEach(() => {
   cleanup();
@@ -97,12 +100,43 @@ describe('NotificationList', () => {
     expect(screen.getByText('Manutenção no sábado')).toBeInTheDocument();
     expect(screen.getByText(/Das 8h às 8h10\./)).toBeInTheDocument();
     expect(screen.getByText('há 1 hora')).toBeInTheDocument();
+    // Abrir a central não marca nada sozinho.
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByRole('status')).toHaveTextContent('1 não lida.');
+    const results = await axe.run(container, { runOnly: ['wcag2a', 'wcag2aa'] });
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+
+    // Marcar uma como lida: chama a rota dela, some o "Nova" e o botão, e o sino atualiza.
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: 'Marcar como lida: Partida registrada em Noite: Bia venceu.',
+        }),
+      );
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/me/notifications/1/read',
+      expect.objectContaining({ method: 'POST' }),
+    );
+    expect(screen.queryByText('Nova')).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Marcar como lida/ })).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Tudo lido.');
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('"Marcar todas como lidas" marca tudo de uma vez', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+    wrap(<NotificationList items={items.map((i) => ({ ...i, readAt: null }))} />);
+    expect(screen.getAllByText('Nova')).toHaveLength(5);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Marcar todas como lidas' }));
+    });
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v1/me/notifications/read',
       expect.objectContaining({ method: 'POST' }),
     );
-    const results = await axe.run(container, { runOnly: ['wcag2a', 'wcag2aa'] });
-    expect(results.violations.map((v) => v.id)).toEqual([]);
+    expect(screen.queryByText('Nova')).toBeNull();
   });
 
   it('sem notificações: explica o que vai aparecer, sem chamar a API', () => {

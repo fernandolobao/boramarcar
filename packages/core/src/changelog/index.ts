@@ -74,6 +74,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Quando alguém chama você para o próximo encontro, o convite também aparece no sino de notificações.',
     en: 'When someone invites you to the next meetup, the invite also shows up in the notifications bell.',
   },
+  {
+    date: '2026-11-18',
+    pt: 'Notificações agora podem ser marcadas como lidas uma a uma, ou todas de uma vez.',
+    en: 'Notifications can now be marked as read one by one, or all at once.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

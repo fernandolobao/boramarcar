@@ -266,7 +266,30 @@ export async function countUnreadNotifications(db: Database, input: { userId: st
   return Number(row?.n ?? 0);
 }
 
-/** A pessoa abriu a central: tudo o que chegou até agora conta como lido. */
+/**
+ * Marca uma notificação como lida (só a da própria pessoa). Devolve `false` se ela não existe ou
+ * é de outra pessoa (a rota responde 404, sem revelar qual).
+ */
+export async function markNotificationRead(
+  db: Database,
+  input: { userId: string; id: string; now?: Date },
+) {
+  const [own] = await db
+    .select({ readAt: notifications.readAt })
+    .from(notifications)
+    .where(and(eq(notifications.id, input.id), eq(notifications.userId, input.userId)))
+    .limit(1);
+  if (!own) return false;
+  if (!own.readAt) {
+    await db
+      .update(notifications)
+      .set({ readAt: input.now ?? new Date() })
+      .where(and(eq(notifications.id, input.id), eq(notifications.userId, input.userId)));
+  }
+  return true;
+}
+
+/** "Marcar todas como lidas": tudo o que chegou até agora conta como lido. */
 export async function markNotificationsRead(db: Database, input: { userId: string; now?: Date }) {
   await db
     .update(notifications)

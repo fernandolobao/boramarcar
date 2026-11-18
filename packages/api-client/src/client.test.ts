@@ -495,6 +495,11 @@ describe('cliente da API', () => {
     expect(fetchMock.mock.calls[1]![0]).toBe(
       'https://www.arcanakin.com.br/api/v1/me/notifications/read',
     );
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }));
+    await api.me.markNotificationRead('n1');
+    expect(fetchMock.mock.calls[2]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/me/notifications/n1/read',
+    );
   });
 
   it('grupo: convite novo, papéis, remoção, posse e locais', async () => {

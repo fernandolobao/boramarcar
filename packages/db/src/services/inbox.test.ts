@@ -7,6 +7,7 @@ import {
   checkPodium,
   countUnreadNotifications,
   listNotifications,
+  markNotificationRead,
   markNotificationsRead,
   notifyAchievementsFromGame,
   notifyGameRecorded,
@@ -72,6 +73,12 @@ describe('central de notificações: partidas', () => {
     expect((await listNotifications(db, { userId: caio.id }))[0]!.readAt).toBeInstanceOf(Date);
     // Marcar as de uma pessoa não mexe nas dos outros.
     expect(await countUnreadNotifications(db, { userId: duda.id })).toBe(1);
+    // Uma a uma: só a própria, e só a escolhida.
+    const [dudaItem] = await listNotifications(db, { userId: duda.id });
+    expect(await markNotificationRead(db, { userId: bia.id, id: dudaItem!.id })).toBe(false);
+    expect(await countUnreadNotifications(db, { userId: duda.id })).toBe(1);
+    expect(await markNotificationRead(db, { userId: duda.id, id: dudaItem!.id })).toBe(true);
+    expect(await countUnreadNotifications(db, { userId: duda.id })).toBe(0);
   });
 });
 

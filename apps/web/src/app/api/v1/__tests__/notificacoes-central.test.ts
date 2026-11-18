@@ -13,6 +13,7 @@ const games = await import('../events/[eventId]/games/route');
 const inbox = await import('../me/notifications/route');
 const nudge = await import('../groups/[groupId]/members/[userId]/nudge/route');
 const read = await import('../me/notifications/read/route');
+const readOne = await import('../me/notifications/[notificationId]/read/route');
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
 let close: () => Promise<void>;
@@ -76,6 +77,24 @@ describe('central de notificações (API)', () => {
         people: { [ana.id]: 'Ana' },
       },
     );
+    // Uma a uma: só a escolhida; a de outra pessoa não existe (404).
+    const gameItem = (forBia.body!.items as { id: string; kind: string }[]).find(
+      (i) => i.kind === 'game',
+    )!;
+    const one = await call(readOne.POST, {
+      method: 'POST',
+      params: { notificationId: gameItem.id },
+    });
+    expect(one.status).toBe(204);
+    expect((await call(inbox.GET)).body!.unread).toBe(1);
+    asUser(caio);
+    const other = await call(readOne.POST, {
+      method: 'POST',
+      params: { notificationId: gameItem.id },
+    });
+    expect(other.status).toBe(404);
+    asUser(bia);
+    // Todas de uma vez.
     expect((await call(read.POST, { method: 'POST' })).status).toBe(204);
     expect((await call(inbox.GET)).body!.unread).toBe(0);
 

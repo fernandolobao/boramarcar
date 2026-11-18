@@ -286,7 +286,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'notificacoes',
             question: 'O que aparece no sino de notificações?',
             intro: [
-              'O sino fica no topo do site e no painel do app, com o número de novidades. Lá aparecem as partidas em que você jogou, as partidas do seu grupo, as conquistas que você ganhou, as mudanças no pódio do grupo e os avisos do ArcanaKin. Toque numa notificação para abrir o encontro, o perfil ou o ranking. Ao abrir a lista, tudo passa a contar como lido.',
+              'O sino fica no topo do site e no painel do app, com o número de novidades. Lá aparecem as partidas em que você jogou, as partidas do seu grupo, as conquistas que você ganhou, as mudanças no pódio do grupo e os avisos do ArcanaKin. Toque numa notificação para abrir o encontro, o perfil ou o ranking; ela passa a contar como lida. Também dá para marcar uma como lida sem abrir, ou "Marcar todas como lidas" no topo.',
               'Toda semana, as novidades do ArcanaKin também chegam por ali, num texto curto.',
               'As notificações ficam só no site e no app: e-mail e avisos no celular continuam só para encontros.',
             ],
@@ -604,7 +604,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'notificacoes',
             question: 'What shows up in the notifications bell?',
             intro: [
-              'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking. Opening the list marks everything as read.',
+              'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
             ],

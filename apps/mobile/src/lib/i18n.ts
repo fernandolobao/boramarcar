@@ -544,6 +544,8 @@ const pt = {
   notifEmpty:
     'Nada por aqui ainda. Quando alguém registrar uma partida sua ou do seu grupo, ela aparece aqui.',
   notifNew: 'Nova',
+  notifMarkOne: 'Marcar como lida',
+  notifMarkAll: 'Marcar todas como lidas',
   notifSomeone: 'alguém',
   notifAnd: ' e ',
   notifGameWin: 'Você venceu uma partida em {event}.',
@@ -1388,6 +1390,8 @@ const en: Messages = {
   notifEmpty:
     'Nothing here yet. When someone records a game of yours or of your group, it shows up here.',
   notifNew: 'New',
+  notifMarkOne: 'Mark as read',
+  notifMarkAll: 'Mark all as read',
   notifSomeone: 'someone',
   notifAnd: ' and ',
   notifGameWin: 'You won a game at {event}.',
