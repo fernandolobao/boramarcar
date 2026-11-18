@@ -32,6 +32,29 @@ test.describe('smoke', () => {
     await expect(page.getByRole('img', { name: /Exemplo do ArcanaKin/ })).toBeVisible();
   });
 
+  test('navegador em inglês no Brasil abre em português; o seletor troca e lembra', async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      extraHTTPHeaders: { 'Accept-Language': 'en-US,en;q=0.9,pt-BR;q=0.8' },
+    });
+    const page = await context.newPage();
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR');
+    const languages = page.getByRole('banner').getByRole('group', { name: 'Idioma' });
+    await expect(languages.getByRole('button', { name: /^PT/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await languages.getByRole('button', { name: /^EN/ }).click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.getByRole('heading', { level: 2, name: 'Features' })).toBeVisible();
+    // A escolha fica no cookie: a próxima visita já vem em inglês.
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await context.close();
+  });
+
   test('áreas logadas levam visitantes para a tela de entrada (e voltam depois)', async ({
     page,
   }) => {

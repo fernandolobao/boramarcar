@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@electric-sql/pglite": "^0.5.15",
+    "@electric-sql/pglite": "^0.5.16",
     "@playwright/test": "1.65.1",
     "@tailwindcss/postcss": "^4.3.4",
     "@testing-library/jest-dom": "^7.0.1",
