@@ -7,7 +7,9 @@ test.describe('central de notificações', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
   test.use({ storageState: AUTH_STATE });
 
-  test('o sino mostra as não lidas; abrir a central lista e marca como lidas', async ({ page }) => {
+  test('o sino mostra as não lidas; na central, marca uma ou todas como lidas', async ({
+    page,
+  }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
     // Outros testes podem ter aberto a central antes: começa com tudo lido e uma nova.
     const { pool } = createDb(process.env.E2E_DATABASE_URL!, { max: 1 });
@@ -36,7 +38,14 @@ test.describe('central de notificações', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Notificações' })).toBeVisible();
     const item = page.getByRole('link', { name: /Você venceu uma partida em/ }).first();
     await expect(item).toHaveAttribute('href', '/eventos/e2e-event-past');
-    // Lidas: na próxima página o sino já não tem número.
+    // Abrir a central não marca nada; "Marcar como lida" marca só aquela.
+    const markOne = page.getByRole('button', { name: /^Marcar como lida: Você venceu/ }).first();
+    await expect(markOne).toBeVisible();
+    await markOne.click();
+    // "Marcar todas como lidas" (se ainda houver alguma) zera o sino.
+    const markAll = page.getByRole('button', { name: 'Marcar todas como lidas' });
+    if (await markAll.isVisible()) await markAll.click();
+    await expect(page.getByRole('status').filter({ hasText: 'Tudo lido.' })).toBeVisible();
     await expect
       .poll(async () => {
         await page.goto('/painel');

@@ -223,6 +223,9 @@ export function createApiClient(options: ApiClientOptions) {
         ),
       /** A central foi aberta: tudo o que chegou conta como lido. */
       markNotificationsRead: () => request('POST', '/me/notifications/read', z.unknown()),
+      /** Marca uma notificação como lida. */
+      markNotificationRead: (id: string) =>
+        request('POST', `/me/notifications/${encodeURIComponent(id)}/read`, z.unknown()),
       /**
        * Conquistas ganhas desde a última vez que a pessoa viu (janela do painel e do perfil).
        * Conquistas que esta versão do app não conhece ficam de fora.

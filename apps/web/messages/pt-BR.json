@@ -2064,6 +2064,10 @@
     "achievement": "Conquista nova: {name}.",
     "podium": "O pódio de {group} mudou: {podium}.",
     "announcement": "Aviso do ArcanaKin.",
-    "open": "Ver"
+    "open": "Ver",
+    "markOne": "Marcar como lida",
+    "markOneLabel": "Marcar como lida: {text}",
+    "markAll": "Marcar todas como lidas",
+    "unreadCount": "{count, plural, =0 {Tudo lido.} =1 {1 não lida.} other {# não lidas.}}"
   }
 }
