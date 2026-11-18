@@ -5,6 +5,7 @@
  */
 import { mapScryfallCard, type ImportedDeck } from '@boramarcar/core';
 import {
+  createAnnouncement,
   addAvailability,
   addAvailabilityRule,
   addCollectionCard,
@@ -70,6 +71,9 @@ const r = {
   activeGroup: await import('../me/active-group/route'),
   player: await import('../players/[userId]/route'),
   season: await import('../seasons/[seasonId]/route'),
+  announcements: await import('../admin/announcements/route'),
+  announcement: await import('../admin/announcements/[announcementId]/route'),
+  publish: await import('../admin/announcements/[announcementId]/publish/route'),
 };
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
@@ -222,6 +226,14 @@ beforeAll(async () => {
   await addCollectionCard(db, { userId: ana.id, card: cards[0]!, quantity: 1, foil: false });
   const collection = await listCollection(db, ana.id);
   ids.collectionEntry = collection[0]!.id;
+  ids.announcement = (
+    await createAnnouncement(db, {
+      title: 'Aviso secret',
+      body: 'Texto secret',
+      groupId: null,
+      createdBy: ana.id,
+    })
+  ).id;
 });
 afterAll(() => close());
 afterEach(() => {
@@ -500,6 +512,34 @@ const outsiderCases: Case[] = [
   ],
   ...deckCases('privateDeck'),
   ...deckCases('groupDeck'),
+  // Avisos do ArcanaKin: só admins da plataforma (ADMIN_EMAILS); para os outros, a rota não existe.
+  ['GET avisos (admin)', r.announcements.GET as Handler, 'GET', () => ({})],
+  [
+    'POST aviso (admin)',
+    r.announcements.POST as Handler,
+    'POST',
+    () => ({}),
+    { title: 'x', body: 'y', groupId: null },
+  ],
+  [
+    'PATCH aviso (admin)',
+    r.announcement.PATCH as Handler,
+    'PATCH',
+    () => ({ announcementId: ids.announcement! }),
+    { title: 'x' },
+  ],
+  [
+    'DELETE aviso (admin)',
+    r.announcement.DELETE as Handler,
+    'DELETE',
+    () => ({ announcementId: ids.announcement! }),
+  ],
+  [
+    'POST publicar aviso (admin)',
+    r.publish.POST as Handler,
+    'POST',
+    () => ({ announcementId: ids.announcement! }),
+  ],
 ];
 
 /** O que só a dona (ou admin) pode fazer, visto por um membro comum do mesmo grupo (Bia). */

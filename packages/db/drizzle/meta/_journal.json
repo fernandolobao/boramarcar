@@ -169,6 +169,13 @@
       "when": 1795011022279,
       "tag": "0023_heavy_bloodstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1795011556223,
+      "tag": "0024_lean_zodiak",
+      "breakpoints": true
     }
   ]
 }

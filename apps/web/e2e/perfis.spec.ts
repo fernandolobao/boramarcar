@@ -63,7 +63,11 @@ test.describe('perfis e conquistas', () => {
     const dialog = page.getByRole('dialog', { name: 'Conquista nova!' });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText('Primeira vitória')).toBeVisible();
-    await dialog.getByRole('button', { name: 'Legal!' }).click();
+    // Espera a chamada que marca como vista antes de recarregar.
+    await Promise.all([
+      page.waitForResponse((r) => r.url().endsWith('/api/v1/me/achievements/seen')),
+      dialog.getByRole('button', { name: 'Legal!' }).click(),
+    ]);
     await expect(dialog).toBeHidden();
     await page.reload();
     await expect(page.locator('h1').first()).toBeVisible();

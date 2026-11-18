@@ -23,7 +23,12 @@ const wrap = (ui: React.ReactNode) =>
     </NextIntlClientProvider>,
   );
 
-const base = { groupName: 'Mesa de Quinta', eventTitle: 'Noite', people: { b: 'Bia', c: 'Caio' } };
+const base = {
+  groupName: 'Mesa de Quinta',
+  eventTitle: 'Noite',
+  people: { b: 'Bia', c: 'Caio' },
+  announcement: null,
+};
 const items: InboxEntry[] = [
   {
     ...base,
@@ -49,6 +54,16 @@ const items: InboxEntry[] = [
     readAt: '2026-11-17T13:00:00Z',
     data: { kind: 'podium', userIds: ['c', 'b', 'x'] },
   },
+  {
+    ...base,
+    id: '4',
+    kind: 'announcement',
+    groupName: null,
+    createdAt: '2026-11-15T12:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    announcement: { title: 'Manutenção no sábado', body: 'Das 8h às 8h10.\nVolta logo!' },
+    data: { kind: 'announcement', announcementId: 'a1' },
+  },
 ];
 
 describe('NotificationList', () => {
@@ -65,6 +80,9 @@ describe('NotificationList', () => {
       screen.getByText('O pódio de Mesa de Quinta mudou: 1º Caio, 2º Bia, 3º alguém.'),
     ).toBeInTheDocument();
     expect(screen.getAllByText('Nova')).toHaveLength(1);
+    // Aviso do ArcanaKin: título e texto, sem link.
+    expect(screen.getByText('Manutenção no sábado')).toBeInTheDocument();
+    expect(screen.getByText(/Das 8h às 8h10\./)).toBeInTheDocument();
     expect(screen.getByText('há 1 hora')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v1/me/notifications/read',

@@ -44,7 +44,7 @@ function notificationText(item: NotificationItem) {
           .join(', '),
       });
     default:
-      return t('notifAnnouncement');
+      return item.announcement?.title ?? t('notifAnnouncement');
   }
 }
 
@@ -94,7 +94,9 @@ export default function NotificationsScreen() {
               key={item.id}
               onPress={() => open(item)}
               accessibilityRole="button"
-              accessibilityLabel={`${isNew ? `${t('notifNew')}. ` : ''}${text} ${meta}`}
+              accessibilityLabel={`${isNew ? `${t('notifNew')}. ` : ''}${text}. ${
+                item.announcement ? `${item.announcement.body} ` : ''
+              }${meta}`}
               style={{
                 flexDirection: 'row',
                 gap: 12,
@@ -107,7 +109,10 @@ export default function NotificationsScreen() {
               }}
             >
               <View style={{ flex: 1, gap: 2 }}>
-                <AppText>{text}</AppText>
+                <AppText style={item.announcement ? { fontWeight: '700' } : undefined}>
+                  {text}
+                </AppText>
+                {item.announcement ? <AppText>{item.announcement.body}</AppText> : null}
                 <AppText muted>{meta}</AppText>
               </View>
               {isNew ? (

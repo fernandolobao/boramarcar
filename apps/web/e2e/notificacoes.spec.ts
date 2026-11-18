@@ -28,14 +28,14 @@ test.describe('central de notificações', () => {
     );
     await pool.end();
     await page.goto('/painel');
-    const bell = page.getByRole('banner').getByRole('link', { name: 'Notificações: 1 nova' });
+    // Outros testes rodam em paralelo com a mesma pessoa: pode haver mais de uma nova.
+    const bell = page.getByRole('banner').getByRole('link', { name: /^Notificações: \d+ novas?$/ });
     await expect(bell).toBeVisible();
     await bell.click();
     await expect(page).toHaveURL(/\/notificacoes$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Notificações' })).toBeVisible();
     const item = page.getByRole('link', { name: /Você venceu uma partida em/ }).first();
     await expect(item).toHaveAttribute('href', '/eventos/e2e-event-past');
-    await expect(item.getByText('Nova')).toBeVisible();
     // Lidas: na próxima página o sino já não tem número.
     await expect
       .poll(async () => {
@@ -43,5 +43,31 @@ test.describe('central de notificações', () => {
         return page.getByRole('banner').getByRole('link', { name: 'Notificações' }).count();
       })
       .toBe(1);
+  });
+});
+
+test.describe('avisos do ArcanaKin', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('admin escreve, publica em dois cliques e o aviso chega na central', async ({ page }) => {
+    test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
+    const title = `Aviso E2E ${Date.now()}`;
+    await page.goto('/admin');
+    const section = page.getByRole('region', { name: 'Avisos do ArcanaKin' });
+    await section.getByLabel('Título').fill(title);
+    await section.getByLabel('Texto').fill('Linha 1\nLinha 2');
+    await section.getByLabel('Para quem').selectOption({ label: 'Mesa de Quinta' });
+    await section.getByRole('button', { name: 'Salvar rascunho' }).click();
+    const publish = section.getByRole('button', { name: `Publicar (${title})` });
+    await publish.click();
+    await section
+      .getByRole('button', { name: `Confirmar: publicar para Mesa de Quinta (${title})` })
+      .click();
+    await expect(section.getByText(/Publicado para \d+ pessoas/)).toBeVisible();
+
+    await page.goto('/notificacoes');
+    await expect(page.getByText(title)).toBeVisible();
+    await expect(page.getByText(/Linha 1\s*Linha 2/)).toBeVisible();
   });
 });

@@ -543,6 +543,8 @@ export const notificationSchema = z
     groupName: z.string().nullable(),
     eventTitle: z.string().nullable(),
     people: z.record(z.string(), z.string()),
+    /** Título e texto, nos avisos do ArcanaKin. */
+    announcement: z.object({ title: z.string(), body: z.string() }).nullable().optional(),
   })
   .loose();
 export type NotificationItem = z.infer<typeof notificationSchema>;

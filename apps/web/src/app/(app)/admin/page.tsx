@@ -4,6 +4,7 @@ import {
   getBetaGroupStats,
   getProductMetrics,
   type TipId,
+  listAnnouncements,
   listGroupsForBeta,
   listRecentFeedback,
   listUsersForAdmin,
@@ -14,6 +15,7 @@ import { formatMinutes } from '@/server/metrics-email';
 import { requireAdmin } from '@/server/admin';
 import { AdminUsers } from '@/components/admin-users';
 import { BetaControl } from '@/components/beta-control';
+import { AnnouncementsAdmin } from '@/components/announcements-admin';
 import { sectionMetadata } from '@/server/seo';
 
 export const generateMetadata = sectionMetadata('admin', '/admin');
@@ -23,12 +25,13 @@ export default async function AdminPage() {
   await requireAdmin();
   const db = getDb();
   const now = new Date();
-  const [m, recent, beta, betaGroups, users] = await Promise.all([
+  const [m, recent, beta, betaGroups, users, notices] = await Promise.all([
     getProductMetrics(db, now),
     listRecentFeedback(db, 30),
     getBeta(db, now),
     listGroupsForBeta(db),
     listUsersForAdmin(db),
+    listAnnouncements(db),
   ]);
   const betaStats = await getBetaGroupStats(db, beta.state, now);
   const t = await getTranslations('admin');
@@ -111,6 +114,22 @@ export default async function AdminPage() {
           {t('retention')}:{' '}
           {t('retentionValue', { retained: m.retention.retained, previous: m.retention.previous })}
         </p>
+      </section>
+
+      <section className="card space-y-4" aria-labelledby="admin-avisos">
+        <div>
+          <h2 id="admin-avisos" className="section-title mb-1">
+            {t('announcements.title')}
+          </h2>
+          <p className="muted max-w-2xl">{t('announcements.intro')}</p>
+        </div>
+        <AnnouncementsAdmin
+          groups={betaGroups.map((g) => ({ id: g.id, name: g.name }))}
+          announcements={notices.map((a) => ({
+            ...a,
+            publishedAt: a.publishedAt?.toISOString() ?? null,
+          }))}
+        />
       </section>
 
       <section className="card space-y-4" aria-labelledby="admin-beta">
