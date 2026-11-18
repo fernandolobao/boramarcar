@@ -24,7 +24,8 @@
     "./beta": "./src/beta/index.ts",
     "./help": "./src/help/index.ts",
     "./integration": "./src/integration/index.ts",
-    "./notifications": "./src/notifications/index.ts"
+    "./notifications": "./src/notifications/index.ts",
+    "./changelog": "./src/changelog/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p contract",
