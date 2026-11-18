@@ -528,3 +528,10 @@ sem rolagem horizontal em 320px.
 - `Select` do site: altura (40 px), fonte e espaço do rótulo iguais aos do `input` e dos `btn*`, para alinhar lado a lado com eles (antes ficava mais alto que os botões de visualização da coleção).
 - Coleção (galeria): o selo "✦ Foil" foi para cima da imagem (`aria-hidden`, como o "×N"), e o "Foil" passou a fazer parte do nome do botão da carta, para quem usa leitor de tela.
 - Componentes no teste axe, com testes de teclado/clique e da descrição.
+
+## Torneios do grupo no site (19/11/2026)
+
+- `/torneios`, `/torneios/novo` e `/torneios/<id>` no E2E de acessibilidade (o seed tem um torneio de Modern em andamento, com mesa sem resultado, mesa registrada e classificação).
+- Página do torneio: um `h1`, seções com `h2` (`aria-labelledby`) para inscrições, cada rodada, classificação, linha do tempo e organização; mesas com `h3`. Classificação numa `table` com `th scope="col"` e o nome em `th scope="row"`; os critérios de desempate explicados em texto logo abaixo.
+- Resultado da mesa: no pod, um grupo de rádio "Quem venceu a mesa N" (com "Empate"); no par, um campo numérico por inscrição ("Jogos vencidos por …"). O botão "Salvar resultado" leva a mesa no nome (`sr-only`), e a confirmação vem num `role="status"`.
+- Tirar inscrição e apagar o torneio em dois cliques (padrão do projeto), com o nome de quem sai no botão.

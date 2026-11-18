@@ -292,6 +292,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'torneios',
+            question: 'Como funciona um torneio do grupo?',
+            intro: [
+              'O dono ou um admin cria o torneio num encontro (no próprio encontro, em "Criar torneio neste encontro", ou em Encontros → Torneios), em qualquer formato. Nos formatos multijogador (Commander, Brawl, Oathbreaker) as mesas são pods de 4, de 3 quando a conta não fecha; no um contra um (Modern, Pauper, Draft…) são pares em melhor de 3 (ou de 1), e no Two-Headed Giant cada inscrição é uma dupla.',
+              'Cada pessoa se inscreve em "Me inscrever" (quem organiza inscreve qualquer pessoa do grupo). Ao começar, a 1ª rodada é sorteada; as seguintes juntam quem tem pontos parecidos e evitam repetir adversários, e com número ímpar alguém fica de bye (vale vitória). Quem está na mesa registra o resultado, que vale na hora; quem organiza corrige quando precisar e libera a próxima rodada quando todas as mesas têm resultado.',
+              'A classificação usa os pontos do torneio (3/1/0 por padrão) e desempata pelos critérios oficiais: % de vitórias dos oponentes, % de jogos vencidos e % de jogos vencidos dos oponentes. Se o torneio conta no ranking, cada jogo também vira uma partida do grupo.',
+            ],
+          },
+          {
             id: 'retrospectiva',
             question: 'O que é a retrospectiva do mês?',
             intro: [
@@ -628,6 +637,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
+            ],
+          },
+          {
+            id: 'torneios',
+            question: 'How does a group tournament work?',
+            intro: [
+              'The owner or an admin creates the tournament at a meetup (on the meetup itself, under "Create a tournament at this meetup", or in Meetups → Tournaments), in any format. In multiplayer formats (Commander, Brawl, Oathbreaker) tables are pods of 4, or 3 when the numbers don’t work out; in one-on-one formats (Modern, Pauper, Draft…) they are best-of-3 (or best-of-1) pairs, and in Two-Headed Giant each entry is a duo.',
+              'Everyone enters with "Enter myself" (organizers can enter anyone in the group). When it starts, round 1 is drawn at random; later rounds group players with similar points and avoid repeat opponents, and with an odd number someone gets a bye (counts as a win). Players at a table report the result, which counts right away; organizers correct it when needed and open the next round once every table has a result.',
+              'Standings use the tournament points (3/1/0 by default) and break ties with the official criteria: opponents’ match-win %, game-win % and opponents’ game-win %. If the tournament counts in the ranking, each game also becomes a group game.',
             ],
           },
           {

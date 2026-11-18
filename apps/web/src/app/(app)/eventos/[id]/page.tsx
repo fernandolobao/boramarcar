@@ -6,6 +6,7 @@ import {
   listDecksForUsers,
   listLocations,
   listMembers,
+  listTournaments,
 } from '@boramarcar/db';
 import { formatRules, isGameFormat, MIN_PLAYERS_FOR_TABLES } from '@boramarcar/core';
 import Link from 'next/link';
@@ -56,12 +57,15 @@ export default async function EventPage({ params }: Props) {
       throw error;
     },
   );
-  const [members, locations, shareText, settings] = await Promise.all([
+  const [members, locations, shareText, settings, groupTournaments, tt9] = await Promise.all([
     listMembers(db, event.groupId),
     listLocations(db, event.groupId),
     buildEventShareText(event),
     getGroupSettings(db, { groupId: event.groupId, userId: user.id }),
+    listTournaments(db, { groupId: event.groupId, userId: user.id }),
+    getTranslations('tournaments'),
   ]);
+  const eventTournaments = groupTournaments.filter((x) => x.eventId === event.id);
   // Sugestão de mesas: encontro marcado, formato todos contra todos e 6+ confirmados.
   const tableRules = isGameFormat(settings.defaultFormat)
     ? formatRules(settings.defaultFormat)
@@ -316,6 +320,37 @@ export default async function EventPage({ params }: Props) {
               <p className="text-sm">{tt('openHint')}</p>
             </div>
             <GameForm eventId={event.id} players={players} defaultFormat={settings.defaultFormat} />
+          </section>
+        )}
+
+        {/* Torneios do encontro (9.1), e criar um aqui (quem organiza). */}
+        {(eventTournaments.length > 0 || (event.canManage && event.status !== 'cancelled')) && (
+          <section className="card space-y-3" aria-labelledby="encontro-torneios">
+            <h2 id="encontro-torneios" className="section-title mb-0">
+              {tt9('eventSection')}
+            </h2>
+            {eventTournaments.length === 0 ? (
+              <p className="muted">{tt9('eventEmpty')}</p>
+            ) : (
+              <ul className="space-y-1">
+                {eventTournaments.map((x) => (
+                  <li key={x.id}>
+                    <Link href={`/torneios/${x.id}`} className="underline underline-offset-2">
+                      {x.name}
+                    </Link>{' '}
+                    <span className="muted text-sm">
+                      · {tt9(`status.${x.status as 'registration' | 'running' | 'finished'}`)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {event.canManage && event.status !== 'cancelled' && (
+              <Link href={`/torneios/novo?encontro=${event.id}`} className="btn-secondary">
+                <Icon name="ranking" />
+                {tt9('createHere')}
+              </Link>
+            )}
           </section>
         )}
 
