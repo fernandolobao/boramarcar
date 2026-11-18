@@ -81,8 +81,18 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-18',
-    pt: 'As conquistas no perfil ganharam abas: "Para conquistar", com as mais perto de sair primeiro, e "Conquistadas".',
-    en: 'Achievements on the profile now have tabs: "To earn", closest first, and "Earned".',
+    pt: 'As conquistas no perfil ganharam abas: "Em aberto", com as mais perto de sair primeiro, e "Finalizadas".',
+    en: 'Achievements on the profile now have tabs: "Open", closest first, and "Completed".',
+  },
+  {
+    date: '2026-11-19',
+    pt: 'Boas-vindas para quem chega: o resumo da noite celebra a primeira partida com o grupo, e o painel acolhe quem entrou há pouco.',
+    en: 'Welcoming newcomers: the night recap celebrates a first game with the group, and the dashboard greets people who just joined.',
+  },
+  {
+    date: '2026-11-19',
+    pt: 'Conquista nova, "Enturmado": jogue ao menos uma partida com cada pessoa do seu grupo.',
+    en: 'New achievement, "One of the gang": play at least one game with each person in your group.',
   },
   {
     date: '2026-11-19',

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { AUTH_STATE } from './support/global-setup';
 import { E2E_INVITE_CODE } from './support/seed';
 
 /** Onboarding (Fase 7): o convite mostra o grupo antes de entrar. */
@@ -16,5 +17,15 @@ test.describe('onboarding', () => {
     await expect(how).toBeVisible();
     // Nada de e-mail de ninguém numa página que circula por link.
     await expect(page.locator('body')).not.toContainText('@e2e.test');
+  });
+});
+
+test.describe('boas-vindas no painel', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('quem entrou no grupo há menos de 30 dias vê as boas-vindas', async ({ page }) => {
+    await page.goto('/painel');
+    await expect(page.getByText(/^Boas-vindas ao grupo!/)).toBeVisible();
   });
 });

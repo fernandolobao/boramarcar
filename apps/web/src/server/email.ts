@@ -261,6 +261,9 @@ export function buildRecapEmail(
       lines: [
         ...lines,
         ...(top && top.wins > 0 ? [t('recap.top', { name: top.name, wins: top.wins })] : []),
+        ...(recap.debuts.length
+          ? [t('recap.debuts', { names: format.list(recap.debuts, { type: 'conjunction' }) })]
+          : []),
       ],
       cta: { label: t('recap.cta'), url: recapUrl(recap.eventId) },
       footer: t('footer', { group: data.groupName, url: profileUrl() }),

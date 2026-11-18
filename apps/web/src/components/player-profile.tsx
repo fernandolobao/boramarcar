@@ -85,7 +85,7 @@ export async function Achievements({ achievements }: { achievements: Profile['ac
           {t('unlocked', { count: done.length, total: achievements.length })}
         </p>
       </div>
-      {/* "Para conquistar" abre por padrão (o que falta e quanto falta); "Conquistadas" ao lado. */}
+      {/* "Em aberto" abre por padrão (o que falta e quanto falta); "Finalizadas" ao lado. */}
       <AchievementTabs
         label={t('tabsLabel')}
         tabs={[

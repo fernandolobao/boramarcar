@@ -94,6 +94,7 @@
       "since": "Your last game with <name></name> was {when}.",
       "goingNext": "going to the next meetup"
     },
+    "welcomeNew": "Welcome to the group! Confirm you’re coming to the next meetup and come play with us.",
     "rivalries": {
       "title": "Rivalries",
       "hint": "Only people who played with you at least 3 times count. Just for fun!",
@@ -849,7 +850,8 @@
       "gameWin": "Game {number}: {names} ({commanders})",
       "gameDraw": "Game {number}: draw",
       "top": "Standout: {name}, with {wins, plural, =1 {1 win} other {# wins}}.",
-      "cta": "See and share the recap"
+      "cta": "See and share the recap",
+      "debuts": "First game with the group: {names}. Welcome!"
     },
     "account": {
       "verify": {
@@ -1051,11 +1053,15 @@
       "months_12": {
         "name": "All year round",
         "description": "Play in all 12 months of the same year."
+      },
+      "enturmado": {
+        "name": "One of the gang",
+        "description": "Play at least one game with each person in your group (groups of 4 or more)."
       }
     },
     "tabsLabel": "Achievements",
-    "tabPending": "To earn ({count})",
-    "tabDone": "Earned ({count})",
+    "tabPending": "Open ({count})",
+    "tabDone": "Completed ({count})",
     "allDone": "All earned! Nothing left.",
     "noneYet": "No achievements yet. Your first recorded game already earns one."
   },
@@ -1953,7 +1959,8 @@
     "cta": "Organize your group's Commander nights on ArcanaKin: times, games, rankings and decks.",
     "ctaButton": "Discover ArcanaKin",
     "link": "Recap to share",
-    "linkHint": "First names, commanders and score — no place or contacts."
+    "linkHint": "First names, commanders and score — no place or contacts.",
+    "debuts": "First game with the group: {names}. Welcome!"
   },
   "auth": {
     "or": "or",

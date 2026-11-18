@@ -16,6 +16,8 @@ export const groupSchema = z
     role: z.enum(['owner', 'admin', 'member']),
     inviteCode: z.string().optional(),
     defaultFormat: z.string().optional(),
+    /** Quando a pessoa entrou no grupo (boas-vindas no painel). */
+    joinedAt: z.coerce.date().optional(),
   })
   .loose();
 export type Group = z.infer<typeof groupSchema>;
@@ -203,6 +205,7 @@ export const ACHIEVEMENT_IDS = [
   'comeback',
   'events_streak_4',
   'months_12',
+  'enturmado',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 

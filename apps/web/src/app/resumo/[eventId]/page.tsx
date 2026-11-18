@@ -75,6 +75,11 @@ export default async function RecapPage({ params }: Props) {
         <h1 className="page-title">{recap.title}</h1>
         <p className="muted">{day}</p>
         <p className="text-lg">{summary}</p>
+        {recap.debuts.length > 0 && (
+          <p className="font-medium">
+            {t('debuts', { names: format.list(recap.debuts, { type: 'conjunction' }) })}
+          </p>
+        )}
       </div>
 
       <section className="card space-y-3" aria-labelledby="resumo-placar">

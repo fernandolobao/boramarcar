@@ -8,6 +8,10 @@ import { t } from '@/lib/i18n';
 import { usePushNotifications } from '@/lib/push';
 import { useColors } from '@/lib/theme';
 import { Loading } from '@/components/ui';
+import { initSentry, Sentry } from '@/lib/sentry';
+
+// Erros do app (só com o DSN configurado; ver `lib/sentry.ts`).
+initSentry();
 
 /** Na área logada: renova o token de push e abre a tela de um aviso tocado. */
 function PushNotifications() {
@@ -32,7 +36,7 @@ function GuideLauncher() {
 }
 
 /** Raiz: sessão do Better Auth; sem sessão só a tela de entrada fica acessível. */
-export default function RootLayout() {
+function RootLayout() {
   const { data: session, isPending } = authClient.useSession();
   const colors = useColors();
   if (isPending) return <Loading />;
@@ -86,3 +90,5 @@ export default function RootLayout() {
     </>
   );
 }
+
+export default Sentry.wrap(RootLayout);

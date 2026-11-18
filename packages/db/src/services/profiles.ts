@@ -93,7 +93,11 @@ async function achievementContext(db: Database, userId: string): Promise<Achieve
   if (!groupIds.length) return { timeZone: person?.timeZone ?? undefined };
   const [members, held] = await Promise.all([
     db
-      .select({ groupId: groupMembers.groupId, userId: groupMembers.userId })
+      .select({
+        groupId: groupMembers.groupId,
+        userId: groupMembers.userId,
+        joinedAt: groupMembers.joinedAt,
+      })
       .from(groupMembers)
       .where(inArray(groupMembers.groupId, groupIds)),
     db
@@ -104,8 +108,11 @@ async function achievementContext(db: Database, userId: string): Promise<Achieve
   ]);
   const groupMembersMap: Record<string, string[]> = {};
   for (const m of members) (groupMembersMap[m.groupId] ??= []).push(m.userId);
+  const memberSince: Record<string, Record<string, Date>> = {};
+  for (const m of members) (memberSince[m.groupId] ??= {})[m.userId] = m.joinedAt;
   return {
     groupMembers: groupMembersMap,
+    memberSince,
     groupEvents: held,
     timeZone: person?.timeZone ?? undefined,
   };

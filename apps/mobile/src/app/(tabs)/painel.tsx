@@ -5,7 +5,7 @@ import type {
   PartnerHint,
   Ranking,
 } from '@boramarcar/api-client';
-import { rivalriesFor } from '@boramarcar/core/integration';
+import { isNewMember, rivalriesFor } from '@boramarcar/core/integration';
 import { Link, router } from 'expo-router';
 import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { Aura } from '@/components/aura';
@@ -396,6 +396,10 @@ export default function DashboardScreen() {
           {t('dashHello', { name: firstName })}
         </AppText>
         <AppText muted>{group.name}</AppText>
+        {/* Quem entrou há menos de 30 dias: boas-vindas e o convite para o próximo encontro. */}
+        {isNewMember(group.joinedAt, new Date()) ? (
+          <AppText style={{ fontSize: 16 }}>{t('dashWelcomeNew')}</AppText>
+        ) : null}
         <BetaBanner groupId={group.id} />
         <NextEvent event={upcoming[0]} />
         <MyNumbers ranking={ranking.data} stats={stats.data} userId={session?.user.id ?? ''} />

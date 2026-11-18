@@ -254,7 +254,7 @@ O beta assistido (8.5) começa em **fevereiro de 2027** e **precisa que lojas po
 - ✅ Teste do limite de relatórios de CSP: relógio parado no teste (a janela não vira mais no meio).
 - ✅ "Chamar para o próximo": o chamado também vai para a central de notificações, gravado junto; push e e-mail são reforço.
 - App: várias telas novas só foram verificadas por tipos e testes, sem aparelho — entram no ensaio (passo 8).
-- App sem Sentry: erros do app mobile não chegam a lugar nenhum. Antes do beta, ligar o Sentry no app (`@sentry/react-native`, com o mesmo cuidado de privacidade do site).
+- ✅ Sentry no app: código pronto (mesma privacidade do site) e projeto `arcanakin-app` ligado (DSN no `eas.json`); mapas de código com os builds de dezembro (plugin + `SENTRY_AUTH_TOKEN`, passo a passo em `docs/ARCHITECTURE.md`).
 
 ### Definição de pronto (para cada item)
 

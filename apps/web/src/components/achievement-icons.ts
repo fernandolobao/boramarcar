@@ -29,4 +29,5 @@ export const ACHIEVEMENT_ICON: Record<AchievementId, IconName> = {
   comeback: 'comeback',
   events_streak_4: 'eventStreak',
   months_12: 'allYear',
+  enturmado: 'join',
 };
