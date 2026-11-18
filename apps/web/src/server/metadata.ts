@@ -11,7 +11,8 @@ type NavKey =
   | 'group'
   | 'profile'
   | 'settings'
-  | 'feedback';
+  | 'feedback'
+  | 'notifications';
 
 /** Seção e caminho de cada item da navegação. */
 const NAV: Record<NavKey, { section: Section; path: string }> = {
@@ -25,6 +26,7 @@ const NAV: Record<NavKey, { section: Section; path: string }> = {
   profile: { section: 'profile', path: '/perfil' },
   settings: { section: 'settings', path: '/configuracoes' },
   feedback: { section: 'feedback', path: '/feedback' },
+  notifications: { section: 'notifications', path: '/notificacoes' },
 };
 
 /** `generateMetadata` das seções da navegação: título, descrição e prévia de link (`seo.ts`). */

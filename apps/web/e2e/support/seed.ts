@@ -257,6 +257,21 @@ export async function seedE2E(databaseUrl: string) {
         deckId: i === 0 ? E2E_IDS.deck : null,
       })),
     ]);
+    // Uma notificação da Bia para a Ana (partida no grupo) e uma da partida em que ela venceu.
+    await db.insert(s.notifications).values([
+      {
+        userId: 'e2e-ana',
+        groupId: E2E_IDS.group,
+        kind: 'game',
+        data: {
+          kind: 'game',
+          gameId: 'e2e-game-1',
+          eventId: E2E_IDS.pastEvent,
+          result: 'win',
+          winnerIds: ['e2e-ana'],
+        },
+      },
+    ]);
     // Todas as conquistas contam como vistas: a janela de conquistas novas não abre no meio de
     // outros testes (ela tem o próprio teste em `perfis.spec.ts`).
     await db

@@ -15,6 +15,7 @@ const PROTECTED = [
   '/jogadores',
   '/configuracoes',
   '/feedback',
+  '/notificacoes',
   '/admin',
   '/mesa',
 ];

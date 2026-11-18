@@ -1,4 +1,4 @@
-import { recordGame } from '@boramarcar/db';
+import { notifyGameRecorded, recordGame } from '@boramarcar/db';
 import { runAfterResponse } from '@/server/background';
 import { gameSchema } from '@/server/game-schema';
 import { authed, parseJson } from '@/server/http';
@@ -10,6 +10,8 @@ export const POST = authed<{ eventId: string }>(
     const game = await recordGame(db, { ...body, eventId: params.eventId, userId: user.id });
     // Partida registrada depois de finalizar: o resumo sai agora (se ainda não saiu).
     runAfterResponse(() => sendEventRecap(db, params.eventId));
+    // Central de notificações: quem jogou e o resto do grupo.
+    runAfterResponse(() => notifyGameRecorded(db, { gameId: game.id, actorId: user.id }));
     return { game };
   },
   { status: 201 },

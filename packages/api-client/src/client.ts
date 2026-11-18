@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  notificationSchema,
   achievementSchema,
   availabilityRuleSchema,
   deckDetailSchema,
@@ -213,6 +214,15 @@ export function createApiClient(options: ApiClientOptions) {
           | 'tip-table'
           | 'tip-collection',
       ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
+      /** Central de notificações: as mais recentes e quantas ainda não foram lidas. */
+      notifications: () =>
+        request(
+          'GET',
+          '/me/notifications',
+          z.object({ items: z.array(notificationSchema), unread: z.number() }),
+        ),
+      /** A central foi aberta: tudo o que chegou conta como lido. */
+      markNotificationsRead: () => request('POST', '/me/notifications/read', z.unknown()),
       /**
        * Conquistas ganhas desde a última vez que a pessoa viu (janela do painel e do perfil).
        * Conquistas que esta versão do app não conhece ficam de fora.

@@ -528,3 +528,21 @@ export const groupAttendanceSchema = z.object({
   confirmedNext: z.array(z.string()),
 });
 export type GroupAttendance = z.infer<typeof groupAttendanceSchema>;
+
+/**
+ * Item da central de notificações. `data.kind` diz o tipo; tipos que esta versão do app não
+ * conhece aparecem com um texto genérico.
+ */
+export const notificationSchema = z
+  .object({
+    id: z.string(),
+    kind: z.string(),
+    data: z.object({ kind: z.string() }).loose(),
+    createdAt: date,
+    readAt: date.nullable(),
+    groupName: z.string().nullable(),
+    eventTitle: z.string().nullable(),
+    people: z.record(z.string(), z.string()),
+  })
+  .loose();
+export type NotificationItem = z.infer<typeof notificationSchema>;

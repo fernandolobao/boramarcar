@@ -283,6 +283,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'notificacoes',
+            question: 'O que aparece no sino de notificações?',
+            intro: [
+              'O sino fica no topo do site e no painel do app, com o número de novidades. Lá aparecem as partidas em que você jogou, as partidas do seu grupo e, em breve, conquistas, mudanças no pódio e avisos do ArcanaKin. Toque numa notificação para abrir o encontro. Ao abrir a lista, tudo passa a contar como lido.',
+              'As notificações ficam só no site e no app: e-mail e avisos no celular continuam só para encontros.',
+            ],
+          },
+          {
             id: 'com-quem-jogar',
             question: 'O que é "Com quem jogar" no painel?',
             intro: [
@@ -589,6 +597,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             intro: [
               'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year and more. Open a profile (tap a name in the ranking) to see the progress of each one and what is left.',
               'When you earn new achievements, a window shows them all together the next time you open the dashboard or your profile, even if they came from several games.',
+            ],
+          },
+          {
+            id: 'notificacoes',
+            question: 'What shows up in the notifications bell?',
+            intro: [
+              'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games and, soon, achievements, podium changes and ArcanaKin announcements. Tap a notification to open the meetup. Opening the list marks everything as read.',
+              'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
             ],
           },
           {

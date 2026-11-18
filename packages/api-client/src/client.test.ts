@@ -463,6 +463,40 @@ describe('cliente da API', () => {
     });
   });
 
+  it('central de notificações: lista com datas e marca como lidas', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json({
+          unread: 1,
+          items: [
+            {
+              id: 'n1',
+              kind: 'game',
+              data: { kind: 'game', eventId: 'e1', result: 'win', winnerIds: ['u1'] },
+              createdAt: '2026-11-18T11:00:00.000Z',
+              readAt: null,
+              groupName: 'Mesa',
+              eventTitle: 'Noite',
+              people: { u1: 'Ana' },
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const inbox = await api.me.notifications();
+    expect(inbox.unread).toBe(1);
+    expect(inbox.items[0]!.createdAt).toBeInstanceOf(Date);
+    await api.me.markNotificationsRead();
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/me/notifications/read',
+    );
+  });
+
   it('grupo: convite novo, papéis, remoção, posse e locais', async () => {
     const fetchMock = vi
       .fn()

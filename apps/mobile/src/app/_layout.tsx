@@ -57,6 +57,7 @@ export default function RootLayout() {
         <Stack.Screen name="colecao" options={{ title: t('collectionTitle') }} />
         <Stack.Screen name="jogadores/[id]" options={{ title: t('profileTitle') }} />
         <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
+        <Stack.Screen name="notificacoes" options={{ title: t('notifTitle') }} />
         <Stack.Screen name="ajuda" options={{ title: t('helpTitle') }} />
         <Stack.Screen name="boas-vindas" options={{ title: t('guideTitle') }} />
         <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />

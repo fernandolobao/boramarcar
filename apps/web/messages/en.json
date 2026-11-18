@@ -31,7 +31,8 @@
     "signedInAs": "Signed in as",
     "collection": "Collection",
     "feedback": "Send feedback",
-    "admin": "Beta metrics"
+    "admin": "Beta metrics",
+    "notifications": "Notifications"
   },
   "dashboard": {
     "hello": "Hi, {name}!",
@@ -1884,6 +1885,10 @@
     "help": {
       "title": "Help",
       "description": "How to use ArcanaKin step by step: group, availability, meetups, games, table mode, decks and ranking."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Your games and your group’s, new achievements, podium changes and ArcanaKin announcements."
     }
   },
   "beta": {
@@ -2016,5 +2021,23 @@
     "intro": "Since your last visit:",
     "close": "Nice!",
     "viewAll": "See all on your profile"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "{count, plural, =0 {Notifications} =1 {Notifications: 1 new} other {Notifications: # new}}",
+    "empty": "Nothing here yet. When someone records a game of yours or of your group, it shows up here.",
+    "new": "New",
+    "someone": "someone",
+    "game": {
+      "win": "You won a game at {event}.",
+      "loss": "Game recorded at {event}: {winners} won.",
+      "draw": "Game recorded at {event}: a draw."
+    },
+    "group_game": "{winners} won a game at {event}.",
+    "group_game_draw": "A game at {event} ended in a draw.",
+    "achievement": "New achievement: {name}.",
+    "podium": "The {group} podium changed: {podium}.",
+    "announcement": "ArcanaKin announcement.",
+    "open": "Open"
   }
 }

@@ -52,6 +52,7 @@ const AUTH_PAGES = [
   '/perfil',
   '/configuracoes',
   '/feedback?de=/painel',
+  '/notificacoes',
   '/admin',
   '/jogadores/e2e-bia',
   `/convite/${E2E_INVITE_CODE}`,

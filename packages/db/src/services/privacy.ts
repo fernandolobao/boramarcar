@@ -8,6 +8,7 @@ import {
   deckCards,
   decks,
   eventNudges,
+  notifications,
   eventParticipants,
   events,
   feedback,
@@ -193,6 +194,17 @@ export async function exportUserData(db: Database, userId: string) {
     .innerJoin(groups, eq(groups.id, events.groupId))
     .where(eq(eventNudges.userId, userId))
     .orderBy(asc(eventNudges.createdAt));
+  // Central de notificações: tipo, dados (identificadores), quando chegou e quando foi lida.
+  const inbox = await db
+    .select({
+      kind: notifications.kind,
+      data: notifications.data,
+      at: notifications.createdAt,
+      readAt: notifications.readAt,
+    })
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(asc(notifications.createdAt));
 
   return {
     format: 'arcanakin-export',
@@ -208,6 +220,7 @@ export async function exportUserData(db: Database, userId: string) {
     availability: { slots, weekly: rules },
     events: rsvps,
     invitations,
+    notifications: inbox,
     games: played,
     decks: ownDecks.map(({ id, ...deck }) => ({
       ...deck,
@@ -280,6 +293,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(onboardingSteps).where(eq(onboardingSteps.userId, userId));
     // Chamados recebidos são da pessoa; os que ela mandou ficam para o grupo, sem autor.
     await tx.delete(eventNudges).where(eq(eventNudges.userId, userId));
+    await tx.delete(notifications).where(eq(notifications.userId, userId));
     await tx.update(eventNudges).set({ sentBy: null }).where(eq(eventNudges.sentBy, userId));
     await tx.delete(feedback).where(eq(feedback.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));

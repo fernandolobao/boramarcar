@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router/js-tabs';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { Logo } from '@/components/logo';
+import { NotificationsBell } from '@/components/notifications-bell';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
@@ -45,6 +46,8 @@ export default function TabsLayout() {
           tabBarIcon: icon('view-dashboard-outline'),
           // Na aba inicial, o cabeçalho mostra o logotipo (a tela tem o próprio título).
           headerTitle: () => <Logo height={20} />,
+          // Sino da central de notificações.
+          headerRight: () => <NotificationsBell />,
         }}
       />
       <Tabs.Screen

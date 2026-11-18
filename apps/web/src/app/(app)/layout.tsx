@@ -6,12 +6,13 @@ import { BackLink } from '@/components/back-link';
 import { NavLinks } from '@/components/nav-links';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
-import { getGuideState, getUserPreferences } from '@boramarcar/db';
+import { countUnreadNotifications, getGuideState, getUserPreferences } from '@boramarcar/db';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { LocaleSync } from '@/components/locale-sync';
 import { TimeZoneSync } from '@/components/time-zone-sync';
 import { isLocale, LOCALE_COOKIE } from '@/i18n/config';
+import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { UserMenu } from '@/components/user-menu';
 import { TIME_ZONE_COOKIE } from '@/i18n/config';
@@ -22,17 +23,19 @@ import { getDb } from '@/server/db';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
-  const [{ active }, preferences, cookieStore, guide] = await Promise.all([
+  const [{ active }, preferences, cookieStore, guide, unread] = await Promise.all([
     getActiveGroup(user.id),
     getUserPreferences(getDb(), user.id),
     cookies(),
     getGuideState(getDb(), { userId: user.id }),
+    countUnreadNotifications(getDb(), { userId: user.id }),
   ]);
   // Primeiro acesso de conta nova: o guia (7.1) abre sozinho, uma vez; pular ou concluir encerra.
   if (guide.show) redirect('/boas-vindas');
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
   const tl = await getTranslations('legal');
+  const tn = await getTranslations('notifications');
 
   const links = [
     { href: '/painel', label: t('dashboard'), icon: 'dashboard' as const },
@@ -72,12 +75,31 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               </span>
             )}
           </Link>
-          <UserMenu
-            name={user.name}
-            email={user.email}
-            image={user.image ?? null}
-            admin={isAdmin(user.email)}
-          />
+          <div className="flex shrink-0 items-center gap-2">
+            {/* Sino da central de notificações, com o número de não lidas. */}
+            <Link
+              href="/notificacoes"
+              aria-label={tn('bell', { count: unread })}
+              title={tn('bell', { count: unread })}
+              className="relative grid size-10 place-items-center rounded-full hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <Icon name="notifications" className="size-5" />
+              {unread > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-0.5 -right-0.5 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-xs font-bold text-on-accent tabular-nums"
+                >
+                  {unread > 99 ? '99+' : unread}
+                </span>
+              )}
+            </Link>
+            <UserMenu
+              name={user.name}
+              email={user.email}
+              image={user.image ?? null}
+              admin={isAdmin(user.email)}
+            />
+          </div>
         </div>
         <div className="mx-auto max-w-5xl px-4 pt-2 pb-1">
           <NavLinks label={t('label')} links={links} />

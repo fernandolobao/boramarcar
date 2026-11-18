@@ -31,7 +31,8 @@
     "signedInAs": "Conectado como",
     "collection": "Coleção",
     "feedback": "Enviar feedback",
-    "admin": "Métricas do beta"
+    "admin": "Métricas do beta",
+    "notifications": "Notificações"
   },
   "dashboard": {
     "hello": "Olá, {name}!",
@@ -1884,6 +1885,10 @@
     "help": {
       "title": "Ajuda",
       "description": "Como usar o ArcanaKin passo a passo: grupo, disponibilidade, encontros, partidas, modo mesa, decks e ranking."
+    },
+    "notifications": {
+      "title": "Notificações",
+      "description": "Partidas suas e do seu grupo, conquistas novas, mudanças no pódio e avisos do ArcanaKin."
     }
   },
   "beta": {
@@ -2016,5 +2021,23 @@
     "intro": "Desde a sua última visita:",
     "close": "Legal!",
     "viewAll": "Ver todas no perfil"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "bell": "{count, plural, =0 {Notificações} =1 {Notificações: 1 nova} other {Notificações: # novas}}",
+    "empty": "Nada por aqui ainda. Quando alguém registrar uma partida sua ou do seu grupo, ela aparece aqui.",
+    "new": "Nova",
+    "someone": "alguém",
+    "game": {
+      "win": "Você venceu uma partida em {event}.",
+      "loss": "Partida registrada em {event}: {winners} {count, plural, =1 {venceu} other {venceram}}.",
+      "draw": "Partida registrada em {event}: empate."
+    },
+    "group_game": "{winners} {count, plural, =1 {venceu} other {venceram}} uma partida em {event}.",
+    "group_game_draw": "Partida em {event} terminou empatada.",
+    "achievement": "Conquista nova: {name}.",
+    "podium": "O pódio de {group} mudou: {podium}.",
+    "announcement": "Aviso do ArcanaKin.",
+    "open": "Ver"
   }
 }

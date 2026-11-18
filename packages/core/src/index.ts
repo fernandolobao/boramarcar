@@ -9,6 +9,7 @@ export * from './email';
 export * from './games';
 export * from './stats';
 export * from './achievements';
+export * from './notifications';
 export * from './currency';
 export * from './places';
 export * from './table';
