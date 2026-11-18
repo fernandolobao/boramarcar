@@ -504,6 +504,11 @@ sem rolagem horizontal em 320px.
 - `/grupo/recordes`: `h1`, duas seções com `h2`; cada recorde com título e frase completa (quem, o quê, em qual encontro e quando), com links para o perfil e o encontro; ícones decorativos. As cores aparecem com o símbolo de mana (decorativo) **e** o nome por extenso com a porcentagem — cor não é a única pista. Página no E2E de acessibilidade.
 - App: tela com cada recorde como item acessível (título e frase).
 
+## Admin: decks de qualquer pessoa e contagens (19/11/2026)
+
+- Deck aberto por admin sem ser visível para ele: aviso em texto no topo (`role="note"`), com ícone decorativo.
+- `/admin`: "Decks" e "Cartas na coleção" entram na lista de dados de cada conta (`dl` com `dt`/`dd`, como os outros).
+
 ## Retrospectiva do mês (19/11/2026)
 
 - `/retrospectiva/<grupo>/<mês>` (pública, como o resumo da noite): `main#conteudo`, um `h1` com o mês, seções com `h2` (feitos do mês, duelo, compartilhar). "Recorde do grupo" é texto num selo, não só cor; ícone do destaque decorativo. Página no E2E de acessibilidade (sem login).

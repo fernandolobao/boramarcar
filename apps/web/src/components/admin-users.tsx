@@ -11,6 +11,8 @@ export interface AdminUserRow {
   emailVerified: boolean;
   providers: string[];
   groups: number;
+  decks: number;
+  collectionCards: number;
   createdAt: string;
   lastSeenAt: string | null;
 }
@@ -72,7 +74,7 @@ export function AdminUsers({ users }: { users: AdminUserRow[] }) {
                 )}
               </p>
             </div>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-3">
               <div>
                 <dt className="muted text-xs">{t('signIn')}</dt>
                 <dd>{u.providers.length ? u.providers.map(provider).join(', ') : '—'}</dd>
@@ -80,6 +82,14 @@ export function AdminUsers({ users }: { users: AdminUserRow[] }) {
               <div>
                 <dt className="muted text-xs">{t('groups')}</dt>
                 <dd className="tabular-nums">{u.groups}</dd>
+              </div>
+              <div>
+                <dt className="muted text-xs">{t('decks')}</dt>
+                <dd className="tabular-nums">{u.decks}</dd>
+              </div>
+              <div>
+                <dt className="muted text-xs">{t('collectionCards')}</dt>
+                <dd className="tabular-nums">{u.collectionCards}</dd>
               </div>
               <div>
                 <dt className="muted text-xs">{t('created')}</dt>

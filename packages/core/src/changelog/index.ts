@@ -111,6 +111,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-19',
+    pt: 'Atualizamos a política de privacidade: a equipe do ArcanaKin pode ver decks privados só para suporte e moderação, e cada acesso fica registrado nos seus dados.',
+    en: 'We updated the privacy policy: the ArcanaKin team can view private decks only for support and moderation, and each access is logged in your data.',
+  },
+  {
+    date: '2026-11-19',
     pt: 'Retrospectiva do mês: todo dia 1, o seu grupo recebe o resumo do mês que passou, com o destaque, as estreias, os recordes que caíram e o duelo do mês, pronto para compartilhar.',
     en: 'Monthly recap: on the 1st of each month, your group gets a recap of the month before, with the player of the month, first-timers, records that fell and the duel of the month, ready to share.',
   },

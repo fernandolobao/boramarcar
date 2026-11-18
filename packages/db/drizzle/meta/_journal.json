@@ -176,6 +176,13 @@
       "when": 1795011556223,
       "tag": "0024_lean_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795039941682,
+      "tag": "0025_flaky_stardust",
+      "breakpoints": true
     }
   ]
 }
