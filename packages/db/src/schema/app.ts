@@ -611,3 +611,24 @@ export const announcements = pgTable('announcements', {
   createdAt: createdAt(),
   publishedAt: timestamp('published_at', { withTimezone: true }),
 });
+
+/**
+ * Acessos de admins da plataforma a dados que a pessoa não deixou visíveis (ex.: deck privado ou
+ * de grupo), para suporte e moderação. Fica registrado para transparência (LGPD): sai na
+ * exportação de dados da pessoa e some com a conta dela.
+ */
+export const adminAccessLog = pgTable(
+  'admin_access_log',
+  {
+    id: id(),
+    adminId: text('admin_id').references(() => user.id, { onDelete: 'set null' }),
+    targetUserId: text('target_user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    /** `deck` (um deck aberto) ou `profile_decks` (a lista de decks do perfil). */
+    resource: text('resource').notNull(),
+    resourceId: text('resource_id'),
+    createdAt: createdAt(),
+  },
+  (t) => [index('admin_access_log_target_idx').on(t.targetUserId, t.createdAt)],
+);

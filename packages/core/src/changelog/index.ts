@@ -109,6 +109,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Recordes do grupo: vitória mais rápida, partida mais longa, maior sequência e mais, além da cara do grupo (cores e comandantes).',
     en: 'Group records: fastest win, longest game, longest streak and more, plus the group’s identity (colors and commanders).',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Atualizamos a política de privacidade: a equipe do ArcanaKin pode ver decks privados só para suporte e moderação, e cada acesso fica registrado nos seus dados.',
+    en: 'We updated the privacy policy: the ArcanaKin team can view private decks only for support and moderation, and each access is logged in your data.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

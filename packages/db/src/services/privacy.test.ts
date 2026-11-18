@@ -6,6 +6,7 @@ import {
   decks,
   eventNudges,
   notifications,
+  adminAccessLog,
   groupMembers,
   groups,
   locations,
@@ -109,6 +110,18 @@ describe('exportUserData', () => {
       .insert(notifications)
       .values({ userId: a, kind: 'podium', data: { kind: 'podium', userIds: [a] } });
     const data = await exportUserData(db, a);
+    await db.insert(adminAccessLog).values({
+      adminId: b,
+      targetUserId: a,
+      resource: 'deck',
+      resourceId: 'd-x',
+    });
+    const withAccess = await exportUserData(db, a);
+    // O acesso de admin aparece, sem dizer quem foi o admin.
+    expect(withAccess.adminAccess).toEqual([
+      expect.objectContaining({ resource: 'deck', resourceId: 'd-x' }),
+    ]);
+    expect(Object.keys(withAccess.adminAccess[0]!)).not.toContain('adminId');
     expect(data.notifications).toEqual([expect.objectContaining({ kind: 'podium', readAt: null })]);
     // Chamados para encontros: o encontro e quando, sem dizer quem chamou (dado de outra pessoa).
     expect(data.invitations).toEqual([
