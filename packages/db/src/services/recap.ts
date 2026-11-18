@@ -21,6 +21,8 @@ export interface EventRecap {
   standings: { name: string; wins: number; games: number }[];
   /** Arte do comandante de quem mais venceu (para a imagem de compartilhamento). */
   artUri: string | null;
+  /** Quem teve neste encontro a primeira partida com o grupo (boas-vindas). */
+  debuts: string[];
 }
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0] || name;
@@ -50,6 +52,7 @@ export async function getEventRecap(db: Database, eventId: string): Promise<Even
       title: events.title,
       startsAt: events.startsAt,
       status: events.status,
+      groupId: events.groupId,
     })
     .from(events)
     .where(eq(events.id, eventId))
@@ -128,6 +131,24 @@ export async function getEventRecap(db: Database, eventId: string): Promise<Even
     ? playerRows.find((p) => p.userId === top.userId && p.result === 'win' && p.deckId)?.deckId
     : undefined;
 
+  // Estreias: a primeira partida da pessoa no grupo é deste encontro.
+  const playerIds = [...tally.keys()];
+  const firsts = playerIds.length
+    ? await db
+        .select({ userId: gamePlayers.userId, eventId: games.eventId, playedAt: games.playedAt })
+        .from(gamePlayers)
+        .innerJoin(games, eq(games.id, gamePlayers.gameId))
+        .where(and(eq(games.groupId, event.groupId), inArray(gamePlayers.userId, playerIds)))
+        .orderBy(asc(games.playedAt), asc(games.number))
+    : [];
+  const firstEvent = new Map<string, string>();
+  for (const row of firsts)
+    if (!firstEvent.has(row.userId)) firstEvent.set(row.userId, row.eventId);
+  const debuts = standings
+    .filter((s) => firstEvent.get(s.userId) === event.id)
+    .map((s) => s.name)
+    .sort((x, y) => x.localeCompare(y));
+
   return {
     eventId: event.id,
     title: event.title,
@@ -135,6 +156,7 @@ export async function getEventRecap(db: Database, eventId: string): Promise<Even
     games: recapGames,
     standings: standings.map(({ name, wins, games: played }) => ({ name, wins, games: played })),
     artUri: topDeck ? (covers.get(topDeck)?.artUri ?? null) : null,
+    debuts,
   };
 }
 

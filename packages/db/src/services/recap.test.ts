@@ -86,4 +86,29 @@ describe('resumo da noite (8.6)', () => {
     expect(new Set(claimed?.userIds)).toEqual(new Set([ana1.id, ana2.id, a, b, c]));
     expect(await claimEventRecap(db, event.id)).toBeNull();
   });
+
+  it('estreias: quem teve a primeira partida no grupo neste encontro', async () => {
+    const { group, players } = await seedGroup(db, 3);
+    const [a, b, c] = players.map((p) => p.id) as [string, string, string];
+    const night = async (title: string, day: number, ids: string[]) => {
+      const event = await createEvent(db, {
+        groupId: group.id,
+        userId: a,
+        title,
+        startsAt: new Date(Date.UTC(2026, 10, day, 22)),
+      });
+      await recordGame(db, {
+        eventId: event.id,
+        userId: a,
+        playedAt: new Date(Date.UTC(2026, 10, day, 23)),
+        players: ids.map((userId, i) => ({ userId, result: i === 0 ? 'win' : 'loss' })),
+      });
+      await updateEvent(db, { eventId: event.id, userId: a, status: 'finished' });
+      return event;
+    };
+    await night('Primeira noite', 5, [a, b]);
+    const second = await night('Segunda noite', 12, [a, b, c]);
+    // Na segunda noite, só P3 estreou (P1 e P2 já tinham jogado).
+    expect((await getEventRecap(db, second.id))!.debuts).toEqual(['P3']);
+  });
 });

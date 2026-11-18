@@ -23,6 +23,7 @@ import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { EmptyState } from '@/components/empty-state';
 import { BETA_WEEKS } from '@boramarcar/core';
+import { isNewMember } from '@boramarcar/core/integration';
 import { BetaBanner } from '@/components/beta-banner';
 import { FirstSteps } from '@/components/first-steps';
 import { NewAchievements } from '@/components/new-achievements';
@@ -209,6 +210,10 @@ export default async function DashboardPage() {
         >
           {t('hello', { name: user.name.split(' ')[0] ?? user.name })}
         </h1>
+        {/* Quem entrou há menos de 30 dias: boas-vindas e o convite para o próximo encontro. */}
+        {isNewMember(group.joinedAt, now) && (
+          <p className="mt-2 max-w-xl text-lg text-pergaminho">{t('welcomeNew')}</p>
+        )}
         {next ? (
           <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="space-y-2">

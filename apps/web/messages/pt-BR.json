@@ -93,7 +93,8 @@
       "never": "Você ainda não jogou com <name></name>.",
       "since": "Sua última partida com <name></name> foi {when}.",
       "goingNext": "vai no próximo encontro"
-    }
+    },
+    "welcomeNew": "Boas-vindas ao grupo! Confirme presença no próximo encontro e venha jogar com a gente."
   },
   "group": {
     "title": "Seu grupo",
@@ -842,7 +843,8 @@
       "gameWin": "Partida {number}: {names} ({commanders})",
       "gameDraw": "Partida {number}: empate",
       "top": "Destaque: {name}, com {wins, plural, =1 {1 vitória} other {# vitórias}}.",
-      "cta": "Ver e compartilhar o resumo"
+      "cta": "Ver e compartilhar o resumo",
+      "debuts": "Primeira partida com o grupo: {names}. Boas-vindas!"
     },
     "account": {
       "verify": {
@@ -1044,6 +1046,10 @@
       "months_12": {
         "name": "O ano inteiro",
         "description": "Jogar em todos os 12 meses de um mesmo ano."
+      },
+      "enturmado": {
+        "name": "Enturmado",
+        "description": "Jogar ao menos uma partida com cada pessoa do grupo (grupos com 4 ou mais pessoas)."
       }
     },
     "tabsLabel": "Conquistas",
@@ -1946,7 +1952,8 @@
     "cta": "Organize os encontros de Commander do seu grupo no ArcanaKin: horários, partidas, ranking e decks.",
     "ctaButton": "Conhecer o ArcanaKin",
     "link": "Resumo para compartilhar",
-    "linkHint": "Primeiros nomes, comandantes e placar — sem local nem contatos."
+    "linkHint": "Primeiros nomes, comandantes e placar — sem local nem contatos.",
+    "debuts": "Primeira partida com o grupo: {names}. Boas-vindas!"
   },
   "auth": {
     "or": "ou",

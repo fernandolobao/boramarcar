@@ -483,3 +483,8 @@ sem rolagem horizontal em 320px.
 
 - Site: abas do React Aria (`tablist`/`tab`/`tabpanel`, setas do teclado, `aria-selected`), "Para conquistar (N)" selecionada por padrão; o número está no nome da aba. Aba vazia mostra uma frase (não fica em branco).
 - App: as abas são o `Choices` do design system (`radiogroup` com nome "Conquistas"); cada conquista continua um item acessível com nome, descrição e situação.
+
+## Boas-vindas a quem chega (19/11/2026)
+
+- Painel: a frase de boas-vindas para quem entrou há menos de 30 dias é texto comum no destaque (pergaminho sobre a camada escura do destaque, o mesmo contraste do título), logo abaixo do `h1`.
+- Resumo da noite (`/resumo` e e-mail): "Primeira partida com o grupo: …" em texto, com os nomes numa lista natural ("Caio e Duda").

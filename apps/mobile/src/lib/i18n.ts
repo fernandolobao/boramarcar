@@ -28,6 +28,8 @@ const pt = {
   tabEvents: 'Encontros',
   tabHome: 'Início',
   dashHello: 'Olá, {name}!',
+  dashWelcomeNew:
+    'Boas-vindas ao grupo! Confirme presença no próximo encontro e venha jogar com a gente.',
   dashNextEvent: 'Próximo encontro',
   dashNoEvents: 'Nenhum encontro marcado ainda. Marque quando você pode jogar e a mesa se forma.',
   dashOpenEvent: 'Ver o encontro',
@@ -617,6 +619,9 @@ const pt = {
     'Jogar em 4 encontros seguidos do grupo (encontros com partida registrada).',
   achievement_months_12_name: 'O ano inteiro',
   achievement_months_12_description: 'Jogar em todos os 12 meses de um mesmo ano.',
+  achievement_enturmado_name: 'Enturmado',
+  achievement_enturmado_description:
+    'Jogar ao menos uma partida com cada pessoa do grupo (grupos com 4 ou mais pessoas).',
   achievement_first_player_win_name: 'Saiu na frente',
   achievement_first_player_win_description: 'Vencer uma partida em que você começou.',
   achievement_deck_loyal_name: 'Fiel ao deck',
@@ -879,6 +884,8 @@ const en: Messages = {
   tabEvents: 'Meetups',
   tabHome: 'Home',
   dashHello: 'Hi, {name}!',
+  dashWelcomeNew:
+    'Welcome to the group! Confirm you’re coming to the next meetup and come play with us.',
   dashNextEvent: 'Next meetup',
   dashNoEvents: 'No meetup scheduled yet. Mark when you can play and the table forms.',
   dashOpenEvent: 'Open meetup',
@@ -1467,6 +1474,9 @@ const en: Messages = {
     'Play at 4 meetups of the group in a row (meetups with a recorded game).',
   achievement_months_12_name: 'All year round',
   achievement_months_12_description: 'Play in all 12 months of the same year.',
+  achievement_enturmado_name: 'One of the gang',
+  achievement_enturmado_description:
+    'Play at least one game with each person in your group (groups of 4 or more).',
   achievement_first_player_win_name: 'Head start',
   achievement_first_player_win_description: 'Win a game you started.',
   achievement_deck_loyal_name: 'Loyal to the deck',
