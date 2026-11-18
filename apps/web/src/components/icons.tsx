@@ -36,6 +36,7 @@ import {
   Zap,
   Flame,
   Globe,
+  Languages,
   Lock,
   Ban,
   CalendarDays,
@@ -157,6 +158,8 @@ export const Icons = {
   // Visibilidade
   private: Lock,
   public: Globe,
+  // Idioma
+  language: Languages,
   // Conquistas
   achievement: Award,
   firstGame: Footprints,

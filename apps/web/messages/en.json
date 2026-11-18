@@ -1061,6 +1061,8 @@
     },
     "goToDashboard": "Go to dashboard",
     "signInToDashboard": "Sign in to dashboard",
+    "signInShort": "Sign in",
+    "dashboardShort": "Dashboard",
     "hero": {
       "eyebrow": "In testing with Commander groups",
       "title": "The table comes together. ArcanaKin handles the rest.",
@@ -1933,5 +1935,12 @@
     "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.",
     "collection": "Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.",
     "toggle": "Tip about this screen"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "names": {
+      "pt-BR": "Português (Brasil)",
+      "en": "English"
+    }
   }
 }

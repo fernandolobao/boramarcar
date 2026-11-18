@@ -9,14 +9,27 @@ export const TIME_ZONE_COOKIE = 'bm_tz';
 export const isLocale = (value: unknown): value is Locale =>
   typeof value === 'string' && (LOCALES as readonly string[]).includes(value);
 
-/** Escolhe o idioma pelo cookie e, em seguida, pelo Accept-Language. */
-export function resolveLocale(cookieValue?: string | null, acceptLanguage?: string | null): Locale {
+/** Países de língua portuguesa (código do cabeçalho `x-vercel-ip-country`). */
+const PORTUGUESE_COUNTRIES = new Set(['BR', 'PT', 'AO', 'MZ', 'CV', 'GW', 'ST', 'TL']);
+
+/**
+ * Escolhe o idioma: a escolha feita (cookie) manda; sem ela, português para quem acessa de um
+ * país de língua portuguesa ou tem português em qualquer posição do navegador (muita gente no
+ * Brasil usa o navegador em inglês); depois, o primeiro idioma do navegador que conhecemos.
+ */
+export function resolveLocale(
+  cookieValue?: string | null,
+  acceptLanguage?: string | null,
+  country?: string | null,
+): Locale {
   if (isLocale(cookieValue)) return cookieValue;
   const preferred = (acceptLanguage ?? '')
     .split(',')
     .map((part) => part.split(';')[0]?.trim().toLowerCase())
     .filter((tag): tag is string => Boolean(tag));
   const base = (tag: string) => tag.split('-')[0];
+  if (PORTUGUESE_COUNTRIES.has((country ?? '').toUpperCase())) return 'pt-BR';
+  if (preferred.some((tag) => base(tag) === 'pt')) return 'pt-BR';
   for (const tag of preferred) {
     const match =
       LOCALES.find((l) => l.toLowerCase() === tag) ??
