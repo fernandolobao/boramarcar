@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Select } from '@/components/ds/select';
 
 interface MoxfieldBlocked {
   url: string;
@@ -161,26 +162,17 @@ export function DeckImportForm() {
       </div>
 
       <div>
-        <label className="label" htmlFor="deck-import-format">
-          {t('format')}
-        </label>
-        <select
+        <Select
+          label={t('format')}
           id="deck-import-format"
-          className="select"
-          aria-describedby="deck-import-format-hint"
-          value={format}
-          onChange={(e) => setFormat(e.target.value as GameFormat | 'auto')}
-        >
-          <option value="auto">{t('formatAuto')}</option>
-          {GAME_FORMATS.map((f) => (
-            <option key={f} value={f}>
-              {tf(f)}
-            </option>
-          ))}
-        </select>
-        <p id="deck-import-format-hint" className="muted mt-1">
-          {t('formatHint')}
-        </p>
+          description={t('formatHint')}
+          value={String(format)}
+          onChange={(v) => setFormat(v as GameFormat | 'auto')}
+          options={[
+            { value: 'auto', label: t('formatAuto') },
+            ...GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) })),
+          ]}
+        />
       </div>
 
       <button className="btn-primary" disabled={pending}>

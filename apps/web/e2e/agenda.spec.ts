@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
+import { pick } from './support/select';
 
 test.describe('agenda', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
@@ -99,7 +100,7 @@ test.describe('histórico de encontros', () => {
 
     const search = page.getByRole('search', { name: 'Filtrar histórico' });
     await search.getByLabel('Buscar').fill('semana passada');
-    await search.getByLabel('Situação').selectOption('finished');
+    await pick(search, 'Situação', 'Finalizado');
     await search.getByRole('button', { name: 'Filtrar' }).click();
     await expect(page).toHaveURL(/q=semana\+passada.*situacao=finished/);
     await expect(page.getByRole('heading', { name: '1 encontro' })).toBeVisible();

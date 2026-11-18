@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { GameEditor } from './game-editor';
 import { GameForm } from './game-form';
+import { pick, selectButton } from '@/test/select';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 
@@ -45,13 +46,11 @@ describe('GameForm', () => {
     expect(submit).toBeDisabled(); // falta o vencedor
 
     fireEvent.click(screen.getByRole('radio', { name: 'Venceu: Ana' }));
-    fireEvent.change(screen.getByRole('combobox', { name: 'Deck de Ana' }), {
-      target: { value: 'omnath' },
-    });
-    fireEvent.change(screen.getByLabelText('Quem começou'), { target: { value: 'caio' } });
+    pick('Deck de Ana', 'Omnath');
+    pick('Quem começou', 'Caio');
     fireEvent.change(screen.getByLabelText('Turno em que acabou'), { target: { value: '9' } });
     fireEvent.blur(screen.getByLabelText('Turno em que acabou'));
-    fireEvent.change(screen.getByRole('combobox', { name: 'Caio' }), { target: { value: '1' } });
+    pick('Caio', '1º a sair');
     fireEvent.click(submit);
 
     await waitFor(() => expect(lastCall().url).toBe('/api/v1/events/e1/games'));
@@ -77,15 +76,13 @@ describe('GameForm', () => {
   it('trocar para um duelo deixa 2 jogadores; 2HG monta times e vence o time', async () => {
     const lastCall = captureFetch();
     wrap(<GameForm eventId="e1" defaultFormat="commander" players={players} />);
-    const format = screen.getByLabelText('Tipo de jogo');
-
-    fireEvent.change(format, { target: { value: 'modern' } });
+    pick('Tipo de jogo', 'Modern');
     expect(screen.getByText('Selecione 2 jogadores (2 selecionados).')).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: 'Caio' })).not.toBeChecked();
 
-    fireEvent.change(format, { target: { value: 'two_headed_giant' } });
+    pick('Tipo de jogo', 'Two-Headed Giant (2×2)');
     expect(screen.getByText('Selecione 4 jogadores (4 selecionados).')).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: 'Time de Caio' })).toHaveValue('1');
+    expect(selectButton('Time de Caio')).toHaveTextContent('Time 1');
     expect(screen.queryByRole('radio', { name: /Venceu/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('radio', { name: /Time 2/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Registrar partida' }));
@@ -131,7 +128,7 @@ describe('GameEditor', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByLabelText('Tipo de jogo')).toHaveValue('standard');
+    expect(selectButton('Tipo de jogo')).toHaveTextContent('Standard');
     fireEvent.click(screen.getByRole('radio', { name: 'Venceu: Bia' }));
     fireEvent.click(screen.getByRole('button', { name: 'Salvar partida' }));
 

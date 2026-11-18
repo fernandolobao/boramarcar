@@ -8,6 +8,7 @@ import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { NumberField } from './ds/number-field';
 import { Choices } from './ds/choices';
+import { Select } from '@/components/ds/select';
 
 export interface GamePlayerOption {
   userId: string;
@@ -191,21 +192,13 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
       }}
     >
       <div className="max-w-xs">
-        <label className="label" htmlFor={`${id}-format`}>
-          {t('format')}
-        </label>
-        <select
+        <Select
+          label={t('format')}
           id={`${id}-format`}
-          className="select"
-          value={format}
-          onChange={(e) => changeFormat(e.target.value as GameFormat)}
-        >
-          {GAME_FORMATS.map((f) => (
-            <option key={f} value={f}>
-              {tf(f)}
-            </option>
-          ))}
-        </select>
+          value={String(format)}
+          onChange={(v) => changeFormat(v as GameFormat)}
+          options={GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) }))}
+        />
       </div>
 
       <fieldset>
@@ -243,21 +236,20 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
 
                 <div className="flex flex-wrap items-center gap-3 ps-7 sm:ps-0">
                   {isTeams ? (
-                    <select
-                      className="select w-auto"
-                      aria-label={t('teamOf', { name: player.name })}
-                      disabled={!isPlaying}
-                      value={teamBy[player.userId] ?? 1}
-                      onChange={(e) =>
-                        setTeamBy((prev) => ({ ...prev, [player.userId]: Number(e.target.value) }))
+                    <Select
+                      label={t('teamOf', { name: player.name })}
+                      hideLabel
+                      value={String(teamBy[player.userId] ?? 1)}
+                      onChange={(v) =>
+                        setTeamBy((prev) => ({ ...prev, [player.userId]: Number(v) }))
                       }
-                    >
-                      {Array.from({ length: teamCount }, (_, i) => (
-                        <option key={i} value={i + 1}>
-                          {t('teamName', { number: i + 1 })}
-                        </option>
-                      ))}
-                    </select>
+                      disabled={!isPlaying}
+                      className="w-auto"
+                      options={Array.from({ length: teamCount }, (_, i) => ({
+                        value: String(i + 1),
+                        label: t('teamName', { number: i + 1 }),
+                      }))}
+                    />
                   ) : (
                     <label className="flex min-h-6 items-center gap-2 text-sm">
                       <input
@@ -275,22 +267,20 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
 
                 <div className="ps-7 sm:ps-0">
                   {player.decks.length > 0 ? (
-                    <select
-                      className="select"
-                      aria-label={t('deckOf', { name: player.name })}
+                    <Select
+                      label={t('deckOf', { name: player.name })}
+                      hideLabel
+                      value={String(deckBy[player.userId] ?? '')}
+                      onChange={(v) => setDeckBy((prev) => ({ ...prev, [player.userId]: v }))}
                       disabled={!isPlaying}
-                      value={deckBy[player.userId] ?? ''}
-                      onChange={(e) =>
-                        setDeckBy((prev) => ({ ...prev, [player.userId]: e.target.value }))
-                      }
-                    >
-                      <option value="">{t('deck')}: —</option>
-                      {player.decks.map((deck) => (
-                        <option key={deck.id} value={deck.id}>
-                          {deck.name}
-                        </option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: '', label: `${t('deck')}: —` },
+                        ...player.decks.map((deck) => ({
+                          value: String(deck.id),
+                          label: deck.name,
+                        })),
+                      ]}
+                    />
                   ) : (
                     <span className="muted text-sm">{t('noDeck')}</span>
                   )}
@@ -333,22 +323,16 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
         <summary className="cursor-pointer py-1 font-medium">{t('details')}</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div>
-            <label className="label" htmlFor={`${id}-first`}>
-              {t('firstPlayer')}
-            </label>
-            <select
+            <Select
+              label={t('firstPlayer')}
               id={`${id}-first`}
-              className="select"
-              value={playing.includes(firstPlayerId) ? firstPlayerId : ''}
-              onChange={(e) => setFirstPlayerId(e.target.value)}
-            >
-              <option value="">—</option>
-              {ordered.map((p) => (
-                <option key={p.userId} value={p.userId}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+              value={String(playing.includes(firstPlayerId) ? firstPlayerId : '')}
+              onChange={(v) => setFirstPlayerId(v)}
+              options={[
+                { value: '', label: '—' },
+                ...ordered.map((p) => ({ value: String(p.userId), label: p.name })),
+              ]}
+            />
           </div>
           <div>
             <NumberField
@@ -378,25 +362,20 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
               {ordered
                 .filter((p) => isDraw || p.userId !== winner)
                 .map((p) => (
-                  <div key={p.userId} className="flex items-center gap-2">
-                    <label className="min-w-24 text-sm" htmlFor={`${id}-out-${p.userId}`}>
-                      {p.name}
-                    </label>
-                    <select
+                  <div key={p.userId}>
+                    <Select
+                      label={p.name}
                       id={`${id}-out-${p.userId}`}
-                      className="select"
-                      value={eliminatedBy[p.userId] ?? ''}
-                      onChange={(e) =>
-                        setEliminatedBy((prev) => ({ ...prev, [p.userId]: e.target.value }))
-                      }
-                    >
-                      <option value="">{t('notEliminated')}</option>
-                      {Array.from({ length: playing.length - 1 }, (_, i) => (
-                        <option key={i} value={i + 1}>
-                          {t('eliminatedPosition', { position: i + 1 })}
-                        </option>
-                      ))}
-                    </select>
+                      value={String(eliminatedBy[p.userId] ?? '')}
+                      onChange={(v) => setEliminatedBy((prev) => ({ ...prev, [p.userId]: v }))}
+                      options={[
+                        { value: '', label: t('notEliminated') },
+                        ...Array.from({ length: playing.length - 1 }, (_, i) => ({
+                          value: String(i + 1),
+                          label: t('eliminatedPosition', { position: i + 1 }),
+                        })),
+                      ]}
+                    />
                   </div>
                 ))}
             </div>

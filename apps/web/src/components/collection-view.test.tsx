@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { CollectionView, type CollectionViewEntry } from './collection-view';
+import { pick } from '@/test/select';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -127,14 +128,14 @@ describe('CollectionView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Limpar filtros' }));
     expect(status()).toMatch(/^2 linhas/);
 
-    fireEvent.change(screen.getByLabelText('Em decks'), { target: { value: 'yes' } });
+    pick('Em decks', 'Em algum deck');
     expect(screen.getByRole('button', { name: /^Ver e editar Sol Ring/ })).toBeTruthy();
     expect(screen.queryByRole('button', { name: /^Ver e editar Cultivate/ })).toBeNull();
-    fireEvent.change(screen.getByLabelText('Em decks'), { target: { value: 'all' } });
+    pick('Em decks', 'Todas');
 
-    fireEvent.change(screen.getByLabelText('Acabamento'), { target: { value: 'foil' } });
+    pick('Acabamento', 'Só foil');
     expect(status()).toMatch(/^1 linha/);
-    fireEvent.change(screen.getByLabelText('Acabamento'), { target: { value: 'all' } });
+    pick('Acabamento', 'Todos');
 
     fireEvent.click(screen.getByRole('button', { name: 'Feitiço' }));
     fireEvent.click(screen.getByRole('button', { name: '1' }));

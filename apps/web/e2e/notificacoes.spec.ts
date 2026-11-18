@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { createDb } from '@boramarcar/db';
 import { AUTH_STATE } from './support/global-setup';
 import { E2E_IDS } from './support/seed';
+import { pick } from './support/select';
 
 test.describe('central de notificações', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
@@ -66,7 +67,7 @@ test.describe('avisos do ArcanaKin', () => {
     const section = page.getByRole('region', { name: 'Avisos do ArcanaKin' });
     await section.getByLabel('Título').fill(title);
     await section.getByLabel('Texto').fill('Linha 1\nLinha 2');
-    await section.getByLabel('Para quem').selectOption({ label: 'Mesa de Quinta' });
+    await pick(section, 'Para quem', 'Mesa de Quinta');
     await section.getByRole('button', { name: 'Salvar rascunho' }).click();
     const publish = section.getByRole('button', { name: `Publicar (${title})` });
     await publish.click();

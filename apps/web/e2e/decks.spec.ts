@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
 import { E2E_IDS } from './support/seed';
+import { pick } from './support/select';
 
 test.describe('deck', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
@@ -124,7 +125,7 @@ test.describe('deck', () => {
     await page.getByRole('button', { name: 'Colar lista' }).click();
     await page.getByLabel('Lista de cartas').fill('4 Sol Ring\n20 Forest');
     await page.getByLabel('Nome do deck').fill('Teste Modern');
-    await page.getByLabel('Tipo de jogo').selectOption('modern');
+    await pick(page, 'Tipo de jogo', 'Modern');
     await page.getByRole('button', { name: 'Importar deck' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Teste Modern' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Validação · Modern' })).toBeVisible();

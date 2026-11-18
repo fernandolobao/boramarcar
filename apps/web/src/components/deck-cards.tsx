@@ -14,6 +14,7 @@ import { ManaCost } from './mana';
 import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 import { NumberField } from './ds/number-field';
+import { Select } from '@/components/ds/select';
 
 export interface DeckLineView {
   key: string;
@@ -665,21 +666,13 @@ function AddCardForm({ deckId }: { deckId: string }) {
       </h3>
       <CardSearch id={`${id}-name`} label={t('cardName')} value={name} onChange={setName} />
       <div>
-        <label className="label" htmlFor={`${id}-board`}>
-          {t('board')}
-        </label>
-        <select
+        <Select
+          label={t('board')}
           id={`${id}-board`}
-          className="select"
-          value={board}
-          onChange={(e) => setBoard(e.target.value as DeckBoard)}
-        >
-          {DECK_BOARDS.map((b) => (
-            <option key={b} value={b}>
-              {t(`boards.${b}`)}
-            </option>
-          ))}
-        </select>
+          value={String(board)}
+          onChange={(v) => setBoard(v as DeckBoard)}
+          options={[...DECK_BOARDS.map((b) => ({ value: String(b), label: t(`boards.${b}`) }))]}
+        />
       </div>
       <div>
         <NumberField

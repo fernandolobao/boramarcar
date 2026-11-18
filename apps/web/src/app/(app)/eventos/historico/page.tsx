@@ -7,6 +7,7 @@ import { Icon } from '@/components/icons';
 import { getDb } from '@/server/db';
 import { requireUserAndGroup } from '@/server/require-group';
 import { pageMetadata } from '@/server/seo';
+import { Select } from '@/components/ds/select';
 
 const STATUSES = ['finished', 'scheduled', 'cancelled'] as const;
 type Status = (typeof STATUSES)[number];
@@ -93,40 +94,28 @@ export default async function EventHistoryPage({ searchParams }: Props) {
           </p>
         </div>
         <div>
-          <label className="label" htmlFor="historico-situacao">
-            {t('status')}
-          </label>
-          <select
+          <Select
+            label={t('status')}
             id="historico-situacao"
             name="situacao"
-            className="select"
-            defaultValue={status ?? ''}
-          >
-            <option value="">{t('allStatuses')}</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {te(`status.${s}`)}
-              </option>
-            ))}
-          </select>
+            defaultValue={String(status ?? '')}
+            options={[
+              { value: '', label: t('allStatuses') },
+              ...STATUSES.map((s) => ({ value: String(s), label: `${te(`status.${s}`)}` })),
+            ]}
+          />
         </div>
         <div>
-          <label className="label" htmlFor="historico-jogador">
-            {t('player')}
-          </label>
-          <select
+          <Select
+            label={t('player')}
             id="historico-jogador"
             name="jogador"
-            className="select"
-            defaultValue={playerId ?? ''}
-          >
-            <option value="">{t('allPlayers')}</option>
-            {members.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+            defaultValue={String(playerId ?? '')}
+            options={[
+              { value: '', label: t('allPlayers') },
+              ...members.map((m) => ({ value: String(m.userId), label: m.name })),
+            ]}
+          />
         </div>
         <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-1">
           <button className="btn-primary">

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Select } from '@/components/ds/select';
 
 /** Configurações do grupo (1.12 e 2.7). Membros comuns veem os valores, sem editar. */
 export function GroupSettingsForm({
@@ -71,22 +72,14 @@ export function GroupSettingsForm({
           <input {...number('minDurationMinutes', 30, 720)} step={15} />
         </div>
         <div>
-          <label className="label" htmlFor="settings-defaultFormat">
-            {t('defaultFormat')}
-          </label>
-          <select
+          <Select
+            label={t('defaultFormat')}
             id="settings-defaultFormat"
-            className="select"
+            value={String(values.defaultFormat)}
+            onChange={(v) => set('defaultFormat', v as GameFormat)}
             disabled={!canEdit}
-            value={values.defaultFormat}
-            onChange={(e) => set('defaultFormat', e.target.value as GameFormat)}
-          >
-            {GAME_FORMATS.map((f) => (
-              <option key={f} value={f}>
-                {tf(f)}
-              </option>
-            ))}
-          </select>
+            options={GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) }))}
+          />
         </div>
       </div>
       <p id="settings-tableSize-hint" className="muted -mt-2 text-sm">

@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { DeckTools } from './deck-tools';
+import { pick } from '@/test/select';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 afterEach(() => {
@@ -79,7 +80,7 @@ describe('DeckTools', () => {
     expect(open).toHaveAttribute('href', '/decks/d1/imprimir?which=proxies&page=a4');
     expect(link).toHaveAttribute('href', '/api/v1/decks/d1/proxies?which=proxies&page=a4');
     fireEvent.click(screen.getByLabelText('O deck todo'));
-    fireEvent.change(screen.getByLabelText('Papel'), { target: { value: 'letter' } });
+    pick('Papel', 'Carta (Letter)');
     expect(open).toHaveAttribute('href', '/decks/d1/imprimir?which=all&page=letter');
     expect(link).toHaveAttribute('href', '/api/v1/decks/d1/proxies?which=all&page=letter');
     expect(screen.getByLabelText('Só os proxies (3 cartas)')).not.toBeChecked();

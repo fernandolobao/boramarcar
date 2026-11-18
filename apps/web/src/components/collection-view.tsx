@@ -33,6 +33,7 @@ import { FormError, useApiAction } from './use-api-action';
 import { EmptyState } from './empty-state';
 import { NumberField } from './ds/number-field';
 import { Choices } from './ds/choices';
+import { Select } from '@/components/ds/select';
 
 export interface CollectionViewEntry {
   id: string;
@@ -184,21 +185,18 @@ export function CollectionView({
             </p>
             <div className="flex flex-wrap items-end gap-3">
               <div>
-                <label className="label" htmlFor="colecao-ordem">
-                  {t('sort')}
-                </label>
-                <select
+                <Select
+                  label={t('sort')}
                   id="colecao-ordem"
-                  className="select"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as CollectionSort)}
-                >
-                  {COLLECTION_SORTS.map((s) => (
-                    <option key={s} value={s}>
-                      {t(`sorts.${s}`)}
-                    </option>
-                  ))}
-                </select>
+                  value={String(sort)}
+                  onChange={(v) => setSort(v as CollectionSort)}
+                  options={[
+                    ...COLLECTION_SORTS.map((s) => ({
+                      value: String(s),
+                      label: t(`sorts.${s}`),
+                    })),
+                  ]}
+                />
               </div>
               <div role="group" aria-label={t('view')} className="flex gap-1">
                 {(['gallery', 'list'] as const).map((v) => (
@@ -439,42 +437,31 @@ function Filters({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="label" htmlFor={`${id}-set`}>
-              {t('set')}
-            </label>
-            <select
+            <Select
+              label={t('set')}
               id={`${id}-set`}
-              className="select"
-              value={filters.set ?? ''}
-              onChange={(e) => update({ set: e.target.value || undefined })}
-            >
-              <option value="">{t('any')}</option>
-              {facets.sets.map((s) => (
-                <option key={s.code} value={s.code}>
-                  {s.name} ({s.code.toUpperCase()})
-                </option>
-              ))}
-            </select>
+              value={String(filters.set ?? '')}
+              onChange={(v) => update({ set: v || undefined })}
+              options={[
+                { value: '', label: t('any') },
+                ...facets.sets.map((s) => ({
+                  value: String(s.code),
+                  label: `${s.name} (${s.code.toUpperCase()})`,
+                })),
+              ]}
+            />
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-year`}>
-              {t('year')}
-            </label>
-            <select
+            <Select
+              label={t('year')}
               id={`${id}-year`}
-              className="select"
-              value={filters.year ?? ''}
-              onChange={(e) =>
-                update({ year: e.target.value ? Number(e.target.value) : undefined })
-              }
-            >
-              <option value="">{t('any')}</option>
-              {facets.years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
+              value={String(filters.year ?? '')}
+              onChange={(v) => update({ year: v ? Number(v) : undefined })}
+              options={[
+                { value: '', label: t('any') },
+                ...facets.years.map((y) => ({ value: String(y), label: String(y) })),
+              ]}
+            />
           </div>
         </div>
 
@@ -542,52 +529,45 @@ function Filters({
 
         <div className="grid grid-cols-3 gap-3 md:col-span-2 xl:col-span-3">
           <div>
-            <label className="label" htmlFor={`${id}-rarity`}>
-              {t('rarity')}
-            </label>
-            <select
+            <Select
+              label={t('rarity')}
               id={`${id}-rarity`}
-              className="select"
-              value={filters.rarity ?? ''}
-              onChange={(e) => update({ rarity: e.target.value || undefined })}
-            >
-              <option value="">{t('any')}</option>
-              {COLLECTION_RARITIES.map((r) => (
-                <option key={r} value={r}>
-                  {t(`rarities.${r}`)}
-                </option>
-              ))}
-            </select>
+              value={String(filters.rarity ?? '')}
+              onChange={(v) => update({ rarity: v || undefined })}
+              options={[
+                { value: '', label: t('any') },
+                ...COLLECTION_RARITIES.map((r) => ({
+                  value: String(r),
+                  label: t(`rarities.${r}`),
+                })),
+              ]}
+            />
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-foil`}>
-              {t('foil')}
-            </label>
-            <select
+            <Select
+              label={t('foil')}
               id={`${id}-foil`}
-              className="select"
               value={filters.foil ?? 'all'}
-              onChange={(e) => update({ foil: e.target.value as CollectionFilters['foil'] })}
-            >
-              <option value="all">{t('foilAll')}</option>
-              <option value="foil">{t('foilOnly')}</option>
-              <option value="nonfoil">{t('nonFoil')}</option>
-            </select>
+              onChange={(v) => update({ foil: v as CollectionFilters['foil'] })}
+              options={[
+                { value: 'all', label: t('foilAll') },
+                { value: 'foil', label: t('foilOnly') },
+                { value: 'nonfoil', label: t('nonFoil') },
+              ]}
+            />
           </div>
           <div>
-            <label className="label" htmlFor={`${id}-deck`}>
-              {t('inDeck')}
-            </label>
-            <select
+            <Select
+              label={t('inDeck')}
               id={`${id}-deck`}
-              className="select"
               value={filters.inDeck ?? 'all'}
-              onChange={(e) => update({ inDeck: e.target.value as CollectionFilters['inDeck'] })}
-            >
-              <option value="all">{t('inDeckAll')}</option>
-              <option value="yes">{t('inDeckYes')}</option>
-              <option value="no">{t('inDeckNo')}</option>
-            </select>
+              onChange={(v) => update({ inDeck: v as CollectionFilters['inDeck'] })}
+              options={[
+                { value: 'all', label: t('inDeckAll') },
+                { value: 'yes', label: t('inDeckYes') },
+                { value: 'no', label: t('inDeckNo') },
+              ]}
+            />
           </div>
         </div>
       </div>

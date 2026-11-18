@@ -2,6 +2,7 @@ import { fillDate } from './support/fill-date';
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
 import { E2E_IDS } from './support/seed';
+import { pick } from './support/select';
 
 test.describe('ranking e estatísticas', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
@@ -9,7 +10,7 @@ test.describe('ranking e estatísticas', () => {
 
   test('filtra por tipo de jogo pelo formulário e mostra as estatísticas', async ({ page }) => {
     await page.goto('/ranking');
-    await page.getByLabel('Tipo de jogo').selectOption({ label: 'Two-Headed Giant (2×2)' });
+    await pick(page, 'Tipo de jogo', 'Two-Headed Giant (2×2)');
     await page.getByRole('button', { name: 'Filtrar' }).click();
 
     await expect(page).toHaveURL(/tipo=two_headed_giant/);
@@ -45,9 +46,12 @@ test.describe('ranking e estatísticas', () => {
     await page.getByRole('button', { name: 'Criar temporada' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Temporada criada.' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Temporada E2E' })).toBeVisible();
+    // A temporada nova aparece como opção do filtro de período.
+    await page.getByRole('button', { name: /(^|\s)Período$/ }).click();
     await expect(
-      page.getByLabel('Período').locator('option', { hasText: 'Temporada: Temporada E2E' }),
+      page.getByRole('listbox').getByRole('option', { name: 'Temporada: Temporada E2E' }),
     ).toHaveCount(1);
+    await page.keyboard.press('Escape');
   });
 
   test('recordes do grupo: atalho na tela do grupo e os recordes com o encontro', async ({

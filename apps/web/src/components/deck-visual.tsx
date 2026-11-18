@@ -14,6 +14,7 @@ import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { ManaSymbol } from './mana';
 import { Choices } from './ds/choices';
+import { Select } from '@/components/ds/select';
 
 const COLOR_ORDER = ['W', 'U', 'B', 'R', 'G'] as const;
 
@@ -93,21 +94,13 @@ export function DeckSettingsForm({
         />
       </div>
       <div>
-        <label className="label" htmlFor="deck-format">
-          {t('format')}
-        </label>
-        <select
+        <Select
+          label={t('format')}
           id="deck-format"
-          className="select"
-          value={values.format}
-          onChange={(e) => setValues((v) => ({ ...v, format: e.target.value as GameFormat }))}
-        >
-          {GAME_FORMATS.map((f) => (
-            <option key={f} value={f}>
-              {tf(f)}
-            </option>
-          ))}
-        </select>
+          value={String(values.format)}
+          onChange={(f) => setValues((v) => ({ ...v, format: f as GameFormat }))}
+          options={GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) }))}
+        />
       </div>
       <Choices
         className="sm:col-span-3"

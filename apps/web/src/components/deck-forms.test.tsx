@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { DeckImportForm } from './deck-forms';
+import { pick, selectButton } from '@/test/select';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push, refresh: vi.fn() }) }));
@@ -108,9 +109,8 @@ describe('DeckImportForm', () => {
     fireEvent.change(screen.getByLabelText('Link do Archidekt ou Moxfield'), {
       target: { value: 'https://archidekt.com/decks/1' },
     });
-    const select = screen.getByLabelText('Tipo de jogo');
-    expect(select).toHaveValue('auto');
-    fireEvent.change(select, { target: { value: 'modern' } });
+    expect(selectButton('Tipo de jogo')).toHaveTextContent(/Detectar/);
+    pick('Tipo de jogo', 'Modern');
     fireEvent.click(screen.getByRole('button', { name: 'Importar deck' }));
     await waitFor(() => expect(push).toHaveBeenCalledWith('/decks/d1'));
     expect(JSON.parse(String(fetchMock.mock.calls[0]![1]!.body))).toMatchObject({
