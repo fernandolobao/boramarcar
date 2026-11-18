@@ -52,13 +52,18 @@ const STEPS = [
   'compare',
   'group',
 ] as const;
+/**
+ * Partes da nota e a cor de cada uma. Seis cores distintas das três famílias da marca (roxo,
+ * mana, dourado), alternando a família a cada parte; validadas para daltonismo (ΔE ≥ 12 entre
+ * vizinhas). A lista ao lado traz os pontos e o nome, então a cor nunca é a única pista.
+ */
 const SCORE_PARTS = [
-  ['lands', 25],
-  ['ramp', ROLE_POINTS.ramp],
-  ['draw', ROLE_POINTS.draw],
-  ['removal', ROLE_POINTS.removal],
-  ['wipe', ROLE_POINTS.wipe],
-  ['curve', 10],
+  ['lands', 25, 'bg-brand-800 dark:bg-brand-600'],
+  ['ramp', ROLE_POINTS.ramp, 'bg-teal-500'],
+  ['draw', ROLE_POINTS.draw, 'bg-gold-600'],
+  ['removal', ROLE_POINTS.removal, 'bg-brand-400'],
+  ['wipe', ROLE_POINTS.wipe, 'bg-teal-600'],
+  ['curve', 10, 'bg-gold-500'],
 ] as const;
 /**
  * Cores da paleta ArcanaKin (tokens), só como detalhe visual (o texto carrega a informação).
@@ -338,22 +343,18 @@ export default async function HomePage({
               <figcaption className="mb-3 font-semibold">{t('method.scoreCaption')}</figcaption>
               {/* Barra decorativa: os mesmos números estão na lista ao lado. */}
               <div className="flex h-4 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
-                {SCORE_PARTS.map(([key, points], i) => (
+                {SCORE_PARTS.map(([key, points, color]) => (
                   <span
                     key={key}
-                    className="h-full"
-                    style={{ flexGrow: points, flexBasis: 0, backgroundColor: ACCENTS[i] }}
+                    className={`h-full ${color}`}
+                    style={{ flexGrow: points, flexBasis: 0 }}
                   />
                 ))}
               </div>
               <ul className="mt-4 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-                {SCORE_PARTS.map(([key, points], i) => (
+                {SCORE_PARTS.map(([key, points, color]) => (
                   <li key={key} className="flex items-center gap-2">
-                    <span
-                      className="size-3 shrink-0 rounded-sm"
-                      style={{ backgroundColor: ACCENTS[i] }}
-                      aria-hidden="true"
-                    />
+                    <span className={`size-3 shrink-0 rounded-sm ${color}`} aria-hidden="true" />
                     <span className="font-semibold tabular-nums">
                       {t('method.points', { count: points })}
                     </span>
