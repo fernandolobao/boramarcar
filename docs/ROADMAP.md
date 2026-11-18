@@ -185,6 +185,30 @@ Ciclo principal: **convite → disponibilidade → encontro → partida registra
 
 **Decidido — escopo:** não expandir agora para marketplace, scanner de coleção (5.9) ou rede social genérica.
 
+## Fase 9 — Torneios do grupo (depois do beta)
+
+Desenho e pesquisa em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design.md` (aguardando aprovação das 4 decisões listadas lá). Aproveita encontros, partidas, ranking, conquistas e notificações; não substitui o Wizards EventLink em eventos sancionados.
+
+| #   | Item                                                                                                                                                                                     | Tamanho | Status         |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------- |
+| 9.1 | **Pods de Commander**: suíço em pods de 4 (3 quando não fecha), pontuação configurável, resultados lançados pela mesa e confirmados pelo organizador, página do torneio no site e no app | G       | Desenho pronto |
+| 9.2 | **Top cut e conquistas**: top 4/10/16 em pods com cabeças de chave misturadas; conquistas de torneio; notificações de rodada e mesa                                                      | M       |                |
+| 9.3 | **Suíço 1 contra 1** com desempates do MTR (OMW%, GW%, OGW%, piso de 33%) e top 8                                                                                                        | M       |                |
+| 9.4 | **Eliminação simples e dupla, todos contra todos**                                                                                                                                       | M       |                |
+| 9.5 | **Página pública compartilhável** e linha do tempo ao vivo                                                                                                                               | P       |                |
+
+## Fase 10 — Perfis de loja (fase futura)
+
+Mesmo documento de desenho. Loja criada por um admin do ArcanaKin, com convite por e-mail; eventos e torneios com o motor da Fase 9; descoberta por cidade. Organizar e participar nunca dependem de pagamento.
+
+| #    | Item                                                                                                                     | Tamanho | Status |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | ------- | ------ |
+| 10.1 | **Perfil de loja** criado por admin, convite por e-mail, equipe da loja, selo de verificada                              | M       |        |
+| 10.2 | **Eventos da loja**: vagas, inscrição pelo app ou código no balcão, check-in, premiação em texto, acompanhamento ao vivo | G       |        |
+| 10.3 | **Descoberta por cidade**: lojas e eventos perto de você, com "adicionar à agenda"                                       | M       |        |
+| 10.4 | **Seguidores e avisos da loja** (só para quem segue)                                                                     | P       |        |
+| 10.5 | **Piloto com 1–3 lojas** (o 8.9)                                                                                         | —       |        |
+
 ## Transversal (contínuo)
 
 | Item                                                                                                                                                                                                                                                                                                                  | Tamanho |
