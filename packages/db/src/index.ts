@@ -27,3 +27,4 @@ export * from './services/privacy';
 export * from './services/external';
 export * from './services/collection';
 export * from './services/integration';
+export * from './services/tournaments';

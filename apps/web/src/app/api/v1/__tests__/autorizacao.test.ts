@@ -21,6 +21,11 @@ import {
   recordGame,
   saveImportedDeck,
   updateDeck,
+  addEntrant,
+  createTournament,
+  getTournament,
+  reportTable,
+  startTournament,
 } from '@boramarcar/db';
 import { createTestDb, createTestUser } from '@boramarcar/db/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -78,6 +83,14 @@ const r = {
   announcements: await import('../admin/announcements/route'),
   announcement: await import('../admin/announcements/[announcementId]/route'),
   publish: await import('../admin/announcements/[announcementId]/publish/route'),
+  groupTournaments: await import('../groups/[groupId]/tournaments/route'),
+  eventTournaments: await import('../events/[eventId]/tournaments/route'),
+  tournament: await import('../tournaments/[tournamentId]/route'),
+  entrants: await import('../tournaments/[tournamentId]/entrants/route'),
+  entrant: await import('../tournaments/[tournamentId]/entrants/[entrantId]/route'),
+  start: await import('../tournaments/[tournamentId]/start/route'),
+  next: await import('../tournaments/[tournamentId]/next/route'),
+  tournamentTable: await import('../tournaments/[tournamentId]/tables/[tableId]/route'),
 };
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
@@ -238,6 +251,29 @@ beforeAll(async () => {
     },
   ]);
   ids.notification = (await listNotifications(db, { userId: ana.id }))[0]!.id;
+  // Torneio da Ana (Ana e Bia inscritas), já rodando, com a mesa registrada pela Ana.
+  const tournament = await createTournament(db, {
+    eventId: event.id,
+    userId: ana.id,
+    name: 'Torneio Secreto',
+    format: 'standard',
+    bestOf: 1,
+  });
+  ids.tournament = tournament.id;
+  ids.anaEntrant = (
+    await addEntrant(db, { tournamentId: tournament.id, userId: ana.id, memberIds: [ana.id] })
+  ).id;
+  await addEntrant(db, { tournamentId: tournament.id, userId: ana.id, memberIds: [bia.id] });
+  await startTournament(db, { tournamentId: tournament.id, userId: ana.id });
+  const tview = await getTournament(db, { tournamentId: tournament.id, userId: ana.id });
+  const ttable = tview.rounds[0]!.tables[0]!;
+  ids.tournamentTable = ttable.id;
+  await reportTable(db, {
+    tableId: ttable.id,
+    userId: ana.id,
+    gameWins: { [ids.anaEntrant]: 1 },
+    gameDraws: 0,
+  });
   ids.announcement = (
     await createAnnouncement(db, {
       title: 'Aviso secret',
@@ -326,6 +362,58 @@ const outsiderCases: Case[] = [
   ],
   ['GET presença do grupo', r.attendance.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
 
+  [
+    'GET torneios do grupo',
+    r.groupTournaments.GET as Handler,
+    'GET',
+    () => ({ groupId: ids.group! }),
+  ],
+  [
+    'POST torneio no encontro',
+    r.eventTournaments.POST as Handler,
+    'POST',
+    () => ({ eventId: ids.event! }),
+    { name: 'Intruso', format: 'commander' },
+  ],
+  ['GET torneio', r.tournament.GET as Handler, 'GET', () => ({ tournamentId: ids.tournament! })],
+  [
+    'DELETE torneio',
+    r.tournament.DELETE as Handler,
+    'DELETE',
+    () => ({ tournamentId: ids.tournament! }),
+  ],
+  [
+    'POST inscrição no torneio',
+    r.entrants.POST as Handler,
+    'POST',
+    () => ({ tournamentId: ids.tournament! }),
+    () => ({ memberIds: [otto.id] }),
+  ],
+  [
+    'DELETE inscrição no torneio',
+    r.entrant.DELETE as Handler,
+    'DELETE',
+    () => ({ tournamentId: ids.tournament!, entrantId: ids.anaEntrant! }),
+  ],
+  [
+    'POST começar torneio',
+    r.start.POST as Handler,
+    'POST',
+    () => ({ tournamentId: ids.tournament! }),
+  ],
+  [
+    'POST próxima rodada',
+    r.next.POST as Handler,
+    'POST',
+    () => ({ tournamentId: ids.tournament! }),
+  ],
+  [
+    'PUT resultado da mesa',
+    r.tournamentTable.PUT as Handler,
+    'PUT',
+    () => ({ tournamentId: ids.tournament!, tableId: ids.tournamentTable! }),
+    () => ({ gameWins: { [ids.anaEntrant!]: 1 }, gameDraws: 0 }),
+  ],
   ['GET grupo: faixa do beta', r.beta.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: temporadas', r.seasons.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: configurações', r.settings.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
@@ -563,6 +651,52 @@ const outsiderCases: Case[] = [
 
 /** O que só a dona (ou admin) pode fazer, visto por um membro comum do mesmo grupo (Bia). */
 const memberCases: Case[] = [
+  [
+    'POST torneio no encontro (membro comum)',
+    r.eventTournaments.POST as Handler,
+    'POST',
+    () => ({ eventId: ids.event! }),
+    { name: 'Da Bia', format: 'commander' },
+  ],
+  [
+    'DELETE torneio da Ana',
+    r.tournament.DELETE as Handler,
+    'DELETE',
+    () => ({ tournamentId: ids.tournament! }),
+  ],
+  [
+    'POST inscrever a Ana',
+    r.entrants.POST as Handler,
+    'POST',
+    () => ({ tournamentId: ids.tournament! }),
+    () => ({ memberIds: [ana.id] }),
+  ],
+  [
+    'DELETE inscrição da Ana',
+    r.entrant.DELETE as Handler,
+    'DELETE',
+    () => ({ tournamentId: ids.tournament!, entrantId: ids.anaEntrant! }),
+  ],
+  [
+    'POST começar torneio da Ana',
+    r.start.POST as Handler,
+    'POST',
+    () => ({ tournamentId: ids.tournament! }),
+  ],
+  [
+    'POST próxima rodada do torneio da Ana',
+    r.next.POST as Handler,
+    'POST',
+    () => ({ tournamentId: ids.tournament! }),
+  ],
+  [
+    'PUT corrigir resultado já registrado',
+    r.tournamentTable.PUT as Handler,
+    'PUT',
+    () => ({ tournamentId: ids.tournament!, tableId: ids.tournamentTable! }),
+    () => ({ gameWins: {}, gameDraws: 1 }),
+  ],
+
   [
     'POST chamar para o próximo',
     r.nudge.POST as Handler,
