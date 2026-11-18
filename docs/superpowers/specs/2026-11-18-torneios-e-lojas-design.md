@@ -1,6 +1,6 @@
 # Torneios do grupo e perfis de loja — pesquisa e desenho
 
-Data: 18/11/2026. Situação: **proposta para aprovação** (nada construído). Fases no roadmap: 9 (torneios do grupo) e 10 (lojas).
+Data: 18/11/2026. Situação: **aprovado em 18/11/2026, com a correção de 19/11/2026 (qualquer formato, ver abaixo)**. Fases no roadmap: 9 (torneios do grupo) e 10 (lojas).
 
 ## Por que
 
@@ -82,6 +82,31 @@ Aproveita o que já existe: grupo, encontros, partidas, ranking, conquistas e no
 - **9.3** Suíço 1 contra 1 com desempates do MTR.
 - **9.4** Eliminação e todos contra todos.
 - **9.5** Página pública compartilhável e linha do tempo ao vivo.
+
+## Correção de 19/11/2026: qualquer formato
+
+O dono do projeto pediu que o torneio **suporte qualquer formato desde a primeira entrega**, não só Commander. O motor passa a ser um só, guiado pelas regras de cada formato que já existem no núcleo (`FORMAT_RULES`):
+
+| Estrutura do formato | Formatos                                                          | Mesa do torneio                                                            | Partidas por rodada                     |
+| -------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| Todos contra todos   | Commander, Brawl, Oathbreaker, Outro                              | **pod de 4** (de 3 quando a conta não fecha; com 5 inscritos, um pod de 5) | 1 partida por pod                       |
+| Um contra um         | Standard, Pioneer, Modern, Legacy, Vintage, Pauper, Draft, Selado | **par** (número ímpar: um bye)                                             | **melhor de 3** (padrão) ou melhor de 1 |
+| Times                | Two-Headed Giant                                                  | **par de duplas**: cada inscrição é uma dupla                              | melhor de 3 (padrão) ou melhor de 1     |
+
+**Regras comuns (todas as estruturas):**
+
+- **Suíço:** 1ª rodada sorteada; as seguintes juntam quem tem pontos parecidos, evitando repetir adversários; rodadas recomendadas pelo número de inscrições (no mínimo 3).
+- **Pontos por rodada** (configuráveis, padrão 3/1/0 como o ranking do grupo): vitória, empate e derrota. O **bye** vale uma vitória (no um contra um: 2 a 0 em jogos).
+- **Desempates** (MTR, piso de 33%, bye fora das contas): pontos, % de vitórias dos oponentes (OMW%), % de jogos vencidos (GW%) e % de jogos vencidos dos oponentes (OGW%). No pod, "jogos" e "rodadas" coincidem (uma partida por rodada) e os oponentes são os outros do pod.
+- **Resultado** pela mesa (modo mesa ou formulário rápido), como decidido em 18/11. No um contra um, informa-se o placar em jogos (2–0, 2–1, 1–1…).
+- **Ranking do grupo:** cada jogo disputado vira uma partida do grupo (se o torneio conta no ranking), no formato do torneio.
+
+**Entregas, refeitas:**
+
+- **9.1** Torneio suíço em qualquer formato (pods, um contra um e duplas), com desempates do MTR, do núcleo às telas no site e no app, e o resultado pelo modo mesa. Em partes: (a) núcleo puro e testado; (b) banco, API e o resultado virando partida do grupo; (c) telas do site; (d) telas do app e o modo mesa.
+- **9.2** Top cut (top 4/8 em eliminação simples no um contra um; top 4/10/16 em pods) e conquistas de torneio.
+- **9.3** (absorvido pelo 9.1: o suíço 1 contra 1 e os desempates do MTR entram já na primeira entrega).
+- **9.4** e **9.5** sem mudança.
 
 ## Perfis de loja (Fase 10, depois do beta e da Fase 9)
 

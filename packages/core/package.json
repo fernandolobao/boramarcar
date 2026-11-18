@@ -24,6 +24,7 @@
     "./beta": "./src/beta/index.ts",
     "./help": "./src/help/index.ts",
     "./integration": "./src/integration/index.ts",
+    "./tournaments": "./src/tournaments/index.ts",
     "./notifications": "./src/notifications/index.ts",
     "./changelog": "./src/changelog/index.ts"
   },
