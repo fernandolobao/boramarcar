@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -49,9 +50,19 @@ export function AdminUsers({ users }: { users: AdminUserRow[] }) {
         {shown.map((u) => (
           <li key={u.id} className="grid gap-1 py-3 sm:grid-cols-[2fr_3fr] sm:gap-4">
             <div className="min-w-0">
-              <p className="font-semibold break-words">{u.name}</p>
+              <p className="font-semibold break-words">
+                <Link
+                  href={`/jogadores/${u.id}`}
+                  className="inline-flex min-h-6 items-center underline decoration-fg-muted/60 underline-offset-2 hover:decoration-current"
+                >
+                  {u.name}
+                </Link>
+              </p>
               <p className="muted text-sm break-all" data-cs-mask>
-                <a href={`mailto:${u.email}`} className="underline underline-offset-2">
+                <a
+                  href={`mailto:${u.email}`}
+                  className="inline-flex min-h-6 items-center underline underline-offset-2"
+                >
                   {u.email}
                 </a>
                 {!u.emailVerified && (

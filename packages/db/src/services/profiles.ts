@@ -81,7 +81,16 @@ async function listSeasonTitles(db: Database, userId: string, now: Date): Promis
  */
 export async function getPlayerProfile(
   db: Database,
-  input: { userId: string; viewerId: string; now?: Date },
+  input: {
+    userId: string;
+    viewerId: string;
+    now?: Date;
+    /**
+     * Admin da plataforma (`ADMIN_EMAILS`): vê o perfil de qualquer pessoa, com todos os grupos
+     * dela. Os decks seguem a visibilidade de sempre (privados e de grupo continuam fechados).
+     */
+    viewerIsAdmin?: boolean;
+  },
 ) {
   const [person] = await db
     .select({ id: user.id, name: user.name, image: user.image, email: user.email })
@@ -90,7 +99,8 @@ export async function getPlayerProfile(
     .limit(1);
   if (!person) throw new DomainError('not_found', 'Jogador não encontrado');
   const isSelf = input.userId === input.viewerId;
-  if (!isSelf && !(await sharesGroup(db, input.userId, input.viewerId))) {
+  const admin = Boolean(input.viewerIsAdmin);
+  if (!isSelf && !admin && !(await sharesGroup(db, input.userId, input.viewerId))) {
     // Mesmo erro de "não existe": não revela quem usa o app.
     throw new DomainError('not_found', 'Jogador não encontrado');
   }
@@ -99,7 +109,7 @@ export async function getPlayerProfile(
     listPlayerGames(db, input.userId),
     listSeasonTitles(db, input.userId, input.now ?? new Date()),
     listDecksVisibleTo(db, { ownerId: input.userId, viewerId: input.viewerId }),
-    isSelf
+    isSelf || admin
       ? Promise.resolve(null)
       : db
           .select({ groupId: groupMembers.groupId })
