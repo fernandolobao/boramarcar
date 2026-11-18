@@ -17,6 +17,7 @@ export * from './services/beta';
 export * from './services/recap';
 export * from './services/stats';
 export * from './services/profiles';
+export * from './services/achievements';
 export * from './services/privacy';
 export * from './services/external';
 export * from './services/collection';

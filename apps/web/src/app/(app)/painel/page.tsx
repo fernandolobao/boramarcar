@@ -5,6 +5,7 @@ import {
   getGroupRanking,
   getGroupStats,
   listEvents,
+  listNewAchievements,
   listPartnerHints,
   suggestGameWindows,
   TABLE_SIZE,
@@ -24,6 +25,7 @@ import { EmptyState } from '@/components/empty-state';
 import { BETA_WEEKS } from '@boramarcar/core';
 import { BetaBanner } from '@/components/beta-banner';
 import { FirstSteps } from '@/components/first-steps';
+import { NewAchievements } from '@/components/new-achievements';
 
 export const generateMetadata = navMetadata('dashboard');
 
@@ -124,7 +126,7 @@ export default async function DashboardPage() {
   const db = getDb();
   const now = new Date();
   const timeZone = await getTimeZone();
-  const [events, windows, ranking, stats, onboarding, beta, partners] = await Promise.all([
+  const [events, windows, ranking, stats, onboarding, beta, partners, fresh] = await Promise.all([
     listEvents(db, {
       groupId: group.id,
       userId: user.id,
@@ -143,6 +145,7 @@ export default async function DashboardPage() {
     getOnboardingChecklist(db, { userId: user.id, groupId: group.id, now }),
     getBetaBanner(db, { userId: user.id, groupId: group.id, now }),
     listPartnerHints(db, { groupId: group.id, userId: user.id, now }),
+    listNewAchievements(db, { userId: user.id, now }),
   ]);
   const showFirstSteps = !onboarding.dismissed && onboarding.completed < onboarding.steps.length;
   const next = events[0]
@@ -169,6 +172,13 @@ export default async function DashboardPage() {
 
   return (
     <>
+      {/* Conquistas ganhas desde a última visita (abre sozinha). */}
+      <NewAchievements
+        achievements={fresh.map((a) => ({
+          id: a.id,
+          unlockedAt: a.unlockedAt?.toISOString() ?? null,
+        }))}
+      />
       {/* Destaque: saudação e o próximo encontro. */}
       <section
         aria-labelledby="painel-titulo"

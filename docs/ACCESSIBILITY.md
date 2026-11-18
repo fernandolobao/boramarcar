@@ -452,3 +452,9 @@ sem rolagem horizontal em 320px.
 ## Compartilhar deck público (18/11/2026)
 
 - "Compartilhar deck" é um `<details>` (fechado por padrão), só em decks públicos. Dentro: QR Code (`role="img"` com nome "QR Code do deck …") com "Baixar QR Code" logo abaixo, o link num `CopyField` com "Copiar link" ao lado, e WhatsApp/menu do celular. Conferido em 360 px (tema escuro) e 1100 px (claro), sem rolagem horizontal; componente no `deck-share.test.tsx` com axe.
+
+## Janela de conquistas novas (18/11/2026)
+
+- Site: `<dialog>` modal com `aria-labelledby` no título ("2 conquistas novas!"), aberto com `showModal()` (o foco vai para dentro; Esc e clique no fundo fecham, e o foco do navegador volta à página). Ícones decorativos; nome, descrição e data em texto. axe no `new-achievements.test.tsx`.
+- App: `Modal` transparente com `accessibilityViewIsModal`, título como cabeçalho, cada conquista como um item acessível e o botão "Legal!"; o "voltar" do Android também fecha.
+- Nos E2E, o seed marca todas as conquistas como vistas para a janela não cobrir outras telas; ela tem o próprio teste.

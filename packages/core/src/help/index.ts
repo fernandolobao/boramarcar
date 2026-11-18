@@ -266,6 +266,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'O que são as conquistas?',
             intro: [
               'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano e outros. Abra o perfil (toque no seu nome no ranking) para ver o progresso de cada uma e o que falta.',
+              'Quando você ganha conquistas novas, uma janela mostra todas juntas na próxima vez que abrir o painel ou o seu perfil, mesmo que tenham vindo de várias partidas.',
             ],
           },
           {
@@ -561,6 +562,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'What are achievements?',
             intro: [
               'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year and more. Open a profile (tap a name in the ranking) to see the progress of each one and what is left.',
+              'When you earn new achievements, a window shows them all together the next time you open the dashboard or your profile, even if they came from several games.',
             ],
           },
           {

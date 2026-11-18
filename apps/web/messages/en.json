@@ -1997,5 +1997,11 @@
     "qrCode": "QR code for the deck {deck}",
     "hint": "This deck is public: anyone with the link sees the list and the analysis (people without an account create one first).",
     "text": "Check out the deck {deck} on ArcanaKin: {url}"
+  },
+  "newAchievements": {
+    "title": "{count, plural, =1 {New achievement!} other {# new achievements!}}",
+    "intro": "Since your last visit:",
+    "close": "Nice!",
+    "viewAll": "See all on your profile"
   }
 }
