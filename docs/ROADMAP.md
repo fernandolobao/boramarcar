@@ -185,9 +185,9 @@ Ciclo principal: **convite → disponibilidade → encontro → partida registra
 
 **Decidido — escopo:** não expandir agora para marketplace, scanner de coleção (5.9) ou rede social genérica.
 
-## Fase 9 — Torneios do grupo (depois do beta)
+## Fase 9 — Torneios do grupo (antes do beta de fevereiro)
 
-Desenho e pesquisa em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design.md` (aguardando aprovação das 4 decisões listadas lá). Aproveita encontros, partidas, ranking, conquistas e notificações; não substitui o Wizards EventLink em eventos sancionados.
+Desenho e pesquisa em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design.md` (decisões tomadas em 18/11/2026; ver "Rumo ao beta"). Aproveita encontros, partidas, ranking, conquistas e notificações; não substitui o Wizards EventLink em eventos sancionados.
 
 | #   | Item                                                                                                                                                                                     | Tamanho | Status         |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------- |
@@ -197,9 +197,9 @@ Desenho e pesquisa em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design
 | 9.4 | **Eliminação simples e dupla, todos contra todos**                                                                                                                                       | M       |                |
 | 9.5 | **Página pública compartilhável** e linha do tempo ao vivo                                                                                                                               | P       |                |
 
-## Fase 10 — Perfis de loja (fase futura)
+## Fase 10 — Perfis de loja (10.1 e 10.2 antes do beta)
 
-Mesmo documento de desenho. Loja criada por um admin do ArcanaKin, com convite por e-mail; eventos e torneios com o motor da Fase 9; descoberta por cidade. Organizar e participar nunca dependem de pagamento.
+Mesmo documento de desenho. O beta de fevereiro precisa que lojas criem torneios (10.1 e 10.2); descoberta e seguidores ficam para depois. Loja criada por um admin do ArcanaKin, com convite por e-mail; eventos e torneios com o motor da Fase 9; descoberta por cidade. Organizar e participar nunca dependem de pagamento.
 
 | #    | Item                                                                                                                     | Tamanho | Status |
 | ---- | ------------------------------------------------------------------------------------------------------------------------ | ------- | ------ |
@@ -229,22 +229,24 @@ Mesmo documento de desenho. Loja criada por um admin do ArcanaKin, com convite p
 
 ---
 
-## Rumo ao beta (revisado em 15/11/2026)
+## Rumo ao beta (revisado em 18/11/2026: beta em fevereiro de 2027)
 
-Feito até aqui: agenda, partidas e ranking, decks e coleção, análise, app com paridade com o site (5.10), rebranding, modo mesa no nível do Lotus, integração do grupo (entrega 1), design system (fase 1) e a página inicial com capturas. O beta assistido (8.5) começa quando os itens abaixo estiverem prontos, nesta ordem:
+Feito até aqui: agenda, partidas e ranking, decks e coleção, análise (com nota para 60 e 40 cartas), app com paridade com o site, rebranding, modo mesa, onboarding (guia, dicas, avisos no app, ativação), design system (fases 1 e 2), alertas (8.7), medição do registro pós-jogo (8.8), integração do grupo (entrega 1), conquistas (26) com a janela de conquistas novas, central de notificações (partidas, conquistas, pódio, avisos do ArcanaKin) e as novidades da semana com aprovação de admin.
 
-1. **Guia do primeiro acesso (7.1)** — em andamento: site pronto, falta o app.
-2. **Avisos no app na hora útil (7.5)**: oferecer as notificações ao confirmar presença.
-3. **Dicas nas telas densas (7.4)** e **contagens de ativação (7.7)**.
-4. **Datas e horários do design system (fase 2)**: `DateField`/`TimeField` no site e no app, no lugar dos campos nativos (o do iOS destoa e já deu bug no iPad).
-5. **Alertas (8.7)**: erro novo e pico de erros no Sentry; aviso quando um cron (lembretes, resumo, cache do Scryfall) falhar.
-6. **Medir o registro pós-jogo (8.8)**, para o beta já sair medindo.
-7. **Pendências conhecidas** (abaixo) corrigidas.
-8. **Ensaio do beta**: roteiro de teste em aparelhos reais (iPhone, iPad, Android e computador) do começo ao fim — conta nova → guia → convite → disponibilidade → encontro → modo mesa → registrar → resumo da noite. Eu preparo o roteiro e corrijo o que aparecer; o ensaio é com o seu grupo.
-9. **App para os testadores**: build de pré-lançamento pelo EAS (TestFlight e teste interno do Google Play). Precisa das contas de desenvolvedor da Apple e do Google (você). A publicação aberta nas lojas (5.7) fica para depois do beta.
-10. **Início do beta (8.5)**: 5 grupos por 8 semanas, com o `/admin` decidindo o início.
+O beta assistido (8.5) começa em **fevereiro de 2027** e **precisa que lojas possam criar torneios**. Até lá, nesta ordem:
 
-**Durante o beta:** integração do grupo, entregas 2 e 3 (8.11, 8.12); design system, fase 3; nomes internos (6.6); o que o feedback (8.4) e as métricas (8.3) apontarem.
+1. **Pendências conhecidas** (abaixo), incluindo o **Sentry no app**.
+2. **Marcar notificação como lida**, uma a uma (e "marcar todas").
+3. **Integração do grupo, entregas 2 e 3** (8.11, 8.12).
+4. **Design system, fase 3** (Select, Checkbox/Switch, Stat).
+5. **Torneios do grupo (Fase 9)** e **perfis de loja com torneios (Fase 10, 10.1 e 10.2)** — desenho em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design.md`.
+6. **Ensaio do beta** em aparelhos reais (roteiro meu; ensaio com o seu grupo), incluindo um torneio de loja de ponta a ponta.
+7. **Dezembro: contas de desenvolvedor da Apple e do Google** (você) e, com elas, o **build de pré-lançamento** pelo EAS (TestFlight e teste interno do Google Play). Contas pessoais do Google exigem 12 testadores por 14 dias antes da publicação.
+8. **Início do beta (8.5)** em fevereiro.
+
+**Depois do beta:** nomes internos (6.6), publicação aberta nas lojas (5.7), descoberta de lojas por cidade e seguidores (10.3, 10.4).
+
+**Decidido (18/11/2026), torneios:** pods de Commander com pontuação padrão 3/1/0 (o organizador muda); partidas do torneio contam no ranking do grupo por padrão (com opção de desligar); resultados lançados pelos jogadores da mesa e confirmados pelo organizador; torneios abertos a quem não é do grupo chegam com as lojas (Fase 10).
 
 ### Pendências conhecidas
 
