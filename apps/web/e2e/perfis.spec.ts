@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
+import { createDb } from '@boramarcar/db';
 import { E2E_IDS } from './support/seed';
 
 test.describe('perfis e conquistas', () => {
@@ -44,5 +45,28 @@ test.describe('perfis e conquistas', () => {
     await page.getByRole('radio', { name: /Grupo/ }).check({ force: true });
     await page.getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Deck salvo.')).toBeVisible();
+  });
+
+  test('janela de conquistas novas no painel: aparece uma vez e some depois de vista', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
+    // "Esquece" que a Ana viu a primeira vitória.
+    const { pool } = createDb(process.env.E2E_DATABASE_URL!, { max: 1 });
+    await pool.query('delete from onboarding_steps where user_id = $1 and step = $2', [
+      'e2e-ana',
+      'achievement:first_win',
+    ]);
+    await pool.end();
+
+    await page.goto('/painel');
+    const dialog = page.getByRole('dialog', { name: 'Conquista nova!' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText('Primeira vitória')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Legal!' }).click();
+    await expect(dialog).toBeHidden();
+    await page.reload();
+    await expect(page.locator('h1').first()).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Conquista nova!' })).toHaveCount(0);
   });
 });

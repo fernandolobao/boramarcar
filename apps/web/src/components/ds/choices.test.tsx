@@ -53,4 +53,22 @@ describe('Choices (site)', () => {
     const result = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } });
     expect(result.violations.map((v) => v.id)).toEqual([]);
   });
+
+  it('cartões: 3 opções curtas ficam numa linha só (a partir de telas médias)', () => {
+    const three = [
+      { value: 'a', label: 'Automático' },
+      { value: 'b', label: 'Claro' },
+      { value: 'c', label: 'Escuro' },
+    ] as const;
+    const { container } = render(
+      <Choices<V> label="Tema" variant="cards" value="a" options={three} onChange={() => {}} />,
+    );
+    expect(container.querySelector('.sm\\:grid-cols-3')).not.toBeNull();
+    cleanup();
+    // Com descrição em cada opção (ex.: vencedor na mesa), continuam em duas colunas.
+    const { container: c2 } = render(
+      <Choices<V> label="Tipo" variant="cards" value="a" options={options} onChange={() => {}} />,
+    );
+    expect(c2.querySelector('.sm\\:grid-cols-3')).toBeNull();
+  });
 });

@@ -462,3 +462,9 @@ sem rolagem horizontal em 320px.
 
 - Site: o sino no topo é um link com nome que inclui o número ("Notificações: 2 novas", também como `title`; com dois-pontos, e não parênteses, para o axe reconhecer o número visível dentro do nome); o número visível é decorativo (`aria-hidden`). A página `/notificacoes` tem `h1`, lista de links com o texto completo, a data em `<time>` e o selo "Nova" em texto (não só cor). Componente com axe em `notifications.test.tsx`; página no E2E de acessibilidade.
 - App: o sino no cabeçalho do painel é um botão com o mesmo nome; cada notificação é um botão com o texto, a data e "Nova" no nome acessível.
+
+## Janela de conquistas novas (18/11/2026)
+
+- Site: `<dialog>` modal com `aria-labelledby` no título ("2 conquistas novas!"), aberto com `showModal()` (o foco vai para dentro; Esc e clique no fundo fecham, e o foco do navegador volta à página). Ícones decorativos; nome, descrição e data em texto. axe no `new-achievements.test.tsx`.
+- App: `Modal` transparente com `accessibilityViewIsModal`, título como cabeçalho, cada conquista como um item acessível e o botão "Legal!"; o "voltar" do Android também fecha.
+- Nos E2E, o seed marca todas as conquistas como vistas para a janela não cobrir outras telas; ela tem o próprio teste.

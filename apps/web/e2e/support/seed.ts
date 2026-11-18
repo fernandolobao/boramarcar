@@ -3,6 +3,7 @@
  * encontros, partidas e um deck) e gera a sessão de um usuário logado.
  * Usado pelos testes E2E autenticados (acessibilidade e fluxos).
  */
+import { ACHIEVEMENT_IDS } from '@boramarcar/core';
 import { createHmac } from 'node:crypto';
 import { createDb, schema, syncCollectionFromDecks } from '@boramarcar/db';
 
@@ -271,6 +272,16 @@ export async function seedE2E(databaseUrl: string) {
         },
       },
     ]);
+    // Todas as conquistas contam como vistas: a janela de conquistas novas não abre no meio de
+    // outros testes (ela tem o próprio teste em `perfis.spec.ts`).
+    await db
+      .insert(s.onboardingSteps)
+      .values(
+        users.flatMap((u) => [
+          { userId: u.id, step: 'achievements-baseline' },
+          ...ACHIEVEMENT_IDS.map((id) => ({ userId: u.id, step: `achievement:${id}` })),
+        ]),
+      );
   } finally {
     await pool.end();
   }

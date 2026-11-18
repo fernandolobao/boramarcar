@@ -428,6 +428,41 @@ describe('cliente da API', () => {
     expect(player.seasonTitles[0]!.endsAt).toBeInstanceOf(Date);
   });
 
+  it('conquistas novas: lista (ignorando as desconhecidas) e marca as vistas', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json({
+          achievements: [
+            {
+              id: 'streak_3',
+              unlocked: true,
+              unlockedAt: '2026-11-17T22:00:00.000Z',
+              progress: 3,
+              target: 3,
+            },
+            { id: 'futura', unlocked: true, unlockedAt: null, progress: 1, target: 1 },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const list = await api.me.newAchievements();
+    expect(list.map((a) => a.id)).toEqual(['streak_3']);
+    expect(list[0]!.unlockedAt).toBeInstanceOf(Date);
+    await api.me.markAchievementsSeen(['streak_3']);
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/me/achievements/seen',
+    );
+    expect(fetchMock.mock.calls[1]![1]).toMatchObject({
+      method: 'POST',
+      body: JSON.stringify({ ids: ['streak_3'] }),
+    });
+  });
+
   it('central de notificações: lista com datas e marca como lidas', async () => {
     const fetchMock = vi
       .fn()

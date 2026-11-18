@@ -1,4 +1,5 @@
 import type { Achievement, PlayerProfile } from '@boramarcar/api-client';
+import { NewAchievements } from '@/components/new-achievements';
 import { ApiError } from '@boramarcar/api-client';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
@@ -170,6 +171,8 @@ export default function PlayerScreen() {
       }
     >
       <Stack.Screen options={{ title: p.isSelf ? t('profileMine') : p.name }} />
+      {/* No próprio perfil: conquistas ganhas desde a última visita (abre sozinha). */}
+      {p.isSelf && <NewAchievements />}
       <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
         <Avatar name={p.name} image={p.image} />
         <View style={{ flex: 1 }}>

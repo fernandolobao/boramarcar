@@ -49,7 +49,12 @@ export function Choices<T extends string>({
       <div
         className={
           orientation === 'vertical' || variant === 'cards'
-            ? 'grid gap-2 sm:grid-cols-2'
+            ? // Três opções curtas (ex.: tema, visibilidade) cabem numa linha só.
+              orientation !== 'vertical' &&
+              options.length === 3 &&
+              options.every((o) => !o.description)
+              ? 'grid gap-2 sm:grid-cols-3'
+              : 'grid gap-2 sm:grid-cols-2'
             : 'flex flex-wrap gap-2'
         }
       >

@@ -9,6 +9,7 @@ import { Link, router } from 'expo-router';
 import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { Aura } from '@/components/aura';
 import { BetaBanner } from '@/components/beta-banner';
+import { NewAchievements } from '@/components/new-achievements';
 import { NoGroup } from '@/components/no-group';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -326,6 +327,8 @@ export default function DashboardScreen() {
   return (
     <>
       <Aura />
+      {/* Conquistas ganhas desde a última visita (abre sozinha). */}
+      <NewAchievements />
       <ScrollView
         contentContainerStyle={{ padding: 16, gap: 12 }}
         refreshControl={
