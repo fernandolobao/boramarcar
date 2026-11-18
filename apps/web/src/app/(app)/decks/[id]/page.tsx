@@ -20,7 +20,6 @@ import Image from 'next/image';
 import { ViewTransition } from 'react';
 import { DeckHeroCard } from '@/components/deck-hero-card';
 import { getFormatter, getTranslations } from 'next-intl/server';
-import { DeleteButton } from '@/components/availability-forms';
 import { Icon } from '@/components/icons';
 import {
   BracketCard,
@@ -37,7 +36,8 @@ import { DeckComparisonCard } from '@/components/deck-comparison';
 import { DeckRoles, RefreshAnalysis } from '@/components/deck-roles';
 import { DeckTools } from '@/components/deck-tools';
 import { canPrintProxies } from '@/server/features';
-import { ColorIdentity, DeckSettingsForm } from '@/components/deck-visual';
+import { ColorIdentity } from '@/components/deck-visual';
+import { DeckEditDialog } from '@/components/deck-edit-dialog';
 import { runAfterResponse } from '@/server/background';
 import { requireUser } from '@/server/current-user';
 import { TitleWithTip } from '@/components/tip';
@@ -167,6 +167,21 @@ export default async function DeckPage({ params }: Props) {
               className="scale-110 object-cover opacity-25 blur-2xl dark:opacity-20"
             />
           )}
+          {/* Editar deck (só o dono): janela com nome, tipo de jogo, visibilidade e remover. */}
+          {deck.isOwner && (
+            <div className="relative z-10 flex justify-end px-5 pt-4 md:absolute md:top-4 md:right-4 md:p-0">
+              <DeckEditDialog
+                deckId={deck.id}
+                name={deck.name}
+                format={format}
+                visibility={
+                  (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
+                    ? (deck.visibility as DeckVisibility)
+                    : 'group'
+                }
+              />
+            </div>
+          )}
           <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,15rem)_1fr] md:items-start">
             {hero?.card?.imageUri && (
               <ViewTransition name={`deck-${deck.id}`} share="morph" default="none">
@@ -178,7 +193,7 @@ export default async function DeckPage({ params }: Props) {
                 />
               </ViewTransition>
             )}
-            <div className="min-w-0 space-y-3">
+            <div className={`min-w-0 space-y-3 ${deck.isOwner ? 'md:pe-36' : ''}`}>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-ink-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-ink-100 dark:text-ink-900">
                   {tf(format)}
@@ -244,36 +259,9 @@ export default async function DeckPage({ params }: Props) {
                   </span>
                 </p>
               )}
-              {deck.isOwner && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <DeleteButton
-                    path={`/api/v1/decks/${deck.id}`}
-                    redirectTo="/decks"
-                    label={t('deleteDeck', { name: deck.name })}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
-
-        {deck.isOwner && (
-          <details className="card">
-            <summary className="cursor-pointer font-semibold">{t('settings')}</summary>
-            <div className="mt-4">
-              <DeckSettingsForm
-                deckId={deck.id}
-                name={deck.name}
-                format={format}
-                visibility={
-                  (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
-                    ? (deck.visibility as DeckVisibility)
-                    : 'group'
-                }
-              />
-            </div>
-          </details>
-        )}
 
         {shareQr && (
           <DeckShare

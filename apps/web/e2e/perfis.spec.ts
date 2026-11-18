@@ -37,19 +37,23 @@ test.describe('perfis e conquistas', () => {
   test('deck privado some do perfil para os outros', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    await page.getByText('Editar deck').click();
+    // "Editar deck" abre uma janela no topo da página; salvar fecha e atualiza a página.
+    await page.getByRole('button', { name: 'Editar deck' }).click();
+    let dialog = page.getByRole('dialog', { name: 'Editar deck' });
     // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
-    await page.getByRole('radio', { name: /Privado/ }).check({ force: true });
-    await page.getByRole('button', { name: 'Salvar' }).click();
-    await expect(page.getByText('Deck salvo.')).toBeVisible();
+    await dialog.getByRole('radio', { name: /Privado/ }).check({ force: true });
+    await dialog.getByRole('button', { name: 'Salvar' }).click();
+    await expect(dialog).toBeHidden();
     await expect(page.getByText('Privado', { exact: true }).first()).toBeVisible();
     const api = await page.request.get(`/api/v1/players/e2e-ana`);
     const decks = (await api.json()).player.decks as { id: string; visibility: string }[];
     expect(decks.find((d) => d.id === E2E_IDS.deck)?.visibility).toBe('private');
     // Volta ao padrão para não afetar os outros testes.
-    await page.getByRole('radio', { name: /Grupo/ }).check({ force: true });
-    await page.getByRole('button', { name: 'Salvar' }).click();
-    await expect(page.getByText('Deck salvo.')).toBeVisible();
+    await page.getByRole('button', { name: 'Editar deck' }).click();
+    dialog = page.getByRole('dialog', { name: 'Editar deck' });
+    await dialog.getByRole('radio', { name: /Grupo/ }).check({ force: true });
+    await dialog.getByRole('button', { name: 'Salvar' }).click();
+    await expect(dialog).toBeHidden();
   });
 
   test('janela de conquistas novas no painel: aparece uma vez e some depois de vista', async ({

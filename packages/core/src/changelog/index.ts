@@ -94,6 +94,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Conquista nova, "Enturmado": jogue ao menos uma partida com cada pessoa do seu grupo.',
     en: 'New achievement, "One of the gang": play at least one game with each person in your group.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'A página do deck ficou mais limpa: nome, tipo de jogo, visibilidade e remover agora ficam em "Editar deck", no topo.',
+    en: 'The deck page is cleaner: name, game type, visibility and delete now live under "Edit deck", at the top.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
