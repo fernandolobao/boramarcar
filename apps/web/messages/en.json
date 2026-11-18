@@ -982,6 +982,54 @@
       "season_champion": {
         "name": "Season champion",
         "description": "Finish a season in 1st place."
+      },
+      "games_100": {
+        "name": "Centurion",
+        "description": "Play 100 games."
+      },
+      "wins_25": {
+        "name": "25 wins",
+        "description": "Win 25 games."
+      },
+      "wins_50": {
+        "name": "Table legend",
+        "description": "Win 50 games."
+      },
+      "decks_5": {
+        "name": "Arsenal",
+        "description": "Play with 5 different decks."
+      },
+      "groups_2": {
+        "name": "Traveler",
+        "description": "Play in 2 different groups."
+      },
+      "opponents_10": {
+        "name": "Full table",
+        "description": "Play with 10 different people."
+      },
+      "nemesis": {
+        "name": "Everyone’s nemesis",
+        "description": "Beat every person in your group at least once (groups of 3 or more)."
+      },
+      "underdog_10": {
+        "name": "Catching up",
+        "description": "Win 10 games someone else started."
+      },
+      "proxy_win": {
+        "name": "Proxy pride",
+        "description": "Win with a deck that has proxies."
+      },
+      "comeback": {
+        "name": "Comeback",
+        "description": "Win after losing 5 games in a row."
+      },
+      "events_streak_4": {
+        "name": "Always there",
+        "description": "Play at 4 meetups of the group in a row (meetups with a recorded game)."
+      },
+      "months_12": {
+        "name": "All year round",
+        "description": "Play in all 12 months of the same year."
       }
     }
   },

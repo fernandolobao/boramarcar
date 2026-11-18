@@ -1,12 +1,22 @@
 import {
   computeAchievements,
   DomainError,
+  type AchievementContext,
   type AchievementGame,
   type SeasonTitle,
 } from '@boramarcar/core';
 import { and, eq, inArray, lte } from 'drizzle-orm';
 import type { Database } from '../client';
-import { gamePlayers, games, groupMembers, groups, seasons, user } from '../schema';
+import {
+  deckCards,
+  events,
+  gamePlayers,
+  games,
+  groupMembers,
+  groups,
+  seasons,
+  user,
+} from '../schema';
 import { listDecksVisibleTo, sharesGroup } from './decks';
 import { getGroupRanking } from './ranking';
 import { getUserSummary } from './users';
@@ -27,6 +37,8 @@ async function listPlayerGames(db: Database, userId: string): Promise<Achievemen
         format: games.format,
         firstPlayerId: games.firstPlayerId,
         winningTurn: games.winningTurn,
+        groupId: games.groupId,
+        eventId: games.eventId,
       })
       .from(games)
       .where(inArray(games.id, ids)),
@@ -40,7 +52,70 @@ async function listPlayerGames(db: Database, userId: string): Promise<Achievemen
       .from(gamePlayers)
       .where(inArray(gamePlayers.gameId, ids)),
   ]);
-  return gameRows.map((g) => ({ ...g, players: playerRows.filter((p) => p.gameId === g.id) }));
+  // Decks (do jogador) com proxies hoje, para "Proxy de respeito".
+  const myDecks = [
+    ...new Set(playerRows.filter((p) => p.userId === userId && p.deckId).map((p) => p.deckId!)),
+  ];
+  const withProxies = new Set(
+    myDecks.length
+      ? (
+          await db
+            .selectDistinct({ deckId: deckCards.deckId })
+            .from(deckCards)
+            .where(and(inArray(deckCards.deckId, myDecks), eq(deckCards.isProxy, true)))
+        ).map((r) => r.deckId)
+      : [],
+  );
+  return gameRows.map((g) => ({
+    ...g,
+    players: playerRows
+      .filter((p) => p.gameId === g.id)
+      .map((p) => ({ ...p, deckHasProxies: p.deckId ? withProxies.has(p.deckId) : false })),
+  }));
+}
+
+/**
+ * O que as conquistas precisam além das partidas: membros atuais dos grupos do jogador, os
+ * encontros desses grupos que tiveram partida (para "4 encontros seguidos") e o fuso dele.
+ */
+async function achievementContext(db: Database, userId: string): Promise<AchievementContext> {
+  const [mine, [person]] = await Promise.all([
+    db
+      .select({ groupId: groupMembers.groupId })
+      .from(groupMembers)
+      .where(eq(groupMembers.userId, userId)),
+    db.select({ timeZone: user.timeZone }).from(user).where(eq(user.id, userId)).limit(1),
+  ]);
+  const groupIds = mine.map((m) => m.groupId);
+  if (!groupIds.length) return { timeZone: person?.timeZone ?? undefined };
+  const [members, held] = await Promise.all([
+    db
+      .select({ groupId: groupMembers.groupId, userId: groupMembers.userId })
+      .from(groupMembers)
+      .where(inArray(groupMembers.groupId, groupIds)),
+    db
+      .selectDistinct({ groupId: events.groupId, eventId: events.id, startsAt: events.startsAt })
+      .from(events)
+      .innerJoin(games, eq(games.eventId, events.id))
+      .where(inArray(events.groupId, groupIds)),
+  ]);
+  const groupMembersMap: Record<string, string[]> = {};
+  for (const m of members) (groupMembersMap[m.groupId] ??= []).push(m.userId);
+  return {
+    groupMembers: groupMembersMap,
+    groupEvents: held,
+    timeZone: person?.timeZone ?? undefined,
+  };
+}
+
+/** Conquistas do jogador (com a data de cada uma), calculadas das partidas. */
+export async function getUserAchievements(db: Database, userId: string, now = new Date()) {
+  const [playerGames, titles, context] = await Promise.all([
+    listPlayerGames(db, userId),
+    listSeasonTitles(db, userId, now),
+    achievementContext(db, userId),
+  ]);
+  return computeAchievements(userId, playerGames, titles, context);
 }
 
 /** Temporadas encerradas em que o jogador terminou em 1º (empates no 1º lugar também contam). */
@@ -104,7 +179,7 @@ export async function getPlayerProfile(
     // Mesmo erro de "não existe": não revela quem usa o app.
     throw new DomainError('not_found', 'Jogador não encontrado');
   }
-  const [summary, playerGames, titles, decksVisible, viewerGroups] = await Promise.all([
+  const [summary, playerGames, titles, decksVisible, viewerGroups, context] = await Promise.all([
     getUserSummary(db, input.userId),
     listPlayerGames(db, input.userId),
     listSeasonTitles(db, input.userId, input.now ?? new Date()),
@@ -115,6 +190,7 @@ export async function getPlayerProfile(
           .select({ groupId: groupMembers.groupId })
           .from(groupMembers)
           .where(eq(groupMembers.userId, input.viewerId)),
+    achievementContext(db, input.userId),
   ]);
   const shared = viewerGroups ? new Set(viewerGroups.map((g) => g.groupId)) : null;
   return {
@@ -129,7 +205,7 @@ export async function getPlayerProfile(
     winRate: summary.winRate,
     groups: shared ? summary.groups.filter((g) => shared.has(g.id)) : summary.groups,
     decks: decksVisible,
-    achievements: computeAchievements(input.userId, playerGames, titles),
+    achievements: computeAchievements(input.userId, playerGames, titles, context),
     seasonTitles: titles,
   };
 }

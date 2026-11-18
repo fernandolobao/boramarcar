@@ -982,6 +982,54 @@
       "season_champion": {
         "name": "Campeão da temporada",
         "description": "Terminar uma temporada em 1º lugar."
+      },
+      "games_100": {
+        "name": "Centenário",
+        "description": "Jogar 100 partidas."
+      },
+      "wins_25": {
+        "name": "25 vitórias",
+        "description": "Vencer 25 partidas."
+      },
+      "wins_50": {
+        "name": "Lenda da mesa",
+        "description": "Vencer 50 partidas."
+      },
+      "decks_5": {
+        "name": "Arsenal",
+        "description": "Jogar com 5 decks diferentes."
+      },
+      "groups_2": {
+        "name": "Viajante",
+        "description": "Jogar em 2 grupos diferentes."
+      },
+      "opponents_10": {
+        "name": "Mesa cheia",
+        "description": "Jogar com 10 pessoas diferentes."
+      },
+      "nemesis": {
+        "name": "Nêmesis de todos",
+        "description": "Vencer cada pessoa do seu grupo pelo menos uma vez (grupos com 3 ou mais pessoas)."
+      },
+      "underdog_10": {
+        "name": "Correndo atrás",
+        "description": "Vencer 10 partidas em que outra pessoa começou."
+      },
+      "proxy_win": {
+        "name": "Proxy de respeito",
+        "description": "Vencer com um deck que tem proxies."
+      },
+      "comeback": {
+        "name": "Volta por cima",
+        "description": "Vencer depois de 5 derrotas seguidas."
+      },
+      "events_streak_4": {
+        "name": "Presença garantida",
+        "description": "Jogar em 4 encontros seguidos do grupo (encontros com partida registrada)."
+      },
+      "months_12": {
+        "name": "O ano inteiro",
+        "description": "Jogar em todos os 12 meses de um mesmo ano."
       }
     }
   },

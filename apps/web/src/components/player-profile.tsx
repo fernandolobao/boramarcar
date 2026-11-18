@@ -23,6 +23,18 @@ const ACHIEVEMENT_ICON: Record<AchievementId, IconName> = {
   versatile: 'versatile',
   team_win: 'team',
   season_champion: 'champion',
+  games_100: 'veteran',
+  wins_25: 'ranking',
+  wins_50: 'ranking',
+  decks_5: 'decks',
+  groups_2: 'group',
+  opponents_10: 'crowd',
+  nemesis: 'nemesis',
+  underdog_10: 'underdog',
+  proxy_win: 'print',
+  comeback: 'comeback',
+  events_streak_4: 'eventStreak',
+  months_12: 'allYear',
 };
 
 /** Selos de conquistas: desbloqueadas em destaque; bloqueadas com o progresso em texto. */
