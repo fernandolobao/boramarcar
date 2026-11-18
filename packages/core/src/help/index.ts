@@ -227,6 +227,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'No deck, no modo Editar, toque em "Edição" na carta.',
               'Filtre pelo código e número ("ltr 268"), por parte do nome da edição ou pelo ilustrador ("tedin"), útil em cartas antigas sem número.',
               'Escolha a impressão e quantas cópias mudam. As outras continuam na edição atual.',
+              'Ao adicionar à coleção, a edição é escolhida antes; se a carta só tem uma edição, ela já vem escolhida.',
             ],
           },
           {
@@ -510,6 +511,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'In the deck, in Edit mode, tap "Edition" on the card.',
               'Filter by set code and number ("ltr 268"), by part of the set name or by artist ("tedin"), handy for old cards without a number.',
               'Pick the printing and how many copies change. The rest keep the current edition.',
+              'When adding to your collection, you pick the edition first; if the card has only one edition, it comes already picked.',
             ],
           },
           {

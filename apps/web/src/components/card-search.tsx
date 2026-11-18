@@ -13,11 +13,14 @@ export function CardSearch({
   label,
   value,
   onChange,
+  onPick,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /** Quando a pessoa escolhe uma sugestão (o nome é de uma carta que existe). */
+  onPick?: (name: string) => void;
 }) {
   const t = useTranslations('decks');
   const listId = useId();
@@ -59,6 +62,7 @@ export function CardSearch({
   const visible = open && value.trim().length >= 2 && options.length > 0;
   const choose = (name: string) => {
     onChange(name);
+    onPick?.(name);
     setOpen(false);
     setOptions([]);
     setActive(-1);
