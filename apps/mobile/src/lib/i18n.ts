@@ -28,6 +28,10 @@ const pt = {
   tabEvents: 'Encontros',
   tabHome: 'Início',
   dashHello: 'Olá, {name}!',
+  rivalriesTitle: 'Rivalidades',
+  rivalriesHint: 'Só conta quem jogou com você pelo menos 3 vezes. É brincadeira!',
+  rivalryRival: 'Seu maior rival: {name} venceu {losses} das {games} partidas entre vocês.',
+  rivalryPrey: 'Seu freguês: você venceu {name} em {wins} das {games} partidas.',
   dashWelcomeNew:
     'Boas-vindas ao grupo! Confirme presença no próximo encontro e venha jogar com a gente.',
   dashNextEvent: 'Próximo encontro',
@@ -884,6 +888,10 @@ const en: Messages = {
   tabEvents: 'Meetups',
   tabHome: 'Home',
   dashHello: 'Hi, {name}!',
+  rivalriesTitle: 'Rivalries',
+  rivalriesHint: 'Only people who played with you at least 3 times count. Just for fun!',
+  rivalryRival: 'Your biggest rival: {name} won {losses} of the {games} games you played together.',
+  rivalryPrey: 'Your favorite target: you beat {name} in {wins} of {games} games.',
   dashWelcomeNew:
     'Welcome to the group! Confirm you’re coming to the next meetup and come play with us.',
   dashNextEvent: 'Next meetup',

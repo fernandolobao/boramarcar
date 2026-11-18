@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { isDomainError } from '@boramarcar/core';
-import { getDeckCovers, getDeckRatings, getPlayerProfile } from '@boramarcar/db';
+import { getDeckCovers, getDeckRatings, getGroupStats, getPlayerProfile } from '@boramarcar/db';
+import { headToHeadBetween } from '@boramarcar/core/integration';
+import { getActiveGroup } from '@/server/active-group';
 import { notFound, redirect } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTimeZone, getTranslations } from 'next-intl/server';
 import { PlayerProfile } from '@/components/player-profile';
 import { isAdmin } from '@/server/admin';
 import { requireUser } from '@/server/current-user';
@@ -45,12 +47,27 @@ export default async function PlayerPage({ params }: Props) {
     throw error;
   });
   const ids = profile.decks.map((d) => d.id);
-  const [covers, ratings] = await Promise.all([getDeckCovers(db, ids), getDeckRatings(db, ids)]);
+  // Confronto entre vocês dois no grupo ativo (se a pessoa também é dele).
+  const { active } = await getActiveGroup(user.id);
+  const sharesActive = active && profile.groups.some((g) => g.id === active.id);
+  const [covers, ratings, stats] = await Promise.all([
+    getDeckCovers(db, ids),
+    getDeckRatings(db, ids),
+    sharesActive
+      ? getGroupStats(db, {
+          groupId: active.id,
+          userId: user.id,
+          now: new Date(),
+          timeZone: await getTimeZone(),
+        }).catch(() => null)
+      : null,
+  ]);
+  const versus = stats ? headToHeadBetween(stats.headToHead, user.id, id) : null;
   return (
     <>
       {/* Perfil: fluxo de mana em ouro líquido. */}
       <ManaFlowColors stops={GOLD_FLOW} />
-      <PlayerProfile profile={profile} covers={covers} ratings={ratings} />
+      <PlayerProfile profile={profile} covers={covers} ratings={ratings} versus={versus} />
     </>
   );
 }

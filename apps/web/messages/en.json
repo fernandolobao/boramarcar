@@ -94,7 +94,14 @@
       "since": "Your last game with <name></name> was {when}.",
       "goingNext": "going to the next meetup"
     },
-    "welcomeNew": "Welcome to the group! Confirm you’re coming to the next meetup and come play with us."
+    "welcomeNew": "Welcome to the group! Confirm you’re coming to the next meetup and come play with us.",
+    "rivalries": {
+      "title": "Rivalries",
+      "hint": "Only people who played with you at least 3 times count. Just for fun!",
+      "rival": "Your biggest rival: <name></name> won {losses, plural, =1 {1 game} other {# games}} of the {games} you played together.",
+      "prey": "Your favorite target: you beat <name></name> in {wins, plural, =1 {1 game} other {# games}} of {games}.",
+      "versus": "Between you two: you won {wins}, {name} won {losses} (in {games, plural, =1 {1 game} other {# games}})."
+    }
   },
   "group": {
     "title": "Your group",

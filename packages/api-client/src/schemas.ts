@@ -268,6 +268,18 @@ export type Preferences = z.infer<typeof preferencesSchema>;
 export const groupStatsSchema = z
   .object({
     totalGames: z.number(),
+    /** Confronto direto entre cada par (rivalidades no painel). */
+    headToHead: z
+      .array(
+        z.object({
+          userId: z.string(),
+          opponentId: z.string(),
+          games: z.number(),
+          wins: z.number(),
+          losses: z.number(),
+        }),
+      )
+      .optional(),
     averageWinningTurn: z.number().nullable().optional(),
     averageDurationMinutes: z.number().nullable().optional(),
     players: z.array(
