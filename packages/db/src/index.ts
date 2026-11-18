@@ -19,6 +19,7 @@ export * from './services/stats';
 export * from './services/profiles';
 export * from './services/inbox';
 export * from './services/records';
+export * from './services/admin-access';
 export * from './services/announcements';
 export * from './services/achievements';
 export * from './services/privacy';

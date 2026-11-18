@@ -26,6 +26,7 @@ import {
 import { and, asc, count, desc, eq, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
+import { logAdminAccess } from './admin-access';
 import { syncCollectionFromDecks, takeFromCollection } from './collection';
 import { cards, collectionCards, deckCards, decks, groupMembers, user } from '../schema';
 
@@ -418,11 +419,27 @@ export async function getDeckRatings(db: Database, deckIds: readonly string[]) {
   return ratings;
 }
 
-export async function getDeck(db: Database, input: { deckId: string; viewerId: string }) {
+export async function getDeck(
+  db: Database,
+  input: {
+    deckId: string;
+    viewerId: string;
+    /** Admin da plataforma: vê qualquer deck (o acesso a deck fechado fica registrado). */
+    viewerIsAdmin?: boolean;
+  },
+) {
   const [deck] = await db.select().from(decks).where(eq(decks.id, input.deckId)).limit(1);
   if (!deck) throw new DomainError('not_found', 'Deck não encontrado');
+  let viewedAsAdmin = false;
   if (!(await canView(db, deck, input.viewerId))) {
-    throw new DomainError('forbidden', 'Você não pode ver este deck');
+    if (!input.viewerIsAdmin) throw new DomainError('forbidden', 'Você não pode ver este deck');
+    viewedAsAdmin = true;
+    await logAdminAccess(db, {
+      adminId: input.viewerId,
+      targetUserId: deck.ownerId,
+      resource: 'deck',
+      resourceId: deck.id,
+    });
   }
   const rows = await db
     .select({ entry: deckCards, card: cards })
@@ -469,6 +486,8 @@ export async function getDeck(db: Database, input: { deckId: string; viewerId: s
   return {
     ...deckFields,
     ownerName: owner?.name ?? '',
+    /** Aberto por um admin da plataforma sem ser visível para ele (aviso na página). */
+    viewedAsAdmin,
     isOwner: deck.ownerId === input.viewerId,
     entries,
     /** Uma linha por carta/board, com total e quantas cópias são proxy (3.6). */
@@ -990,12 +1009,26 @@ export async function findCachedCardByName(db: Database, name: string) {
 /** Decks de um jogador que quem está vendo pode ver (perfil do jogador). */
 export async function listDecksVisibleTo(
   db: Database,
-  input: { ownerId: string; viewerId: string },
+  input: {
+    ownerId: string;
+    viewerId: string;
+    /** Admin da plataforma: vê todos (o acesso aos decks fechados fica registrado). */
+    viewerIsAdmin?: boolean;
+  },
 ) {
   const all = await listDecks(db, input.ownerId);
   if (input.ownerId === input.viewerId) return all;
   const shared = await sharesGroup(db, input.ownerId, input.viewerId);
-  return all.filter((d) => d.visibility === 'public' || (d.visibility === 'group' && shared));
+  const visible = all.filter(
+    (d) => d.visibility === 'public' || (d.visibility === 'group' && shared),
+  );
+  if (!input.viewerIsAdmin || visible.length === all.length) return visible;
+  await logAdminAccess(db, {
+    adminId: input.viewerId,
+    targetUserId: input.ownerId,
+    resource: 'profile_decks',
+  });
+  return all;
 }
 
 /** Cartas usadas em algum deck com cache mais antigo que `olderThan` (mais antigas primeiro). */

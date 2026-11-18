@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Database } from '../client';
 import { createTestDb, createTestUser } from '../testing';
-import { account } from '../schema';
+import { account, collectionCards, decks } from '../schema';
 import { createGroup } from './groups';
 import { seedGroup } from '../test/helpers';
 import { addAvailability } from './availability';
@@ -150,12 +150,28 @@ describe('contas para o /admin', () => {
       { id: 'a2', accountId: bia.id, providerId: 'credential', userId: bia.id, password: 'x' },
     ]);
     await createGroup(db, { name: 'Mesa', userId: ana.id });
+    // Ana: 2 decks e 3 cartas na coleção (2 cópias de uma, 1 de outra).
+    await db.insert(decks).values([
+      { ownerId: ana.id, name: 'Um', source: 'text' },
+      { ownerId: ana.id, name: 'Dois', source: 'text' },
+    ]);
+    await db.insert(collectionCards).values([
+      { userId: ana.id, cardName: 'Sol Ring', quantity: 2 },
+      { userId: ana.id, cardName: 'Forest', quantity: 1 },
+    ]);
     const list = await listUsersForAdmin(db);
     expect(list.map((u) => u.name).sort()).toEqual(['Ana', 'Bia']);
-    expect(list.find((u) => u.name === 'Ana')).toMatchObject({ providers: ['google'], groups: 1 });
+    expect(list.find((u) => u.name === 'Ana')).toMatchObject({
+      providers: ['google'],
+      groups: 1,
+      decks: 2,
+      collectionCards: 3,
+    });
     expect(list.find((u) => u.name === 'Bia')).toMatchObject({
       providers: ['credential'],
       groups: 0,
+      decks: 0,
+      collectionCards: 0,
       lastSeenAt: null,
     });
     await closeDb();

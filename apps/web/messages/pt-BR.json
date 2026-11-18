@@ -562,7 +562,8 @@
     "dangerZone": "Zona de perigo",
     "deleteDeckHint": "Remove o deck e as cartas dele. As partidas em que ele foi usado continuam no histórico.",
     "removeDeck": "Remover deck",
-    "confirmRemove": "Confirmar remoção"
+    "confirmRemove": "Confirmar remoção",
+    "viewedAsAdmin": "Você está vendo este deck como admin do ArcanaKin (ele não está visível para você normalmente). O acesso fica registrado."
   },
   "analysis": {
     "title": "Análise",
@@ -1774,7 +1775,9 @@
       "groups": "Grupos",
       "created": "Criada em",
       "lastSeen": "Último acesso",
-      "never": "Nunca"
+      "never": "Nunca",
+      "decks": "Decks",
+      "collectionCards": "Cartas na coleção"
     },
     "onboarding": "Onboarding (todo o período)",
     "guideCompleted": "Guias concluídos",

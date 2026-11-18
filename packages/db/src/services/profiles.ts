@@ -221,7 +221,11 @@ export async function getPlayerProfile(
     getUserSummary(db, input.userId),
     listPlayerGames(db, input.userId),
     listSeasonTitles(db, input.userId, input.now ?? new Date()),
-    listDecksVisibleTo(db, { ownerId: input.userId, viewerId: input.viewerId }),
+    listDecksVisibleTo(db, {
+      ownerId: input.userId,
+      viewerId: input.viewerId,
+      viewerIsAdmin: admin,
+    }),
     isSelf || admin
       ? Promise.resolve(null)
       : db

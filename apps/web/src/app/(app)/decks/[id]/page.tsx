@@ -39,6 +39,7 @@ import { canPrintProxies } from '@/server/features';
 import { ColorIdentity } from '@/components/deck-visual';
 import { DeckEditDialog } from '@/components/deck-edit-dialog';
 import { runAfterResponse } from '@/server/background';
+import { isAdmin } from '@/server/admin';
 import { requireUser } from '@/server/current-user';
 import { TitleWithTip } from '@/components/tip';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
@@ -66,7 +67,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DeckPage({ params }: Props) {
   const { id } = await params;
   const user = await requireUser();
-  const deck = await getDeck(getDb(), { deckId: id, viewerId: user.id }).catch((error: unknown) => {
+  const deck = await getDeck(getDb(), {
+    deckId: id,
+    viewerId: user.id,
+    // Admins da plataforma veem qualquer deck (o acesso a deck fechado fica registrado).
+    viewerIsAdmin: isAdmin(user.email),
+  }).catch((error: unknown) => {
     if (isDomainError(error) && (error.code === 'not_found' || error.code === 'forbidden'))
       notFound();
     throw error;
@@ -109,7 +115,7 @@ export default async function DeckPage({ params }: Props) {
     : null;
   const formatName = tf(format);
   // Dados do Tagger/Spellbook faltando: busca depois de responder (a próxima visita já vê).
-  if (deck.analysisStale) {
+  if (deck.analysisStale && !deck.viewedAsAdmin) {
     runAfterResponse(() => refreshDeckAnalysis(getDb(), { deckId: deck.id, viewerId: user.id }));
   }
 
@@ -269,6 +275,16 @@ export default async function DeckPage({ params }: Props) {
             url={shareUrl}
             qr={shareQr}
           />
+        )}
+
+        {deck.viewedAsAdmin && (
+          <p
+            role="note"
+            className="rounded-xl border border-line bg-surface-muted px-4 py-3 text-sm"
+          >
+            <Icon name="makeAdmin" className="me-1 inline size-4 align-[-2px]" />
+            {t('viewedAsAdmin')}
+          </p>
         )}
 
         {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}

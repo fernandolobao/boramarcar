@@ -12,12 +12,14 @@ import {
   max,
   ne,
   sql,
+  sum,
 } from 'drizzle-orm';
 import type { Database } from '../client';
 import { TIP_IDS, type TipId } from './onboarding';
 import {
   availabilityRules,
   availabilitySlots,
+  collectionCards,
   decks,
   eventParticipants,
   events,
@@ -235,7 +237,7 @@ export async function listUsersForAdmin(db: Database, limit = 1000) {
     .limit(limit);
   if (rows.length === 0) return [];
   const ids = rows.map((r) => r.id);
-  const [providers, memberships, sessions] = await Promise.all([
+  const [providers, memberships, sessions, deckCounts, collectionCounts] = await Promise.all([
     db
       .select({ userId: account.userId, providerId: account.providerId })
       .from(account)
@@ -250,7 +252,19 @@ export async function listUsersForAdmin(db: Database, limit = 1000) {
       .from(session)
       .where(inArray(session.userId, ids))
       .groupBy(session.userId),
+    db
+      .select({ userId: decks.ownerId, n: count() })
+      .from(decks)
+      .where(inArray(decks.ownerId, ids))
+      .groupBy(decks.ownerId),
+    db
+      .select({ userId: collectionCards.userId, n: sum(collectionCards.quantity) })
+      .from(collectionCards)
+      .where(inArray(collectionCards.userId, ids))
+      .groupBy(collectionCards.userId),
   ]);
+  const decksOf = new Map(deckCounts.map((d) => [d.userId, Number(d.n)]));
+  const cardsOf = new Map(collectionCounts.map((c) => [c.userId, Number(c.n ?? 0)]));
   const groupsOf = new Map(memberships.map((m) => [m.userId, Number(m.n)]));
   const lastOf = new Map(sessions.map((s) => [s.userId, s.last]));
   return rows.map((r) => ({
@@ -259,6 +273,9 @@ export async function listUsersForAdmin(db: Database, limit = 1000) {
       ...new Set(providers.filter((p) => p.userId === r.id).map((p) => p.providerId)),
     ].sort(),
     groups: groupsOf.get(r.id) ?? 0,
+    /** Decks cadastrados e cartas na coleção (somando as cópias). */
+    decks: decksOf.get(r.id) ?? 0,
+    collectionCards: cardsOf.get(r.id) ?? 0,
     lastSeenAt: lastOf.get(r.id) ?? null,
   }));
 }

@@ -3,6 +3,7 @@ import type { Database } from '../client';
 import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { getDeck, listDecksVisibleTo, saveImportedDeck, updateDeck } from './decks';
+import { listAdminAccess } from './admin-access';
 import { createEvent, recordGame } from './events';
 import { getPlayerProfile } from './profiles';
 import { createSeason } from './stats';
@@ -68,6 +69,40 @@ describe('visibilidade dos decks', () => {
     expect(await names(owner.id)).toEqual(['Grupo', 'Privado', 'Público']);
     expect(await names(friend.id)).toEqual(['Grupo', 'Público']);
     expect(await names(stranger.id)).toEqual(['Público']);
+  });
+
+  it('admin da plataforma vê qualquer deck, e o acesso a deck fechado fica registrado', async () => {
+    const { players } = await seedGroup(db, 1);
+    const owner = players[0]!;
+    const admin = await createTestUser(db, { name: 'Admin' });
+    const priv = await deckOf(owner.id, 'Secreto');
+    await updateDeck(db, { deckId: priv.id, userId: owner.id, visibility: 'private' });
+    const pub = await deckOf(owner.id, 'Aberto');
+    await updateDeck(db, { deckId: pub.id, userId: owner.id, visibility: 'public' });
+
+    // Sem a marca de admin, nada muda.
+    await expect(getDeck(db, { deckId: priv.id, viewerId: admin.id })).rejects.toMatchObject({
+      code: 'forbidden',
+    });
+    const seen = await getDeck(db, { deckId: priv.id, viewerId: admin.id, viewerIsAdmin: true });
+    expect(seen).toMatchObject({ name: 'Secreto', viewedAsAdmin: true });
+    // Deck público não é "acesso de admin": não registra.
+    expect(
+      (await getDeck(db, { deckId: pub.id, viewerId: admin.id, viewerIsAdmin: true }))
+        .viewedAsAdmin,
+    ).toBe(false);
+    const all = await listDecksVisibleTo(db, {
+      ownerId: owner.id,
+      viewerId: admin.id,
+      viewerIsAdmin: true,
+    });
+    expect(all.map((d) => d.name).sort()).toEqual(['Aberto', 'Secreto']);
+
+    const log = await listAdminAccess(db, { targetUserId: owner.id });
+    expect(log).toEqual([
+      expect.objectContaining({ adminId: admin.id, resource: 'deck', resourceId: priv.id }),
+      expect.objectContaining({ adminId: admin.id, resource: 'profile_decks' }),
+    ]);
   });
 });
 
@@ -144,7 +179,7 @@ describe('perfil do jogador', () => {
     });
   });
 
-  it('admin da plataforma vê o perfil de qualquer pessoa, sem ver decks que não pode', async () => {
+  it('admin da plataforma vê o perfil e os decks de qualquer pessoa', async () => {
     const { group, owner } = await seedGroup(db, 1);
     const admin = await createTestUser(db);
     await deckOf(owner.id, 'Deck do grupo');
@@ -158,7 +193,7 @@ describe('perfil do jogador', () => {
     });
     expect(seen).toMatchObject({ isSelf: false, email: null });
     expect(seen.groups.map((g) => g.id)).toEqual([group.id]);
-    // A visibilidade dos decks continua valendo: só os públicos.
-    expect(seen.decks).toEqual([]);
+    // Admin também vê os decks de grupo e privados (o acesso fica registrado).
+    expect(seen.decks.map((d) => d.name)).toEqual(['Deck do grupo']);
   });
 });

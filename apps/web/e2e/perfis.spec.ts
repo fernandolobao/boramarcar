@@ -95,4 +95,26 @@ test.describe('perfis e conquistas', () => {
       /^Entre vocês: você venceu \d+, Bia venceu \d+ \(em \d+ partidas?\)\.$/,
     );
   });
+
+  test('admin: vê o deck privado de outra pessoa (com aviso) e as contagens no /admin', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
+    const deckId = `e2e-bia-privado-${Date.now()}`;
+    const { pool } = createDb(process.env.E2E_DATABASE_URL!, { max: 1 });
+    await pool.query(
+      `insert into decks (id, owner_id, name, source, visibility) values ($1, 'e2e-bia', 'Deck secreto da Bia', 'text', 'private')`,
+      [deckId],
+    );
+    await pool.end();
+    await page.goto(`/decks/${deckId}`);
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Deck secreto da Bia' }),
+    ).toBeVisible();
+    await expect(page.getByRole('note')).toContainText('como admin do ArcanaKin');
+    await page.goto('/admin');
+    const bia = page.getByRole('listitem').filter({ hasText: 'bia@e2e.test' });
+    await expect(bia.getByText('Decks', { exact: true })).toBeVisible();
+    await expect(bia.getByText('Cartas na coleção')).toBeVisible();
+  });
 });

@@ -9,6 +9,7 @@ import {
   decks,
   eventNudges,
   notifications,
+  adminAccessLog,
   eventParticipants,
   events,
   feedback,
@@ -206,6 +207,17 @@ export async function exportUserData(db: Database, userId: string) {
     .where(eq(notifications.userId, userId))
     .orderBy(asc(notifications.createdAt));
 
+  // Acessos de admins a dados que você não deixou visíveis (sem dizer qual admin).
+  const adminAccess = await db
+    .select({
+      resource: adminAccessLog.resource,
+      resourceId: adminAccessLog.resourceId,
+      at: adminAccessLog.createdAt,
+    })
+    .from(adminAccessLog)
+    .where(eq(adminAccessLog.targetUserId, userId))
+    .orderBy(asc(adminAccessLog.createdAt));
+
   return {
     format: 'arcanakin-export',
     version: 1,
@@ -221,6 +233,7 @@ export async function exportUserData(db: Database, userId: string) {
     events: rsvps,
     invitations,
     notifications: inbox,
+    adminAccess,
     games: played,
     decks: ownDecks.map(({ id, ...deck }) => ({
       ...deck,
@@ -294,6 +307,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     // Chamados recebidos são da pessoa; os que ela mandou ficam para o grupo, sem autor.
     await tx.delete(eventNudges).where(eq(eventNudges.userId, userId));
     await tx.delete(notifications).where(eq(notifications.userId, userId));
+    await tx.delete(adminAccessLog).where(eq(adminAccessLog.targetUserId, userId));
     await tx.update(eventNudges).set({ sentBy: null }).where(eq(eventNudges.sentBy, userId));
     await tx.delete(feedback).where(eq(feedback.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
