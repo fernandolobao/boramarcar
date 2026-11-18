@@ -4,7 +4,7 @@ import axe from 'axe-core';
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
-import { CardName, CardNames } from './card-dialog';
+import { CardName, CardNames, DeckPrintsProvider } from './card-dialog';
 
 afterEach(() => {
   cleanup();
@@ -71,5 +71,44 @@ describe('nome de carta clicável', () => {
     wrap(<CardName name="Carta Inventada" />);
     fireEvent.click(screen.getByRole('button', { name: 'Carta Inventada' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Carta não encontrada no Scryfall.');
+  });
+
+  it('dentro de um deck, abre a edição usada no deck (sem buscar), também pela 1ª face', () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    wrap(
+      <DeckPrintsProvider
+        cards={[
+          {
+            name: 'Sol Ring',
+            card: {
+              typeLine: 'Artifact',
+              setName: 'Commander 2021',
+              setCode: 'c21',
+              collectorNumber: '263',
+            },
+          },
+          {
+            name: "Idol of the Deep King // Sovereign's Macuahuitl",
+            card: {
+              typeLine: 'Artifact',
+              setName: 'The Lost Caverns of Ixalan',
+              setCode: 'lci',
+              collectorNumber: '155',
+            },
+          },
+        ]}
+      >
+        <p>
+          <CardNames names={['Sol Ring', 'Idol of the Deep King']} />
+        </p>
+      </DeckPrintsProvider>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Sol Ring' }));
+    expect(screen.getByText('Edição: Commander 2021 (C21 #263)')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Idol of the Deep King' }));
+    expect(screen.getByText('Edição: The Lost Caverns of Ixalan (LCI #155)')).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
