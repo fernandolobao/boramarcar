@@ -516,6 +516,15 @@ sem rolagem horizontal em 320px.
 
 ## Design system, fase 3: `Select` (19/11/2026)
 
-- Site: os 30 `<select>` nativos viraram o `Select` do React Aria. Botão com o valor e o rótulo no nome, lista (`listbox`) em popover, setas, digitar para achar, Esc fecha e o foco volta ao botão; opção desabilitada com `aria-disabled`; descrição e erro ligados ao campo; alvo ≥ 44 px. Nos filtros `GET` (ranking e histórico), o valor vai num campo oculto com `name`. Para quem já tinha rótulo visível só em outro lugar (custo máximo das funções), o nome acessível completo continua no campo (`hideLabel`).
+- Site: os 30 `<select>` nativos viraram o `Select` do React Aria. Botão com o valor e o rótulo no nome, lista (`listbox`) em popover, setas, digitar para achar, Esc fecha e o foco volta ao botão; opção desabilitada com `aria-disabled`; descrição e erro ligados ao campo; alvo de 40 px, a mesma altura dos campos e botões do site. Nos filtros `GET` (ranking e histórico), o valor vai num campo oculto com `name`. Para quem já tinha rótulo visível só em outro lugar (custo máximo das funções), o nome acessível completo continua no campo (`hideLabel`).
 - App: o tipo de jogo (13 opções) no ranking, no grupo e no deck saiu dos chips para o `Select`: campo-botão com "rótulo: valor", folha com as opções como botões com estado `selected`.
 - Componente no teste de acessibilidade (axe) e testes de unidade do teclado e do envio em formulário.
+
+## Design system, fase 3: `Checkbox`, `Switch` e `Stat` (19/11/2026)
+
+- Site: os 11 checkboxes nativos viraram o `Checkbox` do React Aria. Caixa própria com borda de contraste ≥ 3:1 e ✓ ao marcar, rótulo clicável, foco visível na caixa, dica ligada por `aria-describedby` (inclusive a contagem de jogadores no registro de partida). `Switch` (papel `switch`) para configurações de efeito imediato.
+- App: os 9 "botões-checkbox" viraram o `Checkbox` do design system (papel `checkbox`, estado `checked`) e ganharam um ✓ visível quando marcados, porque antes só a cor mudava (WCAG 1.4.1). O nome acessível fica sem o ✓. Os 2 `Switch` (e-mail e notificações no celular) usam o mesmo componente, com rótulo e dica.
+- `Stat` (número com rótulo): no site, par `dt`/`dd` dentro de `dl`; no app, um item acessível lido como "rótulo: valor, dica". Substituiu as cópias do painel e do perfil.
+- `Select` do site: altura (40 px), fonte e espaço do rótulo iguais aos do `input` e dos `btn*`, para alinhar lado a lado com eles (antes ficava mais alto que os botões de visualização da coleção).
+- Coleção (galeria): o selo "✦ Foil" foi para cima da imagem (`aria-hidden`, como o "×N"), e o "Foil" passou a fazer parte do nome do botão da carta, para quem usa leitor de tela.
+- Componentes no teste axe, com testes de teclado/clique e da descrição.

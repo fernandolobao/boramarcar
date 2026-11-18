@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { splitAchievements } from '@boramarcar/core/achievements';
 import { Choices } from '@/components/ds/choices';
 import { useAsync } from '@/lib/use-async';
+import { Stat } from '@/components/ds/stat';
 
 const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = {
   owner: 'roleOwner',
@@ -49,28 +50,6 @@ function Avatar({ name, image }: { name: string; image?: string | null }) {
       ) : (
         <AppText style={{ fontSize: 24, fontWeight: '800' }}>{initials}</AppText>
       )}
-    </View>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  const colors = useColors();
-  return (
-    <View
-      style={{
-        flexBasis: '47%',
-        flexGrow: 1,
-        padding: 12,
-        borderRadius: 12,
-        backgroundColor: colors.surfaceMuted,
-      }}
-      accessible
-      accessibilityLabel={`${label}: ${value}`}
-    >
-      <AppText muted>{label}</AppText>
-      <AppText style={{ fontSize: 24, fontWeight: '700', fontVariant: ['tabular-nums'] }}>
-        {value}
-      </AppText>
     </View>
   );
 }

@@ -79,7 +79,8 @@ test.describe('agenda', () => {
     await page.reload();
     await expect(toggle).not.toBeChecked();
 
-    await toggle.check();
+    // Caixa do React Aria: o input fica escondido sob a caixa desenhada, que recebe o clique.
+    await toggle.check({ force: true });
     await save();
     await page.reload();
     await expect(toggle).toBeChecked();
