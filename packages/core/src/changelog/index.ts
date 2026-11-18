@@ -81,8 +81,8 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-18',
-    pt: 'As conquistas no perfil ganharam abas: "Para conquistar", com as mais perto de sair primeiro, e "Conquistadas".',
-    en: 'Achievements on the profile now have tabs: "To earn", closest first, and "Earned".',
+    pt: 'As conquistas no perfil ganharam abas: "Em aberto", com as mais perto de sair primeiro, e "Finalizadas".',
+    en: 'Achievements on the profile now have tabs: "Open", closest first, and "Completed".',
   },
   {
     date: '2026-11-19',

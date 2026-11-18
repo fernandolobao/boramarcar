@@ -1053,8 +1053,8 @@
       }
     },
     "tabsLabel": "Achievements",
-    "tabPending": "To earn ({count})",
-    "tabDone": "Earned ({count})",
+    "tabPending": "Open ({count})",
+    "tabDone": "Completed ({count})",
     "allDone": "All earned! Nothing left.",
     "noneYet": "No achievements yet. Your first recorded game already earns one."
   },
