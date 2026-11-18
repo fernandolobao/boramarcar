@@ -1,7 +1,7 @@
 import { isGameFormat } from '@boramarcar/core';
-import { getGroupAttendance, listLocations, listMembers } from '@boramarcar/db';
+import { getGroupAttendance, lastRecapMonth, listLocations, listMembers } from '@boramarcar/db';
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { AttendanceCard } from '@/components/attendance-card';
 import { CreateGroupForm, JoinGroupForm, SwitchGroupButton } from '@/components/group-forms';
 import { GroupSettingsForm } from '@/components/group-settings-form';
@@ -36,6 +36,17 @@ export default async function GroupPage() {
       : null;
   const ts = await getTranslations('share');
   const tr = await getTranslations('records');
+  const tm = await getTranslations('monthly');
+  const recapMonth = active
+    ? await lastRecapMonth(getDb(), { groupId: active.id }).then(async (value) => ({
+        value,
+        label: (await getFormatter()).dateTime(new Date(`${value}-15T12:00:00Z`), {
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
+      }))
+    : null;
   const invite = active
     ? await (async () => {
         const url = inviteUrl(active.inviteCode);
@@ -59,10 +70,22 @@ export default async function GroupPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-xl font-semibold">{active.name}</h2>
                 {/* Atalho para os recordes e a cara do grupo (8.12). */}
-                <Link href="/grupo/recordes" className="btn-secondary">
-                  <Icon name="ranking" />
-                  {tr('link')}
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/grupo/recordes" className="btn-secondary">
+                    <Icon name="ranking" />
+                    {tr('link')}
+                  </Link>
+                  {/* Retrospectiva do mês que passou (8.12). */}
+                  {recapMonth && (
+                    <Link
+                      href={`/retrospectiva/${active.id}/${recapMonth.value}`}
+                      className="btn-secondary"
+                    >
+                      <Icon name="events" />
+                      {tm('link', { month: recapMonth.label })}
+                    </Link>
+                  )}
+                </div>
               </div>
               <h3 className="section-title mt-4">{t('inviteTitle')}</h3>
               {invite && (

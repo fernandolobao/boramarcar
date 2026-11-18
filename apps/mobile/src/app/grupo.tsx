@@ -1,7 +1,8 @@
 import type { Member } from '@boramarcar/api-client';
 import { Stack, router } from 'expo-router';
 import { useState } from 'react';
-import { RefreshControl, ScrollView, Share, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, Share, View } from 'react-native';
+import { previousMonth } from '@boramarcar/core/integration';
 import { ConfirmButton } from '@/components/confirm-button';
 import { AttendanceCard } from '@/components/attendance-card';
 import { GroupSettingsCard, SeasonsCard } from '@/components/group-settings';
@@ -10,9 +11,9 @@ import { NoGroup } from '@/components/no-group';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
-import { API_URL } from '@/lib/config';
+import { API_URL, monthlyRecapUrl } from '@/lib/config';
 import { useGroup } from '@/lib/group';
-import { t, type MessageKey } from '@/lib/i18n';
+import { formatMonthYear, t, type MessageKey } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 
 type Role = Member['role'];
@@ -124,6 +125,7 @@ function MemberRow({
 /** Seu grupo (paridade com /grupo do site): convite, membros e locais do grupo ativo. */
 export default function GroupScreen() {
   const { group, groups, loading: loadingGroup, error: groupError, reload } = useGroup();
+  const recapMonth = previousMonth(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone);
   const { data: session } = authClient.useSession();
   const members = useAsync(
     () => (group ? api.groups.members(group.id) : Promise.resolve([])),
@@ -198,6 +200,13 @@ export default function GroupScreen() {
         label={t('recordsLink')}
         variant="secondary"
         onPress={() => router.push('/recordes')}
+        style={{ alignSelf: 'flex-start' }}
+      />
+      {/* Retrospectiva do mês que passou (página do site, a mesma que se compartilha). */}
+      <Button
+        label={t('monthlyLink', { month: formatMonthYear(new Date(`${recapMonth}-15T12:00:00Z`)) })}
+        variant="secondary"
+        onPress={() => void Linking.openURL(monthlyRecapUrl(group.id, recapMonth))}
         style={{ alignSelf: 'flex-start' }}
       />
 

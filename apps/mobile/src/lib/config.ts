@@ -12,3 +12,7 @@ export const API_URL = (process.env.EXPO_PUBLIC_API_URL?.trim() || PRODUCTION_UR
 
 /** Tempo máximo de cada pedido ao servidor antes de mostrar o erro de conexão. */
 export const REQUEST_TIMEOUT_MS = 15_000;
+
+/** Retrospectiva do mês do grupo (página pública do site). */
+export const monthlyRecapUrl = (groupId: string, month: string) =>
+  `${API_URL}/retrospectiva/${groupId}/${month}`;

@@ -4,3 +4,4 @@ export * from './attendance';
 export * from './rivalries';
 export * from './welcome';
 export * from './records';
+export * from './monthly';
