@@ -2093,5 +2093,50 @@
     "markAll": "Mark all as read",
     "unreadCount": "{count, plural, =0 {All read.} =1 {1 unread.} other {# unread.}}",
     "nudge": "{group} invited you to the next meetup: {event}."
+  },
+  "records": {
+    "title": "Group records",
+    "metaDescription": "Your Magic table’s records and the group’s identity: colors, commanders and the meta.",
+    "intro": "What {group} has achieved so far, and the group’s identity.",
+    "empty": "No games recorded yet. Records show up after the first game night.",
+    "recordsTitle": "Records",
+    "someone": "someone",
+    "event": "meetup",
+    "fastestWin": {
+      "title": "Fastest win",
+      "body": "<who></who> won on turn {turn}, at <event></event> ({date})."
+    },
+    "longestGame": {
+      "title": "Longest game",
+      "body": "A {minutes}-minute game, at <event></event> ({date})."
+    },
+    "longestStreak": {
+      "title": "Longest winning streak",
+      "body": "<who></who> won {length} games in a row, up to <event></event> ({date})."
+    },
+    "busiestNight": {
+      "title": "Night with the most games",
+      "body": "{games} games at <event></event> ({date})."
+    },
+    "topCommander": {
+      "title": "Commander with the most wins",
+      "body": "{name}, with {wins, plural, =1 {1 win} other {# wins}}."
+    },
+    "faceTitle": "The group’s identity",
+    "faceHint": "The colors of the decks used in games (each deck counts the colors of its identity) and the commanders that show up at the table.",
+    "colorsLabel": "Most played colors",
+    "colors": {
+      "W": "White",
+      "U": "Blue",
+      "B": "Black",
+      "R": "Red",
+      "G": "Green",
+      "C": "Colorless"
+    },
+    "commanders": "{count, plural, =0 {No commanders recorded yet.} =1 {1 different commander has shown up at the table.} other {# different commanders have shown up at the table.}}",
+    "metaTitle": "The meta of the last {days} days",
+    "metaGames": "{count, plural, =1 {1 game} other {# games}}",
+    "link": "Records and group identity",
+    "and": " and "
   }
 }

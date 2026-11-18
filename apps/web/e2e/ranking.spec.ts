@@ -48,4 +48,15 @@ test.describe('ranking e estatísticas', () => {
       page.getByLabel('Período').locator('option', { hasText: 'Temporada: Temporada E2E' }),
     ).toHaveCount(1);
   });
+
+  test('recordes do grupo: atalho na tela do grupo e os recordes com o encontro', async ({
+    page,
+  }) => {
+    await page.goto('/grupo');
+    await page.getByRole('link', { name: 'Recordes e a cara do grupo' }).click();
+    await expect(page).toHaveURL(/\/grupo\/recordes$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Recordes do grupo' })).toBeVisible();
+    await expect(page.getByText('Noite com mais partidas')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'A cara do grupo' })).toBeVisible();
+  });
 });

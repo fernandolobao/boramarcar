@@ -502,6 +502,40 @@ describe('cliente da API', () => {
     );
   });
 
+  it('recordes do grupo: datas convertidas e recordes vazios aceitos', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      json({
+        totalGames: 2,
+        records: {
+          fastestWin: {
+            gameId: 'g1',
+            eventId: 'e1',
+            playedAt: '2026-11-12T23:00:00.000Z',
+            turn: 4,
+            winnerIds: ['u1'],
+          },
+          longestGame: null,
+          longestStreak: null,
+          busiestNight: { eventId: 'e1', playedAt: '2026-11-12T23:00:00.000Z', games: 2 },
+          topCommander: null,
+        },
+        face: { colors: { W: 0, U: 0, B: 0, R: 0, G: 2, C: 0 }, commanders: 1, meta: [] },
+        people: { u1: 'Ana' },
+        eventTitles: { e1: 'Noite' },
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const view = await api.stats.records('g1');
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/records',
+    );
+    expect(view.records.fastestWin!.playedAt).toBeInstanceOf(Date);
+    expect(view.records.longestGame).toBeNull();
+  });
+
   it('grupo: convite novo, papéis, remoção, posse e locais', async () => {
     const fetchMock = vi
       .fn()

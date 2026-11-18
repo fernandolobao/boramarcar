@@ -498,3 +498,8 @@ sem rolagem horizontal em 320px.
 
 - Botão "Editar deck" (`aria-haspopup="dialog"`) no canto do topo da página do deck, só para o dono. Abre um `<dialog>` modal com título associado; Esc, clique no fundo e o botão "Fechar" (ícone com nome e `title`) fecham, e o foco volta ao botão. Salvar fecha a janela e atualiza a página.
 - "Remover deck" saiu do topo e foi para a "Zona de perigo" dentro da janela (seção com título e explicação), com a confirmação em dois cliques; o nome acessível do primeiro clique traz o nome do deck.
+
+## Recordes e a cara do grupo (19/11/2026)
+
+- `/grupo/recordes`: `h1`, duas seções com `h2`; cada recorde com título e frase completa (quem, o quê, em qual encontro e quando), com links para o perfil e o encontro; ícones decorativos. As cores aparecem com o símbolo de mana (decorativo) **e** o nome por extenso com a porcentagem — cor não é a única pista. Página no E2E de acessibilidade.
+- App: tela com cada recorde como item acessível (título e frase).

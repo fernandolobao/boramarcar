@@ -35,6 +35,7 @@ export default async function GroupPage() {
       ? await getGroupAttendance(db, { groupId: active.id, userId: user.id, now })
       : null;
   const ts = await getTranslations('share');
+  const tr = await getTranslations('records');
   const invite = active
     ? await (async () => {
         const url = inviteUrl(active.inviteCode);
@@ -55,7 +56,14 @@ export default async function GroupPage() {
         {active && (
           <>
             <section className="card">
-              <h2 className="text-xl font-semibold">{active.name}</h2>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-xl font-semibold">{active.name}</h2>
+                {/* Atalho para os recordes e a cara do grupo (8.12). */}
+                <Link href="/grupo/recordes" className="btn-secondary">
+                  <Icon name="ranking" />
+                  {tr('link')}
+                </Link>
+              </div>
               <h3 className="section-title mt-4">{t('inviteTitle')}</h3>
               {invite && (
                 <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">

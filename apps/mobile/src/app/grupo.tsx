@@ -193,6 +193,13 @@ export default function GroupScreen() {
       <AppText accessibilityRole="header" style={styles.title}>
         {group.name}
       </AppText>
+      {/* Recordes e a cara do grupo (8.12). */}
+      <Button
+        label={t('recordsLink')}
+        variant="secondary"
+        onPress={() => router.push('/recordes')}
+        style={{ alignSelf: 'flex-start' }}
+      />
 
       <Card style={{ gap: 10 }}>
         <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>

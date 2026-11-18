@@ -49,6 +49,7 @@ const AUTH_PAGES = [
   '/decks/importar',
   '/colecao',
   '/grupo',
+  '/grupo/recordes',
   '/perfil',
   '/configuracoes',
   '/feedback?de=/painel',

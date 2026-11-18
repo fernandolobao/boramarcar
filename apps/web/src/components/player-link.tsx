@@ -24,13 +24,22 @@ export function PlayerLink({
   );
 }
 
-/** Lista de jogadores separada por vírgulas, cada nome com link para o perfil. */
-export function PlayerLinks({ players }: { players: readonly { userId: string; name: string }[] }) {
+/**
+ * Lista de jogadores separada por vírgulas, cada nome com link para o perfil. Com `lastSeparator`
+ * (ex.: " e "), o último nome vem depois dele: "Ana, Bia e Caio".
+ */
+export function PlayerLinks({
+  players,
+  lastSeparator,
+}: {
+  players: readonly { userId: string; name: string }[];
+  lastSeparator?: string;
+}) {
   return (
     <>
       {players.map((p, i) => (
         <Fragment key={p.userId}>
-          {i > 0 && ', '}
+          {i > 0 && (lastSeparator && i === players.length - 1 ? lastSeparator : ', ')}
           <PlayerLink userId={p.userId} name={p.name} />
         </Fragment>
       ))}

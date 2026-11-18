@@ -2093,5 +2093,50 @@
     "markAll": "Marcar todas como lidas",
     "unreadCount": "{count, plural, =0 {Tudo lido.} =1 {1 não lida.} other {# não lidas.}}",
     "nudge": "{group} chamou você para o próximo encontro: {event}."
+  },
+  "records": {
+    "title": "Recordes do grupo",
+    "metaDescription": "Os recordes da sua mesa de Magic e a cara do grupo: cores, comandantes e o meta.",
+    "intro": "Os feitos da {group} até aqui, e a cara do grupo.",
+    "empty": "Ainda não há partidas registradas. Os recordes aparecem depois da primeira noite de jogo.",
+    "recordsTitle": "Recordes",
+    "someone": "alguém",
+    "event": "encontro",
+    "fastestWin": {
+      "title": "Vitória mais rápida",
+      "body": "<who></who> {count, plural, =1 {venceu} other {venceram}} no turno {turn}, em <event></event> ({date})."
+    },
+    "longestGame": {
+      "title": "Partida mais longa",
+      "body": "{minutes} minutos de partida, em <event></event> ({date})."
+    },
+    "longestStreak": {
+      "title": "Maior sequência de vitórias",
+      "body": "<who></who> venceu {length} partidas seguidas, até <event></event> ({date})."
+    },
+    "busiestNight": {
+      "title": "Noite com mais partidas",
+      "body": "{games} partidas em <event></event> ({date})."
+    },
+    "topCommander": {
+      "title": "Comandante com mais vitórias",
+      "body": "{name}, com {wins, plural, =1 {1 vitória} other {# vitórias}}."
+    },
+    "faceTitle": "A cara do grupo",
+    "faceHint": "As cores dos decks usados nas partidas (cada deck conta as cores da identidade dele) e os comandantes que aparecem na mesa.",
+    "colorsLabel": "Cores mais jogadas",
+    "colors": {
+      "W": "Branco",
+      "U": "Azul",
+      "B": "Preto",
+      "R": "Vermelho",
+      "G": "Verde",
+      "C": "Incolor"
+    },
+    "commanders": "{count, plural, =0 {Nenhum comandante registrado ainda.} =1 {1 comandante diferente já apareceu na mesa.} other {# comandantes diferentes já apareceram na mesa.}}",
+    "metaTitle": "O meta dos últimos {days} dias",
+    "metaGames": "{count, plural, =1 {1 partida} other {# partidas}}",
+    "link": "Recordes e a cara do grupo",
+    "and": " e "
   }
 }
