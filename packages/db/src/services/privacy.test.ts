@@ -26,6 +26,7 @@ import {
   exportUserData,
 } from './privacy';
 import { getGroupRanking } from './ranking';
+import { addEntrant, createTournament } from './tournaments';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -105,6 +106,14 @@ async function seedPlayer() {
 describe('exportUserData', () => {
   it('traz os dados da pessoa, sem tokens nem dados de outras pessoas', async () => {
     const { a, b, future } = await seedPlayer();
+    const cup = await createTournament(db, {
+      eventId: future.id,
+      userId: a,
+      name: 'Copa de Quinta',
+      format: 'modern',
+    });
+    await addEntrant(db, { tournamentId: cup.id, userId: a, memberIds: [a] });
+    await addEntrant(db, { tournamentId: cup.id, userId: a, memberIds: [b] });
     await db.insert(eventNudges).values({ eventId: future.id, userId: a, sentBy: b });
     await db
       .insert(notifications)
@@ -123,6 +132,11 @@ describe('exportUserData', () => {
     ]);
     expect(Object.keys(withAccess.adminAccess[0]!)).not.toContain('adminId');
     expect(data.notifications).toEqual([expect.objectContaining({ kind: 'podium', readAt: null })]);
+    // Torneios em que a pessoa se inscreveu: nome e formato, sem dizer quem mais entrou.
+    expect(data.tournaments).toEqual([
+      expect.objectContaining({ name: 'Copa de Quinta', format: 'modern' }),
+    ]);
+    expect(JSON.stringify(data.tournaments)).not.toContain(b);
     // Chamados para encontros: o encontro e quando, sem dizer quem chamou (dado de outra pessoa).
     expect(data.invitations).toEqual([
       expect.objectContaining({ event: 'Encontro futuro', group: 'Mesa de Quinta' }),

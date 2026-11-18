@@ -10,6 +10,8 @@ import {
   eventNudges,
   notifications,
   adminAccessLog,
+  tournamentEntrantMembers,
+  tournaments,
   eventParticipants,
   events,
   feedback,
@@ -218,6 +220,19 @@ export async function exportUserData(db: Database, userId: string) {
     .where(eq(adminAccessLog.targetUserId, userId))
     .orderBy(asc(adminAccessLog.createdAt));
 
+  // Torneios em que a pessoa se inscreveu (sem quem mais entrou: dado de outras pessoas).
+  const tournamentRows = await db
+    .select({
+      name: tournaments.name,
+      format: tournaments.format,
+      status: tournaments.status,
+      createdAt: tournaments.createdAt,
+    })
+    .from(tournamentEntrantMembers)
+    .innerJoin(tournaments, eq(tournaments.id, tournamentEntrantMembers.tournamentId))
+    .where(eq(tournamentEntrantMembers.userId, userId))
+    .orderBy(asc(tournaments.createdAt));
+
   return {
     format: 'arcanakin-export',
     version: 1,
@@ -234,6 +249,7 @@ export async function exportUserData(db: Database, userId: string) {
     invitations,
     notifications: inbox,
     adminAccess,
+    tournaments: tournamentRows,
     games: played,
     decks: ownDecks.map(({ id, ...deck }) => ({
       ...deck,
