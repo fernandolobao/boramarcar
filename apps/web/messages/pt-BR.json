@@ -1047,8 +1047,8 @@
       }
     },
     "tabsLabel": "Conquistas",
-    "tabPending": "Para conquistar ({count})",
-    "tabDone": "Conquistadas ({count})",
+    "tabPending": "Em aberto ({count})",
+    "tabDone": "Finalizadas ({count})",
     "allDone": "Todas conquistadas! Não falta nenhuma.",
     "noneYet": "Nenhuma conquista ainda. A primeira partida registrada já vale uma."
   },

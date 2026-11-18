@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components';
 
 /**
- * Abas das conquistas no perfil: "Para conquistar" abre por padrão; "Conquistadas" ao lado.
+ * Abas das conquistas no perfil: "Em aberto" abre por padrão; "Finalizadas" ao lado.
  * As listas chegam prontas do servidor (o conteúdo de cada aba).
  */
 export function AchievementTabs({
