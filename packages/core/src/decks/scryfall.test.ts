@@ -138,6 +138,30 @@ describe('fetchScryfallAutocomplete', () => {
     ).toEqual([]);
   });
 
+  it('acha cartas de duas faces pelo nome em português (o nome fica nas faces)', async () => {
+    const { fetchScryfallPrintedNames } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json({
+        data: [
+          {
+            name: "Idol of the Deep King // Sovereign's Macuahuitl",
+            lang: 'pt',
+            card_faces: [
+              { name: 'Idol of the Deep King', printed_name: 'Ídolo do Rei das Profundezas' },
+              { name: "Sovereign's Macuahuitl", printed_name: 'Macuahuitl do Soberano' },
+            ],
+          },
+        ],
+      }),
+    );
+    expect(await fetchScryfallPrintedNames('ídolo do rei', { fetch: fetchMock })).toEqual([
+      {
+        name: "Idol of the Deep King // Sovereign's Macuahuitl",
+        printedName: 'Ídolo do Rei das Profundezas // Macuahuitl do Soberano',
+      },
+    ]);
+  });
+
   it('busca cartas e trata "sem resultados"', async () => {
     const { fetchScryfallSearch } = await import('./scryfall');
     const fetchMock = vi.fn(async (_url: string) =>
