@@ -104,6 +104,15 @@ describe('CollectionView', () => {
     expect(await audit(container)).toEqual([]);
   });
 
+  it('grade: "Em 1 deck" e "Em nenhum deck" com o mesmo tamanho, peso e cor', () => {
+    wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
+    const inDeck = screen.getByText('Em 1 deck');
+    const none = screen.getByText('Em nenhum deck');
+    expect(none.className).toBe(inDeck.className);
+    // Sem `muted` (que traz text-sm e deixaria um maior que o outro).
+    expect(none.className.split(' ')).not.toContain('muted');
+  });
+
   it('filtros: cor, custo, tipo, foil, em deck; limpar volta tudo', () => {
     wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
     const status = () =>
