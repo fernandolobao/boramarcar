@@ -41,13 +41,14 @@ test.describe('conta com e-mail e senha', () => {
       page.getByRole('alert').filter({ hasText: 'E-mail ou senha incorretos' }),
     ).toBeVisible();
 
-    // Confirmado (o link do e-mail faz isso): entra (sem grupo ainda, o painel leva ao grupo).
+    // Confirmado (o link do e-mail faz isso): entra. Conta nova (criada depois do lançamento do
+    // guia) abre primeiro o guia de boas-vindas.
     const { pool } = createDb(process.env.E2E_DATABASE_URL!, { max: 1 });
     await pool.query('update "user" set email_verified = true where email = $1', [email]);
     await pool.end();
     await signIn.getByLabel('Senha').fill('senha-segura-123');
     await signIn.getByRole('button', { name: 'Entrar com e-mail' }).click();
-    await expect(page).toHaveURL(/\/(painel|grupo)$/);
+    await expect(page).toHaveURL(/\/boas-vindas$/);
   });
 
   test('esqueci a senha responde igual exista ou não a conta; link inválido avisa', async ({
