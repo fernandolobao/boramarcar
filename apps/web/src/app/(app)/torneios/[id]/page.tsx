@@ -236,6 +236,7 @@ export default async function TournamentPage({ params }: Props) {
             <div
               role="region"
               aria-label={t('standings')}
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- região rolável precisa de foco pelo teclado
               tabIndex={0}
               className="-mx-1 overflow-x-auto px-1 focus-visible:outline-2 focus-visible:outline-focus"
             >
