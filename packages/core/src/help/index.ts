@@ -231,6 +231,17 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'compartilhar-deck',
+            question: 'Como compartilho um deck?',
+            steps: [
+              'No site, abra o deck e, em "Editar deck", mude a visibilidade para "Público".',
+              'Abra "Compartilhar deck": copie o link, mande pelo WhatsApp ou baixe o QR Code.',
+            ],
+            notes: [
+              'Quem recebe vê a lista e a análise; quem ainda não tem conta cria uma antes. Decks do grupo ou privados não têm esse bloco.',
+            ],
+          },
+          {
             id: 'proxies',
             question: 'Como marco e imprimo proxies?',
             intro: [
@@ -512,6 +523,17 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Filter by set code and number ("ltr 268"), by part of the set name or by artist ("tedin"), handy for old cards without a number.',
               'Pick the printing and how many copies change. The rest keep the current edition.',
               'When adding to your collection, you pick the edition first; if the card has only one edition, it comes already picked.',
+            ],
+          },
+          {
+            id: 'compartilhar-deck',
+            question: 'How do I share a deck?',
+            steps: [
+              'On the website, open the deck and, in "Edit deck", set the visibility to "Public".',
+              'Open "Share deck": copy the link, send it on WhatsApp or download the QR code.',
+            ],
+            notes: [
+              'People who get it see the list and the analysis; anyone without an account creates one first. Group and private decks do not have this block.',
             ],
           },
           {
