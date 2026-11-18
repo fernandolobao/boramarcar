@@ -433,6 +433,7 @@ sem rolagem horizontal em 320px.
 ## Gráfico da metodologia na página inicial (18/11/2026)
 
 - As seis partes da nota tinham cores parecidas (dois roxos e dois verdes quase iguais). Agora são seis tons distintos das três famílias da marca, alternando a família a cada parte, validados com o script de paleta (separação para daltonismo ΔE ≥ 12 entre vizinhas, tema claro). A barra é decorativa (`aria-hidden`): a lista ao lado traz os pontos e o nome de cada parte, na mesma ordem, então a cor não é a única pista.
+
 ## Seletor de idioma na página inicial (18/11/2026)
 
 - "PT | EN" no topo é um `role="group"` ("Idioma") com dois botões `aria-pressed`. O nome acessível começa pelo texto visível ("PT — Português (Brasil)", WCAG 2.5.3) e cada botão tem `lang` do próprio idioma. Alvos com 24 px no mínimo e foco visível.
