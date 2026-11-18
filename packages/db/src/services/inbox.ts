@@ -207,7 +207,9 @@ export async function listNotifications(
   const eventIds = [
     ...new Set(
       items.flatMap((i) =>
-        i.data.kind === 'game' || i.data.kind === 'group_game' ? [i.data.eventId] : [],
+        i.data.kind === 'game' || i.data.kind === 'group_game' || i.data.kind === 'nudge'
+          ? [i.data.eventId]
+          : [],
       ),
     ),
   ];
@@ -244,7 +246,7 @@ export async function listNotifications(
     readAt: i.readAt,
     groupName: i.groupName,
     eventTitle:
-      i.data.kind === 'game' || i.data.kind === 'group_game'
+      i.data.kind === 'game' || i.data.kind === 'group_game' || i.data.kind === 'nudge'
         ? (titleOf.get(i.data.eventId) ?? null)
         : null,
     announcement:

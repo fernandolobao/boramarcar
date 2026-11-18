@@ -61,6 +61,21 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-18',
+    pt: 'No editor de deck, vários toques no − ou + agora viram uma gravação só, sem travar o campo.',
+    en: 'In the deck editor, several taps on − or + now save once, without locking the field.',
+  },
+  {
+    date: '2026-11-18',
+    pt: 'No modo mesa do app, apagar o número de um marcador para digitar outro não zera mais o marcador.',
+    en: 'In the app’s table mode, clearing a counter to type another number no longer resets it.',
+  },
+  {
+    date: '2026-11-18',
+    pt: 'Quando alguém chama você para o próximo encontro, o convite também aparece no sino de notificações.',
+    en: 'When someone invites you to the next meetup, the invite also shows up in the notifications bell.',
+  },
+  {
+    date: '2026-11-18',
     pt: 'Notificações agora podem ser marcadas como lidas uma a uma, ou todas de uma vez.',
     en: 'Notifications can now be marked as read one by one, or all at once.',
   },

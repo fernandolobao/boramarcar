@@ -243,3 +243,13 @@ export const rollDie = (sides: number, random: () => number = Math.random) =>
   1 + Math.floor(random() * sides);
 
 export * from './layout';
+
+/**
+ * Mudança pedida por um campo numérico do modo mesa (marcadores, dano de comandante): a
+ * diferença para o valor atual, ou `null` quando não há o que mudar. Campo vazio é "apagando
+ * para digitar outro número", não zero: o marcador continua como estava.
+ */
+export function fieldDelta(next: number | null, current: number): number | null {
+  if (next === null || next === current) return null;
+  return next - current;
+}

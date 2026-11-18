@@ -2068,6 +2068,7 @@
     "markOne": "Mark as read",
     "markOneLabel": "Mark as read: {text}",
     "markAll": "Mark all as read",
-    "unreadCount": "{count, plural, =0 {All read.} =1 {1 unread.} other {# unread.}}"
+    "unreadCount": "{count, plural, =0 {All read.} =1 {1 unread.} other {# unread.}}",
+    "nudge": "{group} invited you to the next meetup: {event}."
   }
 }

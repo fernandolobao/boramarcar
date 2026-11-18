@@ -11,6 +11,7 @@ const join = await import('../groups/join/route');
 const events = await import('../groups/[groupId]/events/route');
 const games = await import('../events/[eventId]/games/route');
 const inbox = await import('../me/notifications/route');
+const nudge = await import('../groups/[groupId]/members/[userId]/nudge/route');
 const read = await import('../me/notifications/read/route');
 const readOne = await import('../me/notifications/[notificationId]/read/route');
 
@@ -107,5 +108,36 @@ describe('central de notificações (API)', () => {
     expect(forAna.map((i) => i.kind)).toEqual(['achievement', 'achievement']);
     // Primeira partida do grupo: o pódio só é guardado, sem aviso.
     expect(forAna.some((i) => i.kind === 'podium')).toBe(false);
+  });
+
+  it('"Chamar para o próximo" chega na central de quem foi chamado (não depende de push nem e-mail)', async () => {
+    asUser(ana);
+    const created = await call(groups.POST, { method: 'POST', body: { name: 'Mesa 2' } });
+    const groupId = created.body!.group.id as string;
+    asUser(caio);
+    await call(join.POST, { method: 'POST', body: { inviteCode: created.body!.group.inviteCode } });
+    asUser(ana);
+    const event = await call(events.POST, {
+      method: 'POST',
+      params: { groupId },
+      body: {
+        title: 'Próxima quinta',
+        startsAt: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+      },
+    });
+    const eventId = event.body!.event.id as string;
+    const res = await call(nudge.POST, {
+      method: 'POST',
+      params: { groupId, userId: caio.id },
+      body: { eventId },
+    });
+    expect(res.status).toBe(201);
+    asUser(caio);
+    const items = (await call(inbox.GET)).body!.items as { kind: string }[];
+    expect(items.find((i) => i.kind === 'nudge')).toMatchObject({
+      kind: 'nudge',
+      eventTitle: 'Próxima quinta',
+      data: { kind: 'nudge', eventId },
+    });
   });
 });

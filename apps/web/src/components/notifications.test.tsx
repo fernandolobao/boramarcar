@@ -59,6 +59,14 @@ const items: InboxEntry[] = [
   },
   {
     ...base,
+    id: '5',
+    kind: 'nudge',
+    createdAt: '2026-11-15T10:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    data: { kind: 'nudge', eventId: 'e9' },
+  },
+  {
+    ...base,
     id: '4',
     kind: 'announcement',
     groupName: null,
@@ -83,6 +91,11 @@ describe('NotificationList', () => {
       screen.getByText('O pódio de Mesa de Quinta mudou: 1º Caio, 2º Bia, 3º alguém.'),
     ).toBeInTheDocument();
     expect(screen.getAllByText('Nova')).toHaveLength(1);
+    expect(
+      screen.getByRole('link', {
+        name: /Mesa de Quinta chamou você para o próximo encontro: Noite\./,
+      }),
+    ).toHaveAttribute('href', '/eventos/e9');
     // Aviso do ArcanaKin: título e texto, sem link.
     expect(screen.getByText('Manutenção no sábado')).toBeInTheDocument();
     expect(screen.getByText(/Das 8h às 8h10\./)).toBeInTheDocument();
@@ -115,7 +128,7 @@ describe('NotificationList', () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
     vi.stubGlobal('fetch', fetchMock);
     wrap(<NotificationList items={items.map((i) => ({ ...i, readAt: null }))} />);
-    expect(screen.getAllByText('Nova')).toHaveLength(4);
+    expect(screen.getAllByText('Nova')).toHaveLength(5);
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Marcar todas como lidas' }));
     });

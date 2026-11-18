@@ -1,5 +1,6 @@
 import { formatRules } from '@boramarcar/core/games';
 import {
+  fieldDelta,
   defeatReason,
   nextRotation,
   seatSwipe,
@@ -167,14 +168,18 @@ function PlayerOptions({
                   min={0}
                   label={t('tableFrom', { name: p.name })}
                   value={player.commanderDamage[p.userId] ?? 0}
-                  onChange={(v) =>
-                    dispatch({
-                      type: 'commander',
-                      userId: player.userId,
-                      fromUserId: p.userId,
-                      delta: (v ?? 0) - (player.commanderDamage[p.userId] ?? 0),
-                    })
-                  }
+                  onChange={(v) => {
+                    // Campo vazio não zera: a pessoa está apagando para digitar outro número.
+                    const delta = fieldDelta(v, player.commanderDamage[p.userId] ?? 0);
+                    if (delta !== null) {
+                      dispatch({
+                        type: 'commander',
+                        userId: player.userId,
+                        fromUserId: p.userId,
+                        delta,
+                      });
+                    }
+                  }}
                 />
               ))}
           </View>
@@ -189,14 +194,13 @@ function PlayerOptions({
               min={0}
               label={counterLabel(counter)}
               value={player.counters[counter]}
-              onChange={(v) =>
-                dispatch({
-                  type: 'counter',
-                  userId: player.userId,
-                  counter,
-                  delta: (v ?? 0) - player.counters[counter],
-                })
-              }
+              onChange={(v) => {
+                // Campo vazio não zera o marcador (ver `fieldDelta`).
+                const delta = fieldDelta(v, player.counters[counter]);
+                if (delta !== null) {
+                  dispatch({ type: 'counter', userId: player.userId, counter, delta });
+                }
+              }}
             />
           ))}
         </View>
