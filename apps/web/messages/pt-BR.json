@@ -94,7 +94,14 @@
       "since": "Sua última partida com <name></name> foi {when}.",
       "goingNext": "vai no próximo encontro"
     },
-    "welcomeNew": "Boas-vindas ao grupo! Confirme presença no próximo encontro e venha jogar com a gente."
+    "welcomeNew": "Boas-vindas ao grupo! Confirme presença no próximo encontro e venha jogar com a gente.",
+    "rivalries": {
+      "title": "Rivalidades",
+      "hint": "Só conta quem jogou com você pelo menos 3 vezes. É brincadeira!",
+      "rival": "Seu maior rival: <name></name> venceu {losses, plural, =1 {1 partida} other {# partidas}} das {games} entre vocês.",
+      "prey": "Seu freguês: você venceu <name></name> em {wins, plural, =1 {1 partida} other {# partidas}} das {games}.",
+      "versus": "Entre vocês: {wins, plural, =1 {você venceu 1} other {você venceu #}}, {name} venceu {losses} (em {games, plural, =1 {1 partida} other {# partidas}})."
+    }
   },
   "group": {
     "title": "Seu grupo",
@@ -1057,8 +1064,8 @@
       }
     },
     "tabsLabel": "Conquistas",
-    "tabPending": "Para conquistar ({count})",
-    "tabDone": "Conquistadas ({count})",
+    "tabPending": "Em aberto ({count})",
+    "tabDone": "Finalizadas ({count})",
     "allDone": "Todas conquistadas! Não falta nenhuma.",
     "noneYet": "Nenhuma conquista ainda. A primeira partida registrada já vale uma."
   },

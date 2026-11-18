@@ -23,7 +23,7 @@ import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
 import { EmptyState } from '@/components/empty-state';
 import { BETA_WEEKS } from '@boramarcar/core';
-import { isNewMember } from '@boramarcar/core/integration';
+import { isNewMember, rivalriesFor } from '@boramarcar/core/integration';
 import { BetaBanner } from '@/components/beta-banner';
 import { FirstSteps } from '@/components/first-steps';
 import { NewAchievements } from '@/components/new-achievements';
@@ -170,6 +170,8 @@ export default async function DashboardPage() {
   const recent = mine?.recent ?? [];
   const count = (r: string) => recent.filter((x) => x === r).length;
   const heroArt = stats.commanders.find((c) => c.artUri)?.artUri ?? null;
+  const rivalries = rivalriesFor(stats.headToHead, user.id);
+  const nameOf = (id: string) => stats.players.find((p) => p.userId === id)?.name ?? '';
 
   return (
     <>
@@ -398,6 +400,52 @@ export default async function DashboardPage() {
             </ol>
           )}
         </section>
+
+        {/* Rivalidades (8.11): maior rival e freguês, com no mínimo 3 partidas juntos. */}
+        {(rivalries.rival || rivalries.prey) && (
+          <section className="card" aria-labelledby="painel-rivalidades">
+            <h2 id="painel-rivalidades" className="section-title">
+              {t('rivalries.title')}
+            </h2>
+            <p className="muted mb-3">{t('rivalries.hint')}</p>
+            <ul className="space-y-2">
+              {rivalries.rival && (
+                <li className="flex items-start gap-2">
+                  <Icon name="games" className="mt-0.5 shrink-0 text-fg-muted" />
+                  <span>
+                    {t.rich('rivalries.rival', {
+                      losses: rivalries.rival.losses,
+                      games: rivalries.rival.games,
+                      name: () => (
+                        <PlayerLink
+                          userId={rivalries.rival!.opponentId}
+                          name={nameOf(rivalries.rival!.opponentId)}
+                        />
+                      ),
+                    })}
+                  </span>
+                </li>
+              )}
+              {rivalries.prey && (
+                <li className="flex items-start gap-2">
+                  <Icon name="winner" className="mt-0.5 shrink-0 text-fg-muted" />
+                  <span>
+                    {t.rich('rivalries.prey', {
+                      wins: rivalries.prey.wins,
+                      games: rivalries.prey.games,
+                      name: () => (
+                        <PlayerLink
+                          userId={rivalries.prey!.opponentId}
+                          name={nameOf(rivalries.prey!.opponentId)}
+                        />
+                      ),
+                    })}
+                  </span>
+                </li>
+              )}
+            </ul>
+          </section>
+        )}
 
         {/* Com quem você ainda não jogou: misturar a mesa. */}
         {partners.hints.length > 0 && (

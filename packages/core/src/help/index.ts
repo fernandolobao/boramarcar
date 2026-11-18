@@ -278,7 +278,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'O que são as conquistas?',
             intro: [
-              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano e outros. Abra o perfil (toque no seu nome no ranking): a aba "Para conquistar" mostra o que falta, as mais perto de sair primeiro, e "Conquistadas" mostra as que você já ganhou, com a data.',
+              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano e outros. Abra o perfil (toque no seu nome no ranking): a aba "Em aberto" mostra o que falta, as mais perto de sair primeiro, e "Finalizadas" mostra as que você já ganhou, com a data.',
               'Quando você ganha conquistas novas, uma janela mostra todas juntas na próxima vez que abrir o painel ou o seu perfil, mesmo que tenham vindo de várias partidas.',
             ],
           },
@@ -289,6 +289,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'O sino fica no topo do site e no painel do app, com o número de novidades. Lá aparecem as partidas em que você jogou, as partidas do seu grupo, as conquistas que você ganhou, as mudanças no pódio do grupo e os avisos do ArcanaKin. Toque numa notificação para abrir o encontro, o perfil ou o ranking; ela passa a contar como lida. Também dá para marcar uma como lida sem abrir, ou "Marcar todas como lidas" no topo.',
               'Toda semana, as novidades do ArcanaKin também chegam por ali, num texto curto.',
               'As notificações ficam só no site e no app: e-mail e avisos no celular continuam só para encontros.',
+            ],
+          },
+          {
+            id: 'rivalidades',
+            question: 'O que são "Rivalidades"?',
+            intro: [
+              'No painel, "Seu maior rival" é quem mais venceu você e "Seu freguês" é quem você mais venceu, entre as pessoas do grupo que jogaram com você pelo menos 3 vezes. No perfil de outra pessoa, aparece o placar entre vocês dois no grupo. É só brincadeira: ninguém vê as rivalidades dos outros.',
             ],
           },
           {
@@ -596,7 +603,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'What are achievements?',
             intro: [
-              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year and more. Open a profile (tap a name in the ranking): the "To earn" tab shows what is left, closest first, and "Earned" shows the ones you already have, with the date.',
+              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year and more. Open a profile (tap a name in the ranking): the "Open" tab shows what is left, closest first, and "Completed" shows the ones you already have, with the date.',
               'When you earn new achievements, a window shows them all together the next time you open the dashboard or your profile, even if they came from several games.',
             ],
           },
@@ -607,6 +614,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
+            ],
+          },
+          {
+            id: 'rivalidades',
+            question: 'What are "Rivalries"?',
+            intro: [
+              'On the dashboard, "Your biggest rival" is who beat you the most and "Your favorite target" is who you beat the most, among group members who played with you at least 3 times. On someone else’s profile, you see the score between the two of you in the group. It’s just for fun: nobody sees other people’s rivalries.',
             ],
           },
           {

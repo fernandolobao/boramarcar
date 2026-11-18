@@ -85,7 +85,7 @@ export async function Achievements({ achievements }: { achievements: Profile['ac
           {t('unlocked', { count: done.length, total: achievements.length })}
         </p>
       </div>
-      {/* "Para conquistar" abre por padrão (o que falta e quanto falta); "Conquistadas" ao lado. */}
+      {/* "Em aberto" abre por padrão (o que falta e quanto falta); "Finalizadas" ao lado. */}
       <AchievementTabs
         label={t('tabsLabel')}
         tabs={[
@@ -110,14 +110,18 @@ export async function PlayerProfile({
   profile,
   covers,
   ratings,
+  versus,
 }: {
   profile: Profile;
   covers: Awaited<ReturnType<typeof getDeckCovers>>;
   ratings?: DeckRatings;
+  /** Perfil de outra pessoa: o confronto entre vocês dois no grupo ativo (8.11). */
+  versus?: { games: number; wins: number; losses: number } | null;
 }) {
   const t = await getTranslations('profilePage');
   const tp = await getTranslations('player');
   const tg = await getTranslations('group');
+  const td = await getTranslations('dashboard');
   const format = await getFormatter();
 
   return (
@@ -138,6 +142,16 @@ export async function PlayerProfile({
               date: format.dateTime(profile.memberSince, { month: 'long', year: 'numeric' }),
             })}
           </p>
+          {versus && (
+            <p className="mt-1 text-sm font-medium" data-testid="versus">
+              {td('rivalries.versus', {
+                wins: versus.wins,
+                losses: versus.losses,
+                games: versus.games,
+                name: profile.name.split(' ')[0] ?? profile.name,
+              })}
+            </p>
+          )}
         </div>
         {profile.isSelf && (
           <Link href="/configuracoes" className="btn-secondary ms-auto">

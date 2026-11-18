@@ -11,11 +11,11 @@ test.describe('perfis e conquistas', () => {
     await page.goto('/perfil');
     await expect(page.getByRole('heading', { level: 1, name: 'Ana Teste' })).toBeVisible();
     const achievements = page.getByRole('region', { name: 'Conquistas' });
-    // Abas: "Para conquistar" abre por padrão; "Conquistadas" ao lado.
-    const pending = achievements.getByRole('tab', { name: /^Para conquistar \(\d+\)$/ });
+    // Abas: "Em aberto" abre por padrão; "Finalizadas" ao lado.
+    const pending = achievements.getByRole('tab', { name: /^Em aberto \(\d+\)$/ });
     await expect(pending).toHaveAttribute('aria-selected', 'true');
     await expect(achievements.getByText(/Progresso: \d+ de \d+/).first()).toBeVisible();
-    await achievements.getByRole('tab', { name: /^Conquistadas \(\d+\)$/ }).click();
+    await achievements.getByRole('tab', { name: /^Finalizadas \(\d+\)$/ }).click();
     await expect(achievements.getByText('Primeira vitória')).toBeVisible();
     await expect(achievements.getByText(/Conquistada em/).first()).toBeVisible();
     await expect(achievements.getByText(/de 27 conquistadas/)).toBeVisible();
@@ -81,5 +81,18 @@ test.describe('perfis e conquistas', () => {
     await page.reload();
     await expect(page.locator('h1').first()).toBeVisible();
     await expect(page.getByRole('dialog', { name: 'Conquista nova!' })).toHaveCount(0);
+  });
+
+  test('rivalidades: freguês no painel e o confronto no perfil de outra pessoa', async ({
+    page,
+  }) => {
+    await page.goto('/painel');
+    const card = page.getByRole('region', { name: 'Rivalidades' });
+    await expect(card.getByText(/^Seu freguês: você venceu/).first()).toBeVisible();
+    await page.goto('/jogadores/e2e-bia');
+    // Outros testes registram partidas em paralelo: só o formato do texto é conferido.
+    await expect(page.getByTestId('versus')).toHaveText(
+      /^Entre vocês: você venceu \d+, Bia venceu \d+ \(em \d+ partidas?\)\.$/,
+    );
   });
 });
