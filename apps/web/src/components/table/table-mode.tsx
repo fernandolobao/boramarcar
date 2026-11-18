@@ -33,6 +33,7 @@ import { NumberField } from '../ds/number-field';
 import { Choices } from '../ds/choices';
 import { TitleWithTip } from '../tip';
 import { Select } from '@/components/ds/select';
+import { Checkbox } from '@/components/ds/checkbox';
 
 export interface TablePlayerOption {
   userId: string;
@@ -181,16 +182,15 @@ function Setup({
           <ul className="grid gap-2 sm:grid-cols-2">
             {players.map((p) => (
               <li key={p.userId}>
-                <label className="flex min-h-11 items-center gap-2 rounded-xl border border-ink-300 px-3 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50 dark:border-ink-700 dark:has-[:checked]:bg-brand-700/20">
-                  <input
-                    type="checkbox"
-                    checked={seats.includes(p.userId)}
-                    disabled={!seats.includes(p.userId) && seats.length >= MAX_PLAYERS}
-                    onChange={() => toggle(p.userId)}
-                  />
-                  {p.name}
+                <Checkbox
+                  label={p.name}
+                  checked={seats.includes(p.userId)}
+                  disabled={!seats.includes(p.userId) && seats.length >= MAX_PLAYERS}
+                  onChange={() => toggle(p.userId)}
+                  className="min-h-11 rounded-xl border border-line-strong px-3 data-[selected]:border-primary data-[selected]:bg-surface-muted"
+                >
                   {p.confirmed && <span className="muted text-xs">({t('confirmed')})</span>}
-                </label>
+                </Checkbox>
               </li>
             ))}
           </ul>

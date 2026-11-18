@@ -14,6 +14,7 @@ import { useColors } from '@/lib/theme';
 import { formatLabel } from './labels';
 import { Choices } from '@/components/ds/choices';
 import { Tip } from '@/components/tip';
+import { Checkbox } from '@/components/ds/checkbox';
 
 const MAX_PLAYERS = 6;
 const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
@@ -137,18 +138,12 @@ export function TableSetupScreen({
         {setup.players.map((p) => {
           const checked = seats.includes(p.userId);
           return (
-            <Button
+            <Checkbox
               key={p.userId}
-              label={`${checked ? '✓ ' : ''}${p.name}${p.confirmed ? ` (${t('tableConfirmed')})` : ''}`}
-              variant="secondary"
-              accessibilityRole="checkbox"
-              accessibilityState={{
-                checked,
-                disabled: !checked && seats.length >= MAX_PLAYERS,
-              }}
-              selected={checked}
+              label={`${p.name}${p.confirmed ? ` (${t('tableConfirmed')})` : ''}`}
+              checked={checked}
               disabled={!checked && seats.length >= MAX_PLAYERS}
-              onPress={() => toggle(p.userId)}
+              onChange={() => toggle(p.userId)}
               style={{ alignItems: 'flex-start' }}
             />
           );

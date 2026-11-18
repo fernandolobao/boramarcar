@@ -27,6 +27,7 @@ import { isNewMember, rivalriesFor } from '@boramarcar/core/integration';
 import { BetaBanner } from '@/components/beta-banner';
 import { FirstSteps } from '@/components/first-steps';
 import { NewAchievements } from '@/components/new-achievements';
+import { Stat } from '@/components/ds/stat';
 
 export const generateMetadata = navMetadata('dashboard');
 
@@ -521,26 +522,25 @@ export default async function DashboardPage() {
             </tbody>
           </table>
           <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-surface-muted p-2">
-              <dt className="muted text-xs">{t('totalGames')}</dt>
-              <dd className="text-xl font-bold tabular-nums">{stats.totalGames}</dd>
-            </div>
-            <div className="rounded-xl bg-surface-muted p-2">
-              <dt className="muted text-xs">{t('avgTurn')}</dt>
-              <dd className="text-xl font-bold tabular-nums">
-                {stats.averageWinningTurn != null
+            <Stat size="sm" label={t('totalGames')} value={String(stats.totalGames)} />
+            <Stat
+              size="sm"
+              label={t('avgTurn')}
+              value={
+                stats.averageWinningTurn != null
                   ? format.number(stats.averageWinningTurn, { maximumFractionDigits: 1 })
-                  : '—'}
-              </dd>
-            </div>
-            <div className="rounded-xl bg-surface-muted p-2">
-              <dt className="muted text-xs">{t('avgDuration')}</dt>
-              <dd className="text-xl font-bold tabular-nums">
-                {stats.averageDurationMinutes != null
+                  : '—'
+              }
+            />
+            <Stat
+              size="sm"
+              label={t('avgDuration')}
+              value={
+                stats.averageDurationMinutes != null
                   ? tc('minutes', { count: Math.round(stats.averageDurationMinutes) })
-                  : '—'}
-              </dd>
-            </div>
+                  : '—'
+              }
+            />
           </dl>
         </section>
 

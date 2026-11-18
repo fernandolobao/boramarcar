@@ -14,6 +14,7 @@ import { useGroup } from '@/lib/group';
 import { useAsync } from '@/lib/use-async';
 import { Choices } from '@/components/ds/choices';
 import { DateField } from '@/components/ds/date-field';
+import { Checkbox } from '@/components/ds/checkbox';
 
 /** Texto para compartilhar o encontro, igual ao do site (WhatsApp, folha nativa). */
 export function eventShareText(event: EventDetail, timeZone: string) {
@@ -144,13 +145,10 @@ export function EventManage({ event, onDone }: { event: EventDetail; onDone: () 
             max={days[days.length - 1]}
           />
           <TimeStepper label={t('eventStart')} value={start} onChange={setStart} />
-          <Button
+          <Checkbox
             label={t('eventSetEnd')}
-            variant="secondary"
-            accessibilityRole="checkbox"
-            accessibilityState={{ checked: hasEnd }}
-            selected={hasEnd}
-            onPress={() => setHasEnd((v) => !v)}
+            checked={hasEnd}
+            onChange={() => setHasEnd((v) => !v)}
             style={{ alignItems: 'flex-start' }}
           />
           {hasEnd && <TimeStepper label={t('eventEnd')} value={end} onChange={setEnd} />}

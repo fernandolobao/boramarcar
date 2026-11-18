@@ -1,13 +1,13 @@
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, Switch, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { AppText, Button, Card, ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
 import { deviceTimeZone } from '@/lib/dates';
 import { t } from '@/lib/i18n';
-import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { Choices } from '@/components/ds/choices';
+import { Switch } from '@/components/ds/switch';
 
 type Locale = 'pt-BR' | 'en';
 const LOCALES: readonly Locale[] = ['pt-BR', 'en'];
@@ -15,7 +15,6 @@ const LOCALE_LABEL: Record<Locale, string> = { 'pt-BR': 'Português (Brasil)', e
 
 /** Configurações (paridade com /configuracoes do site): fuso, idioma e avisos por e-mail. */
 export default function SettingsScreen() {
-  const colors = useColors();
   const prefs = useAsync(() => api.me.preferences(), []);
   const [timeZone, setTimeZone] = useState('');
   const [locale, setLocale] = useState<Locale>('pt-BR');
@@ -86,17 +85,12 @@ export default function SettingsScreen() {
       </Card>
 
       <Card style={{ gap: 8 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <AppText style={{ flex: 1, fontWeight: '700' }}>{t('settingsEmail')}</AppText>
-          <Switch
-            accessibilityLabel={t('settingsEmail')}
-            accessibilityHint={t('settingsEmailHint')}
-            value={email}
-            onValueChange={setEmail}
-            trackColor={{ true: colors.brand, false: colors.border }}
-          />
-        </View>
-        <AppText muted>{t('settingsEmailHint')}</AppText>
+        <Switch
+          label={t('settingsEmail')}
+          description={t('settingsEmailHint')}
+          checked={email}
+          onChange={setEmail}
+        />
       </Card>
 
       <Button

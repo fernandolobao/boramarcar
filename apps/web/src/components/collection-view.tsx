@@ -34,6 +34,7 @@ import { EmptyState } from './empty-state';
 import { NumberField } from './ds/number-field';
 import { Choices } from './ds/choices';
 import { Select } from '@/components/ds/select';
+import { Checkbox } from '@/components/ds/checkbox';
 
 export interface CollectionViewEntry {
   id: string;
@@ -268,7 +269,7 @@ function GalleryTile({
       <button
         type="button"
         aria-haspopup="dialog"
-        aria-label={`${t('open', { name: entry.name })} (${t('copies', { count: entry.quantity })})`}
+        aria-label={`${t('open', { name: entry.name })} (${t('copies', { count: entry.quantity })}${entry.foil ? `, ${td('foil')}` : ''})`}
         className={`relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-surface-muted shadow-sm ${
           entry.foil && image ? 'holo' : ''
         }`}
@@ -299,12 +300,17 @@ function GalleryTile({
       >
         ×{entry.quantity}
       </span>
+      {/* Selo de foil sobre a imagem (como na galeria do deck), para as legendas terem o mesmo
+          espaço em todas as cartas; o "foil" já está no nome do botão. */}
+      {entry.foil && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1 right-1 rounded-md bg-teal-100 px-1.5 py-0.5 text-xs font-bold text-teal-900"
+        >
+          ✦ {td('foil')}
+        </span>
+      )}
       <p className="flex flex-wrap items-center gap-1 text-xs">
-        {entry.foil && (
-          <span className="inline-flex items-center rounded bg-teal-100 px-1 font-medium text-teal-900 dark:bg-teal-900 dark:text-teal-100">
-            <span aria-hidden="true">✦</span> {td('foil')}
-          </span>
-        )}
         {/* Mesmo tamanho, peso e cor nos dois casos: o texto já diz se está em algum deck. */}
         <span className="inline-flex items-center gap-0.5 font-medium text-fg-muted">
           <Icon name="decks" className="size-3.5 shrink-0" />
@@ -765,10 +771,9 @@ function AddToCollection({ empty }: { empty: boolean }) {
               max={999}
             />
           </div>
-          <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
-            <input type="checkbox" checked={foil} onChange={(e) => setFoil(e.target.checked)} />
-            <span aria-hidden="true">✦</span> {t('addFoil')}
-          </label>
+          <Checkbox label={t('addFoil')} checked={foil} onChange={setFoil} className="font-medium">
+            <span aria-hidden="true">✦</span>
+          </Checkbox>
           <button type="submit" className="btn-primary" disabled={pending || !trimmed || !print}>
             <Icon name="add" />
             {t('add')}
@@ -840,10 +845,9 @@ function SplitCopies({ entry }: { entry: CollectionViewEntry }) {
             max={entry.quantity}
           />
         </div>
-        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
-          <input type="checkbox" checked={foil} onChange={(e) => setFoil(e.target.checked)} />
-          <span aria-hidden="true">✦</span> {t('splitFoil')}
-        </label>
+        <Checkbox label={t('splitFoil')} checked={foil} onChange={setFoil} className="font-medium">
+          <span aria-hidden="true">✦</span>
+        </Checkbox>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-sm">

@@ -9,6 +9,8 @@ import { Icon } from './icons';
 import { NumberField } from './ds/number-field';
 import { Choices } from './ds/choices';
 import { Select } from '@/components/ds/select';
+import { Checkbox } from '@/components/ds/checkbox';
+import { toggleIn } from '@boramarcar/ui';
 
 export interface GamePlayerOption {
   userId: string;
@@ -217,22 +219,16 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
                 key={player.userId}
                 className="grid gap-2 px-3 py-2.5 sm:grid-cols-[minmax(10rem,1fr)_auto_minmax(10rem,14rem)] sm:items-center"
               >
-                <label className="flex min-h-6 items-center gap-2 font-medium">
-                  <input
-                    type="checkbox"
-                    checked={isPlaying}
-                    aria-describedby={`${id}-count`}
-                    onChange={(e) => {
-                      setSaved(false);
-                      setPlaying((prev) =>
-                        e.target.checked
-                          ? [...prev, player.userId]
-                          : prev.filter((u) => u !== player.userId),
-                      );
-                    }}
-                  />
-                  {player.name}
-                </label>
+                <Checkbox
+                  label={player.name}
+                  checked={isPlaying}
+                  describedBy={`${id}-count`}
+                  onChange={(on) => {
+                    setSaved(false);
+                    setPlaying((prev) => toggleIn(prev, player.userId, on));
+                  }}
+                  className="font-medium"
+                />
 
                 <div className="flex flex-wrap items-center gap-3 ps-7 sm:ps-0">
                   {isTeams ? (
@@ -311,10 +307,7 @@ export function GameForm({ players, defaultFormat, eventId, gameId, initial, onS
         />
       )}
 
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={isDraw} onChange={(e) => setIsDraw(e.target.checked)} />
-        {t('isDraw')}
-      </label>
+      <Checkbox label={t('isDraw')} checked={isDraw} onChange={setIsDraw} />
 
       <details
         className="rounded-xl border border-ink-300 px-3 py-2 dark:border-ink-700"

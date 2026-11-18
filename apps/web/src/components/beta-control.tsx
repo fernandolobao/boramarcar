@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
+import { Checkbox } from '@/components/ds/checkbox';
 
 type Phase = 'draft' | 'scheduled' | 'running' | 'ended';
 
@@ -79,15 +80,14 @@ export function BetaControl({
           <ul className="grid max-h-72 gap-1 overflow-y-auto sm:grid-cols-2">
             {groups.map((g) => (
               <li key={g.id}>
-                <label className="flex min-h-10 items-center gap-2 rounded-lg px-2 hover:bg-surface-muted">
-                  <input
-                    type="checkbox"
-                    checked={selected.has(g.id)}
-                    onChange={() => toggle(g.id)}
-                  />
-                  <span className="min-w-0 flex-1">{g.name}</span>
-                  <span className="muted">{t('members', { count: g.members })}</span>
-                </label>
+                <Checkbox
+                  label={g.name}
+                  checked={selected.has(g.id)}
+                  onChange={() => toggle(g.id)}
+                  className="rounded-lg px-2 hover:bg-surface-muted"
+                >
+                  <span className="muted ms-auto">{t('members', { count: g.members })}</span>
+                </Checkbox>
               </li>
             ))}
           </ul>

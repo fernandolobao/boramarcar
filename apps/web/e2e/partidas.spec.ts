@@ -35,7 +35,8 @@ test.describe('partidas', () => {
     const form = page.locator(
       `#${await toggle.getAttribute('aria-controls')}`.replace(/:/g, '\\:'),
     );
-    await form.getByLabel('A partida terminou empatada').uncheck();
+    // Caixa do React Aria: o input fica escondido sob a caixa desenhada, que recebe o clique.
+    await form.getByLabel('A partida terminou empatada').uncheck({ force: true });
     await form.getByRole('radio', { name: 'Venceu: Bia' }).check();
     await form.getByText('Mais detalhes (opcional)').click();
     // Pelo papel: os botões −/+ também têm o rótulo no nome. O valor é confirmado ao sair do campo.

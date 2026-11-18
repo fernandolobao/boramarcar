@@ -120,6 +120,11 @@ describe('CollectionView', () => {
       screen.getAllByRole('status').find((s) => /linhas? de/.test(s.textContent ?? ''))
         ?.textContent;
     expect(status()).toMatch(/^2 linhas de 2/);
+    // O selo de foil fica sobre a imagem (só visual); o "Foil" vai no nome do botão da carta.
+    expect(
+      screen.getByRole('button', { name: /^Ver e editar Cultivate \(.*, Foil\)$/ }),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: /^Ver e editar Sol Ring \([^,]*\)$/ })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: /verde/i }));
     expect(status()).toMatch(/^1 linha de 2/);
     expect(screen.getByRole('button', { name: /verde/i }).getAttribute('aria-pressed')).toBe(

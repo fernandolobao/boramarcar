@@ -14,6 +14,7 @@ import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { NumberField } from '@/components/ds/number-field';
 import { Choices } from '@/components/ds/choices';
+import { Checkbox } from '@/components/ds/checkbox';
 
 type Sort = 'name' | 'value' | 'recent';
 type FoilFilter = 'all' | 'foil' | 'nonfoil';
@@ -99,13 +100,10 @@ function AddCard({ onAdded }: { onAdded: (message: string) => void }) {
         max={999}
         onChange={(q) => setQuantity(q ?? 1)}
       />
-      <Button
+      <Checkbox
         label={t('collectionFoil')}
-        variant="secondary"
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: foil }}
-        selected={foil}
-        onPress={() => setFoil((f) => !f)}
+        checked={foil}
+        onChange={() => setFoil((f) => !f)}
         style={{ alignSelf: 'flex-start' }}
       />
       <Button
@@ -200,14 +198,11 @@ function EntrySheet({
                 );
               }}
             />
-            <Button
+            <Checkbox
               label={t('collectionFoil')}
-              variant="secondary"
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: entry.foil }}
-              selected={entry.foil}
+              checked={entry.foil}
               disabled={busy}
-              onPress={() =>
+              onChange={() =>
                 void run(
                   () => api.collection.update(entry.id, { foil: !entry.foil }),
                   t('collectionSaved', { name: entry.name }),

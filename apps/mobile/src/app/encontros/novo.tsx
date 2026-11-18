@@ -14,6 +14,7 @@ import { useAsync } from '@/lib/use-async';
 import { NoGroup } from '@/components/no-group';
 import { Choices } from '@/components/ds/choices';
 import { DateField } from '@/components/ds/date-field';
+import { Checkbox } from '@/components/ds/checkbox';
 
 /**
  * Criar encontro pelo app (5.4): título, dia, horário de início (e de término, opcional) e local
@@ -95,13 +96,10 @@ export default function NewEventScreen() {
         />
 
         <TimeStepper label={t('eventStart')} value={start} onChange={setStart} />
-        <Button
+        <Checkbox
           label={t('eventSetEnd')}
-          variant="secondary"
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: hasEnd }}
-          selected={hasEnd}
-          onPress={() => setHasEnd((v) => !v)}
+          checked={hasEnd}
+          onChange={() => setHasEnd((v) => !v)}
           style={{ alignItems: 'flex-start' }}
         />
         {hasEnd && (
