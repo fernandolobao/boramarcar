@@ -101,6 +101,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-19',
+    pt: 'A página do deck ficou mais limpa: nome, tipo de jogo, visibilidade e remover agora ficam em "Editar deck", no topo.',
+    en: 'The deck page is cleaner: name, game type, visibility and delete now live under "Edit deck", at the top.',
+  },
+  {
+    date: '2026-11-19',
     pt: 'Recordes do grupo: vitória mais rápida, partida mais longa, maior sequência e mais, além da cara do grupo (cores e comandantes).',
     en: 'Group records: fastest win, longest game, longest streak and more, plus the group’s identity (colors and commanders).',
   },

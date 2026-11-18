@@ -247,7 +247,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'compartilhar-deck',
             question: 'Como compartilho um deck?',
             steps: [
-              'No site, abra o deck e, em "Editar deck", mude a visibilidade para "Público".',
+              'No site, abra o deck, toque em "Editar deck" (no canto do topo da página) e mude a visibilidade para "Público".',
               'Abra "Compartilhar deck": copie o link, mande pelo WhatsApp ou baixe o QR Code.',
             ],
             notes: [
@@ -579,7 +579,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'compartilhar-deck',
             question: 'How do I share a deck?',
             steps: [
-              'On the website, open the deck and, in "Edit deck", set the visibility to "Public".',
+              'On the website, open the deck, tap "Edit deck" (in the top corner of the page) and set the visibility to "Public".',
               'Open "Share deck": copy the link, send it on WhatsApp or download the QR code.',
             ],
             notes: [

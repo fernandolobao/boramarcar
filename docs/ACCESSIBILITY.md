@@ -494,6 +494,11 @@ sem rolagem horizontal em 320px.
 - Painel: a frase de boas-vindas para quem entrou há menos de 30 dias é texto comum no destaque (pergaminho sobre a camada escura do destaque, o mesmo contraste do título), logo abaixo do `h1`.
 - Resumo da noite (`/resumo` e e-mail): "Primeira partida com o grupo: …" em texto, com os nomes numa lista natural ("Caio e Duda").
 
+## "Editar deck" em janela (19/11/2026)
+
+- Botão "Editar deck" (`aria-haspopup="dialog"`) no canto do topo da página do deck, só para o dono. Abre um `<dialog>` modal com título associado; Esc, clique no fundo e o botão "Fechar" (ícone com nome e `title`) fecham, e o foco volta ao botão. Salvar fecha a janela e atualiza a página.
+- "Remover deck" saiu do topo e foi para a "Zona de perigo" dentro da janela (seção com título e explicação), com a confirmação em dois cliques; o nome acessível do primeiro clique traz o nome do deck.
+
 ## Recordes e a cara do grupo (19/11/2026)
 
 - `/grupo/recordes`: `h1`, duas seções com `h2`; cada recorde com título e frase completa (quem, o quê, em qual encontro e quando), com links para o perfil e o encontro; ícones decorativos. As cores aparecem com o símbolo de mana (decorativo) **e** o nome por extenso com a porcentagem — cor não é a única pista. Página no E2E de acessibilidade.
