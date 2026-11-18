@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  achievementSchema,
   availabilityRuleSchema,
   deckDetailSchema,
   availabilitySlotSchema,
@@ -27,6 +28,7 @@ import {
   rsvpSchema,
   seasonSchema,
   tableSetupSchema,
+  type AchievementId,
   type GameInput,
   type Rsvp,
 } from './schemas';
@@ -211,6 +213,28 @@ export function createApiClient(options: ApiClientOptions) {
           | 'tip-table'
           | 'tip-collection',
       ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
+      /**
+       * Conquistas ganhas desde a última vez que a pessoa viu (janela do painel e do perfil).
+       * Conquistas que esta versão do app não conhece ficam de fora.
+       */
+      newAchievements: async () =>
+        (
+          await request(
+            'GET',
+            '/me/achievements/new',
+            z.object({
+              achievements: z.array(z.unknown()).transform((list) =>
+                list.flatMap((a) => {
+                  const parsed = achievementSchema.safeParse(a);
+                  return parsed.success ? [parsed.data] : [];
+                }),
+              ),
+            }),
+          )
+        ).achievements,
+      /** A janela foi fechada: as conquistas mostradas contam como vistas. */
+      markAchievementsSeen: (ids: readonly AchievementId[]) =>
+        request('POST', '/me/achievements/seen', z.unknown(), { ids }),
       /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
       deleteAccount: () =>
         request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {
