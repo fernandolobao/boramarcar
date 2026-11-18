@@ -22,13 +22,13 @@ import Image from 'next/image';
 import { HoloLayers } from './holo-effects';
 import Link from 'next/link';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
 import { Icon } from './icons';
 import { ManaSymbol, useColorName } from './mana';
-import { printLabel, PrintPicker } from './print-picker';
+import { fetchPrints, printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 import { EmptyState } from './empty-state';
 import { NumberField } from './ds/number-field';
@@ -307,14 +307,11 @@ function GalleryTile({
             <span aria-hidden="true">✦</span> {td('foil')}
           </span>
         )}
-        {entry.decks.length > 0 ? (
-          <span className="inline-flex items-center gap-0.5 font-medium">
-            <Icon name="decks" className="size-3.5 shrink-0" />
-            {t('inDecks', { count: entry.decks.length })}
-          </span>
-        ) : (
-          <span className="muted">{t('notInDecks')}</span>
-        )}
+        {/* Mesmo tamanho, peso e cor nos dois casos: o texto já diz se está em algum deck. */}
+        <span className="inline-flex items-center gap-0.5 font-medium text-fg-muted">
+          <Icon name="decks" className="size-3.5 shrink-0" />
+          {entry.decks.length > 0 ? t('inDecks', { count: entry.decks.length }) : t('notInDecks')}
+        </span>
       </p>
     </div>
   );
@@ -653,6 +650,11 @@ function AddToCollection({ empty }: { empty: boolean }) {
   const [done, setDone] = useState<string | null>(null);
   const trimmed = name.trim();
   const chosen = print && print !== 'default' ? print : null;
+  /** Nome atual, para ignorar a resposta das edições se a pessoa já trocou de carta. */
+  const currentName = useRef(trimmed);
+  useEffect(() => {
+    currentName.current = trimmed;
+  }, [trimmed]);
   return (
     <details className="card" open={empty}>
       <summary className="cursor-pointer font-semibold">
@@ -703,6 +705,26 @@ function AddToCollection({ empty }: { empty: boolean }) {
             setName(value);
             // Outra carta: a edição escolhida não vale mais.
             if (value.trim().toLowerCase() !== trimmed.toLowerCase()) setPrint(null);
+          }}
+          onPick={(picked) => {
+            // Carta com uma edição só: já fica escolhida (não há o que escolher no seletor).
+            fetchPrints(picked)
+              .then((prints) => {
+                const only = prints.length === 1 ? prints[0]! : null;
+                if (!only || currentName.current.toLowerCase() !== picked.toLowerCase()) return;
+                setPrint((current) =>
+                  current
+                    ? current
+                    : {
+                        scryfallId: only.scryfallId,
+                        setCode: only.setCode,
+                        setName: only.setName,
+                        collectorNumber: only.collectorNumber,
+                        imageUri: only.imageUri ?? null,
+                      },
+                );
+              })
+              .catch(() => {});
           }}
         />
         <div>

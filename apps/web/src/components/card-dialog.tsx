@@ -4,7 +4,17 @@ import { ligaMagicCardUrl } from '@boramarcar/core';
 import Image from 'next/image';
 import { HoloLayers } from './holo-effects';
 import { useFormatter, useTranslations } from 'next-intl';
-import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  Fragment,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { api } from '@/lib/api';
 import { Icon } from './icons';
@@ -230,8 +240,38 @@ export function CardDialog({
   );
 }
 
+/** Cartas do deck aberto, pelo nome em minúsculas (nome inteiro e 1ª face). */
+const DeckPrints = createContext<Map<string, DialogCard> | null>(null);
+
 /**
- * Nome de carta que abre a carta (busca pelo nome na primeira vez). Use onde só o nome aparece
+ * Na página de um deck: os nomes de carta (análise, funções, combos…) abrem a carta na edição
+ * usada no deck, em vez da impressão padrão do Scryfall. Com várias versões da mesma carta,
+ * vale a primeira da lista.
+ */
+export function DeckPrintsProvider({
+  cards,
+  children,
+}: {
+  cards: { name: string; card: Omit<DialogCard, 'name'> | null }[];
+  children: ReactNode;
+}) {
+  const map = useMemo(() => {
+    const m = new Map<string, DialogCard>();
+    for (const { name, card } of cards) {
+      if (!card) continue;
+      const full = { ...card, name };
+      for (const key of [name, name.split(' // ')[0]!]) {
+        if (!m.has(key.toLowerCase())) m.set(key.toLowerCase(), full);
+      }
+    }
+    return m;
+  }, [cards]);
+  return <DeckPrints.Provider value={map}>{children}</DeckPrints.Provider>;
+}
+
+/**
+ * Nome de carta que abre a carta (busca pelo nome na primeira vez; dentro de um deck, usa a
+ * edição do deck). Use onde só o nome aparece
  * escrito (análise, validação, comparação, estatísticas…).
  */
 export function CardName({ name, className = '' }: { name: string; className?: string }) {
@@ -242,11 +282,16 @@ export function CardName({ name, className = '' }: { name: string; className?: s
     card: DialogCard | null;
   } | null>(null);
   const opener = useRef<HTMLButtonElement>(null);
+  const deckCard = useContext(DeckPrints)?.get(name.toLowerCase()) ?? null;
 
   const show = () => {
     setOpen(true);
     setBack(false);
     if (state?.status === 'ready' || state?.status === 'missing') return;
+    if (deckCard) {
+      setState({ status: 'ready', card: deckCard });
+      return;
+    }
     setState({ status: 'loading', card: null });
     api<{ card: DialogCard | null }>(`/api/v1/cards/named?${new URLSearchParams({ name })}`)
       .then(({ card }) => setState({ status: card ? 'ready' : 'missing', card }))

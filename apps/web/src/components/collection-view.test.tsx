@@ -104,6 +104,15 @@ describe('CollectionView', () => {
     expect(await audit(container)).toEqual([]);
   });
 
+  it('grade: "Em 1 deck" e "Em nenhum deck" com o mesmo tamanho, peso e cor', () => {
+    wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
+    const inDeck = screen.getByText('Em 1 deck');
+    const none = screen.getByText('Em nenhum deck');
+    expect(none.className).toBe(inDeck.className);
+    // Sem `muted` (que traz text-sm e deixaria um maior que o outro).
+    expect(none.className.split(' ')).not.toContain('muted');
+  });
+
   it('filtros: cor, custo, tipo, foil, em deck; limpar volta tudo', () => {
     wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
     const status = () =>
@@ -237,6 +246,55 @@ describe('CollectionView', () => {
       }),
     );
     expect(await audit(container)).toEqual([]);
+  });
+
+  it('adicionar: carta com uma edição só já vem escolhida ao pegar a sugestão', async () => {
+    const prints = [
+      {
+        scryfallId: 'idol-lci',
+        setCode: 'lci',
+        setName: 'The Lost Caverns of Ixalan',
+        collectorNumber: '155',
+        imageUri: null,
+        priceUsd: '0.20',
+      },
+    ];
+    const fetchMock = vi.fn(async (url: string) => {
+      if (String(url).includes('/cards/prints')) return Response.json({ prints });
+      if (String(url).includes('/autocomplete')) {
+        return Response.json({ names: ['Idol of the Deep King'] });
+      }
+      return Response.json({ added: true, name: 'Idol of the Deep King' }, { status: 201 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    wrap(<CollectionView entries={entries} brlRate={null} rateDate={null} />);
+    const form = screen.getByRole('form', { name: 'Adicionar cartas' });
+    fireEvent.change(within(form).getByRole('combobox', { name: 'Carta' }), {
+      target: { value: 'Idol of' },
+    });
+    // Espera a sugestão (o campo aguarda a pessoa parar de digitar).
+    await act(() => new Promise((r) => setTimeout(r, 300)));
+    await act(async () => {
+      fireEvent.mouseDown(within(form).getByRole('option', { name: 'Idol of the Deep King' }));
+    });
+    // A única edição já fica escolhida: dá para adicionar sem abrir o seletor.
+    expect(within(form).getByText('The Lost Caverns of Ixalan')).toBeInTheDocument();
+    const add = within(form).getByRole('button', { name: 'Adicionar' });
+    expect(add).toBeEnabled();
+    await act(async () => {
+      fireEvent.click(add);
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/collection',
+      expect.objectContaining({
+        body: JSON.stringify({
+          name: 'Idol of the Deep King',
+          scryfallId: 'idol-lci',
+          quantity: 1,
+          foil: false,
+        }),
+      }),
+    );
   });
 
   it('separar cópias: parte da pilha vai para outro acabamento (ou edição)', async () => {

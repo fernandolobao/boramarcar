@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { EventStatusBadge } from './event-manage';
-import { ShareButtons } from './share-buttons';
+import { CopyField, ShareButtons } from './share-buttons';
 
 afterEach(cleanup);
 
@@ -53,6 +53,25 @@ describe('ShareButtons', () => {
     expect(share).toHaveBeenCalledWith({ title: 'Grupo', text: 't', url: 'https://x.app' });
     expect(screen.queryByRole('link', { name: /agenda/ })).toBeNull();
     Reflect.deleteProperty(navigator, 'share');
+  });
+});
+
+describe('CopyField', () => {
+  it('mostra o link num campo de leitura com o botão de copiar ao lado', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    wrap(<CopyField label="Link de convite" value="https://x.app/c/ABC" />);
+    const field = screen.getByRole('textbox', { name: 'Link de convite' });
+    expect(field).toHaveValue('https://x.app/c/ABC');
+    expect(field).toHaveAttribute('readonly');
+    fireEvent.click(screen.getByRole('button', { name: 'Copiar link' }));
+    expect(writeText).toHaveBeenCalledWith('https://x.app/c/ABC');
+    expect(await screen.findByText('Copiado!')).toBeInTheDocument();
+  });
+
+  it('sem `copy`, os botões de compartilhar não repetem o "Copiar link"', () => {
+    wrap(<ShareButtons text="t" url="https://x.app" title="Grupo" copy={false} />);
+    expect(screen.queryByRole('button', { name: 'Copiar link' })).toBeNull();
   });
 });
 

@@ -59,7 +59,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             steps: [
               'Toque em "Entrar ou criar grupo" e depois em "Criar grupo". Dê um nome (ex.: "Mesa de Terça").',
               'Abra "Seu grupo" (app) ou o menu Grupo (site): ali estão o link e o código de convite.',
-              'Toque em "Compartilhar convite" para mandar pelo WhatsApp ou por onde preferir. No site também há um QR Code para imprimir.',
+              'Toque em "Compartilhar convite" para mandar pelo WhatsApp ou por onde preferir. No site, "Copiar link" fica ao lado do link, e "Baixar QR Code" logo abaixo do QR Code, para imprimir.',
             ],
             notes: [
               'Quem cria o grupo vira dono(a) e pode promover admins, remover pessoas e passar a posse. Se o link vazar, gere um novo convite: o antigo deixa de funcionar.',
@@ -227,6 +227,18 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'No deck, no modo Editar, toque em "Edição" na carta.',
               'Filtre pelo código e número ("ltr 268"), por parte do nome da edição ou pelo ilustrador ("tedin"), útil em cartas antigas sem número.',
               'Escolha a impressão e quantas cópias mudam. As outras continuam na edição atual.',
+              'Ao adicionar à coleção, a edição é escolhida antes; se a carta só tem uma edição, ela já vem escolhida.',
+            ],
+          },
+          {
+            id: 'compartilhar-deck',
+            question: 'Como compartilho um deck?',
+            steps: [
+              'No site, abra o deck e, em "Editar deck", mude a visibilidade para "Público".',
+              'Abra "Compartilhar deck": copie o link, mande pelo WhatsApp ou baixe o QR Code.',
+            ],
+            notes: [
+              'Quem recebe vê a lista e a análise; quem ainda não tem conta cria uma antes. Decks do grupo ou privados não têm esse bloco.',
             ],
           },
           {
@@ -342,7 +354,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             steps: [
               'Tap "Join or create a group", then "Create group". Give it a name (e.g. "Tuesday Table").',
               'Open "Your group" (app) or the Group menu (website): the invite link and code are there.',
-              'Tap "Share invite" to send it on WhatsApp or wherever you like. The website also has a QR code to print.',
+              'Tap "Share invite" to send it on WhatsApp or wherever you like. On the website, "Copy link" sits next to the link and "Download QR code" right below the QR code, to print.',
             ],
             notes: [
               'Whoever creates the group becomes the owner and can promote admins, remove people and transfer ownership. If the link leaks, generate a new invite: the old one stops working.',
@@ -510,6 +522,18 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'In the deck, in Edit mode, tap "Edition" on the card.',
               'Filter by set code and number ("ltr 268"), by part of the set name or by artist ("tedin"), handy for old cards without a number.',
               'Pick the printing and how many copies change. The rest keep the current edition.',
+              'When adding to your collection, you pick the edition first; if the card has only one edition, it comes already picked.',
+            ],
+          },
+          {
+            id: 'compartilhar-deck',
+            question: 'How do I share a deck?',
+            steps: [
+              'On the website, open the deck and, in "Edit deck", set the visibility to "Public".',
+              'Open "Share deck": copy the link, send it on WhatsApp or download the QR code.',
+            ],
+            notes: [
+              'People who get it see the list and the analysis; anyone without an account creates one first. Group and private decks do not have this block.',
             ],
           },
           {

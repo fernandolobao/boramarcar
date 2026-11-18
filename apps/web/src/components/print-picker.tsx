@@ -30,6 +30,15 @@ export function printLabel(card: PrintLine['card']) {
 /** Versão do formato das impressões (ver o pedido abaixo). */
 const PRINTS_VERSION = 2;
 
+/** Edições em papel de uma carta (mais novas primeiro). */
+export function fetchPrints(name: string) {
+  // `v` muda quando o formato da resposta muda (v2: ilustrador): o navegador (1 h) e o CDN (1 dia,
+  // mais 7 de stale-while-revalidate) guardam a resposta por URL, e sem isso serviriam a lista antiga.
+  return api<{ prints: CardPrint[] }>(
+    `/api/v1/cards/prints?name=${encodeURIComponent(name)}&v=${PRINTS_VERSION}`,
+  ).then((r) => r.prints);
+}
+
 /** Impressões desenhadas de cada vez (terrenos básicos têm mais de mil). */
 const PRINTS_PAGE = 60;
 
@@ -124,12 +133,8 @@ export function PrintPicker({
     setFilter('');
     if (prints) return;
     setLoadError(null);
-    // `v` muda quando o formato da resposta muda (v2: ilustrador): o navegador (1 h) e o CDN (1 dia,
-    // mais 7 de stale-while-revalidate) guardam a resposta por URL, e sem isso serviriam a lista antiga.
-    api<{ prints: CardPrint[] }>(
-      `/api/v1/cards/prints?name=${encodeURIComponent(line.name)}&v=${PRINTS_VERSION}`,
-    )
-      .then((r) => setPrints(r.prints))
+    fetchPrints(line.name)
+      .then(setPrints)
       .catch((e: unknown) =>
         setLoadError(
           e instanceof ApiError && e.code === 'upstream_error'

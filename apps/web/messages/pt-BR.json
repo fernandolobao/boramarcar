@@ -1942,5 +1942,12 @@
       "pt-BR": "Português (Brasil)",
       "en": "English"
     }
+  },
+  "deckShare": {
+    "title": "Compartilhar deck",
+    "link": "Link do deck",
+    "qrCode": "QR Code do deck {deck}",
+    "hint": "O deck é público: qualquer pessoa com o link vê a lista e a análise (quem não tem conta cria uma antes).",
+    "text": "Olha o deck {deck} no ArcanaKin: {url}"
   }
 }

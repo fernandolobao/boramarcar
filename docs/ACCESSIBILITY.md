@@ -430,6 +430,15 @@ sem rolagem horizontal em 320px.
 
 - A dica deixou de sumir de vez: um botão ⓘ ao lado do título (site) ou no topo da seção (app) abre e fecha a dica (`aria-expanded`, `aria-controls`; nome "Dica sobre esta tela" e a mesma dica visível no `title`). Na primeira vez ela vem aberta, sem roubar o foco; "Entendi" fecha, grava que a pessoa já viu e devolve o foco ao ⓘ. Alvo de 40 px no site e 44 pt no app. Mais espaço entre o título e o quadro da dica.
 
+## Convite do grupo mais enxuto (18/11/2026)
+
+- O link de convite agora é um campo só de leitura com rótulo ("Link de convite") e o botão "Copiar link" ao lado (`CopyField`); o texto "Copiado!" é anunciado (`aria-live`). Focar o campo seleciona o link.
+- "Baixar QR Code" fica logo abaixo do QR Code, no mesmo `figure`. Os botões de compartilhar não repetem o "Copiar link".
+
+## Gráfico da metodologia na página inicial (18/11/2026)
+
+- As seis partes da nota tinham cores parecidas (dois roxos e dois verdes quase iguais). Agora são seis tons distintos das três famílias da marca, alternando a família a cada parte, validados com o script de paleta (separação para daltonismo ΔE ≥ 12 entre vizinhas, tema claro). A barra é decorativa (`aria-hidden`): a lista ao lado traz os pontos e o nome de cada parte, na mesma ordem, então a cor não é a única pista.
+
 ## Seletor de idioma na página inicial (18/11/2026)
 
 - "PT | EN" no topo é um `role="group"` ("Idioma") com dois botões `aria-pressed`. O nome acessível começa pelo texto visível ("PT — Português (Brasil)", WCAG 2.5.3) e cada botão tem `lang` do próprio idioma. Alvos com 24 px no mínimo e foco visível.
@@ -439,3 +448,7 @@ sem rolagem horizontal em 320px.
 ## Admin: nomes levam ao perfil (18/11/2026)
 
 - Na lista de contas do `/admin`, o nome de cada pessoa virou link sublinhado para o perfil (`/jogadores/:id`), que os admins da plataforma podem abrir mesmo sem dividir grupo.
+
+## Compartilhar deck público (18/11/2026)
+
+- "Compartilhar deck" é um `<details>` (fechado por padrão), só em decks públicos. Dentro: QR Code (`role="img"` com nome "QR Code do deck …") com "Baixar QR Code" logo abaixo, o link num `CopyField` com "Copiar link" ao lado, e WhatsApp/menu do celular. Conferido em 360 px (tema escuro) e 1100 px (claro), sem rolagem horizontal; componente no `deck-share.test.tsx` com axe.

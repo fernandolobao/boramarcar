@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import {
   artCropUrl,
+  DECK_BOARDS,
   DECK_VISIBILITIES,
   deckFormatProfile,
   edhrecCommanderUrl,
@@ -43,11 +44,14 @@ import { TitleWithTip } from '@/components/tip';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
-import { CardNames } from '@/components/card-dialog';
+import { CardNames, DeckPrintsProvider } from '@/components/card-dialog';
 import { StackSections } from '@/components/stack-sections';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { deckBarBackground, deckBarEdge, deckFlow } from '@boramarcar/tokens/flow';
 import { deckMetadata } from '@/server/seo-pages';
+import { DeckShare } from '@/components/deck-share';
+import { getBaseUrl } from '@/env';
+import { linkQrCode } from '@/server/invite';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -114,213 +118,248 @@ export default async function DeckPage({ params }: Props) {
     identity,
     Object.fromEntries(analysis.manaBase.map((row) => [row.color, row.pips])),
   );
+  // Deck público: link e QR Code para compartilhar.
+  const shareUrl = `${getBaseUrl()}/decks/${deck.id}`;
+  const shareQr = deck.visibility === 'public' ? await linkQrCode(shareUrl) : null;
+  // Nomes de carta na análise abrem a edição usada no deck (comandante e deck principal primeiro).
+  const deckPrints = [...deck.lines]
+    .sort((a, b) => DECK_BOARDS.indexOf(a.board) - DECK_BOARDS.indexOf(b.board))
+    .map((l) => ({
+      name: l.name,
+      card: l.card
+        ? {
+            typeLine: l.card.typeLine,
+            manaCost: l.card.manaCost,
+            imageUri: l.card.imageUri,
+            backImageUri: l.card.backImageUri,
+            backName: l.card.backName,
+            setCode: l.card.setCode,
+            setName: l.card.setName,
+            collectorNumber: l.card.collectorNumber,
+            priceUsd: l.card.priceUsd,
+          }
+        : null,
+    }));
   return (
-    // Barras dos gráficos nas cores do deck (curva, nota, mão inicial), nos dois temas.
-    <div
-      className="space-y-6"
-      style={
-        {
-          '--deck-bar-light': deckBarBackground(identity, 'light'),
-          '--deck-bar-dark': deckBarBackground(identity, 'dark'),
-          '--deck-bar-edge-light': deckBarEdge(identity, 'light'),
-          '--deck-bar-edge-dark': deckBarEdge(identity, 'dark'),
-        } as React.CSSProperties
-      }
-    >
-      <ManaFlowColors stops={flow} />
-      <div className="relative overflow-hidden rounded-3xl border border-ink-200 bg-surface dark:border-ink-800 dark:bg-ink-900">
-        {background && (
-          // Arte do comandante desfocada como fundo decorativo.
-          <Image
-            src={background}
-            alt=""
-            fill
-            unoptimized
-            sizes="100vw"
-            className="scale-110 object-cover opacity-25 blur-2xl dark:opacity-20"
-          />
-        )}
-        <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,15rem)_1fr] md:items-start">
-          {hero?.card?.imageUri && (
-            <ViewTransition name={`deck-${deck.id}`} share="morph" default="none">
-              <DeckHeroCard
-                name={hero.name}
-                imageUri={hero.card.imageUri}
-                backImageUri={hero.card.backImageUri}
-                backName={hero.card.backName}
-              />
-            </ViewTransition>
+    <DeckPrintsProvider cards={deckPrints}>
+      {/* Barras dos gráficos nas cores do deck (curva, nota, mão inicial), nos dois temas. */}
+      <div
+        className="space-y-6"
+        style={
+          {
+            '--deck-bar-light': deckBarBackground(identity, 'light'),
+            '--deck-bar-dark': deckBarBackground(identity, 'dark'),
+            '--deck-bar-edge-light': deckBarEdge(identity, 'light'),
+            '--deck-bar-edge-dark': deckBarEdge(identity, 'dark'),
+          } as React.CSSProperties
+        }
+      >
+        <ManaFlowColors stops={flow} />
+        <div className="relative overflow-hidden rounded-3xl border border-ink-200 bg-surface dark:border-ink-800 dark:bg-ink-900">
+          {background && (
+            // Arte do comandante desfocada como fundo decorativo.
+            <Image
+              src={background}
+              alt=""
+              fill
+              unoptimized
+              sizes="100vw"
+              className="scale-110 object-cover opacity-25 blur-2xl dark:opacity-20"
+            />
           )}
-          <div className="min-w-0 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-ink-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-ink-100 dark:text-ink-900">
-                {tf(format)}
-              </span>
-              <ColorIdentity colors={identity} />
-              <VisibilityBadge visibility={deck.visibility} />
-            </div>
-            <h1 className="page-title">{deck.name}</h1>
-            {!deck.isOwner && (
-              <p className="text-sm">
-                <Link href={`/jogadores/${deck.ownerId}`} className="underline underline-offset-2">
-                  {tp('ownerOf', { name: deck.ownerName })}
-                </Link>
-              </p>
+          <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,15rem)_1fr] md:items-start">
+            {hero?.card?.imageUri && (
+              <ViewTransition name={`deck-${deck.id}`} share="morph" default="none">
+                <DeckHeroCard
+                  name={hero.name}
+                  imageUri={hero.card.imageUri}
+                  backImageUri={hero.card.backImageUri}
+                  backName={hero.card.backName}
+                />
+              </ViewTransition>
             )}
-            {analysis.commanders.length > 0 && (
-              <p className="text-lg font-medium">
-                <CardNames names={analysis.commanders} separator=" & " />
-              </p>
-            )}
-            <p className="muted">
-              {t('cards', { count: analysis.totalCards })} ·{' '}
-              {t('proxies', { count: analysis.proxies })}
-              {deck.sourceUrl && (
-                <>
-                  {' · '}
-                  <a href={deck.sourceUrl} target="_blank" rel="noreferrer" className="underline">
-                    {deck.source}
-                    <Icon name="externalLink" className="ml-0.5 inline size-3.5 align-[-2px]" />
-                    <span className="sr-only"> {tc('newTab')}</span>
-                  </a>
-                </>
+            <div className="min-w-0 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-ink-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-ink-100 dark:text-ink-900">
+                  {tf(format)}
+                </span>
+                <ColorIdentity colors={identity} />
+                <VisibilityBadge visibility={deck.visibility} />
+              </div>
+              <h1 className="page-title">{deck.name}</h1>
+              {!deck.isOwner && (
+                <p className="text-sm">
+                  <Link
+                    href={`/jogadores/${deck.ownerId}`}
+                    className="underline underline-offset-2"
+                  >
+                    {tp('ownerOf', { name: deck.ownerName })}
+                  </Link>
+                </p>
               )}
-            </p>
-            {price.total > 0 && (
-              <p className="text-sm">
-                <span className="font-medium">{t('price')}:</span>{' '}
-                {t('priceValue', { total: usd(price.total), proxies: usd(price.proxies) })}
-                {rate && (
+              {analysis.commanders.length > 0 && (
+                <p className="text-lg font-medium">
+                  <CardNames names={analysis.commanders} separator=" & " />
+                </p>
+              )}
+              <p className="muted">
+                {t('cards', { count: analysis.totalCards })} ·{' '}
+                {t('proxies', { count: analysis.proxies })}
+                {deck.sourceUrl && (
                   <>
                     {' · '}
-                    {t('priceBrl', {
-                      total: brl(usdToBrl(price.total, rate.rate)),
-                      proxies: brl(usdToBrl(price.proxies, rate.rate)),
-                    })}
+                    <a href={deck.sourceUrl} target="_blank" rel="noreferrer" className="underline">
+                      {deck.source}
+                      <Icon name="externalLink" className="ml-0.5 inline size-3.5 align-[-2px]" />
+                      <span className="sr-only"> {tc('newTab')}</span>
+                    </a>
                   </>
                 )}
-                {price.missing > 0 && (
-                  <span className="muted"> · {t('priceMissing', { count: price.missing })}</span>
-                )}
-                <span className="muted block text-xs">
-                  {rate
-                    ? t('priceHintBrl', {
-                        rate: brl(rate.rate),
-                        date: fmt.dateTime(new Date(`${rate.date}T12:00:00Z`), {
-                          dateStyle: 'short',
-                        }),
-                      })
-                    : t('priceHint')}
-                </span>
               </p>
-            )}
-            {deck.isOwner && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                <DeleteButton
-                  path={`/api/v1/decks/${deck.id}`}
-                  redirectTo="/decks"
-                  label={t('deleteDeck', { name: deck.name })}
-                />
-              </div>
-            )}
+              {price.total > 0 && (
+                <p className="text-sm">
+                  <span className="font-medium">{t('price')}:</span>{' '}
+                  {t('priceValue', { total: usd(price.total), proxies: usd(price.proxies) })}
+                  {rate && (
+                    <>
+                      {' · '}
+                      {t('priceBrl', {
+                        total: brl(usdToBrl(price.total, rate.rate)),
+                        proxies: brl(usdToBrl(price.proxies, rate.rate)),
+                      })}
+                    </>
+                  )}
+                  {price.missing > 0 && (
+                    <span className="muted"> · {t('priceMissing', { count: price.missing })}</span>
+                  )}
+                  <span className="muted block text-xs">
+                    {rate
+                      ? t('priceHintBrl', {
+                          rate: brl(rate.rate),
+                          date: fmt.dateTime(new Date(`${rate.date}T12:00:00Z`), {
+                            dateStyle: 'short',
+                          }),
+                        })
+                      : t('priceHint')}
+                  </span>
+                </p>
+              )}
+              {deck.isOwner && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <DeleteButton
+                    path={`/api/v1/decks/${deck.id}`}
+                    redirectTo="/decks"
+                    label={t('deleteDeck', { name: deck.name })}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {deck.isOwner && (
-        <details className="card">
-          <summary className="cursor-pointer font-semibold">{t('settings')}</summary>
-          <div className="mt-4">
-            <DeckSettingsForm
-              deckId={deck.id}
-              name={deck.name}
-              format={format}
-              visibility={
-                (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
-                  ? (deck.visibility as DeckVisibility)
-                  : 'group'
-              }
-            />
-          </div>
-        </details>
-      )}
+        {deck.isOwner && (
+          <details className="card">
+            <summary className="cursor-pointer font-semibold">{t('settings')}</summary>
+            <div className="mt-4">
+              <DeckSettingsForm
+                deckId={deck.id}
+                name={deck.name}
+                format={format}
+                visibility={
+                  (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
+                    ? (deck.visibility as DeckVisibility)
+                    : 'group'
+                }
+              />
+            </div>
+          </details>
+        )}
 
-      {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}
-      <StackSections>
-        <section className="card space-y-4">
-          <TitleWithTip id="deck-analysis" dismissed={!showTip}>
-            <h2 className="section-title mb-0">{ta('title')}</h2>
-          </TitleWithTip>
-          <DeckScore analysis={analysis} formatName={formatName} />
-          <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
-        </section>
-        <section className="card space-y-6">
-          <ManaCurve curve={analysis.manaCurve} cardsByCurve={analysis.cardsByCurve} />
-          <p className="text-sm">
-            {ta('averageCmc')}: <strong>{analysis.averageCmc}</strong> · {ta('lands')}:{' '}
-            <strong>{analysis.lands}</strong>
-          </p>
-          <ColorPips pips={analysis.colorPips} />
-        </section>
-        <section className="card">
-          <DeckValidation analysis={analysis} formatName={formatName} />
-        </section>
-        {analysis.suggestions.length > 0 && (
-          <section className="card">
-            <DeckSuggestions analysis={analysis} />
-          </section>
-        )}
-        {deck.bracket && (
-          <section className="card">
-            <BracketCard bracket={deck.bracket} />
-          </section>
-        )}
-        <section className="card">
-          <DeckRoles
-            deckId={deck.id}
-            roles={analysis.roles}
-            cardsByRole={analysis.cardsByRole}
-            targets={profile.roleTargets}
-            tagged={analysis.rolesTagged}
+        {shareQr && (
+          <DeckShare
+            deck={{ id: deck.id, name: deck.name, visibility: deck.visibility }}
+            url={shareUrl}
+            qr={shareQr}
           />
-        </section>
-        <section className="card">
-          <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
-        </section>
-        {analysis.commanders.length > 0 && (
+        )}
+
+        {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}
+        <StackSections>
+          <section className="card space-y-4">
+            <TitleWithTip id="deck-analysis" dismissed={!showTip}>
+              <h2 className="section-title mb-0">{ta('title')}</h2>
+            </TitleWithTip>
+            <DeckScore analysis={analysis} formatName={formatName} />
+            <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
+          </section>
+          <section className="card space-y-6">
+            <ManaCurve curve={analysis.manaCurve} cardsByCurve={analysis.cardsByCurve} />
+            <p className="text-sm">
+              {ta('averageCmc')}: <strong>{analysis.averageCmc}</strong> · {ta('lands')}:{' '}
+              <strong>{analysis.lands}</strong>
+            </p>
+            <ColorPips pips={analysis.colorPips} />
+          </section>
           <section className="card">
-            <DeckComparisonCard
-              commanders={analysis.commanders}
-              comparison={comparison}
-              edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
-              leastPopular={leastPopularCards(deck.entries)}
+            <DeckValidation analysis={analysis} formatName={formatName} />
+          </section>
+          {analysis.suggestions.length > 0 && (
+            <section className="card">
+              <DeckSuggestions analysis={analysis} />
+            </section>
+          )}
+          {deck.bracket && (
+            <section className="card">
+              <BracketCard bracket={deck.bracket} />
+            </section>
+          )}
+          <section className="card">
+            <DeckRoles
+              deckId={deck.id}
+              roles={analysis.roles}
+              cardsByRole={analysis.cardsByRole}
+              targets={profile.roleTargets}
+              tagged={analysis.rolesTagged}
             />
           </section>
-        )}
-        {analysis.handOdds && (
           <section className="card">
-            <HandOdds odds={analysis.handOdds} />
+            <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
           </section>
-        )}
-      </StackSections>
+          {analysis.commanders.length > 0 && (
+            <section className="card">
+              <DeckComparisonCard
+                commanders={analysis.commanders}
+                comparison={comparison}
+                edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
+                leastPopular={leastPopularCards(deck.entries)}
+              />
+            </section>
+          )}
+          {analysis.handOdds && (
+            <section className="card">
+              <HandOdds odds={analysis.handOdds} />
+            </section>
+          )}
+        </StackSections>
 
-      <DeckCards
-        deckId={deck.id}
-        lines={deck.lines}
-        isOwner={deck.isOwner}
-        usdBrl={rate?.rate ?? null}
-      />
+        <DeckCards
+          deckId={deck.id}
+          lines={deck.lines}
+          isOwner={deck.isOwner}
+          usdBrl={rate?.rate ?? null}
+        />
 
-      <DeckTools
-        deckId={deck.id}
-        isOwner={deck.isOwner}
-        source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
-        proxyCount={deck.lines.reduce((sum, l) => sum + l.proxies, 0)}
-        canPrint={await canPrintProxies(user)}
-        hasSourceUrl={
-          Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
-        }
-      />
-    </div>
+        <DeckTools
+          deckId={deck.id}
+          isOwner={deck.isOwner}
+          source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
+          proxyCount={deck.lines.reduce((sum, l) => sum + l.proxies, 0)}
+          canPrint={await canPrintProxies(user)}
+          hasSourceUrl={
+            Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
+          }
+        />
+      </div>
+    </DeckPrintsProvider>
   );
 }
