@@ -444,3 +444,7 @@ sem rolagem horizontal em 320px.
 - "PT | EN" no topo é um `role="group"` ("Idioma") com dois botões `aria-pressed`. O nome acessível começa pelo texto visível ("PT — Português (Brasil)", WCAG 2.5.3) e cada botão tem `lang` do próprio idioma. Alvos com 24 px no mínimo e foco visível.
 - Abaixo de 400 px o botão do topo usa o texto curto ("Entrar"/"Painel") e o ícone do seletor some, para não haver rolagem horizontal em 320 px. O menu de seções aparece só a partir de 1280 px, sem quebrar linha.
 - Campos de data e hora: cada segmento (dia, mês, hora…) tem largura mínima de 24 px. Uma hora de um dígito ("9") deixava o alvo menor que 24 px (2.5.8), e o E2E só pegava isso em certas horas do dia.
+
+## Compartilhar deck público (18/11/2026)
+
+- "Compartilhar deck" é um `<details>` (fechado por padrão), só em decks públicos. Dentro: QR Code (`role="img"` com nome "QR Code do deck …") com "Baixar QR Code" logo abaixo, o link num `CopyField` com "Copiar link" ao lado, e WhatsApp/menu do celular. Conferido em 360 px (tema escuro) e 1100 px (claro), sem rolagem horizontal; componente no `deck-share.test.tsx` com axe.
