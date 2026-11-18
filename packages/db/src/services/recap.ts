@@ -28,7 +28,7 @@ export interface EventRecap {
 const firstName = (name: string) => name.trim().split(/\s+/)[0] || name;
 
 /** Primeiro nome; se dois jogadores têm o mesmo, acrescenta a inicial do sobrenome. */
-function displayNames(people: { userId: string; name: string }[]) {
+export function displayNames(people: { userId: string; name: string }[]) {
   const byFirst = new Map<string, Set<string>>();
   for (const p of people) {
     const key = firstName(p.name).toLowerCase();

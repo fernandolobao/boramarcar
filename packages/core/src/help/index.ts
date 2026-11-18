@@ -292,6 +292,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'retrospectiva',
+            question: 'O que é a retrospectiva do mês?',
+            intro: [
+              'Todo dia 1, quem é de um grupo que jogou no mês anterior recebe no sino o aviso da retrospectiva: quantas partidas e noites, o destaque do mês, as estreias, os feitos do mês (com os recordes do grupo que caíram) e o duelo do mês. Ela também fica na tela do grupo, em "Retrospectiva de…". Como o resumo da noite, dá para compartilhar o link: ela mostra só o primeiro nome de quem jogou, sem o nome do grupo, local ou e-mail.',
+            ],
+          },
+          {
             id: 'recordes',
             question: 'Onde vejo os recordes do grupo?',
             intro: [
@@ -621,6 +628,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
+            ],
+          },
+          {
+            id: 'retrospectiva',
+            question: 'What is the monthly recap?',
+            intro: [
+              'On the 1st of each month, people in a group that played the month before get the recap notice in the bell: how many games and nights, the player of the month, first-timers, the month’s feats (including group records that fell) and the duel of the month. It also lives on the group screen, under "… recap". Like the night recap, you can share the link: it shows only first names, with no group name, place or e-mail.',
             ],
           },
           {

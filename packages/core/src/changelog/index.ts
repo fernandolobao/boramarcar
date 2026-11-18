@@ -116,6 +116,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-19',
+    pt: 'Retrospectiva do mês: todo dia 1, o seu grupo recebe o resumo do mês que passou, com o destaque, as estreias, os recordes que caíram e o duelo do mês, pronto para compartilhar.',
+    en: 'Monthly recap: on the 1st of each month, your group gets a recap of the month before, with the player of the month, first-timers, records that fell and the duel of the month, ready to share.',
+  },
+  {
+    date: '2026-11-19',
     pt: 'As listas de escolha (tipo de jogo, filtros, local, deck…) ganharam a cara do ArcanaKin: iguais em qualquer navegador, celular ou tablet, nos temas claro e escuro.',
     en: 'Pick lists (game type, filters, place, deck…) now look like ArcanaKin: the same in any browser, phone or tablet, in light and dark themes.',
   },

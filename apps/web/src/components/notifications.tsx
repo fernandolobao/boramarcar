@@ -21,6 +21,7 @@ const ICON: Record<InboxEntry['kind'], IconName> = {
   podium: 'ranking',
   announcement: 'info',
   nudge: 'events',
+  monthly: 'ranking',
 };
 
 /** Para onde a notificação leva. */
@@ -34,6 +35,8 @@ export function notificationHref(item: InboxEntry): string | null {
       return '/perfil';
     case 'podium':
       return '/ranking';
+    case 'monthly':
+      return `/retrospectiva/${item.data.groupId}/${item.data.month}`;
     default:
       return null;
   }
@@ -64,6 +67,15 @@ function useNotificationText() {
         return t('achievement', { name: ta(`items.${d.achievementId}.name`) });
       case 'nudge':
         return t('nudge', { event, group: item.groupName ?? '' });
+      case 'monthly':
+        return t('monthly', {
+          group: item.groupName ?? '',
+          month: format.dateTime(new Date(`${d.month}-15T12:00:00Z`), {
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'UTC',
+          }),
+        });
       case 'podium':
         return t('podium', {
           group: item.groupName ?? '',

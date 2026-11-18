@@ -20,6 +20,7 @@ export * from './services/profiles';
 export * from './services/inbox';
 export * from './services/records';
 export * from './services/admin-access';
+export * from './services/monthly';
 export * from './services/announcements';
 export * from './services/achievements';
 export * from './services/privacy';
