@@ -63,19 +63,30 @@ describe('central de notificações (API)', () => {
 
     asUser(bia);
     const forBia = await call(inbox.GET);
-    expect(forBia.body!.unread).toBe(1);
-    expect(forBia.body!.items[0]).toMatchObject({
-      kind: 'game',
-      eventTitle: 'Noite',
-      data: { result: 'loss', winnerIds: [ana.id] },
-      people: { [ana.id]: 'Ana' },
-    });
+    // A partida e a conquista que ela desbloqueou ("Estreia").
+    expect(forBia.body!.unread).toBe(2);
+    const kinds = (forBia.body!.items as { kind: string }[]).map((i) => i.kind).sort();
+    expect(kinds).toEqual(['achievement', 'game']);
+    expect((forBia.body!.items as { kind: string }[]).find((i) => i.kind === 'game')).toMatchObject(
+      {
+        kind: 'game',
+        eventTitle: 'Noite',
+        data: { result: 'loss', winnerIds: [ana.id] },
+        people: { [ana.id]: 'Ana' },
+      },
+    );
     expect((await call(read.POST, { method: 'POST' })).status).toBe(204);
     expect((await call(inbox.GET)).body!.unread).toBe(0);
 
     asUser(caio);
-    expect((await call(inbox.GET)).body!.items[0]).toMatchObject({ kind: 'group_game' });
+    expect((await call(inbox.GET)).body!.items).toEqual([
+      expect.objectContaining({ kind: 'group_game' }),
+    ]);
+    // Ana registrou: só a conquista dela (estreia e primeira vitória), sem "partida registrada".
     asUser(ana);
-    expect((await call(inbox.GET)).body!.items).toEqual([]);
+    const forAna = (await call(inbox.GET)).body!.items as { kind: string }[];
+    expect(forAna.map((i) => i.kind)).toEqual(['achievement', 'achievement']);
+    // Primeira partida do grupo: o pódio só é guardado, sem aviso.
+    expect(forAna.some((i) => i.kind === 'podium')).toBe(false);
   });
 });

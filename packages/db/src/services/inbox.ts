@@ -1,7 +1,18 @@
 import type { NotificationData, NotificationKind } from '@boramarcar/core';
 import { and, count, desc, eq, inArray, isNull } from 'drizzle-orm';
 import type { Database } from '../client';
-import { events, gamePlayers, games, groupMembers, groups, notifications, user } from '../schema';
+import {
+  events,
+  gamePlayers,
+  games,
+  groupMembers,
+  groupPodiums,
+  groups,
+  notifications,
+  user,
+} from '../schema';
+import { achievementsUnlockedByGame } from './profiles';
+import { getGroupRanking } from './ranking';
 
 /**
  * Central de notificações (sino no site e no app). Cada linha guarda só identificadores; nomes de
@@ -69,6 +80,84 @@ export async function notifyGameRecorded(db: Database, input: { gameId: string; 
         data: { kind: 'group_game' as const, gameId: game.id, eventId: game.eventId, winnerIds },
       })),
   ]);
+}
+
+/**
+ * Conquistas que a partida desbloqueou para cada jogador viram notificação (uma vez por
+ * conquista: rodar de novo, ou editar a partida, não repete).
+ */
+export async function notifyAchievementsFromGame(db: Database, input: { gameId: string }) {
+  const [game] = await db
+    .select({ groupId: games.groupId })
+    .from(games)
+    .where(eq(games.id, input.gameId))
+    .limit(1);
+  if (!game) return;
+  const players = await db
+    .select({ userId: gamePlayers.userId })
+    .from(gamePlayers)
+    .where(eq(gamePlayers.gameId, input.gameId));
+  for (const { userId } of players) {
+    const unlocked = await achievementsUnlockedByGame(db, { userId, gameId: input.gameId });
+    if (!unlocked.length) continue;
+    const already = await db
+      .select({ data: notifications.data })
+      .from(notifications)
+      .where(and(eq(notifications.userId, userId), eq(notifications.kind, 'achievement')));
+    const notified = new Set(
+      already.map((n) => (n.data as { achievementId?: string }).achievementId),
+    );
+    await addNotifications(
+      db,
+      unlocked
+        .filter((id) => !notified.has(id))
+        .map((achievementId) => ({
+          userId,
+          groupId: game.groupId,
+          data: { kind: 'achievement' as const, achievementId },
+        })),
+    );
+  }
+}
+
+/**
+ * Confere o pódio (top 3 do ranking geral) do grupo depois de registrar, editar ou apagar uma
+ * partida. Se mudou desde o último aviso, todo o grupo recebe uma notificação. A primeira
+ * leitura só guarda (sem avisar sobre um pódio que já existia).
+ */
+export async function checkPodium(db: Database, input: { groupId: string; actorId: string }) {
+  const ranking = await getGroupRanking(db, { groupId: input.groupId, userId: input.actorId });
+  const top = ranking.standings
+    .filter((s) => s.games > 0)
+    .slice(0, 3)
+    .map((s) => s.userId);
+  const [stored] = await db
+    .select({ userIds: groupPodiums.userIds })
+    .from(groupPodiums)
+    .where(eq(groupPodiums.groupId, input.groupId))
+    .limit(1);
+  const previous = (stored?.userIds as string[] | undefined) ?? null;
+  if (previous && previous.join() === top.join()) return;
+  await db
+    .insert(groupPodiums)
+    .values({ groupId: input.groupId, userIds: top })
+    .onConflictDoUpdate({
+      target: groupPodiums.groupId,
+      set: { userIds: top, updatedAt: new Date() },
+    });
+  if (!previous || top.length === 0) return;
+  const members = await db
+    .select({ userId: groupMembers.userId })
+    .from(groupMembers)
+    .where(eq(groupMembers.groupId, input.groupId));
+  await addNotifications(
+    db,
+    members.map((m) => ({
+      userId: m.userId,
+      groupId: input.groupId,
+      data: { kind: 'podium' as const, userIds: top },
+    })),
+  );
 }
 
 /** Pessoas citadas numa notificação (para mostrar o nome). */

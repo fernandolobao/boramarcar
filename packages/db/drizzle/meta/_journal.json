@@ -162,6 +162,13 @@
       "when": 1795009512518,
       "tag": "0022_plain_frank_castle",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795011022279,
+      "tag": "0023_heavy_bloodstrike",
+      "breakpoints": true
     }
   ]
 }

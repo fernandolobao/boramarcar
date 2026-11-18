@@ -581,3 +581,15 @@ export const notifications = pgTable(
   },
   (t) => [index('notifications_user_created_idx').on(t.userId, t.createdAt)],
 );
+
+/**
+ * Último pódio (top 3 do ranking geral) avisado em cada grupo: quando muda, o grupo recebe uma
+ * notificação. A primeira leitura só guarda.
+ */
+export const groupPodiums = pgTable('group_podiums', {
+  groupId: text('group_id')
+    .primaryKey()
+    .references(() => groups.id, { onDelete: 'cascade' }),
+  userIds: jsonb('user_ids').notNull(),
+  updatedAt: updatedAt(),
+});
