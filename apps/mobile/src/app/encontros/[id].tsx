@@ -136,6 +136,15 @@ export default function EventScreen() {
       {e.canManage && e.status === 'scheduled' && e.startsAt.getTime() <= Date.now() && (
         <FinishEvent event={e} onDone={() => void event.refresh()} />
       )}
+      {/* Torneio neste encontro (9.1): quem organiza cria; a lista fica em Grupo → Torneios. */}
+      {e.canManage && e.status !== 'cancelled' && (
+        <Button
+          label={t('tourCreateHere')}
+          variant="secondary"
+          onPress={() => router.push({ pathname: '/torneios/novo', params: { encontro: e.id } })}
+          style={{ alignSelf: 'flex-start' }}
+        />
+      )}
       {e.canManage && (
         <EventManage key={e.id + e.status} event={e} onDone={() => void event.refresh()} />
       )}

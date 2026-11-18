@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import {
   groupRecordsSchema,
+  tournamentSummarySchema,
+  tournamentViewSchema,
   notificationSchema,
   achievementSchema,
   availabilityRuleSchema,
@@ -700,6 +702,69 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ player: playerProfileSchema }),
           )
         ).player,
+    },
+    /** Torneios do grupo (9.1), em qualquer formato. */
+    tournaments: {
+      list: async (groupId: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/tournaments`,
+            z.object({ tournaments: z.array(tournamentSummarySchema) }),
+          )
+        ).tournaments,
+      get: (id: string) =>
+        request('GET', `/tournaments/${encodeURIComponent(id)}`, tournamentViewSchema),
+      create: async (
+        eventId: string,
+        input: {
+          name: string;
+          format: string;
+          bestOf?: 1 | 3;
+          rounds?: number | null;
+          points?: { win: number; draw: number; loss: number };
+          countsInRanking?: boolean;
+        },
+      ) =>
+        (
+          await request(
+            'POST',
+            `/events/${encodeURIComponent(eventId)}/tournaments`,
+            z.object({ tournament: z.object({ id: z.string() }).loose() }),
+            input,
+          )
+        ).tournament,
+      addEntrant: (id: string, memberIds: string[]) =>
+        request('POST', `/tournaments/${encodeURIComponent(id)}/entrants`, z.unknown(), {
+          memberIds,
+        }),
+      removeEntrant: (id: string, entrantId: string) =>
+        request(
+          'DELETE',
+          `/tournaments/${encodeURIComponent(id)}/entrants/${encodeURIComponent(entrantId)}`,
+          z.unknown(),
+        ),
+      start: (id: string) =>
+        request('POST', `/tournaments/${encodeURIComponent(id)}/start`, z.unknown()),
+      next: (id: string) =>
+        request(
+          'POST',
+          `/tournaments/${encodeURIComponent(id)}/next`,
+          z.object({ finished: z.boolean() }).loose(),
+        ),
+      report: (
+        id: string,
+        tableId: string,
+        result: { gameWins: Record<string, number>; gameDraws: number },
+      ) =>
+        request(
+          'PUT',
+          `/tournaments/${encodeURIComponent(id)}/tables/${encodeURIComponent(tableId)}`,
+          z.unknown(),
+          result,
+        ),
+      remove: (id: string) =>
+        request('DELETE', `/tournaments/${encodeURIComponent(id)}`, z.unknown()),
     },
     stats: {
       /** Estatísticas do grupo: sequências, comandantes em alta, atividade por mês. */

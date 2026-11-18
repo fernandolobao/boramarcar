@@ -10,6 +10,7 @@ import {
   groupPodiums,
   groups,
   notifications,
+  tournaments,
   user,
 } from '../schema';
 import { achievementsUnlockedByGame } from './profiles';
@@ -181,6 +182,8 @@ export interface InboxItem {
   people: Record<string, string>;
   /** Título e texto, nos avisos do ArcanaKin. */
   announcement: { title: string; body: string } | null;
+  /** Nome do torneio, nos avisos de torneio. */
+  tournamentName: string | null;
 }
 
 /** Notificações da pessoa, mais novas primeiro. */
@@ -218,7 +221,10 @@ export async function listNotifications(
       items.flatMap((i) => (i.data.kind === 'announcement' ? [i.data.announcementId] : [])),
     ),
   ];
-  const [names, titles, notices] = await Promise.all([
+  const tournamentIds = [
+    ...new Set(items.flatMap((i) => (i.data.kind === 'tournament' ? [i.data.tournamentId] : []))),
+  ];
+  const [names, titles, notices, cups] = await Promise.all([
     userIds.length
       ? db.select({ id: user.id, name: user.name }).from(user).where(inArray(user.id, userIds))
       : [],
@@ -234,7 +240,14 @@ export async function listNotifications(
           .from(announcements)
           .where(inArray(announcements.id, announcementIds))
       : [],
+    tournamentIds.length
+      ? db
+          .select({ id: tournaments.id, name: tournaments.name })
+          .from(tournaments)
+          .where(inArray(tournaments.id, tournamentIds))
+      : [],
   ]);
+  const cupOf = new Map(cups.map((c) => [c.id, c.name]));
   const noticeOf = new Map(notices.map((n) => [n.id, { title: n.title, body: n.body }]));
   const nameOf = new Map(names.map((n) => [n.id, n.name]));
   const titleOf = new Map(titles.map((e) => [e.id, e.title]));
@@ -251,6 +264,7 @@ export async function listNotifications(
         : null,
     announcement:
       i.data.kind === 'announcement' ? (noticeOf.get(i.data.announcementId) ?? null) : null,
+    tournamentName: i.data.kind === 'tournament' ? (cupOf.get(i.data.tournamentId) ?? null) : null,
     people: Object.fromEntries(
       peopleIn(i.data).flatMap((id) => (nameOf.has(id) ? [[id, nameOf.get(id)!]] : [])),
     ),

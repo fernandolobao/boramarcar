@@ -22,6 +22,7 @@ const ICON: Record<InboxEntry['kind'], IconName> = {
   announcement: 'info',
   nudge: 'events',
   monthly: 'ranking',
+  tournament: 'winner',
 };
 
 /** Para onde a notificação leva. */
@@ -37,6 +38,8 @@ export function notificationHref(item: InboxEntry): string | null {
       return '/ranking';
     case 'monthly':
       return `/retrospectiva/${item.data.groupId}/${item.data.month}`;
+    case 'tournament':
+      return `/torneios/${item.data.tournamentId}`;
     default:
       return null;
   }
@@ -67,6 +70,13 @@ function useNotificationText() {
         return t('achievement', { name: ta(`items.${d.achievementId}.name`) });
       case 'nudge':
         return t('nudge', { event, group: item.groupName ?? '' });
+      case 'tournament': {
+        const name = item.tournamentName ?? '';
+        if (d.event === 'finished') return t('tournamentFinished', { name });
+        return d.table === null
+          ? t('tournamentBye', { name, round: d.round })
+          : t('tournamentRound', { name, round: d.round, table: d.table });
+      }
       case 'monthly':
         return t('monthly', {
           group: item.groupName ?? '',
