@@ -558,7 +558,11 @@
     "foilsSaved": "{name}: {count, plural, =0 {nenhuma cópia foil} =1 {1 cópia foil} other {# cópias foil}}.",
     "splitFoil": "Separar 1 cópia foil",
     "splitNormal": "Separar 1 cópia comum",
-    "editLineFoil": "Editar a versão foil no deck"
+    "editLineFoil": "Editar a versão foil no deck",
+    "dangerZone": "Zona de perigo",
+    "deleteDeckHint": "Remove o deck e as cartas dele. As partidas em que ele foi usado continuam no histórico.",
+    "removeDeck": "Remover deck",
+    "confirmRemove": "Confirmar remoção"
   },
   "analysis": {
     "title": "Análise",

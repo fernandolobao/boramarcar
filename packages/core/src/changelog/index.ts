@@ -99,6 +99,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Rivalidades no painel: seu maior rival e o seu freguês no grupo, e o placar entre vocês no perfil de cada pessoa.',
     en: 'Rivalries on the dashboard: your biggest rival and your favorite target in the group, plus your head-to-head score on each person’s profile.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'A página do deck ficou mais limpa: nome, tipo de jogo, visibilidade e remover agora ficam em "Editar deck", no topo.',
+    en: 'The deck page is cleaner: name, game type, visibility and delete now live under "Edit deck", at the top.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

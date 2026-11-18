@@ -558,7 +558,11 @@
     "foilsSaved": "{name}: {count, plural, =0 {no foil copies} =1 {1 foil copy} other {# foil copies}}.",
     "splitFoil": "Split 1 copy as foil",
     "splitNormal": "Split 1 copy as non-foil",
-    "editLineFoil": "Edit the foil version in the deck"
+    "editLineFoil": "Edit the foil version in the deck",
+    "dangerZone": "Danger zone",
+    "deleteDeckHint": "Deletes the deck and its cards. Games where it was used stay in the history.",
+    "removeDeck": "Delete deck",
+    "confirmRemove": "Confirm deletion"
   },
   "analysis": {
     "title": "Analysis",

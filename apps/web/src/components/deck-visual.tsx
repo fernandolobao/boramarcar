@@ -6,6 +6,7 @@ import {
   type DeckVisibility,
   type GameFormat,
 } from '@boramarcar/core';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { api } from '@/lib/api';
@@ -45,15 +46,19 @@ export function DeckSettingsForm({
   name,
   format,
   visibility = 'group',
+  onSaved,
 }: {
   deckId: string;
   name: string;
   format: GameFormat;
   visibility?: DeckVisibility;
+  /** Depois de salvar (ex.: fechar a janela de edição). */
+  onSaved?: () => void;
 }) {
   const t = useTranslations('decks');
   const tf = useTranslations('formats');
   const tc = useTranslations('common');
+  const router = useRouter();
   const { run, error, pending } = useApiAction();
   const [values, setValues] = useState({ name, format, visibility });
   const [saved, setSaved] = useState(false);
@@ -65,7 +70,12 @@ export function DeckSettingsForm({
         setSaved(false);
         void run(
           () => api(`/api/v1/decks/${deckId}`, { method: 'PATCH', body: values }),
-          () => setSaved(true),
+          () => {
+            setSaved(true);
+            // A página mostra o nome, o formato e a visibilidade novos (e o "Compartilhar deck").
+            router.refresh();
+            onSaved?.();
+          },
         );
       }}
     >
