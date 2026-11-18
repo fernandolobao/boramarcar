@@ -561,3 +561,23 @@ export const rateLimits = pgTable(
   },
   (t) => [primaryKey({ columns: [t.key, t.windowStart] })],
 );
+
+/**
+ * Central de notificações (sino no site e no app). `data` guarda só identificadores; o texto é
+ * montado no idioma de quem lê. Some com a conta (LGPD) e com o grupo.
+ */
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    groupId: text('group_id').references(() => groups.id, { onDelete: 'cascade' }),
+    data: jsonb('data').notNull(),
+    createdAt: createdAt(),
+    readAt: timestamp('read_at', { withTimezone: true }),
+  },
+  (t) => [index('notifications_user_created_idx').on(t.userId, t.createdAt)],
+);

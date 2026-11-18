@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  notificationSchema,
   availabilityRuleSchema,
   deckDetailSchema,
   availabilitySlotSchema,
@@ -211,6 +212,15 @@ export function createApiClient(options: ApiClientOptions) {
           | 'tip-table'
           | 'tip-collection',
       ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
+      /** Central de notificações: as mais recentes e quantas ainda não foram lidas. */
+      notifications: () =>
+        request(
+          'GET',
+          '/me/notifications',
+          z.object({ items: z.array(notificationSchema), unread: z.number() }),
+        ),
+      /** A central foi aberta: tudo o que chegou conta como lido. */
+      markNotificationsRead: () => request('POST', '/me/notifications/read', z.unknown()),
       /** Exclui a conta (LGPD): dados pessoais apagados, partidas ficam anônimas. */
       deleteAccount: () =>
         request('DELETE', '/me', z.object({ deleted: z.literal(true) }).loose(), {

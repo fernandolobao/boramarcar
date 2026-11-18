@@ -27,6 +27,7 @@ export const SECTIONS = [
   'player',
   'settings',
   'feedback',
+  'notifications',
   'table',
   'recap',
   'signIn',

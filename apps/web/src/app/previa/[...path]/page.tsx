@@ -39,6 +39,8 @@ function sectionFor([first, second, third]: string[]): Section | null {
       return 'settings';
     case 'feedback':
       return 'feedback';
+    case 'notificacoes':
+      return 'notifications';
     case 'mesa':
       return second ? 'table' : null;
     default:

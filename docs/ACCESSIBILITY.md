@@ -457,3 +457,8 @@ sem rolagem horizontal em 320px.
 ## Compartilhar deck público (18/11/2026)
 
 - "Compartilhar deck" é um `<details>` (fechado por padrão), só em decks públicos. Dentro: QR Code (`role="img"` com nome "QR Code do deck …") com "Baixar QR Code" logo abaixo, o link num `CopyField` com "Copiar link" ao lado, e WhatsApp/menu do celular. Conferido em 360 px (tema escuro) e 1100 px (claro), sem rolagem horizontal; componente no `deck-share.test.tsx` com axe.
+
+## Central de notificações (18/11/2026)
+
+- Site: o sino no topo é um link com nome que inclui o número ("Notificações: 2 novas", também como `title`; com dois-pontos, e não parênteses, para o axe reconhecer o número visível dentro do nome); o número visível é decorativo (`aria-hidden`). A página `/notificacoes` tem `h1`, lista de links com o texto completo, a data em `<time>` e o selo "Nova" em texto (não só cor). Componente com axe em `notifications.test.tsx`; página no E2E de acessibilidade.
+- App: o sino no cabeçalho do painel é um botão com o mesmo nome; cada notificação é um botão com o texto, a data e "Nova" no nome acessível.

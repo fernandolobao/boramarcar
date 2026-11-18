@@ -7,6 +7,7 @@
  */
 import {
   Award,
+  Bell,
   CalendarCheck,
   CalendarRange,
   Shield,
@@ -166,6 +167,8 @@ export const Icons = {
   public: Globe,
   // Idioma
   language: Languages,
+  // Notificações
+  notifications: Bell,
   // Conquistas
   achievement: Award,
   firstGame: Footprints,
