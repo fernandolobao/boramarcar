@@ -53,13 +53,16 @@ export function AdminUsers({ users }: { users: AdminUserRow[] }) {
               <p className="font-semibold break-words">
                 <Link
                   href={`/jogadores/${u.id}`}
-                  className="underline decoration-fg-muted/60 underline-offset-2 hover:decoration-current"
+                  className="inline-flex min-h-6 items-center underline decoration-fg-muted/60 underline-offset-2 hover:decoration-current"
                 >
                   {u.name}
                 </Link>
               </p>
               <p className="muted text-sm break-all" data-cs-mask>
-                <a href={`mailto:${u.email}`} className="underline underline-offset-2">
+                <a
+                  href={`mailto:${u.email}`}
+                  className="inline-flex min-h-6 items-center underline underline-offset-2"
+                >
                   {u.email}
                 </a>
                 {!u.emailVerified && (
