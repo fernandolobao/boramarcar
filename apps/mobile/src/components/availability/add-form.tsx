@@ -9,6 +9,7 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Choices } from '@/components/ds/choices';
 import { DateField } from '@/components/ds/date-field';
+import { Checkbox } from '@/components/ds/checkbox';
 
 const row = { flexDirection: 'row', flexWrap: 'wrap', gap: 8 } as const;
 
@@ -110,15 +111,12 @@ export function AddAvailability({
           <AppText style={{ fontWeight: '600' }}>{t('availWeekdays')}</AppText>
           <View style={row}>
             {WEEKDAY_ORDER.map((w) => (
-              <Button
+              <Checkbox
                 key={w}
                 label={weekdayName(w, 'short')}
                 accessibilityLabel={weekdayName(w)}
-                variant="secondary"
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: weekdays.includes(w) }}
-                selected={weekdays.includes(w)}
-                onPress={() => setWeekdays((list) => toggle(list, w))}
+                checked={weekdays.includes(w)}
+                onChange={() => setWeekdays((list) => toggle(list, w))}
               />
             ))}
           </View>
@@ -135,14 +133,11 @@ export function AddAvailability({
           <AppText muted>{t('availLocationsHint')}</AppText>
           <View style={row}>
             {locations.map((l) => (
-              <Button
+              <Checkbox
                 key={l.id}
                 label={l.name}
-                variant="secondary"
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: selected.includes(l.id) }}
-                selected={selected.includes(l.id)}
-                onPress={() => setSelected((list) => toggle(list, l.id))}
+                checked={selected.includes(l.id)}
+                onChange={() => setSelected((list) => toggle(list, l.id))}
               />
             ))}
           </View>

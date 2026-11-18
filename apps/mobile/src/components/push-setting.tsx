@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Linking, Switch, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { AppText, Button, Card, styles } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { disablePush, enablePush, getPushState, type PushState } from '@/lib/push';
 import { useColors } from '@/lib/theme';
+import { Switch } from '@/components/ds/switch';
 
 /**
  * "Avisos neste celular": liga/desliga o push. A permissão do sistema só é pedida ao ligar.
@@ -40,18 +41,13 @@ export function PushSetting() {
         <AppText accessibilityRole="header" style={styles.title}>
           {t('pushTitle')}
         </AppText>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <AppText style={{ flex: 1 }}>{t('pushToggle')}</AppText>
-          <Switch
-            accessibilityLabel={t('pushToggle')}
-            accessibilityHint={t('pushHint')}
-            value={state === 'on'}
-            disabled={pending || state === 'unavailable'}
-            onValueChange={(on) => void toggle(on)}
-            trackColor={{ true: colors.brand, false: colors.border }}
-          />
-        </View>
-        <AppText muted>{t('pushHint')}</AppText>
+        <Switch
+          label={t('pushToggle')}
+          description={t('pushHint')}
+          checked={state === 'on'}
+          disabled={pending || state === 'unavailable'}
+          onChange={(on) => void toggle(on)}
+        />
         {state === 'denied' && (
           <>
             <AppText accessibilityRole="alert">{t('pushDenied')}</AppText>

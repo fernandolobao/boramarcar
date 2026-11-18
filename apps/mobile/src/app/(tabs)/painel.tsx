@@ -19,29 +19,7 @@ import { useGroup } from '@/lib/group';
 import { formatDate, formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
-
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  const colors = useColors();
-  return (
-    <View
-      style={{
-        flexBasis: '47%',
-        flexGrow: 1,
-        padding: 12,
-        borderRadius: 12,
-        backgroundColor: colors.surfaceMuted,
-      }}
-      accessible
-      accessibilityLabel={`${label}: ${value}${hint ? `, ${hint}` : ''}`}
-    >
-      <AppText muted>{label}</AppText>
-      <AppText style={{ fontSize: 24, fontWeight: '700', fontVariant: ['tabular-nums'] }}>
-        {value}
-      </AppText>
-      {hint ? <AppText muted>{hint}</AppText> : null}
-    </View>
-  );
-}
+import { Stat } from '@/components/ds/stat';
 
 function NextEvent({ event }: { event: EventSummary | undefined }) {
   if (!event) {

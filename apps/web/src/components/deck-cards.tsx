@@ -15,6 +15,7 @@ import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 import { NumberField } from './ds/number-field';
 import { Select } from '@/components/ds/select';
+import { Checkbox } from '@/components/ds/checkbox';
 
 export interface DeckLineView {
   key: string;
@@ -571,15 +572,15 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
             />
           </div>
         )}
-        <label className="inline-flex min-h-10 items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            checked={isFoil}
-            disabled={pending || real < 1}
-            onChange={() => moveFinish(real)}
-          />
-          <span aria-hidden="true">✦</span> {t('foil')}
-        </label>
+        <Checkbox
+          label={t('foil')}
+          checked={isFoil}
+          disabled={pending || real < 1}
+          onChange={() => moveFinish(real)}
+          className="font-medium"
+        >
+          <span aria-hidden="true">✦</span>
+        </Checkbox>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {tile.card && <PrintPicker deckId={deckId} line={{ ...tile, foil: isFoil }} />}
@@ -684,10 +685,7 @@ function AddCardForm({ deckId }: { deckId: string }) {
           max={MAX_COPIES}
         />
       </div>
-      <label className="flex min-h-10 items-center gap-2 text-sm">
-        <input type="checkbox" checked={proxy} onChange={(e) => setProxy(e.target.checked)} />
-        {t('addAsProxy')}
-      </label>
+      <Checkbox label={t('addAsProxy')} checked={proxy} onChange={setProxy} />
       <button className="btn-primary" disabled={pending || !name.trim()}>
         <Icon name="add" />
         {t('addCard')}

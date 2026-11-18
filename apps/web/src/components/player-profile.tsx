@@ -7,6 +7,7 @@ import { splitAchievements } from '@boramarcar/core/achievements';
 import { ACHIEVEMENT_ICON } from './achievement-icons';
 import { AchievementTabs } from './achievement-tabs';
 import { Icon } from './icons';
+import { Stat } from './ds/stat';
 
 type Profile = Awaited<ReturnType<typeof getPlayerProfile>>;
 
@@ -172,10 +173,7 @@ export async function PlayerProfile({
             [t('winRate'), format.number(profile.winRate, { style: 'percent' })],
             [t('decks'), format.number(profile.decks.length)],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl bg-ink-50 p-3 dark:bg-ink-900">
-              <dt className="muted text-sm">{label}</dt>
-              <dd className="text-2xl font-semibold tabular-nums">{value}</dd>
-            </div>
+            <Stat key={label} label={label!} value={value!} />
           ))}
         </dl>
         {profile.seasonTitles.length > 0 && (

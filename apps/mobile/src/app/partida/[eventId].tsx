@@ -18,6 +18,7 @@ import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { Choices } from '@/components/ds/choices';
+import { Checkbox } from '@/components/ds/checkbox';
 
 /** Formatos do formulário simples: todos contra todos e duelo (times seguem no site). */
 const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
@@ -183,13 +184,10 @@ export default function RecordGameScreen() {
           }`;
           return (
             <View key={p.userId} style={{ gap: 6 }}>
-              <Button
+              <Checkbox
                 label={label}
-                variant="secondary"
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked }}
-                selected={checked}
-                onPress={() => toggle(p.userId)}
+                checked={checked}
+                onChange={() => toggle(p.userId)}
                 style={{ alignItems: 'flex-start' }}
               />
               {checked && p.decks.length > 0 && (

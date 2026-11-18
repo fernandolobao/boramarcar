@@ -19,7 +19,7 @@ test.describe('beta assistido', () => {
     await groups
       .getByRole('checkbox', { name: /Mesa de Quinta/ })
       .first()
-      .check();
+      .check({ force: true });
 
     // Data no futuro: fica marcado e nada muda para o grupo.
     await fillDate(beta, 'Data de início', '2099-01-04');

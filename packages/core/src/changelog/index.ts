@@ -124,6 +124,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'As listas de escolha (tipo de jogo, filtros, local, deck…) ganharam a cara do ArcanaKin: iguais em qualquer navegador, celular ou tablet, nos temas claro e escuro.',
     en: 'Pick lists (game type, filters, place, deck…) now look like ArcanaKin: the same in any browser, phone or tablet, in light and dark themes.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Caixas de marcar e interruptores com a cara do ArcanaKin, com um ✓ visível no app; a lista de escolha alinha com os campos e botões ao lado, e o selo Foil da coleção fica sobre a imagem da carta.',
+    en: 'Checkboxes and switches now look like ArcanaKin, with a visible ✓ in the app; pick lists line up with the fields and buttons next to them, and the collection’s Foil tag sits on the card image.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

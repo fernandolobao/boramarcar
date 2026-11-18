@@ -70,20 +70,21 @@ export function Select<T extends string>({
       placeholder={placeholder}
       isDisabled={disabled}
       isInvalid={Boolean(error)}
-      className={`space-y-1 ${className ?? ''}`}
+      className={className}
     >
+      {/* `label` já traz o espaço até o campo; mesma altura e fonte do `input` e dos `btn*`. */}
       <Label className={hideLabel ? 'sr-only' : 'label'}>{label}</Label>
-      <Button className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-line-strong bg-surface ps-3 pe-2 text-start text-fg hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 data-[pressed]:bg-surface-muted [[data-invalid]_&]:border-danger">
+      <Button className="flex min-h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-line-strong bg-surface ps-3 pe-2 text-start text-sm text-fg hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 data-[pressed]:bg-surface-muted [[data-invalid]_&]:border-danger">
         <SelectValue className="truncate data-[placeholder]:text-fg-muted" />
         <Icon name="chevronDown" />
       </Button>
       {name !== undefined && <input type="hidden" name={name} value={current ?? ''} />}
       {description && (
-        <Text slot="description" className="muted block text-sm">
+        <Text slot="description" className="muted mt-1 block text-sm">
           {description}
         </Text>
       )}
-      <FieldError className="block text-sm text-danger">{error}</FieldError>
+      <FieldError className="mt-1 block text-sm text-danger">{error}</FieldError>
       <Popover className="min-w-(--trigger-width) overflow-auto rounded-2xl border border-line bg-surface p-1 shadow-xl motion-safe:transition-opacity">
         <ListBox className="max-h-72 outline-none">
           {options.map((o) => (

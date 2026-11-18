@@ -10,6 +10,8 @@ import { api } from '@/lib/api';
 import { WEEKDAY_ORDER, weekdayNames } from '@/lib/weekdays';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Checkbox } from '@/components/ds/checkbox';
+import { toggleIn } from '@boramarcar/ui';
 
 interface LocationOption {
   id: string;
@@ -123,21 +125,13 @@ export function AvailabilityForm({
             <legend className="label">{t('weekdays')}</legend>
             <div className="flex flex-wrap gap-2">
               {WEEKDAY_ORDER.map((day) => (
-                <label
+                <Checkbox
                   key={day}
-                  className="flex items-center gap-2 rounded-xl border border-ink-500 px-3 py-2 text-sm"
-                >
-                  <input
-                    type="checkbox"
-                    checked={weekdays.includes(day)}
-                    onChange={(e) =>
-                      setWeekdays((prev) =>
-                        e.target.checked ? [...prev, day] : prev.filter((d) => d !== day),
-                      )
-                    }
-                  />
-                  {names[day]}
-                </label>
+                  label={names[day] ?? String(day)}
+                  checked={weekdays.includes(day)}
+                  onChange={(on) => setWeekdays((prev) => toggleIn(prev, day, on))}
+                  className="rounded-xl border border-line-strong px-3 data-[selected]:border-primary data-[selected]:bg-surface-muted"
+                />
               ))}
             </div>
           </fieldset>
@@ -158,23 +152,13 @@ export function AvailabilityForm({
           <p className="muted mb-2">{t('locationsHint')}</p>
           <div className="flex flex-wrap gap-2">
             {locations.map((location) => (
-              <label
+              <Checkbox
                 key={location.id}
-                className="flex items-center gap-2 rounded-xl border border-ink-300 px-3 py-2 text-sm dark:border-ink-700"
-              >
-                <input
-                  type="checkbox"
-                  checked={selected.includes(location.id)}
-                  onChange={(e) =>
-                    setSelected((prev) =>
-                      e.target.checked
-                        ? [...prev, location.id]
-                        : prev.filter((id) => id !== location.id),
-                    )
-                  }
-                />
-                {location.name}
-              </label>
+                label={location.name}
+                checked={selected.includes(location.id)}
+                onChange={(on) => setSelected((prev) => toggleIn(prev, location.id, on))}
+                className="rounded-xl border border-line-strong px-3 data-[selected]:border-primary data-[selected]:bg-surface-muted"
+              />
             ))}
           </div>
         </fieldset>

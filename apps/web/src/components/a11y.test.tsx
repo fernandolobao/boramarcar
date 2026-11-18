@@ -49,6 +49,9 @@ import { FeedbackForm } from './feedback-form';
 import { NumberField } from './ds/number-field';
 import { Choices } from './ds/choices';
 import { Select } from './ds/select';
+import { Checkbox } from './ds/checkbox';
+import { Stat } from './ds/stat';
+import { Switch } from './ds/switch';
 
 vi.mock('./places/location-map', () => ({
   LocationMap: ({ label }: { label: string }) => <div role="region" aria-label={label} />,
@@ -471,6 +474,23 @@ const cases: [string, ReactElement][] = [
       ]}
       onChange={() => undefined}
     />,
+  ],
+  [
+    'Checkbox',
+    <Checkbox
+      key="c"
+      label="Foil"
+      checked
+      description="Cartas brilhantes"
+      onChange={() => undefined}
+    />,
+  ],
+  ['Switch', <Switch key="w" label="Avisos por e-mail" checked onChange={() => undefined} />],
+  [
+    'Stat',
+    <dl key="t">
+      <Stat label="Vitórias" value="3" hint="no mês" />
+    </dl>,
   ],
 ];
 

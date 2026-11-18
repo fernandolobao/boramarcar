@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { Select } from '@/components/ds/select';
+import { Checkbox } from '@/components/ds/checkbox';
 
 function listTimeZones(current: string): string[] {
   const zones =
@@ -81,18 +82,12 @@ export function ProfileForm({ emailNotifications = true }: { emailNotifications?
         />
       </div>
       <div>
-        <label className="flex items-center gap-2 font-medium">
-          <input
-            type="checkbox"
-            checked={notify}
-            aria-describedby="profile-email-hint"
-            onChange={(e) => setNotify(e.target.checked)}
-          />
-          {t('emailNotifications')}
-        </label>
-        <p id="profile-email-hint" className="muted mt-1">
-          {t('emailNotificationsHint')}
-        </p>
+        <Checkbox
+          label={t('emailNotifications')}
+          checked={notify}
+          description={t('emailNotificationsHint')}
+          onChange={setNotify}
+        />
       </div>
       <div className="flex items-center gap-3">
         <button className="btn-primary" disabled={pending}>
