@@ -72,4 +72,3 @@ describe('Choices (site)', () => {
     expect(c2.querySelector('.sm\\:grid-cols-3')).toBeNull();
   });
 });
-
