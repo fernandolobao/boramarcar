@@ -28,6 +28,7 @@ import { BetaBanner } from '@/components/beta-banner';
 import { FirstSteps } from '@/components/first-steps';
 import { NewAchievements } from '@/components/new-achievements';
 import { Stat } from '@/components/ds/stat';
+import { HeroArt } from '@/components/hero-art';
 
 export const generateMetadata = navMetadata('dashboard');
 
@@ -190,13 +191,7 @@ export default async function DashboardPage() {
       >
         {/* Arte do comandante em alta no grupo, tingida na cor da marca (só textura: o texto fica
             sobre uma camada escura que garante o contraste com qualquer arte). */}
-        {heroArt && (
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-20 bg-cover bg-[50%_30%] mix-blend-luminosity"
-            style={{ backgroundImage: `url(${JSON.stringify(heroArt)})` }}
-          />
-        )}
+        {heroArt && <HeroArt src={heroArt} />}
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-arcano/80" />
         <div
           aria-hidden="true"

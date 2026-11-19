@@ -31,6 +31,7 @@ import { StackSections } from '@/components/stack-sections';
 import { TableSuggestions } from '@/components/table-suggestions';
 import { EmptyState } from '@/components/empty-state';
 import { pageMetadata } from '@/server/seo';
+import { HeroArt } from '@/components/hero-art';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -121,11 +122,7 @@ export default async function EventPage({ params }: Props) {
         // Com partidas: a arte do deck vencedor (ou de quem jogou) no topo, tingida na cor da
         // marca; o texto fica sobre uma camada escura que garante o contraste com qualquer arte.
         <div className="relative isolate overflow-hidden rounded-3xl bg-arcano p-6 text-pergaminho sm:p-8">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-20 bg-cover bg-[50%_30%] mix-blend-luminosity"
-            style={{ backgroundImage: `url(${JSON.stringify(heroArt)})` }}
-          />
+          <HeroArt src={heroArt} />
           <div aria-hidden="true" className="absolute inset-0 -z-10 bg-arcano/80" />
           <h1 className="flex flex-wrap items-center gap-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             {event.title} <EventStatusBadge status={event.status} />

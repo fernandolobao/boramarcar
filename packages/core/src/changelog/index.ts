@@ -151,6 +151,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-19',
+    pt: 'O painel e a página do encontro abrem mais rápido no celular: a arte do destaque passou a carregar primeiro.',
+    en: 'The dashboard and meetup pages open faster on phones: the highlight art now loads first.',
+  },
+  {
+    date: '2026-11-19',
     pt: 'Chegaram os perfis de loja: endereço com mapa, horários, contatos e formatos, com o selo de loja verificada. A loja entra por convite da equipe do ArcanaKin.',
     en: 'Store profiles are here: address with a map, hours, contacts and formats, with a verified-store badge. Stores join by invite from the ArcanaKin team.',
   },
