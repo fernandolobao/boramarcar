@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 import { AccountPrivacy } from '@/components/account-privacy';
+import { AvatarPicker } from '@/components/avatar-picker';
 import { PushSetting } from '@/components/push-setting';
 import { AppText, Button, Card, styles } from '@/components/ui';
 import { authClient } from '@/lib/auth';
@@ -11,7 +12,7 @@ import { Choices } from '@/components/ds/choices';
 
 /** Conta: quem está conectado, grupo ativo, avisos neste celular, sair e privacidade (LGPD). */
 export default function AccountScreen() {
-  const { data: session } = authClient.useSession();
+  const { data: session, refetch } = authClient.useSession();
   const { groups, group, select } = useGroup();
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
@@ -20,6 +21,18 @@ export default function AccountScreen() {
         <AppText style={{ fontWeight: '700' }}>{session?.user.name}</AppText>
         <AppText muted>{session?.user.email}</AppText>
       </Card>
+      {session?.user && (
+        <Card>
+          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+            {t('avatarTitle')}
+          </AppText>
+          <AvatarPicker
+            name={session.user.name}
+            image={session.user.image}
+            onChanged={() => void refetch({ query: { disableCookieCache: true } })}
+          />
+        </Card>
+      )}
       {groups.length > 0 && (
         <View style={{ gap: 8 }}>
           <AppText accessibilityRole="header" style={styles.title}>

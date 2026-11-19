@@ -142,6 +142,7 @@ const publicFields = {
   website: stores.website,
   formats: stores.formats,
   verified: stores.verified,
+  logoUrl: stores.logoUrl,
 };
 
 /** Perfil público da loja (sem o e-mail de contato); `null` se não existe. */
@@ -424,4 +425,21 @@ export async function getStoreName(db: Database, storeId: string) {
   const [row] = await db.select({ name: stores.name }).from(stores).where(eq(stores.id, storeId));
   if (!row) throw new DomainError('not_found', 'Loja não encontrada');
   return row.name;
+}
+
+/**
+ * Troca (ou tira, com `null`) o logo da loja. Dono ou equipe. Devolve o logo anterior, para o
+ * arquivo antigo ser apagado do armazenamento.
+ */
+export async function setStoreLogo(
+  db: Database,
+  input: { storeId: string; userId: string; url: string | null },
+) {
+  await requireStoreRole(db, input.storeId, input.userId, ['owner', 'staff']);
+  const [before] = await db
+    .select({ logoUrl: stores.logoUrl })
+    .from(stores)
+    .where(eq(stores.id, input.storeId));
+  await db.update(stores).set({ logoUrl: input.url }).where(eq(stores.id, input.storeId));
+  return before?.logoUrl ?? null;
 }

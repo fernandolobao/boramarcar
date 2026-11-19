@@ -109,6 +109,7 @@ const r = {
   storeEventGuests: await import('../store-events/[eventId]/guests/route'),
   storeEntry: await import('../store-entries/[entryId]/route'),
   storeTournament: await import('../store-events/[eventId]/tournament/route'),
+  storeLogo: await import('../stores/[storeId]/logo/route'),
 };
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
@@ -493,6 +494,8 @@ const outsiderCases: Case[] = [
     { hours: 'x' },
   ],
   ['DELETE perfil da loja', r.store.DELETE as Handler, 'DELETE', () => ({ storeId: ids.store! })],
+  ['PUT logo da loja', r.storeLogo.PUT as Handler, 'PUT', () => ({ storeId: ids.store! }), {}],
+  ['DELETE logo da loja', r.storeLogo.DELETE as Handler, 'DELETE', () => ({ storeId: ids.store! })],
   [
     'POST convite da equipe da loja',
     r.storeInvites.POST as Handler,

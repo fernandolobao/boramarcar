@@ -1,5 +1,5 @@
 import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { Linking, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Image, Linking, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { formatLabel } from '@/components/table/labels';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -36,6 +36,15 @@ export default function StoreScreen() {
     >
       <Stack.Screen options={{ title: store.name }} />
       <View style={{ gap: 4 }}>
+        {store.logoUrl ? (
+          // Decorativo: o nome da loja vem logo abaixo.
+          <Image
+            source={{ uri: store.logoUrl }}
+            style={{ width: 72, height: 72, borderRadius: 16 }}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        ) : null}
         <AppText accessibilityRole="header" style={styles.title}>
           {store.name}
         </AppText>

@@ -42,6 +42,7 @@ import { MemberActions } from './member-actions';
 import { UserMenu } from './user-menu';
 import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
+import { ImageUpload } from './image-upload';
 import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
 import { FirstSteps } from './first-steps';
@@ -320,6 +321,26 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  [
+    'ImageUpload (sem foto)',
+    <ImageUpload
+      key="r"
+      kind="avatar"
+      endpoint="/api/v1/me/avatar"
+      name="Ana Teste"
+      image={null}
+    />,
+  ],
+  [
+    'ImageUpload (logo)',
+    <ImageUpload
+      key="r"
+      kind="logo"
+      endpoint="/api/v1/stores/s1/logo"
+      name="Loja do Mago"
+      image="https://x.public.blob.vercel-storage.com/l.webp"
+    />,
+  ],
   ['ThemePicker', <ThemePicker key="tp" />],
   [
     'BracketCard',

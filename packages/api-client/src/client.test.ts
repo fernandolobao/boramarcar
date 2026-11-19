@@ -570,6 +570,32 @@ describe('cliente da API', () => {
     );
   });
 
+  it('foto do perfil e logo da loja: multipart (PUT), sem Content-Type JSON; remover com DELETE', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ image: 'https://x.public.blob.vercel-storage.com/a.webp' }))
+      .mockResolvedValueOnce(json({ logoUrl: 'https://x.public.blob.vercel-storage.com/l.webp' }))
+      .mockResolvedValueOnce(json({ image: null }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const form = new FormData();
+    form.append('file', new Blob(['x'], { type: 'image/jpeg' }), 'foto.jpg');
+    expect(await api.me.setAvatar(form)).toBe('https://x.public.blob.vercel-storage.com/a.webp');
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe('https://www.arcanakin.com.br/api/v1/me/avatar');
+    expect(init.method).toBe('PUT');
+    expect(init.body).toBe(form);
+    expect(init.headers['Content-Type']).toBeUndefined();
+    expect(await api.stores.setLogo('s1', form)).toBe(
+      'https://x.public.blob.vercel-storage.com/l.webp',
+    );
+    expect(fetchMock.mock.calls[1]![0]).toBe('https://www.arcanakin.com.br/api/v1/stores/s1/logo');
+    expect(await api.me.removeAvatar()).toBeNull();
+    expect(fetchMock.mock.calls[2]![1].method).toBe('DELETE');
+  });
+
   it('torneio de loja: sem grupo nem encontro, com convidado', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(
       json({

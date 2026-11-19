@@ -1,6 +1,7 @@
 import { isGameFormat } from '@boramarcar/core';
 import { getStorePublic, listMyStores, listStoreEvents } from '@boramarcar/db';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -89,12 +90,26 @@ export default async function StorePage({ params }: Props) {
       </Link>
 
       <header className="flex items-center gap-4">
-        <span
-          aria-hidden="true"
-          className="grid size-16 shrink-0 place-items-center rounded-2xl bg-arcano font-display text-2xl font-semibold text-pergaminho"
-        >
-          {initials}
-        </span>
+        {store.logoUrl ? (
+          // Decorativo: o nome da loja está no título ao lado.
+          <span className="relative size-16 shrink-0 overflow-hidden rounded-2xl border border-line bg-surface">
+            <Image
+              src={store.logoUrl}
+              alt=""
+              fill
+              sizes="64px"
+              unoptimized
+              className="object-cover"
+            />
+          </span>
+        ) : (
+          <span
+            aria-hidden="true"
+            className="grid size-16 shrink-0 place-items-center rounded-2xl bg-arcano font-display text-2xl font-semibold text-pergaminho"
+          >
+            {initials}
+          </span>
+        )}
         <div className="min-w-0 space-y-1">
           <h1 className="page-title">{store.name}</h1>
           <p className="muted">{store.city}</p>

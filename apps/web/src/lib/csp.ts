@@ -23,6 +23,8 @@ const IMAGES = [
   'https://cards.scryfall.io',
   'https://svgs.scryfall.io',
   'https://lh3.googleusercontent.com',
+  // Fotos do perfil e logos de loja enviados (Vercel Blob).
+  'https://*.public.blob.vercel-storage.com',
   'https://tile.openstreetmap.org',
   'https://*.contentsquare.net',
   'https://*.hotjar.com',

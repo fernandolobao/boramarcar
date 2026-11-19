@@ -706,6 +706,7 @@ export const storePublicSchema = z
     website: z.string().nullable(),
     formats: z.array(z.string()),
     verified: z.boolean(),
+    logoUrl: z.string().nullable().optional(),
   })
   .loose();
 export type StorePublic = z.infer<typeof storePublicSchema>;

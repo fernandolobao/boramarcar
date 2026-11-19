@@ -26,6 +26,7 @@
     "./integration": "./src/integration/index.ts",
     "./tournaments": "./src/tournaments/index.ts",
     "./stores": "./src/stores/index.ts",
+    "./images": "./src/images/index.ts",
     "./notifications": "./src/notifications/index.ts",
     "./changelog": "./src/changelog/index.ts"
   },

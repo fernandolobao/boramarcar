@@ -1,7 +1,8 @@
-import { accountDeletionPreview, getUserPreferences } from '@boramarcar/db';
+import { accountDeletionPreview, getUserImage, getUserPreferences } from '@boramarcar/db';
 import { getTranslations } from 'next-intl/server';
 import { ConsentSettings } from '@/components/consent-settings';
 import { DataRights } from '@/components/data-rights';
+import { ImageUpload } from '@/components/image-upload';
 import { ProfileForm } from '@/components/profile-form';
 import { ThemePicker } from '@/components/theme-picker';
 import { requireUser } from '@/server/current-user';
@@ -14,9 +15,10 @@ export default async function SettingsPage() {
   const user = await requireUser();
   const t = await getTranslations('settings');
   const tp = await getTranslations('privacySettings');
-  const [preferences, deletion] = await Promise.all([
+  const [preferences, deletion, image] = await Promise.all([
     getUserPreferences(getDb(), user.id),
     accountDeletionPreview(getDb(), user.id),
+    getUserImage(getDb(), user.id),
   ]);
   return (
     <>
@@ -24,6 +26,9 @@ export default async function SettingsPage() {
         <h1 className="page-title">{t('title')}</h1>
         <p className="muted">{t('intro')}</p>
       </div>
+      <section className="card">
+        <ImageUpload kind="avatar" endpoint="/api/v1/me/avatar" name={user.name} image={image} />
+      </section>
       <section className="card">
         <ProfileForm emailNotifications={preferences.emailNotifications} />
       </section>

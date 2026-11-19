@@ -17,6 +17,10 @@ const schema = z.object({
   CRON_SECRET: z.string().min(16).optional(),
   /** Token de acesso do Expo para o envio de push (opcional; só se a segurança extra estiver ligada no Expo). */
   EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
+  /** Vercel Blob (foto do perfil e logo da loja): o store ligado ao projeto, com acesso por OIDC. */
+  BLOB_STORE_ID: z.string().min(1).optional(),
+  /** Alternativa ao OIDC (fora da Vercel). Sem nenhum dos dois, o envio de imagens fica desligado. */
+  BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
   /** `off` desliga o envio de notificações push. */
   PUSH_NOTIFICATIONS: z.enum(['on', 'off']).default('on'),
   /** E-mails de quem administra o projeto (separados por vírgula): recebem o feedback do beta. */

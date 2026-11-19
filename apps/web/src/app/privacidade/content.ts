@@ -45,6 +45,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
           'Da sua conta Google, ao entrar com ela: nome, e-mail, foto de perfil e o identificador da conta. Não pedimos acesso ao Gmail, ao Drive nem a nenhum outro serviço do Google.',
           'Se você cria a conta com e-mail e senha: nome, e-mail e a senha guardada só como hash (embaralhada de um jeito que não dá para desfazer; ninguém, nem nós, consegue ver a senha). O e-mail é usado para confirmar a conta e para redefinir a senha.',
           'O que você informa no app: grupos de que participa, disponibilidade, locais e endereços cadastrados, encontros e presenças, partidas e resultados, decks e preferências (fuso horário, idioma, tema e avisos por e-mail). Se você liga os avisos no celular, guardamos o identificador de notificação daquele aparelho (apagado quando você desliga, sai da conta ou desinstala o app).',
+          'Foto do perfil que você envia (e o logo da loja, enviado pela equipe dela): guardamos só uma cópia quadrada e reduzida, sem a localização e os outros dados do arquivo (câmera, data). Você troca ou remove quando quiser, e ela é apagada junto com a conta.',
           'Feedback que você envia pelo site ou pelo app: o texto, o tipo, a página de onde veio e a plataforma, junto com a sua conta.',
           'Dados técnicos: cookies de sessão, endereço IP e registros de acesso mantidos pelo provedor de hospedagem, métricas de uso agregadas do Vercel Analytics (sem cookies e sem identificar você) e, quando algo dá errado, o registro do erro no Sentry, sem nome nem e-mail.',
           'Só com o seu consentimento: gravação de como as telas são usadas (cliques, rolagem, navegação e mapas de calor) pelo Hotjar (Contentsquare). O que você digita em campos de formulário não é gravado, e o seu e-mail é mascarado na tela.',
@@ -76,7 +77,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         ],
         items: [
           'Google: login (OpenID Connect).',
-          'Vercel: hospedagem do site e da API, e métricas agregadas sem cookies.',
+          'Vercel: hospedagem do site e da API, armazenamento das fotos de perfil e logos enviados, e métricas agregadas sem cookies.',
           'Sentry: registro de erros do site e do app (mensagem do erro, página ou tela, navegador ou aparelho e sistema), sem nome, e-mail nem gravação de tela.',
           'Neon: banco de dados.',
           'Resend: envio dos e-mails de aviso, de confirmação da conta e de redefinição de senha.',
@@ -176,6 +177,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
           'From your Google account, when you sign in with it: name, e-mail, profile photo and the account identifier. We don’t ask for access to Gmail, Drive or any other Google service.',
           'If you create the account with e-mail and password: name, e-mail and the password stored only as a hash (scrambled in a way that can’t be undone; nobody, not even us, can see it). The e-mail is used to confirm the account and to reset the password.',
           'What you enter in the app: the groups you are in, availability, places and addresses, meetups and RSVPs, games and results, decks and preferences (time zone, language, theme and e-mail notices). If you turn on notifications on your phone, we keep that device’s notification identifier (deleted when you turn them off, sign out or uninstall the app).',
+          'A profile photo you upload (and a store’s logo, uploaded by its team): we keep only a reduced square copy, without the location and other file data (camera, date). You can change or remove it anytime, and it is deleted with your account.',
           'Feedback you send from the website or the app: the text, the type, the page you came from and the platform, with your account.',
           'Technical data: session cookies, IP address and access logs kept by the hosting provider, aggregated usage metrics from Vercel Analytics (no cookies, doesn’t identify you) and, when something goes wrong, the error log in Sentry, without name or e-mail.',
           'Only with your consent: recordings of how screens are used (clicks, scrolling, navigation and heatmaps) by Hotjar (Contentsquare). What you type in form fields isn’t recorded, and your e-mail is masked on screen.',
@@ -207,7 +209,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
         ],
         items: [
           'Google: sign-in (OpenID Connect).',
-          'Vercel: hosting of the site and API, and cookieless aggregated metrics.',
+          'Vercel: hosting of the site and API, storage of uploaded profile photos and logos, and cookieless aggregated metrics.',
           'Sentry: error logging for the site and the app (error message, page or screen, browser or device and system), without name, e-mail or screen recording.',
           'Neon: database.',
           'Resend: sending notice, account confirmation and password reset e-mails.',

@@ -45,6 +45,14 @@
           "color": "#7C3AED",
           "defaultChannel": "default"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O ArcanaKin acessa suas fotos só quando você escolhe uma foto do perfil.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {

@@ -107,16 +107,17 @@ pnpm dev
 
 ### Variáveis de ambiente
 
-| Variável                                    | Descrição                                                                                                                 |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                              | URL do Postgres. Na Vercel, use a URL **pooled** do Neon (`...-pooler...`).                                               |
-| `BETTER_AUTH_SECRET`                        | Segredo aleatório com 32+ caracteres (`openssl rand -base64 32`).                                                         |
-| `BETTER_AUTH_URL`                           | URL pública do app (em produção: `https://www.arcanakin.com.br`). Se ausente, usa `VERCEL_URL`.                           |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciais OAuth do Google Cloud.                                                                                        |
-| `RESEND_API_KEY`                            | Opcional. Chave do [Resend](https://resend.com) para os avisos por e-mail. Sem ela, os e-mails só são registrados no log. |
-| `EMAIL_FROM`                                | Opcional. Remetente (padrão: `ArcanaKin <onboarding@resend.dev>`, que só entrega para o dono da conta Resend).            |
-| `CRON_SECRET`                               | Segredo (16+ caracteres) que a Vercel envia ao cron de lembretes (`/api/cron/reminders`).                                 |
-| `SKIP_ENV_VALIDATION`                       | `1` para build/testes sem segredos reais (usado na CI).                                                                   |
+| Variável                                    | Descrição                                                                                                                                                                   |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                              | URL do Postgres. Na Vercel, use a URL **pooled** do Neon (`...-pooler...`).                                                                                                 |
+| `BETTER_AUTH_SECRET`                        | Segredo aleatório com 32+ caracteres (`openssl rand -base64 32`).                                                                                                           |
+| `BETTER_AUTH_URL`                           | URL pública do app (em produção: `https://www.arcanakin.com.br`). Se ausente, usa `VERCEL_URL`.                                                                             |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciais OAuth do Google Cloud.                                                                                                                                          |
+| `RESEND_API_KEY`                            | Opcional. Chave do [Resend](https://resend.com) para os avisos por e-mail. Sem ela, os e-mails só são registrados no log.                                                   |
+| `EMAIL_FROM`                                | Opcional. Remetente (padrão: `ArcanaKin <onboarding@resend.dev>`, que só entrega para o dono da conta Resend).                                                              |
+| `CRON_SECRET`                               | Segredo (16+ caracteres) que a Vercel envia ao cron de lembretes (`/api/cron/reminders`).                                                                                   |
+| `BLOB_READ_WRITE_TOKEN`                     | Opcional, só fora da Vercel. Na Vercel, ligar um Blob store **público** ao projeto cria `BLOB_STORE_ID` (OIDC). Sem nenhum dos dois, o envio de foto e logo fica desligado. |
+| `SKIP_ENV_VALIDATION`                       | `1` para build/testes sem segredos reais (usado na CI).                                                                                                                     |
 
 ### Scripts
 

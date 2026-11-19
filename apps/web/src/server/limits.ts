@@ -27,6 +27,8 @@ export const RATE_LIMITS = {
   feedback: { limit: 10, windowMs: 60 * MINUTE },
   /** Código do balcão dos eventos de loja: tentativas, para o código não ser adivinhado. */
   storeCode: { limit: 20, windowMs: 10 * MINUTE },
+  /** Envio de foto do perfil e logo da loja. */
+  upload: { limit: 20, windowMs: 60 * MINUTE },
 } as const;
 
 export type RateLimitKind = keyof typeof RATE_LIMITS;

@@ -176,6 +176,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-19',
+    pt: 'Agora dá para escolher a sua foto do perfil, no site (Configurações) e no app (Conta). A foto é guardada sem a localização. Lojas também ganham logo, trocado em "Gerenciar a loja".',
+    en: 'You can now choose your profile photo, on the website (Settings) and in the app (Account). The photo is stored without its location. Stores get a logo too, changed under "Manage the store".',
+  },
+  {
+    date: '2026-11-19',
     pt: 'Eventos de loja também no app: em Conta → Eventos de loja, os seus próximos eventos e o código do balcão; dá para ver a loja, se inscrever, desistir e acompanhar o torneio ao vivo.',
     en: 'Store events in the app too: under Account → Store events, your upcoming events and the counter code; see the store, sign up, drop out and follow the tournament live.',
   },
