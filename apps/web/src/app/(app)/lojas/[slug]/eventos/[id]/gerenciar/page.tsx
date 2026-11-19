@@ -85,6 +85,7 @@ export default async function ManageStoreEventPage({ params }: Props) {
           ) : (
             <StoreTournamentStart
               eventId={id}
+              format={event.format}
               checkedIn={
                 staff.entries.filter((e) => e.status === 'registered' && e.checkedInAt).length
               }

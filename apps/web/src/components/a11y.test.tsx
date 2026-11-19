@@ -43,6 +43,7 @@ import { UserMenu } from './user-menu';
 import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ImageUpload } from './image-upload';
+import { TopCutSelect } from './tournaments/top-cut-select';
 import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
 import { FirstSteps } from './first-steps';
@@ -321,6 +322,7 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  ['TopCutSelect', <TopCutSelect key="r" table="pod" value={10} onChange={() => {}} />],
   [
     'ImageUpload (sem foto)',
     <ImageUpload

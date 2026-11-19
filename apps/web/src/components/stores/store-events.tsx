@@ -1,5 +1,6 @@
 'use client';
 
+import { tournamentShape } from '@boramarcar/core/tournaments';
 import { GAME_FORMATS, type GameFormat } from '@boramarcar/core';
 import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { useTimeZone, useTranslations } from 'next-intl';
@@ -12,6 +13,7 @@ import { DateTimeField, fromLocalDateTime, toLocalDateTime } from '../ds/date-ti
 import { NumberField } from '../ds/number-field';
 import { Select } from '../ds/select';
 import { Icon } from '../icons';
+import { TopCutSelect } from '../tournaments/top-cut-select';
 import { FormError, useApiAction } from '../use-api-action';
 
 function TextArea({
@@ -489,25 +491,38 @@ export function EventCodeForm() {
 /** Começar o torneio do evento (equipe): com quem fez check-in; depois, a página do evento acompanha. */
 export function StoreTournamentStart({
   eventId,
+  format,
   checkedIn,
   publicHref,
 }: {
   eventId: string;
+  format: string;
   checkedIn: number;
   publicHref: string;
 }) {
   const t = useTranslations('storeEvents');
   const router = useRouter();
   const { run, error, pending } = useApiAction();
+  const [topCut, setTopCut] = useState<number | null>(null);
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      <TopCutSelect
+        table={tournamentShape(format).table}
+        entrants={checkedIn}
+        value={topCut}
+        onChange={setTopCut}
+      />
       <button
         type="button"
         className="btn-primary"
         disabled={pending || checkedIn < 2}
         onClick={() =>
           void run(
-            () => api(`/api/v1/store-events/${eventId}/tournament`, { method: 'POST' }),
+            () =>
+              api(`/api/v1/store-events/${eventId}/tournament`, {
+                method: 'POST',
+                body: { topCut },
+              }),
             () => router.push(publicHref),
           )
         }

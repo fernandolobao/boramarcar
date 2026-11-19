@@ -12,6 +12,7 @@ import { NumberField } from '../ds/number-field';
 import { Select } from '../ds/select';
 import { Icon } from '../icons';
 import { FormError, useApiAction } from '../use-api-action';
+import { TopCutSelect } from './top-cut-select';
 
 /** Criar torneio (9.1): encontro, nome, formato e, se quiser, melhor de N, rodadas e pontos. */
 export function TournamentForm({
@@ -39,6 +40,7 @@ export function TournamentForm({
   const [draw, setDraw] = useState<number | null>(1);
   const [loss, setLoss] = useState<number | null>(0);
   const [counts, setCounts] = useState(true);
+  const [topCut, setTopCut] = useState<number | null>(null);
   const hint = shape.entrantSize === 2 ? t('tableHint.duo') : t(`tableHint.${shape.table}`);
 
   return (
@@ -57,6 +59,7 @@ export function TournamentForm({
                 rounds,
                 points: { win: win ?? 0, draw: draw ?? 0, loss: loss ?? 0 },
                 countsInRanking: counts,
+                topCut: shape.entrantSize === 1 ? topCut : null,
               },
             }),
           (r) => router.push(`/torneios/${r.tournament.id}`),
@@ -111,6 +114,10 @@ export function TournamentForm({
         max={15}
         description={t('roundsHint')}
       />
+      {/* Top cut: um contra um e pods (no 2HG ainda não). */}
+      {shape.entrantSize === 1 && (
+        <TopCutSelect table={shape.table} value={topCut} onChange={setTopCut} />
+      )}
       <fieldset>
         <legend className="label">{t('points')}</legend>
         <div className="grid gap-3 sm:grid-cols-3">

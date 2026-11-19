@@ -794,6 +794,8 @@ export function createApiClient(options: ApiClientOptions) {
           rounds?: number | null;
           points?: { win: number; draw: number; loss: number };
           countsInRanking?: boolean;
+          /** Top cut depois do suíço (9.2). */
+          topCut?: number | null;
         },
       ) =>
         (

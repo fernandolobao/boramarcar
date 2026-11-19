@@ -296,3 +296,103 @@ export function tableModeEligible(
     rules.structure !== 'teams'
   );
 }
+
+/* ───────────────────────── Top cut (9.2) ───────────────────────── */
+
+/** Tamanhos de top cut por tipo de mesa (eliminação simples no par; pods no multijogador). */
+const TOP_CUT_SIZES: Record<TournamentTable, readonly number[]> = {
+  pair: [4, 8],
+  pod: [4, 10, 16],
+};
+
+/** Tops possíveis: os do tipo de mesa que deixam alguém de fora (inscritos > tamanho). */
+export function topCutOptions(table: TournamentTable, entrants: number): number[] {
+  return TOP_CUT_SIZES[table].filter((size) => entrants > size);
+}
+
+export function isTopCutSize(table: TournamentTable, size: number): boolean {
+  return TOP_CUT_SIZES[table].includes(size);
+}
+
+/** Quem avança da mesa: o vencedor; num empate, a melhor cabeça de chave entre os empatados no topo. */
+function advancer(table: TableResult, seedOf: (e: string) => number): string {
+  const outcome = tableOutcome(table);
+  const top = table.entrants.filter((e) => outcome[e] === 'win' || outcome[e] === 'draw');
+  return [...(top.length ? top : table.entrants)].sort((a, b) => seedOf(a) - seedOf(b))[0]!;
+}
+
+/** Ordem clássica da chave (1, 8, 4, 5, 2, 7, 3, 6): os favoritos só se cruzam no fim. */
+function bracketOrder(size: number): number[] {
+  let order = [1];
+  while (order.length < size) {
+    const n = order.length * 2;
+    order = order.flatMap((seed) => [seed, n + 1 - seed]);
+  }
+  return order;
+}
+
+/**
+ * Próximo passo do top cut, a partir das cabeças de chave (a classificação do suíço, melhor
+ * primeiro) e das rodadas do top já jogadas (mesas na ordem). Devolve as mesas da próxima fase ou,
+ * depois da final, o campeão.
+ *
+ * - Par: chave clássica (1×8, 4×5, 2×7, 3×6); os vencedores seguem em ordem.
+ * - Pod: top 4 é a final; top 16, quatro pods misturados (1-8-9-16, …); top 10, os dois primeiros
+ *   esperam na final e 3–10 jogam dois pods (3-6-7-10 e 4-5-8-9). Vencedores vão para a final.
+ * - Empate no topo da mesa: avança a melhor cabeça de chave.
+ */
+export function planTopCut(input: {
+  table: TournamentTable;
+  size: number;
+  seeds: readonly string[];
+  played: readonly (readonly TableResult[])[];
+}): { next: string[][] } | { champion: string } {
+  const seeds = input.seeds.slice(0, input.size);
+  const at = (seed: number) => seeds[seed - 1]!;
+  const seedOf = (e: string) => seeds.indexOf(e);
+  const last = input.played.at(-1);
+
+  if (!last) {
+    if (input.table === 'pair') {
+      const order = bracketOrder(input.size);
+      const next: string[][] = [];
+      for (let i = 0; i < order.length; i += 2) next.push([at(order[i]!), at(order[i + 1]!)]);
+      return { next };
+    }
+    if (input.size === 4) return { next: [seeds.slice(0, 4)] };
+    if (input.size === 10) {
+      return {
+        next: [
+          [at(3), at(6), at(7), at(10)],
+          [at(4), at(5), at(8), at(9)],
+        ],
+      };
+    }
+    return {
+      next: [0, 1, 2, 3].map((k) => [at(k + 1), at(8 - k), at(9 + k), at(16 - k)]),
+    };
+  }
+
+  const winners = last.map((t) => advancer(t, seedOf));
+  if (last.length === 1) return { champion: winners[0]! };
+  if (input.table === 'pair') {
+    const next: string[][] = [];
+    for (let i = 0; i < winners.length; i += 2) next.push([winners[i]!, winners[i + 1]!]);
+    return { next };
+  }
+  const waiting = input.size === 10 ? [at(1), at(2)] : [];
+  return { next: [[...waiting, ...winners].sort((a, b) => seedOf(a) - seedOf(b))] };
+}
+
+export type TopCutStage = 'quarterfinal' | 'semifinal' | 'final';
+
+/** Nome da fase do top (`index` = 0 para a primeira rodada do top). */
+export function topCutStageName(input: {
+  table: TournamentTable;
+  size: number;
+  index: number;
+}): TopCutStage {
+  const total = input.table === 'pair' ? Math.log2(input.size) : input.size === 4 ? 1 : 2;
+  const remaining = total - input.index;
+  return remaining <= 1 ? 'final' : remaining === 2 ? 'semifinal' : 'quarterfinal';
+}

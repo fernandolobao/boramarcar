@@ -633,6 +633,8 @@ export const tournamentViewSchema = z
         entrantSize: z.number(),
         bestOf: z.number(),
         rounds: z.number().nullable(),
+        /** Top cut depois do suíço (9.2), ou `null`. */
+        topCut: z.number().nullable().optional(),
         status: z.string(),
         countsInRanking: z.boolean(),
         createdAt: date,
@@ -649,6 +651,9 @@ export const tournamentViewSchema = z
         .object({
           id: z.string(),
           number: z.number(),
+          /** `swiss` ou `top` (9.2); a fase do top em `stageName`. */
+          stage: z.enum(['swiss', 'top']).optional(),
+          stageName: z.enum(['quarterfinal', 'semifinal', 'final']).nullable().optional(),
           tables: z.array(
             z
               .object({
@@ -685,6 +690,10 @@ export const tournamentViewSchema = z
         .object({ kind: z.string(), data: z.record(z.string(), z.unknown()), createdAt: date })
         .loose(),
     ),
+    /** O que o botão de quem organiza faz agora; `null` enquanto houver mesa sem resultado. */
+    nextStep: z.enum(['round', 'topCut', 'finish']).nullable().optional(),
+    /** Campeão (inscrição), com o torneio encerrado e um vencedor único. */
+    champion: z.string().nullable().optional(),
   })
   .loose();
 export type TournamentView = z.infer<typeof tournamentViewSchema>;

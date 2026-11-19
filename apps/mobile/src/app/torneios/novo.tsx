@@ -1,6 +1,6 @@
 import { ApiError } from '@boramarcar/api-client';
 import { GAME_FORMATS, isGameFormat, type GameFormat } from '@boramarcar/core';
-import { tournamentShape } from '@boramarcar/core/tournaments';
+import { topCutOptions, tournamentShape } from '@boramarcar/core/tournaments';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView } from 'react-native';
@@ -30,6 +30,7 @@ export default function NewTournamentScreen() {
   const [format, setFormat] = useState<GameFormat | null>(null);
   const [bestOf, setBestOf] = useState<'1' | '3'>('3');
   const [counts, setCounts] = useState(true);
+  const [topCut, setTopCut] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -58,6 +59,7 @@ export default function NewTournamentScreen() {
         format: chosenFormat,
         bestOf: shape.table === 'pair' ? (Number(bestOf) as 1 | 3) : 1,
         countsInRanking: counts,
+        topCut: topCut && shape.entrantSize === 1 ? Number(topCut) : null,
       });
       router.replace({ pathname: '/torneios/[id]', params: { id: created.id } });
     } catch (e) {
@@ -104,6 +106,21 @@ export default function NewTournamentScreen() {
               options={[
                 { value: '1', label: t('tourBestOfOption', { count: 1 }) },
                 { value: '3', label: t('tourBestOfOption', { count: 3 }) },
+              ]}
+            />
+          )}
+          {/* Top cut (9.2): um contra um e pods; no 2HG ainda não. */}
+          {shape.entrantSize === 1 && (
+            <Choices
+              label={t('tourTopCut')}
+              value={topCut}
+              onChange={setTopCut}
+              options={[
+                { value: '', label: t('tourTopCutNone') },
+                ...topCutOptions(shape.table, Number.POSITIVE_INFINITY).map((n) => ({
+                  value: String(n),
+                  label: t('tourTopCutOption', { count: n }),
+                })),
               ]}
             />
           )}

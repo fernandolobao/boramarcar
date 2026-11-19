@@ -68,6 +68,33 @@ test.describe('torneios', () => {
     ).toBeVisible();
   });
 
+  test('top cut na criação: tamanhos do um contra um e dos pods, com a explicação', async ({
+    page,
+  }) => {
+    await page.goto(`/eventos/${E2E_IDS.upcomingEvent}`);
+    await page.getByRole('link', { name: 'Criar torneio neste encontro' }).click();
+    await pick(page, 'Formato', 'Modern');
+    await page.getByRole('button', { name: /Top cut/ }).click();
+    await expect(page.getByRole('option')).toHaveText([
+      'Sem top cut (só o suíço)',
+      'Top 4',
+      'Top 8',
+    ]);
+    // Fecha escolhendo (como uma pessoa faria; no celular a lista cobre a tela).
+    await page.getByRole('option', { name: 'Top 8', exact: true }).click();
+    await expect(page.getByText(/eliminação simples: 1º contra o último do top/)).toBeVisible();
+    await pick(page, 'Formato', 'Commander');
+    await page.getByRole('button', { name: /Top cut/ }).click();
+    await expect(page.getByRole('option')).toHaveText([
+      'Sem top cut (só o suíço)',
+      'Top 4',
+      'Top 10',
+      'Top 16',
+    ]);
+    await page.getByRole('option', { name: 'Top 10', exact: true }).click();
+    await expect(page.getByRole('button', { name: /^Top 10 Top cut/ })).toBeVisible();
+  });
+
   test('Modern em melhor de 3: placar em jogos na mesa e classificação com desempates', async ({
     page,
   }) => {

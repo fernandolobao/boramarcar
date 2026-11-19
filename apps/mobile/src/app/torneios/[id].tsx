@@ -117,6 +117,13 @@ function ResultForm({
 }
 
 /** Página do torneio (9.1): inscrições, rodadas e mesas, classificação e organização. */
+
+/** Nome da fase do top cut (9.2). */
+const STAGE: Record<'quarterfinal' | 'semifinal' | 'final', MessageKey> = {
+  quarterfinal: 'tourStageQuarterfinal',
+  semifinal: 'tourStageSemifinal',
+  final: 'tourStageFinal',
+};
 export default function TournamentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: session } = authClient.useSession();
@@ -143,8 +150,7 @@ export default function TournamentScreen() {
   const taken = new Set(v.entrants.flatMap((e) => e.memberIds));
   const free = (members.data ?? []).filter((m) => !taken.has(m.userId));
   const current = v.rounds.at(-1);
-  const canAdvance = Boolean(current?.tables.every((x) => x.reported));
-  const lastRound = (current?.number ?? 0) >= (tour.rounds ?? Infinity);
+  const nextStep = v.nextStep ?? null;
 
   const act = async (action: () => Promise<unknown>) => {
     setBusy(true);
@@ -261,10 +267,24 @@ export default function TournamentScreen() {
         </Card>
       )}
 
+      {v.champion && (
+        <Card>
+          <AppText accessibilityLiveRegion="polite" style={{ fontWeight: '700', fontSize: 18 }}>
+            🏆{' '}
+            {t('tourChampion', { name: v.entrants.find((e) => e.id === v.champion)?.name ?? '—' })}
+          </AppText>
+        </Card>
+      )}
+
       {[...v.rounds].reverse().map((round, index) => (
         <Card key={round.id} style={{ gap: 12 }}>
           <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
-            {t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
+            {round.stageName && tour.topCut
+              ? t('tourStageHeading', {
+                  size: tour.topCut,
+                  stage: t(STAGE[round.stageName]),
+                })
+              : t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
           </AppText>
           {round.tables.map((table) => {
             const seated = table.entrants.map(
@@ -338,7 +358,7 @@ export default function TournamentScreen() {
       {tour.status !== 'registration' && (
         <Card style={{ gap: 8 }}>
           <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
-            {t('tourStandings')}
+            {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}
           </AppText>
           {v.standings.map((s) => {
             const line = t('tourStandingRow', {
@@ -374,11 +394,19 @@ export default function TournamentScreen() {
           {tour.status === 'running' && (
             <>
               <Button
-                label={lastRound ? t('tourFinish') : t('tourNext')}
-                disabled={busy || !canAdvance}
+                label={
+                  nextStep === 'finish'
+                    ? t('tourFinish')
+                    : nextStep === 'topCut'
+                      ? t('tourStartTopCut', { count: tour.topCut ?? 0 })
+                      : current?.stage === 'top'
+                        ? t('tourNextStage')
+                        : t('tourNext')
+                }
+                disabled={busy || !nextStep}
                 onPress={() => void act(() => api.tournaments.next(tour.id))}
               />
-              {!canAdvance && <AppText muted>{t('tourNextHint')}</AppText>}
+              {!nextStep && <AppText muted>{t('tourNextHint')}</AppText>}
             </>
           )}
           <ConfirmButton

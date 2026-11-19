@@ -11,6 +11,8 @@ const schema = z.object({
   points: z.object({ win: points, draw: points, loss: points }).optional(),
   rounds: z.number().int().min(1).max(15).nullable().optional(),
   countsInRanking: z.boolean().optional(),
+  /** Top cut depois do suíço (9.2): o serviço confere o tamanho para o formato. */
+  topCut: z.number().int().min(2).max(16).nullable().optional(),
 });
 
 /** Cria um torneio no encontro (dono ou admin do grupo), em qualquer formato (9.1). */

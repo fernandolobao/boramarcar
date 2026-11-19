@@ -593,3 +593,10 @@ sem rolagem horizontal em 320px.
 - Loja: contatos e "Como chegar" como botões com a dica "Abre fora do app"; selo de verificada em texto (✓ + "Loja verificada").
 - Aviso de vaga no sino do app, com o texto completo e indo para o evento.
 - Telas conferidas com `tsc` e lint; não houve captura de tela do app (vale testar no Expo Go).
+
+## Top cut nos torneios (19/11/2026)
+
+- Campo "Top cut" (Select do design system, com descrição de como funciona) na criação do torneio e no início do torneio de loja; no app, `Choices`. Coberto pelo axe (`a11y.test.tsx`).
+- Rodadas do top com título próprio ("Top 8 · Semifinal"), mantendo a hierarquia de títulos; a classificação vira "Classificação do suíço".
+- Campeão em destaque com texto completo ("Campeão: …") em região de status, com o ícone decorativo; no app, região viva.
+- O botão de quem organiza diz o que vai acontecer ("Começar o top 8", "Próxima fase do top", "Encerrar o torneio").

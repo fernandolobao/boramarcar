@@ -29,7 +29,6 @@ export async function TournamentLive({
   const nameOf = new Map(view.entrants.map((e) => [e.id, e.name]));
   const entrantName = (eid: string) => nameOf.get(eid) ?? '—';
   const current = view.rounds.at(-1);
-  const canAdvance = Boolean(current?.tables.every((table) => table.reported));
 
   /** Resultado da mesa em texto: no pod, quem venceu (ou empate); no par, o placar em jogos. */
   const resultText = (
@@ -48,13 +47,22 @@ export async function TournamentLive({
 
   const timelineText = (kind: string, data: Record<string, unknown>) => {
     switch (kind) {
-      case 'started':
-        return t('events.started', {
+      case 'started': {
+        const started = t('events.started', {
           entrants: Number(data.entrants ?? 0),
           rounds: Number(data.rounds ?? 0),
         });
-      case 'round_started':
-        return t('events.round_started', { round: Number(data.round ?? 0) });
+        return data.topCut
+          ? `${started} ${t('events.started_top', { size: Number(data.topCut) })}`
+          : started;
+      }
+      case 'round_started': {
+        if (data.stage !== 'top') {
+          return t('events.round_started', { round: Number(data.round ?? 0) });
+        }
+        const stageName = view.rounds.find((r) => r.number === Number(data.round))?.stageName;
+        return t('events.top_round', { stage: t(`stage.${stageName ?? 'final'}`) });
+      }
       case 'table_reported':
         return t(data.corrected ? 'events.table_corrected' : 'events.table_reported', {
           round: Number(data.round ?? 0),
@@ -75,6 +83,12 @@ export async function TournamentLive({
 
   return (
     <>
+      {view.champion && (
+        <p className="card flex items-center gap-2 text-lg font-semibold" role="status">
+          <Icon name="winner" />
+          {t('champion', { name: entrantName(view.champion) })}
+        </p>
+      )}
       {[...view.rounds].reverse().map((round, index) => (
         <section
           key={round.id}
@@ -82,7 +96,9 @@ export async function TournamentLive({
           aria-labelledby={`torneio-rodada-${round.number}`}
         >
           <h2 id={`torneio-rodada-${round.number}`} className="section-title mb-0">
-            {t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
+            {round.stageName && tour.topCut
+              ? t('stageHeading', { size: tour.topCut, stage: t(`stage.${round.stageName}`) })
+              : t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
           </h2>
           <ol className="grid items-start gap-4 md:grid-cols-2">
             {round.tables.map((table) => {
@@ -174,12 +190,12 @@ export async function TournamentLive({
       {tour.status !== 'registration' && (
         <section className="card space-y-3" aria-labelledby="torneio-classificacao">
           <h2 id="torneio-classificacao" className="section-title mb-0">
-            {t('standings')}
+            {tour.topCut ? t('standingsSwiss') : t('standings')}
           </h2>
           {/* Rolável no celular: com nome e alcançável pelo teclado, como no ranking. */}
           <div
             role="region"
-            aria-label={t('standings')}
+            aria-label={tour.topCut ? t('standingsSwiss') : t('standings')}
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- região rolável precisa de foco pelo teclado
             tabIndex={0}
             className="-mx-1 overflow-x-auto px-1 focus-visible:outline-2 focus-visible:outline-focus"
@@ -260,8 +276,9 @@ export async function TournamentLive({
             tournamentId={tour.id}
             status={tour.status}
             canStart={view.entrants.length >= 2}
-            canAdvance={canAdvance}
-            lastRound={(current?.number ?? 0) >= (tour.rounds ?? Infinity)}
+            nextStep={view.nextStep}
+            topCut={tour.topCut}
+            inTopCut={current?.stage === 'top'}
             deletable={deletable}
           />
         </section>

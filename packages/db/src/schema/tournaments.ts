@@ -45,6 +45,8 @@ export const tournaments = pgTable(
     pointsLoss: integer('points_loss').notNull().default(0),
     /** Rodadas planejadas; `null` = as recomendadas para o número de inscritos, ao começar. */
     rounds: integer('rounds'),
+    /** Top cut depois do suíço (9.2): 4/8 no par, 4/10/16 no pod; `null` = sem top. */
+    topCut: integer('top_cut'),
     /** Cada jogo do torneio vira uma partida do grupo (conta no ranking). */
     countsInRanking: boolean('counts_in_ranking').notNull().default(true),
     /** `registration` → `running` → `finished`. */
@@ -99,6 +101,8 @@ export const tournamentRounds = pgTable(
       .notNull()
       .references(() => tournaments.id, { onDelete: 'cascade' }),
     number: integer('number').notNull(),
+    /** `swiss` (classificação) ou `top` (eliminação depois do suíço). */
+    stage: text('stage').notNull().default('swiss'),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex('tournament_rounds_number_idx').on(t.tournamentId, t.number)],

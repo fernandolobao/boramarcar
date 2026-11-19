@@ -2275,7 +2275,9 @@
       "round_started": "Round {round} started.",
       "table_reported": "Round {round}, table {table} reported.",
       "table_corrected": "Round {round}, table {table} corrected.",
-      "finished": "Tournament finished. {champions, select, none {} other {Champion: {champions}.}}"
+      "finished": "Tournament finished. {champions, select, none {} other {Champion: {champions}.}}",
+      "started_top": "After the Swiss rounds, top {size}.",
+      "top_round": "Top cut: {stage} started."
     },
     "champion": "Champion: {name}",
     "delete": "Delete tournament",
@@ -2287,7 +2289,25 @@
     "listLink": "Tournaments",
     "manage": "Organizing",
     "podWinner": "Won by {name}",
-    "openInTableHint": "Play with the life counter and send the result straight to this table."
+    "openInTableHint": "Play with the life counter and send the result straight to this table.",
+    "topCut": {
+      "label": "Top cut",
+      "none": "No top cut (Swiss only)",
+      "option": "Top {count}",
+      "hint": {
+        "pair": "After the Swiss rounds, the best play single elimination: 1st against the last of the cut, and so on. Each table needs a winner.",
+        "pod": "After the Swiss rounds, the best play elimination pods up to the final table. In a top 10, the first two wait at the final. A drawn table: whoever finished higher in the Swiss advances."
+      }
+    },
+    "stage": {
+      "quarterfinal": "Quarterfinals",
+      "semifinal": "Semifinals",
+      "final": "Final"
+    },
+    "stageHeading": "Top {size} · {stage}",
+    "startTopCut": "Start the top {count}",
+    "nextStage": "Next top cut stage",
+    "standingsSwiss": "Swiss standings"
   },
   "stores": {
     "metaDescription": "{name} in {city}: address, hours, contacts and the Magic formats the store plays.",
