@@ -15,6 +15,8 @@ export const E2E_IDS = {
   pastEvent: 'e2e-event-past',
   deck: 'e2e-deck',
   tournament: 'e2e-tournament',
+  store: 'loja-e2e',
+  storeInvite: 'e2e-convite-loja',
 } as const;
 
 const HOUR = 3600_000;
@@ -336,6 +338,38 @@ export async function seedE2E(databaseUrl: string) {
         data: { round: 1, table: 2, corrected: false },
       },
     ]);
+
+    // Loja verificada com a Ana de dona e a Bia na equipe, endereço com mapa e um convite pendente.
+    await db.insert(s.stores).values({
+      id: 'e2e-store',
+      slug: E2E_IDS.store,
+      name: 'Loja E2E',
+      city: 'Porto Alegre',
+      contactEmail: 'contato@loja-e2e.test',
+      about: 'Commander às sextas e Modern aos sábados.',
+      address: 'Av. Ipiranga, 6681, Porto Alegre',
+      lat: -30.0596,
+      lng: -51.1734,
+      hours: 'Ter a sáb, 14h às 22h',
+      instagram: 'lojae2e',
+      whatsapp: '5551999990000',
+      website: 'https://loja-e2e.test/',
+      formats: ['commander', 'modern'],
+      verified: true,
+      createdBy: 'e2e-ana',
+    });
+    await db.insert(s.storeMembers).values([
+      { storeId: 'e2e-store', userId: 'e2e-ana', role: 'owner' },
+      { storeId: 'e2e-store', userId: 'e2e-bia', role: 'staff' },
+    ]);
+    await db.insert(s.storeInvites).values({
+      storeId: 'e2e-store',
+      email: 'nova@loja-e2e.test',
+      role: 'staff',
+      token: E2E_IDS.storeInvite,
+      createdBy: 'e2e-ana',
+      expiresAt: new Date(Date.now() + 14 * DAY),
+    });
 
     // Todas as conquistas contam como vistas: a janela de conquistas novas não abre no meio de
     // outros testes (ela tem o próprio teste em `perfis.spec.ts`).

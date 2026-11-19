@@ -5,6 +5,7 @@ import {
   getProductMetrics,
   type TipId,
   listAnnouncements,
+  listStoresForAdmin,
   listGroupsForBeta,
   listRecentFeedback,
   listUsersForAdmin,
@@ -16,6 +17,7 @@ import { requireAdmin } from '@/server/admin';
 import { AdminUsers } from '@/components/admin-users';
 import { BetaControl } from '@/components/beta-control';
 import { AnnouncementsAdmin } from '@/components/announcements-admin';
+import { StoresAdmin } from '@/components/stores/stores-admin';
 import { sectionMetadata } from '@/server/seo';
 
 export const generateMetadata = sectionMetadata('admin', '/admin');
@@ -25,16 +27,18 @@ export default async function AdminPage() {
   await requireAdmin();
   const db = getDb();
   const now = new Date();
-  const [m, recent, beta, betaGroups, users, notices] = await Promise.all([
+  const [m, recent, beta, betaGroups, users, notices, storeList] = await Promise.all([
     getProductMetrics(db, now),
     listRecentFeedback(db, 30),
     getBeta(db, now),
     listGroupsForBeta(db),
     listUsersForAdmin(db),
     listAnnouncements(db),
+    listStoresForAdmin(db),
   ]);
   const betaStats = await getBetaGroupStats(db, beta.state, now);
   const t = await getTranslations('admin');
+  const ts = await getTranslations('stores');
   const tb = await getTranslations('admin.beta');
   const tf = await getTranslations('feedback');
   const format = await getFormatter();
@@ -128,6 +132,24 @@ export default async function AdminPage() {
           announcements={notices.map((a) => ({
             ...a,
             publishedAt: a.publishedAt?.toISOString() ?? null,
+          }))}
+        />
+      </section>
+
+      {/* Perfis de loja (10.1). */}
+      <section className="card space-y-4" aria-labelledby="admin-lojas">
+        <h2 id="admin-lojas" className="section-title mb-0">
+          {ts('admin.title')}
+        </h2>
+        <StoresAdmin
+          stores={storeList.map((x) => ({
+            id: x.id,
+            slug: x.slug,
+            name: x.name,
+            city: x.city,
+            contactEmail: x.contactEmail,
+            verified: x.verified,
+            members: x.members,
           }))}
         />
       </section>
