@@ -15,7 +15,8 @@
     "players": "{count, plural, =1 {1 jogador} other {# jogadores}}",
     "minutes": "{count} min",
     "skipToContent": "Pular para o conteúdo",
-    "newTab": "(abre em nova aba)"
+    "newTab": "(abre em nova aba)",
+    "close": "Fechar"
   },
   "nav": {
     "dashboard": "Painel",
@@ -159,7 +160,10 @@
       "nudgedLabel": "{name}: chamado",
       "sent": "Aviso enviado para {name}.",
       "noNext": "Marque um encontro para poder chamar alguém."
-    }
+    },
+    "inviteButton": "Convidar",
+    "settingsButton": "Configurações",
+    "membersCount": "{count, plural, =1 {1 pessoa} other {# pessoas}} no grupo"
   },
   "availability": {
     "title": "Disponibilidade",

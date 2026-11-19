@@ -64,7 +64,6 @@ const AUTH_PAGES = [
   '/decks/importar',
   '/colecao',
   '/grupo',
-  '/grupo/recordes',
   '/torneios',
   '/torneios/novo',
   `/torneios/${E2E_IDS.tournament}`,

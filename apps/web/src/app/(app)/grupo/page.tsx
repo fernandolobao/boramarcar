@@ -14,7 +14,10 @@ import { getDb } from '@/server/db';
 import { inviteQrCode, inviteUrl } from '@/server/invite';
 import { navMetadata } from '@/server/metadata';
 import { Icon } from '@/components/icons';
-import { LocationsSection } from '@/components/places/locations-section';
+import { AddLocationButton, LocationsSection } from '@/components/places/locations-section';
+import { AvatarImage } from '@/components/avatar-image';
+import { GroupRecords } from '@/components/group-records';
+import { ModalButton } from '@/components/modal-button';
 import { StackSections } from '@/components/stack-sections';
 
 export const generateMetadata = navMetadata('group');
@@ -35,7 +38,6 @@ export default async function GroupPage() {
       ? await getGroupAttendance(db, { groupId: active.id, userId: user.id, now })
       : null;
   const ts = await getTranslations('share');
-  const tr = await getTranslations('records');
   const tm = await getTranslations('monthly');
   const recapMonth = active
     ? await lastRecapMonth(getDb(), { groupId: active.id }).then(async (value) => ({
@@ -67,14 +69,83 @@ export default async function GroupPage() {
         {active && (
           <>
             <section className="card">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-xl font-semibold">{active.name}</h2>
-                {/* Atalho para os recordes e a cara do grupo (8.12). */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-display text-2xl font-semibold">{active.name}</h2>
+                {/* Ações do grupo em modais: a página fica para o grupo em si, não para administrar. */}
                 <div className="flex flex-wrap gap-2">
-                  <Link href="/grupo/recordes" className="btn-secondary">
-                    <Icon name="ranking" />
-                    {tr('link')}
-                  </Link>
+                  {invite && (
+                    <ModalButton
+                      label={t('inviteButton')}
+                      title={t('inviteTitle')}
+                      icon="join"
+                      variant="primary"
+                    >
+                      <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
+                        {/* QR Code com o botão de baixar logo abaixo. */}
+                        <figure className="mx-auto w-48 space-y-2 sm:mx-0">
+                          <div
+                            role="img"
+                            aria-label={t('qrCode', { group: active.name })}
+                            data-testid="invite-qr"
+                            className="overflow-hidden rounded-2xl border border-ink-200 bg-white p-2 dark:border-ink-700 [&>svg]:h-auto [&>svg]:w-full"
+                            // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
+                            dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
+                          />
+                          <a
+                            className="btn-secondary w-full"
+                            href={invite.qr.png}
+                            download={`convite-${active.inviteCode}.png`}
+                          >
+                            <Icon name="download" />
+                            {t('downloadQr')}
+                          </a>
+                          <figcaption className="muted text-center text-sm">
+                            {t('qrHint')}
+                          </figcaption>
+                        </figure>
+                        {/* Link com o botão de copiar ao lado; depois, enviar pelo WhatsApp ou pelo
+                      menu do celular. */}
+                        <div className="min-w-0 space-y-4">
+                          <div>
+                            <CopyField label={t('inviteLink')} value={invite.url} />
+                            <p className="muted mt-2 text-sm">
+                              {t('inviteCode')}:{' '}
+                              <span className="font-mono tracking-widest" data-testid="invite-code">
+                                {active.inviteCode}
+                              </span>
+                            </p>
+                          </div>
+                          <ShareButtons
+                            text={invite.text}
+                            url={invite.url}
+                            title={active.name}
+                            copy={false}
+                          />
+                          {active.role !== 'member' && (
+                            <div>
+                              <RegenerateInviteButton groupId={active.id} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </ModalButton>
+                  )}
+                  <ModalButton label={t('settingsButton')} title={tg('title')} icon="settings">
+                    <GroupSettingsForm
+                      groupId={active.id}
+                      canEdit={active.role !== 'member'}
+                      settings={{
+                        tableSize: active.tableSize,
+                        minDurationMinutes: active.minDurationMinutes,
+                        pointsWin: active.pointsWin,
+                        pointsDraw: active.pointsDraw,
+                        pointsLoss: active.pointsLoss,
+                        defaultFormat: isGameFormat(active.defaultFormat)
+                          ? active.defaultFormat
+                          : 'commander',
+                      }}
+                    />
+                  </ModalButton>
                   {/* Retrospectiva do mês que passou (8.12). */}
                   {recapMonth && (
                     <Link
@@ -87,56 +158,10 @@ export default async function GroupPage() {
                   )}
                 </div>
               </div>
-              <h3 className="section-title mt-4">{t('inviteTitle')}</h3>
-              {invite && (
-                <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
-                  {/* QR Code com o botão de baixar logo abaixo. */}
-                  <figure className="mx-auto w-48 space-y-2 sm:mx-0">
-                    <div
-                      role="img"
-                      aria-label={t('qrCode', { group: active.name })}
-                      data-testid="invite-qr"
-                      className="overflow-hidden rounded-2xl border border-ink-200 bg-white p-2 dark:border-ink-700 [&>svg]:h-auto [&>svg]:w-full"
-                      // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
-                      dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
-                    />
-                    <a
-                      className="btn-secondary w-full"
-                      href={invite.qr.png}
-                      download={`convite-${active.inviteCode}.png`}
-                    >
-                      <Icon name="download" />
-                      {t('downloadQr')}
-                    </a>
-                    <figcaption className="muted text-center text-sm">{t('qrHint')}</figcaption>
-                  </figure>
-                  {/* Link com o botão de copiar ao lado; depois, enviar pelo WhatsApp ou pelo
-                      menu do celular. */}
-                  <div className="min-w-0 space-y-4">
-                    <div>
-                      <CopyField label={t('inviteLink')} value={invite.url} />
-                      <p className="muted mt-2 text-sm">
-                        {t('inviteCode')}:{' '}
-                        <span className="font-mono tracking-widest" data-testid="invite-code">
-                          {active.inviteCode}
-                        </span>
-                      </p>
-                    </div>
-                    <ShareButtons
-                      text={invite.text}
-                      url={invite.url}
-                      title={active.name}
-                      copy={false}
-                    />
-                    {active.role !== 'member' && (
-                      <div>
-                        <RegenerateInviteButton groupId={active.id} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              <p className="muted mt-2">{t('membersCount', { count: members.length })}</p>
             </section>
+            {/* Recordes e a cara do grupo (8.12), logo no começo. */}
+            <GroupRecords groupId={active.id} userId={user.id} />
             <section className="card">
               <h2 className="section-title">{t('members')}</h2>
               <ul className="divide-y divide-ink-200 dark:divide-ink-800">
@@ -145,15 +170,20 @@ export default async function GroupPage() {
                     key={m.userId}
                     className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 text-sm"
                   >
-                    <span className="min-w-0">
-                      <Link
-                        href={m.userId === user.id ? '/perfil' : `/jogadores/${m.userId}`}
-                        className="font-medium underline-offset-2 hover:underline"
-                      >
-                        {m.name}
-                      </Link>
-                      {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
-                      <span className="muted block">{t(`roles.${m.role}`)}</span>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-700 dark:text-white">
+                        <AvatarImage name={m.name} image={m.image} sizes="40px" />
+                      </span>
+                      <span className="min-w-0">
+                        <Link
+                          href={m.userId === user.id ? '/perfil' : `/jogadores/${m.userId}`}
+                          className="font-medium underline-offset-2 hover:underline"
+                        >
+                          {m.name}
+                        </Link>
+                        {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
+                        <span className="muted block">{t(`roles.${m.role}`)}</span>
+                      </span>
                     </span>
                     <MemberActions
                       groupId={active.id}
@@ -189,34 +219,29 @@ export default async function GroupPage() {
               />
             )}
             <section className="card" aria-labelledby="group-locations-title">
-              <h2 id="group-locations-title" className="section-title">
-                {t('locations')}
-              </h2>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 id="group-locations-title" className="section-title mb-0">
+                  {t('locations')}
+                </h2>
+                <AddLocationButton
+                  groupId={active.id}
+                  members={members.map((m) => ({ userId: m.userId, name: m.name }))}
+                  near={
+                    locations.find((l) => l.lat !== null && l.lng !== null)
+                      ? {
+                          lat: locations.find((l) => l.lat !== null)!.lat!,
+                          lng: locations.find((l) => l.lng !== null)!.lng!,
+                        }
+                      : null
+                  }
+                />
+              </div>
               <LocationsSection
                 groupId={active.id}
                 locations={locations}
                 members={members.map((m) => ({ userId: m.userId, name: m.name }))}
                 canManageAll={active.role !== 'member'}
                 userId={user.id}
-              />
-            </section>
-            <section className="card" aria-labelledby="group-settings-title">
-              <h2 id="group-settings-title" className="section-title">
-                {tg('title')}
-              </h2>
-              <GroupSettingsForm
-                groupId={active.id}
-                canEdit={active.role !== 'member'}
-                settings={{
-                  tableSize: active.tableSize,
-                  minDurationMinutes: active.minDurationMinutes,
-                  pointsWin: active.pointsWin,
-                  pointsDraw: active.pointsDraw,
-                  pointsLoss: active.pointsLoss,
-                  defaultFormat: isGameFormat(active.defaultFormat)
-                    ? active.defaultFormat
-                    : 'commander',
-                }}
               />
             </section>
           </>

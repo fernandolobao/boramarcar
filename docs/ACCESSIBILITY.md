@@ -615,3 +615,10 @@ sem rolagem horizontal em 320px.
 
 - Campo "Estrutura" (Select do design system, com a explicação de cada estrutura na descrição), só quando há escolha (mesas de par); ao trocar, os campos que não valem (rodadas, top cut) somem em vez de ficarem desabilitados sem explicação. No app, `Choices`. Coberto pelo axe (`a11y.test.tsx`).
 - Na eliminação simples, cada rodada tem o nome da fase quando faz sentido ("Quartas de final", "Semifinal", "Final") e a classificação por pontos não aparece (a chave decide); o campeão segue em destaque, em texto.
+
+## Página do grupo com modais (19/11/2026)
+
+- `ModalButton`: `<dialog>` modal nativo aberto por um `<button aria-haspopup="dialog">`, com título (`aria-labelledby`), botão "Fechar" com nome, Esc e clique no fundo; o foco volta para o botão ao fechar. Usado no convite, nas configurações do grupo e em "Adicionar local" (que fecha sozinho ao salvar). Teste do componente cobre título, conteúdo, fechar e o foco.
+- O formulário de local no modal mantém o título acessível (`sr-only`) para não repetir o título do modal na tela.
+- Recordes e a cara do grupo agora são seções `<h2>` da página do grupo (sem pular níveis); `/grupo/recordes` só redireciona.
+- Fotos dos membros são decorativas (`alt=""`; o nome está ao lado).

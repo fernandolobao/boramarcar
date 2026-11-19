@@ -210,7 +210,7 @@ export default async function MonthlyRecapPage({ params }: Props) {
       </section>
 
       {signedIn ? (
-        <Link href="/grupo/recordes" className="btn-secondary self-start">
+        <Link href="/grupo#recordes" className="btn-secondary self-start">
           <Icon name="ranking" />
           {t('openRecords')}
         </Link>

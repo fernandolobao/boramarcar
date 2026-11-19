@@ -204,6 +204,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Torneios de um contra um ganham eliminação simples (chave sorteada, quem perde sai) e todos contra todos (cada um enfrenta todos), além do suíço.',
     en: 'One-on-one tournaments get single elimination (random bracket, lose and you’re out) and round robin (everyone plays everyone), besides Swiss.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'A página do grupo ficou mais do grupo: recordes e a cara do grupo logo no começo, fotos de quem participa, e convite, configurações e novo local em janelas que abrem por botões.',
+    en: 'The group page is more about the group now: records and the group’s identity right at the top, members’ photos, and invite, settings and new place in windows opened by buttons.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
