@@ -270,3 +270,29 @@ export function pairRound(
   }
   return tables;
 }
+
+/**
+ * A mesa do torneio pode ser jogada no modo mesa? Torneio rodando, mesa sem resultado, de
+ * inscrições individuais e numa partida só (pod, ou par em melhor de 1), num formato que o modo
+ * mesa conhece (não o 2HG). No melhor de 3, o placar em jogos vai pelo formulário da mesa.
+ */
+export function tableModeEligible(
+  tournament: {
+    status: string;
+    entrantSize: number;
+    bestOf: number;
+    table: TournamentTable;
+    format: string;
+  },
+  table: { reported: boolean; entrants: readonly string[] },
+) {
+  const rules = FORMAT_RULES[isGameFormat(tournament.format) ? tournament.format : 'other'];
+  return (
+    tournament.status === 'running' &&
+    !table.reported &&
+    table.entrants.length >= 2 &&
+    tournament.entrantSize === 1 &&
+    (tournament.table === 'pod' || tournament.bestOf === 1) &&
+    rules.structure !== 'teams'
+  );
+}

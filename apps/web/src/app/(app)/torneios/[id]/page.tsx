@@ -1,10 +1,11 @@
 import { getTournament, listMembers } from '@boramarcar/db';
 import { isDomainError, isGameFormat } from '@boramarcar/core';
+import { tableModeEligible } from '@boramarcar/core/tournaments';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
-import { StackSections } from '@/components/stack-sections';
+import { Icon } from '@/components/icons';
 import {
   TableResultForm,
   TournamentControls,
@@ -124,7 +125,8 @@ export default async function TournamentPage({ params }: Props) {
         </p>
       </div>
 
-      <StackSections>
+      {/* Seções comuns (sem o empilhamento ao rolar): as mesas têm formulários e mudam de altura. */}
+      <div className="mt-6 space-y-6">
         {tour.status === 'registration' && (
           <section className="card" aria-labelledby="torneio-inscricoes">
             <h2 id="torneio-inscricoes" className="section-title">
@@ -186,6 +188,20 @@ export default async function TournamentPage({ params }: Props) {
                         ? `${t('result')}: ${resultText(table, seated)}`
                         : t('waiting')}
                     </p>
+                    {/* Modo mesa (pod ou melhor de 1): jogadores já na mesa; o resultado volta para cá. */}
+                    {canReport && tableModeEligible(tour, table) && (
+                      <div className="space-y-1">
+                        <Link
+                          href={`/mesa/${tour.eventId}?torneio=${tour.id}&mesa=${table.id}`}
+                          className="btn-primary"
+                        >
+                          <Icon name="table" />
+                          {t('openInTable')}
+                          <span className="sr-only"> ({t('table', { number: table.number })})</span>
+                        </Link>
+                        <p className="muted text-sm">{t('openInTableHint')}</p>
+                      </div>
+                    )}
                     {canReport &&
                       (table.reported ? (
                         // Já registrada: a correção (de quem organiza) fica recolhida.
@@ -321,7 +337,7 @@ export default async function TournamentPage({ params }: Props) {
             />
           </section>
         )}
-      </StackSections>
+      </div>
     </>
   );
 }
