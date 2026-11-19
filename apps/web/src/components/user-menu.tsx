@@ -28,6 +28,7 @@ export function UserMenu({
   stores?: { slug: string; name: string }[];
 }) {
   const t = useTranslations('nav');
+  const tse = useTranslations('storeEvents');
   const tc = useTranslations('common');
   const router = useRouter();
   const pathname = usePathname();
@@ -131,6 +132,16 @@ export function UserMenu({
             >
               <Icon name="feedback" />
               {t('feedback')}
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/codigo"
+              className={itemClass}
+              aria-current={pathname === '/codigo' ? 'page' : undefined}
+            >
+              <Icon name="store" />
+              {tse('codeMenu')}
             </Link>
           </li>
           {stores.map((store) => (

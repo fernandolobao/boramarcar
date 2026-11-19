@@ -18,6 +18,7 @@ const PROTECTED = [
   '/notificacoes',
   '/admin',
   '/mesa',
+  '/codigo',
 ];
 
 /**

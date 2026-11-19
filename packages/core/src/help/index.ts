@@ -292,6 +292,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'eventos-de-loja',
+            question: 'Como me inscrevo num evento de loja?',
+            intro: [
+              'Pela página do evento (na página da loja, em "Próximos eventos"): "Me inscrever". Se as vagas acabaram, você entra na lista de espera e sobe sozinho quando alguém desiste. Já está na loja? No menu da conta, "Código de evento": digite o código que está no balcão.',
+              'A equipe da loja também inscreve quem chegou sem conta, só com o nome, e marca quem chegou (check-in). Na página pública aparecem só as vagas: os nomes de quem se inscreveu ficam com a equipe da loja.',
+            ],
+          },
+          {
             id: 'lojas',
             question: 'Como uma loja entra no ArcanaKin?',
             intro: [
@@ -645,6 +653,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'The bell sits at the top of the website and on the app dashboard, with the number of new items. It lists the games you played, your group’s games, the achievements you earned, podium changes in your group and ArcanaKin announcements. Tap a notification to open the meetup, profile or ranking; it then counts as read. You can also mark one as read without opening it, or use "Mark all as read" at the top.',
               'Every week, ArcanaKin news arrives there too, in a short text.',
               'Notifications stay in the website and the app: e-mail and phone alerts are still only for meetups.',
+            ],
+          },
+          {
+            id: 'eventos-de-loja',
+            question: 'How do I sign up for a store event?',
+            intro: [
+              'On the event page (on the store page, under "Upcoming events"): "Sign me up". If the spots are full, you go on the waitlist and move up automatically when someone drops out. Already at the store? In the account menu, "Event code": type the code from the counter.',
+              'The store team can also sign up people without an account, by name only, and mark who arrived (check-in). The public page only shows the spots: the names of who signed up stay with the store team.',
             ],
           },
           {

@@ -1,10 +1,10 @@
 import { isGameFormat } from '@boramarcar/core';
-import { getStorePublic, listMyStores } from '@boramarcar/db';
+import { getStorePublic, listMyStores, listStoreEvents } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { StoreMap } from '@/components/stores/store-map';
@@ -39,11 +39,14 @@ export default async function StorePage({ params }: Props) {
   const { slug } = await params;
   const store = await load(slug);
   if (!store) notFound();
-  const [t, tf, tc, session] = await Promise.all([
+  const [t, te, tf, tc, format, session, upcoming] = await Promise.all([
     getTranslations('stores'),
+    getTranslations('storeEvents'),
     getTranslations('formats'),
     getTranslations('common'),
+    getFormatter(),
     getSessionUser(await headers()).catch(() => null),
+    listStoreEvents(getDb(), { storeId: store.id, when: 'upcoming' }),
   ]);
   const mine = session
     ? (await listMyStores(getDb(), { userId: session.id })).some((s) => s.slug === slug)
@@ -178,11 +181,32 @@ export default async function StorePage({ params }: Props) {
         </section>
       )}
 
-      <section className="card space-y-2" aria-labelledby="loja-eventos">
+      <section className="card space-y-3" aria-labelledby="loja-eventos">
         <h2 id="loja-eventos" className="section-title mb-0">
-          {t('events')}
+          {te('upcoming')}
         </h2>
-        <p className="muted">{t('eventsSoon')}</p>
+        {upcoming.length === 0 ? (
+          <p className="muted">{te('none')}</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {upcoming.map((ev) => (
+              <li key={ev.id} className="py-2">
+                <Link
+                  href={`/lojas/${slug}/eventos/${ev.id}`}
+                  className="font-semibold underline underline-offset-2"
+                >
+                  {ev.title}
+                </Link>
+                <p className="muted text-sm">
+                  {format.dateTime(ev.startsAt, { dateStyle: 'medium', timeStyle: 'short' })} ·{' '}
+                  {te(`kind.${ev.kind as 'tournament' | 'casual'}`)} ·{' '}
+                  {tf(isGameFormat(ev.format) ? ev.format : 'other')}
+                  {ev.status === 'cancelled' && ` · ${te('cancelled')}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {!session && (

@@ -31,3 +31,32 @@ describe('perfil de loja', () => {
     expect(normalizeWebsite('não é site')).toBeNull();
   });
 });
+
+describe('eventos de loja (10.2)', () => {
+  it('código do evento: 6 caracteres sem letras que se confundem', async () => {
+    const { eventCode, normalizeEventCode } = await import('./index');
+    let seed = 0;
+    const random = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const code = eventCode(random);
+    expect(code).toMatch(/^[A-HJ-NP-Z2-9]{6}$/);
+    expect(normalizeEventCode(' ab-c 23z ')).toBe('ABC23Z');
+    expect(normalizeEventCode('ab')).toBeNull();
+  });
+
+  it('vaga ou lista de espera, e quem sobe quando alguém desiste', async () => {
+    const { entryStatusFor, promoteFromWaitlist } = await import('./index');
+    expect(entryStatusFor(3, 4)).toBe('registered');
+    expect(entryStatusFor(4, 4)).toBe('waitlist');
+    expect(entryStatusFor(100, null)).toBe('registered');
+    const entries = [
+      { id: 'a', status: 'registered' as const, createdAt: new Date('2026-11-01') },
+      { id: 'w2', status: 'waitlist' as const, createdAt: new Date('2026-11-03') },
+      { id: 'w1', status: 'waitlist' as const, createdAt: new Date('2026-11-02') },
+    ];
+    // Vaga livre (capacidade 2, 1 inscrito): sobe o primeiro da fila (o mais antigo).
+    expect(promoteFromWaitlist(entries, 2)).toEqual(['w1']);
+    expect(promoteFromWaitlist(entries, 3)).toEqual(['w1', 'w2']);
+    expect(promoteFromWaitlist(entries, 1)).toEqual([]);
+    expect(promoteFromWaitlist(entries, null)).toEqual(['w1', 'w2']);
+  });
+});

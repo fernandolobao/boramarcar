@@ -159,6 +159,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Chegaram os perfis de loja: endereço com mapa, horários, contatos e formatos, com o selo de loja verificada. A loja entra por convite da equipe do ArcanaKin.',
     en: 'Store profiles are here: address with a map, hours, contacts and formats, with a verified-store badge. Stores join by invite from the ArcanaKin team.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Eventos de loja: a loja publica torneios e noites livres com vagas, premiação e regras; você se inscreve pelo site ou pelo código do balcão, e a lista de espera anda sozinha.',
+    en: 'Store events: stores post tournaments and open-play nights with spots, prizes and rules; sign up on the site or with the counter code, and the waitlist moves on its own.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

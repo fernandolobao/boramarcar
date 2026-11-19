@@ -141,6 +141,23 @@ O dono do projeto pediu que o torneio **suporte qualquer formato desde a primeir
 - **10.4** Seguidores e avisos da loja.
 - **10.5** Piloto com 1 a 3 lojas (o 8.9).
 
+## Eventos de loja (10.2): decisões de 19/11/2026
+
+O dono do projeto decidiu:
+
+1. **Quem joga:** com conta **ou convidado**. Quem tem conta se inscreve pelo app/site ou pelo **código do evento**; a equipe da loja também inscreve na hora quem chega sem conta, só com o nome. O convidado aparece na lista, nas mesas e na classificação, sem perfil nem histórico.
+2. **Tipo de evento:** **torneio ou noite livre**. A loja publica eventos na agenda dela; cada um pode ter um torneio (motor do 9.1) ou ser uma noite de jogo livre com vagas e inscrição.
+3. **Antes do beta:** vagas com lista de espera, inscrição pelo app/site, código no balcão, check-in, premiação e regras da casa em texto.
+
+**Como fica:**
+
+- `store_events`: loja, título, quando, formato, tipo (`tournament` ou `casual`), vagas (vazio = sem limite), **código** curto (6 caracteres, sem letras que se confundem), premiação e regras em texto, situação.
+- `store_event_entries`: inscrição de uma conta **ou** de um convidado (nome), `registered` ou `waitlist`, check-in. Quem desiste libera a vaga para o primeiro da lista de espera.
+- O torneio do evento de loja usa o motor do 9.1, montado com quem fez check-in (inclusive convidados); não conta em ranking de grupo nenhum. A equipe da loja organiza; quem está na mesa registra o resultado.
+- Página pública do evento com vagas, premiação, regras e, no torneio, as mesas e a classificação ao vivo.
+
+**Entregas:** 10.2a (eventos, inscrição, código, convidados, check-in, premiação e regras, no site), 10.2b (o torneio no evento de loja, com acompanhamento ao vivo), 10.2c (o app).
+
 ## Decisões (18/11/2026)
 
 1. **Pontuação padrão dos pods:** 3/1/0, igual ao ranking do grupo. O organizador muda por torneio.

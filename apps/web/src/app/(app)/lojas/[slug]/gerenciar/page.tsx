@@ -1,10 +1,11 @@
-import { getStoreForManager } from '@boramarcar/db';
+import { getStoreForManager, listStoreEvents } from '@boramarcar/db';
 import { isDomainError } from '@boramarcar/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
+import { StoreEventForm } from '@/components/stores/store-events';
 import { StoreProfileForm, StoreTeam } from '@/components/stores/store-manage';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
@@ -40,8 +41,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ManageStorePage({ params }: Props) {
   const { slug } = await params;
   const { user, view } = await load(slug);
-  const t = await getTranslations('stores');
   const s = view.store;
+  const [t, te, format, upcoming] = await Promise.all([
+    getTranslations('stores'),
+    getTranslations('storeEvents'),
+    getFormatter(),
+    listStoreEvents(getDb(), { storeId: s.id, when: 'upcoming' }),
+  ]);
   return (
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -71,6 +77,33 @@ export default async function ManageStorePage({ params }: Props) {
             formats: s.formats,
           }}
         />
+      </section>
+      <section className="card space-y-4" aria-labelledby="loja-eventos">
+        <h2 id="loja-eventos" className="section-title mb-0">
+          {te('upcoming')}
+        </h2>
+        {upcoming.length === 0 ? (
+          <p className="muted">{te('none')}</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {upcoming.map((ev) => (
+              <li key={ev.id} className="py-2">
+                <Link
+                  href={`/lojas/${slug}/eventos/${ev.id}/gerenciar`}
+                  className="font-semibold underline underline-offset-2"
+                >
+                  {ev.title}
+                </Link>
+                <p className="muted text-sm">
+                  {format.dateTime(ev.startsAt, { dateStyle: 'medium', timeStyle: 'short' })}
+                  {ev.status === 'cancelled' && ` · ${te('cancelled')}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+        <h3 className="font-semibold">{te('newTitle')}</h3>
+        <StoreEventForm storeId={s.id} slug={slug} />
       </section>
       <section className="card" aria-labelledby="loja-equipe">
         <h2 id="loja-equipe" className="section-title">
