@@ -149,6 +149,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Nas mesas de torneio (pods e melhor de 1), "Abrir no modo mesa" já traz os jogadores e o formato; ao registrar, o resultado vai direto para a mesa do torneio.',
     en: 'On tournament tables (pods and best of 1), "Open in table mode" brings the players and format; when you save, the result goes straight to the tournament table.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'O painel e a página do encontro abrem mais rápido no celular: a arte do destaque passou a carregar primeiro.',
+    en: 'The dashboard and meetup pages open faster on phones: the highlight art now loads first.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
