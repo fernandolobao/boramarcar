@@ -11,6 +11,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
+import { municipalities } from './municipalities';
 
 const id = () =>
   text('id')
@@ -27,6 +28,10 @@ export const stores = pgTable('stores', {
   slug: text('slug').notNull().unique(),
   name: text('name').notNull(),
   city: text('city').notNull(),
+  /** Município do IBGE (10.3); `null` = cidade a confirmar pelo admin (lojas antigas). */
+  municipalityCode: text('municipality_code').references(() => municipalities.code),
+  /** O que a loja oferece (`singles`, `sealed`, `play_space`, `tournaments`). */
+  offers: jsonb('offers').$type<string[]>().notNull().default([]),
   contactEmail: text('contact_email').notNull(),
   about: text('about'),
   address: text('address'),

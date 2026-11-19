@@ -10,6 +10,9 @@ export type StoreRole = (typeof STORE_ROLES)[number];
 export const STORE_INVITE_DAYS = 14;
 
 /** Endereço da página da loja a partir do nome: minúsculas, sem acento, palavras com hífen. */
+/** Endereços de loja que não podem ser usados (`/lojas/em/...` é a descoberta por cidade). */
+export const RESERVED_STORE_SLUGS = ['em'] as const;
+
 export function storeSlug(name: string): string {
   const slug = name
     .normalize('NFD')

@@ -4,13 +4,16 @@ import {
   normalizeInstagram,
   normalizeWebsite,
   normalizeWhatsapp,
+  RESERVED_STORE_SLUGS,
   storeSlug,
   type StoreRole,
 } from '@boramarcar/core/stores';
+import { isStoreOffer, STORE_OFFERS } from '@boramarcar/core/discovery';
 import { randomBytes } from 'node:crypto';
 import { and, asc, count, eq, inArray, isNull, like } from 'drizzle-orm';
 import type { Database } from '../client';
-import { storeInvites, storeMembers, stores, user } from '../schema';
+import { municipalities, storeInvites, storeMembers, stores, user } from '../schema';
+import { getMunicipalityByCode } from './municipalities';
 
 /**
  * Perfis de loja (10.1). Criar a loja e dar o selo de verificada são ações de admin do
@@ -30,6 +33,8 @@ async function uniqueSlug(db: Database, name: string) {
         .where(like(stores.slug, `${base}%`))
     ).map((r) => r.slug),
   );
+  // Endereços reservados (ex.: `/lojas/em/...`, a descoberta por cidade) contam como ocupados.
+  for (const reserved of RESERVED_STORE_SLUGS) taken.add(reserved);
   if (!taken.has(base)) return base;
   for (let n = 2; ; n++) if (!taken.has(`${base}-${n}`)) return `${base}-${n}`;
 }
@@ -54,16 +59,22 @@ async function newInvite(
   return invite!;
 }
 
+/** Município do IBGE pelo código (lança `invalid_input` se não existe). */
+async function requireMunicipality(db: Database, code: string) {
+  const municipality = await getMunicipalityByCode(db, code);
+  if (!municipality) throw new DomainError('invalid_input', 'Cidade inválida');
+  return municipality;
+}
+
 /** Cria a loja (admin do ArcanaKin) e o convite de dono para o e-mail informado. */
 export async function createStore(
   db: Database,
-  input: { name: string; city: string; email: string; createdBy: string; now?: Date },
+  input: { name: string; municipalityCode: string; email: string; createdBy: string; now?: Date },
 ) {
   const name = input.name.trim();
-  const city = input.city.trim();
   const email = normalizeEmail(input.email);
   if (!name || name.length > 80) throw new DomainError('invalid_input', 'Nome inválido');
-  if (!city || city.length > 80) throw new DomainError('invalid_input', 'Cidade inválida');
+  const municipality = await requireMunicipality(db, input.municipalityCode);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new DomainError('invalid_input', 'E-mail inválido');
   }
@@ -72,7 +83,8 @@ export async function createStore(
     .values({
       slug: await uniqueSlug(db, name),
       name,
-      city,
+      city: municipality.name,
+      municipalityCode: municipality.code,
       contactEmail: email,
       createdBy: input.createdBy,
     })
@@ -89,7 +101,12 @@ export async function createStore(
 
 /** Lojas para o `/admin`: com o e-mail de contato, o tamanho da equipe e o selo. */
 export async function listStoresForAdmin(db: Database) {
-  const rows = await db.select().from(stores).orderBy(asc(stores.name));
+  const rows = await db
+    .select({ store: stores, municipality: municipalityFields })
+    .from(stores)
+    .leftJoin(municipalities, eq(municipalities.code, stores.municipalityCode))
+    .orderBy(asc(stores.name))
+    .then((list) => list.map((r) => ({ ...r.store, municipality: r.municipality })));
   if (!rows.length) return [];
   const counts = await db
     .select({ storeId: storeMembers.storeId, n: count() })
@@ -107,6 +124,8 @@ export async function listStoresForAdmin(db: Database) {
     slug: r.slug,
     name: r.name,
     city: r.city,
+    // `null` = cidade a confirmar (loja criada antes da lista do IBGE).
+    municipality: r.municipality,
     contactEmail: r.contactEmail,
     verified: r.verified,
     members: membersOf.get(r.id) ?? 0,
@@ -127,6 +146,14 @@ export async function setStoreVerified(
   if (!row) throw new DomainError('not_found', 'Loja não encontrada');
 }
 
+/** Município da loja (para a página pública e a descoberta). */
+const municipalityFields = {
+  code: municipalities.code,
+  name: municipalities.name,
+  uf: municipalities.uf,
+  slug: municipalities.slug,
+};
+
 const publicFields = {
   id: stores.id,
   slug: stores.slug,
@@ -143,6 +170,8 @@ const publicFields = {
   formats: stores.formats,
   verified: stores.verified,
   logoUrl: stores.logoUrl,
+  offers: stores.offers,
+  municipality: municipalityFields,
 };
 
 /** Perfil público da loja (sem o e-mail de contato); `null` se não existe. */
@@ -150,6 +179,7 @@ export async function getStorePublic(db: Database, input: { slug: string }) {
   const [row] = await db
     .select(publicFields)
     .from(stores)
+    .leftJoin(municipalities, eq(municipalities.code, stores.municipalityCode))
     .where(eq(stores.slug, input.slug))
     .limit(1);
   return row ?? null;
@@ -243,7 +273,10 @@ export async function updateStore(
     storeId: string;
     userId: string;
     name?: string;
-    city?: string;
+    /** Município do IBGE (10.3); a cidade exibida vem dele. */
+    municipalityCode?: string;
+    /** O que a loja oferece (10.3). */
+    offers?: string[];
     about?: string | null;
     address?: string | null;
     lat?: number | null;
@@ -257,12 +290,15 @@ export async function updateStore(
 ) {
   await requireStoreRole(db, input.storeId, input.userId, ['owner', 'staff']);
   const name = input.name === undefined ? undefined : input.name.trim();
-  const city = input.city === undefined ? undefined : input.city.trim();
   if (name !== undefined && (!name || name.length > 80)) {
     throw new DomainError('invalid_input', 'Nome inválido');
   }
-  if (city !== undefined && (!city || city.length > 80)) {
-    throw new DomainError('invalid_input', 'Cidade inválida');
+  const municipality =
+    input.municipalityCode === undefined
+      ? undefined
+      : await requireMunicipality(db, input.municipalityCode);
+  if (input.offers && input.offers.some((o) => !isStoreOffer(o))) {
+    throw new DomainError('invalid_input', 'Oferta inválida');
   }
   if (input.formats && input.formats.some((f) => !isGameFormat(f))) {
     throw new DomainError('invalid_input', 'Formato inválido');
@@ -277,7 +313,9 @@ export async function updateStore(
   }
   const set = {
     name,
-    city,
+    city: municipality?.name,
+    municipalityCode: municipality?.code,
+    offers: input.offers ? STORE_OFFERS.filter((o) => input.offers!.includes(o)) : undefined,
     about: text(input.about, 2000),
     address: text(input.address, 200),
     lat: input.lat,

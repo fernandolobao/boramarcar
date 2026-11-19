@@ -2,6 +2,7 @@ import { isGameFormat } from '@boramarcar/core';
 import { getStorePublic, listMyStores, listStoreEvents } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { isStoreOffer } from '@boramarcar/core/discovery';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -164,7 +165,7 @@ export default async function StorePage({ params }: Props) {
         </section>
       )}
 
-      {(contacts.length > 0 || store.formats.length > 0) && (
+      {(contacts.length > 0 || store.formats.length > 0 || store.offers.length > 0) && (
         <section className="card space-y-4" aria-labelledby="loja-contatos">
           <h2 id="loja-contatos" className="section-title mb-0">
             {t('contacts')}
@@ -180,6 +181,18 @@ export default async function StorePage({ params }: Props) {
                 </li>
               ))}
             </ul>
+          )}
+          {store.offers.length > 0 && (
+            <div>
+              <h3 className="mb-2 font-semibold">{t('offersLabel')}</h3>
+              <ul className="flex flex-wrap gap-2">
+                {store.offers.filter(isStoreOffer).map((o) => (
+                  <li key={o} className="rounded-full bg-surface-muted px-3 py-1 text-sm">
+                    {t(`offers.${o}`)}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           {store.formats.length > 0 && (
             <div>

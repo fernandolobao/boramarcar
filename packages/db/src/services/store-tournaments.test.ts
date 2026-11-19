@@ -38,7 +38,7 @@ async function storeWithEvent(format = 'modern') {
   const dono = await createTestUser(db, { name: 'Dono' });
   const { store } = await createStore(db, {
     name: `Loja ${Math.random()}`,
-    city: 'Porto Alegre',
+    municipalityCode: '4314902',
     email: 'x@loja.test',
     createdBy: admin.id,
   });
