@@ -285,3 +285,35 @@ describe('abas de conquistas', () => {
     expect(b.enturmado!.unlocked).toBe(false);
   });
 });
+
+describe('conquistas de torneio', () => {
+  const byId = (list: ReturnType<typeof computeAchievements>, id: string) =>
+    list.find((a) => a.id === id)!;
+
+  it('estreia, top cut e campeão (com quantas vezes), pela data em que o torneio acabou', () => {
+    const jan = new Date('2026-01-10T23:00:00Z');
+    const mar = new Date('2026-03-10T23:00:00Z');
+    const may = new Date('2026-05-10T23:00:00Z');
+    const list = computeAchievements('u1', [], [], {
+      tournaments: [
+        { finishedAt: may, champion: true, topCut: true },
+        { finishedAt: jan, champion: false, topCut: false },
+        { finishedAt: mar, champion: false, topCut: true },
+      ],
+    });
+    expect(byId(list, 'tournament_first')).toMatchObject({ unlocked: true, unlockedAt: jan });
+    expect(byId(list, 'tournament_top')).toMatchObject({ unlocked: true, unlockedAt: mar });
+    expect(byId(list, 'tournament_champion')).toMatchObject({
+      unlocked: true,
+      unlockedAt: may,
+      count: 1,
+    });
+  });
+
+  it('sem torneio, nada desbloqueado', () => {
+    const list = computeAchievements('u1', []);
+    for (const id of ['tournament_first', 'tournament_top', 'tournament_champion']) {
+      expect(byId(list, id)).toMatchObject({ unlocked: false, progress: 0, target: 1 });
+    }
+  });
+});

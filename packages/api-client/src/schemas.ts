@@ -206,6 +206,9 @@ export const ACHIEVEMENT_IDS = [
   'events_streak_4',
   'months_12',
   'enturmado',
+  'tournament_first',
+  'tournament_top',
+  'tournament_champion',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
