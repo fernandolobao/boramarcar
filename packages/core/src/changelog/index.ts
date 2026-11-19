@@ -139,6 +139,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Torneios também no app, e um aviso no sino a cada rodada com a sua mesa (ou o bye) e quando o torneio termina.',
     en: 'Tournaments in the app too, plus a bell notice every round with your table (or bye) and when the tournament ends.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Trocar de página ficou mais responsivo: o item do menu reage na hora do toque e a página nova mostra onde o conteúdo vai aparecer enquanto carrega.',
+    en: 'Switching pages feels faster: the menu item reacts right when you tap it, and the new page shows where content will appear while it loads.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

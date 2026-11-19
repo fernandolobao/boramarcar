@@ -95,6 +95,18 @@ for (const scheme of ['light', 'dark'] as const) {
         test(path, async ({ page }) => {
           await page.goto(path);
           await expect(page.locator('main')).toBeVisible();
+          // A página chega em etapas (esqueleto do `loading.tsx` e animação de entrada): mede o
+          // contraste só com o conteúdo final, sem nada no meio de um esmaecimento.
+          await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+          await page.waitForFunction(() =>
+            document
+              .getAnimations()
+              .every(
+                (a) =>
+                  a.playState !== 'running' ||
+                  a.effect?.getComputedTiming().iterations === Infinity,
+              ),
+          );
           await expectNoViolations(page);
         });
       }
