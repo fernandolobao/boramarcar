@@ -28,12 +28,15 @@ export function LocationForm({
   location,
   near,
   onDone,
+  heading = true,
 }: {
   groupId: string;
   members: readonly { userId: string; name: string }[];
   location?: LocationView;
   near?: { lat: number; lng: number } | null;
   onDone?: () => void;
+  /** `false` dentro de um modal que já tem o título. */
+  heading?: boolean;
 }) {
   const t = useTranslations('places');
   const tc = useTranslations('common');
@@ -98,7 +101,7 @@ export function LocationForm({
         );
       }}
     >
-      <h3 id={`${id}-title`} className="font-semibold">
+      <h3 id={`${id}-title`} className={heading ? 'font-semibold' : 'sr-only'}>
         {location ? t('editTitle', { name: location.name }) : t('addTitle')}
       </h3>
       <div className="grid gap-3 md:grid-cols-2">

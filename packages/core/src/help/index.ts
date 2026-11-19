@@ -58,7 +58,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'Como crio um grupo novo e convido as pessoas?',
             steps: [
               'Toque em "Entrar ou criar grupo" e depois em "Criar grupo". Dê um nome (ex.: "Mesa de Terça").',
-              'Abra "Seu grupo" (app) ou o menu Grupo (site): ali estão o link e o código de convite.',
+              'Abra "Seu grupo" (app) ou o menu Grupo (site) e toque em "Convidar": ali estão o link, o código e o QR Code do convite.',
               'Toque em "Compartilhar convite" para mandar pelo WhatsApp ou por onde preferir. No site, "Copiar link" fica ao lado do link, e "Baixar QR Code" logo abaixo do QR Code, para imprimir.',
             ],
             notes: [
@@ -271,7 +271,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'pontos',
             question: 'Como funciona o ranking?',
             intro: [
-              'Cada partida registrada dá pontos a quem jogou, com mais para quem venceu. O ranking do grupo soma tudo; os filtros mostram um período, uma temporada ou um tipo de jogo. Temporadas são criadas pelo organizador nas configurações do grupo, e quem termina em 1º ganha o título no perfil.',
+              'Cada partida registrada dá pontos a quem jogou, com mais para quem venceu. O ranking do grupo soma tudo; os filtros mostram um período, uma temporada ou um tipo de jogo. Temporadas são criadas pelo organizador nas configurações do grupo (botão "Configurações" na tela do grupo), e quem termina em 1º ganha o título no perfil.',
             ],
           },
           {
@@ -331,7 +331,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'recordes',
             question: 'Onde vejo os recordes do grupo?',
             intro: [
-              'Na tela do grupo, em "Recordes e a cara do grupo": vitória mais rápida, partida mais longa, maior sequência de vitórias, noite com mais partidas e comandante com mais vitórias, cada um com o encontro e a data. Logo abaixo, a cara do grupo: as cores mais jogadas, quantos comandantes diferentes já apareceram e o meta dos últimos 90 dias.',
+              'Na tela do grupo, logo no começo: vitória mais rápida, partida mais longa, maior sequência de vitórias, noite com mais partidas e comandante com mais vitórias, cada um com o encontro e a data. Logo abaixo, a cara do grupo: as cores mais jogadas, quantos comandantes diferentes já apareceram e o meta dos últimos 90 dias.',
             ],
           },
           {
@@ -434,7 +434,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'How do I create a new group and invite people?',
             steps: [
               'Tap "Join or create a group", then "Create group". Give it a name (e.g. "Tuesday Table").',
-              'Open "Your group" (app) or the Group menu (website): the invite link and code are there.',
+              'Open "Your group" (app) or the Group menu (website) and tap "Invite": the invite link, code and QR code are there.',
               'Tap "Share invite" to send it on WhatsApp or wherever you like. On the website, "Copy link" sits next to the link and "Download QR code" right below the QR code, to print.',
             ],
             notes: [
@@ -647,7 +647,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'pontos',
             question: 'How does the ranking work?',
             intro: [
-              'Each recorded game gives points to everyone who played, with more for the winner. The group ranking adds it all up; filters show a period, a season or a game type. Seasons are created by the organizer in the group settings, and whoever finishes 1st gets the title on their profile.',
+              'Each recorded game gives points to everyone who played, with more for the winner. The group ranking adds it all up; filters show a period, a season or a game type. Seasons are created by the organizer in the group settings (the "Settings" button on the group screen), and whoever finishes 1st gets the title on their profile.',
             ],
           },
           {
@@ -707,7 +707,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'recordes',
             question: 'Where do I see the group records?',
             intro: [
-              'On the group screen, under "Records and group identity": fastest win, longest game, longest winning streak, night with the most games and the commander with the most wins, each with its meetup and date. Below, the group’s identity: the most played colors, how many different commanders have shown up and the meta of the last 90 days.',
+              'On the group screen, right at the top: fastest win, longest game, longest winning streak, night with the most games and the commander with the most wins, each with its meetup and date. Below, the group’s identity: the most played colors, how many different commanders have shown up and the meta of the last 90 days.',
             ],
           },
           {

@@ -15,7 +15,8 @@
     "players": "{count, plural, =1 {1 player} other {# players}}",
     "minutes": "{count} min",
     "skipToContent": "Skip to content",
-    "newTab": "(opens in a new tab)"
+    "newTab": "(opens in a new tab)",
+    "close": "Close"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -159,7 +160,10 @@
       "nudgedLabel": "{name}: invited",
       "sent": "Invite sent to {name}.",
       "noNext": "Schedule a meetup to be able to invite someone."
-    }
+    },
+    "inviteButton": "Invite",
+    "settingsButton": "Settings",
+    "membersCount": "{count, plural, =1 {1 person} other {# people}} in the group"
   },
   "availability": {
     "title": "Availability",

@@ -8,8 +8,9 @@ import { DirectionsLinks } from './directions';
 import { LocationForm, type LocationView } from './location-form';
 import { LocationMap } from './location-map';
 import { EmptyState } from '../empty-state';
+import { ModalButton } from '../modal-button';
 
-/** Locais do grupo (2.14): mapa com todos, lista com rotas e edição, e o formulário para cadastrar. */
+/** Locais do grupo (2.14): mapa com todos e a lista com rotas e edição (cadastrar: `AddLocationButton`). */
 export function LocationsSection({
   groupId,
   locations,
@@ -90,9 +91,32 @@ export function LocationsSection({
           ))}
         </ul>
       )}
-      <div className="border-t border-ink-200 pt-6 dark:border-ink-800">
-        <LocationForm groupId={groupId} members={members} near={near} />
-      </div>
     </div>
+  );
+}
+
+/** "Adicionar local" (canto da seção de locais): o formulário num modal, que fecha ao salvar. */
+export function AddLocationButton({
+  groupId,
+  members,
+  near,
+}: {
+  groupId: string;
+  members: readonly { userId: string; name: string }[];
+  near: { lat: number; lng: number } | null;
+}) {
+  const t = useTranslations('places');
+  return (
+    <ModalButton label={t('add')} title={t('addTitle')} icon="add">
+      {(close) => (
+        <LocationForm
+          groupId={groupId}
+          members={members}
+          near={near}
+          heading={false}
+          onDone={close}
+        />
+      )}
+    </ModalButton>
   );
 }
