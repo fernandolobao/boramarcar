@@ -48,8 +48,17 @@ describe('envio de imagens para o armazenamento', () => {
     expect(put).not.toHaveBeenCalled();
   });
 
+  it('com OIDC (só BLOB_STORE_ID, sem o token permanente) também envia', async () => {
+    vi.stubEnv('BLOB_READ_WRITE_TOKEN', '');
+    vi.stubEnv('BLOB_STORE_ID', 'store_abc');
+    await expect(
+      saveUploadedImage(await photo(), { folder: 'avatars', ownerId: 'u1' }),
+    ).resolves.toMatch(/^https:/);
+  });
+
   it('sem o armazenamento configurado, avisa que o envio está indisponível', async () => {
     vi.stubEnv('BLOB_READ_WRITE_TOKEN', '');
+    vi.stubEnv('BLOB_STORE_ID', '');
     await expect(
       saveUploadedImage(await photo(), { folder: 'avatars', ownerId: 'u1' }),
     ).rejects.toMatchObject({ code: 'upstream_error' });

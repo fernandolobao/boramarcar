@@ -6,8 +6,9 @@ import { del, put } from '@vercel/blob';
 import { processUploadedImage } from './images';
 
 /**
- * Foto do perfil e logo da loja no Vercel Blob. O token (`BLOB_READ_WRITE_TOKEN`) é criado pela
- * Vercel ao ligar um Blob store ao projeto; sem ele, o envio fica indisponível (o resto funciona).
+ * Foto do perfil e logo da loja no Vercel Blob. Ao ligar um Blob store ao projeto, a Vercel cria
+ * `BLOB_STORE_ID` (acesso por OIDC, sem segredo guardado); `BLOB_READ_WRITE_TOKEN` é a alternativa
+ * fora da Vercel. Sem nenhum dos dois, o envio fica indisponível (o resto funciona).
  * O nome do arquivo é aleatório: a URL é pública, mas não dá para adivinhar a de outra pessoa.
  */
 export async function saveUploadedImage(
@@ -18,7 +19,9 @@ export async function saveUploadedImage(
   if (problem) {
     throw new DomainError('invalid_input', 'Imagem não aceita', { reason: problem });
   }
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  // Na Vercel, o projeto ligado ao store entra por OIDC (`BLOB_STORE_ID` + credencial do deploy);
+  // fora dela (ou em stores antigos), pelo token permanente.
+  if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN) {
     throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento');
   }
   const image = await processUploadedImage(Buffer.from(await file.arrayBuffer()));
