@@ -2,8 +2,11 @@ import type { MetadataRoute } from 'next';
 import { citiesWithStores } from '@boramarcar/db';
 import { getDb } from '@/server/db';
 
-/** A lista de cidades muda quando entra loja nova: refaz a cada hora. */
-export const revalidate = 3600;
+/**
+ * Lido do banco a cada pedido (a lista de cidades muda quando entra loja nova). Gerar no build
+ * congelaria a lista do momento do build; só buscadores leem este arquivo.
+ */
+export const dynamic = 'force-dynamic';
 
 const base = () => process.env.BETTER_AUTH_URL ?? 'https://www.arcanakin.com.br';
 
