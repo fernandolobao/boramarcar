@@ -636,3 +636,8 @@ sem rolagem horizontal em 320px.
 - Filtros (formato, tipo de evento, o que a loja oferece) são botões com `aria-pressed`, agrupados com `role="group"` e nome.
 - "Baixar para a agenda" e "Google Agenda" repetem em cada evento: o nome acessível leva o título do evento (`sr-only`), e o do Google avisa a nova aba.
 - Rotas novas no `a11y.spec.ts`.
+
+## Lojas e eventos no app e cidade no perfil (20/11/2026)
+
+- App, Conta → "Lojas e eventos": campo de cidade com rótulo e dica; as sugestões são botões com "Cidade, UF"; "Usar minha localização" é um botão e o resultado sai em região viva; eventos e lojas são botões com nome completo (título, data, loja, distância); "Adicionar à agenda" leva o título do evento no nome e avisa que abre fora do app.
+- Site, Configurações: "Sua cidade" pelo `CityPicker`, com dica explicando que é opcional e para que serve.

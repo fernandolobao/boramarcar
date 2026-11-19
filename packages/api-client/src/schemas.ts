@@ -263,6 +263,11 @@ export const preferencesSchema = z
     timeZone: z.string(),
     locale: z.enum(['pt-BR', 'en']),
     emailNotifications: z.boolean(),
+    /** Cidade do perfil (10.3). */
+    city: z
+      .object({ code: z.string(), name: z.string(), uf: z.string(), slug: z.string() })
+      .nullable()
+      .optional(),
   })
   .loose();
 export type Preferences = z.infer<typeof preferencesSchema>;
@@ -782,3 +787,57 @@ const storeEntryResultSchema = z
   })
   .loose();
 export { storeEntryResultSchema };
+
+/** Município do IBGE (10.3). */
+export const municipalitySchema = z
+  .object({ code: z.string(), name: z.string(), uf: z.string(), slug: z.string() })
+  .loose();
+export type Municipality = z.infer<typeof municipalitySchema>;
+
+/** Lojas e eventos por perto (10.3). */
+export const discoverySchema = z
+  .object({
+    origin: z
+      .object({
+        kind: z.enum(['city', 'device']),
+        city: z.object({ name: z.string(), uf: z.string(), slug: z.string() }).optional(),
+      })
+      .loose(),
+    events: z.array(
+      z
+        .object({
+          id: z.string(),
+          title: z.string(),
+          startsAt: date,
+          format: z.string(),
+          kind: z.string(),
+          capacity: z.number().nullable(),
+          registered: z.number(),
+          waitlist: z.number(),
+          distanceKm: z.number(),
+          store: z.object({
+            name: z.string(),
+            slug: z.string(),
+            municipality: z.object({ name: z.string(), uf: z.string() }),
+          }),
+        })
+        .loose(),
+    ),
+    stores: z.array(
+      z
+        .object({
+          id: z.string(),
+          slug: z.string(),
+          name: z.string(),
+          logoUrl: z.string().nullable(),
+          verified: z.boolean(),
+          offers: z.array(z.string()),
+          distanceKm: z.number(),
+          municipality: z.object({ name: z.string(), uf: z.string(), slug: z.string() }),
+          nextEvent: z.object({ id: z.string(), title: z.string(), startsAt: date }).nullable(),
+        })
+        .loose(),
+    ),
+  })
+  .loose();
+export type Discovery = z.infer<typeof discoverySchema>;

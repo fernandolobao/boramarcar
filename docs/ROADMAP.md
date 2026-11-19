@@ -201,13 +201,13 @@ Desenho e pesquisa em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design
 
 Mesmo documento de desenho. O beta de fevereiro precisa que lojas criem torneios (10.1 e 10.2); descoberta e seguidores ficam para depois. Loja criada por um admin do ArcanaKin, com convite por e-mail; eventos e torneios com o motor da Fase 9; descoberta por cidade. Organizar e participar nunca dependem de pagamento.
 
-| #    | Item                                                                                                                     | Tamanho | Status                                                                                                   |
-| ---- | ------------------------------------------------------------------------------------------------------------------------ | ------- | -------------------------------------------------------------------------------------------------------- |
-| 10.1 | **Perfil de loja** criado por admin, convite por e-mail, equipe da loja, selo de verificada                              | M       | ✅ (19/11/2026); logo no Vercel Blob (#201)                                                              |
-| 10.2 | **Eventos da loja**: vagas, inscrição pelo app ou código no balcão, check-in, premiação em texto, acompanhamento ao vivo | G       | ✅ (19/11/2026): eventos, vagas, código, convidados, check-in, torneio ao vivo e app; 2HG em loja depois |
-| 10.3 | **Descoberta por cidade**: lojas e eventos perto de você, com "adicionar à agenda"                                       | M       | Depois do beta                                                                                           |
-| 10.4 | **Seguidores e avisos da loja** (só para quem segue)                                                                     | P       | Depois do beta                                                                                           |
-| 10.5 | **Piloto com 1–3 lojas** (o 8.9)                                                                                         | —       | Depois do beta                                                                                           |
+| #    | Item                                                                                                                     | Tamanho | Status                                                                                                        |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------- |
+| 10.1 | **Perfil de loja** criado por admin, convite por e-mail, equipe da loja, selo de verificada                              | M       | ✅ (19/11/2026); logo no Vercel Blob (#201)                                                                   |
+| 10.2 | **Eventos da loja**: vagas, inscrição pelo app ou código no balcão, check-in, premiação em texto, acompanhamento ao vivo | G       | ✅ (19/11/2026): eventos, vagas, código, convidados, check-in, torneio ao vivo e app; 2HG em loja depois      |
+| 10.3 | **Descoberta por cidade**: lojas e eventos perto de você, com "adicionar à agenda"                                       | M       | ✅ (20/11/2026): municípios do IBGE, /lojas e /lojas/em/<uf>/<cidade>, agenda, cidade no perfil e tela no app |
+| 10.4 | **Seguidores e avisos da loja** (só para quem segue)                                                                     | P       | Depois do beta                                                                                                |
+| 10.5 | **Piloto com 1–3 lojas** (o 8.9)                                                                                         | —       | Depois do beta                                                                                                |
 
 ## Transversal (contínuo)
 

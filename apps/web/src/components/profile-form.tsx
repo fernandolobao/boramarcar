@@ -8,6 +8,7 @@ import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { Select } from '@/components/ds/select';
 import { Checkbox } from '@/components/ds/checkbox';
+import { CityPicker, type CityOption } from './places/city-picker';
 
 function listTimeZones(current: string): string[] {
   const zones =
@@ -15,7 +16,14 @@ function listTimeZones(current: string): string[] {
   return zones.includes(current) ? zones : [current, ...zones];
 }
 
-export function ProfileForm({ emailNotifications = true }: { emailNotifications?: boolean }) {
+export function ProfileForm({
+  emailNotifications = true,
+  city: initialCity = null,
+}: {
+  emailNotifications?: boolean;
+  /** Cidade do perfil (10.3), usada em "Lojas e eventos". */
+  city?: CityOption | null;
+}) {
   const t = useTranslations('profile');
   const tc = useTranslations('common');
   const currentTimeZone = useTimeZone() ?? 'America/Sao_Paulo';
@@ -24,6 +32,7 @@ export function ProfileForm({ emailNotifications = true }: { emailNotifications?
   const [timeZone, setTimeZone] = useState(currentTimeZone);
   const [locale, setLocale] = useState<Locale>(currentLocale);
   const [notify, setNotify] = useState(emailNotifications);
+  const [city, setCity] = useState<CityOption | null>(initialCity);
   const browserTimeZone = useSyncExternalStore(
     () => () => {},
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -42,7 +51,12 @@ export function ProfileForm({ emailNotifications = true }: { emailNotifications?
           () =>
             api('/api/v1/me/preferences', {
               method: 'PUT',
-              body: { timeZone, locale, emailNotifications: notify },
+              body: {
+                timeZone,
+                locale,
+                emailNotifications: notify,
+                ...(city ? { municipalityCode: city.code } : {}),
+              },
             }),
           () => setSaved(true),
         );
@@ -80,6 +94,10 @@ export function ProfileForm({ emailNotifications = true }: { emailNotifications?
           onChange={(v) => setLocale(v as Locale)}
           options={LOCALES.map((l) => ({ value: String(l), label: t(`languages.${l}`) }))}
         />
+      </div>
+      <div>
+        <CityPicker id="profile-city" label={t('city')} value={city} onChange={setCity} />
+        <p className="muted mt-1">{t('cityHint')}</p>
       </div>
       <div>
         <Checkbox

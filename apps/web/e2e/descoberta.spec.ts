@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { AUTH_STATE } from './support/global-setup';
 
 /** Descoberta de lojas e eventos por cidade (10.3): pública, sem login. */
 test.describe('descoberta de lojas e eventos', () => {
@@ -65,5 +66,21 @@ test.describe('descoberta de lojas e eventos', () => {
     expect(xml).toContain('/lojas/em/rs/porto-alegre');
     expect(xml).toContain('/lojas</loc>');
     expect(xml).not.toContain('/lojas/em/rs/esteio');
+  });
+
+  test.describe('com conta', () => {
+    test.use({ storageState: AUTH_STATE });
+    test('a cidade escolhida em Configurações abre "Lojas e eventos" nela', async ({ page }) => {
+      test.skip(test.info().project.name !== 'chromium', 'muda dados da conta: só no desktop');
+      await page.goto('/configuracoes');
+      await page.getByRole('combobox', { name: 'Sua cidade' }).fill('Porto Ale');
+      await page.getByRole('option', { name: 'Porto Alegre, RS' }).click();
+      await page.getByRole('button', { name: 'Salvar' }).first().click();
+      await expect(
+        page.getByRole('status').filter({ hasText: 'Preferências salvas.' }),
+      ).toBeVisible();
+      await page.goto('/lojas');
+      await expect(page.getByRole('heading', { level: 1, name: /Porto Alegre, RS/ })).toBeVisible();
+    });
   });
 });

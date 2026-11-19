@@ -812,7 +812,9 @@
       "en": "English"
     },
     "emailNotifications": "Get email notices",
-    "emailNotificationsHint": "New game nights, changes, cancellations, reminders and when the table is full."
+    "emailNotificationsHint": "New game nights, changes, cancellations, reminders and when the table is full.",
+    "city": "Your city",
+    "cityHint": "Used in \"Stores and events\" to show what’s near you. Optional."
   },
   "email": {
     "greeting": "Hi, {name}!",

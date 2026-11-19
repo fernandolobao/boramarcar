@@ -143,7 +143,10 @@ describe('exportUserData', () => {
     await db
       .insert(notifications)
       .values({ userId: a, kind: 'podium', data: { kind: 'podium', userIds: [a] } });
+    await db.update(user).set({ municipalityCode: '4106902' }).where(eq(user.id, a));
     const data = await exportUserData(db, a);
+    // A cidade do perfil (10.3) sai na exportação.
+    expect(data.profile).toMatchObject({ city: { name: 'Curitiba', uf: 'PR' } });
     await db.insert(adminAccessLog).values({
       adminId: b,
       targetUserId: a,
@@ -239,7 +242,14 @@ describe('deleteUserAccount', () => {
     await db
       .insert(storeEventEntries)
       .values({ storeEventId: noite!.id, userId: a, status: 'registered' });
+    await db.update(user).set({ municipalityCode: '4106902' }).where(eq(user.id, a));
     const result = await deleteUserAccount(db, a, new Date('2026-11-11T12:00:00Z'));
+    // A cidade do perfil (10.3) some com a conta.
+    const [cityAfter] = await db
+      .select({ code: user.municipalityCode })
+      .from(user)
+      .where(eq(user.id, a));
+    expect(cityAfter?.code ?? null).toBeNull();
     expect(await db.select().from(notifications).where(eq(notifications.userId, a))).toEqual([]);
     // Sai das equipes de loja.
     expect(await db.select().from(storeMembers).where(eq(storeMembers.userId, a))).toEqual([]);

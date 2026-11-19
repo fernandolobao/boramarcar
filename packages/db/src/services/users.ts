@@ -2,7 +2,8 @@ import { assertTimeZone, DEFAULT_TIME_ZONE, DomainError } from '@boramarcar/core
 import { isOwnUpload } from '@boramarcar/core/images';
 import { asc, count, eq, sql } from 'drizzle-orm';
 import type { Database } from '../client';
-import { decks, gamePlayers, groupMembers, groups, user } from '../schema';
+import { decks, gamePlayers, groupMembers, groups, municipalities, user } from '../schema';
+import { getMunicipalityByCode } from './municipalities';
 
 export async function getUserPreferences(db: Database, userId: string) {
   const [row] = await db
@@ -10,8 +11,15 @@ export async function getUserPreferences(db: Database, userId: string) {
       timeZone: user.timeZone,
       locale: user.locale,
       emailNotifications: user.emailNotifications,
+      city: {
+        code: municipalities.code,
+        name: municipalities.name,
+        uf: municipalities.uf,
+        slug: municipalities.slug,
+      },
     })
     .from(user)
+    .leftJoin(municipalities, eq(municipalities.code, user.municipalityCode))
     .where(eq(user.id, userId))
     .limit(1);
   if (!row) throw new DomainError('not_found', 'Usuário não encontrado');
@@ -20,14 +28,32 @@ export async function getUserPreferences(db: Database, userId: string) {
     timeZoneIsDefault: !row.timeZone,
     locale: row.locale,
     emailNotifications: row.emailNotifications,
+    /** Cidade do perfil (10.3); `null` = não escolhida. */
+    city: row.city,
   };
 }
 
 export async function updateUserPreferences(
   db: Database,
-  input: { userId: string; timeZone?: string; locale?: string; emailNotifications?: boolean },
+  input: {
+    userId: string;
+    timeZone?: string;
+    locale?: string;
+    emailNotifications?: boolean;
+    /** Cidade do perfil (10.3); `null` tira. */
+    municipalityCode?: string | null;
+  },
 ) {
   const changes: Partial<typeof user.$inferInsert> = {};
+  if (input.municipalityCode !== undefined) {
+    if (
+      input.municipalityCode !== null &&
+      !(await getMunicipalityByCode(db, input.municipalityCode))
+    ) {
+      throw new DomainError('invalid_input', 'Cidade inválida');
+    }
+    changes.municipalityCode = input.municipalityCode;
+  }
   if (input.timeZone !== undefined) {
     assertTimeZone(input.timeZone);
     changes.timeZone = input.timeZone;

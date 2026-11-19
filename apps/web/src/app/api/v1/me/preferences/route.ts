@@ -13,10 +13,21 @@ const schema = z
     timeZone: z.string().min(1).max(64).optional(),
     locale: z.enum(LOCALES).optional(),
     emailNotifications: z.boolean().optional(),
+    /** Cidade do perfil (10.3): código IBGE, ou `null` para tirar. */
+    municipalityCode: z
+      .string()
+      .regex(/^\d{7}$/)
+      .nullable()
+      .optional(),
   })
-  .refine((v) => v.timeZone || v.locale || v.emailNotifications !== undefined, {
-    message: 'Informe timeZone, locale ou emailNotifications',
-  });
+  .refine(
+    (v) =>
+      v.timeZone ||
+      v.locale ||
+      v.emailNotifications !== undefined ||
+      v.municipalityCode !== undefined,
+    { message: 'Informe timeZone, locale, emailNotifications ou municipalityCode' },
+  );
 
 /** Salva fuso, idioma (também usados nos e-mails) e se a pessoa quer receber avisos. */
 export const PUT = authed(async ({ req, db, user }) => {

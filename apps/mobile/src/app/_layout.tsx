@@ -73,6 +73,7 @@ function RootLayout() {
         <Stack.Screen name="eventos-loja/index" options={{ title: t('storeEvTitle') }} />
         <Stack.Screen name="eventos-loja/[id]" options={{ title: t('storeEvTitle') }} />
         <Stack.Screen name="lojas/[slug]" options={{ title: t('storeEvTitle') }} />
+        <Stack.Screen name="lojas/index" options={{ title: t('discTitle') }} />
         <Stack.Screen name="configuracoes" options={{ title: t('settingsTitle') }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
