@@ -12,6 +12,7 @@ import {
   listStoresForAdmin,
   removeStoreMember,
   revokeStoreInvite,
+  setStoreLogo,
   setStoreVerified,
   updateStore,
 } from './stores';
@@ -184,5 +185,27 @@ describe('perfis de loja (10.1)', () => {
         now: new Date('2026-02-01T12:00:00Z'),
       }),
     ).rejects.toMatchObject({ code: 'conflict' });
+  });
+});
+
+describe('logo da loja', () => {
+  it('dono e equipe trocam o logo (devolve o anterior, para apagar); quem é de fora não', async () => {
+    const admin = await createTestUser(db);
+    const dono = await createTestUser(db, { email: 'logo@loja.test' });
+    const estranho = await createTestUser(db);
+    const { store, invite } = await createStore(db, {
+      name: 'Loja do Logo',
+      city: 'Natal',
+      email: 'logo@loja.test',
+      createdBy: admin.id,
+    });
+    await acceptStoreInvite(db, { token: invite.token, userId: dono.id, userEmail: dono.email });
+    const first = 'https://x.public.blob.vercel-storage.com/logos/a.webp';
+    expect(await setStoreLogo(db, { storeId: store.id, userId: dono.id, url: first })).toBeNull();
+    expect((await getStorePublic(db, { slug: store.slug }))!.logoUrl).toBe(first);
+    expect(await setStoreLogo(db, { storeId: store.id, userId: dono.id, url: null })).toBe(first);
+    await expect(
+      setStoreLogo(db, { storeId: store.id, userId: estranho.id, url: first }),
+    ).rejects.toMatchObject({ code: 'forbidden' });
   });
 });

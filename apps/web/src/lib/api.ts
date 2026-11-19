@@ -17,10 +17,18 @@ export async function api<T = unknown>(
   path: string,
   options: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown } = {},
 ): Promise<T> {
+  // Arquivo (FormData): o navegador monta o multipart e o cabeçalho com o separador.
+  const form = options.body instanceof FormData;
   const response = await fetch(path, {
     method: options.method ?? 'GET',
-    headers: options.body === undefined ? undefined : { 'Content-Type': 'application/json' },
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    headers:
+      options.body === undefined || form ? undefined : { 'Content-Type': 'application/json' },
+    body:
+      options.body === undefined
+        ? undefined
+        : form
+          ? (options.body as FormData)
+          : JSON.stringify(options.body),
     credentials: 'same-origin',
   });
   if (response.status === 204) return undefined as T;

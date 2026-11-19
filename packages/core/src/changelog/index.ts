@@ -174,6 +174,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Saiu da lista de espera de um evento de loja? O aviso chega no sino, com o link para o evento.',
     en: 'Moved off a store event’s waitlist? The notice arrives in the bell, with a link to the event.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Agora dá para escolher a sua foto do perfil, no site (Configurações) e no app (Conta). A foto é guardada sem a localização. Lojas também ganham logo, trocado em "Gerenciar a loja".',
+    en: 'You can now choose your profile photo, on the website (Settings) and in the app (Account). The photo is stored without its location. Stores get a logo too, changed under "Manage the store".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

@@ -3,7 +3,14 @@ import type { Database } from '../client';
 import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { createEvent, recordGame } from './events';
-import { getUserPreferences, getUserSummary, updateUserPreferences } from './users';
+import {
+  getUserImage,
+  getUserPreferences,
+  getUserSummary,
+  setUserImage,
+  updateUserImage,
+  updateUserPreferences,
+} from './users';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -80,5 +87,24 @@ describe('preferências do usuário', () => {
     });
     expect((await getUserSummary(db, a.id)).winRate).toBeCloseTo(2 / 3);
     await expect(getUserSummary(db, 'nope')).rejects.toMatchObject({ code: 'not_found' });
+  });
+});
+
+describe('foto do perfil enviada', () => {
+  it('troca e tira a foto, devolvendo a anterior; o login do Google não passa por cima da enviada', async () => {
+    const ana = await createTestUser(db, { name: 'Ana' });
+    await updateUserImage(db, { userId: ana.id, image: 'https://lh3.googleusercontent.com/a/1' });
+    const mine = 'https://x.public.blob.vercel-storage.com/avatars/ana.webp';
+    expect(await setUserImage(db, { userId: ana.id, image: mine })).toBe(
+      'https://lh3.googleusercontent.com/a/1',
+    );
+    // Próximo login com o Google: a foto enviada fica.
+    expect(
+      await updateUserImage(db, { userId: ana.id, image: 'https://lh3.googleusercontent.com/a/2' }),
+    ).toBe(false);
+    expect(await getUserImage(db, ana.id)).toBe(mine);
+    // Tirar a foto: volta às iniciais (e o próximo login do Google pode trazer a do Google).
+    expect(await setUserImage(db, { userId: ana.id, image: null })).toBe(mine);
+    expect(await getUserImage(db, ana.id)).toBeNull();
   });
 });

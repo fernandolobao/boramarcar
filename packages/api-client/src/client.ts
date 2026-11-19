@@ -80,7 +80,10 @@ export function createApiClient(options: ApiClientOptions) {
   ): Promise<z.infer<T>> {
     const headers: Record<string, string> = {
       Accept: 'application/json',
-      ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      // Arquivo (FormData): quem monta o multipart e o cabeçalho com o separador é o `fetch`.
+      ...(body !== undefined && !(body instanceof FormData)
+        ? { 'Content-Type': 'application/json' }
+        : {}),
       ...(await options.getHeaders?.()),
     };
     let response: Response;
@@ -92,7 +95,8 @@ export function createApiClient(options: ApiClientOptions) {
       response = await fetchFn(`${base}/api/v1${path}`, {
         method,
         headers,
-        body: body !== undefined ? JSON.stringify(body) : undefined,
+        body:
+          body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
         // O cookie vai no cabeçalho; `include` pode atrapalhar no React Native.
         credentials: 'omit',
         signal: controller.signal,
@@ -151,6 +155,12 @@ export function createApiClient(options: ApiClientOptions) {
 
   return {
     me: {
+      /** Envia a foto do perfil (FormData com o campo `file`); devolve a URL nova. */
+      setAvatar: async (form: FormData) =>
+        (await request('PUT', '/me/avatar', z.object({ image: z.string() }), form)).image,
+      /** Tira a foto do perfil (volta às iniciais). */
+      removeAvatar: async () =>
+        (await request('DELETE', '/me/avatar', z.object({ image: z.null() }))).image,
       /** Grupos que mudam de dono (ou são apagados) se a pessoa excluir a conta. */
       deletionPreview: async () =>
         (
@@ -710,6 +720,16 @@ export function createApiClient(options: ApiClientOptions) {
     },
     /** Perfis de loja (10.1). */
     stores: {
+      /** Envia o logo da loja (dono ou equipe; FormData com o campo `file`). */
+      setLogo: async (storeId: string, form: FormData) =>
+        (
+          await request(
+            'PUT',
+            `/stores/${encodeURIComponent(storeId)}/logo`,
+            z.object({ logoUrl: z.string() }),
+            form,
+          )
+        ).logoUrl,
       get: (slug: string) =>
         request(
           'GET',

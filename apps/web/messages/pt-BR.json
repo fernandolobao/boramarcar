@@ -2437,5 +2437,33 @@
     "followTournament": "Acompanhar o torneio",
     "tournamentTitle": "Torneio",
     "registrationClosed": "Inscrições encerradas: o torneio já começou."
+  },
+  "imageUpload": {
+    "hint": "JPEG, PNG ou WebP. A imagem é recortada em quadrado; a localização e outros dados do arquivo não são guardados.",
+    "error": {
+      "type": "Use uma imagem JPEG, PNG ou WebP.",
+      "size": "A imagem é grande demais (até 4 MB).",
+      "empty": "O arquivo está vazio."
+    },
+    "avatar": {
+      "title": "Foto do perfil",
+      "file": "Arquivo da foto",
+      "choose": "Escolher foto",
+      "change": "Trocar foto",
+      "remove": "Remover foto",
+      "removeConfirm": "Confirmar: remover foto",
+      "saved": "Foto atualizada.",
+      "removed": "Foto removida: agora aparecem as suas iniciais."
+    },
+    "logo": {
+      "title": "Logo da loja",
+      "file": "Arquivo do logo",
+      "choose": "Escolher logo",
+      "change": "Trocar logo",
+      "remove": "Remover logo",
+      "removeConfirm": "Confirmar: remover logo",
+      "saved": "Logo atualizado.",
+      "removed": "Logo removido."
+    }
   }
 }

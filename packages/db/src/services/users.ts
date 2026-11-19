@@ -1,4 +1,5 @@
 import { assertTimeZone, DEFAULT_TIME_ZONE, DomainError } from '@boramarcar/core';
+import { isOwnUpload } from '@boramarcar/core/images';
 import { asc, count, eq, sql } from 'drizzle-orm';
 import type { Database } from '../client';
 import { decks, gamePlayers, groupMembers, groups, user } from '../schema';
@@ -91,6 +92,8 @@ export async function getUserSummary(db: Database, userId: string) {
  */
 export async function updateUserImage(db: Database, input: { userId: string; image: string }) {
   if (!input.image.trim()) return false;
+  // Foto enviada pela pessoa vale mais que a do Google: o login não passa por cima dela.
+  if (isOwnUpload(await getUserImage(db, input.userId))) return false;
   const updated = await db
     .update(user)
     .set({ image: input.image, updatedAt: new Date() })
@@ -107,4 +110,17 @@ export async function getUserImage(db: Database, userId: string) {
     .where(eq(user.id, userId))
     .limit(1);
   return row?.image ?? null;
+}
+
+/**
+ * Foto do perfil escolhida pela pessoa (enviada pelo site ou app), ou `null` para tirar (volta às
+ * iniciais). Devolve a foto anterior, para o arquivo antigo ser apagado do armazenamento.
+ */
+export async function setUserImage(db: Database, input: { userId: string; image: string | null }) {
+  const before = await getUserImage(db, input.userId);
+  await db
+    .update(user)
+    .set({ image: input.image, updatedAt: new Date() })
+    .where(eq(user.id, input.userId));
+  return before;
 }

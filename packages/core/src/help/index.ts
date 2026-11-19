@@ -372,6 +372,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         title: 'Conta e privacidade',
         questions: [
           {
+            id: 'foto',
+            question: 'Como troco a minha foto?',
+            intro: [
+              'Em Configurações (site) ou Conta (app): "Escolher foto" ou "Trocar foto". Vale JPEG, PNG ou WebP; a foto é recortada em quadrado e guardada sem a localização e os outros dados do arquivo. "Remover foto" volta às suas iniciais. Quem entra com o Google começa com a foto do Google; depois de enviar a sua, ela fica no lugar.',
+              'A equipe de uma loja troca o logo da mesma forma, em "Gerenciar a loja".',
+            ],
+          },
+          {
             id: 'fuso-idioma',
             question: 'Como mudo fuso horário e idioma?',
             intro: [
@@ -736,6 +744,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         id: 'conta',
         title: 'Account and privacy',
         questions: [
+          {
+            id: 'foto',
+            question: 'How do I change my photo?',
+            intro: [
+              'In Settings (website) or Account (app): "Choose photo" or "Change photo". JPEG, PNG or WebP work; the photo is cropped square and stored without the location and other file data. "Remove photo" brings back your initials. If you sign in with Google you start with your Google photo; once you upload your own, it stays.',
+              'A store’s team changes its logo the same way, under "Manage the store".',
+            ],
+          },
           {
             id: 'fuso-idioma',
             question: 'How do I change time zone and language?',

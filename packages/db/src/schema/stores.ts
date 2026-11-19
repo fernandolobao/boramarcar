@@ -36,6 +36,8 @@ export const stores = pgTable('stores', {
   instagram: text('instagram'),
   whatsapp: text('whatsapp'),
   website: text('website'),
+  /** Logo enviado pela equipe (Vercel Blob, WebP quadrado). */
+  logoUrl: text('logo_url'),
   formats: jsonb('formats').$type<string[]>().notNull().default([]),
   /** Selo "loja verificada", dado por um admin. */
   verified: boolean('verified').notNull().default(false),

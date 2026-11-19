@@ -1,7 +1,8 @@
-import { accountDeletionPreview, deleteUserAccount } from '@boramarcar/db';
+import { accountDeletionPreview, deleteUserAccount, getUserImage } from '@boramarcar/db';
 import { z } from 'zod';
 import { getAuth } from '@/server/auth';
 import { authed, parseJson } from '@/server/http';
+import { deleteUploadedImage } from '@/server/uploads';
 
 /** O que muda nos grupos se a pessoa excluir a conta (para avisar antes de confirmar). */
 export const GET = authed(async ({ db, user }) => ({
@@ -23,7 +24,10 @@ export const DELETE = authed(async ({ req, db, user }) => {
   } catch {
     // Sem sessão por cookie (ex.: app com bearer): a exclusão apaga as sessões do mesmo jeito.
   }
+  const image = await getUserImage(db, user.id);
   const result = await deleteUserAccount(db, user.id);
+  // A foto enviada sai do armazenamento junto (LGPD).
+  await deleteUploadedImage(image);
   const response = Response.json({ deleted: true, ...result });
   for (const cookie of cleared?.getSetCookie() ?? []) response.headers.append('Set-Cookie', cookie);
   return response;

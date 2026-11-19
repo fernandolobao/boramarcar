@@ -579,3 +579,8 @@ sem rolagem horizontal em 320px.
 
 - Sino: "Abriu vaga em {evento}: você saiu da lista de espera e está inscrito.", com link para a página do evento (texto completo, como os outros avisos). Teste do sino cobre o texto e o link.
 - O torneio de loja aberto pelo endereço de torneio (ex.: aviso de rodada) leva direto à página do evento, onde ele é acompanhado.
+
+## Foto do perfil e logo da loja (19/11/2026)
+
+- Site (`ImageUpload`): grupo com nome ("Foto do perfil"/"Logo da loja"); a imagem é decorativa (`alt=""`, o nome está ao lado) e, sem imagem, as iniciais ficam `aria-hidden`. "Escolher/Trocar foto" é um `<button>` que abre o seletor de arquivo (o `<input type="file">` fica fora da ordem de foco, com rótulo próprio); "Remover" usa a confirmação em dois cliques. Erro de tipo/tamanho em `role="alert"` antes de enviar; "Foto atualizada" em `role="status"`. Coberto pelo axe (`a11y.test.tsx`) e pelo teste do componente.
+- App (`AvatarPicker`): seletor de imagens do sistema (já com recorte quadrado), "Remover foto" em dois toques (`ConfirmButton`), resultado em região viva; imagem e iniciais escondidas do leitor de tela.

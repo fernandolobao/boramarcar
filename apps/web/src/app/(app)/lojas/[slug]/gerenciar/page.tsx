@@ -2,6 +2,7 @@ import { getStoreForManager, listStoreEvents } from '@boramarcar/db';
 import { isDomainError } from '@boramarcar/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ImageUpload } from '@/components/image-upload';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
@@ -61,6 +62,14 @@ export default async function ManageStorePage({ params }: Props) {
         <h2 id="loja-perfil" className="section-title">
           {t('profile')}
         </h2>
+        <div className="mb-6">
+          <ImageUpload
+            kind="logo"
+            endpoint={`/api/v1/stores/${s.id}/logo`}
+            name={s.name}
+            image={s.logoUrl ?? null}
+          />
+        </div>
         <StoreProfileForm
           store={{
             id: s.id,

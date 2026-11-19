@@ -22,6 +22,7 @@
     "@internationalized/date": "3.12.4",
     "@sentry/nextjs": "11.12.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "2.9.0",
     "@vercel/speed-insights": "^2.1.0",
     "better-auth": "^1.7.18",
     "flags": "^4.4.0",
@@ -35,6 +36,7 @@
     "react-aria-components": "1.22.1",
     "react-dom": "^19.3.1",
     "server-only": "^0.0.1",
+    "sharp": "0.35.5",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -52,7 +54,6 @@
     "@vitejs/plugin-react": "^6.2.1",
     "axe-core": "^4.14.0",
     "jsdom": "^31.0.1",
-    "sharp": "0.35.5",
     "tailwindcss": "^4.3.4",
     "typescript": "~6.0.3",
     "vitest": "5.1.0"
