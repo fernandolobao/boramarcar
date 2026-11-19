@@ -28,6 +28,7 @@ import {
   pushTokens,
   session,
   user,
+  municipalities,
 } from '../schema';
 
 /** Nome exibido no histórico das partidas de quem excluiu a conta. */
@@ -48,10 +49,13 @@ export async function exportUserData(db: Database, userId: string) {
       timeZone: user.timeZone,
       locale: user.locale,
       emailNotifications: user.emailNotifications,
+      // Cidade do perfil (10.3).
+      city: { name: municipalities.name, uf: municipalities.uf },
       createdAt: user.createdAt,
       deletedAt: user.deletedAt,
     })
     .from(user)
+    .leftJoin(municipalities, eq(municipalities.code, user.municipalityCode))
     .where(eq(user.id, userId))
     .limit(1);
   if (!profile || profile.deletedAt) throw new DomainError('not_found', 'Usuário não encontrado');
@@ -367,6 +371,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
         emailVerified: false,
         image: null,
         timeZone: null,
+        municipalityCode: null,
         locale: null,
         emailNotifications: false,
         deletedAt: now,

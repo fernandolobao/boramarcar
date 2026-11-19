@@ -1,6 +1,6 @@
-import { citiesWithStores } from '@boramarcar/db';
+import { citiesWithStores, getUserPreferences } from '@boramarcar/db';
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { DiscoveryView } from '@/components/discovery/discovery-view';
@@ -9,6 +9,7 @@ import { Logo } from '@/components/logo';
 import { getDb } from '@/server/db';
 import { cityFromParam, discoveryFor } from '@/server/discovery';
 import { pageMetadata } from '@/server/seo';
+import { getSessionUser } from '@/server/session';
 
 type Props = { searchParams: Promise<{ cidade?: string }> };
 
@@ -23,7 +24,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DiscoveryPage({ searchParams }: Props) {
   const { cidade } = await searchParams;
   const db = getDb();
-  const city = await cityFromParam(db, cidade ?? (await cookies()).get(CITY_COOKIE)?.value);
+  // Ordem: a cidade do endereço, a escolhida antes (cookie) e, para quem entrou, a do perfil.
+  const fromCookie = cidade ?? (await cookies()).get(CITY_COOKIE)?.value;
+  const session = fromCookie ? null : await getSessionUser(await headers()).catch(() => null);
+  const profileCity = session
+    ? (await getUserPreferences(db, session.id).catch(() => null))?.city
+    : null;
+  const city = fromCookie
+    ? await cityFromParam(db, fromCookie)
+    : profileCity
+      ? await cityFromParam(db, `${profileCity.uf}/${profileCity.slug}`)
+      : null;
   const [t, tc] = await Promise.all([getTranslations('discovery'), getTranslations('common')]);
   const found = city ? await discoveryFor(db, city) : null;
   const cities = city ? [] : await citiesWithStores(db);

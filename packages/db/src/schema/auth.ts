@@ -1,3 +1,4 @@
+import { municipalities } from './municipalities';
 import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 /**
@@ -14,6 +15,10 @@ export const user = pgTable('user', {
   timeZone: text('time_zone'),
   /** Idioma preferido para e-mails (pt-BR | en). Nulo = padrão do app. */
   locale: text('locale'),
+  /** Cidade do perfil (10.3, descoberta de lojas e eventos); município do IBGE, opcional. */
+  municipalityCode: text('municipality_code').references(() => municipalities.code, {
+    onDelete: 'set null',
+  }),
   /** Aceita receber notificações por e-mail. */
   emailNotifications: boolean('email_notifications').notNull().default(true),
   /** Conta excluída pelo titular (LGPD): dados pessoais apagados, partidas mantidas anônimas. */

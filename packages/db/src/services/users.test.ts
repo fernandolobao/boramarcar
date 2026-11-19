@@ -28,6 +28,7 @@ describe('preferências do usuário', () => {
       timeZoneIsDefault: true,
       locale: null,
       emailNotifications: true,
+      city: null,
     });
     await updateUserPreferences(db, { userId: user.id, timeZone: 'Europe/Lisbon' });
     expect(await getUserPreferences(db, user.id)).toMatchObject({
@@ -106,5 +107,24 @@ describe('foto do perfil enviada', () => {
     // Tirar a foto: volta às iniciais (e o próximo login do Google pode trazer a do Google).
     expect(await setUserImage(db, { userId: ana.id, image: null })).toBe(mine);
     expect(await getUserImage(db, ana.id)).toBeNull();
+  });
+});
+
+describe('cidade do perfil (10.3)', () => {
+  it('guarda, mostra com nome e UF, troca e tira; cidade inexistente é recusada', async () => {
+    const ana = await createTestUser(db);
+    expect((await getUserPreferences(db, ana.id)).city).toBeNull();
+    await updateUserPreferences(db, { userId: ana.id, municipalityCode: '4106902' });
+    expect((await getUserPreferences(db, ana.id)).city).toEqual({
+      code: '4106902',
+      name: 'Curitiba',
+      uf: 'PR',
+      slug: 'curitiba',
+    });
+    await expect(
+      updateUserPreferences(db, { userId: ana.id, municipalityCode: '9999999' }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await updateUserPreferences(db, { userId: ana.id, municipalityCode: null });
+    expect((await getUserPreferences(db, ana.id)).city).toBeNull();
   });
 });

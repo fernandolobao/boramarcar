@@ -30,7 +30,7 @@ export default async function SettingsPage() {
         <ImageUpload kind="avatar" endpoint="/api/v1/me/avatar" name={user.name} image={image} />
       </section>
       <section className="card">
-        <ProfileForm emailNotifications={preferences.emailNotifications} />
+        <ProfileForm emailNotifications={preferences.emailNotifications} city={preferences.city} />
       </section>
       <section className="card">
         <ThemePicker />

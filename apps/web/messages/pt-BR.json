@@ -808,7 +808,9 @@
       "en": "English"
     },
     "emailNotifications": "Receber avisos por e-mail",
-    "emailNotificationsHint": "Novos encontros, mudanças, cancelamentos, lembretes e quando a mesa fecha."
+    "emailNotificationsHint": "Novos encontros, mudanças, cancelamentos, lembretes e quando a mesa fecha.",
+    "city": "Sua cidade",
+    "cityHint": "Usada em \"Lojas e eventos\" para mostrar o que há perto de você. Opcional."
   },
   "email": {
     "greeting": "Olá, {name}!",

@@ -149,6 +149,7 @@ describe('preferências', () => {
       timeZoneIsDefault: true,
       locale: null,
       emailNotifications: true,
+      city: null,
     });
 
     const res = await call(preferences.PUT, {
@@ -164,6 +165,7 @@ describe('preferências', () => {
       timeZoneIsDefault: false,
       locale: 'en',
       emailNotifications: true,
+      city: null,
     });
 
     const optOut = await call(preferences.PUT, {
