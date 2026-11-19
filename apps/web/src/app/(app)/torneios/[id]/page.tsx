@@ -1,8 +1,8 @@
-import { getTournament, listMembers } from '@boramarcar/db';
+import { getStoreEventPublic, getTournament, listMembers } from '@boramarcar/db';
 import { isDomainError, isGameFormat } from '@boramarcar/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { TournamentEntrants } from '@/components/tournaments/tournament-actions';
 import { TournamentLive } from '@/components/tournaments/tournament-live';
@@ -21,6 +21,11 @@ async function load(id: string) {
       throw error;
     },
   );
+  // Torneio de loja (10.2b): quem acompanha é a página do evento da loja.
+  if (view.tournament.storeEventId) {
+    const event = await getStoreEventPublic(getDb(), { eventId: view.tournament.storeEventId });
+    if (event) redirect(`/lojas/${event.store.slug}/eventos/${event.id}#torneio`);
+  }
   return { user, view };
 }
 

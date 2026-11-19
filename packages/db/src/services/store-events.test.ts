@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Database } from '../client';
 import { storeMembers } from '../schema';
 import { createTestDb, createTestUser } from '../testing';
+import { listNotifications } from './inbox';
 import {
   addGuestEntry,
   cancelStoreEntry,
@@ -9,6 +10,7 @@ import {
   createStoreEvent,
   getStoreEventForStaff,
   getStoreEventPublic,
+  listMyStoreEntries,
   listStoreEvents,
   registerByCode,
   registerForStoreEvent,
@@ -107,6 +109,15 @@ describe('eventos de loja (10.2a)', () => {
     expect(
       (await getStoreEventPublic(db, { eventId: ev.id, viewerId: caio.id }))!.myEntry,
     ).toMatchObject({ status: 'registered' });
+    // Quem saiu da fila recebe o aviso no sino, com o evento e a loja.
+    const [notice] = await listNotifications(db, { userId: caio.id });
+    expect(notice).toMatchObject({
+      kind: 'store_event',
+      data: { kind: 'store_event', storeEventId: ev.id, event: 'promoted' },
+      storeEvent: { title: 'Commander de sexta', slug: store.slug },
+    });
+    // Quem já estava inscrito não recebe nada.
+    expect(await listNotifications(db, { userId: bia.id })).toEqual([]);
   });
 
   it('convidado sem conta (pela equipe), check-in, mais vagas sobem a fila, cancelar e listar', async () => {
@@ -155,5 +166,32 @@ describe('eventos de loja (10.2a)', () => {
     await expect(registerByCode(db, { code: 'ZZZZZZ', userId: ana.id })).rejects.toMatchObject({
       code: 'not_found',
     });
+  });
+});
+
+describe('meus eventos de loja', () => {
+  it('os próximos em que a pessoa está inscrita ou na fila, com a loja; passados e cancelados não', async () => {
+    const { store, dono } = await setup();
+    const ana = await createTestUser(db, { name: 'Ana' });
+    const make = (title: string, days: number) =>
+      createStoreEvent(db, {
+        storeId: store.id,
+        userId: dono.id,
+        title,
+        startsAt: new Date(Date.now() + days * 86_400_000),
+        format: 'commander',
+        kind: 'casual',
+      });
+    const [cedo, tarde, cancelado] = [
+      await make('Cedo', 2),
+      await make('Tarde', 9),
+      await make('Cancelado', 4),
+    ];
+    for (const ev of [tarde, cedo, cancelado])
+      await registerForStoreEvent(db, { eventId: ev.id, userId: ana.id });
+    await cancelStoreEvent(db, { eventId: cancelado.id, userId: dono.id });
+    const mine = await listMyStoreEntries(db, { userId: ana.id });
+    expect(mine.map((m) => m.event.title)).toEqual(['Cedo', 'Tarde']);
+    expect(mine[0]).toMatchObject({ status: 'registered', store: { slug: store.slug } });
   });
 });

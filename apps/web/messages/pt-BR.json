@@ -2118,7 +2118,8 @@
     "monthly": "A retrospectiva de {month} de {group} está pronta.",
     "tournamentRound": "{name}: rodada {round} começou. Sua mesa é a {table}.",
     "tournamentBye": "{name}: rodada {round} começou. Você está de bye (vale vitória).",
-    "tournamentFinished": "{name} terminou. Veja a classificação final."
+    "tournamentFinished": "{name} terminou. Veja a classificação final.",
+    "storePromoted": "Abriu vaga em {title}: você saiu da lista de espera e está inscrito."
   },
   "records": {
     "title": "Recordes do grupo",

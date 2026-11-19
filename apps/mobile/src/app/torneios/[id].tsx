@@ -123,7 +123,9 @@ export default function TournamentScreen() {
   const me = session?.user.id ?? '';
   const view = useAsync(() => api.tournaments.get(id), [id]);
   const members = useAsync(
-    async () => (view.data ? api.groups.members(view.data.tournament.groupId) : []),
+    // Torneio de loja (sem grupo): a inscrição é pelo evento, então não há membros para escolher.
+    async () =>
+      view.data?.tournament.groupId ? api.groups.members(view.data.tournament.groupId) : [],
     [view.data?.tournament.groupId],
   );
   useRefreshOnFocus(view.refresh);
@@ -295,14 +297,14 @@ export default function TournamentScreen() {
                   {table.reported ? `${t('tourResult')}: ${resultText(table)}` : t('tourWaiting')}
                 </AppText>
                 {/* Modo mesa (pod ou melhor de 1): jogadores já na mesa; o resultado volta para cá. */}
-                {canReport && tableModeEligible(tour, table) && (
+                {canReport && tour.eventId && tableModeEligible(tour, table) && (
                   <Button
                     label={t('tourOpenInTable')}
                     accessibilityLabel={`${t('tourOpenInTable')} (${t('tourTable', { number: table.number })})`}
                     onPress={() =>
                       router.push({
                         pathname: '/mesa/[id]',
-                        params: { id: tour.eventId, torneio: tour.id, mesa: table.id },
+                        params: { id: tour.eventId!, torneio: tour.id, mesa: table.id },
                       })
                     }
                   />

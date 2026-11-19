@@ -570,6 +570,101 @@ describe('cliente da API', () => {
     );
   });
 
+  it('torneio de loja: sem grupo nem encontro, com convidado', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      json({
+        tournament: {
+          id: 't2',
+          groupId: null,
+          eventId: null,
+          storeEventId: 'se1',
+          name: 'Copa da loja',
+          format: 'modern',
+          table: 'pair',
+          entrantSize: 1,
+          bestOf: 3,
+          rounds: 3,
+          status: 'running',
+          countsInRanking: false,
+          createdAt: '2026-11-19T10:00:00.000Z',
+        },
+        event: { title: 'Copa da loja', startsAt: '2026-11-27T22:00:00.000Z' },
+        canManage: false,
+        myEntrantId: null,
+        entrants: [{ id: 'x2', name: 'Zé', memberIds: [], guest: true }],
+        rounds: [],
+        standings: [],
+        timeline: [],
+      }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const got = await api.tournaments.get('t2');
+    expect(got.tournament.groupId).toBeNull();
+    expect(got.tournament.storeEventId).toBe('se1');
+  });
+
+  it('lojas: perfil, evento (com a minha inscrição), código e os meus eventos', async () => {
+    const event = {
+      id: 'se1',
+      storeId: 's1',
+      title: 'Commander de sexta',
+      startsAt: '2026-11-27T22:00:00.000Z',
+      endsAt: null,
+      format: 'commander',
+      kind: 'tournament',
+      capacity: 8,
+      prizes: null,
+      rules: null,
+      status: 'scheduled',
+      createdAt: '2026-11-19T10:00:00.000Z',
+      store: { name: 'Loja do Mago', slug: 'loja-do-mago' },
+      registered: 3,
+      waitlist: 0,
+      myEntry: { id: 'en1', status: 'registered' },
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ event, tournamentId: null }))
+      .mockResolvedValueOnce(
+        json({ entry: { id: 'en2', eventId: 'se1', slug: 'loja-do-mago', status: 'waitlist' } }),
+      )
+      .mockResolvedValueOnce(
+        json({
+          entries: [
+            {
+              entryId: 'en1',
+              status: 'registered',
+              event: {
+                id: 'se1',
+                title: 'X',
+                startsAt: '2026-11-27T22:00:00.000Z',
+                format: 'commander',
+                kind: 'casual',
+              },
+              store: { name: 'Loja do Mago', slug: 'loja-do-mago' },
+            },
+          ],
+        }),
+      );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const got = await api.storeEvents.get('se1');
+    expect(got.event.startsAt).toBeInstanceOf(Date);
+    expect(got.event.myEntry).toEqual({ id: 'en1', status: 'registered' });
+    const entry = await api.storeEvents.byCode('abc123');
+    expect(entry).toMatchObject({ status: 'waitlist', slug: 'loja-do-mago' });
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/store-events/by-code',
+    );
+    const mine = await api.storeEvents.mine();
+    expect(mine[0]!.event.startsAt).toBeInstanceOf(Date);
+  });
+
   it('recordes do grupo: datas convertidas e recordes vazios aceitos', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(
       json({

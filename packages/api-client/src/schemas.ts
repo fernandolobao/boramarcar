@@ -562,6 +562,8 @@ export const notificationSchema = z
     announcement: z.object({ title: z.string(), body: z.string() }).nullable().optional(),
     /** Nome do torneio, nos avisos de torneio. */
     tournamentName: z.string().nullable().optional(),
+    /** Evento de loja, nos avisos de evento de loja. */
+    storeEvent: z.object({ title: z.string(), slug: z.string() }).nullable().optional(),
   })
   .loose();
 export type NotificationItem = z.infer<typeof notificationSchema>;
@@ -621,8 +623,10 @@ export const tournamentViewSchema = z
     tournament: z
       .object({
         id: z.string(),
-        groupId: z.string(),
-        eventId: z.string(),
+        /** `null` no torneio de loja (10.2b), que pertence a um evento da loja. */
+        groupId: z.string().nullable(),
+        eventId: z.string().nullable(),
+        storeEventId: z.string().nullable().optional(),
         name: z.string(),
         format: z.string(),
         table: z.enum(['pod', 'pair']),
@@ -684,3 +688,82 @@ export const tournamentViewSchema = z
   })
   .loose();
 export type TournamentView = z.infer<typeof tournamentViewSchema>;
+
+/** Perfil público de loja (10.1), sem o e-mail de contato. */
+export const storePublicSchema = z
+  .object({
+    id: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    city: z.string(),
+    about: z.string().nullable(),
+    address: z.string().nullable(),
+    lat: z.number().nullable(),
+    lng: z.number().nullable(),
+    hours: z.string().nullable(),
+    instagram: z.string().nullable(),
+    whatsapp: z.string().nullable(),
+    website: z.string().nullable(),
+    formats: z.array(z.string()),
+    verified: z.boolean(),
+  })
+  .loose();
+export type StorePublic = z.infer<typeof storePublicSchema>;
+
+export const storeEventSummarySchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    startsAt: date,
+    format: z.string(),
+    kind: z.string(),
+    capacity: z.number().nullable(),
+    status: z.string(),
+  })
+  .loose();
+
+/** Evento de loja (10.2) para quem vê: vagas, premiação, regras e a própria inscrição. */
+export const storeEventSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    startsAt: date,
+    format: z.string(),
+    kind: z.string(),
+    capacity: z.number().nullable(),
+    prizes: z.string().nullable(),
+    rules: z.string().nullable(),
+    status: z.string(),
+    store: z.object({ name: z.string(), slug: z.string() }),
+    registered: z.number(),
+    waitlist: z.number(),
+    myEntry: z.object({ id: z.string(), status: z.enum(['registered', 'waitlist']) }).nullable(),
+  })
+  .loose();
+export type StoreEvent = z.infer<typeof storeEventSchema>;
+
+export const myStoreEntrySchema = z
+  .object({
+    entryId: z.string(),
+    status: z.enum(['registered', 'waitlist']),
+    event: z.object({
+      id: z.string(),
+      title: z.string(),
+      startsAt: date,
+      format: z.string(),
+      kind: z.string(),
+    }),
+    store: z.object({ name: z.string(), slug: z.string() }),
+  })
+  .loose();
+export type MyStoreEntry = z.infer<typeof myStoreEntrySchema>;
+
+const storeEntryResultSchema = z
+  .object({
+    id: z.string(),
+    eventId: z.string(),
+    slug: z.string(),
+    status: z.enum(['registered', 'waitlist']),
+  })
+  .loose();
+export { storeEntryResultSchema };

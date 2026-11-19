@@ -2,6 +2,11 @@ import { z } from 'zod';
 import {
   groupRecordsSchema,
   tournamentSummarySchema,
+  storePublicSchema,
+  storeEventSummarySchema,
+  storeEventSchema,
+  myStoreEntrySchema,
+  storeEntryResultSchema,
   tournamentViewSchema,
   notificationSchema,
   achievementSchema,
@@ -702,6 +707,51 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ player: playerProfileSchema }),
           )
         ).player,
+    },
+    /** Perfis de loja (10.1). */
+    stores: {
+      get: (slug: string) =>
+        request(
+          'GET',
+          `/stores/by-slug/${encodeURIComponent(slug)}`,
+          z.object({ store: storePublicSchema, upcoming: z.array(storeEventSummarySchema) }),
+        ),
+    },
+    /** Eventos de loja (10.2): ver, inscrever-se, desistir, código do balcão e os meus. */
+    storeEvents: {
+      get: (id: string) =>
+        request(
+          'GET',
+          `/store-events/${encodeURIComponent(id)}`,
+          z.object({ event: storeEventSchema, tournamentId: z.string().nullable() }),
+        ),
+      register: async (id: string) =>
+        (
+          await request(
+            'POST',
+            `/store-events/${encodeURIComponent(id)}/entries`,
+            z.object({ entry: storeEntryResultSchema }),
+          )
+        ).entry,
+      leave: (entryId: string) =>
+        request('DELETE', `/store-entries/${encodeURIComponent(entryId)}`, z.unknown()),
+      byCode: async (code: string) =>
+        (
+          await request(
+            'POST',
+            '/store-events/by-code',
+            z.object({ entry: storeEntryResultSchema }),
+            { code },
+          )
+        ).entry,
+      mine: async () =>
+        (
+          await request(
+            'GET',
+            '/me/store-events',
+            z.object({ entries: z.array(myStoreEntrySchema) }),
+          )
+        ).entries,
     },
     /** Torneios do grupo (9.1), em qualquer formato. */
     tournaments: {
