@@ -21,6 +21,7 @@ import {
   user,
 } from '../schema';
 import { recordGame } from './events';
+import { addNotifications } from './inbox';
 import { requireMembership } from './groups';
 
 /**
@@ -216,6 +217,37 @@ async function playedRounds(db: Database, tournamentId: string): Promise<PlayedR
   }));
 }
 
+/** Avisa no sino cada pessoa inscrita: a mesa dela na rodada (ou o bye), ou o encerramento. */
+async function notifyEntrants(
+  db: Database,
+  row: TournamentRow,
+  event: 'round' | 'finished',
+  round: number,
+  tableOf: Map<string, number | null> = new Map(),
+) {
+  const members = await db
+    .select({
+      entrantId: tournamentEntrantMembers.entrantId,
+      userId: tournamentEntrantMembers.userId,
+    })
+    .from(tournamentEntrantMembers)
+    .where(eq(tournamentEntrantMembers.tournamentId, row.id));
+  await addNotifications(
+    db,
+    members.map((m) => ({
+      userId: m.userId,
+      groupId: row.groupId,
+      data: {
+        kind: 'tournament' as const,
+        tournamentId: row.id,
+        event,
+        round,
+        table: tableOf.get(m.entrantId) ?? null,
+      },
+    })),
+  );
+}
+
 async function createRound(
   db: Database,
   row: TournamentRow,
@@ -242,6 +274,11 @@ async function createRound(
     );
   });
   await log(db, row.id, 'round_started', { round: number, tables: tables.length });
+  const tableOf = new Map<string, number | null>();
+  tables.forEach((entrantIds, i) => {
+    for (const e of entrantIds) tableOf.set(e, entrantIds.length === 1 ? null : i + 1);
+  });
+  await notifyEntrants(db, row, 'round', number, tableOf);
 }
 
 /** Fecha a inscrição e sorteia a 1ª rodada (quem organiza; 2 inscrições ou mais). */
@@ -436,6 +473,7 @@ export async function nextRound(
     await log(db, row.id, 'finished', {
       champions: table.filter((s) => s.rank === 1).map((s) => s.entrant),
     });
+    await notifyEntrants(db, row, 'finished', current!.number);
     return { finished: true as const };
   }
   await createRound(db, row, current!.number + 1, input.random);

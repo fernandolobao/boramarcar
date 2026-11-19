@@ -5,6 +5,7 @@ import { gamePlayers, games } from '../schema';
 import { createTestDb, createTestUser } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { createEvent } from './events';
+import { listNotifications } from './inbox';
 import {
   addEntrant,
   createTournament,
@@ -289,5 +290,44 @@ describe('acesso e ciclo de vida', () => {
     expect(await listTournaments(db, { groupId: other.group.id, userId: other.owner.id })).toEqual(
       [],
     );
+  });
+});
+
+describe('avisos do torneio no sino', () => {
+  it('a cada rodada, cada pessoa recebe a sua mesa (ou o bye); no fim, o encerramento', async () => {
+    const { players, owner, tournament } = await setup(3, 'pauper', { rounds: 1, bestOf: 1 });
+    for (const p of players)
+      await addEntrant(db, { tournamentId: tournament.id, userId: owner.id, memberIds: [p.id] });
+    await startTournament(db, { tournamentId: tournament.id, userId: owner.id, random: fixed() });
+    const view = await getTournament(db, { tournamentId: tournament.id, userId: owner.id });
+    const tables = view.rounds[0]!.tables;
+    for (const p of players) {
+      const entrant = view.entrants.find((e) => e.memberIds.includes(p.id))!;
+      const table = tables.find((t) => t.entrants.includes(entrant.id))!;
+      const inbox = await listNotifications(db, { userId: p.id });
+      expect(inbox).toEqual([
+        expect.objectContaining({
+          kind: 'tournament',
+          tournamentName: 'Torneio de novembro',
+          data: {
+            kind: 'tournament',
+            tournamentId: tournament.id,
+            event: 'round',
+            round: 1,
+            table: table.entrants.length === 1 ? null : table.number,
+          },
+        }),
+      ]);
+    }
+    const match = tables.find((t) => t.entrants.length === 2)!;
+    await reportTable(db, {
+      tableId: match.id,
+      userId: owner.id,
+      gameWins: { [match.entrants[0]!]: 1 },
+      gameDraws: 0,
+    });
+    await nextRound(db, { tournamentId: tournament.id, userId: owner.id });
+    const last = (await listNotifications(db, { userId: players[1]!.id }))[0]!;
+    expect(last.data).toMatchObject({ kind: 'tournament', event: 'finished' });
   });
 });

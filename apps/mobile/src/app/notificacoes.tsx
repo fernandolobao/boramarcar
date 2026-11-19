@@ -35,6 +35,13 @@ function notificationText(item: NotificationItem) {
     }
     case 'nudge':
       return t('notifNudge', { event, group: item.groupName ?? '' });
+    case 'tournament': {
+      const name = item.tournamentName ?? '';
+      if (d.event === 'finished') return t('notifTournamentFinished', { name });
+      return d.table === null || d.table === undefined
+        ? t('notifTournamentBye', { name, round: Number(d.round) })
+        : t('notifTournamentRound', { name, round: Number(d.round), table: Number(d.table) });
+    }
     case 'monthly':
       return t('notifMonthly', {
         group: item.groupName ?? '',
@@ -66,6 +73,8 @@ function open(item: NotificationItem) {
     router.push({ pathname: '/encontros/[id]', params: { id: d.eventId } });
   } else if (item.kind === 'podium') {
     router.push('/ranking');
+  } else if (item.kind === 'tournament' && typeof d.tournamentId === 'string') {
+    router.push({ pathname: '/torneios/[id]', params: { id: d.tournamentId } });
   } else if (
     item.kind === 'monthly' &&
     typeof d.groupId === 'string' &&

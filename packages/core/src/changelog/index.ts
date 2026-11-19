@@ -134,6 +134,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Chegaram os torneios do grupo, em qualquer formato: pods no Commander, partidas um contra um em melhor de 3 e duplas no 2HG, com rodadas, mesas, classificação com desempates oficiais e linha do tempo.',
     en: 'Group tournaments are here, in any format: Commander pods, best-of-3 one-on-one matches and Two-Headed Giant duos, with rounds, tables, standings with official tiebreakers and a timeline.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Torneios também no app, e um aviso no sino a cada rodada com a sua mesa (ou o bye) e quando o torneio termina.',
+    en: 'Tournaments in the app too, plus a bell notice every round with your table (or bye) and when the tournament ends.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

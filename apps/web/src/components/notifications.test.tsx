@@ -31,6 +31,7 @@ const base = {
   eventTitle: 'Noite',
   people: { b: 'Bia', c: 'Caio' },
   announcement: null,
+  tournamentName: null,
 };
 const items: InboxEntry[] = [
   {
@@ -75,6 +76,24 @@ const items: InboxEntry[] = [
     announcement: { title: 'Manutenção no sábado', body: 'Das 8h às 8h10.\nVolta logo!' },
     data: { kind: 'announcement', announcementId: 'a1' },
   },
+  {
+    ...base,
+    id: '5',
+    kind: 'tournament',
+    createdAt: '2026-11-14T12:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    tournamentName: 'Copa de Modern',
+    data: { kind: 'tournament', tournamentId: 't1', event: 'round', round: 2, table: 3 },
+  },
+  {
+    ...base,
+    id: '6',
+    kind: 'tournament',
+    createdAt: '2026-11-14T11:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    tournamentName: 'Copa de Modern',
+    data: { kind: 'tournament', tournamentId: 't1', event: 'round', round: 1, table: null },
+  },
 ];
 
 describe('NotificationList', () => {
@@ -96,6 +115,13 @@ describe('NotificationList', () => {
         name: /Mesa de Quinta chamou você para o próximo encontro: Noite\./,
       }),
     ).toHaveAttribute('href', '/eventos/e9');
+    // Torneio: a mesa da pessoa (ou o bye), com link para o torneio.
+    expect(
+      screen.getByRole('link', { name: /Copa de Modern: rodada 2 começou\. Sua mesa é a 3\./ }),
+    ).toHaveAttribute('href', '/torneios/t1');
+    expect(
+      screen.getByText('Copa de Modern: rodada 1 começou. Você está de bye (vale vitória).'),
+    ).toBeInTheDocument();
     // Aviso do ArcanaKin: título e texto, sem link.
     expect(screen.getByText('Manutenção no sábado')).toBeInTheDocument();
     expect(screen.getByText(/Das 8h às 8h10\./)).toBeInTheDocument();
@@ -128,7 +154,7 @@ describe('NotificationList', () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
     vi.stubGlobal('fetch', fetchMock);
     wrap(<NotificationList items={items.map((i) => ({ ...i, readAt: null }))} />);
-    expect(screen.getAllByText('Nova')).toHaveLength(5);
+    expect(screen.getAllByText('Nova')).toHaveLength(items.length);
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Marcar todas como lidas' }));
     });

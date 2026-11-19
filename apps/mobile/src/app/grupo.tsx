@@ -202,6 +202,13 @@ export default function GroupScreen() {
         onPress={() => router.push('/recordes')}
         style={{ alignSelf: 'flex-start' }}
       />
+      {/* Torneios do grupo (9.1). */}
+      <Button
+        label={t('tourLink')}
+        variant="secondary"
+        onPress={() => router.push('/torneios')}
+        style={{ alignSelf: 'flex-start' }}
+      />
       {/* Retrospectiva do mês que passou (página do site, a mesma que se compartilha). */}
       <Button
         label={t('monthlyLink', { month: formatMonthYear(new Date(`${recapMonth}-15T12:00:00Z`)) })}

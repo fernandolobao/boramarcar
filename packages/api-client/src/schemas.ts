@@ -560,6 +560,8 @@ export const notificationSchema = z
     people: z.record(z.string(), z.string()),
     /** Título e texto, nos avisos do ArcanaKin. */
     announcement: z.object({ title: z.string(), body: z.string() }).nullable().optional(),
+    /** Nome do torneio, nos avisos de torneio. */
+    tournamentName: z.string().nullable().optional(),
   })
   .loose();
 export type NotificationItem = z.infer<typeof notificationSchema>;
@@ -598,3 +600,87 @@ export const groupRecordsSchema = z
   })
   .loose();
 export type GroupRecordsView = z.infer<typeof groupRecordsSchema>;
+
+/** Torneio do grupo (9.1), na lista. */
+export const tournamentSummarySchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    format: z.string(),
+    status: z.string(),
+    eventId: z.string(),
+    createdAt: date,
+    entrants: z.number(),
+  })
+  .loose();
+export type TournamentSummary = z.infer<typeof tournamentSummarySchema>;
+
+/** Página do torneio: inscrições, rodadas e mesas, classificação e linha do tempo. */
+export const tournamentViewSchema = z
+  .object({
+    tournament: z
+      .object({
+        id: z.string(),
+        groupId: z.string(),
+        eventId: z.string(),
+        name: z.string(),
+        format: z.string(),
+        table: z.enum(['pod', 'pair']),
+        entrantSize: z.number(),
+        bestOf: z.number(),
+        rounds: z.number().nullable(),
+        status: z.string(),
+        countsInRanking: z.boolean(),
+        createdAt: date,
+      })
+      .loose(),
+    event: z.object({ title: z.string(), startsAt: date }).loose().nullable(),
+    canManage: z.boolean(),
+    myEntrantId: z.string().nullable(),
+    entrants: z.array(
+      z.object({ id: z.string(), name: z.string(), memberIds: z.array(z.string()) }).loose(),
+    ),
+    rounds: z.array(
+      z
+        .object({
+          id: z.string(),
+          number: z.number(),
+          tables: z.array(
+            z
+              .object({
+                id: z.string(),
+                number: z.number(),
+                entrants: z.array(z.string()),
+                gameWins: z.record(z.string(), z.number()),
+                gameDraws: z.number(),
+                reported: z.boolean(),
+              })
+              .loose(),
+          ),
+        })
+        .loose(),
+    ),
+    standings: z.array(
+      z
+        .object({
+          entrant: z.string(),
+          points: z.number(),
+          wins: z.number(),
+          draws: z.number(),
+          losses: z.number(),
+          byes: z.number(),
+          omw: z.number(),
+          gw: z.number(),
+          ogw: z.number(),
+          rank: z.number(),
+        })
+        .loose(),
+    ),
+    timeline: z.array(
+      z
+        .object({ kind: z.string(), data: z.record(z.string(), z.unknown()), createdAt: date })
+        .loose(),
+    ),
+  })
+  .loose();
+export type TournamentView = z.infer<typeof tournamentViewSchema>;
