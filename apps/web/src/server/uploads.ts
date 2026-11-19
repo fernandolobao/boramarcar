@@ -22,7 +22,9 @@ export async function saveUploadedImage(
   // Na Vercel, o projeto ligado ao store entra por OIDC (`BLOB_STORE_ID` + credencial do deploy);
   // fora dela (ou em stores antigos), pelo token permanente.
   if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN) {
-    throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento');
+    throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento', {
+      reason: 'storage',
+    });
   }
   const image = await processUploadedImage(Buffer.from(await file.arrayBuffer()));
   try {
@@ -39,7 +41,11 @@ export async function saveUploadedImage(
     const { name, message } =
       error instanceof Error ? error : { name: 'Error', message: String(error) };
     console.error(`[uploads] o Blob recusou a imagem: ${name}: ${message}`);
-    throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento');
+    // O nome do erro (ex.: `BlobAccessError`) vai na resposta: ajuda a diagnosticar e não é segredo.
+    throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento', {
+      reason: 'storage',
+      cause: name,
+    });
   }
 }
 

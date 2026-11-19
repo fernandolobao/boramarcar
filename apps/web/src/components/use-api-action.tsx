@@ -21,7 +21,10 @@ const KNOWN = [
  * roda (inclusive a espera pelo servidor), `pending` fica verdadeiro, o botão que a disparou
  * mostra um indicador de carregamento (`aria-busy`) e a barra do topo aparece.
  */
-export function useApiAction() {
+export function useApiAction(
+  /** Mensagens próprias da tela para alguns códigos de erro (ex.: `upstream_error`). */
+  overrides: Partial<Record<(typeof KNOWN)[number], string>> = {},
+) {
   const t = useTranslations('errors');
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -53,9 +56,11 @@ export function useApiAction() {
         : 'internal_error';
       // Mensagens específicas do servidor (pt-BR) são mais úteis para erros de validação de domínio.
       setError(
-        e instanceof ApiError && known === 'invalid_input' && e.message !== 'Dados inválidos'
-          ? e.message
-          : t(known),
+        known !== 'internal_error' && overrides[known]
+          ? overrides[known]
+          : e instanceof ApiError && known === 'invalid_input' && e.message !== 'Dados inválidos'
+            ? e.message
+            : t(known),
       );
       return undefined;
     } finally {

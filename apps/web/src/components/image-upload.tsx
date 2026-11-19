@@ -26,7 +26,7 @@ export function ImageUpload({
   image: string | null;
 }) {
   const t = useTranslations('imageUpload');
-  const { run, error, pending } = useApiAction();
+  const { run, error, pending } = useApiAction({ upstream_error: t('error.unavailable') });
   const input = useRef<HTMLInputElement>(null);
   const titleId = useId();
   const [problem, setProblem] = useState<string | null>(null);

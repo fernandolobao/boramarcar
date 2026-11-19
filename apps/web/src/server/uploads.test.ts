@@ -73,7 +73,10 @@ describe('envio de imagens para o armazenamento', () => {
     );
     await expect(
       saveUploadedImage(await photo(), { folder: 'avatars', ownerId: 'u1' }),
-    ).rejects.toMatchObject({ code: 'upstream_error' });
+    ).rejects.toMatchObject({
+      code: 'upstream_error',
+      details: { reason: 'storage', cause: 'BlobAccessError' },
+    });
     expect(String(warn.mock.calls[0]?.join(' '))).toContain('private store');
     warn.mockRestore();
   });

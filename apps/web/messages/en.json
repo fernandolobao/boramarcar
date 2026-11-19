@@ -2443,7 +2443,8 @@
     "error": {
       "type": "Use a JPEG, PNG or WebP image.",
       "size": "The image is too large (up to 4 MB).",
-      "empty": "The file is empty."
+      "empty": "The file is empty.",
+      "unavailable": "The image couldn’t be saved right now. Try again in a few minutes."
     },
     "avatar": {
       "title": "Profile photo",

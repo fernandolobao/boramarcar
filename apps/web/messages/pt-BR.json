@@ -2443,7 +2443,8 @@
     "error": {
       "type": "Use uma imagem JPEG, PNG ou WebP.",
       "size": "A imagem é grande demais (até 4 MB).",
-      "empty": "O arquivo está vazio."
+      "empty": "O arquivo está vazio.",
+      "unavailable": "Não foi possível guardar a imagem agora. Tente de novo em alguns minutos."
     },
     "avatar": {
       "title": "Foto do perfil",

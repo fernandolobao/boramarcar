@@ -58,6 +58,25 @@ describe('envio de foto e logo', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Foto atualizada');
   });
 
+  it('armazenamento indisponível: mensagem própria da foto', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            error: { code: 'upstream_error', message: 'x', details: { reason: 'storage' } },
+          }),
+          { status: 502 },
+        ),
+      ),
+    );
+    renderIt();
+    pick(new File(['x'], 'a.png', { type: 'image/png' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Não foi possível guardar a imagem agora. Tente de novo em alguns minutos.',
+    );
+  });
+
   it('com foto: trocar e remover (remover pede confirmação)', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ image: null })));
     vi.stubGlobal('fetch', fetchMock);
