@@ -600,3 +600,7 @@ sem rolagem horizontal em 320px.
 - Rodadas do top com título próprio ("Top 8 · Semifinal"), mantendo a hierarquia de títulos; a classificação vira "Classificação do suíço".
 - Campeão em destaque com texto completo ("Campeão: …") em região de status, com o ícone decorativo; no app, região viva.
 - O botão de quem organiza diz o que vai acontecer ("Começar o top 8", "Próxima fase do top", "Encerrar o torneio").
+
+## Conquistas de torneio (19/11/2026)
+
+- Três conquistas novas (estreia em torneio, top cut e campeão de torneio) usam os mesmos componentes das outras: nome e descrição em texto, ícone decorativo do mapa `Icons` (`events`, `ranking`, `champion`) e progresso em texto. Nada novo de interface.

@@ -15,6 +15,11 @@ import {
   groupMembers,
   groups,
   seasons,
+  tournamentEntrantMembers,
+  tournamentEvents,
+  tournamentRounds,
+  tournamentTables,
+  tournaments,
   user,
 } from '../schema';
 import { listDecksVisibleTo, sharesGroup } from './decks';
@@ -78,19 +83,72 @@ async function listPlayerGames(
 }
 
 /**
+ * Torneios encerrados de que a pessoa participou (de grupo ou de loja): quando acabaram, se ela
+ * chegou ao top cut e se foi campeã (está entre os campeões registrados no encerramento).
+ */
+async function listTournamentResults(db: Database, userId: string) {
+  const mine = await db
+    .select({
+      tournamentId: tournamentEntrantMembers.tournamentId,
+      entrantId: tournamentEntrantMembers.entrantId,
+    })
+    .from(tournamentEntrantMembers)
+    .innerJoin(tournaments, eq(tournaments.id, tournamentEntrantMembers.tournamentId))
+    .where(and(eq(tournamentEntrantMembers.userId, userId), eq(tournaments.status, 'finished')));
+  if (!mine.length) return [];
+  const ids = mine.map((m) => m.tournamentId);
+  const [finished, topTables] = await Promise.all([
+    db
+      .select({
+        tournamentId: tournamentEvents.tournamentId,
+        data: tournamentEvents.data,
+        createdAt: tournamentEvents.createdAt,
+      })
+      .from(tournamentEvents)
+      .where(
+        and(inArray(tournamentEvents.tournamentId, ids), eq(tournamentEvents.kind, 'finished')),
+      ),
+    db
+      .select({
+        tournamentId: tournamentTables.tournamentId,
+        entrantIds: tournamentTables.entrantIds,
+      })
+      .from(tournamentTables)
+      .innerJoin(tournamentRounds, eq(tournamentRounds.id, tournamentTables.roundId))
+      .where(and(inArray(tournamentTables.tournamentId, ids), eq(tournamentRounds.stage, 'top'))),
+  ]);
+  return mine.flatMap((m) => {
+    const done = finished.filter((f) => f.tournamentId === m.tournamentId).at(-1);
+    if (!done) return [];
+    const champions = Array.isArray(done.data.champions) ? done.data.champions.map(String) : [];
+    return [
+      {
+        finishedAt: done.createdAt,
+        // Campeão único (com top cut, quem venceu a final; sem top, o 1º sem empate).
+        champion: champions.length === 1 && champions[0] === m.entrantId,
+        topCut: topTables.some(
+          (t) => t.tournamentId === m.tournamentId && t.entrantIds.includes(m.entrantId),
+        ),
+      },
+    ];
+  });
+}
+
+/**
  * O que as conquistas precisam além das partidas: membros atuais dos grupos do jogador, os
  * encontros desses grupos que tiveram partida (para "4 encontros seguidos") e o fuso dele.
  */
 async function achievementContext(db: Database, userId: string): Promise<AchievementContext> {
-  const [mine, [person]] = await Promise.all([
+  const [mine, [person], cups] = await Promise.all([
     db
       .select({ groupId: groupMembers.groupId })
       .from(groupMembers)
       .where(eq(groupMembers.userId, userId)),
     db.select({ timeZone: user.timeZone }).from(user).where(eq(user.id, userId)).limit(1),
+    listTournamentResults(db, userId),
   ]);
   const groupIds = mine.map((m) => m.groupId);
-  if (!groupIds.length) return { timeZone: person?.timeZone ?? undefined };
+  if (!groupIds.length) return { timeZone: person?.timeZone ?? undefined, tournaments: cups };
   const [members, held] = await Promise.all([
     db
       .select({
@@ -115,6 +173,7 @@ async function achievementContext(db: Database, userId: string): Promise<Achieve
     memberSince,
     groupEvents: held,
     timeZone: person?.timeZone ?? undefined,
+    tournaments: cups,
   };
 }
 

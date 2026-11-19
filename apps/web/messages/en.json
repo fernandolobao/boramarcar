@@ -1074,6 +1074,18 @@
       "enturmado": {
         "name": "One of the gang",
         "description": "Play at least one game with each person in your group (groups of 4 or more)."
+      },
+      "tournament_first": {
+        "name": "Tournament debut",
+        "description": "Play a tournament to the end."
+      },
+      "tournament_top": {
+        "name": "Made the cut",
+        "description": "Reach the top cut of a tournament."
+      },
+      "tournament_champion": {
+        "name": "Tournament champion",
+        "description": "Win a tournament."
       }
     },
     "tabsLabel": "Achievements",

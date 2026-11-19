@@ -3,6 +3,7 @@ import type { Database } from '../client';
 import { createTestDb } from '../testing';
 import { seedGroup } from '../test/helpers';
 import { createEvent } from './events';
+import { getUserAchievements } from './profiles';
 import {
   addEntrant,
   createTournament,
@@ -173,5 +174,33 @@ describe('top cut', () => {
     // Sem top, o 1º lugar pode ser dividido: aí não há um campeão único.
     const leaders = view.standings.filter((x) => x.rank === 1);
     expect(view.champion).toBe(leaders.length === 1 ? leaders[0]!.entrant : null);
+  });
+
+  it('conquistas: quem joga ganha a estreia; quem chega ao top e quem vence, as suas', async () => {
+    const { owner, tournament } = await running(6, 'modern', 4, 1);
+    await playRound(tournament.id, owner.id);
+    await nextRound(db, { tournamentId: tournament.id, userId: owner.id });
+    await playRound(tournament.id, owner.id);
+    await nextRound(db, { tournamentId: tournament.id, userId: owner.id });
+    await playRound(tournament.id, owner.id);
+    await nextRound(db, { tournamentId: tournament.id, userId: owner.id });
+    const view = await getTournament(db, { tournamentId: tournament.id, userId: owner.id });
+    expect(view.tournament.status).toBe('finished');
+    const userOf = (entrant: string) => view.entrants.find((e) => e.id === entrant)!.memberIds[0]!;
+    const seeded = new Set(
+      view.rounds
+        .filter((r) => r.stage === 'top')
+        .flatMap((r) => r.tables.flatMap((x) => x.entrants)),
+    );
+    const outside = view.entrants.find((e) => !seeded.has(e.id))!;
+    const has = async (userId: string, id: string) =>
+      (await getUserAchievements(db, userId)).find((a) => a.id === id)!.unlocked;
+
+    const champion = userOf(view.champion!);
+    expect(await has(champion, 'tournament_champion')).toBe(true);
+    expect(await has(champion, 'tournament_top')).toBe(true);
+    expect(await has(outside.memberIds[0]!, 'tournament_first')).toBe(true);
+    expect(await has(outside.memberIds[0]!, 'tournament_top')).toBe(false);
+    expect(await has(outside.memberIds[0]!, 'tournament_champion')).toBe(false);
   });
 });

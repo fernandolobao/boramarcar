@@ -28,6 +28,8 @@ export interface AchievementContext {
   memberSince?: Record<string, Record<string, Date>>;
   /** Fuso para "12 meses de um ano" (padrão: São Paulo). */
   timeZone?: string;
+  /** Torneios encerrados de que a pessoa participou (9.2): se chegou ao top cut e se venceu. */
+  tournaments?: readonly { finishedAt: Date; champion: boolean; topCut: boolean }[];
 }
 
 export interface SeasonTitle {
@@ -64,6 +66,9 @@ export const ACHIEVEMENT_IDS = [
   'events_streak_4',
   'months_12',
   'enturmado',
+  'tournament_first',
+  'tournament_top',
+  'tournament_champion',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -250,6 +255,15 @@ export function computeAchievements(
     }
   }
 
+  const cups = [...(context.tournaments ?? [])].sort(
+    (a, b) => a.finishedAt.getTime() - b.finishedAt.getTime(),
+  );
+  const firstCup = cups[0];
+  const firstTop = cups.find((c) => c.topCut);
+  const titlesWon = cups.filter((c) => c.champion);
+  if (firstCup) unlock('tournament_first', firstCup.finishedAt);
+  if (firstTop) unlock('tournament_top', firstTop.finishedAt);
+  if (titlesWon[0]) unlock('tournament_champion', titlesWon[0].finishedAt);
   const titles = [...seasonTitles].sort((a, b) => a.endsAt.getTime() - b.endsAt.getTime());
   if (titles.length) unlock('season_champion', titles[0]!.endsAt);
 
@@ -281,6 +295,9 @@ export function computeAchievements(
     events_streak_4: [bestEventRun, 4],
     enturmado: unlockedAt.has('enturmado') ? [enturmado[1], enturmado[1]] : enturmado,
     months_12: [Math.max(0, ...[...monthsByYear.values()].map((m) => m.size)), 12],
+    tournament_first: [cups.length ? 1 : 0, 1],
+    tournament_top: [firstTop ? 1 : 0, 1],
+    tournament_champion: [titlesWon.length ? 1 : 0, 1],
   };
 
   return ACHIEVEMENT_IDS.map((id) => {
@@ -292,6 +309,7 @@ export function computeAchievements(
       progress: Math.min(current, target),
       target,
       ...(id === 'season_champion' ? { count: titles.length } : {}),
+      ...(id === 'tournament_champion' ? { count: titlesWon.length } : {}),
     };
   });
 }
