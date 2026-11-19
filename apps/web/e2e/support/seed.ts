@@ -18,6 +18,7 @@ export const E2E_IDS = {
   store: 'loja-e2e',
   storeInvite: 'e2e-convite-loja',
   storeEvent: 'e2e-evento-loja',
+  storeTournamentEvent: 'e2e-evento-torneio',
 } as const;
 
 const HOUR = 3600_000;
@@ -380,6 +381,50 @@ export async function seedE2E(databaseUrl: string) {
     await db
       .insert(s.storeEventEntries)
       .values({ storeEventId: E2E_IDS.storeEvent, userId: 'e2e-bia', status: 'registered' });
+    // Evento de loja com torneio em andamento (Modern, melhor de 3): a Bia e um convidado na mesa 1.
+    await db.insert(s.storeEvents).values({
+      id: E2E_IDS.storeTournamentEvent,
+      storeId: 'e2e-store',
+      title: 'Copa de Modern da loja',
+      startsAt: new Date(Date.now() + 2 * DAY),
+      format: 'modern',
+      kind: 'tournament',
+      code: 'E2ETR8',
+      createdBy: 'e2e-ana',
+    });
+    await db.insert(s.tournaments).values({
+      id: 'e2e-store-tournament',
+      storeEventId: E2E_IDS.storeTournamentEvent,
+      name: 'Copa de Modern da loja',
+      format: 'modern',
+      tableKind: 'pair',
+      entrantSize: 1,
+      bestOf: 3,
+      rounds: 3,
+      countsInRanking: false,
+      status: 'running',
+      createdBy: 'e2e-ana',
+    });
+    await db.insert(s.tournamentEntrants).values([
+      { id: 'e2e-store-entrant-1', tournamentId: 'e2e-store-tournament' },
+      { id: 'e2e-store-entrant-2', tournamentId: 'e2e-store-tournament', guestName: 'Zé da Loja' },
+    ]);
+    await db.insert(s.tournamentEntrantMembers).values({
+      entrantId: 'e2e-store-entrant-1',
+      tournamentId: 'e2e-store-tournament',
+      userId: 'e2e-bia',
+    });
+    await db
+      .insert(s.tournamentRounds)
+      .values({ id: 'e2e-store-round-1', tournamentId: 'e2e-store-tournament', number: 1 });
+    await db.insert(s.tournamentTables).values({
+      id: 'e2e-store-table-1',
+      roundId: 'e2e-store-round-1',
+      tournamentId: 'e2e-store-tournament',
+      number: 1,
+      entrantIds: ['e2e-store-entrant-1', 'e2e-store-entrant-2'],
+    });
+
     await db.insert(s.storeInvites).values({
       storeId: 'e2e-store',
       email: 'nova@loja-e2e.test',

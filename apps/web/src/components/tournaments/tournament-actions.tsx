@@ -163,12 +163,15 @@ export function TournamentControls({
   canStart,
   canAdvance,
   lastRound,
+  deletable = true,
 }: {
   tournamentId: string;
   status: string;
   canStart: boolean;
   canAdvance: boolean;
   lastRound: boolean;
+  /** No torneio de loja, apagar não aparece (o torneio é do evento). */
+  deletable?: boolean;
 }) {
   const t = useTranslations('tournaments');
   const router = useRouter();
@@ -208,28 +211,30 @@ export function TournamentControls({
           {!canAdvance && <p className="muted text-sm">{t('nextHint')}</p>}
         </div>
       )}
-      <div className="space-y-1">
-        <button
-          type="button"
-          className={
-            confirm ? 'btn-danger border border-red-300 dark:border-red-800' : 'btn-danger'
-          }
-          disabled={pending}
-          onBlur={() => setConfirm(false)}
-          onClick={() => {
-            if (!confirm) return setConfirm(true);
-            setConfirm(false);
-            void run(
-              () => api(`/api/v1/tournaments/${tournamentId}`, { method: 'DELETE' }),
-              () => router.push('/torneios'),
-            );
-          }}
-        >
-          <Icon name="delete" />
-          {confirm ? t('deleteConfirm') : t('delete')}
-        </button>
-        <p className="muted text-sm">{t('deleteHint')}</p>
-      </div>
+      {deletable && (
+        <div className="space-y-1">
+          <button
+            type="button"
+            className={
+              confirm ? 'btn-danger border border-red-300 dark:border-red-800' : 'btn-danger'
+            }
+            disabled={pending}
+            onBlur={() => setConfirm(false)}
+            onClick={() => {
+              if (!confirm) return setConfirm(true);
+              setConfirm(false);
+              void run(
+                () => api(`/api/v1/tournaments/${tournamentId}`, { method: 'DELETE' }),
+                () => router.push('/torneios'),
+              );
+            }}
+          >
+            <Icon name="delete" />
+            {confirm ? t('deleteConfirm') : t('delete')}
+          </button>
+          <p className="muted text-sm">{t('deleteHint')}</p>
+        </div>
+      )}
       <FormError message={error} />
     </div>
   );

@@ -2430,6 +2430,11 @@
     "codeLabel": "Código do evento",
     "codeSubmit": "Me inscrever",
     "codeMenu": "Código de evento",
-    "viewPublic": "Ver a página do evento"
+    "viewPublic": "Ver a página do evento",
+    "startTournament": "Começar o torneio com quem chegou",
+    "startTournamentHint": "{count, plural, =0 {Ninguém fez check-in ainda.} one {1 pessoa fez check-in.} other {# pessoas fizeram check-in.}} Precisa de ao menos 2; quem não chegou fica de fora.",
+    "followTournament": "Acompanhar o torneio",
+    "tournamentTitle": "Torneio",
+    "registrationClosed": "Inscrições encerradas: o torneio já começou."
   }
 }

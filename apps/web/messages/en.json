@@ -2430,6 +2430,11 @@
     "codeLabel": "Event code",
     "codeSubmit": "Sign me up",
     "codeMenu": "Event code",
-    "viewPublic": "See the event page"
+    "viewPublic": "See the event page",
+    "startTournament": "Start the tournament with who arrived",
+    "startTournamentHint": "{count, plural, =0 {No one has checked in yet.} one {1 person checked in.} other {# people checked in.}} At least 2 are needed; anyone who hasn’t arrived is left out.",
+    "followTournament": "Follow the tournament",
+    "tournamentTitle": "Tournament",
+    "registrationClosed": "Sign-ups are closed: the tournament has started."
   }
 }

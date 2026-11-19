@@ -108,6 +108,7 @@ const r = {
   storeEventCancel: await import('../store-events/[eventId]/cancel/route'),
   storeEventGuests: await import('../store-events/[eventId]/guests/route'),
   storeEntry: await import('../store-entries/[entryId]/route'),
+  storeTournament: await import('../store-events/[eventId]/tournament/route'),
 };
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
@@ -561,6 +562,12 @@ const outsiderCases: Case[] = [
     r.storeEntry.DELETE as Handler,
     'DELETE',
     () => ({ entryId: ids.storeEntry! }),
+  ],
+  [
+    'POST começar torneio do evento da loja',
+    r.storeTournament.POST as Handler,
+    'POST',
+    () => ({ eventId: ids.storeEvent! }),
   ],
   ['GET grupo: faixa do beta', r.beta.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: temporadas', r.seasons.GET as Handler, 'GET', () => ({ groupId: ids.group! })],

@@ -7,7 +7,7 @@ import {
   tournamentShape,
   type PlayedRound,
 } from '@boramarcar/core/tournaments';
-import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   events,
@@ -19,10 +19,13 @@ import {
   tournamentTables,
   tournaments,
   user,
+  storeEvents,
+  storeEventEntries,
 } from '../schema';
 import { recordGame } from './events';
 import { addNotifications } from './inbox';
 import { requireMembership } from './groups';
+import { requireStoreRole } from './stores';
 
 /**
  * Torneio suíço do grupo em qualquer formato (9.1). As regras (mesa, emparelhamento,
@@ -34,16 +37,41 @@ type TournamentRow = typeof tournaments.$inferSelect;
 
 const view = (row: TournamentRow) => ({ ...row, table: row.tableKind as 'pod' | 'pair' });
 
-async function loadTournament(db: Database, tournamentId: string, userId: string) {
+/**
+ * Carrega o torneio e quem pode organizar. Torneio do grupo: só quem é do grupo vê; organiza o
+ * dono/admin ou quem criou. Torneio de loja (10.2b): qualquer pessoa acompanha (`userId` pode ser
+ * `null`); organiza a equipe da loja.
+ */
+async function loadTournament(db: Database, tournamentId: string, userId: string | null) {
   const [row] = await db
     .select()
     .from(tournaments)
     .where(eq(tournaments.id, tournamentId))
     .limit(1);
   if (!row) throw new DomainError('not_found', 'Torneio não encontrado');
-  const membership = await requireMembership(db, row.groupId, userId);
+  if (row.storeEventId) {
+    const [ev] = await db
+      .select({ storeId: storeEvents.storeId })
+      .from(storeEvents)
+      .where(eq(storeEvents.id, row.storeEventId));
+    const canManage = userId
+      ? await requireStoreRole(db, ev!.storeId, userId, ['owner', 'staff']).then(
+          () => true,
+          () => false,
+        )
+      : false;
+    return { row, canManage };
+  }
+  if (!userId) throw new DomainError('forbidden', 'Entre para ver este torneio');
+  const membership = await requireMembership(db, row.groupId!, userId);
   const canManage = membership.role !== 'member' || row.createdBy === userId;
-  return { row, membership, canManage };
+  return { row, canManage };
+}
+
+/** Inscrição e remoção pelo torneio valem só no do grupo (no de loja, é pelo evento). */
+function groupOnly(row: TournamentRow) {
+  if (!row.groupId) throw new DomainError('conflict', 'A inscrição é pelo evento da loja');
+  return row.groupId;
 }
 
 async function requireOrganizer(db: Database, tournamentId: string, userId: string) {
@@ -139,7 +167,8 @@ export async function addEntrant(
       row.entrantSize === 2 ? 'Inscreva uma dupla' : 'Inscreva uma pessoa',
     );
   }
-  for (const id of memberIds) await requireMembership(db, row.groupId, id);
+  const groupId = groupOnly(row);
+  for (const id of memberIds) await requireMembership(db, groupId, id);
   const taken = await db
     .select({ userId: tournamentEntrantMembers.userId })
     .from(tournamentEntrantMembers)
@@ -186,6 +215,7 @@ export async function removeEntrant(
   if (!canManage && !members.some((m) => m.userId === input.userId)) {
     throw new DomainError('forbidden', 'Você só pode tirar a sua inscrição');
   }
+  groupOnly(row);
   if (row.status !== 'registration') throw new DomainError('conflict', 'A inscrição já fechou');
   await db.delete(tournamentEntrants).where(eq(tournamentEntrants.id, input.entrantId));
 }
@@ -288,6 +318,11 @@ export async function startTournament(
 ) {
   const { row } = await requireOrganizer(db, input.tournamentId, input.userId);
   if (row.status !== 'registration') throw new DomainError('conflict', 'O torneio já começou');
+  await begin(db, row, input.random);
+}
+
+/** Fecha a inscrição: rodadas (as recomendadas, sem número definido) e a 1ª rodada sorteada. */
+async function begin(db: Database, row: TournamentRow, random?: () => number) {
   const entrants = await entrantIdsOf(db, row.id);
   if (entrants.length < 2) throw new DomainError('invalid_input', 'Inscreva ao menos 2');
   const rounds = row.rounds ?? recommendedRounds(entrants.length, row.tableKind as 'pod' | 'pair');
@@ -297,7 +332,97 @@ export async function startTournament(
     .where(eq(tournaments.id, row.id))
     .returning();
   await log(db, row.id, 'started', { entrants: entrants.length, rounds });
-  await createRound(db, running!, 1, input.random);
+  await createRound(db, running!, 1, random);
+  return running!;
+}
+
+/**
+ * Torneio do evento de loja (10.2b): a equipe começa com quem fez check-in (contas e convidados).
+ * Não conta em ranking de grupo nenhum. Um torneio por evento; 2HG fica para depois.
+ */
+export async function startStoreTournament(
+  db: Database,
+  input: { eventId: string; userId: string; random?: () => number },
+) {
+  const [event] = await db
+    .select()
+    .from(storeEvents)
+    .where(eq(storeEvents.id, input.eventId))
+    .limit(1);
+  if (!event) throw new DomainError('not_found', 'Evento não encontrado');
+  await requireStoreRole(db, event.storeId, input.userId, ['owner', 'staff']);
+  if (event.kind !== 'tournament') {
+    throw new DomainError('invalid_input', 'Este evento é uma noite livre, sem torneio');
+  }
+  if (event.status === 'cancelled') throw new DomainError('conflict', 'Evento cancelado');
+  const shape = tournamentShape(event.format);
+  if (shape.entrantSize !== 1) {
+    throw new DomainError('invalid_input', 'Torneio de duplas em loja ainda não é possível');
+  }
+  const [existing] = await db
+    .select({ id: tournaments.id })
+    .from(tournaments)
+    .where(eq(tournaments.storeEventId, event.id))
+    .limit(1);
+  if (existing) throw new DomainError('conflict', 'Este evento já tem torneio');
+  const present = await db
+    .select({ userId: storeEventEntries.userId, guestName: storeEventEntries.guestName })
+    .from(storeEventEntries)
+    .where(
+      and(
+        eq(storeEventEntries.storeEventId, event.id),
+        eq(storeEventEntries.status, 'registered'),
+        isNotNull(storeEventEntries.checkedInAt),
+      ),
+    )
+    .orderBy(asc(storeEventEntries.createdAt));
+  if (present.length < 2) {
+    throw new DomainError('invalid_input', 'Faça o check-in de ao menos 2 pessoas');
+  }
+  const [row] = await db
+    .insert(tournaments)
+    .values({
+      storeEventId: event.id,
+      name: event.title,
+      format: event.format,
+      tableKind: shape.table,
+      entrantSize: 1,
+      bestOf: shape.bestOf,
+      countsInRanking: false,
+      createdBy: input.userId,
+    })
+    .returning();
+  for (const [i, p] of present.entries()) {
+    const [entrant] = await db
+      .insert(tournamentEntrants)
+      .values({
+        tournamentId: row!.id,
+        guestName: p.userId ? null : p.guestName,
+        // Ordem estável: a da chegada (para a classificação desempatar igual).
+        createdAt: new Date(Date.now() + i),
+      })
+      .returning();
+    if (p.userId) {
+      await db
+        .insert(tournamentEntrantMembers)
+        .values({ entrantId: entrant!.id, tournamentId: row!.id, userId: p.userId });
+    }
+  }
+  return begin(db, row!, input.random);
+}
+
+/** Torneio do evento de loja para acompanhar (qualquer pessoa); `null` se o evento não tem. */
+export async function getStoreEventTournament(
+  db: Database,
+  input: { eventId: string; viewerId: string | null },
+) {
+  const [row] = await db
+    .select({ id: tournaments.id })
+    .from(tournaments)
+    .where(eq(tournaments.storeEventId, input.eventId))
+    .limit(1);
+  if (!row) return null;
+  return getTournament(db, { tournamentId: row.id, userId: input.viewerId });
 }
 
 /** Valida o placar da mesa: pod = um vencedor ou empate; par = até o melhor de N. */
@@ -412,7 +537,7 @@ export async function reportTable(
   // Correção: as partidas antigas desta mesa saem antes das novas.
   if (table.gameIds.length) await db.delete(games).where(inArray(games.id, table.gameIds));
   const gameIds: string[] = [];
-  if (row.countsInRanking) {
+  if (row.countsInRanking && row.eventId) {
     const list = gamesFor(row, table.entrantIds, members, gameWins, input.gameDraws);
     for (const players of list) {
       const game = await recordGame(db, {
@@ -489,7 +614,10 @@ export async function nextRound(
 }
 
 /** Página do torneio: inscrições, rodadas e mesas, classificação e linha do tempo. */
-export async function getTournament(db: Database, input: { tournamentId: string; userId: string }) {
+export async function getTournament(
+  db: Database,
+  input: { tournamentId: string; userId: string | null },
+) {
   const { row, canManage } = await loadTournament(db, input.tournamentId, input.userId);
   const [entrantRows, memberRows, rounds, tables, timeline, [event]] = await Promise.all([
     entrantIdsOf(db, row.id),
@@ -522,20 +650,35 @@ export async function getTournament(db: Database, input: { tournamentId: string;
       .from(tournamentEvents)
       .where(eq(tournamentEvents.tournamentId, row.id))
       .orderBy(asc(tournamentEvents.createdAt)),
-    db
-      .select({ title: events.title, startsAt: events.startsAt })
-      .from(events)
-      .where(eq(events.id, row.eventId)),
+    row.eventId
+      ? db
+          .select({ title: events.title, startsAt: events.startsAt })
+          .from(events)
+          .where(eq(events.id, row.eventId))
+      : db
+          .select({ title: storeEvents.title, startsAt: storeEvents.startsAt })
+          .from(storeEvents)
+          .where(eq(storeEvents.id, row.storeEventId!)),
   ]);
+  const guests = await db
+    .select({ id: tournamentEntrants.id, guestName: tournamentEntrants.guestName })
+    .from(tournamentEntrants)
+    .where(
+      and(eq(tournamentEntrants.tournamentId, row.id), isNotNull(tournamentEntrants.guestName)),
+    );
+  const guestName = new Map(guests.map((g) => [g.id, g.guestName!]));
   const entrants = entrantRows.map((id) => {
     const members = memberRows.filter((m) => m.entrantId === id);
     return {
       id,
       memberIds: members.map((m) => m.userId),
-      name: members.map((m) => m.name).join(' & '),
+      name: guestName.get(id) ?? members.map((m) => m.name).join(' & '),
+      guest: guestName.has(id),
     };
   });
-  const mine = entrants.find((e) => e.memberIds.includes(input.userId))?.id ?? null;
+  const mine = input.userId
+    ? (entrants.find((e) => e.memberIds.includes(input.userId!))?.id ?? null)
+    : null;
   const played: PlayedRound[] = rounds.map((r) => ({
     tables: tables
       .filter((t) => t.roundId === r.id && t.reportedAt)
