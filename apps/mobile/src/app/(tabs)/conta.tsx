@@ -47,6 +47,12 @@ export default function AccountScreen() {
       {group && (
         <Button label={t('groupOpen')} variant="secondary" onPress={() => router.push('/grupo')} />
       )}
+      {/* Eventos de loja (10.2c): os meus e o código do balcão. */}
+      <Button
+        label={t('storeEvTitle')}
+        variant="secondary"
+        onPress={() => router.push('/eventos-loja')}
+      />
       <Button
         label={t('groupsManage')}
         variant="secondary"

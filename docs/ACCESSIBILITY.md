@@ -579,3 +579,11 @@ sem rolagem horizontal em 320px.
 
 - Sino: "Abriu vaga em {evento}: você saiu da lista de espera e está inscrito.", com link para a página do evento (texto completo, como os outros avisos). Teste do sino cobre o texto e o link.
 - O torneio de loja aberto pelo endereço de torneio (ex.: aviso de rodada) leva direto à página do evento, onde ele é acompanhado.
+
+## Eventos de loja no app (19/11/2026)
+
+- Conta → "Eventos de loja": os meus próximos eventos (cada um um botão com nome completo: evento, loja, data e situação) e o código do balcão (campo com rótulo; erro em `alert`).
+- Evento: tipo, formato, data, vagas em texto; situação da inscrição em região viva; desistir com `ConfirmButton` (dois toques, com o nome do evento); com o torneio começado, "Acompanhar o torneio" abre a tela de torneio (que agora aceita torneio de loja).
+- Loja: contatos e "Como chegar" como botões com a dica "Abre fora do app"; selo de verificada em texto (✓ + "Loja verificada").
+- Aviso de vaga no sino do app, com o texto completo e indo para o evento.
+- Telas conferidas com `tsc` e lint; não houve captura de tela do app (vale testar no Expo Go).

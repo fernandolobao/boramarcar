@@ -35,6 +35,8 @@ function notificationText(item: NotificationItem) {
     }
     case 'nudge':
       return t('notifNudge', { event, group: item.groupName ?? '' });
+    case 'store_event':
+      return t('notifStorePromoted', { title: item.storeEvent?.title ?? '' });
     case 'tournament': {
       const name = item.tournamentName ?? '';
       if (d.event === 'finished') return t('notifTournamentFinished', { name });
@@ -73,6 +75,8 @@ function open(item: NotificationItem) {
     router.push({ pathname: '/encontros/[id]', params: { id: d.eventId } });
   } else if (item.kind === 'podium') {
     router.push('/ranking');
+  } else if (item.kind === 'store_event' && typeof d.storeEventId === 'string') {
+    router.push({ pathname: '/eventos-loja/[id]', params: { id: d.storeEventId } });
   } else if (item.kind === 'tournament' && typeof d.tournamentId === 'string') {
     router.push({ pathname: '/torneios/[id]', params: { id: d.tournamentId } });
   } else if (
