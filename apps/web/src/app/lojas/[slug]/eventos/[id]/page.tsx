@@ -1,6 +1,7 @@
 import { isGameFormat } from '@boramarcar/core';
 import { getStoreEventPublic, getStoreEventTournament, listMyStores } from '@boramarcar/db';
 import type { Metadata } from 'next';
+import { googleCalendarUrl } from '@boramarcar/core/calendar';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -49,7 +50,8 @@ export default async function StoreEventPage({ params }: Props) {
   const session = await getSessionUser(await headers()).catch(() => null);
   const event = await load(slug, id, session?.id);
   if (!event) notFound();
-  const [t, tf, tc, format, staff, tournament] = await Promise.all([
+  const [td, t, tf, tc, format, staff, tournament] = await Promise.all([
+    getTranslations('discovery'),
     getTranslations('storeEvents'),
     getTranslations('formats'),
     getTranslations('common'),
@@ -92,6 +94,30 @@ export default async function StoreEventPage({ params }: Props) {
           <p role="status" className="font-semibold text-danger">
             {t('eventCancelled')}
           </p>
+        )}
+        {/* "Adicionar à agenda" (10.3): arquivo .ics ou Google Agenda, sem precisar de conta. */}
+        {event.status === 'scheduled' && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <a className="btn-secondary" href={`/api/v1/store-events/${event.id}/ics`} download>
+              <Icon name="addToCalendar" />
+              {td('ics')}
+            </a>
+            <a
+              className="btn-secondary"
+              target="_blank"
+              rel="noreferrer"
+              href={googleCalendarUrl({
+                uid: event.id,
+                title: `${event.title} · ${event.store.name}`,
+                start: event.startsAt,
+                end: event.endsAt,
+                location: event.store.name,
+              })}
+            >
+              {td('google')}
+              <span className="sr-only"> {tc('newTab')}</span>
+            </a>
+          </div>
         )}
       </div>
 

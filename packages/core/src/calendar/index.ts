@@ -91,3 +91,17 @@ export function slugify(value: string, fallback = 'evento'): string {
     .slice(0, 60);
   return slug || fallback;
 }
+
+/** Link "Adicionar ao Google Agenda" (sem baixar arquivo), com as mesmas regras de duração do .ics. */
+export function googleCalendarUrl(event: CalendarEvent): string {
+  const end =
+    event.end ?? new Date(event.start.getTime() + DEFAULT_EVENT_DURATION_MINUTES * 60_000);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title,
+    dates: `${toIcsDate(event.start)}/${toIcsDate(end)}`,
+  });
+  if (event.location) params.set('location', event.location);
+  if (event.description) params.set('details', event.description);
+  return `https://calendar.google.com/calendar/render?${params}`;
+}

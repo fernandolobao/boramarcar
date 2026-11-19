@@ -469,6 +469,9 @@ export default async function HomePage({
             </a>
           </p>
           <p className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/lojas" className="underline underline-offset-2">
+              {tl('stores')}
+            </Link>
             <Link href="/ajuda" className="underline underline-offset-2">
               {tl('help')}
             </Link>

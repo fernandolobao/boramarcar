@@ -66,3 +66,23 @@ describe('helpers', () => {
     expect(slugify('***')).toBe('evento');
   });
 });
+
+describe('link do Google Agenda (10.3)', () => {
+  it('evento com início, fim padrão de 4 h, local e detalhes', async () => {
+    const { googleCalendarUrl } = await import('./index');
+    const url = new URL(
+      googleCalendarUrl({
+        uid: 'x',
+        title: 'Commander de sexta · Loja do Mago',
+        start: new Date('2026-11-27T22:00:00Z'),
+        location: 'Loja do Mago',
+        description: 'https://www.arcanakin.com.br/lojas/loja-do-mago/eventos/1',
+      }),
+    );
+    expect(url.origin + url.pathname).toBe('https://calendar.google.com/calendar/render');
+    expect(url.searchParams.get('action')).toBe('TEMPLATE');
+    expect(url.searchParams.get('text')).toBe('Commander de sexta · Loja do Mago');
+    expect(url.searchParams.get('dates')).toBe('20261127T220000Z/20261128T020000Z');
+    expect(url.searchParams.get('location')).toBe('Loja do Mago');
+  });
+});

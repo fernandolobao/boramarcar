@@ -31,6 +31,7 @@ export const SECTIONS = [
   'table',
   'recap',
   'tournament',
+  'discovery',
   'signIn',
   'signUp',
   'forgotPassword',

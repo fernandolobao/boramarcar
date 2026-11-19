@@ -209,6 +209,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Lojas agora dizem o que oferecem (cartas avulsas, selados, mesas para jogar, torneios), e a cidade da loja vem da lista oficial de municípios.',
     en: 'Stores now show what they offer (singles, sealed, tables to play, tournaments), and the store’s city comes from the official list of municipalities.',
   },
+  {
+    date: '2026-11-20',
+    pt: 'Nova página "Lojas e eventos": escolha a sua cidade (ou use a localização) e veja torneios, noites de jogo e lojas a até 50 km, com "Adicionar à agenda". Funciona sem conta.',
+    en: 'New "Stores and events" page: pick your city (or use your location) and see tournaments, game nights and stores within 50 km, with "Add to calendar". Works without an account.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
