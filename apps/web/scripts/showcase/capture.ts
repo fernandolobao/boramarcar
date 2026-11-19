@@ -145,6 +145,43 @@ async function fillThroughApi(sessions: Record<string, string>) {
   return deckOf;
 }
 
+/**
+ * Torneio de Modern (melhor de 3) com as 6 pessoas, no próximo encontro: rodada 1 inteira
+ * registrada e a 2 com uma mesa registrada. Não conta no ranking (a captura do ranking não muda).
+ */
+async function tournamentThroughApi(sessions: Record<string, string>) {
+  const ana = api(sessions[SHOWCASE_VIEWER]!);
+  const { tournament } = await ana<{ tournament: { id: string } }>(
+    'POST',
+    '/events/sc-event-next/tournaments',
+    { name: 'Copa de Modern', format: 'modern', bestOf: 3, rounds: 3, countsInRanking: false },
+  );
+  for (const u of SHOWCASE_USERS) {
+    await api(sessions[u.id]!)('POST', `/tournaments/${tournament.id}/entrants`, {
+      memberIds: [u.id],
+    });
+  }
+  await ana('POST', `/tournaments/${tournament.id}/start`);
+  type View = { rounds: { tables: { id: string; entrants: string[] }[] }[] };
+  const report = async (table: { id: string; entrants: string[] }, wins: [number, number]) =>
+    ana('PUT', `/tournaments/${tournament.id}/tables/${table.id}`, {
+      gameWins: { [table.entrants[0]!]: wins[0], [table.entrants[1]!]: wins[1] },
+      gameDraws: 0,
+    });
+  let view = await ana<View>('GET', `/tournaments/${tournament.id}`);
+  const scores: [number, number][] = [
+    [2, 1],
+    [2, 0],
+    [1, 2],
+  ];
+  for (const [i, table] of view.rounds[0]!.tables.entries()) await report(table, scores[i]!);
+  await ana('POST', `/tournaments/${tournament.id}/next`);
+  view = await ana<View>('GET', `/tournaments/${tournament.id}`);
+  await report(view.rounds[1]!.tables[0]!, [2, 1]);
+  log(`torneio: ${tournament.id}`);
+  return tournament.id;
+}
+
 /** Mesa em andamento: 4 jogadores, vidas e dano de comandante variados. */
 function tableInProgress(deckOf: Record<string, string>): TableState {
   const players = SHOWCASE_USERS.slice(0, 4).map((u) => ({
@@ -208,6 +245,7 @@ async function main() {
   const server = await startServer(databaseUrl);
   try {
     const deckOf = await fillThroughApi(sessions);
+    const tournamentId = await tournamentThroughApi(sessions);
     await mkdir(OUT, { recursive: true });
     const browser = await chromium.launch({ channel: 'chrome' });
     const token = sessions[SHOWCASE_VIEWER]!;
@@ -222,6 +260,7 @@ async function main() {
           ['deck', `/decks/${deckOf[SHOWCASE_VIEWER]}`, 'Análise'],
           ['colecao', '/colecao', 'Valor estimado'],
           ['ranking', '/ranking', null],
+          ['torneio', `/torneios/${tournamentId}`, null],
         ] as const) {
           await page.goto(`${BASE}${url}`);
           if (top) {

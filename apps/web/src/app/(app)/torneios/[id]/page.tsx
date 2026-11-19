@@ -152,7 +152,7 @@ export default async function TournamentPage({ params }: Props) {
             <h2 id={`torneio-rodada-${round.number}`} className="section-title mb-0">
               {t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
             </h2>
-            <ol className="grid gap-4 md:grid-cols-2">
+            <ol className="grid items-start gap-4 md:grid-cols-2">
               {round.tables.map((table) => {
                 const seated = table.entrants.map((eid) => ({
                   id: eid,

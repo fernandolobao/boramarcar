@@ -1240,6 +1240,11 @@
           "tab": "Ranking",
           "caption": "A classificação do grupo, com jogos, vitórias e pontos, por temporada e tipo de jogo.",
           "alt": "Ranking do grupo após 15 partidas: Ana Lima em 1º com 5 vitórias em 12 jogos e 15 pontos, seguida de Diego, Felipe, Bruno, Carla e Elisa."
+        },
+        "torneio": {
+          "tab": "Torneio",
+          "caption": "Torneios do grupo em qualquer formato: mesas da rodada, placar em jogos, classificação com desempates e linha do tempo.",
+          "alt": "Torneio Copa de Modern em melhor de 3, em andamento: rodada 2 de 3 com três mesas, uma já registrada com o placar em jogos e duas esperando o resultado, com os campos de jogos vencidos por cada jogador."
         }
       }
     },

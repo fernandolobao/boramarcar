@@ -139,6 +139,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Torneios também no app, e um aviso no sino a cada rodada com a sua mesa (ou o bye) e quando o torneio termina.',
     en: 'Tournaments in the app too, plus a bell notice every round with your table (or bye) and when the tournament ends.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Nas mesas de torneio (pods e melhor de 1), "Abrir no modo mesa" já traz os jogadores e o formato; ao registrar, o resultado vai direto para a mesa do torneio.',
+    en: 'On tournament tables (pods and best of 1), "Open in table mode" brings the players and format; when you save, the result goes straight to the tournament table.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

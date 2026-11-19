@@ -652,6 +652,11 @@ const pt = {
   tourDelete: 'Apagar torneio',
   tourDeleteConfirm: 'Confirmar: apagar',
   tourLink: 'Torneios',
+  tourOpenInTable: 'Abrir no modo mesa',
+  tourTableUnavailable:
+    'Esta mesa do torneio não está disponível no modo mesa (já tem resultado ou é melhor de 3). Registre pela página do torneio.',
+  tableTournamentIntro:
+    '{name} · mesa {table}: os jogadores e o formato já vêm do torneio. Ao registrar, o resultado vai para a mesa do torneio.',
   tourCreateHere: 'Criar torneio neste encontro',
   notifTournamentRound: '{name}: rodada {round} começou. Sua mesa é a {table}.',
   notifTournamentBye: '{name}: rodada {round} começou. Você está de bye (vale vitória).',
@@ -1602,6 +1607,11 @@ const en: Messages = {
   tourDelete: 'Delete tournament',
   tourDeleteConfirm: 'Confirm: delete',
   tourLink: 'Tournaments',
+  tourOpenInTable: 'Open in table mode',
+  tourTableUnavailable:
+    'This tournament table isn’t available in table mode (it already has a result or is best of 3). Report it on the tournament page.',
+  tableTournamentIntro:
+    '{name} · table {table}: players and format come from the tournament. When you save, the result goes to the tournament table.',
   tourCreateHere: 'Create a tournament at this meetup',
   notifTournamentRound: '{name}: round {round} started. Your table is {table}.',
   notifTournamentBye: '{name}: round {round} started. You have a bye (counts as a win).',

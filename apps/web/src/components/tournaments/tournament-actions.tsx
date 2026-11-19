@@ -313,7 +313,8 @@ export function TableResultForm({
           ]}
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-3">
+        // Um campo abaixo do outro: a mesa ocupa meia largura e −/campo/+ não cabem lado a lado.
+        <div className="space-y-3">
           {entrants.map((e) => (
             <NumberField
               key={e.id}

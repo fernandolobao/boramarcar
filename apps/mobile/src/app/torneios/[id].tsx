@@ -1,4 +1,5 @@
 import { ApiError, type TournamentView } from '@boramarcar/api-client';
+import { tableModeEligible } from '@boramarcar/core/tournaments';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
@@ -293,6 +294,19 @@ export default function TournamentScreen() {
                 >
                   {table.reported ? `${t('tourResult')}: ${resultText(table)}` : t('tourWaiting')}
                 </AppText>
+                {/* Modo mesa (pod ou melhor de 1): jogadores já na mesa; o resultado volta para cá. */}
+                {canReport && tableModeEligible(tour, table) && (
+                  <Button
+                    label={t('tourOpenInTable')}
+                    accessibilityLabel={`${t('tourOpenInTable')} (${t('tourTable', { number: table.number })})`}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/mesa/[id]',
+                        params: { id: tour.eventId, torneio: tour.id, mesa: table.id },
+                      })
+                    }
+                  />
+                )}
                 {canReport &&
                   (table.reported && correcting !== table.id ? (
                     <Button

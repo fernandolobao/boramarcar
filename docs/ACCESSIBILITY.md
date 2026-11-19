@@ -540,3 +540,10 @@ sem rolagem horizontal em 320px.
 
 - App: lista, novo torneio e página do torneio. Cada torneio da lista é um botão com nome completo (nome, formato, inscrições e situação). Na mesa, a linha de resultado tem `accessibilityLiveRegion` ("Aguardando…" vira o resultado). A classificação é uma lista de itens acessíveis lidos como "1º Ana: 3 pontos (1-0-0). OMW … GW … OGW …". Tirar inscrição e apagar usam o `ConfirmButton` (dois toques, com o nome no rótulo). "Corrigir resultado" abre o formulário só quando pedido, com a mesa no nome.
 - Sino (site e app): aviso de torneio com texto completo ("Copa: rodada 2 começou. Sua mesa é a 3.", bye ou encerramento) e link para o torneio.
+
+## Modo mesa a partir da mesa do torneio (19/11/2026)
+
+- Página do torneio (site e app): "Abrir no modo mesa" (com a mesa no nome acessível) nas mesas de pod ou de melhor de 1 ainda sem resultado. No modo mesa, a introdução diz de qual torneio e mesa se trata; o formato fica travado (campo desabilitado) e a escolha de jogadores não aparece (só a ordem e os decks).
+- Formulário de placar (par): os campos de jogos vencidos ficam um abaixo do outro (lado a lado, estouravam o cartão da mesa em meia largura); as mesas da rodada ficam com a altura do próprio conteúdo.
+- A página do torneio deixou de usar as seções empilhadas ao rolar: com formulários de altura variável, a seção de baixo cobria o botão "Salvar resultado" (o E2E acusou).
+- "Veja por dentro" ganhou a aba "Torneio" (texto alternativo descreve a rodada mostrada).

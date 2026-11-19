@@ -1240,6 +1240,11 @@
           "tab": "Ranking",
           "caption": "The group standings, with games, wins and points, by season and game type.",
           "alt": "Group ranking after 15 games: Ana Lima in 1st with 5 wins in 12 games and 15 points, followed by Diego, Felipe, Bruno, Carla and Elisa."
+        },
+        "torneio": {
+          "tab": "Tournament",
+          "caption": "Group tournaments in any format: round tables, game scores, standings with tiebreakers and a timeline.",
+          "alt": "Copa de Modern tournament, best of 3, in progress: round 2 of 3 with three tables, one already reported with its game score and two waiting for a result, with game-win fields for each player."
         }
       }
     },
