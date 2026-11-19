@@ -876,6 +876,18 @@
     "invite": {
       "subject": "{group} misses you: {title} — {when}",
       "intro": "The {group} crew missed you and invited you to the next meetup. Coming?"
+    },
+    "storeInvite": {
+      "subject": "{store} on ArcanaKin: your invite",
+      "greeting": "Hi!",
+      "intro": {
+        "owner": "{store} now has a store profile on ArcanaKin, and you were invited to run it: edit the profile (address, hours, contacts and formats) and bring in your team.",
+        "staff": "You were invited to {store}’s team on ArcanaKin, to help look after the store profile."
+      },
+      "how": "Sign in (or create your account) with this e-mail, {email}, and open the invite: it only works for this address.",
+      "cta": "Open the invite",
+      "note": "The invite is valid for {days} days.",
+      "footer": "You get this e-mail because someone invited this address to a store on ArcanaKin. If you weren’t expecting it, just ignore it."
     }
   },
   "formats": {

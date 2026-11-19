@@ -876,6 +876,18 @@
     "invite": {
       "subject": "{group} sente sua falta: {title} — {when}",
       "intro": "O pessoal de {group} sentiu sua falta e te chamou para o próximo encontro. Bora?"
+    },
+    "storeInvite": {
+      "subject": "{store} no ArcanaKin: seu convite",
+      "greeting": "Olá!",
+      "intro": {
+        "owner": "{store} ganhou um perfil de loja no ArcanaKin, e você foi convidado para ser o responsável: editar o perfil (endereço, horários, contatos e formatos) e chamar a sua equipe.",
+        "staff": "Você foi convidado para a equipe de {store} no ArcanaKin, para ajudar a cuidar do perfil da loja."
+      },
+      "how": "Entre (ou crie a sua conta) com este e-mail, {email}, e abra o convite: ele só vale para este endereço.",
+      "cta": "Abrir o convite",
+      "note": "O convite vale por {days} dias.",
+      "footer": "Você recebe este e-mail porque alguém convidou este endereço para uma loja no ArcanaKin. Se não esperava, é só ignorar."
     }
   },
   "formats": {

@@ -297,3 +297,27 @@ export function buildAccountEmail(
     }),
   };
 }
+
+/**
+ * Convite de loja (10.1): para o dono (o admin criou a loja) ou para a equipe. Vale só para este
+ * e-mail. Quem recebe pode não ter conta ainda: vai em português (as lojas são do Brasil).
+ */
+export function buildStoreInviteEmail(
+  email: string,
+  data: { storeName: string; role: 'owner' | 'staff'; token: string; days: number },
+): EmailMessage {
+  const { locale, t } = tools({ name: '', email, locale: DEFAULT_LOCALE, timeZone: 'UTC' });
+  return {
+    to: email,
+    ...render({
+      locale,
+      subject: t('storeInvite.subject', { store: data.storeName }),
+      greeting: t('storeInvite.greeting'),
+      intro: t(`storeInvite.intro.${data.role}`, { store: data.storeName }),
+      lines: [t('storeInvite.how', { email })],
+      cta: { label: t('storeInvite.cta'), url: `${getBaseUrl()}/loja/convite/${data.token}` },
+      note: t('storeInvite.note', { days: data.days }),
+      footer: t('storeInvite.footer'),
+    }),
+  };
+}

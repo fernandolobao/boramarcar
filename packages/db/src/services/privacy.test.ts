@@ -7,6 +7,7 @@ import {
   eventNudges,
   notifications,
   adminAccessLog,
+  storeMembers,
   groupMembers,
   groups,
   locations,
@@ -27,6 +28,7 @@ import {
 } from './privacy';
 import { getGroupRanking } from './ranking';
 import { addEntrant, createTournament } from './tournaments';
+import { createStore } from './stores';
 
 let db: Database;
 let close: () => Promise<void>;
@@ -106,6 +108,13 @@ async function seedPlayer() {
 describe('exportUserData', () => {
   it('traz os dados da pessoa, sem tokens nem dados de outras pessoas', async () => {
     const { a, b, future } = await seedPlayer();
+    const shop = await createStore(db, {
+      name: 'Loja da Exportação',
+      city: 'Porto Alegre',
+      email: 'loja@export.test',
+      createdBy: b,
+    });
+    await db.insert(storeMembers).values({ storeId: shop.store.id, userId: a, role: 'staff' });
     const cup = await createTournament(db, {
       eventId: future.id,
       userId: a,
@@ -137,6 +146,10 @@ describe('exportUserData', () => {
       expect.objectContaining({ name: 'Copa de Quinta', format: 'modern' }),
     ]);
     expect(JSON.stringify(data.tournaments)).not.toContain(b);
+    // Equipes de loja: o nome da loja e o papel.
+    expect(data.storeMemberships).toEqual([
+      expect.objectContaining({ store: 'Loja da Exportação', role: 'staff' }),
+    ]);
     // Chamados para encontros: o encontro e quando, sem dizer quem chamou (dado de outra pessoa).
     expect(data.invitations).toEqual([
       expect.objectContaining({ event: 'Encontro futuro', group: 'Mesa de Quinta' }),
@@ -182,8 +195,17 @@ describe('deleteUserAccount', () => {
     await db
       .insert(notifications)
       .values({ userId: a, kind: 'podium', data: { kind: 'podium', userIds: [a] } });
+    const loja = await createStore(db, {
+      name: 'Loja da Exclusão',
+      city: 'Recife',
+      email: 'loja@exclusao.test',
+      createdBy: b,
+    });
+    await db.insert(storeMembers).values({ storeId: loja.store.id, userId: a, role: 'owner' });
     const result = await deleteUserAccount(db, a, new Date('2026-11-11T12:00:00Z'));
     expect(await db.select().from(notifications).where(eq(notifications.userId, a))).toEqual([]);
+    // Sai das equipes de loja.
+    expect(await db.select().from(storeMembers).where(eq(storeMembers.userId, a))).toEqual([]);
     expect(result.transferredGroups).toEqual([group.id]);
     // Chamados recebidos somem; os enviados ficam para o grupo, sem autor.
     expect(await db.select().from(eventNudges).where(eq(eventNudges.userId, a))).toEqual([]);

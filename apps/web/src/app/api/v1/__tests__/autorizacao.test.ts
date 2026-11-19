@@ -26,6 +26,9 @@ import {
   getTournament,
   reportTable,
   startTournament,
+  acceptStoreInvite,
+  createStore,
+  inviteStoreMember,
 } from '@boramarcar/db';
 import { createTestDb, createTestUser } from '@boramarcar/db/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -91,6 +94,13 @@ const r = {
   start: await import('../tournaments/[tournamentId]/start/route'),
   next: await import('../tournaments/[tournamentId]/next/route'),
   tournamentTable: await import('../tournaments/[tournamentId]/tables/[tableId]/route'),
+  adminStores: await import('../admin/stores/route'),
+  adminStore: await import('../admin/stores/[storeId]/route'),
+  store: await import('../stores/[storeId]/route'),
+  storeInvites: await import('../stores/[storeId]/invites/route'),
+  storeInvite: await import('../stores/[storeId]/invites/[inviteId]/route'),
+  storeMember: await import('../stores/[storeId]/members/[userId]/route'),
+  acceptStoreInvite: await import('../store-invites/[token]/accept/route'),
 };
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
@@ -274,6 +284,28 @@ beforeAll(async () => {
     gameWins: { [ids.anaEntrant]: 1 },
     gameDraws: 0,
   });
+  // Loja da Ana (dona), com a Bia na equipe e um convite pendente para outra pessoa.
+  const shop = await createStore(db, {
+    name: 'Loja Secreta',
+    city: 'Porto Alegre',
+    email: 'ana-dona@example.com',
+    createdBy: ana.id,
+  });
+  ids.store = shop.store.id;
+  await acceptStoreInvite(db, { token: shop.invite.token, userId: ana.id, userEmail: ana.email });
+  const staff = await inviteStoreMember(db, {
+    storeId: shop.store.id,
+    userId: ana.id,
+    email: bia.email,
+  });
+  await acceptStoreInvite(db, { token: staff.token, userId: bia.id, userEmail: bia.email });
+  const pending = await inviteStoreMember(db, {
+    storeId: shop.store.id,
+    userId: ana.id,
+    email: 'convidada-secret@example.com',
+  });
+  ids.storeInvite = pending.id;
+  ids.storeInviteToken = pending.token;
   ids.announcement = (
     await createAnnouncement(db, {
       title: 'Aviso secret',
@@ -413,6 +445,60 @@ const outsiderCases: Case[] = [
     'PUT',
     () => ({ tournamentId: ids.tournament!, tableId: ids.tournamentTable! }),
     () => ({ gameWins: { [ids.anaEntrant!]: 1 }, gameDraws: 0 }),
+  ],
+  ['GET lojas (admin)', r.adminStores.GET as Handler, 'GET', () => ({})],
+  [
+    'POST loja (admin)',
+    r.adminStores.POST as Handler,
+    'POST',
+    () => ({}),
+    { name: 'Intrusa', city: 'X', email: 'x@x.test' },
+  ],
+  [
+    'PATCH selo da loja (admin)',
+    r.adminStore.PATCH as Handler,
+    'PATCH',
+    () => ({ storeId: ids.store! }),
+    { verified: true },
+  ],
+  [
+    'DELETE loja (admin)',
+    r.adminStore.DELETE as Handler,
+    'DELETE',
+    () => ({ storeId: ids.store! }),
+  ],
+  [
+    'PATCH perfil da loja',
+    r.store.PATCH as Handler,
+    'PATCH',
+    () => ({ storeId: ids.store! }),
+    { hours: 'x' },
+  ],
+  ['DELETE perfil da loja', r.store.DELETE as Handler, 'DELETE', () => ({ storeId: ids.store! })],
+  [
+    'POST convite da equipe da loja',
+    r.storeInvites.POST as Handler,
+    'POST',
+    () => ({ storeId: ids.store! }),
+    { email: 'x@x.test' },
+  ],
+  [
+    'DELETE convite da equipe da loja',
+    r.storeInvite.DELETE as Handler,
+    'DELETE',
+    () => ({ storeId: ids.store!, inviteId: ids.storeInvite! }),
+  ],
+  [
+    'DELETE alguém da equipe da loja',
+    r.storeMember.DELETE as Handler,
+    'DELETE',
+    () => ({ storeId: ids.store!, userId: bia.id }),
+  ],
+  [
+    'POST aceitar convite de loja de outro e-mail',
+    r.acceptStoreInvite.POST as Handler,
+    'POST',
+    () => ({ token: ids.storeInviteToken! }),
   ],
   ['GET grupo: faixa do beta', r.beta.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: temporadas', r.seasons.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
@@ -651,6 +737,32 @@ const outsiderCases: Case[] = [
 
 /** O que só a dona (ou admin) pode fazer, visto por um membro comum do mesmo grupo (Bia). */
 const memberCases: Case[] = [
+  [
+    'POST convite da equipe (equipe não é dona)',
+    r.storeInvites.POST as Handler,
+    'POST',
+    () => ({ storeId: ids.store! }),
+    { email: 'x@x.test' },
+  ],
+  [
+    'DELETE convite pendente (equipe não é dona)',
+    r.storeInvite.DELETE as Handler,
+    'DELETE',
+    () => ({ storeId: ids.store!, inviteId: ids.storeInvite! }),
+  ],
+  [
+    'DELETE a dona da equipe (equipe não é dona)',
+    r.storeMember.DELETE as Handler,
+    'DELETE',
+    () => ({ storeId: ids.store!, userId: ana.id }),
+  ],
+  [
+    'DELETE perfil da loja (equipe não é dona)',
+    r.store.DELETE as Handler,
+    'DELETE',
+    () => ({ storeId: ids.store! }),
+  ],
+
   [
     'POST torneio no encontro (membro comum)',
     r.eventTournaments.POST as Handler,

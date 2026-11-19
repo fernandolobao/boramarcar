@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildEventEmail, buildRecapEmail } from './email';
+import { buildEventEmail, buildRecapEmail, buildStoreInviteEmail } from './email';
 
 describe('e-mail de encontro', () => {
   it('chamado para o próximo: assunto e texto com o grupo, no idioma de quem recebe', () => {
@@ -54,5 +54,31 @@ describe('e-mail do resumo da noite', () => {
       },
     );
     expect(message.text).toContain('Primeira partida com o grupo: Caio e Duda. Boas-vindas!');
+  });
+});
+
+describe('e-mail de convite da loja (10.1)', () => {
+  it('dono: assunto com a loja, link do convite, prazo e o aviso de que vale só para este e-mail', () => {
+    const msg = buildStoreInviteEmail('dono@loja.test', {
+      storeName: 'Loja do Mago',
+      role: 'owner',
+      token: 'abc123',
+      days: 14,
+    });
+    expect(msg.to).toBe('dono@loja.test');
+    expect(msg.subject).toBe('Loja do Mago no ArcanaKin: seu convite');
+    expect(msg.html).toContain('/loja/convite/abc123');
+    expect(msg.text).toMatch(/14 dias/);
+    expect(msg.text).toMatch(/dono@loja\.test/);
+  });
+
+  it('equipe: texto de quem vai ajudar a cuidar do perfil', () => {
+    const msg = buildStoreInviteEmail('aj@loja.test', {
+      storeName: 'Loja do Mago',
+      role: 'staff',
+      token: 't',
+      days: 14,
+    });
+    expect(msg.text).toMatch(/equipe/);
   });
 });
