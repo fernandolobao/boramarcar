@@ -112,7 +112,7 @@ describe('exportUserData', () => {
     const { a, b, future } = await seedPlayer();
     const shop = await createStore(db, {
       name: 'Loja da Exportação',
-      city: 'Porto Alegre',
+      municipalityCode: '4314902',
       email: 'loja@export.test',
       createdBy: b,
     });
@@ -220,7 +220,7 @@ describe('deleteUserAccount', () => {
       .values({ userId: a, kind: 'podium', data: { kind: 'podium', userIds: [a] } });
     const loja = await createStore(db, {
       name: 'Loja da Exclusão',
-      city: 'Recife',
+      municipalityCode: '2611606',
       email: 'loja@exclusao.test',
       createdBy: b,
     });

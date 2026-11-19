@@ -615,3 +615,9 @@ sem rolagem horizontal em 320px.
 
 - Campo "Estrutura" (Select do design system, com a explicação de cada estrutura na descrição), só quando há escolha (mesas de par); ao trocar, os campos que não valem (rodadas, top cut) somem em vez de ficarem desabilitados sem explicação. No app, `Choices`. Coberto pelo axe (`a11y.test.tsx`).
 - Na eliminação simples, cada rodada tem o nome da fase quando faz sentido ("Quartas de final", "Semifinal", "Final") e a classificação por pontos não aparece (a chave decide); o campeão segue em destaque, em texto.
+
+## Cidade da loja e o que ela oferece (19/11/2026)
+
+- `CityPicker`: campo com rótulo visível no padrão ARIA "combobox" com lista (como a busca de endereço): setas, Enter e Esc; cada sugestão diz cidade e UF ("Curitiba, PR"); a dica explica que vale só o que se escolhe da lista; sair sem escolher volta para a cidade que valia. Coberto pelo axe (`a11y.test.tsx`) e pelo teste do componente.
+- "O que a loja oferece": quatro `Checkbox` num `fieldset` com `legend` e dica; na página pública, lista em texto.
+- No `/admin`, loja antiga sem município aparece com "cidade a confirmar" em texto.

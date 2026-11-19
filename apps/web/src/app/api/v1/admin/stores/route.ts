@@ -8,7 +8,8 @@ import { authed, parseJson } from '@/server/http';
 
 const schema = z.object({
   name: z.string().trim().min(1).max(80),
-  city: z.string().trim().min(1).max(80),
+  /** Código IBGE do município (7 dígitos). */
+  municipalityCode: z.string().regex(/^\d{7}$/),
   email: z.string().trim().email().max(200),
 });
 

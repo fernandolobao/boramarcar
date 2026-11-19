@@ -43,6 +43,7 @@ import { UserMenu } from './user-menu';
 import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ImageUpload } from './image-upload';
+import { CityPicker } from './places/city-picker';
 import { StructureSelect } from './tournaments/structure-select';
 import { TopCutSelect } from './tournaments/top-cut-select';
 import { ThemePicker } from './theme-picker';
@@ -323,6 +324,7 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  ['CityPicker', <CityPicker key="r" label="Cidade" value={null} onChange={() => {}} />],
   [
     'StructureSelect',
     <StructureSelect key="r" table="pair" value="round_robin" onChange={() => {}} />,

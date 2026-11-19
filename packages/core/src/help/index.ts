@@ -304,7 +304,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'lojas',
             question: 'Como uma loja entra no ArcanaKin?',
             intro: [
-              'A equipe do ArcanaKin cria o perfil da loja e manda um convite para o e-mail do responsável. Quem recebe entra (ou cria a conta) com esse mesmo e-mail e aceita o convite: o convite só vale para aquele endereço e por 14 dias. Depois, em "Gerenciar a loja" (no menu da conta), dá para editar endereço com mapa, horários, Instagram, WhatsApp, site e os formatos que a loja joga, e chamar a equipe por e-mail.',
+              'A equipe do ArcanaKin cria o perfil da loja e manda um convite para o e-mail do responsável. Quem recebe entra (ou cria a conta) com esse mesmo e-mail e aceita o convite: o convite só vale para aquele endereço e por 14 dias. Depois, em "Gerenciar a loja" (no menu da conta), dá para editar a cidade (escolhida da lista), o endereço com mapa, horários, Instagram, WhatsApp, site, os formatos que a loja joga e o que ela oferece (cartas avulsas, selados e acessórios, mesas para jogar, torneios), e chamar a equipe por e-mail.',
               'O perfil público da loja abre para qualquer pessoa, sem login, e não mostra o e-mail de contato. O selo "Loja verificada" é dado pela equipe do ArcanaKin.',
             ],
           },
@@ -680,7 +680,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'lojas',
             question: 'How does a store join ArcanaKin?',
             intro: [
-              'The ArcanaKin team creates the store profile and sends an invite to the owner’s e-mail. Whoever gets it signs in (or creates an account) with that same e-mail and accepts the invite: it only works for that address and for 14 days. Then, under "Manage the store" (in the account menu), they can edit the address with a map, hours, Instagram, WhatsApp, website and the formats the store plays, and invite the team by e-mail.',
+              'The ArcanaKin team creates the store profile and sends an invite to the owner’s e-mail. Whoever gets it signs in (or creates an account) with that same e-mail and accepts the invite: it only works for that address and for 14 days. Then, under "Manage the store" (in the account menu), they can edit the city (picked from the list), the address with a map, hours, Instagram, WhatsApp, website, the formats the store plays and what it offers (singles, sealed and accessories, tables to play, tournaments), and invite the team by e-mail.',
               'The store’s public profile opens for anyone, without signing in, and doesn’t show the contact e-mail. The "Verified store" badge is given by the ArcanaKin team.',
             ],
           },
