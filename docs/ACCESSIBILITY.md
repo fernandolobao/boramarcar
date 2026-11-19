@@ -584,3 +584,12 @@ sem rolagem horizontal em 320px.
 
 - Site (`ImageUpload`): grupo com nome ("Foto do perfil"/"Logo da loja"); a imagem é decorativa (`alt=""`, o nome está ao lado) e, sem imagem, as iniciais ficam `aria-hidden`. "Escolher/Trocar foto" é um `<button>` que abre o seletor de arquivo (o `<input type="file">` fica fora da ordem de foco, com rótulo próprio); "Remover" usa a confirmação em dois cliques. Erro de tipo/tamanho em `role="alert"` antes de enviar; "Foto atualizada" em `role="status"`. Coberto pelo axe (`a11y.test.tsx`) e pelo teste do componente.
 - App (`AvatarPicker`): seletor de imagens do sistema (já com recorte quadrado), "Remover foto" em dois toques (`ConfirmButton`), resultado em região viva; imagem e iniciais escondidas do leitor de tela.
+- App: o logo aparece na tela da loja, decorativo (o nome vem logo abaixo).
+
+## Eventos de loja no app (19/11/2026)
+
+- Conta → "Eventos de loja": os meus próximos eventos (cada um um botão com nome completo: evento, loja, data e situação) e o código do balcão (campo com rótulo; erro em `alert`).
+- Evento: tipo, formato, data, vagas em texto; situação da inscrição em região viva; desistir com `ConfirmButton` (dois toques, com o nome do evento); com o torneio começado, "Acompanhar o torneio" abre a tela de torneio (que agora aceita torneio de loja).
+- Loja: contatos e "Como chegar" como botões com a dica "Abre fora do app"; selo de verificada em texto (✓ + "Loja verificada").
+- Aviso de vaga no sino do app, com o texto completo e indo para o evento.
+- Telas conferidas com `tsc` e lint; não houve captura de tela do app (vale testar no Expo Go).

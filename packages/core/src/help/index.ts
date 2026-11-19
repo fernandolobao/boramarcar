@@ -295,7 +295,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'eventos-de-loja',
             question: 'Como me inscrevo num evento de loja?',
             intro: [
-              'Pela página do evento (na página da loja, em "Próximos eventos"): "Me inscrever". Se as vagas acabaram, você entra na lista de espera e sobe sozinho quando alguém desiste. Já está na loja? No menu da conta, "Código de evento": digite o código que está no balcão.',
+              'Pela página do evento (na página da loja, em "Próximos eventos"): "Me inscrever". Se as vagas acabaram, você entra na lista de espera e sobe sozinho quando alguém desiste. Já está na loja? No menu da conta (no app, em Conta → Eventos de loja), "Código de evento": digite o código que está no balcão.',
               'A equipe da loja também inscreve quem chegou sem conta, só com o nome, e marca quem chegou (check-in). Na página pública aparecem só as vagas: os nomes de quem se inscreveu ficam com a equipe da loja.',
               'Nos eventos de torneio, a equipe começa o torneio com quem fez check-in (convidados também) e a inscrição fecha. Qualquer pessoa acompanha as mesas, a classificação e a linha do tempo na página do evento; quem está na mesa registra o resultado (a equipe registra o dos convidados). Torneio de duplas (2HG) em loja ainda não é possível.',
             ],
@@ -668,7 +668,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'eventos-de-loja',
             question: 'How do I sign up for a store event?',
             intro: [
-              'On the event page (on the store page, under "Upcoming events"): "Sign me up". If the spots are full, you go on the waitlist and move up automatically when someone drops out. Already at the store? In the account menu, "Event code": type the code from the counter.',
+              'On the event page (on the store page, under "Upcoming events"): "Sign me up". If the spots are full, you go on the waitlist and move up automatically when someone drops out. Already at the store? In the account menu (in the app, Account → Store events), "Event code": type the code from the counter.',
               'The store team can also sign up people without an account, by name only, and mark who arrived (check-in). The public page only shows the spots: the names of who signed up stay with the store team.',
               'At tournament events, the team starts the tournament with everyone who checked in (guests too), and sign-ups close. Anyone can follow the tables, standings and timeline on the event page; players at a table report the result (the team reports for guests). Two-Headed Giant tournaments at stores aren’t possible yet.',
             ],
