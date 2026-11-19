@@ -485,3 +485,38 @@ export function EventCodeForm() {
     </form>
   );
 }
+
+/** Começar o torneio do evento (equipe): com quem fez check-in; depois, a página do evento acompanha. */
+export function StoreTournamentStart({
+  eventId,
+  checkedIn,
+  publicHref,
+}: {
+  eventId: string;
+  checkedIn: number;
+  publicHref: string;
+}) {
+  const t = useTranslations('storeEvents');
+  const router = useRouter();
+  const { run, error, pending } = useApiAction();
+  return (
+    <div className="space-y-2">
+      <button
+        type="button"
+        className="btn-primary"
+        disabled={pending || checkedIn < 2}
+        onClick={() =>
+          void run(
+            () => api(`/api/v1/store-events/${eventId}/tournament`, { method: 'POST' }),
+            () => router.push(publicHref),
+          )
+        }
+      >
+        <Icon name="play" />
+        {t('startTournament')}
+      </button>
+      <p className="muted text-sm">{t('startTournamentHint', { count: checkedIn })}</p>
+      <FormError message={error} />
+    </div>
+  );
+}

@@ -10,7 +10,7 @@ import {
 } from '@boramarcar/core/stores';
 import { and, asc, desc, eq, gte, inArray, lt } from 'drizzle-orm';
 import type { Database } from '../client';
-import { storeEventEntries, storeEvents, stores, user } from '../schema';
+import { storeEventEntries, storeEvents, stores, tournaments, user } from '../schema';
 import { requireStoreRole } from './stores';
 
 /**
@@ -261,6 +261,13 @@ async function register(
   if (event.status !== 'scheduled') {
     throw new DomainError('conflict', 'Este evento não está aberto para inscrição');
   }
+  // Com o torneio começado, a inscrição fecha (as mesas já foram montadas).
+  const [started] = await db
+    .select({ id: tournaments.id })
+    .from(tournaments)
+    .where(eq(tournaments.storeEventId, event.id))
+    .limit(1);
+  if (started) throw new DomainError('conflict', 'As inscrições fecharam: o torneio já começou');
   if (entry.userId) {
     const [already] = await db
       .select({ id: storeEventEntries.id })

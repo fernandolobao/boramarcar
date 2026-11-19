@@ -35,6 +35,7 @@ const PUBLIC_PAGES = [
   `/resumo/${E2E_IDS.pastEvent}`,
   `/lojas/${E2E_IDS.store}`,
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeEvent}`,
+  `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeTournamentEvent}`,
   `/loja/convite/${E2E_IDS.storeInvite}`,
   `/retrospectiva/${E2E_IDS.group}/${PAST_MONTH}`,
   '/entrar',

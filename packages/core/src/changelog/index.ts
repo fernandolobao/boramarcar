@@ -164,6 +164,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Eventos de loja: a loja publica torneios e noites livres com vagas, premiação e regras; você se inscreve pelo site ou pelo código do balcão, e a lista de espera anda sozinha.',
     en: 'Store events: stores post tournaments and open-play nights with spots, prizes and rules; sign up on the site or with the counter code, and the waitlist moves on its own.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Torneios nos eventos de loja: a loja começa com quem fez check-in (convidados também) e todo mundo acompanha mesas e classificação ao vivo na página do evento.',
+    en: 'Tournaments at store events: the store starts with everyone who checked in (guests too), and anyone can follow tables and standings live on the event page.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

@@ -96,6 +96,46 @@ test.describe('lojas', () => {
     });
   });
 
+  test.describe('torneio de loja', () => {
+    test.use({ storageState: AUTH_STATE });
+
+    test('com quem fez check-in (convidados também), ao vivo na página do evento', async ({
+      page,
+    }) => {
+      test.skip(test.info().project.name !== 'chromium', 'cria dados: só no desktop');
+      const title = `Copa da loja ${Date.now()}`;
+      await page.goto(`/lojas/${E2E_IDS.store}/gerenciar`);
+      await page.getByLabel('Título do evento').fill(title);
+      await fillDate(page, 'Dia', '2099-06-04');
+      await page.getByRole('button', { name: 'Criar evento' }).click();
+      await expect(
+        page.getByRole('heading', { level: 1, name: `${title}: inscrições` }),
+      ).toBeVisible();
+      for (const name of ['Zé', 'Lia']) {
+        await page.getByLabel('Inscrever quem chegou sem conta').fill(name);
+        await page.getByRole('button', { name: 'Inscrever', exact: true }).click();
+        const row = page.getByRole('listitem').filter({ hasText: name });
+        await row.getByRole('checkbox', { name: /Chegou/ }).check({ force: true });
+        await expect(row.getByRole('checkbox', { name: /Chegou/ })).toBeChecked();
+      }
+      await page.reload();
+      await page.getByRole('button', { name: 'Começar o torneio com quem chegou' }).click();
+      await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Rodada 1 de 3' })).toBeVisible();
+      // A equipe registra a mesa dos convidados (Commander: um pod).
+      await page
+        .getByRole('radiogroup', { name: 'Quem venceu a mesa 1' })
+        .getByText('Zé', { exact: true })
+        .click();
+      await page.getByRole('button', { name: /Salvar resultado/ }).click();
+      await expect(
+        page.getByRole('status').filter({ hasText: 'Resultado: Venceu: Zé' }),
+      ).toBeVisible();
+      const standings = page.getByRole('region', { name: 'Classificação' }).first();
+      await expect(standings.getByRole('row').nth(1)).toContainText('Zé');
+    });
+  });
+
   test('perfil público sem login: dados da loja, selo, sem e-mail de contato', async ({
     browser,
   }) => {

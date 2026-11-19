@@ -11,6 +11,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { events, groups } from './app';
+import { storeEvents } from './stores';
 
 const id = () =>
   text('id')
@@ -26,12 +27,12 @@ export const tournaments = pgTable(
   'tournaments',
   {
     id: id(),
-    groupId: text('group_id')
-      .notNull()
-      .references(() => groups.id, { onDelete: 'cascade' }),
-    eventId: text('event_id')
-      .notNull()
-      .references(() => events.id, { onDelete: 'cascade' }),
+    /** Torneio do grupo: num encontro. Torneio de loja (10.2b): num evento da loja (os dois `null`). */
+    groupId: text('group_id').references(() => groups.id, { onDelete: 'cascade' }),
+    eventId: text('event_id').references(() => events.id, { onDelete: 'cascade' }),
+    storeEventId: text('store_event_id')
+      .unique()
+      .references(() => storeEvents.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     format: text('format').notNull(),
     /** `pod` ou `pair` (do formato). */
@@ -62,6 +63,8 @@ export const tournamentEntrants = pgTable(
     tournamentId: text('tournament_id')
       .notNull()
       .references(() => tournaments.id, { onDelete: 'cascade' }),
+    /** Convidado sem conta (torneio de loja): só o nome, sem membros. */
+    guestName: text('guest_name'),
     createdAt: createdAt(),
   },
   (t) => [index('tournament_entrants_tournament_idx').on(t.tournamentId)],

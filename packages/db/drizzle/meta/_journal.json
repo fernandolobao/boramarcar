@@ -204,6 +204,13 @@
       "when": 1795063467097,
       "tag": "0028_natural_namor",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1795064742613,
+      "tag": "0029_lying_miss_america",
+      "breakpoints": true
     }
   ]
 }

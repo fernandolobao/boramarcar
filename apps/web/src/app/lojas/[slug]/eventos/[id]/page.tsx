@@ -1,5 +1,5 @@
 import { isGameFormat } from '@boramarcar/core';
-import { getStoreEventPublic, listMyStores } from '@boramarcar/db';
+import { getStoreEventPublic, getStoreEventTournament, listMyStores } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
@@ -8,6 +8,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { StoreEventRegistration } from '@/components/stores/store-events';
+import { TournamentLive } from '@/components/tournaments/tournament-live';
 import { getDb } from '@/server/db';
 import { pageMetadata } from '@/server/seo';
 import { getSessionUser } from '@/server/session';
@@ -48,7 +49,7 @@ export default async function StoreEventPage({ params }: Props) {
   const session = await getSessionUser(await headers()).catch(() => null);
   const event = await load(slug, id, session?.id);
   if (!event) notFound();
-  const [t, tf, tc, format, staff] = await Promise.all([
+  const [t, tf, tc, format, staff, tournament] = await Promise.all([
     getTranslations('storeEvents'),
     getTranslations('formats'),
     getTranslations('common'),
@@ -56,6 +57,7 @@ export default async function StoreEventPage({ params }: Props) {
     session
       ? listMyStores(getDb(), { userId: session.id }).then((s) => s.some((x) => x.slug === slug))
       : false,
+    getStoreEventTournament(getDb(), { eventId: id, viewerId: session?.id ?? null }),
   ]);
   const cancelled = event.status === 'cancelled';
   const formatName = tf(isGameFormat(event.format) ? event.format : 'other');
@@ -108,7 +110,9 @@ export default async function StoreEventPage({ params }: Props) {
             </span>
           )}
         </p>
+        {tournament && <p className="muted">{t('registrationClosed')}</p>}
         {!cancelled &&
+          !tournament &&
           (session ? (
             <StoreEventRegistration eventId={event.id} myEntry={event.myEntry} />
           ) : (
@@ -126,6 +130,19 @@ export default async function StoreEventPage({ params }: Props) {
           </Link>
         )}
       </section>
+
+      {/* Torneio do evento (10.2b): mesas, classificação e linha do tempo, ao vivo para todos. */}
+      {tournament && (
+        <div id="torneio" className="space-y-6 scroll-mt-4">
+          <h2 className="section-title mb-0">{t('tournamentTitle')}</h2>
+          <TournamentLive
+            view={tournament}
+            viewerId={session?.id ?? null}
+            tableMode={false}
+            deletable={false}
+          />
+        </div>
+      )}
 
       {event.prizes && (
         <section className="card space-y-2" aria-labelledby="evento-premiacao">

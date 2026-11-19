@@ -568,3 +568,9 @@ sem rolagem horizontal em 320px.
 - Página pública: `h1` com o título; quando, vagas e lista de espera em texto; inscrição/desistência com o estado em `role="status"` e desistir em dois cliques. Os nomes de quem se inscreveu não aparecem (só a contagem).
 - Equipe: o código do balcão em texto grande; cada inscrição com "Chegou" (caixa de marcar do design system, com o nome em `sr-only`, marcada na hora e desfeita se a API recusar) e "Tirar" em dois cliques (nome em `sr-only`); convidado com rótulo próprio.
 - Código: campo com rótulo, letras maiúsculas e espaçadas (não depende de cor); erro em `FormError`.
+
+## Torneio no evento de loja (19/11/2026)
+
+- A página pública do evento com torneio em andamento entrou no E2E de acessibilidade (seed: a Bia e um convidado numa mesa).
+- As mesas, a classificação e a linha do tempo vêm do mesmo componente do torneio do grupo (`TournamentLive`), com as mesmas garantias: `h2`/`h3`, linha de resultado em `role="status"`, tabela com `th` e rolagem com foco pelo teclado.
+- Com o torneio começado, o cartão de vagas diz em texto que as inscrições fecharam (antes, oferecia "Entrar para se inscrever").
