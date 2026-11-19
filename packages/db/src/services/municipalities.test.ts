@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Database } from '../client';
-import { createTestDb } from '../testing';
+import { stores } from '../schema';
+import { createTestDb, createTestUser } from '../testing';
 import { getMunicipality, getMunicipalityByCode, searchMunicipalities } from './municipalities';
 
 let db: Database;
@@ -41,4 +42,20 @@ describe('municípios do IBGE', () => {
     expect(await getMunicipality(db, { uf: 'xx', slug: 'curitiba' })).toBeNull();
     expect(await searchMunicipalities(db, { query: ' ' })).toEqual([]);
   });
+
+  it('cidades com loja vêm antes das outras (depois do nome exato)', async () => {
+    const owner = await createTestUser(db);
+    // "São José do Rio Preto" (SP) ganha uma loja: sobe na busca por "sao jose d".
+    await db.insert(stores).values({
+      slug: 'loja-rio-preto',
+      name: 'Loja Rio Preto',
+      city: 'São José do Rio Preto',
+      municipalityCode: '3549805',
+      contactEmail: 'rp@x.test',
+      createdBy: owner.id,
+    });
+    const [first] = await searchMunicipalities(db, { query: 'sao jose d' });
+    expect(first).toMatchObject({ name: 'São José do Rio Preto', uf: 'SP' });
+  });
 });
+
