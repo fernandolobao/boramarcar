@@ -27,6 +27,8 @@ export const RATE_LIMITS = {
   feedback: { limit: 10, windowMs: 60 * MINUTE },
   /** Código do balcão dos eventos de loja: tentativas, para o código não ser adivinhado. */
   storeCode: { limit: 20, windowMs: 10 * MINUTE },
+  /** Descoberta de lojas e eventos (10.3), aberta, por endereço. */
+  discovery: { limit: 60, windowMs: MINUTE },
   /** Envio de foto do perfil e logo da loja. */
   upload: { limit: 20, windowMs: 60 * MINUTE },
 } as const;

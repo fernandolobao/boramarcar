@@ -34,6 +34,8 @@ const PUBLIC_PAGES = [
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,
   `/torneio/${E2E_IDS.tournament}`,
+  '/lojas',
+  '/lojas/em/rs/porto-alegre',
   `/lojas/${E2E_IDS.store}`,
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeEvent}`,
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeTournamentEvent}`,

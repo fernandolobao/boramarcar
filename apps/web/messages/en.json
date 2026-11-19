@@ -1554,7 +1554,8 @@
   "legal": {
     "privacy": "Privacy Policy",
     "help": "Help",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "stores": "Stores and events"
   },
   "collection": {
     "title": "Collection",
@@ -1979,6 +1980,10 @@
     "tournament": {
       "title": "Tournament",
       "description": "Tournament rounds, tables and standings, live."
+    },
+    "discovery": {
+      "title": "Stores and events",
+      "description": "Magic tournaments, game nights and stores near you."
     }
   },
   "beta": {
@@ -2540,6 +2545,39 @@
     }
   },
   "discovery": {
-    "cityHint": "Type and pick from the list (e.g. Curitiba, PR)."
+    "cityHint": "Type and pick from the list (e.g. Curitiba, PR).",
+    "title": "Stores and events",
+    "titleCity": "Stores and events in {city}",
+    "intro": "Tournaments, game nights and stores to buy cards near you.",
+    "cityLabel": "Your city",
+    "useLocation": "Use my location",
+    "locating": "Finding your location…",
+    "located": "Sorted by distance from your location (which isn’t stored).",
+    "locationError": "Couldn’t use your location. Pick the city from the list.",
+    "events": "Upcoming events",
+    "stores": "Stores",
+    "noEvents": "No events scheduled in the next 30 days around here.",
+    "noStores": "No stores near {city} on ArcanaKin yet.",
+    "nearestCities": "Closest cities with stores:",
+    "pickCity": "Pick your city to see stores and events within 50 km.",
+    "citiesWithStores": "Cities with stores on ArcanaKin",
+    "distance": "{km} km",
+    "spots": "{registered} of {capacity} spots",
+    "spotsOpen": "{registered} signed up",
+    "waitlist": "{count} on the waitlist",
+    "ics": "Download to calendar",
+    "google": "Google Calendar",
+    "next": "Next event: {title}, {date}",
+    "verified": "Verified store",
+    "filterFormat": "Format",
+    "filterKind": "Event type",
+    "filterOffers": "What the store offers",
+    "kinds": {
+      "tournament": "Tournament",
+      "casual": "Open play"
+    },
+    "clearFilters": "Clear filters",
+    "metaDescription": "Magic tournaments, game nights and stores in {city}: dates, spots and directions.",
+    "results": "{events, plural, =0 {no events} =1 {1 event} other {# events}} and {stores, plural, =0 {no stores} =1 {1 store} other {# stores}}."
   }
 }

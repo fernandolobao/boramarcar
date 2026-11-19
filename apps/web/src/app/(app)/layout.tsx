@@ -135,6 +135,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </ViewTransition>
       </main>
       <footer className="mx-auto flex max-w-5xl flex-wrap gap-x-4 gap-y-2 px-4 pb-8 text-sm print:hidden">
+        <Link href="/lojas" className="muted underline underline-offset-2 hover:text-fg">
+          {tl('stores')}
+        </Link>
         <Link href="/ajuda" className="muted underline underline-offset-2 hover:text-fg">
           {tl('help')}
         </Link>

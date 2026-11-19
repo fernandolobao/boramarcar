@@ -628,3 +628,11 @@ sem rolagem horizontal em 320px.
 - `CityPicker`: campo com rótulo visível no padrão ARIA "combobox" com lista (como a busca de endereço): setas, Enter e Esc; cada sugestão diz cidade e UF ("Curitiba, PR"); a dica explica que vale só o que se escolhe da lista; sair sem escolher volta para a cidade que valia. Coberto pelo axe (`a11y.test.tsx`) e pelo teste do componente.
 - "O que a loja oferece": quatro `Checkbox` num `fieldset` com `legend` e dica; na página pública, lista em texto.
 - No `/admin`, loja antiga sem município aparece com "cidade a confirmar" em texto.
+
+## Lojas e eventos (descoberta, 20/11/2026)
+
+- `/lojas` e `/lojas/em/<uf>/<cidade>`: páginas públicas com `<main id="conteudo">`, um `<h1>` com a cidade, seções `<h2>` "Próximos eventos" e "Lojas".
+- Cidade pelo `CityPicker` (combobox). "Usar minha localização" é um `<button>`; o resultado (procurando, ordenado pela localização, ou o erro de permissão) sai em texto numa região `role="status"`.
+- Filtros (formato, tipo de evento, o que a loja oferece) são botões com `aria-pressed`, agrupados com `role="group"` e nome.
+- "Baixar para a agenda" e "Google Agenda" repetem em cada evento: o nome acessível leva o título do evento (`sr-only`), e o do Google avisa a nova aba.
+- Rotas novas no `a11y.spec.ts`.

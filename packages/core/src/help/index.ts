@@ -301,6 +301,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'lojas-perto',
+            question: 'Como acho lojas e eventos perto de mim?',
+            intro: [
+              'Em "Lojas e eventos" (link no rodapé do site, sem precisar de conta): escolha a sua cidade da lista e veja os torneios e noites de jogo dos próximos 30 dias e as lojas a até 50 km, as mais perto primeiro. "Usar minha localização" ordena pela distância de onde você está (a posição não é guardada). Os filtros mostram só um formato, um tipo de evento ou lojas que vendem cartas avulsas, selados, têm mesas para jogar ou fazem torneios. Cada evento tem "Baixar para a agenda" e "Google Agenda".',
+            ],
+          },
+          {
             id: 'lojas',
             question: 'Como uma loja entra no ArcanaKin?',
             intro: [
@@ -674,6 +681,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'On the event page (on the store page, under "Upcoming events"): "Sign me up". If the spots are full, you go on the waitlist and move up automatically when someone drops out. Already at the store? In the account menu (in the app, Account → Store events), "Event code": type the code from the counter.',
               'The store team can also sign up people without an account, by name only, and mark who arrived (check-in). The public page only shows the spots: the names of who signed up stay with the store team.',
               'At tournament events, the team starts the tournament with everyone who checked in (guests too), and sign-ups close. Anyone can follow the tables, standings and timeline on the event page; players at a table report the result (the team reports for guests). Two-Headed Giant tournaments at stores aren’t possible yet.',
+            ],
+          },
+          {
+            id: 'lojas-perto',
+            question: 'How do I find stores and events near me?',
+            intro: [
+              'Under "Stores and events" (link in the website footer, no account needed): pick your city from the list and see tournaments and game nights in the next 30 days and stores within 50 km, closest first. "Use my location" sorts by distance from where you are (the position isn’t stored). Filters show only one format, one event type or stores that sell singles or sealed, have tables to play or run tournaments. Each event has "Download to calendar" and "Google Calendar".',
             ],
           },
           {

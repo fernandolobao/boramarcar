@@ -1554,7 +1554,8 @@
   "legal": {
     "privacy": "Política de Privacidade",
     "help": "Ajuda",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "stores": "Lojas e eventos"
   },
   "collection": {
     "title": "Coleção",
@@ -1979,6 +1980,10 @@
     "tournament": {
       "title": "Torneio",
       "description": "Rodadas, mesas e classificação do torneio, ao vivo."
+    },
+    "discovery": {
+      "title": "Lojas e eventos",
+      "description": "Torneios, noites de jogo e lojas de Magic perto de você."
     }
   },
   "beta": {
@@ -2540,6 +2545,39 @@
     }
   },
   "discovery": {
-    "cityHint": "Digite e escolha da lista (ex.: Curitiba, PR)."
+    "cityHint": "Digite e escolha da lista (ex.: Curitiba, PR).",
+    "title": "Lojas e eventos",
+    "titleCity": "Lojas e eventos em {city}",
+    "intro": "Torneios, noites de jogo e lojas para comprar cartas perto de você.",
+    "cityLabel": "Sua cidade",
+    "useLocation": "Usar minha localização",
+    "locating": "Procurando a sua localização…",
+    "located": "Ordenado pela distância da sua localização (que não é guardada).",
+    "locationError": "Não foi possível usar a sua localização. Escolha a cidade na lista.",
+    "events": "Próximos eventos",
+    "stores": "Lojas",
+    "noEvents": "Nenhum evento marcado nos próximos 30 dias por aqui.",
+    "noStores": "Ainda não há lojas perto de {city} no ArcanaKin.",
+    "nearestCities": "Cidades com lojas mais perto:",
+    "pickCity": "Escolha a sua cidade para ver lojas e eventos a até 50 km.",
+    "citiesWithStores": "Cidades com lojas no ArcanaKin",
+    "distance": "{km} km",
+    "spots": "{registered} de {capacity} vagas",
+    "spotsOpen": "{registered} inscritos",
+    "waitlist": "{count} na lista de espera",
+    "ics": "Baixar para a agenda",
+    "google": "Google Agenda",
+    "next": "Próximo evento: {title}, {date}",
+    "verified": "Loja verificada",
+    "filterFormat": "Formato",
+    "filterKind": "Tipo de evento",
+    "filterOffers": "O que a loja oferece",
+    "kinds": {
+      "tournament": "Torneio",
+      "casual": "Noite livre"
+    },
+    "clearFilters": "Limpar filtros",
+    "metaDescription": "Torneios, noites de jogo e lojas de Magic em {city}: datas, vagas e como chegar.",
+    "results": "{events, plural, =0 {nenhum evento} =1 {1 evento} other {# eventos}} e {stores, plural, =0 {nenhuma loja} =1 {1 loja} other {# lojas}}."
   }
 }
