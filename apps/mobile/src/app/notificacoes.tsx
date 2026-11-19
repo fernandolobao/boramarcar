@@ -36,7 +36,18 @@ function notificationText(item: NotificationItem) {
     case 'nudge':
       return t('notifNudge', { event, group: item.groupName ?? '' });
     case 'store_event':
-      return t('notifStorePromoted', { title: item.storeEvent?.title ?? '' });
+      return d.event === 'new' && item.storeEvent?.storeName && item.storeEvent.startsAt
+        ? t('notifStoreNewEvent', {
+            store: item.storeEvent.storeName,
+            title: item.storeEvent.title,
+            date: formatDateTime(item.storeEvent.startsAt),
+          })
+        : t('notifStorePromoted', { title: item.storeEvent?.title ?? '' });
+    case 'store_notice':
+      return t('notifStoreNotice', {
+        store: item.storeNotice?.storeName ?? '',
+        text: item.storeNotice?.text ?? '',
+      });
     case 'tournament': {
       const name = item.tournamentName ?? '';
       if (d.event === 'finished') return t('notifTournamentFinished', { name });
@@ -75,6 +86,8 @@ function open(item: NotificationItem) {
     router.push({ pathname: '/encontros/[id]', params: { id: d.eventId } });
   } else if (item.kind === 'podium') {
     router.push('/ranking');
+  } else if (item.kind === 'store_notice' && item.storeNotice) {
+    router.push({ pathname: '/lojas/[slug]', params: { slug: item.storeNotice.slug } });
   } else if (item.kind === 'store_event' && typeof d.storeEventId === 'string') {
     router.push({ pathname: '/eventos-loja/[id]', params: { id: d.storeEventId } });
   } else if (item.kind === 'tournament' && typeof d.tournamentId === 'string') {

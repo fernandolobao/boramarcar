@@ -29,6 +29,7 @@ import {
   session,
   user,
   municipalities,
+  storeFollowers,
 } from '../schema';
 
 /** Nome exibido no histórico das partidas de quem excluiu a conta. */
@@ -264,10 +265,17 @@ export async function exportUserData(db: Database, userId: string) {
     .where(eq(storeEventEntries.userId, userId))
     .orderBy(asc(storeEvents.startsAt));
 
+  // Lojas que a pessoa segue (10.4).
+  const followed = await db
+    .select({ name: stores.name, slug: stores.slug, since: storeFollowers.createdAt })
+    .from(storeFollowers)
+    .innerJoin(stores, eq(stores.id, storeFollowers.storeId))
+    .where(eq(storeFollowers.userId, userId));
   return {
     format: 'arcanakin-export',
     version: 1,
     exportedAt: new Date().toISOString(),
+    followedStores: followed,
     profile: me,
     logins,
     pushDevices: devices,
@@ -337,6 +345,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     }
 
     await tx.delete(availabilitySlots).where(eq(availabilitySlots.userId, userId));
+    await tx.delete(storeFollowers).where(eq(storeFollowers.userId, userId));
     await tx.delete(availabilityRules).where(eq(availabilityRules.userId, userId));
     // Presenças em encontros que ainda não aconteceram; as passadas ficam (anônimas).
     const upcoming = tx.select({ id: events.id }).from(events).where(gt(events.startsAt, now));

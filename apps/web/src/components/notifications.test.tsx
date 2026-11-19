@@ -33,6 +33,7 @@ const base = {
   announcement: null,
   tournamentName: null,
   storeEvent: null,
+  storeNotice: null,
 };
 const items: InboxEntry[] = [
   {
@@ -101,8 +102,40 @@ const items: InboxEntry[] = [
     kind: 'store_event',
     createdAt: '2026-11-14T10:00:00Z',
     readAt: '2026-11-17T13:00:00Z',
-    storeEvent: { title: 'Commander de sexta', slug: 'loja-do-mago' },
+    storeEvent: {
+      title: 'Commander de sexta',
+      slug: 'loja-do-mago',
+      storeName: 'Loja do Mago',
+      startsAt: new Date('2026-11-27T22:00:00Z'),
+    },
     data: { kind: 'store_event', storeEventId: 'se1', event: 'promoted' },
+  },
+  {
+    ...base,
+    id: '8',
+    kind: 'store_event',
+    createdAt: '2026-11-13T10:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    storeEvent: {
+      title: 'Copa de Modern',
+      slug: 'loja-do-mago',
+      storeName: 'Loja do Mago',
+      startsAt: new Date('2026-11-28T17:00:00Z'),
+    },
+    data: { kind: 'store_event', storeEventId: 'se2', event: 'new' },
+  },
+  {
+    ...base,
+    id: '9',
+    kind: 'store_notice',
+    createdAt: '2026-11-12T10:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    storeNotice: {
+      text: 'Chegou a coleção nova!',
+      storeName: 'Loja do Mago',
+      slug: 'loja-do-mago',
+    },
+    data: { kind: 'store_notice', storeId: 's1', noticeId: 'n1' },
   },
 ];
 
@@ -137,6 +170,13 @@ describe('NotificationList', () => {
       'href',
       '/lojas/loja-do-mago/eventos/se1',
     );
+    // Loja seguida (10.4): evento novo e aviso da equipe, com link.
+    expect(
+      screen.getByRole('link', { name: /Loja do Mago marcou Copa de Modern/ }),
+    ).toHaveAttribute('href', '/lojas/loja-do-mago/eventos/se2');
+    expect(
+      screen.getByRole('link', { name: /Loja do Mago: Chegou a coleção nova!/ }),
+    ).toHaveAttribute('href', '/lojas/loja-do-mago');
     // Aviso do ArcanaKin: título e texto, sem link.
     expect(screen.getByText('Manutenção no sábado')).toBeInTheDocument();
     expect(screen.getByText(/Das 8h às 8h10\./)).toBeInTheDocument();

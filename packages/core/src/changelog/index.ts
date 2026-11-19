@@ -224,6 +224,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, Conta → "Lojas e eventos": a sua cidade (salva no perfil) ou a localização mostram torneios e lojas por perto, com "Adicionar à agenda". No site, a cidade também fica em Configurações.',
     en: 'In the app, Account → "Stores and events": your city (saved to your profile) or your location shows tournaments and stores nearby, with "Add to calendar". On the website, the city also lives in Settings.',
   },
+  {
+    date: '2026-11-21',
+    pt: 'Siga as suas lojas: em "Seguir loja", os eventos novos e os avisos delas chegam no sino e no celular. A equipe da loja manda avisos curtos para quem segue.',
+    en: 'Follow your stores: with "Follow store", their new events and notices arrive in your bell and on your phone. The store team sends short notices to followers.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

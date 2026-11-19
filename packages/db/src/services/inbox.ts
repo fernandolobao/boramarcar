@@ -13,6 +13,7 @@ import {
   tournaments,
   user,
   storeEvents,
+  storeNotices,
   stores,
 } from '../schema';
 import { achievementsUnlockedByGame } from './profiles';
@@ -187,7 +188,9 @@ export interface InboxItem {
   /** Nome do torneio, nos avisos de torneio. */
   tournamentName: string | null;
   /** Evento de loja (título e endereço da loja), nos avisos de evento de loja. */
-  storeEvent: { title: string; slug: string } | null;
+  storeEvent: { title: string; slug: string; storeName: string; startsAt: Date } | null;
+  /** Aviso de uma loja que a pessoa segue (10.4): o texto, a loja e o endereço dela. */
+  storeNotice: { text: string; storeName: string; slug: string } | null;
 }
 
 /** Notificações da pessoa, mais novas primeiro. */
@@ -231,7 +234,10 @@ export async function listNotifications(
   const storeEventIds = [
     ...new Set(items.flatMap((i) => (i.data.kind === 'store_event' ? [i.data.storeEventId] : []))),
   ];
-  const [names, titles, notices, cups, storeEventRows] = await Promise.all([
+  const storeNoticeIds = [
+    ...new Set(items.flatMap((i) => (i.data.kind === 'store_notice' ? [i.data.noticeId] : []))),
+  ];
+  const [names, titles, notices, cups, storeEventRows, storeNoticeRows] = await Promise.all([
     userIds.length
       ? db.select({ id: user.id, name: user.name }).from(user).where(inArray(user.id, userIds))
       : [],
@@ -255,13 +261,39 @@ export async function listNotifications(
       : [],
     storeEventIds.length
       ? db
-          .select({ id: storeEvents.id, title: storeEvents.title, slug: stores.slug })
+          .select({
+            id: storeEvents.id,
+            title: storeEvents.title,
+            slug: stores.slug,
+            storeName: stores.name,
+            startsAt: storeEvents.startsAt,
+          })
           .from(storeEvents)
           .innerJoin(stores, eq(stores.id, storeEvents.storeId))
           .where(inArray(storeEvents.id, storeEventIds))
       : [],
+    storeNoticeIds.length
+      ? db
+          .select({
+            id: storeNotices.id,
+            text: storeNotices.text,
+            storeName: stores.name,
+            slug: stores.slug,
+          })
+          .from(storeNotices)
+          .innerJoin(stores, eq(stores.id, storeNotices.storeId))
+          .where(inArray(storeNotices.id, storeNoticeIds))
+      : [],
   ]);
-  const storeEventOf = new Map(storeEventRows.map((e) => [e.id, { title: e.title, slug: e.slug }]));
+  const storeEventOf = new Map(
+    storeEventRows.map((e) => [
+      e.id,
+      { title: e.title, slug: e.slug, storeName: e.storeName, startsAt: e.startsAt },
+    ]),
+  );
+  const storeNoticeOf = new Map(
+    storeNoticeRows.map((n) => [n.id, { text: n.text, storeName: n.storeName, slug: n.slug }]),
+  );
   const cupOf = new Map(cups.map((c) => [c.id, c.name]));
   const noticeOf = new Map(notices.map((n) => [n.id, { title: n.title, body: n.body }]));
   const nameOf = new Map(names.map((n) => [n.id, n.name]));
@@ -282,6 +314,8 @@ export async function listNotifications(
     tournamentName: i.data.kind === 'tournament' ? (cupOf.get(i.data.tournamentId) ?? null) : null,
     storeEvent:
       i.data.kind === 'store_event' ? (storeEventOf.get(i.data.storeEventId) ?? null) : null,
+    storeNotice:
+      i.data.kind === 'store_notice' ? (storeNoticeOf.get(i.data.noticeId) ?? null) : null,
     people: Object.fromEntries(
       peopleIn(i.data).flatMap((id) => (nameOf.has(id) ? [[id, nameOf.get(id)!]] : [])),
     ),

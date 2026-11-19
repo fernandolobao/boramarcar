@@ -24,6 +24,7 @@ const ICON: Record<InboxEntry['kind'], IconName> = {
   monthly: 'ranking',
   tournament: 'winner',
   store_event: 'store',
+  store_notice: 'store',
 };
 
 /** Para onde a notificação leva. */
@@ -45,6 +46,8 @@ export function notificationHref(item: InboxEntry): string | null {
       return item.storeEvent
         ? `/lojas/${item.storeEvent.slug}/eventos/${item.data.storeEventId}`
         : null;
+    case 'store_notice':
+      return item.storeNotice ? `/lojas/${item.storeNotice.slug}` : null;
     default:
       return null;
   }
@@ -76,7 +79,21 @@ function useNotificationText() {
       case 'nudge':
         return t('nudge', { event, group: item.groupName ?? '' });
       case 'store_event':
-        return t('storePromoted', { title: item.storeEvent?.title ?? '' });
+        return d.event === 'new' && item.storeEvent
+          ? t('storeNewEvent', {
+              store: item.storeEvent.storeName,
+              title: item.storeEvent.title,
+              date: format.dateTime(new Date(item.storeEvent.startsAt), {
+                day: 'numeric',
+                month: 'numeric',
+              }),
+            })
+          : t('storePromoted', { title: item.storeEvent?.title ?? '' });
+      case 'store_notice':
+        return t('storeNotice', {
+          store: item.storeNotice?.storeName ?? '',
+          text: item.storeNotice?.text ?? '',
+        });
       case 'tournament': {
         const name = item.tournamentName ?? '';
         if (d.event === 'finished') return t('tournamentFinished', { name });

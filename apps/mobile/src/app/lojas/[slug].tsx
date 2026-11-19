@@ -1,4 +1,5 @@
 import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { Image, Linking, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { formatLabel } from '@/components/table/labels';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
@@ -10,9 +11,13 @@ import { useAsync } from '@/lib/use-async';
 export default function StoreScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const view = useAsync(() => api.stores.get(slug), [slug]);
+  const [followOverride, setFollowOverride] = useState<boolean | null>(null);
+  const [followBusy, setFollowBusy] = useState(false);
+  const [followStatus, setFollowStatus] = useState('');
   if (view.loading) return <Loading />;
   if (view.error || !view.data) return <ErrorState error={view.error} onRetry={view.refresh} />;
   const { store, upcoming } = view.data;
+  const following = followOverride ?? view.data.following ?? false;
   const open = (url: string) => void Linking.openURL(url);
   const contacts = [
     store.instagram && {
@@ -50,6 +55,29 @@ export default function StoreScreen() {
         </AppText>
         <AppText muted>{store.city}</AppText>
         {store.verified && <AppText style={{ fontWeight: '700' }}>✓ {t('storeVerified')}</AppText>}
+        {/* Seguir a loja (10.4): botão liga/desliga; o nome não muda. */}
+        <Button
+          label={t('storeFollow')}
+          variant={following ? 'primary' : 'secondary'}
+          accessibilityState={{ selected: following, busy: followBusy }}
+          disabled={followBusy}
+          onPress={() => {
+            setFollowBusy(true);
+            void (following ? api.stores.unfollow(store.id) : api.stores.follow(store.id))
+              .then((now) => {
+                setFollowOverride(now);
+                setFollowStatus(t(now ? 'storeFollowOn' : 'storeFollowOff', { store: store.name }));
+              })
+              .catch(() => setFollowStatus(t('loadError')))
+              .finally(() => setFollowBusy(false));
+          }}
+          style={{ alignSelf: 'flex-start' }}
+        />
+        {followStatus ? (
+          <AppText accessibilityLiveRegion="polite" muted>
+            {followStatus}
+          </AppText>
+        ) : null}
       </View>
       {store.about ? (
         <Card style={{ gap: 6 }}>

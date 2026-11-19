@@ -112,3 +112,35 @@ export function buildRecapPush(
     data: { url: `/encontros/${data.eventId}` },
   };
 }
+
+/** Push de evento novo de uma loja que a pessoa segue (10.4): abre o evento no app. */
+export function buildStoreEventPush(
+  target: PushTarget,
+  data: { storeName: string; event: { id: string; title: string; startsAt: Date } },
+): PushMessage {
+  const { t, format } = tools(target);
+  const values = {
+    store: data.storeName,
+    title: data.event.title,
+    when: format.dateTime(data.event.startsAt, SHORT_WHEN),
+  };
+  return {
+    to: target.token,
+    title: t('storeEvent.title', values),
+    body: t('storeEvent.body', values),
+    data: { url: `/eventos-loja/${data.event.id}` },
+  };
+}
+
+/** Push do aviso de uma loja que a pessoa segue (10.4): o texto inteiro; abre a loja no app. */
+export function buildStoreNoticePush(
+  target: PushTarget,
+  data: { storeName: string; slug: string; text: string },
+): PushMessage {
+  return {
+    to: target.token,
+    title: data.storeName,
+    body: data.text,
+    data: { url: `/lojas/${data.slug}` },
+  };
+}

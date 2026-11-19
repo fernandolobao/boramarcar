@@ -16,6 +16,7 @@ export const NOTIFICATION_KINDS = [
   'monthly',
   'tournament',
   'store_event',
+  'store_notice',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -41,8 +42,10 @@ export type NotificationData =
   /** Retrospectiva do mês do grupo pronta (dia 1, só se o grupo jogou no mês). */
   | { kind: 'monthly'; groupId: string; month: string }
   /** Torneio: rodada nova (com a mesa da pessoa; `null` = bye) ou torneio encerrado. */
-  /** Evento de loja: abriu vaga e a pessoa saiu da lista de espera. */
-  | { kind: 'store_event'; storeEventId: string; event: 'promoted' }
+  /** Evento de loja: abriu vaga (saiu da lista de espera) ou evento novo de loja que a pessoa segue. */
+  | { kind: 'store_event'; storeEventId: string; event: 'promoted' | 'new' }
+  /** Aviso da equipe de uma loja que a pessoa segue (10.4). */
+  | { kind: 'store_notice'; storeId: string; noticeId: string }
   | {
       kind: 'tournament';
       tournamentId: string;
