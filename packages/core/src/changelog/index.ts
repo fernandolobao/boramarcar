@@ -174,6 +174,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Saiu da lista de espera de um evento de loja? O aviso chega no sino, com o link para o evento.',
     en: 'Moved off a store event’s waitlist? The notice arrives in the bell, with a link to the event.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Eventos de loja também no app: em Conta → Eventos de loja, os seus próximos eventos e o código do balcão; dá para ver a loja, se inscrever, desistir e acompanhar o torneio ao vivo.',
+    en: 'Store events in the app too: under Account → Store events, your upcoming events and the counter code; see the store, sign up, drop out and follow the tournament live.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
