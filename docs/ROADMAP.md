@@ -206,7 +206,7 @@ Mesmo documento de desenho. O beta de fevereiro precisa que lojas criem torneios
 | 10.1 | **Perfil de loja** criado por admin, convite por e-mail, equipe da loja, selo de verificada                              | M       | ✅ (19/11/2026); logo no Vercel Blob (#201)                                                                   |
 | 10.2 | **Eventos da loja**: vagas, inscrição pelo app ou código no balcão, check-in, premiação em texto, acompanhamento ao vivo | G       | ✅ (19/11/2026): eventos, vagas, código, convidados, check-in, torneio ao vivo e app; 2HG em loja depois      |
 | 10.3 | **Descoberta por cidade**: lojas e eventos perto de você, com "adicionar à agenda"                                       | M       | ✅ (20/11/2026): municípios do IBGE, /lojas e /lojas/em/<uf>/<cidade>, agenda, cidade no perfil e tela no app |
-| 10.4 | **Seguidores e avisos da loja** (só para quem segue)                                                                     | P       | Depois do beta                                                                                                |
+| 10.4 | **Seguidores e avisos da loja** (só para quem segue)                                                                     | P       | ✅ (21/11/2026): seguir loja (site e app), evento novo e avisos no sino e no push                             |
 | 10.5 | **Piloto com 1–3 lojas** (o 8.9)                                                                                         | —       | Depois do beta                                                                                                |
 
 ## Transversal (contínuo)

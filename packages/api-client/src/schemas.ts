@@ -571,7 +571,20 @@ export const notificationSchema = z
     /** Nome do torneio, nos avisos de torneio. */
     tournamentName: z.string().nullable().optional(),
     /** Evento de loja, nos avisos de evento de loja. */
-    storeEvent: z.object({ title: z.string(), slug: z.string() }).nullable().optional(),
+    storeEvent: z
+      .object({
+        title: z.string(),
+        slug: z.string(),
+        storeName: z.string().optional(),
+        startsAt: date.optional(),
+      })
+      .nullable()
+      .optional(),
+    /** Aviso de uma loja que a pessoa segue (10.4). */
+    storeNotice: z
+      .object({ text: z.string(), storeName: z.string(), slug: z.string() })
+      .nullable()
+      .optional(),
   })
   .loose();
 export type NotificationItem = z.infer<typeof notificationSchema>;

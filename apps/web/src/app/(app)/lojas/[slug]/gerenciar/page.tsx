@@ -1,8 +1,14 @@
-import { getStoreForManager, listStoreEvents } from '@boramarcar/db';
+import {
+  getStoreForManager,
+  listStoreEvents,
+  getStoreFollowerCount,
+  listStoreNotices,
+} from '@boramarcar/db';
 import { isDomainError } from '@boramarcar/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ImageUpload } from '@/components/image-upload';
+import { StoreFollowersSection } from '@/components/stores/store-followers';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
@@ -43,11 +49,13 @@ export default async function ManageStorePage({ params }: Props) {
   const { slug } = await params;
   const { user, view } = await load(slug);
   const s = view.store;
-  const [t, te, format, upcoming] = await Promise.all([
+  const [t, te, format, upcoming, followerCount, notices] = await Promise.all([
     getTranslations('stores'),
     getTranslations('storeEvents'),
     getFormatter(),
     listStoreEvents(getDb(), { storeId: s.id, when: 'upcoming' }),
+    getStoreFollowerCount(getDb(), { storeId: s.id, userId: user.id }),
+    listStoreNotices(getDb(), { storeId: s.id, userId: user.id }),
   ]);
   return (
     <>
@@ -58,6 +66,16 @@ export default async function ManageStorePage({ params }: Props) {
           {t('viewPublic')}
         </Link>
       </div>
+      <section className="card space-y-3" aria-labelledby="loja-seguidores">
+        <h2 id="loja-seguidores" className="section-title mb-0">
+          {t('followers.title')}
+        </h2>
+        <StoreFollowersSection
+          storeId={s.id}
+          count={followerCount}
+          notices={notices.map((n) => ({ ...n, createdAt: n.createdAt.toISOString() }))}
+        />
+      </section>
       <section className="card" aria-labelledby="loja-perfil">
         <h2 id="loja-perfil" className="section-title">
           {t('profile')}

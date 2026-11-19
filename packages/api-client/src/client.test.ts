@@ -638,6 +638,24 @@ describe('cliente da API', () => {
     expect(got.tournament.storeEventId).toBe('se1');
   });
 
+  it('seguir loja (10.4): PUT e DELETE; o perfil da loja diz se a pessoa segue', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ following: true }))
+      .mockResolvedValueOnce(json({ following: false }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.stores.follow('s1')).toBe(true);
+    expect(fetchMock.mock.calls[0]).toEqual([
+      'https://www.arcanakin.com.br/api/v1/stores/s1/follow',
+      expect.objectContaining({ method: 'PUT' }),
+    ]);
+    expect(await api.stores.unfollow('s1')).toBe(false);
+    expect(fetchMock.mock.calls[1]![1].method).toBe('DELETE');
+  });
+
   it('descoberta (10.3): por cidade ou posição, busca de cidade e a cidade do perfil', async () => {
     const found = {
       origin: { kind: 'city', city: { name: 'Curitiba', uf: 'PR', slug: 'curitiba' } },

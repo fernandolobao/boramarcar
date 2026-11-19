@@ -44,6 +44,8 @@ import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ImageUpload } from './image-upload';
 import { CityPicker } from './places/city-picker';
+import { FollowStoreButton } from './stores/follow-button';
+import { StoreFollowersSection } from './stores/store-followers';
 import { StructureSelect } from './tournaments/structure-select';
 import { TopCutSelect } from './tournaments/top-cut-select';
 import { ThemePicker } from './theme-picker';
@@ -324,6 +326,26 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  [
+    'FollowStoreButton',
+    <FollowStoreButton
+      key="r"
+      storeId="s1"
+      slug="loja"
+      storeName="Loja"
+      following={false}
+      signedIn
+    />,
+  ],
+  [
+    'StoreFollowersSection',
+    <StoreFollowersSection
+      key="r"
+      storeId="s1"
+      count={3}
+      notices={[{ id: 'n1', text: 'Chegou a coleção nova!', createdAt: '2026-11-20T12:00:00Z' }]}
+    />,
+  ],
   ['CityPicker', <CityPicker key="r" label="Cidade" value={null} onChange={() => {}} />],
   [
     'StructureSelect',

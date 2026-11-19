@@ -31,4 +31,5 @@ export * from './services/tournaments';
 export * from './services/stores';
 export * from './services/municipalities';
 export * from './services/discovery';
+export * from './services/store-followers';
 export * from './services/store-events';
