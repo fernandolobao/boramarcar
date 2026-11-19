@@ -29,6 +29,8 @@ import {
   acceptStoreInvite,
   createStore,
   inviteStoreMember,
+  createStoreEvent,
+  registerForStoreEvent,
 } from '@boramarcar/db';
 import { createTestDb, createTestUser } from '@boramarcar/db/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -101,6 +103,11 @@ const r = {
   storeInvite: await import('../stores/[storeId]/invites/[inviteId]/route'),
   storeMember: await import('../stores/[storeId]/members/[userId]/route'),
   acceptStoreInvite: await import('../store-invites/[token]/accept/route'),
+  storeEvents: await import('../stores/[storeId]/events/route'),
+  storeEvent: await import('../store-events/[eventId]/route'),
+  storeEventCancel: await import('../store-events/[eventId]/cancel/route'),
+  storeEventGuests: await import('../store-events/[eventId]/guests/route'),
+  storeEntry: await import('../store-entries/[entryId]/route'),
 };
 
 type U = Awaited<ReturnType<typeof createTestUser>>;
@@ -306,6 +313,16 @@ beforeAll(async () => {
   });
   ids.storeInvite = pending.id;
   ids.storeInviteToken = pending.token;
+  const storeEvent = await createStoreEvent(db, {
+    storeId: shop.store.id,
+    userId: ana.id,
+    title: 'Evento Secreto',
+    startsAt: new Date(Date.now() + 5 * 864e5),
+    format: 'commander',
+    kind: 'casual',
+  });
+  ids.storeEvent = storeEvent.id;
+  ids.storeEntry = (await registerForStoreEvent(db, { eventId: storeEvent.id, userId: bia.id })).id;
   ids.announcement = (
     await createAnnouncement(db, {
       title: 'Aviso secret',
@@ -499,6 +516,51 @@ const outsiderCases: Case[] = [
     r.acceptStoreInvite.POST as Handler,
     'POST',
     () => ({ token: ids.storeInviteToken! }),
+  ],
+  [
+    'POST evento da loja',
+    r.storeEvents.POST as Handler,
+    'POST',
+    () => ({ storeId: ids.store! }),
+    {
+      title: 'Intruso',
+      startsAt: new Date(Date.now() + 864e5).toISOString(),
+      format: 'commander',
+      kind: 'casual',
+    },
+  ],
+  [
+    'PATCH evento da loja',
+    r.storeEvent.PATCH as Handler,
+    'PATCH',
+    () => ({ eventId: ids.storeEvent! }),
+    { title: 'Intruso' },
+  ],
+  [
+    'POST cancelar evento da loja',
+    r.storeEventCancel.POST as Handler,
+    'POST',
+    () => ({ eventId: ids.storeEvent! }),
+  ],
+  [
+    'POST convidado no evento da loja',
+    r.storeEventGuests.POST as Handler,
+    'POST',
+    () => ({ eventId: ids.storeEvent! }),
+    { name: 'Intruso' },
+  ],
+  [
+    'PATCH check-in de outra pessoa',
+    r.storeEntry.PATCH as Handler,
+    'PATCH',
+    () => ({ entryId: ids.storeEntry! }),
+    { checkedIn: true },
+  ],
+  [
+    'DELETE inscrição de outra pessoa',
+    r.storeEntry.DELETE as Handler,
+    'DELETE',
+    () => ({ entryId: ids.storeEntry! }),
   ],
   ['GET grupo: faixa do beta', r.beta.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
   ['GET grupo: temporadas', r.seasons.GET as Handler, 'GET', () => ({ groupId: ids.group! })],

@@ -2,11 +2,13 @@ import {
   boolean,
   doublePrecision,
   index,
+  integer,
   jsonb,
   pgTable,
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 
@@ -78,4 +80,53 @@ export const storeInvites = pgTable(
     acceptedAt: timestamp('accepted_at', { withTimezone: true }),
   },
   (t) => [index('store_invites_store_idx').on(t.storeId)],
+);
+
+/** Evento da loja (10.2): torneio ou noite livre, com vagas, código do balcão, premiação e regras. */
+export const storeEvents = pgTable(
+  'store_events',
+  {
+    id: id(),
+    storeId: text('store_id')
+      .notNull()
+      .references(() => stores.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    format: text('format').notNull(),
+    /** `tournament` ou `casual`. */
+    kind: text('kind').notNull(),
+    /** Vagas; `null` = sem limite. */
+    capacity: integer('capacity'),
+    /** Código curto para a inscrição no balcão. */
+    code: text('code').notNull().unique(),
+    prizes: text('prizes'),
+    rules: text('rules'),
+    /** `scheduled`, `cancelled` ou `finished`. */
+    status: text('status').notNull().default('scheduled'),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [index('store_events_store_idx').on(t.storeId, t.startsAt)],
+);
+
+/** Inscrição num evento de loja: de uma conta ou de um convidado (só o nome). */
+export const storeEventEntries = pgTable(
+  'store_event_entries',
+  {
+    id: id(),
+    storeEventId: text('store_event_id')
+      .notNull()
+      .references(() => storeEvents.id, { onDelete: 'cascade' }),
+    userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+    guestName: text('guest_name'),
+    /** `registered` ou `waitlist`. */
+    status: text('status').notNull(),
+    checkedInAt: timestamp('checked_in_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index('store_event_entries_event_idx').on(t.storeEventId),
+    uniqueIndex('store_event_entries_user_idx').on(t.storeEventId, t.userId),
+  ],
 );

@@ -155,7 +155,8 @@ export async function getStorePublic(db: Database, input: { slug: string }) {
 }
 export type StorePublic = NonNullable<Awaited<ReturnType<typeof getStorePublic>>>;
 
-async function requireStoreRole(
+/** Confere o papel na equipe da loja (lança `forbidden`); devolve o papel. */
+export async function requireStoreRole(
   db: Database,
   storeId: string,
   userId: string,

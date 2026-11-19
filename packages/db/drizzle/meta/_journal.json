@@ -197,6 +197,13 @@
       "when": 1795061958982,
       "tag": "0027_daffy_robbie_robertson",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1795063467097,
+      "tag": "0028_natural_namor",
+      "breakpoints": true
     }
   ]
 }
