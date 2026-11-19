@@ -99,16 +99,22 @@ export function buildRecapPush(
     title: string;
     games: number;
     top: { name: string; wins: number } | null;
+    /** Quem teve a primeira partida com o grupo nesta noite (8.11): as boas-vindas. */
+    debuts?: string[];
   },
 ): PushMessage {
-  const { t } = tools(target);
+  const { t, format } = tools(target);
+  const result =
+    data.top && data.top.wins > 0
+      ? t('recap.body', { name: data.top.name, wins: data.top.wins, count: data.games })
+      : t('recap.bodyDraw', { count: data.games });
+  const welcome = data.debuts?.length
+    ? ` ${t('recap.debuts', { names: format.list(data.debuts, { type: 'conjunction' }) })}`
+    : '';
   return {
     to: target.token,
     title: t('recap.title', { title: data.title }),
-    body:
-      data.top && data.top.wins > 0
-        ? t('recap.body', { name: data.top.name, wins: data.top.wins, count: data.games })
-        : t('recap.bodyDraw', { count: data.games }),
+    body: `${result}${welcome}`,
     data: { url: `/encontros/${data.eventId}` },
   };
 }

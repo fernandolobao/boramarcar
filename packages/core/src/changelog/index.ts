@@ -224,6 +224,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, Conta → "Lojas e eventos": a sua cidade (salva no perfil) ou a localização mostram torneios e lojas por perto, com "Adicionar à agenda". No site, a cidade também fica em Configurações.',
     en: 'In the app, Account → "Stores and events": your city (saved to your profile) or your location shows tournaments and stores nearby, with "Add to calendar". On the website, the city also lives in Settings.',
   },
+  {
+    date: '2026-11-21',
+    pt: 'O aviso do resumo da noite no celular agora dá as boas-vindas a quem jogou a primeira partida com o grupo, e o perfil de outra pessoa no app mostra o placar entre vocês.',
+    en: 'The night recap notification on your phone now welcomes whoever played their first game with the group, and someone else’s profile in the app shows the score between you two.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

@@ -42,6 +42,7 @@ export async function sendEventRecap(db: Database, eventId: string) {
               title: recap.title,
               games: recap.games.length,
               top,
+              debuts: recap.debuts,
             }),
           ),
         ),

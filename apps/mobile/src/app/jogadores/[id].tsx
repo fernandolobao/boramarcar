@@ -11,6 +11,9 @@ import { useState } from 'react';
 import { splitAchievements } from '@boramarcar/core/achievements';
 import { Choices } from '@/components/ds/choices';
 import { useAsync } from '@/lib/use-async';
+import { useGroup } from '@/lib/group';
+import { authClient } from '@/lib/auth';
+import { headToHeadBetween } from '@boramarcar/core/integration';
 import { Stat } from '@/components/ds/stat';
 
 const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = {
@@ -149,6 +152,14 @@ export default function PlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const profile = useAsync(() => api.players.get(id), [id]);
   const colors = useColors();
+  // Placar entre você e a pessoa (8.11), das estatísticas do grupo ativo.
+  const { group } = useGroup();
+  const { data: session } = authClient.useSession();
+  const me = session?.user.id;
+  const stats = useAsync(
+    () => (group && me && me !== id ? api.stats.get(group.id) : Promise.resolve(null)),
+    [group?.id, me, id],
+  );
 
   if (profile.loading) return <Loading />;
   if (profile.error || !profile.data) {
@@ -173,6 +184,24 @@ export default function PlayerScreen() {
       <Stack.Screen options={{ title: p.isSelf ? t('profileMine') : p.name }} />
       {/* No próprio perfil: conquistas ganhas desde a última visita (abre sozinha). */}
       {p.isSelf && <NewAchievements />}
+      {(() => {
+        const versus =
+          !p.isSelf && me && stats.data
+            ? headToHeadBetween(stats.data.headToHead ?? [], me, id)
+            : null;
+        return versus ? (
+          <Card>
+            <AppText>
+              {t('profileVersus', {
+                wins: versus.wins,
+                losses: versus.losses,
+                games: versus.games,
+                name: p.name,
+              })}
+            </AppText>
+          </Card>
+        ) : null;
+      })()}
       <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
         <Avatar name={p.name} image={p.image} />
         <View style={{ flex: 1 }}>

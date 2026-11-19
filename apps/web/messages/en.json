@@ -1696,7 +1696,8 @@
     "recap": {
       "title": "How it went: {title}",
       "body": "{name} won {wins} out of {count}. See the recap and send it to the group.",
-      "bodyDraw": "{count, plural, =1 {1 game} other {# games}} recorded. See the recap and send it to the group."
+      "bodyDraw": "{count, plural, =1 {1 game} other {# games}} recorded. See the recap and send it to the group.",
+      "debuts": "First game with the group: {names}."
     },
     "invite": {
       "title": "{group} misses you!",

@@ -1696,7 +1696,8 @@
     "recap": {
       "title": "Como foi: {title}",
       "body": "{name} venceu {wins} de {count}. Veja o resumo e mande no grupo.",
-      "bodyDraw": "{count, plural, =1 {1 partida} other {# partidas}} registradas. Veja o resumo e mande no grupo."
+      "bodyDraw": "{count, plural, =1 {1 partida} other {# partidas}} registradas. Veja o resumo e mande no grupo.",
+      "debuts": "Primeira partida com o grupo: {names}."
     },
     "invite": {
       "title": "{group} sente sua falta!",

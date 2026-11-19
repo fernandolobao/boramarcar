@@ -738,6 +738,8 @@ const pt = {
   discOfferSealed: 'Selados e acessórios',
   discOfferPlaySpace: 'Mesas para jogar',
   discOfferTournaments: 'Torneios',
+  profileVersus:
+    'Entre vocês, em partidas juntos ({games}): você venceu {wins}, {name} venceu {losses}.',
   achievementsTitle: 'Conquistas',
   achievementsTabPending: 'Em aberto ({count})',
   achievementsTabDone: 'Finalizadas ({count})',
@@ -1775,6 +1777,8 @@ const en: Messages = {
   discOfferSealed: 'Sealed and accessories',
   discOfferPlaySpace: 'Tables to play',
   discOfferTournaments: 'Tournaments',
+  profileVersus:
+    'Between you two, in games together ({games}): you won {wins}, {name} won {losses}.',
   achievementsTitle: 'Achievements',
   achievementsTabPending: 'Open ({count})',
   achievementsTabDone: 'Completed ({count})',
