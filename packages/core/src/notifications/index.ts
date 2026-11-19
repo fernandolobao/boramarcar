@@ -15,6 +15,7 @@ export const NOTIFICATION_KINDS = [
   'nudge',
   'monthly',
   'tournament',
+  'store_event',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -40,6 +41,8 @@ export type NotificationData =
   /** Retrospectiva do mês do grupo pronta (dia 1, só se o grupo jogou no mês). */
   | { kind: 'monthly'; groupId: string; month: string }
   /** Torneio: rodada nova (com a mesa da pessoa; `null` = bye) ou torneio encerrado. */
+  /** Evento de loja: abriu vaga e a pessoa saiu da lista de espera. */
+  | { kind: 'store_event'; storeEventId: string; event: 'promoted' }
   | {
       kind: 'tournament';
       tournamentId: string;

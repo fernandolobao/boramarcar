@@ -169,6 +169,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Torneios nos eventos de loja: a loja começa com quem fez check-in (convidados também) e todo mundo acompanha mesas e classificação ao vivo na página do evento.',
     en: 'Tournaments at store events: the store starts with everyone who checked in (guests too), and anyone can follow tables and standings live on the event page.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Saiu da lista de espera de um evento de loja? O aviso chega no sino, com o link para o evento.',
+    en: 'Moved off a store event’s waitlist? The notice arrives in the bell, with a link to the event.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

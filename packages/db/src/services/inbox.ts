@@ -12,6 +12,8 @@ import {
   notifications,
   tournaments,
   user,
+  storeEvents,
+  stores,
 } from '../schema';
 import { achievementsUnlockedByGame } from './profiles';
 import { getGroupRanking } from './ranking';
@@ -184,6 +186,8 @@ export interface InboxItem {
   announcement: { title: string; body: string } | null;
   /** Nome do torneio, nos avisos de torneio. */
   tournamentName: string | null;
+  /** Evento de loja (título e endereço da loja), nos avisos de evento de loja. */
+  storeEvent: { title: string; slug: string } | null;
 }
 
 /** Notificações da pessoa, mais novas primeiro. */
@@ -224,7 +228,10 @@ export async function listNotifications(
   const tournamentIds = [
     ...new Set(items.flatMap((i) => (i.data.kind === 'tournament' ? [i.data.tournamentId] : []))),
   ];
-  const [names, titles, notices, cups] = await Promise.all([
+  const storeEventIds = [
+    ...new Set(items.flatMap((i) => (i.data.kind === 'store_event' ? [i.data.storeEventId] : []))),
+  ];
+  const [names, titles, notices, cups, storeEventRows] = await Promise.all([
     userIds.length
       ? db.select({ id: user.id, name: user.name }).from(user).where(inArray(user.id, userIds))
       : [],
@@ -246,7 +253,15 @@ export async function listNotifications(
           .from(tournaments)
           .where(inArray(tournaments.id, tournamentIds))
       : [],
+    storeEventIds.length
+      ? db
+          .select({ id: storeEvents.id, title: storeEvents.title, slug: stores.slug })
+          .from(storeEvents)
+          .innerJoin(stores, eq(stores.id, storeEvents.storeId))
+          .where(inArray(storeEvents.id, storeEventIds))
+      : [],
   ]);
+  const storeEventOf = new Map(storeEventRows.map((e) => [e.id, { title: e.title, slug: e.slug }]));
   const cupOf = new Map(cups.map((c) => [c.id, c.name]));
   const noticeOf = new Map(notices.map((n) => [n.id, { title: n.title, body: n.body }]));
   const nameOf = new Map(names.map((n) => [n.id, n.name]));
@@ -265,6 +280,8 @@ export async function listNotifications(
     announcement:
       i.data.kind === 'announcement' ? (noticeOf.get(i.data.announcementId) ?? null) : null,
     tournamentName: i.data.kind === 'tournament' ? (cupOf.get(i.data.tournamentId) ?? null) : null,
+    storeEvent:
+      i.data.kind === 'store_event' ? (storeEventOf.get(i.data.storeEventId) ?? null) : null,
     people: Object.fromEntries(
       peopleIn(i.data).flatMap((id) => (nameOf.has(id) ? [[id, nameOf.get(id)!]] : [])),
     ),

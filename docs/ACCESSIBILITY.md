@@ -574,3 +574,8 @@ sem rolagem horizontal em 320px.
 - A página pública do evento com torneio em andamento entrou no E2E de acessibilidade (seed: a Bia e um convidado numa mesa).
 - As mesas, a classificação e a linha do tempo vêm do mesmo componente do torneio do grupo (`TournamentLive`), com as mesmas garantias: `h2`/`h3`, linha de resultado em `role="status"`, tabela com `th` e rolagem com foco pelo teclado.
 - Com o torneio começado, o cartão de vagas diz em texto que as inscrições fecharam (antes, oferecia "Entrar para se inscrever").
+
+## Avisos de evento de loja (19/11/2026)
+
+- Sino: "Abriu vaga em {evento}: você saiu da lista de espera e está inscrito.", com link para a página do evento (texto completo, como os outros avisos). Teste do sino cobre o texto e o link.
+- O torneio de loja aberto pelo endereço de torneio (ex.: aviso de rodada) leva direto à página do evento, onde ele é acompanhado.

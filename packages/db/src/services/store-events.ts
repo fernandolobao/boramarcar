@@ -8,9 +8,10 @@ import {
   type StoreEntryStatus,
   type StoreEventKind,
 } from '@boramarcar/core/stores';
-import { and, asc, desc, eq, gte, inArray, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNotNull, lt } from 'drizzle-orm';
 import type { Database } from '../client';
 import { storeEventEntries, storeEvents, stores, tournaments, user } from '../schema';
+import { addNotifications } from './inbox';
 import { requireStoreRole } from './stores';
 
 /**
@@ -127,6 +128,19 @@ async function promote(db: Database, event: EventRow) {
       .update(storeEventEntries)
       .set({ status: 'registered' })
       .where(inArray(storeEventEntries.id, ids));
+    // Quem tem conta recebe o aviso no sino (convidado não tem).
+    const promoted = await db
+      .select({ userId: storeEventEntries.userId })
+      .from(storeEventEntries)
+      .where(and(inArray(storeEventEntries.id, ids), isNotNull(storeEventEntries.userId)));
+    await addNotifications(
+      db,
+      promoted.map((p) => ({
+        userId: p.userId!,
+        groupId: null,
+        data: { kind: 'store_event' as const, storeEventId: event.id, event: 'promoted' as const },
+      })),
+    );
   }
 }
 
@@ -399,4 +413,38 @@ export async function getStoreEventForStaff(
       checkedInAt: r.checkedInAt,
     })),
   };
+}
+
+/** Próximos eventos de loja em que a pessoa está inscrita (ou na fila), mais cedo primeiro. */
+export async function listMyStoreEntries(db: Database, input: { userId: string; now?: Date }) {
+  const now = input.now ?? new Date();
+  const rows = await db
+    .select({
+      entryId: storeEventEntries.id,
+      status: storeEventEntries.status,
+      eventId: storeEvents.id,
+      title: storeEvents.title,
+      startsAt: storeEvents.startsAt,
+      format: storeEvents.format,
+      kind: storeEvents.kind,
+      storeName: stores.name,
+      slug: stores.slug,
+    })
+    .from(storeEventEntries)
+    .innerJoin(storeEvents, eq(storeEvents.id, storeEventEntries.storeEventId))
+    .innerJoin(stores, eq(stores.id, storeEvents.storeId))
+    .where(
+      and(
+        eq(storeEventEntries.userId, input.userId),
+        eq(storeEvents.status, 'scheduled'),
+        gte(storeEvents.startsAt, now),
+      ),
+    )
+    .orderBy(asc(storeEvents.startsAt));
+  return rows.map((r) => ({
+    entryId: r.entryId,
+    status: r.status as StoreEntryStatus,
+    event: { id: r.eventId, title: r.title, startsAt: r.startsAt, format: r.format, kind: r.kind },
+    store: { name: r.storeName, slug: r.slug },
+  }));
 }

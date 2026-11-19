@@ -32,6 +32,7 @@ const base = {
   people: { b: 'Bia', c: 'Caio' },
   announcement: null,
   tournamentName: null,
+  storeEvent: null,
 };
 const items: InboxEntry[] = [
   {
@@ -94,6 +95,15 @@ const items: InboxEntry[] = [
     tournamentName: 'Copa de Modern',
     data: { kind: 'tournament', tournamentId: 't1', event: 'round', round: 1, table: null },
   },
+  {
+    ...base,
+    id: '7',
+    kind: 'store_event',
+    createdAt: '2026-11-14T10:00:00Z',
+    readAt: '2026-11-17T13:00:00Z',
+    storeEvent: { title: 'Commander de sexta', slug: 'loja-do-mago' },
+    data: { kind: 'store_event', storeEventId: 'se1', event: 'promoted' },
+  },
 ];
 
 describe('NotificationList', () => {
@@ -122,6 +132,11 @@ describe('NotificationList', () => {
     expect(
       screen.getByText('Copa de Modern: rodada 1 começou. Você está de bye (vale vitória).'),
     ).toBeInTheDocument();
+    // Evento de loja: abriu vaga, com link para o evento.
+    expect(screen.getByRole('link', { name: /Abriu vaga em Commander de sexta/ })).toHaveAttribute(
+      'href',
+      '/lojas/loja-do-mago/eventos/se1',
+    );
     // Aviso do ArcanaKin: título e texto, sem link.
     expect(screen.getByText('Manutenção no sábado')).toBeInTheDocument();
     expect(screen.getByText(/Das 8h às 8h10\./)).toBeInTheDocument();
