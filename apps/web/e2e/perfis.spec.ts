@@ -31,7 +31,10 @@ test.describe('perfis e conquistas', () => {
     await expect(page.getByText('Grupos em comum')).toBeVisible();
     await expect(page.getByRole('region', { name: 'Conquistas' })).toBeVisible();
     // Quem não divide grupo não existe para o visitante.
-    expect((await page.goto('/jogadores/ninguem'))!.status()).toBe(404);
+    // (Com o carregamento na hora da troca de página, a resposta já começou com 200: vale a tela.)
+    await page.goto('/jogadores/ninguem');
+    await expect(page.getByText('404', { exact: true })).toBeVisible();
+    await expect(page.getByText('Grupos em comum')).toHaveCount(0);
   });
 
   test('deck privado some do perfil para os outros', async ({ page }) => {

@@ -134,6 +134,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Chegaram os torneios do grupo, em qualquer formato: pods no Commander, partidas um contra um em melhor de 3 e duplas no 2HG, com rodadas, mesas, classificação com desempates oficiais e linha do tempo.',
     en: 'Group tournaments are here, in any format: Commander pods, best-of-3 one-on-one matches and Two-Headed Giant duos, with rounds, tables, standings with official tiebreakers and a timeline.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Trocar de página ficou mais responsivo: o item do menu reage na hora do toque e a página nova mostra onde o conteúdo vai aparecer enquanto carrega.',
+    en: 'Switching pages feels faster: the menu item reacts right when you tap it, and the new page shows where content will appear while it loads.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

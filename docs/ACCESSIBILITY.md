@@ -535,3 +535,9 @@ sem rolagem horizontal em 320px.
 - Página do torneio: um `h1`, seções com `h2` (`aria-labelledby`) para inscrições, cada rodada, classificação, linha do tempo e organização; mesas com `h3`. Classificação numa `table` com `th scope="col"` e o nome em `th scope="row"`; os critérios de desempate explicados em texto logo abaixo.
 - Resultado da mesa: no pod, um grupo de rádio "Quem venceu a mesa N" (com "Empate"); no par, um campo numérico por inscrição ("Jogos vencidos por …"). O botão "Salvar resultado" leva a mesa no nome (`sr-only`), e a confirmação vem num `role="status"`.
 - Tirar inscrição e apagar o torneio em dois cliques (padrão do projeto), com o nome de quem sai no botão.
+
+## Troca de página com retorno imediato (19/11/2026)
+
+- Área logada com `loading.tsx`: ao trocar de página, aparece na hora um esqueleto (título e cartões cinza, decorativos, `aria-hidden`), com `aria-busy` e "Carregando…" numa região de status para leitores de tela. O pulso respeita `motion-reduce`.
+- Menu principal: o item tocado fica destacado e ganha um ponto pulsando (decorativo) até a página chegar (`useLinkStatus`). O `aria-current="page"` continua só na página real. As cores do menu saíram das escalas (`ink-*`) para os tokens por função.
+- E2E de acessibilidade: espera o esqueleto sumir e as animações de entrada terminarem antes de medir o contraste (antes, às vezes media no meio do esmaecimento).
