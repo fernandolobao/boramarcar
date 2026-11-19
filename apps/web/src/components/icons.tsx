@@ -18,6 +18,7 @@ import {
   Gamepad2,
   Skull,
   MapPin,
+  Store,
   Maximize,
   Minimize,
   Navigation,
@@ -202,6 +203,7 @@ export const Icons = {
   openingHand: Hand,
   flip: FlipHorizontal2,
   location: MapPin,
+  store: Store,
   directions: Navigation,
   // Modo mesa
   monarch: Crown,

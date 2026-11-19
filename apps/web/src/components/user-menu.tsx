@@ -17,12 +17,15 @@ export function UserMenu({
   email,
   image,
   admin = false,
+  stores = [],
 }: {
   name: string;
   email: string;
   image: string | null;
   /** Quem está em ADMIN_EMAILS vê o link das métricas do beta. */
   admin?: boolean;
+  /** Lojas em que a pessoa está na equipe (10.1): atalho para gerenciar. */
+  stores?: { slug: string; name: string }[];
 }) {
   const t = useTranslations('nav');
   const tc = useTranslations('common');
@@ -130,6 +133,18 @@ export function UserMenu({
               {t('feedback')}
             </Link>
           </li>
+          {stores.map((store) => (
+            <li key={store.slug}>
+              <Link
+                href={`/lojas/${store.slug}/gerenciar`}
+                className={itemClass}
+                aria-current={pathname.startsWith(`/lojas/${store.slug}`) ? 'page' : undefined}
+              >
+                <Icon name="store" />
+                {store.name}
+              </Link>
+            </li>
+          ))}
           {admin && (
             <li>
               <Link

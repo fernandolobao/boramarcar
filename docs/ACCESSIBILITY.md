@@ -553,3 +553,11 @@ sem rolagem horizontal em 320px.
 - Formulário de placar (par): os campos de jogos vencidos ficam um abaixo do outro (lado a lado, estouravam o cartão da mesa em meia largura); as mesas da rodada ficam com a altura do próprio conteúdo.
 - A página do torneio deixou de usar as seções empilhadas ao rolar: com formulários de altura variável, a seção de baixo cobria o botão "Salvar resultado" (o E2E acusou).
 - "Veja por dentro" ganhou a aba "Torneio" (texto alternativo descreve a rodada mostrada).
+
+## Perfis de loja (19/11/2026)
+
+- Perfil público (`/lojas/<loja>`), gerenciar (`/lojas/<loja>/gerenciar`) e o convite (`/loja/convite/<token>`) no E2E de acessibilidade, claro e escuro, desktop e celular (o seed tem uma loja verificada com endereço e um convite pendente).
+- Perfil público: um `h1` com o nome, seções com `h2`; as iniciais da loja são decorativas; o selo "Loja verificada" é texto (não só cor). Links de contato abrem em nova aba com o aviso `sr-only`; o mapa é complementar (endereço e rotas sempre em texto).
+- Gerenciar: campos com rótulo e dica (`aria-describedby`); formatos como caixas de marcar do design system dentro de `fieldset`/`legend`; status de salvar e de convite em `role="status"`.
+- "Tirar da equipe" e "Cancelar convite": o texto visível faz parte do nome acessível, com o contexto (nome ou e-mail) em `sr-only` (o axe acusou `label-content-name-mismatch` na primeira versão, com `aria-label` diferente do texto).
+- `/admin`: o selo de verificada é um `Switch` (efeito imediato), com o nome da loja no rótulo; excluir em dois cliques.
