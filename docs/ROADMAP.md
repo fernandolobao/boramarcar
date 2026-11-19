@@ -233,13 +233,13 @@ Feito até aqui: agenda, partidas e ranking, decks e coleção, análise (com no
 
 O beta assistido (8.5) começa em **fevereiro de 2027** e **precisa que lojas possam criar torneios**. Até lá, nesta ordem:
 
-1. **Pendências conhecidas** (abaixo), incluindo o **Sentry no app**.
-2. **Marcar notificação como lida**, uma a uma (e "marcar todas").
-3. **Integração do grupo, entregas 2 e 3** (8.11, 8.12).
-4. **Design system, fase 3** (Select, Checkbox/Switch, Stat).
+1. ✅ **Pendências conhecidas** (abaixo), incluindo o **Sentry no app** (os mapas de código vêm com os builds de dezembro).
+2. ✅ **Marcar notificação como lida**, uma a uma (e "marcar todas").
+3. ✅ **Integração do grupo, entrega 3** (8.12); a entrega 2 (8.11) fica para durante o beta.
+4. ✅ **Design system, fase 3** (Select, Checkbox/Switch, Stat).
 5. **Leitura de cartas pela câmera (5.9)** no app, em dezembro, com o build de desenvolvimento (plano em `docs/superpowers/specs/2026-11-18-leitura-de-cartas-camera-design.md`; o app continua em Expo, sem reescrever em nativo).
-6. **Torneios do grupo (Fase 9)** e **perfis de loja com torneios (Fase 10, 10.1 e 10.2)** — desenho em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design.md`.
-7. **Ensaio do beta** em aparelhos reais (roteiro meu; ensaio com o seu grupo), incluindo um torneio de loja de ponta a ponta.
+6. ✅ **Torneios do grupo (Fase 9)** e **perfis de loja com torneios (Fase 10, 10.1 e 10.2)** — desenho em `docs/superpowers/specs/2026-11-18-torneios-e-lojas-design.md`.
+7. **Ensaio do beta** em aparelhos reais, incluindo um torneio de loja de ponta a ponta: roteiro em [`docs/ENSAIO-BETA.md`](ENSAIO-BETA.md); o ensaio é com o seu grupo.
 8. **Dezembro: contas de desenvolvedor da Apple e do Google** (você) e, com elas, o **build de pré-lançamento** pelo EAS (TestFlight e teste interno do Google Play). Contas pessoais do Google exigem 12 testadores por 14 dias antes da publicação.
 9. **Início do beta (8.5)** em fevereiro.
 
