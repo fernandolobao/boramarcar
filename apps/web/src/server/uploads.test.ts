@@ -55,6 +55,20 @@ describe('envio de imagens para o armazenamento', () => {
     ).rejects.toMatchObject({ code: 'upstream_error' });
   });
 
+  it('armazenamento recusa (ex.: store privado): erro claro e registrado, não um 500 mudo', async () => {
+    const warn = vi.spyOn(console, 'error').mockImplementation(() => {});
+    put.mockRejectedValueOnce(
+      Object.assign(new Error('Cannot use public access on a private store'), {
+        name: 'BlobAccessError',
+      }),
+    );
+    await expect(
+      saveUploadedImage(await photo(), { folder: 'avatars', ownerId: 'u1' }),
+    ).rejects.toMatchObject({ code: 'upstream_error' });
+    expect(String(warn.mock.calls[0]?.join(' '))).toContain('private store');
+    warn.mockRestore();
+  });
+
   it('apaga só arquivo nosso, e falha ao apagar não derruba a operação', async () => {
     await deleteUploadedImage('https://lh3.googleusercontent.com/a/1');
     await deleteUploadedImage(null);

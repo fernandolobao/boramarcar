@@ -22,13 +22,22 @@ export async function saveUploadedImage(
     throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento');
   }
   const image = await processUploadedImage(Buffer.from(await file.arrayBuffer()));
-  const { url } = await put(`${where.folder}/${where.ownerId}/${randomUUID()}.webp`, image, {
-    access: 'public',
-    contentType: 'image/webp',
-    addRandomSuffix: false,
-    cacheControlMaxAge: 60 * 60 * 24 * 365,
-  });
-  return url;
+  try {
+    const { url } = await put(`${where.folder}/${where.ownerId}/${randomUUID()}.webp`, image, {
+      // O Blob store precisa ser público: a foto aparece em <img> para quem vê o perfil.
+      access: 'public',
+      contentType: 'image/webp',
+      addRandomSuffix: false,
+      cacheControlMaxAge: 60 * 60 * 24 * 365,
+    });
+    return url;
+  } catch (error) {
+    // Ex.: store privado, suspenso ou inexistente. Só o nome e a mensagem do erro (sem o token).
+    const { name, message } =
+      error instanceof Error ? error : { name: 'Error', message: String(error) };
+    console.error(`[uploads] o Blob recusou a imagem: ${name}: ${message}`);
+    throw new DomainError('upstream_error', 'Envio de imagens indisponível no momento');
+  }
 }
 
 /** Apaga um arquivo enviado (foto ou logo trocado). URL de fora (ex.: Google) não é tocada. */
