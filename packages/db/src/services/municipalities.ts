@@ -1,7 +1,7 @@
 import { municipalitySlug } from '@boramarcar/core/discovery';
 import { and, asc, desc, eq, like, sql } from 'drizzle-orm';
 import type { Database } from '../client';
-import { municipalities } from '../schema';
+import { municipalities, stores } from '../schema';
 
 const fields = {
   code: municipalities.code,
@@ -22,7 +22,8 @@ export type Municipality = {
 
 /**
  * Cidades pelo começo do nome, sem acento e sem caixa ("sao jose" acha "São José"). Nome exato
- * primeiro, depois capitais, depois em ordem alfabética. Busca vazia não traz nada.
+ * primeiro, depois cidades com loja, depois capitais, depois em ordem alfabética. Busca vazia não
+ * traz nada.
  */
 export async function searchMunicipalities(
   db: Database,
@@ -36,6 +37,10 @@ export async function searchMunicipalities(
     .where(like(municipalities.slug, `${q}%`))
     .orderBy(
       desc(sql`${municipalities.slug} = ${q}`),
+      // Cidades com loja no ArcanaKin antes das outras (descoberta, 10.3).
+      desc(
+        sql`exists (select 1 from ${stores} where ${stores.municipalityCode} = ${municipalities.code})`,
+      ),
       desc(municipalities.capital),
       asc(municipalities.slug),
       asc(municipalities.uf),
