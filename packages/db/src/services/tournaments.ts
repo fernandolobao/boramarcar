@@ -30,6 +30,7 @@ import {
 import { recordGame } from './events';
 import { addNotifications } from './inbox';
 import { requireMembership } from './groups';
+import { displayNames } from './recap';
 import { requireStoreRole } from './stores';
 
 /**
@@ -753,6 +754,16 @@ export async function getTournament(
   input: { tournamentId: string; userId: string | null },
 ) {
   const { row, canManage } = await loadTournament(db, input.tournamentId, input.userId);
+  return buildView(db, row, canManage, input.userId);
+}
+
+/** Monta a página do torneio (sem conferir acesso: quem chama já conferiu). */
+async function buildView(
+  db: Database,
+  row: TournamentRow,
+  canManage: boolean,
+  viewerId: string | null,
+) {
   const [entrantRows, memberRows, rounds, tables, timeline, [event]] = await Promise.all([
     entrantIdsOf(db, row.id),
     db
@@ -810,9 +821,7 @@ export async function getTournament(
       guest: guestName.has(id),
     };
   });
-  const mine = input.userId
-    ? (entrants.find((e) => e.memberIds.includes(input.userId!))?.id ?? null)
-    : null;
+  const mine = viewerId ? (entrants.find((e) => e.memberIds.includes(viewerId))?.id ?? null) : null;
   const swissRounds = rounds.filter((r) => r.stage === 'swiss');
   const played: PlayedRound[] = swissRounds.map((r) => ({
     tables: tables
@@ -859,6 +868,50 @@ export async function getTournament(
   };
 }
 export type TournamentView = Awaited<ReturnType<typeof getTournament>>;
+
+/**
+ * Página pública do torneio (9.5), para quem tem o link: rodadas, mesas, classificação e linha
+ * do tempo, com só o primeiro nome de cada pessoa (com a inicial do sobrenome quando repete).
+ * Nada de grupo, encontro, e-mail, foto ou ids de conta. `null` antes de começar ou se não existe.
+ */
+export async function getPublicTournament(
+  db: Database,
+  tournamentId: string,
+): Promise<TournamentView | null> {
+  const [row] = await db
+    .select()
+    .from(tournaments)
+    .where(eq(tournaments.id, tournamentId))
+    .limit(1);
+  if (!row || row.status === 'registration') return null;
+  const full = await buildView(db, row, false, null);
+  const people = await db
+    .select({
+      userId: tournamentEntrantMembers.userId,
+      name: user.name,
+      entrantId: tournamentEntrantMembers.entrantId,
+    })
+    .from(tournamentEntrantMembers)
+    .innerJoin(user, eq(user.id, tournamentEntrantMembers.userId))
+    .where(eq(tournamentEntrantMembers.tournamentId, row.id))
+    .orderBy(asc(tournamentEntrantMembers.position));
+  const shown = displayNames(people);
+  const firstOnly = (name: string) => name.trim().split(/\s+/)[0] || name;
+  return {
+    ...full,
+    tournament: { ...full.tournament, groupId: null, eventId: null, createdBy: null },
+    entrants: full.entrants.map((e) => ({
+      ...e,
+      memberIds: [],
+      name: e.guest
+        ? firstOnly(e.name)
+        : people
+            .filter((p) => p.entrantId === e.id)
+            .map((p) => shown.get(p.userId)!)
+            .join(' & '),
+    })),
+  };
+}
 
 /** Torneios do grupo, mais novos primeiro. */
 export async function listTournaments(db: Database, input: { groupId: string; userId: string }) {

@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { TournamentEntrants } from '@/components/tournaments/tournament-actions';
+import { CopyField, ShareButtons } from '@/components/share-buttons';
 import { TournamentLive } from '@/components/tournaments/tournament-live';
 import { requireUser } from '@/server/current-user';
 import { getDb } from '@/server/db';
+import { tournamentPublicUrl } from '@/server/email';
 import { pageMetadata } from '@/server/seo';
 
 type Props = { params: Promise<{ id: string }> };
@@ -96,6 +98,23 @@ export default async function TournamentPage({ params }: Props) {
         )}
 
         <TournamentLive view={view} viewerId={user.id} tableMode={Boolean(tour.eventId)} />
+
+        {/* Link público (9.5): para quem não é do grupo acompanhar, só com primeiros nomes. */}
+        {tour.status !== 'registration' && (
+          <section className="card space-y-3" aria-labelledby="torneio-link">
+            <h2 id="torneio-link" className="section-title mb-0">
+              {t('public.link')}
+            </h2>
+            <p className="muted text-sm">{t('public.linkHint')}</p>
+            <CopyField label={t('public.link')} value={tournamentPublicUrl(tour.id)} />
+            <ShareButtons
+              text={t('public.shareText', { name: tour.name, url: tournamentPublicUrl(tour.id) })}
+              url={tournamentPublicUrl(tour.id)}
+              title={tour.name}
+              copy={false}
+            />
+          </section>
+        )}
       </div>
     </>
   );

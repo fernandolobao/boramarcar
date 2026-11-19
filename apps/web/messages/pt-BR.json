@@ -1971,6 +1971,10 @@
     "notifications": {
       "title": "Notificações",
       "description": "Partidas suas e do seu grupo, conquistas novas, mudanças no pódio e avisos do ArcanaKin."
+    },
+    "tournament": {
+      "title": "Torneio",
+      "description": "Rodadas, mesas e classificação do torneio, ao vivo."
     }
   },
   "beta": {
@@ -2319,7 +2323,17 @@
     "stageHeading": "Top {size} · {stage}",
     "startTopCut": "Começar o top {count}",
     "nextStage": "Próxima fase do top",
-    "standingsSwiss": "Classificação do suíço"
+    "standingsSwiss": "Classificação do suíço",
+    "public": {
+      "live": "Ao vivo",
+      "liveHint": "A página se atualiza sozinha a cada 30 segundos.",
+      "share": "Compartilhar o torneio",
+      "shareText": "Acompanhe {name} ao vivo: {url}",
+      "cta": "Organize os torneios do seu grupo no ArcanaKin.",
+      "ctaButton": "Conhecer o ArcanaKin",
+      "link": "Link público",
+      "linkHint": "Quem tem o link acompanha rodadas, mesas e classificação, sem entrar. Aparece só o primeiro nome de cada pessoa."
+    }
   },
   "stores": {
     "metaDescription": "{name} em {city}: endereço, horários, contatos e formatos de Magic que a loja joga.",
