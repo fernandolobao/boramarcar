@@ -149,6 +149,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Nas mesas de torneio (pods e melhor de 1), "Abrir no modo mesa" já traz os jogadores e o formato; ao registrar, o resultado vai direto para a mesa do torneio.',
     en: 'On tournament tables (pods and best of 1), "Open in table mode" brings the players and format; when you save, the result goes straight to the tournament table.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Chegaram os perfis de loja: endereço com mapa, horários, contatos e formatos, com o selo de loja verificada. A loja entra por convite da equipe do ArcanaKin.',
+    en: 'Store profiles are here: address with a map, hours, contacts and formats, with a verified-store badge. Stores join by invite from the ArcanaKin team.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
