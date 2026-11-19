@@ -17,6 +17,7 @@ export const E2E_IDS = {
   tournament: 'e2e-tournament',
   store: 'loja-e2e',
   storeInvite: 'e2e-convite-loja',
+  storeEvent: 'e2e-evento-loja',
 } as const;
 
 const HOUR = 3600_000;
@@ -362,6 +363,23 @@ export async function seedE2E(databaseUrl: string) {
       { storeId: 'e2e-store', userId: 'e2e-ana', role: 'owner' },
       { storeId: 'e2e-store', userId: 'e2e-bia', role: 'staff' },
     ]);
+    // Evento da loja na semana que vem: torneio de Commander com 8 vagas, a Bia inscrita.
+    await db.insert(s.storeEvents).values({
+      id: E2E_IDS.storeEvent,
+      storeId: 'e2e-store',
+      title: 'Commander de sexta na loja',
+      startsAt: new Date(Date.now() + 7 * DAY),
+      format: 'commander',
+      kind: 'tournament',
+      capacity: 8,
+      code: 'E2ELJ7',
+      prizes: '1º lugar: 3 boosters',
+      rules: 'Bracket 3, proxies permitidos.',
+      createdBy: 'e2e-ana',
+    });
+    await db
+      .insert(s.storeEventEntries)
+      .values({ storeEventId: E2E_IDS.storeEvent, userId: 'e2e-bia', status: 'registered' });
     await db.insert(s.storeInvites).values({
       storeId: 'e2e-store',
       email: 'nova@loja-e2e.test',

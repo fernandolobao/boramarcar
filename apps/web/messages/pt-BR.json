@@ -2302,7 +2302,6 @@
     "website": "Site",
     "manage": "Gerenciar a loja",
     "events": "Eventos",
-    "eventsSoon": "Os eventos e torneios da loja chegam em breve.",
     "cta": "Organize as noites de Magic do seu grupo e acompanhe os eventos das lojas.",
     "ctaButton": "Conhecer o ArcanaKin",
     "manageTitle": "Gerenciar {name}",
@@ -2430,6 +2429,7 @@
     "codeIntro": "Chegou na loja? Digite o código do evento que está no balcão para se inscrever.",
     "codeLabel": "Código do evento",
     "codeSubmit": "Me inscrever",
-    "codeMenu": "Código de evento"
+    "codeMenu": "Código de evento",
+    "viewPublic": "Ver a página do evento"
   }
 }

@@ -561,3 +561,10 @@ sem rolagem horizontal em 320px.
 - Gerenciar: campos com rótulo e dica (`aria-describedby`); formatos como caixas de marcar do design system dentro de `fieldset`/`legend`; status de salvar e de convite em `role="status"`.
 - "Tirar da equipe" e "Cancelar convite": o texto visível faz parte do nome acessível, com o contexto (nome ou e-mail) em `sr-only` (o axe acusou `label-content-name-mismatch` na primeira versão, com `aria-label` diferente do texto).
 - `/admin`: o selo de verificada é um `Switch` (efeito imediato), com o nome da loja no rótulo; excluir em dois cliques.
+
+## Eventos de loja (19/11/2026)
+
+- Página pública do evento, visão da equipe e "Código de evento" no E2E de acessibilidade (o seed tem um evento com inscrição).
+- Página pública: `h1` com o título; quando, vagas e lista de espera em texto; inscrição/desistência com o estado em `role="status"` e desistir em dois cliques. Os nomes de quem se inscreveu não aparecem (só a contagem).
+- Equipe: o código do balcão em texto grande; cada inscrição com "Chegou" (caixa de marcar do design system, com o nome em `sr-only`, marcada na hora e desfeita se a API recusar) e "Tirar" em dois cliques (nome em `sr-only`); convidado com rótulo próprio.
+- Código: campo com rótulo, letras maiúsculas e espaçadas (não depende de cor); erro em `FormError`.
