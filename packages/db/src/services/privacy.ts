@@ -10,6 +10,8 @@ import {
   eventNudges,
   notifications,
   adminAccessLog,
+  storeMembers,
+  stores,
   tournamentEntrantMembers,
   tournaments,
   eventParticipants,
@@ -233,6 +235,14 @@ export async function exportUserData(db: Database, userId: string) {
     .where(eq(tournamentEntrantMembers.userId, userId))
     .orderBy(asc(tournaments.createdAt));
 
+  // Equipes de loja: o nome da loja e o papel.
+  const storeMemberships = await db
+    .select({ store: stores.name, role: storeMembers.role, since: storeMembers.createdAt })
+    .from(storeMembers)
+    .innerJoin(stores, eq(stores.id, storeMembers.storeId))
+    .where(eq(storeMembers.userId, userId))
+    .orderBy(asc(stores.name));
+
   return {
     format: 'arcanakin-export',
     version: 1,
@@ -250,6 +260,7 @@ export async function exportUserData(db: Database, userId: string) {
     notifications: inbox,
     adminAccess,
     tournaments: tournamentRows,
+    storeMemberships,
     games: played,
     decks: ownDecks.map(({ id, ...deck }) => ({
       ...deck,
@@ -324,6 +335,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(eventNudges).where(eq(eventNudges.userId, userId));
     await tx.delete(notifications).where(eq(notifications.userId, userId));
     await tx.delete(adminAccessLog).where(eq(adminAccessLog.targetUserId, userId));
+    await tx.delete(storeMembers).where(eq(storeMembers.userId, userId));
     await tx.update(eventNudges).set({ sentBy: null }).where(eq(eventNudges.sentBy, userId));
     await tx.delete(feedback).where(eq(feedback.userId, userId));
     await tx.delete(account).where(eq(account.userId, userId));
