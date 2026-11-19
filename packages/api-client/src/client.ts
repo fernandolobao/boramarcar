@@ -33,6 +33,8 @@ import {
   memberSchema,
   playerProfileSchema,
   preferencesSchema,
+  municipalitySchema,
+  discoverySchema,
   rankingSchema,
   rsvpSchema,
   seasonSchema,
@@ -183,6 +185,7 @@ export function createApiClient(options: ApiClientOptions) {
         timeZone?: string;
         locale?: 'pt-BR' | 'en';
         emailNotifications?: boolean;
+        municipalityCode?: string | null;
       }) =>
         (
           await request(
@@ -191,6 +194,13 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ preferences: preferencesSchema }),
             input,
           )
+        ).preferences,
+      /** Cidade do perfil (10.3), usada em "Lojas e eventos"; `null` tira. */
+      setCity: async (municipalityCode: string | null) =>
+        (
+          await request('PUT', '/me/preferences', z.object({ preferences: preferencesSchema }), {
+            municipalityCode,
+          })
         ).preferences,
       /** Liga as notificações push neste aparelho (token do Expo). */
       registerPushToken: (token: string, platform: 'ios' | 'android') =>
@@ -717,6 +727,38 @@ export function createApiClient(options: ApiClientOptions) {
             z.object({ player: playerProfileSchema }),
           )
         ).player,
+    },
+    /** Cidades do IBGE pelo começo do nome (10.3). */
+    municipalities: {
+      search: async (query: string) =>
+        (
+          await request(
+            'GET',
+            `/municipalities?q=${encodeURIComponent(query)}`,
+            z.object({ municipalities: z.array(municipalitySchema) }),
+          )
+        ).municipalities,
+    },
+    /** Lojas e eventos por perto (10.3): pela cidade (`uf/cidade`) ou pela posição. */
+    discovery: {
+      near: (
+        origin: { city: string } | { lat: number; lng: number },
+        filters: {
+          formats?: string[];
+          kinds?: ('tournament' | 'casual')[];
+          offers?: string[];
+        } = {},
+      ) => {
+        const params = new URLSearchParams(
+          'city' in origin
+            ? { city: origin.city }
+            : { lat: String(origin.lat), lng: String(origin.lng) },
+        );
+        for (const [key, values] of Object.entries(filters)) {
+          if (values?.length) params.set(key, values.join(','));
+        }
+        return request('GET', `/discovery?${params}`, discoverySchema);
+      },
     },
     /** Perfis de loja (10.1). */
     stores: {

@@ -638,6 +638,83 @@ describe('cliente da API', () => {
     expect(got.tournament.storeEventId).toBe('se1');
   });
 
+  it('descoberta (10.3): por cidade ou posição, busca de cidade e a cidade do perfil', async () => {
+    const found = {
+      origin: { kind: 'city', city: { name: 'Curitiba', uf: 'PR', slug: 'curitiba' } },
+      events: [
+        {
+          id: 'e1',
+          title: 'Commander de sexta',
+          startsAt: '2026-11-27T22:00:00.000Z',
+          format: 'commander',
+          kind: 'tournament',
+          capacity: 8,
+          registered: 3,
+          waitlist: 0,
+          distanceKm: 2.5,
+          store: { name: 'Loja', slug: 'loja', municipality: { name: 'Curitiba', uf: 'PR' } },
+        },
+      ],
+      stores: [
+        {
+          id: 's1',
+          slug: 'loja',
+          name: 'Loja',
+          logoUrl: null,
+          verified: true,
+          offers: ['singles'],
+          formats: ['commander'],
+          distanceKm: 2.5,
+          municipality: { name: 'Curitiba', uf: 'PR', slug: 'curitiba' },
+          nextEvent: {
+            id: 'e1',
+            title: 'Commander de sexta',
+            startsAt: '2026-11-27T22:00:00.000Z',
+          },
+        },
+      ],
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json(found))
+      .mockResolvedValueOnce(json({ ...found, origin: { kind: 'device' } }))
+      .mockResolvedValueOnce(
+        json({
+          municipalities: [{ code: '4106902', name: 'Curitiba', uf: 'PR', slug: 'curitiba' }],
+        }),
+      )
+      .mockResolvedValueOnce(
+        json({
+          preferences: {
+            timeZone: 'America/Sao_Paulo',
+            locale: 'pt-BR',
+            emailNotifications: true,
+            city: { code: '4106902', name: 'Curitiba', uf: 'PR', slug: 'curitiba' },
+          },
+        }),
+      );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const byCity = await api.discovery.near({ city: 'pr/curitiba' }, { kinds: ['tournament'] });
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/discovery?city=pr%2Fcuritiba&kinds=tournament',
+    );
+    expect(byCity.events[0]!.startsAt).toBeInstanceOf(Date);
+    expect(byCity.stores[0]!.nextEvent!.startsAt).toBeInstanceOf(Date);
+    await api.discovery.near({ lat: -25.43, lng: -49.27 });
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/discovery?lat=-25.43&lng=-49.27',
+    );
+    expect(await api.municipalities.search('curi')).toEqual([
+      { code: '4106902', name: 'Curitiba', uf: 'PR', slug: 'curitiba' },
+    ]);
+    await api.me.setCity('4106902');
+    expect(fetchMock.mock.calls[3]![1].method).toBe('PUT');
+    expect(JSON.parse(fetchMock.mock.calls[3]![1].body)).toEqual({ municipalityCode: '4106902' });
+  });
+
   it('lojas: perfil, evento (com a minha inscrição), código e os meus eventos', async () => {
     const event = {
       id: 'se1',

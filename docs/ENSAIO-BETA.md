@@ -71,6 +71,12 @@ próprio site ou app (Conta → Feedback): o texto chega no `/admin` com a tela 
 - [ ] A página do evento mostra o torneio ao vivo para quem não tem conta. O aviso de rodada abre
       a página do evento no site e a tela do torneio no app.
 
+## 5b. Lojas e eventos por perto
+
+- [ ] Sem conta, no site: `/lojas`, escolher a cidade (uma vizinha da loja de teste também serve) e ver a loja e os eventos; "Usar minha localização" pede permissão e ordena por distância; "Baixar para a agenda" abre no calendário do celular.
+- [ ] No app: Conta → "Lojas e eventos"; escolher a cidade (fica salva) e usar a localização (a permissão explica que ela não é guardada).
+- [ ] A página da cidade da loja de teste (`/lojas/em/<uf>/<cidade>`) aparece no Google algumas semanas depois (só confirmar mais tarde).
+
 ## 6. Acessibilidade (rápido, em 3 telas: encontro, torneio, evento de loja)
 
 - [ ] **VoiceOver** (iPhone) ou **TalkBack** (Android): os botões dizem o que fazem? Os avisos

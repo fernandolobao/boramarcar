@@ -304,7 +304,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'lojas-perto',
             question: 'Como acho lojas e eventos perto de mim?',
             intro: [
-              'Em "Lojas e eventos" (link no rodapé do site, sem precisar de conta): escolha a sua cidade da lista e veja os torneios e noites de jogo dos próximos 30 dias e as lojas a até 50 km, as mais perto primeiro. "Usar minha localização" ordena pela distância de onde você está (a posição não é guardada). Os filtros mostram só um formato, um tipo de evento ou lojas que vendem cartas avulsas, selados, têm mesas para jogar ou fazem torneios. Cada evento tem "Baixar para a agenda" e "Google Agenda". Com conta, a sua cidade fica salva em Configurações e a página já abre nela.',
+              'Em "Lojas e eventos" (link no rodapé do site, sem precisar de conta; no app, em Conta → Lojas e eventos): escolha a sua cidade da lista e veja os torneios e noites de jogo dos próximos 30 dias e as lojas a até 50 km, as mais perto primeiro. "Usar minha localização" ordena pela distância de onde você está (a posição não é guardada). Os filtros mostram só um formato, um tipo de evento ou lojas que vendem cartas avulsas, selados, têm mesas para jogar ou fazem torneios. Cada evento tem "Baixar para a agenda" e "Google Agenda". Com conta, a sua cidade fica salva em Configurações e a página já abre nela.',
             ],
           },
           {
@@ -687,7 +687,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'lojas-perto',
             question: 'How do I find stores and events near me?',
             intro: [
-              'Under "Stores and events" (link in the website footer, no account needed): pick your city from the list and see tournaments and game nights in the next 30 days and stores within 50 km, closest first. "Use my location" sorts by distance from where you are (the position isn’t stored). Filters show only one format, one event type or stores that sell singles or sealed, have tables to play or run tournaments. Each event has "Download to calendar" and "Google Calendar". With an account, your city is saved in Settings and the page opens on it.',
+              'Under "Stores and events" (link in the website footer, no account needed; in the app, Account → Stores and events): pick your city from the list and see tournaments and game nights in the next 30 days and stores within 50 km, closest first. "Use my location" sorts by distance from where you are (the position isn’t stored). Filters show only one format, one event type or stores that sell singles or sealed, have tables to play or run tournaments. Each event has "Download to calendar" and "Google Calendar". With an account, your city is saved in Settings and the page opens on it.',
             ],
           },
           {
