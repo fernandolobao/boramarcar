@@ -58,4 +58,3 @@ describe('municípios do IBGE', () => {
     expect(first).toMatchObject({ name: 'São José do Rio Preto', uf: 'SP' });
   });
 });
-
