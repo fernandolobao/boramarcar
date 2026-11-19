@@ -1,6 +1,7 @@
 'use client';
 
 import { GAME_FORMATS } from '@boramarcar/core';
+import { STORE_OFFERS } from '@boramarcar/core/discovery';
 import { toggleIn } from '@boramarcar/ui';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -9,13 +10,17 @@ import { api } from '@/lib/api';
 import { Checkbox } from '../ds/checkbox';
 import { Icon } from '../icons';
 import { AddressSearch } from '../places/address-search';
+import { CityPicker, type CityOption } from '../places/city-picker';
 import { LocationMap } from '../places/location-map';
 import { FormError, useApiAction } from '../use-api-action';
 
 export interface StoreFormValues {
   id: string;
   name: string;
-  city: string;
+  /** Município do IBGE; `null` = cidade a confirmar (loja antiga). */
+  municipality: CityOption | null;
+  /** O que a loja oferece (10.3). */
+  offers: string[];
   about: string | null;
   address: string | null;
   lat: number | null;
@@ -37,7 +42,7 @@ export function StoreProfileForm({ store }: { store: StoreFormValues }) {
   const [status, setStatus] = useState('');
   const set = (patch: Partial<StoreFormValues>) => setValues((v) => ({ ...v, ...patch }));
   const field = (
-    key: 'name' | 'city' | 'hours' | 'instagram' | 'whatsapp' | 'website',
+    key: 'name' | 'hours' | 'instagram' | 'whatsapp' | 'website',
     label: string,
     hint?: string,
     max = 200,
@@ -50,7 +55,7 @@ export function StoreProfileForm({ store }: { store: StoreFormValues }) {
         id={`${id}-${key}`}
         className="input"
         maxLength={max}
-        required={key === 'name' || key === 'city'}
+        required={key === 'name'}
         value={values[key] ?? ''}
         aria-describedby={hint ? `${id}-${key}-hint` : undefined}
         onChange={(e) => set({ [key]: e.target.value })}
@@ -69,7 +74,9 @@ export function StoreProfileForm({ store }: { store: StoreFormValues }) {
       onSubmit={(e) => {
         e.preventDefault();
         setStatus('');
-        const { id: storeId, ...body } = values;
+        const { id: storeId, municipality, ...rest } = values;
+        // Sem cidade escolhida da lista (loja antiga), a cidade não muda.
+        const body = { ...rest, ...(municipality ? { municipalityCode: municipality.code } : {}) };
         void run(
           () => api(`/api/v1/stores/${storeId}`, { method: 'PATCH', body }),
           () => setStatus(t('saved')),
@@ -78,7 +85,13 @@ export function StoreProfileForm({ store }: { store: StoreFormValues }) {
     >
       <div className="grid gap-3 sm:grid-cols-2">
         {field('name', t('name'), undefined, 80)}
-        {field('city', t('city'), undefined, 80)}
+        <CityPicker
+          id={`${id}-city`}
+          label={t('city')}
+          value={values.municipality}
+          onChange={(municipality) => set({ municipality })}
+          required
+        />
       </div>
       <div>
         <label className="label" htmlFor={`${id}-about`}>
@@ -121,6 +134,21 @@ export function StoreProfileForm({ store }: { store: StoreFormValues }) {
         {field('whatsapp', t('whatsapp'), t('whatsappHint'), 40)}
         {field('website', t('website'), t('websiteHint'), 300)}
       </div>
+      <fieldset>
+        <legend className="label">{t('offersLabel')}</legend>
+        <p className="muted mb-2 text-sm">{t('offersHint')}</p>
+        <div className="flex flex-wrap gap-2">
+          {STORE_OFFERS.map((o) => (
+            <Checkbox
+              key={o}
+              label={t(`offers.${o}`)}
+              checked={values.offers.includes(o)}
+              onChange={(on) => set({ offers: toggleIn(values.offers, o, on) })}
+              className="rounded-xl border border-line-strong px-3 data-[selected]:border-primary data-[selected]:bg-surface-muted"
+            />
+          ))}
+        </div>
+      </fieldset>
       <fieldset>
         <legend className="label">{t('formatsLabel')}</legend>
         <div className="flex flex-wrap gap-2">

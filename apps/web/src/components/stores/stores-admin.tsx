@@ -6,6 +6,7 @@ import { useId, useState } from 'react';
 import { api } from '@/lib/api';
 import { Switch } from '../ds/switch';
 import { Icon } from '../icons';
+import { CityPicker, type CityOption } from '../places/city-picker';
 import { FormError, useApiAction } from '../use-api-action';
 
 export interface AdminStoreRow {
@@ -13,6 +14,8 @@ export interface AdminStoreRow {
   slug: string;
   name: string;
   city: string;
+  /** `null` = cidade a confirmar (loja antiga, de antes da lista do IBGE). */
+  municipality: { name: string; uf: string } | null;
   contactEmail: string;
   verified: boolean;
   members: number;
@@ -25,7 +28,7 @@ export function StoresAdmin({ stores }: { stores: AdminStoreRow[] }) {
   const id = useId();
   const { run, error, pending } = useApiAction();
   const [name, setName] = useState('');
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState<CityOption | null>(null);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('');
   const [confirm, setConfirm] = useState<string | null>(null);
@@ -39,11 +42,15 @@ export function StoresAdmin({ stores }: { stores: AdminStoreRow[] }) {
           e.preventDefault();
           setStatus('');
           void run(
-            () => api('/api/v1/admin/stores', { method: 'POST', body: { name, city, email } }),
+            () =>
+              api('/api/v1/admin/stores', {
+                method: 'POST',
+                body: { name, municipalityCode: city?.code, email },
+              }),
             () => {
               setStatus(t('created', { email: email.trim().toLowerCase() }));
               setName('');
-              setCity('');
+              setCity(null);
               setEmail('');
             },
           );
@@ -62,19 +69,7 @@ export function StoresAdmin({ stores }: { stores: AdminStoreRow[] }) {
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div>
-          <label className="label" htmlFor={`${id}-city`}>
-            {ts('city')}
-          </label>
-          <input
-            id={`${id}-city`}
-            className="input"
-            required
-            maxLength={80}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-          />
-        </div>
+        <CityPicker id={`${id}-city`} label={ts('city')} value={city} onChange={setCity} required />
         <div>
           <label className="label" htmlFor={`${id}-email`}>
             {t('contactEmail')}
@@ -113,7 +108,12 @@ export function StoresAdmin({ stores }: { stores: AdminStoreRow[] }) {
                   <Link href={`/lojas/${s.slug}`} className="underline underline-offset-2">
                     {s.name}
                   </Link>{' '}
-                  <span className="muted text-sm font-normal">· {s.city}</span>
+                  <span className="muted text-sm font-normal">
+                    ·{' '}
+                    {s.municipality
+                      ? `${s.municipality.name}, ${s.municipality.uf}`
+                      : `${s.city} (${t('cityToConfirm')})`}
+                  </span>
                 </p>
                 <p className="muted text-sm break-all" data-cs-mask>
                   {s.contactEmail} · {t('members', { count: s.members })}

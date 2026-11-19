@@ -347,6 +347,8 @@ export async function seedE2E(databaseUrl: string) {
       slug: E2E_IDS.store,
       name: 'Loja E2E',
       city: 'Porto Alegre',
+      municipalityCode: '4314902',
+      offers: ['singles', 'play_space', 'tournaments'],
       contactEmail: 'contato@loja-e2e.test',
       about: 'Commander às sextas e Modern aos sábados.',
       address: 'Av. Ipiranga, 6681, Porto Alegre',

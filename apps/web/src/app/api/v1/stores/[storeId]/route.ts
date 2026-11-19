@@ -1,4 +1,5 @@
 import { GAME_FORMATS } from '@boramarcar/core';
+import { STORE_OFFERS } from '@boramarcar/core/discovery';
 import { deleteStore, updateStore } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
@@ -6,7 +7,11 @@ import { authed, parseJson } from '@/server/http';
 const optionalText = (max: number) => z.string().max(max).nullable().optional();
 const schema = z.object({
   name: z.string().trim().min(1).max(80).optional(),
-  city: z.string().trim().min(1).max(80).optional(),
+  municipalityCode: z
+    .string()
+    .regex(/^\d{7}$/)
+    .optional(),
+  offers: z.array(z.enum(STORE_OFFERS)).max(STORE_OFFERS.length).optional(),
   about: optionalText(2000),
   address: optionalText(200),
   lat: z.number().min(-90).max(90).nullable().optional(),

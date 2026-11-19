@@ -31,7 +31,7 @@ describe('perfis de loja (10.1)', () => {
     const intruso = await createTestUser(db, { name: 'Intruso', email: 'outro@x.test' });
     const { store, invite } = await createStore(db, {
       name: 'Loja do Mago',
-      city: 'Porto Alegre',
+      municipalityCode: '4314902',
       email: 'Dono@Loja.test',
       createdBy: admin.id,
     });
@@ -41,7 +41,7 @@ describe('perfis de loja (10.1)', () => {
     // Mesmo nome: endereço diferente.
     const again = await createStore(db, {
       name: 'Loja do Mago',
-      city: 'Canoas',
+      municipalityCode: '4304606',
       email: 'b@loja.test',
       createdBy: admin.id,
     });
@@ -81,7 +81,7 @@ describe('perfis de loja (10.1)', () => {
     const estranho = await createTestUser(db);
     const { store, invite } = await createStore(db, {
       name: 'Cartas & Café',
-      city: 'Curitiba',
+      municipalityCode: '4106902',
       email: 'd2@loja.test',
       createdBy: admin.id,
     });
@@ -172,7 +172,7 @@ describe('perfis de loja (10.1)', () => {
     const dono = await createTestUser(db, { email: 'velho@loja.test' });
     const { invite } = await createStore(db, {
       name: 'Loja Antiga',
-      city: 'Recife',
+      municipalityCode: '2611606',
       email: 'velho@loja.test',
       createdBy: admin.id,
       now: new Date('2026-01-01T12:00:00Z'),
@@ -195,7 +195,7 @@ describe('logo da loja', () => {
     const estranho = await createTestUser(db);
     const { store, invite } = await createStore(db, {
       name: 'Loja do Logo',
-      city: 'Natal',
+      municipalityCode: '2408102',
       email: 'logo@loja.test',
       createdBy: admin.id,
     });
@@ -207,5 +207,67 @@ describe('logo da loja', () => {
     await expect(
       setStoreLogo(db, { storeId: store.id, userId: estranho.id, url: first }),
     ).rejects.toMatchObject({ code: 'forbidden' });
+  });
+});
+
+describe('cidade e o que a loja oferece (10.3)', () => {
+  it('a cidade vem do município do IBGE; município que não existe é recusado', async () => {
+    const admin = await createTestUser(db);
+    const { store } = await createStore(db, {
+      name: 'Loja da Cidade',
+      municipalityCode: '4106902',
+      email: 'cidade@loja.test',
+      createdBy: admin.id,
+    });
+    expect(store.city).toBe('Curitiba');
+    expect(await getStorePublic(db, { slug: store.slug })).toMatchObject({
+      municipality: { code: '4106902', name: 'Curitiba', uf: 'PR', slug: 'curitiba' },
+      offers: [],
+    });
+    await expect(
+      createStore(db, {
+        name: 'Loja Fantasma',
+        municipalityCode: '9999999',
+        email: 'fantasma@loja.test',
+        createdBy: admin.id,
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+
+  it('a equipe troca a cidade e o que oferece; valores fora da lista são recusados', async () => {
+    const admin = await createTestUser(db);
+    const dono = await createTestUser(db, { email: 'oferta@loja.test' });
+    const { store, invite } = await createStore(db, {
+      name: 'Loja das Ofertas',
+      municipalityCode: '4106902',
+      email: 'oferta@loja.test',
+      createdBy: admin.id,
+    });
+    await acceptStoreInvite(db, { token: invite.token, userId: dono.id, userEmail: dono.email });
+    await expect(
+      updateStore(db, { storeId: store.id, userId: dono.id, offers: ['singles', 'cafe'] }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    await updateStore(db, {
+      storeId: store.id,
+      userId: dono.id,
+      offers: ['singles', 'play_space'],
+      municipalityCode: '4125506',
+    });
+    expect(await getStorePublic(db, { slug: store.slug })).toMatchObject({
+      city: 'São José dos Pinhais',
+      municipality: { uf: 'PR' },
+      offers: ['singles', 'play_space'],
+    });
+  });
+
+  it('o endereço "em" é reservado (a descoberta por cidade usa /lojas/em/...)', async () => {
+    const admin = await createTestUser(db);
+    const { store } = await createStore(db, {
+      name: 'Em',
+      municipalityCode: '4106902',
+      email: 'em@loja.test',
+      createdBy: admin.id,
+    });
+    expect(store.slug).not.toBe('em');
   });
 });

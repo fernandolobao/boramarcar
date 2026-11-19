@@ -74,7 +74,8 @@ export default async function ManageStorePage({ params }: Props) {
           store={{
             id: s.id,
             name: s.name,
-            city: s.city,
+            municipality: s.municipality,
+            offers: s.offers,
             about: s.about,
             address: s.address,
             lat: s.lat,

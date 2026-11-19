@@ -209,6 +209,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'A página do grupo ficou mais do grupo: recordes e a cara do grupo logo no começo, fotos de quem participa, e convite, configurações e novo local em janelas que abrem por botões.',
     en: 'The group page is more about the group now: records and the group’s identity right at the top, members’ photos, and invite, settings and new place in windows opened by buttons.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Lojas agora dizem o que oferecem (cartas avulsas, selados, mesas para jogar, torneios), e a cidade da loja vem da lista oficial de municípios.',
+    en: 'Stores now show what they offer (singles, sealed, tables to play, tournaments), and the store’s city comes from the official list of municipalities.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

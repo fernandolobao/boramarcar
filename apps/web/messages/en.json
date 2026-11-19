@@ -2426,7 +2426,16 @@
       "members": "{count, plural, =0 {no team yet} one {1 person on the team} other {# people on the team}}",
       "delete": "Delete",
       "deleteConfirm": "Confirm: delete",
-      "deleteOf": "Delete the store {name}"
+      "deleteOf": "Delete the store {name}",
+      "cityToConfirm": "city to confirm: pick it from the list under \"Manage the store\""
+    },
+    "offersLabel": "What the store offers",
+    "offersHint": "Shows on the store page and works as a filter for people looking for stores nearby.",
+    "offers": {
+      "singles": "Singles",
+      "sealed": "Sealed and accessories",
+      "play_space": "Tables to play",
+      "tournaments": "Tournaments"
     }
   },
   "storeEvents": {
@@ -2529,5 +2538,8 @@
       "saved": "Logo updated.",
       "removed": "Logo removed."
     }
+  },
+  "discovery": {
+    "cityHint": "Type and pick from the list (e.g. Curitiba, PR)."
   }
 }

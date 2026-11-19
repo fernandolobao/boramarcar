@@ -147,6 +147,7 @@ export default async function AdminPage() {
             slug: x.slug,
             name: x.name,
             city: x.city,
+            municipality: x.municipality,
             contactEmail: x.contactEmail,
             verified: x.verified,
             members: x.members,

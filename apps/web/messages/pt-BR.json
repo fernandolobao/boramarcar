@@ -2426,7 +2426,16 @@
       "members": "{count, plural, =0 {sem equipe ainda} one {1 pessoa na equipe} other {# pessoas na equipe}}",
       "delete": "Excluir",
       "deleteConfirm": "Confirmar: excluir",
-      "deleteOf": "Excluir a loja {name}"
+      "deleteOf": "Excluir a loja {name}",
+      "cityToConfirm": "cidade a confirmar: escolha da lista em \"Gerenciar a loja\""
+    },
+    "offersLabel": "O que a loja oferece",
+    "offersHint": "Aparece na página da loja e serve de filtro para quem procura lojas por perto.",
+    "offers": {
+      "singles": "Cartas avulsas",
+      "sealed": "Selados e acessórios",
+      "play_space": "Mesas para jogar",
+      "tournaments": "Torneios"
     }
   },
   "storeEvents": {
@@ -2529,5 +2538,8 @@
       "saved": "Logo atualizado.",
       "removed": "Logo removido."
     }
+  },
+  "discovery": {
+    "cityHint": "Digite e escolha da lista (ex.: Curitiba, PR)."
   }
 }

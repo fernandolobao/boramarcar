@@ -296,7 +296,7 @@ beforeAll(async () => {
   // Loja da Ana (dona), com a Bia na equipe e um convite pendente para outra pessoa.
   const shop = await createStore(db, {
     name: 'Loja Secreta',
-    city: 'Porto Alegre',
+    municipalityCode: '4314902',
     email: 'ana-dona@example.com',
     createdBy: ana.id,
   });
@@ -471,7 +471,7 @@ const outsiderCases: Case[] = [
     r.adminStores.POST as Handler,
     'POST',
     () => ({}),
-    { name: 'Intrusa', city: 'X', email: 'x@x.test' },
+    { name: 'Intrusa', municipalityCode: '4314902', email: 'x@x.test' },
   ],
   [
     'PATCH selo da loja (admin)',

@@ -622,3 +622,9 @@ sem rolagem horizontal em 320px.
 - O formulário de local no modal mantém o título acessível (`sr-only`) para não repetir o título do modal na tela.
 - Recordes e a cara do grupo agora são seções `<h2>` da página do grupo (sem pular níveis); `/grupo/recordes` só redireciona.
 - Fotos dos membros são decorativas (`alt=""`; o nome está ao lado).
+
+## Cidade da loja e o que ela oferece (19/11/2026)
+
+- `CityPicker`: campo com rótulo visível no padrão ARIA "combobox" com lista (como a busca de endereço): setas, Enter e Esc; cada sugestão diz cidade e UF ("Curitiba, PR"); a dica explica que vale só o que se escolhe da lista; sair sem escolher volta para a cidade que valia. Coberto pelo axe (`a11y.test.tsx`) e pelo teste do componente.
+- "O que a loja oferece": quatro `Checkbox` num `fieldset` com `legend` e dica; na página pública, lista em texto.
+- No `/admin`, loja antiga sem município aparece com "cidade a confirmar" em texto.

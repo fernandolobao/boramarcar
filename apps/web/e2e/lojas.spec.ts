@@ -19,7 +19,9 @@ test.describe('lojas', () => {
       await page.goto('/admin');
       const section = page.getByRole('region', { name: 'Lojas' });
       await section.getByLabel('Nome da loja').fill(name);
-      await section.getByLabel('Cidade').fill('Canoas');
+      // Cidade da lista do IBGE (10.3): digitar e escolher.
+      await section.getByRole('combobox', { name: 'Cidade' }).fill('Canoas');
+      await page.getByRole('option', { name: 'Canoas, RS' }).click();
       await section.getByLabel('E-mail do responsável').fill('ana@e2e.test');
       await section.getByRole('button', { name: 'Criar loja e enviar convite' }).click();
       await expect(
