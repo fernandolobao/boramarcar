@@ -14,6 +14,7 @@ export const NOTIFICATION_KINDS = [
   'announcement',
   'nudge',
   'monthly',
+  'tournament',
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -37,4 +38,12 @@ export type NotificationData =
   /** "Chamar para o próximo": a pessoa foi chamada para um encontro. */
   | { kind: 'nudge'; eventId: string }
   /** Retrospectiva do mês do grupo pronta (dia 1, só se o grupo jogou no mês). */
-  | { kind: 'monthly'; groupId: string; month: string };
+  | { kind: 'monthly'; groupId: string; month: string }
+  /** Torneio: rodada nova (com a mesa da pessoa; `null` = bye) ou torneio encerrado. */
+  | {
+      kind: 'tournament';
+      tournamentId: string;
+      event: 'round' | 'finished';
+      round: number;
+      table: number | null;
+    };

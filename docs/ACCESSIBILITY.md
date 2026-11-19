@@ -536,6 +536,11 @@ sem rolagem horizontal em 320px.
 - Resultado da mesa: no pod, um grupo de rádio "Quem venceu a mesa N" (com "Empate"); no par, um campo numérico por inscrição ("Jogos vencidos por …"). O botão "Salvar resultado" leva a mesa no nome (`sr-only`), e a confirmação vem num `role="status"`.
 - Tirar inscrição e apagar o torneio em dois cliques (padrão do projeto), com o nome de quem sai no botão.
 
+## Torneios no app e avisos de rodada (19/11/2026)
+
+- App: lista, novo torneio e página do torneio. Cada torneio da lista é um botão com nome completo (nome, formato, inscrições e situação). Na mesa, a linha de resultado tem `accessibilityLiveRegion` ("Aguardando…" vira o resultado). A classificação é uma lista de itens acessíveis lidos como "1º Ana: 3 pontos (1-0-0). OMW … GW … OGW …". Tirar inscrição e apagar usam o `ConfirmButton` (dois toques, com o nome no rótulo). "Corrigir resultado" abre o formulário só quando pedido, com a mesa no nome.
+- Sino (site e app): aviso de torneio com texto completo ("Copa: rodada 2 começou. Sua mesa é a 3.", bye ou encerramento) e link para o torneio.
+
 ## Troca de página com retorno imediato (19/11/2026)
 
 - Área logada com `loading.tsx`: ao trocar de página, aparece na hora um esqueleto (título e cartões cinza, decorativos, `aria-hidden`), com `aria-busy` e "Carregando…" numa região de status para leitores de tela. O pulso respeita `motion-reduce`.

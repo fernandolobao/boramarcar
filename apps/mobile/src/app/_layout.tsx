@@ -67,6 +67,9 @@ function RootLayout() {
         <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />
         <Stack.Screen name="grupo" options={{ title: t('groupTitle') }} />
         <Stack.Screen name="recordes" options={{ title: t('recordsTitle') }} />
+        <Stack.Screen name="torneios/index" options={{ title: t('tourTitle') }} />
+        <Stack.Screen name="torneios/novo" options={{ title: t('tourNew') }} />
+        <Stack.Screen name="torneios/[id]" options={{ title: t('tourTitle') }} />
         <Stack.Screen name="configuracoes" options={{ title: t('settingsTitle') }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>

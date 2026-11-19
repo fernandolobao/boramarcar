@@ -502,6 +502,74 @@ describe('cliente da API', () => {
     );
   });
 
+  it('torneios: página com datas convertidas e as ações nas rotas certas', async () => {
+    const view = {
+      tournament: {
+        id: 't1',
+        groupId: 'g1',
+        eventId: 'e1',
+        name: 'Copa',
+        format: 'modern',
+        table: 'pair',
+        entrantSize: 1,
+        bestOf: 3,
+        rounds: 3,
+        status: 'running',
+        countsInRanking: true,
+        createdAt: '2026-11-19T10:00:00.000Z',
+      },
+      event: { title: 'Noite', startsAt: '2026-11-20T22:00:00.000Z' },
+      canManage: true,
+      myEntrantId: 'x1',
+      entrants: [{ id: 'x1', name: 'Ana', memberIds: ['u1'] }],
+      rounds: [
+        {
+          id: 'r1',
+          number: 1,
+          tables: [
+            { id: 'tb1', number: 1, entrants: ['x1'], gameWins: {}, gameDraws: 0, reported: true },
+          ],
+        },
+      ],
+      standings: [
+        {
+          entrant: 'x1',
+          points: 3,
+          wins: 0,
+          draws: 0,
+          losses: 0,
+          byes: 1,
+          omw: 0,
+          gw: 1,
+          ogw: 0,
+          rank: 1,
+        },
+      ],
+      timeline: [{ kind: 'started', data: {}, createdAt: '2026-11-19T10:00:00.000Z' }],
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json(view))
+      .mockResolvedValueOnce(json({ reported: true }))
+      .mockResolvedValueOnce(json({ tournaments: [] }));
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    const got = await api.tournaments.get('t1');
+    expect(got.tournament.createdAt).toBeInstanceOf(Date);
+    expect(got.timeline[0]!.createdAt).toBeInstanceOf(Date);
+    await api.tournaments.report('t1', 'tb1', { gameWins: { x1: 2 }, gameDraws: 0 });
+    expect(fetchMock.mock.calls[1]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/tournaments/t1/tables/tb1',
+    );
+    expect(fetchMock.mock.calls[1]![1]).toMatchObject({ method: 'PUT' });
+    await api.tournaments.list('g1');
+    expect(fetchMock.mock.calls[2]![0]).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/tournaments',
+    );
+  });
+
   it('recordes do grupo: datas convertidas e recordes vazios aceitos', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(
       json({
