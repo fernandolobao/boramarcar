@@ -1,6 +1,6 @@
 'use client';
 
-import { tournamentShape } from '@boramarcar/core/tournaments';
+import { tournamentShape, type TournamentStructure } from '@boramarcar/core/tournaments';
 import { GAME_FORMATS, type GameFormat } from '@boramarcar/core';
 import { zonedLocalToUtc } from '@boramarcar/core/time';
 import { useTimeZone, useTranslations } from 'next-intl';
@@ -13,6 +13,7 @@ import { DateTimeField, fromLocalDateTime, toLocalDateTime } from '../ds/date-ti
 import { NumberField } from '../ds/number-field';
 import { Select } from '../ds/select';
 import { Icon } from '../icons';
+import { StructureSelect } from '../tournaments/structure-select';
 import { TopCutSelect } from '../tournaments/top-cut-select';
 import { FormError, useApiAction } from '../use-api-action';
 
@@ -504,14 +505,15 @@ export function StoreTournamentStart({
   const router = useRouter();
   const { run, error, pending } = useApiAction();
   const [topCut, setTopCut] = useState<number | null>(null);
+  const [structure, setStructure] = useState<TournamentStructure>('swiss');
+  const table = tournamentShape(format).table;
+  const chosen: TournamentStructure = table === 'pair' ? structure : 'swiss';
   return (
     <div className="space-y-3">
-      <TopCutSelect
-        table={tournamentShape(format).table}
-        entrants={checkedIn}
-        value={topCut}
-        onChange={setTopCut}
-      />
+      <StructureSelect table={table} value={structure} onChange={setStructure} />
+      {chosen === 'swiss' && (
+        <TopCutSelect table={table} entrants={checkedIn} value={topCut} onChange={setTopCut} />
+      )}
       <button
         type="button"
         className="btn-primary"
@@ -521,7 +523,7 @@ export function StoreTournamentStart({
             () =>
               api(`/api/v1/store-events/${eventId}/tournament`, {
                 method: 'POST',
-                body: { topCut },
+                body: { topCut: chosen === 'swiss' ? topCut : null, structure: chosen },
               }),
             () => router.push(publicHref),
           )

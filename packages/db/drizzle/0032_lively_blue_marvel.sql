@@ -1,0 +1,1 @@
+ALTER TABLE "tournaments" ADD COLUMN "structure" text DEFAULT 'swiss' NOT NULL;

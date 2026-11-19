@@ -638,6 +638,8 @@ export const tournamentViewSchema = z
         rounds: z.number().nullable(),
         /** Top cut depois do suíço (9.2), ou `null`. */
         topCut: z.number().nullable().optional(),
+        /** Estrutura (9.4): suíço, eliminação simples ou todos contra todos. */
+        structure: z.enum(['swiss', 'single_elimination', 'round_robin']).optional(),
         status: z.string(),
         countsInRanking: z.boolean(),
         createdAt: date,

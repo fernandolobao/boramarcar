@@ -1,7 +1,7 @@
 'use client';
 
 import { GAME_FORMATS, type GameFormat } from '@boramarcar/core';
-import { tournamentShape } from '@boramarcar/core/tournaments';
+import { tournamentShape, type TournamentStructure } from '@boramarcar/core/tournaments';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useId, useState } from 'react';
@@ -12,6 +12,7 @@ import { NumberField } from '../ds/number-field';
 import { Select } from '../ds/select';
 import { Icon } from '../icons';
 import { FormError, useApiAction } from '../use-api-action';
+import { StructureSelect } from './structure-select';
 import { TopCutSelect } from './top-cut-select';
 
 /** Criar torneio (9.1): encontro, nome, formato e, se quiser, melhor de N, rodadas e pontos. */
@@ -41,6 +42,10 @@ export function TournamentForm({
   const [loss, setLoss] = useState<number | null>(0);
   const [counts, setCounts] = useState(true);
   const [topCut, setTopCut] = useState<number | null>(null);
+  const [structure, setStructure] = useState<TournamentStructure>('swiss');
+  // Pods só no suíço (o campo nem aparece).
+  const chosen: TournamentStructure = shape.table === 'pair' ? structure : 'swiss';
+  const swiss = chosen === 'swiss';
   const hint = shape.entrantSize === 2 ? t('tableHint.duo') : t(`tableHint.${shape.table}`);
 
   return (
@@ -56,10 +61,11 @@ export function TournamentForm({
                 name,
                 format: game,
                 bestOf: shape.table === 'pair' ? Number(bestOf) : 1,
-                rounds,
+                rounds: swiss ? rounds : null,
+                structure: chosen,
                 points: { win: win ?? 0, draw: draw ?? 0, loss: loss ?? 0 },
                 countsInRanking: counts,
-                topCut: shape.entrantSize === 1 ? topCut : null,
+                topCut: swiss && shape.entrantSize === 1 ? topCut : null,
               },
             }),
           (r) => router.push(`/torneios/${r.tournament.id}`),
@@ -106,16 +112,19 @@ export function TournamentForm({
           ]}
         />
       )}
-      <NumberField
-        label={t('rounds')}
-        value={rounds}
-        onChange={setRounds}
-        min={1}
-        max={15}
-        description={t('roundsHint')}
-      />
+      <StructureSelect table={shape.table} value={structure} onChange={setStructure} />
+      {swiss && (
+        <NumberField
+          label={t('rounds')}
+          value={rounds}
+          onChange={setRounds}
+          min={1}
+          max={15}
+          description={t('roundsHint')}
+        />
+      )}
       {/* Top cut: um contra um e pods (no 2HG ainda não). */}
-      {shape.entrantSize === 1 && (
+      {swiss && shape.entrantSize === 1 && (
         <TopCutSelect table={shape.table} value={topCut} onChange={setTopCut} />
       )}
       <fieldset>

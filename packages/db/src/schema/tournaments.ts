@@ -47,6 +47,8 @@ export const tournaments = pgTable(
     rounds: integer('rounds'),
     /** Top cut depois do suíço (9.2): 4/8 no par, 4/10/16 no pod; `null` = sem top. */
     topCut: integer('top_cut'),
+    /** Estrutura (9.4): `swiss`, `single_elimination` ou `round_robin`. */
+    structure: text('structure').notNull().default('swiss'),
     /** Cada jogo do torneio vira uma partida do grupo (conta no ranking). */
     countsInRanking: boolean('counts_in_ranking').notNull().default(true),
     /** `registration` → `running` → `finished`. */

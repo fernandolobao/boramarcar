@@ -610,3 +610,8 @@ sem rolagem horizontal em 320px.
 - `/torneio/[id]`: página fora da área logada, com `<main id="conteudo">`, um `<h1>` (nome do torneio), o selo "Ao vivo" em texto e a explicação de que a página se atualiza a cada 30 segundos (WCAG 2.2.2: a atualização é avisada, curta e só com a aba visível; nada se move sozinho na tela além do conteúdo novo). Reaproveita `TournamentLive` sem formulários (visitante não registra).
 - Na página do torneio do grupo, seção "Link público" com `CopyField` (rótulo próprio) e os botões de compartilhar.
 - Rota nova no `a11y.spec.ts` (claro/escuro, desktop/celular).
+
+## Estruturas de torneio (19/11/2026)
+
+- Campo "Estrutura" (Select do design system, com a explicação de cada estrutura na descrição), só quando há escolha (mesas de par); ao trocar, os campos que não valem (rodadas, top cut) somem em vez de ficarem desabilitados sem explicação. No app, `Choices`. Coberto pelo axe (`a11y.test.tsx`).
+- Na eliminação simples, cada rodada tem o nome da fase quando faz sentido ("Quartas de final", "Semifinal", "Final") e a classificação por pontos não aparece (a chave decide); o campeão segue em destaque, em texto.

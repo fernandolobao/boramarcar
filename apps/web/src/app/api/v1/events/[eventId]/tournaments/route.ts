@@ -1,4 +1,5 @@
 import { GAME_FORMATS } from '@boramarcar/core';
+import { TOURNAMENT_STRUCTURES } from '@boramarcar/core/tournaments';
 import { createTournament } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
@@ -13,6 +14,7 @@ const schema = z.object({
   countsInRanking: z.boolean().optional(),
   /** Top cut depois do suíço (9.2): o serviço confere o tamanho para o formato. */
   topCut: z.number().int().min(2).max(16).nullable().optional(),
+  structure: z.enum(TOURNAMENT_STRUCTURES).optional(),
 });
 
 /** Cria um torneio no encontro (dono ou admin do grupo), em qualquer formato (9.1). */

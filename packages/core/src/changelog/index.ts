@@ -199,6 +199,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Torneio do grupo com link público: quem não é do grupo acompanha rodadas, mesas e classificação ao vivo, sem entrar e vendo só o primeiro nome de cada pessoa.',
     en: 'Group tournaments get a public link: people outside the group follow rounds, tables and standings live, without signing in and seeing only first names.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Torneios de um contra um ganham eliminação simples (chave sorteada, quem perde sai) e todos contra todos (cada um enfrenta todos), além do suíço.',
+    en: 'One-on-one tournaments get single elimination (random bracket, lose and you’re out) and round robin (everyone plays everyone), besides Swiss.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
