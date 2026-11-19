@@ -541,6 +541,12 @@ sem rolagem horizontal em 320px.
 - App: lista, novo torneio e página do torneio. Cada torneio da lista é um botão com nome completo (nome, formato, inscrições e situação). Na mesa, a linha de resultado tem `accessibilityLiveRegion` ("Aguardando…" vira o resultado). A classificação é uma lista de itens acessíveis lidos como "1º Ana: 3 pontos (1-0-0). OMW … GW … OGW …". Tirar inscrição e apagar usam o `ConfirmButton` (dois toques, com o nome no rótulo). "Corrigir resultado" abre o formulário só quando pedido, com a mesa no nome.
 - Sino (site e app): aviso de torneio com texto completo ("Copa: rodada 2 começou. Sua mesa é a 3.", bye ou encerramento) e link para o torneio.
 
+## Troca de página com retorno imediato (19/11/2026)
+
+- Área logada com `loading.tsx`: ao trocar de página, aparece na hora um esqueleto (título e cartões cinza, decorativos, `aria-hidden`), com `aria-busy` e "Carregando…" numa região de status para leitores de tela. O pulso respeita `motion-reduce`.
+- Menu principal: o item tocado fica destacado e ganha um ponto pulsando (decorativo) até a página chegar (`useLinkStatus`). O `aria-current="page"` continua só na página real. As cores do menu saíram das escalas (`ink-*`) para os tokens por função.
+- E2E de acessibilidade: espera o esqueleto sumir e as animações de entrada terminarem antes de medir o contraste (antes, às vezes media no meio do esmaecimento).
+
 ## Modo mesa a partir da mesa do torneio (19/11/2026)
 
 - Página do torneio (site e app): "Abrir no modo mesa" (com a mesa no nome acessível) nas mesas de pod ou de melhor de 1 ainda sem resultado. No modo mesa, a introdução diz de qual torneio e mesa se trata; o formato fica travado (campo desabilitado) e a escolha de jogadores não aparece (só a ordem e os decks).

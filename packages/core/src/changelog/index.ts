@@ -141,6 +141,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-19',
+    pt: 'Trocar de página ficou mais responsivo: o item do menu reage na hora do toque e a página nova mostra onde o conteúdo vai aparecer enquanto carrega.',
+    en: 'Switching pages feels faster: the menu item reacts right when you tap it, and the new page shows where content will appear while it loads.',
+  },
+  {
+    date: '2026-11-19',
     pt: 'Nas mesas de torneio (pods e melhor de 1), "Abrir no modo mesa" já traz os jogadores e o formato; ao registrar, o resultado vai direto para a mesa do torneio.',
     en: 'On tournament tables (pods and best of 1), "Open in table mode" brings the players and format; when you save, the result goes straight to the tournament table.',
   },
