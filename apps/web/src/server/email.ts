@@ -273,6 +273,8 @@ export function buildRecapEmail(
 
 /** Página pública do resumo (só primeiros nomes, comandantes e placar). */
 export const recapUrl = (eventId: string) => `${getBaseUrl()}/resumo/${eventId}`;
+/** Página pública do torneio (9.5). */
+export const tournamentPublicUrl = (id: string) => `${getBaseUrl()}/torneio/${id}`;
 /** Retrospectiva do mês do grupo (pública para quem tem o link). */
 export const monthlyUrl = (groupId: string, month: string) =>
   `${getBaseUrl()}/retrospectiva/${groupId}/${month}`;

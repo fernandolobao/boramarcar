@@ -604,3 +604,9 @@ sem rolagem horizontal em 320px.
 ## Conquistas de torneio (19/11/2026)
 
 - Três conquistas novas (estreia em torneio, top cut e campeão de torneio) usam os mesmos componentes das outras: nome e descrição em texto, ícone decorativo do mapa `Icons` (`events`, `ranking`, `champion`) e progresso em texto. Nada novo de interface.
+
+## Torneio público (19/11/2026)
+
+- `/torneio/[id]`: página fora da área logada, com `<main id="conteudo">`, um `<h1>` (nome do torneio), o selo "Ao vivo" em texto e a explicação de que a página se atualiza a cada 30 segundos (WCAG 2.2.2: a atualização é avisada, curta e só com a aba visível; nada se move sozinho na tela além do conteúdo novo). Reaproveita `TournamentLive` sem formulários (visitante não registra).
+- Na página do torneio do grupo, seção "Link público" com `CopyField` (rótulo próprio) e os botões de compartilhar.
+- Rota nova no `a11y.spec.ts` (claro/escuro, desktop/celular).

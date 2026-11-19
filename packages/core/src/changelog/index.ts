@@ -194,6 +194,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Conquistas de torneio: estreia em torneio, chegar ao top cut e campeão de torneio (com quantas vezes), de grupo ou de loja.',
     en: 'Tournament achievements: tournament debut, making the top cut and tournament champion (with how many times), in groups or at stores.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Torneio do grupo com link público: quem não é do grupo acompanha rodadas, mesas e classificação ao vivo, sem entrar e vendo só o primeiro nome de cada pessoa.',
+    en: 'Group tournaments get a public link: people outside the group follow rounds, tables and standings live, without signing in and seeing only first names.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

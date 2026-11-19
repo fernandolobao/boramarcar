@@ -30,6 +30,7 @@ export const SECTIONS = [
   'notifications',
   'table',
   'recap',
+  'tournament',
   'signIn',
   'signUp',
   'forgotPassword',

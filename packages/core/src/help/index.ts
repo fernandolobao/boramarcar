@@ -316,6 +316,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Cada pessoa se inscreve em "Me inscrever" (quem organiza inscreve qualquer pessoa do grupo). Ao começar, a 1ª rodada é sorteada; as seguintes juntam quem tem pontos parecidos e evitam repetir adversários, e com número ímpar alguém fica de bye (vale vitória). Quem está na mesa registra o resultado, que vale na hora; quem organiza corrige quando precisar e libera a próxima rodada quando todas as mesas têm resultado.',
               'A classificação usa os pontos do torneio (3/1/0 por padrão) e desempata pelos critérios oficiais: % de vitórias dos oponentes, % de jogos vencidos e % de jogos vencidos dos oponentes. Se o torneio conta no ranking, cada jogo também vira uma partida do grupo.',
               'Top cut (opcional, na criação do torneio ou, na loja, ao começar): depois do suíço, os melhores seguem em eliminação. No um contra um, top 4 ou 8 em chave (1º contra o último do top), e cada mesa precisa de um vencedor. Nos pods, top 4 (mesa final direta), 10 (os dois primeiros esperam na final) ou 16 (quatro pods misturados); empate na mesa leva quem ficou melhor no suíço. Quem vence a final é o campeão; o suíço fica fechado quando o top começa.',
+              'Para quem não é do grupo acompanhar (num campeonato, ou para mandar no WhatsApp), a página do torneio tem o "Link público": abre sem login, se atualiza sozinha enquanto o torneio roda e mostra só o primeiro nome de cada pessoa.',
             ],
           },
           {
@@ -690,6 +691,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Everyone enters with "Enter myself" (organizers can enter anyone in the group). When it starts, round 1 is drawn at random; later rounds group players with similar points and avoid repeat opponents, and with an odd number someone gets a bye (counts as a win). Players at a table report the result, which counts right away; organizers correct it when needed and open the next round once every table has a result.',
               'Standings use the tournament points (3/1/0 by default) and break ties with the official criteria: opponents’ match-win %, game-win % and opponents’ game-win %. If the tournament counts in the ranking, each game also becomes a group game.',
               'Top cut (optional, when creating the tournament or, at a store, when starting it): after the Swiss rounds, the best go on to elimination. In one-on-one, a top 4 or 8 bracket (1st against the last of the cut), and each table needs a winner. In pods, a top 4 (straight to the final table), 10 (the first two wait at the final) or 16 (four mixed pods); a drawn table goes to whoever finished higher in the Swiss. The winner of the final is the champion; the Swiss is locked once the top cut starts.',
+              'For people outside the group to follow along (at an event, or to send on WhatsApp), the tournament page has a "Public link": it opens without signing in, refreshes on its own while the tournament runs and shows only each person’s first name.',
             ],
           },
           {

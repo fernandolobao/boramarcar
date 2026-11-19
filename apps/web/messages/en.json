@@ -1971,6 +1971,10 @@
     "notifications": {
       "title": "Notifications",
       "description": "Your games and your group’s, new achievements, podium changes and ArcanaKin announcements."
+    },
+    "tournament": {
+      "title": "Tournament",
+      "description": "Tournament rounds, tables and standings, live."
     }
   },
   "beta": {
@@ -2319,7 +2323,17 @@
     "stageHeading": "Top {size} · {stage}",
     "startTopCut": "Start the top {count}",
     "nextStage": "Next top cut stage",
-    "standingsSwiss": "Swiss standings"
+    "standingsSwiss": "Swiss standings",
+    "public": {
+      "live": "Live",
+      "liveHint": "The page refreshes on its own every 30 seconds.",
+      "share": "Share the tournament",
+      "shareText": "Follow {name} live: {url}",
+      "cta": "Run your group’s tournaments on ArcanaKin.",
+      "ctaButton": "Discover ArcanaKin",
+      "link": "Public link",
+      "linkHint": "Anyone with the link can follow rounds, tables and standings without signing in. Only each person’s first name shows."
+    }
   },
   "stores": {
     "metaDescription": "{name} in {city}: address, hours, contacts and the Magic formats the store plays.",

@@ -33,6 +33,7 @@ const PUBLIC_PAGES = [
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,
+  `/torneio/${E2E_IDS.tournament}`,
   `/lojas/${E2E_IDS.store}`,
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeEvent}`,
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeTournamentEvent}`,
