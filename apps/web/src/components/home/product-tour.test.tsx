@@ -25,6 +25,7 @@ describe('ProductTour', () => {
       'Coleção',
       'Modo mesa',
       'Ranking',
+      'Torneio',
     ]);
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     const panel = screen.getByRole('tabpanel');
@@ -39,7 +40,7 @@ describe('ProductTour', () => {
     expect(screen.getByRole('tab', { name: 'Agenda' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tabpanel')).toHaveTextContent(/mesa fecha/i);
     fireEvent.keyDown(document.activeElement!, { key: 'End' });
-    expect(screen.getByRole('tab', { name: 'Ranking' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Torneio' })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('cada tela tem a captura clara e a escura com o mesmo texto alternativo', () => {

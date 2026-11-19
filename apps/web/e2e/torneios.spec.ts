@@ -49,6 +49,23 @@ test.describe('torneios', () => {
 
     await page.getByRole('button', { name: 'Próxima rodada' }).click();
     await expect(page.getByRole('heading', { name: 'Rodada 2 de 3' })).toBeVisible();
+
+    // Rodada 2 pelo modo mesa: jogadores e formato vêm do torneio; o resultado volta para a mesa.
+    const url = page.url();
+    await page.getByRole('link', { name: /Abrir no modo mesa/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Modo mesa' })).toBeVisible();
+    await expect(
+      page.getByText(/mesa 1: os jogadores e o formato já vêm do torneio/),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Começar' }).click();
+    await page.getByRole('button', { name: 'Menu da mesa' }).click();
+    await page.getByRole('button', { name: 'Encerrar e registrar' }).click();
+    await page.getByRole('radio', { name: /Caio/ }).check({ force: true });
+    await page.getByRole('button', { name: 'Salvar partida' }).click();
+    await expect(page).toHaveURL(url);
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Resultado: Venceu: Caio' }),
+    ).toBeVisible();
   });
 
   test('Modern em melhor de 3: placar em jogos na mesa e classificação com desempates', async ({

@@ -37,24 +37,30 @@ export function TableSetupScreen({
   onStart,
   onDiscard,
   onBack,
+  tournament,
 }: {
   setup: TableSetup;
   saved: TableState | null;
   onStart: (state: TableState) => void;
   onDiscard: () => void;
   onBack: () => void;
+  /** Mesa de torneio (9.1): formato e jogadores já definidos (só a ordem e os decks mudam). */
+  tournament?: { name: string; tableNumber: number; format: string; seats: string[] };
 }) {
   const colors = useColors();
-  const initialFormat = (FORMATS as readonly string[]).includes(setup.defaultFormat)
-    ? (setup.defaultFormat as GameFormat)
+  const preferred = tournament?.format ?? setup.defaultFormat;
+  const initialFormat = (FORMATS as readonly string[]).includes(preferred)
+    ? (preferred as GameFormat)
     : 'commander';
   const [format, setFormat] = useState<GameFormat>(initialFormat);
   const [life, setLife] = useState(String(startingLifeFor(initialFormat)));
   const [seats, setSeats] = useState<string[]>(
-    setup.players
-      .filter((p) => p.confirmed)
-      .slice(0, MAX_PLAYERS)
-      .map((p) => p.userId),
+    tournament
+      ? tournament.seats
+      : setup.players
+          .filter((p) => p.confirmed)
+          .slice(0, MAX_PLAYERS)
+          .map((p) => p.userId),
   );
   const [decks, setDecks] = useState<Record<string, string | null>>({});
   const byId = new Map(setup.players.map((p) => [p.userId, p]));
@@ -84,7 +90,11 @@ export function TableSetupScreen({
         <AppText accessibilityRole="header" style={ui.title}>
           {t('tableTitle')}
         </AppText>
-        <AppText muted>{t('tableIntro')}</AppText>
+        <AppText muted>
+          {tournament
+            ? t('tableTournamentIntro', { name: tournament.name, table: tournament.tableNumber })
+            : t('tableIntro')}
+        </AppText>
       </View>
       <Tip id="table" />
 
@@ -100,18 +110,20 @@ export function TableSetupScreen({
         </Section>
       )}
 
-      <Section title={t('tableFormat')}>
-        <Choices
-          label={t('tableFormat')}
-          hideLabel
-          value={format}
-          onChange={(f) => {
-            setFormat(f);
-            setLife(String(startingLifeFor(f)));
-          }}
-          options={FORMATS.map((f) => ({ value: f, label: formatLabel(f) }))}
-        />
-      </Section>
+      {!tournament && (
+        <Section title={t('tableFormat')}>
+          <Choices
+            label={t('tableFormat')}
+            hideLabel
+            value={format}
+            onChange={(f) => {
+              setFormat(f);
+              setLife(String(startingLifeFor(f)));
+            }}
+            options={FORMATS.map((f) => ({ value: f, label: formatLabel(f) }))}
+          />
+        </Section>
+      )}
 
       <Section title={t('tableStartingLife')}>
         <TextInput
@@ -134,21 +146,23 @@ export function TableSetupScreen({
         />
       </Section>
 
-      <Section title={t('tablePlayers', { max: MAX_PLAYERS })}>
-        {setup.players.map((p) => {
-          const checked = seats.includes(p.userId);
-          return (
-            <Checkbox
-              key={p.userId}
-              label={`${p.name}${p.confirmed ? ` (${t('tableConfirmed')})` : ''}`}
-              checked={checked}
-              disabled={!checked && seats.length >= MAX_PLAYERS}
-              onChange={() => toggle(p.userId)}
-              style={{ alignItems: 'flex-start' }}
-            />
-          );
-        })}
-      </Section>
+      {!tournament && (
+        <Section title={t('tablePlayers', { max: MAX_PLAYERS })}>
+          {setup.players.map((p) => {
+            const checked = seats.includes(p.userId);
+            return (
+              <Checkbox
+                key={p.userId}
+                label={`${p.name}${p.confirmed ? ` (${t('tableConfirmed')})` : ''}`}
+                checked={checked}
+                disabled={!checked && seats.length >= MAX_PLAYERS}
+                onChange={() => toggle(p.userId)}
+                style={{ alignItems: 'flex-start' }}
+              />
+            );
+          })}
+        </Section>
+      )}
 
       {seats.length > 0 && (
         <Section title={t('tableSeatOrder')}>

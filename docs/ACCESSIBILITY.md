@@ -546,3 +546,10 @@ sem rolagem horizontal em 320px.
 - Área logada com `loading.tsx`: ao trocar de página, aparece na hora um esqueleto (título e cartões cinza, decorativos, `aria-hidden`), com `aria-busy` e "Carregando…" numa região de status para leitores de tela. O pulso respeita `motion-reduce`.
 - Menu principal: o item tocado fica destacado e ganha um ponto pulsando (decorativo) até a página chegar (`useLinkStatus`). O `aria-current="page"` continua só na página real. As cores do menu saíram das escalas (`ink-*`) para os tokens por função.
 - E2E de acessibilidade: espera o esqueleto sumir e as animações de entrada terminarem antes de medir o contraste (antes, às vezes media no meio do esmaecimento).
+
+## Modo mesa a partir da mesa do torneio (19/11/2026)
+
+- Página do torneio (site e app): "Abrir no modo mesa" (com a mesa no nome acessível) nas mesas de pod ou de melhor de 1 ainda sem resultado. No modo mesa, a introdução diz de qual torneio e mesa se trata; o formato fica travado (campo desabilitado) e a escolha de jogadores não aparece (só a ordem e os decks).
+- Formulário de placar (par): os campos de jogos vencidos ficam um abaixo do outro (lado a lado, estouravam o cartão da mesa em meia largura); as mesas da rodada ficam com a altura do próprio conteúdo.
+- A página do torneio deixou de usar as seções empilhadas ao rolar: com formulários de altura variável, a seção de baixo cobria o botão "Salvar resultado" (o E2E acusou).
+- "Veja por dentro" ganhou a aba "Torneio" (texto alternativo descreve a rodada mostrada).

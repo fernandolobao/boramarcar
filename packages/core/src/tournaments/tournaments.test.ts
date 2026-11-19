@@ -4,6 +4,7 @@ import {
   podSizes,
   recommendedRounds,
   standings,
+  tableModeEligible,
   tableOutcome,
   tournamentShape,
   type PlayedRound,
@@ -191,5 +192,39 @@ describe('classificação com desempates do MTR', () => {
     // Os outros três empatam em tudo: mesma posição.
     expect(table.slice(1).map((s) => s.rank)).toEqual([2, 2, 2]);
     expect(table[1]!.points).toBe(1);
+  });
+});
+
+describe('mesa do torneio no modo mesa', () => {
+  const running = {
+    status: 'running',
+    entrantSize: 1,
+    bestOf: 1,
+    table: 'pod' as const,
+    format: 'commander',
+  };
+  const open = { reported: false, entrants: ['a', 'b', 'c', 'd'] };
+  it('pod ou par em melhor de 1, sem resultado, de inscrições individuais', () => {
+    expect(tableModeEligible(running, open)).toBe(true);
+    expect(
+      tableModeEligible(
+        { ...running, table: 'pair', format: 'modern' },
+        { reported: false, entrants: ['a', 'b'] },
+      ),
+    ).toBe(true);
+  });
+  it('fora: melhor de 3, duplas (2HG), mesa já registrada, bye e torneio parado', () => {
+    expect(
+      tableModeEligible({ ...running, table: 'pair', bestOf: 3, format: 'modern' }, open),
+    ).toBe(false);
+    expect(
+      tableModeEligible(
+        { ...running, table: 'pair', entrantSize: 2, format: 'two_headed_giant' },
+        open,
+      ),
+    ).toBe(false);
+    expect(tableModeEligible(running, { ...open, reported: true })).toBe(false);
+    expect(tableModeEligible(running, { reported: false, entrants: ['a'] })).toBe(false);
+    expect(tableModeEligible({ ...running, status: 'finished' }, open)).toBe(false);
   });
 });

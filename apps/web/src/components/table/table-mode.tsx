@@ -44,35 +44,61 @@ export interface TablePlayerOption {
 
 const MAX_PLAYERS = 6;
 
+/** Mesa de torneio (9.1) aberta no modo mesa: jogadores e formato já definidos. */
+export interface TableTournament {
+  id: string;
+  name: string;
+  tableId: string;
+  tableNumber: number;
+  format: GameFormat;
+  /** Pessoas da mesa, na ordem dos assentos. */
+  seats: string[];
+  /** Inscrição de cada pessoa (o resultado vai por inscrição). */
+  entrantOf: Record<string, string>;
+}
+
+/** Chave da partida salva no aparelho: a do encontro, ou a da mesa do torneio. */
+const storageKeyOf = (eventId: string, tournament?: TableTournament) =>
+  tournament ? `${eventId}:${tournament.tableId}` : eventId;
+
 function Setup({
   eventId,
   players,
   defaultFormat,
   showTip,
   onStart,
+  tournament,
 }: {
   eventId: string;
   players: readonly TablePlayerOption[];
   defaultFormat: GameFormat;
   showTip: boolean;
   onStart: (state: TableState) => void;
+  tournament?: TableTournament;
 }) {
   const t = useTranslations('table');
   const tf = useTranslations('formats');
   const id = useId();
   const formats = GAME_FORMATS.filter(tableSupportsFormat);
   const [format, setFormat] = useState<GameFormat>(
-    tableSupportsFormat(defaultFormat) ? defaultFormat : 'commander',
+    tournament && tableSupportsFormat(tournament.format)
+      ? tournament.format
+      : tableSupportsFormat(defaultFormat)
+        ? defaultFormat
+        : 'commander',
   );
   const [life, setLife] = useState<number | null>(startingLifeFor(format));
   const [seats, setSeats] = useState<string[]>(
-    players
-      .filter((p) => p.confirmed)
-      .slice(0, MAX_PLAYERS)
-      .map((p) => p.userId),
+    tournament
+      ? tournament.seats
+      : players
+          .filter((p) => p.confirmed)
+          .slice(0, MAX_PLAYERS)
+          .map((p) => p.userId),
   );
   const [decks, setDecks] = useState<Record<string, string>>({});
-  const saved = useSavedTable(eventId);
+  const storageKey = storageKeyOf(eventId, tournament);
+  const saved = useSavedTable(storageKey);
 
   const toggle = (userId: string) =>
     setSeats((s) =>
@@ -102,7 +128,11 @@ function Setup({
     >
       <TitleWithTip id="table" dismissed={!showTip}>
         <h1 className="page-title">{t('title')}</h1>
-        <p className="muted">{t('intro')}</p>
+        <p className="muted">
+          {tournament
+            ? t('tournamentIntro', { name: tournament.name, table: tournament.tableNumber })
+            : t('intro')}
+        </p>
       </TitleWithTip>
       {saved && (
         <section className="card space-y-3" aria-labelledby={`${id}-saved`}>
@@ -124,7 +154,7 @@ function Setup({
               <Icon name="play" />
               {t('resume')}
             </button>
-            <button type="button" className="btn-secondary" onClick={() => clearTable(eventId)}>
+            <button type="button" className="btn-secondary" onClick={() => clearTable(storageKey)}>
               <Icon name="delete" />
               {t('discard')}
             </button>
@@ -157,6 +187,8 @@ function Setup({
               label={t('format')}
               id={`${id}-format`}
               value={String(format)}
+              // Na mesa do torneio, o formato é o do torneio.
+              disabled={Boolean(tournament)}
               onChange={(v) => {
                 const f = v as GameFormat;
                 setFormat(f);
@@ -177,24 +209,27 @@ function Setup({
           </div>
         </div>
 
-        <fieldset>
-          <legend className="label">{t('players', { max: MAX_PLAYERS })}</legend>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {players.map((p) => (
-              <li key={p.userId}>
-                <Checkbox
-                  label={p.name}
-                  checked={seats.includes(p.userId)}
-                  disabled={!seats.includes(p.userId) && seats.length >= MAX_PLAYERS}
-                  onChange={() => toggle(p.userId)}
-                  className="min-h-11 rounded-xl border border-line-strong px-3 data-[selected]:border-primary data-[selected]:bg-surface-muted"
-                >
-                  {p.confirmed && <span className="muted text-xs">({t('confirmed')})</span>}
-                </Checkbox>
-              </li>
-            ))}
-          </ul>
-        </fieldset>
+        {/* Na mesa do torneio, quem joga já está definido (só a ordem e os decks mudam). */}
+        {!tournament && (
+          <fieldset>
+            <legend className="label">{t('players', { max: MAX_PLAYERS })}</legend>
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {players.map((p) => (
+                <li key={p.userId}>
+                  <Checkbox
+                    label={p.name}
+                    checked={seats.includes(p.userId)}
+                    disabled={!seats.includes(p.userId) && seats.length >= MAX_PLAYERS}
+                    onChange={() => toggle(p.userId)}
+                    className="min-h-11 rounded-xl border border-line-strong px-3 data-[selected]:border-primary data-[selected]:bg-surface-muted"
+                  >
+                    {p.confirmed && <span className="muted text-xs">({t('confirmed')})</span>}
+                  </Checkbox>
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+        )}
 
         {seats.length > 0 && (
           <section aria-labelledby={`${id}-order`}>
@@ -254,9 +289,12 @@ function Setup({
             <Icon name="play" />
             {t('start')}
           </button>
-          <Link href={`/eventos/${eventId}`} className="btn-secondary">
+          <Link
+            href={tournament ? `/torneios/${tournament.id}` : `/eventos/${eventId}`}
+            className="btn-secondary"
+          >
             <Icon name="previous" />
-            {t('back')}
+            {tournament ? t('backToTournament') : t('back')}
           </Link>
         </div>
         {seats.length < 2 && <p className="muted text-sm">{t('needTwo')}</p>}
@@ -269,10 +307,12 @@ function Finish({
   eventId,
   state,
   onBack,
+  tournament,
 }: {
   eventId: string;
   state: TableState;
   onBack: () => void;
+  tournament?: TableTournament;
 }) {
   const t = useTranslations('table');
   const router = useRouter();
@@ -295,21 +335,34 @@ function Finish({
         className="card space-y-5"
         onSubmit={(e) => {
           e.preventDefault();
+          const details = {
+            firstPlayerId: first || null,
+            winningTurn: turn,
+            durationMinutes: tableDurationMinutes(state),
+          };
           void run(
             () =>
-              api(`/api/v1/events/${eventId}/games`, {
-                method: 'POST',
-                body: {
-                  format: state.format,
-                  firstPlayerId: first || null,
-                  winningTurn: turn,
-                  durationMinutes: tableDurationMinutes(state),
-                  players: tableGamePlayers(state, winner === 'draw' ? null : winner),
-                },
-              }),
+              tournament
+                ? // Mesa de torneio: o resultado vai para a mesa (e de lá vira partida do grupo).
+                  api(`/api/v1/tournaments/${tournament.id}/tables/${tournament.tableId}`, {
+                    method: 'PUT',
+                    body: {
+                      gameWins: winner === 'draw' ? {} : { [tournament.entrantOf[winner]!]: 1 },
+                      gameDraws: winner === 'draw' ? 1 : 0,
+                      details,
+                    },
+                  })
+                : api(`/api/v1/events/${eventId}/games`, {
+                    method: 'POST',
+                    body: {
+                      format: state.format,
+                      ...details,
+                      players: tableGamePlayers(state, winner === 'draw' ? null : winner),
+                    },
+                  }),
             () => {
-              clearTable(eventId);
-              router.push(`/eventos/${eventId}`);
+              clearTable(storageKeyOf(eventId, tournament));
+              router.push(tournament ? `/torneios/${tournament.id}` : `/eventos/${eventId}`);
             },
           );
         }}
@@ -424,12 +477,15 @@ export function TableMode({
   players,
   defaultFormat,
   showTip = false,
+  tournament,
 }: {
   eventId: string;
   players: readonly TablePlayerOption[];
   defaultFormat: GameFormat;
   /** Dica do modo mesa (7.4), enquanto a pessoa não a dispensar. */
   showTip?: boolean;
+  /** Mesa de torneio (9.1): jogadores e formato já definidos; o resultado vai para a mesa. */
+  tournament?: TableTournament;
 }) {
   const router = useRouter();
   const [phase, setPhase] = useState<
@@ -441,10 +497,12 @@ export function TableMode({
   if (phase.kind === 'playing') {
     return (
       <Playing
-        eventId={eventId}
+        eventId={storageKeyOf(eventId, tournament)}
         initial={phase.state}
         onFinish={(state) => setPhase({ kind: 'finish', state })}
-        onExit={() => router.push(`/eventos/${eventId}`)}
+        onExit={() =>
+          router.push(tournament ? `/torneios/${tournament.id}` : `/eventos/${eventId}`)
+        }
       />
     );
   }
@@ -452,6 +510,7 @@ export function TableMode({
     return (
       <Finish
         eventId={eventId}
+        tournament={tournament}
         state={phase.state}
         onBack={() => setPhase({ kind: 'playing', state: phase.state })}
       />
@@ -463,6 +522,7 @@ export function TableMode({
       players={players}
       defaultFormat={defaultFormat}
       showTip={showTip}
+      tournament={tournament}
       onStart={(state) => setPhase({ kind: 'playing', state })}
     />
   );

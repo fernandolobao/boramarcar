@@ -331,3 +331,24 @@ describe('avisos do torneio no sino', () => {
     expect(last.data).toMatchObject({ kind: 'tournament', event: 'finished' });
   });
 });
+
+describe('resultado vindo do modo mesa', () => {
+  it('os detalhes da partida (quem começou, turno e duração) vão para a partida do grupo', async () => {
+    const { players, owner, event, tournament } = await setup(4, 'commander');
+    for (const p of players)
+      await addEntrant(db, { tournamentId: tournament.id, userId: owner.id, memberIds: [p.id] });
+    await startTournament(db, { tournamentId: tournament.id, userId: owner.id, random: fixed() });
+    const view = await getTournament(db, { tournamentId: tournament.id, userId: owner.id });
+    const [t] = view.rounds[0]!.tables;
+    const first = view.entrants.find((e) => e.id === t!.entrants[1])!.memberIds[0]!;
+    await reportTable(db, {
+      tableId: t!.id,
+      userId: owner.id,
+      gameWins: { [t!.entrants[0]!]: 1 },
+      gameDraws: 0,
+      details: { firstPlayerId: first, winningTurn: 7, durationMinutes: 52 },
+    });
+    const [game] = await gamesOfEvent(event.id);
+    expect(game).toMatchObject({ firstPlayerId: first, winningTurn: 7, durationMinutes: 52 });
+  });
+});

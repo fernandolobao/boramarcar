@@ -755,7 +755,16 @@ export function createApiClient(options: ApiClientOptions) {
       report: (
         id: string,
         tableId: string,
-        result: { gameWins: Record<string, number>; gameDraws: number },
+        result: {
+          gameWins: Record<string, number>;
+          gameDraws: number;
+          /** Do modo mesa: valem quando a mesa vira uma partida só. */
+          details?: {
+            firstPlayerId?: string | null;
+            winningTurn?: number | null;
+            durationMinutes?: number | null;
+          };
+        },
       ) =>
         request(
           'PUT',

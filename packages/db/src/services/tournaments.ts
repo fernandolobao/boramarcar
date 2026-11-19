@@ -367,6 +367,12 @@ export async function reportTable(
     gameDraws: number;
     /** Da URL: a mesa precisa ser deste torneio. */
     tournamentId?: string;
+    /** Detalhes da partida (modo mesa); valem quando a mesa vira uma partida só. */
+    details?: {
+      firstPlayerId?: string | null;
+      winningTurn?: number | null;
+      durationMinutes?: number | null;
+    };
   },
 ) {
   const [table] = await db
@@ -407,12 +413,14 @@ export async function reportTable(
   if (table.gameIds.length) await db.delete(games).where(inArray(games.id, table.gameIds));
   const gameIds: string[] = [];
   if (row.countsInRanking) {
-    for (const players of gamesFor(row, table.entrantIds, members, gameWins, input.gameDraws)) {
+    const list = gamesFor(row, table.entrantIds, members, gameWins, input.gameDraws);
+    for (const players of list) {
       const game = await recordGame(db, {
         eventId: row.eventId,
         userId: input.userId,
         format: isGameFormat(row.format) ? row.format : undefined,
         players,
+        ...(list.length === 1 ? input.details : {}),
       });
       gameIds.push(game.id);
     }

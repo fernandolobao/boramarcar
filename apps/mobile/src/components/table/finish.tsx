@@ -18,11 +18,14 @@ export function TableFinishScreen({
   state,
   onBack,
   onSaved,
+  tournament,
 }: {
   eventId: string;
   state: TableState;
   onBack: () => void;
   onSaved: () => void;
+  /** Mesa de torneio (9.1): o resultado vai para a mesa (e de lá vira partida do grupo). */
+  tournament?: { id: string; tableId: string; entrantOf: Record<string, string> };
 }) {
   const colors = useColors();
   const result = tableResult(state);
@@ -40,13 +43,24 @@ export function TableFinishScreen({
     setSaving(true);
     setError('');
     try {
-      await api.games.record(eventId, {
-        format: state.format,
+      const details = {
         firstPlayerId: first || null,
         winningTurn: turnValue,
         durationMinutes: tableDurationMinutes(state),
-        players: tableGamePlayers(state, winner === 'draw' ? null : winner),
-      });
+      };
+      if (tournament) {
+        await api.tournaments.report(tournament.id, tournament.tableId, {
+          gameWins: winner === 'draw' ? {} : { [tournament.entrantOf[winner]!]: 1 },
+          gameDraws: winner === 'draw' ? 1 : 0,
+          details,
+        });
+      } else {
+        await api.games.record(eventId, {
+          format: state.format,
+          ...details,
+          players: tableGamePlayers(state, winner === 'draw' ? null : winner),
+        });
+      }
       onSaved();
     } catch {
       setError(t('tableSaveError'));

@@ -1240,6 +1240,11 @@
           "tab": "Ranking",
           "caption": "A classificação do grupo, com jogos, vitórias e pontos, por temporada e tipo de jogo.",
           "alt": "Ranking do grupo após 15 partidas: Ana Lima em 1º com 5 vitórias em 12 jogos e 15 pontos, seguida de Diego, Felipe, Bruno, Carla e Elisa."
+        },
+        "torneio": {
+          "tab": "Torneio",
+          "caption": "Torneios do grupo em qualquer formato: mesas da rodada, placar em jogos, classificação com desempates e linha do tempo.",
+          "alt": "Torneio Copa de Modern em melhor de 3, em andamento: rodada 2 de 3 com três mesas, uma já registrada com o placar em jogos e duas esperando o resultado, com os campos de jogos vencidos por cada jogador."
         }
       }
     },
@@ -1488,7 +1493,9 @@
     "fullscreen": "Tela cheia",
     "fullscreenInstallHint": "Para usar a tela toda no iPhone, adicione o ArcanaKin à tela inicial (botão Compartilhar → Adicionar à Tela de Início) e abra a mesa por lá.",
     "awakeOn": "Tela acesa enquanto a mesa estiver aberta.",
-    "awakeUnavailable": "Não deu para manter a tela acesa: desligue o bloqueio automático nos ajustes do celular ou saia do modo de baixo consumo."
+    "awakeUnavailable": "Não deu para manter a tela acesa: desligue o bloqueio automático nos ajustes do celular ou saia do modo de baixo consumo.",
+    "tournamentIntro": "{name} · mesa {table}: os jogadores e o formato já vêm do torneio. Ao registrar, o resultado vai para a mesa do torneio.",
+    "backToTournament": "Voltar ao torneio"
   },
   "consent": {
     "title": "Cookies e gravação de sessão",
@@ -2266,6 +2273,7 @@
     "createHere": "Criar torneio neste encontro",
     "listLink": "Torneios",
     "manage": "Organização",
-    "podWinner": "Venceu: {name}"
+    "podWinner": "Venceu: {name}",
+    "openInTableHint": "Joga com o contador de vida e manda o resultado direto para esta mesa."
   }
 }
