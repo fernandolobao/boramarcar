@@ -161,15 +161,19 @@ export function TournamentControls({
   tournamentId,
   status,
   canStart,
-  canAdvance,
-  lastRound,
+  nextStep,
+  topCut,
+  inTopCut,
   deletable = true,
 }: {
   tournamentId: string;
   status: string;
   canStart: boolean;
-  canAdvance: boolean;
-  lastRound: boolean;
+  /** O que o botão faz (todas as mesas da rodada registradas); `null` = ainda não dá. */
+  nextStep: 'round' | 'topCut' | 'finish' | null;
+  topCut: number | null;
+  /** A rodada atual já é do top cut (o botão leva à próxima fase). */
+  inTopCut: boolean;
   /** No torneio de loja, apagar não aparece (o torneio é do evento). */
   deletable?: boolean;
 }) {
@@ -200,15 +204,23 @@ export function TournamentControls({
           <button
             type="button"
             className="btn-primary"
-            disabled={pending || !canAdvance}
+            disabled={pending || !nextStep}
             onClick={() =>
               void run(() => api(`/api/v1/tournaments/${tournamentId}/next`, { method: 'POST' }))
             }
           >
-            <Icon name={lastRound ? 'winner' : 'next'} />
-            {lastRound ? t('finish') : t('next')}
+            <Icon
+              name={nextStep === 'finish' ? 'winner' : nextStep === 'topCut' ? 'ranking' : 'next'}
+            />
+            {nextStep === 'finish'
+              ? t('finish')
+              : nextStep === 'topCut'
+                ? t('startTopCut', { count: topCut ?? 0 })
+                : inTopCut
+                  ? t('nextStage')
+                  : t('next')}
           </button>
-          {!canAdvance && <p className="muted text-sm">{t('nextHint')}</p>}
+          {!nextStep && <p className="muted text-sm">{t('nextHint')}</p>}
         </div>
       )}
       {deletable && (

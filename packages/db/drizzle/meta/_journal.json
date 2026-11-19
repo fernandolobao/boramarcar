@@ -218,6 +218,13 @@
       "when": 1795090531018,
       "tag": "0030_flowery_karnak",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795094256691,
+      "tag": "0031_equal_odin",
+      "breakpoints": true
     }
   ]
 }

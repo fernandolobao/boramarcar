@@ -1,11 +1,16 @@
 import { DomainError, type GamePlayerInput } from '@boramarcar/core';
 import { formatRules, isGameFormat } from '@boramarcar/core';
 import {
+  isTopCutSize,
   pairRound,
+  planTopCut,
   recommendedRounds,
   standings,
+  tableOutcome,
+  topCutStageName,
   tournamentShape,
   type PlayedRound,
+  type TableResult,
 } from '@boramarcar/core/tournaments';
 import { and, asc, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import type { Database } from '../client';
@@ -101,6 +106,8 @@ export async function createTournament(
     points?: { win: number; draw: number; loss: number };
     rounds?: number | null;
     countsInRanking?: boolean;
+    /** Top cut depois do suíço (9.2). */
+    topCut?: number | null;
   },
 ) {
   const [event] = await db.select().from(events).where(eq(events.id, input.eventId)).limit(1);
@@ -113,6 +120,7 @@ export async function createTournament(
   if (!name || name.length > 120) throw new DomainError('invalid_input', 'Nome inválido');
   if (!isGameFormat(input.format)) throw new DomainError('invalid_input', 'Formato inválido');
   const shape = tournamentShape(input.format);
+  const topCut = checkTopCut(shape.table, input.topCut);
   // Pods jogam uma partida por rodada; o melhor de 3 é só do um contra um.
   const bestOf = shape.table === 'pod' ? 1 : (input.bestOf ?? shape.bestOf);
   if (bestOf !== 1 && bestOf !== 3) throw new DomainError('invalid_input', 'Melhor de 1 ou de 3');
@@ -140,6 +148,7 @@ export async function createTournament(
       pointsDraw: points.draw,
       pointsLoss: points.loss,
       rounds: input.rounds ?? null,
+      topCut,
       countsInRanking: input.countsInRanking ?? true,
       createdBy: input.userId,
     })
@@ -231,10 +240,13 @@ async function entrantIdsOf(db: Database, tournamentId: string) {
 
 /** Rodadas já jogadas (só mesas com resultado), no formato do núcleo. */
 async function playedRounds(db: Database, tournamentId: string): Promise<PlayedRound[]> {
+  // Só o suíço: o top cut não mexe na classificação nem no emparelhamento.
   const rounds = await db
     .select()
     .from(tournamentRounds)
-    .where(eq(tournamentRounds.tournamentId, tournamentId))
+    .where(
+      and(eq(tournamentRounds.tournamentId, tournamentId), eq(tournamentRounds.stage, 'swiss')),
+    )
     .orderBy(asc(tournamentRounds.number));
   const tables = await db
     .select()
@@ -245,6 +257,38 @@ async function playedRounds(db: Database, tournamentId: string): Promise<PlayedR
       .filter((t) => t.roundId === r.id && t.reportedAt)
       .map((t) => ({ entrants: t.entrantIds, gameWins: t.gameWins ?? {}, gameDraws: t.gameDraws })),
   }));
+}
+
+/** Cabeças de chave do top (classificação do suíço) e as rodadas do top já jogadas, em ordem. */
+async function topCutState(db: Database, row: TournamentRow) {
+  const seeds = standings(await entrantIdsOf(db, row.id), await playedRounds(db, row.id), {
+    win: row.pointsWin,
+    draw: row.pointsDraw,
+    loss: row.pointsLoss,
+  }).map((s) => s.entrant);
+  const rounds = await db
+    .select()
+    .from(tournamentRounds)
+    .where(and(eq(tournamentRounds.tournamentId, row.id), eq(tournamentRounds.stage, 'top')))
+    .orderBy(asc(tournamentRounds.number));
+  const tables = rounds.length
+    ? await db
+        .select()
+        .from(tournamentTables)
+        .where(
+          inArray(
+            tournamentTables.roundId,
+            rounds.map((r) => r.id),
+          ),
+        )
+        .orderBy(asc(tournamentTables.number))
+    : [];
+  const played: TableResult[][] = rounds.map((r) =>
+    tables
+      .filter((t) => t.roundId === r.id)
+      .map((t) => ({ entrants: t.entrantIds, gameWins: t.gameWins ?? {}, gameDraws: t.gameDraws })),
+  );
+  return { seeds, played };
 }
 
 /** Avisa no sino cada pessoa inscrita: a mesa dela na rodada (ou o bye), ou o encerramento. */
@@ -283,14 +327,19 @@ async function createRound(
   row: TournamentRow,
   number: number,
   random?: () => number,
+  /** Mesas do top cut (já definidas pela chave); sem elas, sorteio do suíço. */
+  topTables?: string[][],
 ) {
-  const entrants = await entrantIdsOf(db, row.id);
-  const played = await playedRounds(db, row.id);
-  const tables = pairRound(entrants, played, { table: row.tableKind as 'pod' | 'pair', random });
+  const tables =
+    topTables ??
+    pairRound(await entrantIdsOf(db, row.id), await playedRounds(db, row.id), {
+      table: row.tableKind as 'pod' | 'pair',
+      random,
+    });
   await db.transaction(async (tx) => {
     const [round] = await tx
       .insert(tournamentRounds)
-      .values({ tournamentId: row.id, number })
+      .values({ tournamentId: row.id, number, stage: topTables ? 'top' : 'swiss' })
       .returning();
     await tx.insert(tournamentTables).values(
       tables.map((entrantIds, i) => ({
@@ -303,7 +352,11 @@ async function createRound(
       })),
     );
   });
-  await log(db, row.id, 'round_started', { round: number, tables: tables.length });
+  await log(db, row.id, 'round_started', {
+    round: number,
+    tables: tables.length,
+    ...(topTables ? { stage: 'top' } : {}),
+  });
   const tableOf = new Map<string, number | null>();
   tables.forEach((entrantIds, i) => {
     for (const e of entrantIds) tableOf.set(e, entrantIds.length === 1 ? null : i + 1);
@@ -326,12 +379,14 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
   const entrants = await entrantIdsOf(db, row.id);
   if (entrants.length < 2) throw new DomainError('invalid_input', 'Inscreva ao menos 2');
   const rounds = row.rounds ?? recommendedRounds(entrants.length, row.tableKind as 'pod' | 'pair');
+  // Top cut só deixa alguém de fora com mais inscrições que o tamanho; senão, fica só o suíço.
+  const topCut = row.topCut != null && entrants.length > row.topCut ? row.topCut : null;
   const [running] = await db
     .update(tournaments)
-    .set({ status: 'running', rounds })
+    .set({ status: 'running', rounds, topCut })
     .where(eq(tournaments.id, row.id))
     .returning();
-  await log(db, row.id, 'started', { entrants: entrants.length, rounds });
+  await log(db, row.id, 'started', { entrants: entrants.length, rounds, topCut });
   await createRound(db, running!, 1, random);
   return running!;
 }
@@ -342,7 +397,7 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
  */
 export async function startStoreTournament(
   db: Database,
-  input: { eventId: string; userId: string; random?: () => number },
+  input: { eventId: string; userId: string; topCut?: number | null; random?: () => number },
 ) {
   const [event] = await db
     .select()
@@ -388,6 +443,7 @@ export async function startStoreTournament(
       tableKind: shape.table,
       entrantSize: 1,
       bestOf: shape.bestOf,
+      topCut: checkTopCut(shape.table, input.topCut),
       countsInRanking: false,
       createdBy: input.userId,
     })
@@ -426,6 +482,14 @@ export async function getStoreEventTournament(
 }
 
 /** Valida o placar da mesa: pod = um vencedor ou empate; par = até o melhor de N. */
+/** Confere o tamanho do top cut para o tipo de mesa (lança `invalid_input`). */
+function checkTopCut(table: 'pod' | 'pair', topCut: number | null | undefined) {
+  if (topCut != null && !isTopCutSize(table, topCut)) {
+    throw new DomainError('invalid_input', 'Tamanho de top cut inválido para este formato');
+  }
+  return topCut ?? null;
+}
+
 function checkResult(
   row: TournamentRow,
   entrants: readonly string[],
@@ -533,6 +597,28 @@ export async function reportTable(
   ) as Record<string, number>;
   if (row.status !== 'running') throw new DomainError('conflict', 'O torneio não está rodando');
   checkResult(row, table.entrantIds, gameWins, input.gameDraws);
+  const [stage] = await db
+    .select({ stage: tournamentRounds.stage })
+    .from(tournamentRounds)
+    .where(eq(tournamentRounds.id, table.roundId));
+  if (stage?.stage === 'top') {
+    // Eliminação no um contra um: alguém precisa vencer a mesa.
+    const outcome = tableOutcome({
+      entrants: table.entrantIds,
+      gameWins,
+      gameDraws: input.gameDraws,
+    });
+    if (row.tableKind === 'pair' && !Object.values(outcome).includes('win')) {
+      throw new DomainError('invalid_input', 'No top cut, a mesa precisa de um vencedor');
+    }
+  } else {
+    const [top] = await db
+      .select({ id: tournamentRounds.id })
+      .from(tournamentRounds)
+      .where(and(eq(tournamentRounds.tournamentId, row.id), eq(tournamentRounds.stage, 'top')))
+      .limit(1);
+    if (top) throw new DomainError('conflict', 'O suíço já fechou: o top cut começou');
+  }
 
   // Correção: as partidas antigas desta mesa saem antes das novas.
   if (table.gameIds.length) await db.delete(games).where(inArray(games.id, table.gameIds));
@@ -596,21 +682,69 @@ export async function nextRound(
   if (tables.some((t) => !t.reportedAt)) {
     throw new DomainError('conflict', 'Ainda há mesas sem resultado nesta rodada');
   }
-  if (current!.number >= (row.rounds ?? 0)) {
-    await db.update(tournaments).set({ status: 'finished' }).where(eq(tournaments.id, row.id));
+  const swissDone = current!.stage === 'top' || current!.number >= (row.rounds ?? 0);
+  if (!swissDone) {
+    await createRound(db, row, current!.number + 1, input.random);
+    return { finished: false as const };
+  }
+  let champions: string[];
+  if (row.topCut) {
+    const { seeds, played } = await topCutState(db, row);
+    const plan = planTopCut({
+      table: row.tableKind as 'pod' | 'pair',
+      size: row.topCut,
+      seeds,
+      played,
+    });
+    if ('next' in plan) {
+      await createRound(db, row, current!.number + 1, undefined, plan.next);
+      return { finished: false as const };
+    }
+    champions = [plan.champion];
+  } else {
     const table = standings(await entrantIdsOf(db, row.id), await playedRounds(db, row.id), {
       win: row.pointsWin,
       draw: row.pointsDraw,
       loss: row.pointsLoss,
     });
-    await log(db, row.id, 'finished', {
-      champions: table.filter((s) => s.rank === 1).map((s) => s.entrant),
-    });
-    await notifyEntrants(db, row, 'finished', current!.number);
-    return { finished: true as const };
+    champions = table.filter((s) => s.rank === 1).map((s) => s.entrant);
   }
-  await createRound(db, row, current!.number + 1, input.random);
-  return { finished: false as const };
+  await db.update(tournaments).set({ status: 'finished' }).where(eq(tournaments.id, row.id));
+  await log(db, row.id, 'finished', { champions });
+  await notifyEntrants(db, row, 'finished', current!.number);
+  return { finished: true as const };
+}
+
+/**
+ * O que vem depois (para o botão de quem organiza), com todas as mesas da rodada atual registradas:
+ * mais uma rodada (`round`, inclusive a próxima fase do top), começar o top (`topCut`) ou encerrar.
+ */
+function nextStepOf(
+  row: TournamentRow,
+  rounds: (typeof tournamentRounds.$inferSelect)[],
+  tables: (typeof tournamentTables.$inferSelect)[],
+): 'round' | 'topCut' | 'finish' | null {
+  const current = rounds.at(-1);
+  if (row.status !== 'running' || !current) return null;
+  const open = tables.filter((t) => t.roundId === current.id);
+  if (open.some((t) => !t.reportedAt)) return null;
+  if (current.stage === 'swiss') {
+    if (current.number < (row.rounds ?? 0)) return 'round';
+    return row.topCut ? 'topCut' : 'finish';
+  }
+  // No top: depois da mesa única (a final), encerra.
+  return open.length === 1 ? 'finish' : 'round';
+}
+
+/** Campeão: o primeiro registrado no encerramento (com top, o vencedor da final). */
+function championOf(
+  row: TournamentRow,
+  timeline: { kind: string; data: Record<string, unknown> }[],
+): string | null {
+  if (row.status !== 'finished') return null;
+  const done = timeline.findLast((e) => e.kind === 'finished');
+  const champions = Array.isArray(done?.data.champions) ? done.data.champions : [];
+  return champions.length === 1 ? String(champions[0]) : null;
 }
 
 /** Página do torneio: inscrições, rodadas e mesas, classificação e linha do tempo. */
@@ -679,7 +813,8 @@ export async function getTournament(
   const mine = input.userId
     ? (entrants.find((e) => e.memberIds.includes(input.userId!))?.id ?? null)
     : null;
-  const played: PlayedRound[] = rounds.map((r) => ({
+  const swissRounds = rounds.filter((r) => r.stage === 'swiss');
+  const played: PlayedRound[] = swissRounds.map((r) => ({
     tables: tables
       .filter((t) => t.roundId === r.id && t.reportedAt)
       .map((t) => ({ entrants: t.entrantIds, gameWins: t.gameWins ?? {}, gameDraws: t.gameDraws })),
@@ -693,6 +828,15 @@ export async function getTournament(
     rounds: rounds.map((r) => ({
       id: r.id,
       number: r.number,
+      stage: r.stage as 'swiss' | 'top',
+      stageName:
+        r.stage === 'top' && row.topCut
+          ? topCutStageName({
+              table: row.tableKind as 'pod' | 'pair',
+              size: row.topCut,
+              index: rounds.filter((x) => x.stage === 'top' && x.number < r.number).length,
+            })
+          : null,
       tables: tables
         .filter((t) => t.roundId === r.id)
         .map((t) => ({
@@ -710,6 +854,8 @@ export async function getTournament(
       loss: row.pointsLoss,
     }),
     timeline,
+    nextStep: nextStepOf(row, rounds, tables),
+    champion: championOf(row, timeline),
   };
 }
 export type TournamentView = Awaited<ReturnType<typeof getTournament>>;

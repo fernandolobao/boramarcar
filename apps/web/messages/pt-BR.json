@@ -2275,7 +2275,9 @@
       "round_started": "Rodada {round} começou.",
       "table_reported": "Mesa {table} da rodada {round} registrada.",
       "table_corrected": "Mesa {table} da rodada {round} corrigida.",
-      "finished": "Torneio encerrado. {champions, select, none {} other {Campeão: {champions}.}}"
+      "finished": "Torneio encerrado. {champions, select, none {} other {Campeão: {champions}.}}",
+      "started_top": "Depois do suíço, top {size}.",
+      "top_round": "Top cut: {stage} começou."
     },
     "champion": "Campeão: {name}",
     "delete": "Apagar torneio",
@@ -2287,7 +2289,25 @@
     "listLink": "Torneios",
     "manage": "Organização",
     "podWinner": "Venceu: {name}",
-    "openInTableHint": "Joga com o contador de vida e manda o resultado direto para esta mesa."
+    "openInTableHint": "Joga com o contador de vida e manda o resultado direto para esta mesa.",
+    "topCut": {
+      "label": "Top cut",
+      "none": "Sem top cut (só o suíço)",
+      "option": "Top {count}",
+      "hint": {
+        "pair": "Depois do suíço, os melhores jogam eliminação simples: 1º contra o último do top, e assim por diante. Cada mesa precisa de um vencedor.",
+        "pod": "Depois do suíço, os melhores jogam pods eliminatórios até a mesa final. No top 10, os dois primeiros esperam na final. Empate na mesa: avança quem ficou melhor no suíço."
+      }
+    },
+    "stage": {
+      "quarterfinal": "Quartas de final",
+      "semifinal": "Semifinal",
+      "final": "Final"
+    },
+    "stageHeading": "Top {size} · {stage}",
+    "startTopCut": "Começar o top {count}",
+    "nextStage": "Próxima fase do top",
+    "standingsSwiss": "Classificação do suíço"
   },
   "stores": {
     "metaDescription": "{name} em {city}: endereço, horários, contatos e formatos de Magic que a loja joga.",

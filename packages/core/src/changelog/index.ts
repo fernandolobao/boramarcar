@@ -184,6 +184,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Eventos de loja também no app: em Conta → Eventos de loja, os seus próximos eventos e o código do balcão; dá para ver a loja, se inscrever, desistir e acompanhar o torneio ao vivo.',
     en: 'Store events in the app too: under Account → Store events, your upcoming events and the counter code; see the store, sign up, drop out and follow the tournament live.',
   },
+  {
+    date: '2026-11-19',
+    pt: 'Torneios com top cut: depois do suíço, os melhores seguem em eliminação (top 4 ou 8 no um contra um; top 4, 10 ou 16 em pods) até a final, e o campeão aparece no topo da página.',
+    en: 'Tournaments with a top cut: after the Swiss rounds, the best go on to elimination (top 4 or 8 in one-on-one; top 4, 10 or 16 in pods) up to the final, and the champion shows at the top of the page.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

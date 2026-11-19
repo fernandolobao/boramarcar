@@ -610,6 +610,7 @@ describe('cliente da API', () => {
           entrantSize: 1,
           bestOf: 3,
           rounds: 3,
+          topCut: 4,
           status: 'running',
           countsInRanking: false,
           createdAt: '2026-11-19T10:00:00.000Z',
@@ -618,9 +619,11 @@ describe('cliente da API', () => {
         canManage: false,
         myEntrantId: null,
         entrants: [{ id: 'x2', name: 'Zé', memberIds: [], guest: true }],
-        rounds: [],
+        rounds: [{ id: 'r4', number: 4, stage: 'top', stageName: 'final', tables: [] }],
         standings: [],
         timeline: [],
+        nextStep: 'finish',
+        champion: null,
       }),
     );
     const api = createApiClient({
@@ -628,6 +631,9 @@ describe('cliente da API', () => {
       fetch: fetchMock as unknown as typeof fetch,
     });
     const got = await api.tournaments.get('t2');
+    // Top cut (9.2): fase da rodada e o próximo passo de quem organiza.
+    expect(got.rounds[0]!.stageName).toBe('final');
+    expect(got.nextStep).toBe('finish');
     expect(got.tournament.groupId).toBeNull();
     expect(got.tournament.storeEventId).toBe('se1');
   });
