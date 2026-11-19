@@ -56,4 +56,5 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   silent: !process.env.CI,
   sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
   telemetry: false,
+  bundleSizeOptimizations: { excludeDebugStatements: true },
 });
