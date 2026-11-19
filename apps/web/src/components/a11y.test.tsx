@@ -43,6 +43,7 @@ import { UserMenu } from './user-menu';
 import { buildWeekGrid } from '@boramarcar/core/availability';
 import { ProfileForm } from './profile-form';
 import { ImageUpload } from './image-upload';
+import { StructureSelect } from './tournaments/structure-select';
 import { TopCutSelect } from './tournaments/top-cut-select';
 import { ThemePicker } from './theme-picker';
 import { ShareButtons } from './share-buttons';
@@ -322,6 +323,10 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['ProfileForm', <ProfileForm key="r" />],
+  [
+    'StructureSelect',
+    <StructureSelect key="r" table="pair" value="round_robin" onChange={() => {}} />,
+  ],
   ['TopCutSelect', <TopCutSelect key="r" table="pod" value={10} onChange={() => {}} />],
   [
     'ImageUpload (sem foto)',

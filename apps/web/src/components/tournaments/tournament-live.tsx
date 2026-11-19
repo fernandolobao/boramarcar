@@ -52,15 +52,25 @@ export async function TournamentLive({
           entrants: Number(data.entrants ?? 0),
           rounds: Number(data.rounds ?? 0),
         });
+        const structure = String(data.structure ?? 'swiss');
+        const withStructure =
+          structure !== 'swiss'
+            ? `${started} ${t('events.started_structure', { structure: t(`structure.${structure as 'round_robin'}`) })}`
+            : started;
         return data.topCut
-          ? `${started} ${t('events.started_top', { size: Number(data.topCut) })}`
-          : started;
+          ? `${withStructure} ${t('events.started_top', { size: Number(data.topCut) })}`
+          : withStructure;
       }
       case 'round_started': {
         if (data.stage !== 'top') {
           return t('events.round_started', { round: Number(data.round ?? 0) });
         }
         const stageName = view.rounds.find((r) => r.number === Number(data.round))?.stageName;
+        if (tour.structure === 'single_elimination') {
+          return stageName
+            ? t('events.elimination_round', { stage: t(`stage.${stageName}`) })
+            : t('events.round_started', { round: Number(data.round ?? 0) });
+        }
         return t('events.top_round', { stage: t(`stage.${stageName ?? 'final'}`) });
       }
       case 'table_reported':
@@ -96,9 +106,11 @@ export async function TournamentLive({
           aria-labelledby={`torneio-rodada-${round.number}`}
         >
           <h2 id={`torneio-rodada-${round.number}`} className="section-title mb-0">
-            {round.stageName && tour.topCut
-              ? t('stageHeading', { size: tour.topCut, stage: t(`stage.${round.stageName}`) })
-              : t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
+            {round.stageName && tour.structure === 'single_elimination'
+              ? t(`stage.${round.stageName}`)
+              : round.stageName && tour.topCut
+                ? t('stageHeading', { size: tour.topCut, stage: t(`stage.${round.stageName}`) })
+                : t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
           </h2>
           <ol className="grid items-start gap-4 md:grid-cols-2">
             {round.tables.map((table) => {
@@ -187,7 +199,8 @@ export async function TournamentLive({
         </section>
       ))}
 
-      {tour.status !== 'registration' && (
+      {/* Na eliminação simples, a chave decide (classificação por pontos não faz sentido). */}
+      {tour.status !== 'registration' && tour.structure !== 'single_elimination' && (
         <section className="card space-y-3" aria-labelledby="torneio-classificacao">
           <h2 id="torneio-classificacao" className="section-title mb-0">
             {tour.topCut ? t('standingsSwiss') : t('standings')}

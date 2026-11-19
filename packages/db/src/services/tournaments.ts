@@ -1,7 +1,14 @@
 import { DomainError, type GamePlayerInput } from '@boramarcar/core';
 import { formatRules, isGameFormat } from '@boramarcar/core';
 import {
+  eliminationStageName,
   isTopCutSize,
+  knockoutRounds,
+  planKnockout,
+  ROUND_ROBIN_MAX,
+  roundRobinSchedule,
+  structureOptions,
+  type TournamentStructure,
   pairRound,
   planTopCut,
   recommendedRounds,
@@ -109,6 +116,8 @@ export async function createTournament(
     countsInRanking?: boolean;
     /** Top cut depois do suíço (9.2). */
     topCut?: number | null;
+    /** Estrutura (9.4); padrão: suíço. */
+    structure?: string;
   },
 ) {
   const [event] = await db.select().from(events).where(eq(events.id, input.eventId)).limit(1);
@@ -121,6 +130,7 @@ export async function createTournament(
   if (!name || name.length > 120) throw new DomainError('invalid_input', 'Nome inválido');
   if (!isGameFormat(input.format)) throw new DomainError('invalid_input', 'Formato inválido');
   const shape = tournamentShape(input.format);
+  const structure = checkStructure(shape.table, input.structure, input.topCut);
   const topCut = checkTopCut(shape.table, input.topCut);
   // Pods jogam uma partida por rodada; o melhor de 3 é só do um contra um.
   const bestOf = shape.table === 'pod' ? 1 : (input.bestOf ?? shape.bestOf);
@@ -148,8 +158,10 @@ export async function createTournament(
       pointsWin: points.win,
       pointsDraw: points.draw,
       pointsLoss: points.loss,
-      rounds: input.rounds ?? null,
+      // Fora do suíço, o número de rodadas vem da estrutura.
+      rounds: structure === 'swiss' ? (input.rounds ?? null) : null,
       topCut,
+      structure,
       countsInRanking: input.countsInRanking ?? true,
       createdBy: input.userId,
     })
@@ -328,19 +340,23 @@ async function createRound(
   row: TournamentRow,
   number: number,
   random?: () => number,
-  /** Mesas do top cut (já definidas pela chave); sem elas, sorteio do suíço. */
-  topTables?: string[][],
+  /**
+   * Mesas já definidas (chave do top cut ou da eliminação, rodada do todos contra todos) e a fase;
+   * sem elas, sorteio do suíço.
+   */
+  preset?: { tables: string[][]; stage: 'swiss' | 'top' },
 ) {
   const tables =
-    topTables ??
+    preset?.tables ??
     pairRound(await entrantIdsOf(db, row.id), await playedRounds(db, row.id), {
       table: row.tableKind as 'pod' | 'pair',
       random,
     });
+  const stage = preset?.stage ?? 'swiss';
   await db.transaction(async (tx) => {
     const [round] = await tx
       .insert(tournamentRounds)
-      .values({ tournamentId: row.id, number, stage: topTables ? 'top' : 'swiss' })
+      .values({ tournamentId: row.id, number, stage })
       .returning();
     await tx.insert(tournamentTables).values(
       tables.map((entrantIds, i) => ({
@@ -356,7 +372,7 @@ async function createRound(
   await log(db, row.id, 'round_started', {
     round: number,
     tables: tables.length,
-    ...(topTables ? { stage: 'top' } : {}),
+    ...(stage === 'top' ? { stage: 'top' } : {}),
   });
   const tableOf = new Map<string, number | null>();
   tables.forEach((entrantIds, i) => {
@@ -379,7 +395,26 @@ export async function startTournament(
 async function begin(db: Database, row: TournamentRow, random?: () => number) {
   const entrants = await entrantIdsOf(db, row.id);
   if (entrants.length < 2) throw new DomainError('invalid_input', 'Inscreva ao menos 2');
-  const rounds = row.rounds ?? recommendedRounds(entrants.length, row.tableKind as 'pod' | 'pair');
+  const structure = row.structure as TournamentStructure;
+  let rounds: number;
+  let preset: { tables: string[][]; stage: 'swiss' | 'top' } | undefined;
+  if (structure === 'round_robin') {
+    if (entrants.length > ROUND_ROBIN_MAX) {
+      throw new DomainError(
+        'invalid_input',
+        `Todos contra todos vai até ${ROUND_ROBIN_MAX} inscrições`,
+      );
+    }
+    const schedule = roundRobinSchedule(entrants);
+    rounds = schedule.length;
+    preset = { tables: schedule[0]!, stage: 'swiss' };
+  } else if (structure === 'single_elimination') {
+    rounds = knockoutRounds(entrants.length);
+    const plan = planKnockout({ seeds: shuffled(entrants, random), played: [] });
+    preset = { tables: 'next' in plan ? plan.next : [], stage: 'top' };
+  } else {
+    rounds = row.rounds ?? recommendedRounds(entrants.length, row.tableKind as 'pod' | 'pair');
+  }
   // Top cut só deixa alguém de fora com mais inscrições que o tamanho; senão, fica só o suíço.
   const topCut = row.topCut != null && entrants.length > row.topCut ? row.topCut : null;
   const [running] = await db
@@ -387,8 +422,8 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
     .set({ status: 'running', rounds, topCut })
     .where(eq(tournaments.id, row.id))
     .returning();
-  await log(db, row.id, 'started', { entrants: entrants.length, rounds, topCut });
-  await createRound(db, running!, 1, random);
+  await log(db, row.id, 'started', { entrants: entrants.length, rounds, topCut, structure });
+  await createRound(db, running!, 1, random, preset);
   return running!;
 }
 
@@ -398,7 +433,13 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
  */
 export async function startStoreTournament(
   db: Database,
-  input: { eventId: string; userId: string; topCut?: number | null; random?: () => number },
+  input: {
+    eventId: string;
+    userId: string;
+    topCut?: number | null;
+    structure?: string;
+    random?: () => number;
+  },
 ) {
   const [event] = await db
     .select()
@@ -445,6 +486,7 @@ export async function startStoreTournament(
       entrantSize: 1,
       bestOf: shape.bestOf,
       topCut: checkTopCut(shape.table, input.topCut),
+      structure: checkStructure(shape.table, input.structure, input.topCut),
       countsInRanking: false,
       createdBy: input.userId,
     })
@@ -483,6 +525,32 @@ export async function getStoreEventTournament(
 }
 
 /** Valida o placar da mesa: pod = um vencedor ou empate; par = até o melhor de N. */
+/** Confere a estrutura para o tipo de mesa; top cut só existe no suíço. */
+function checkStructure(
+  table: 'pod' | 'pair',
+  structure: string | undefined,
+  topCut: number | null | undefined,
+): TournamentStructure {
+  const chosen = (structure ?? 'swiss') as TournamentStructure;
+  if (!structureOptions(table).includes(chosen)) {
+    throw new DomainError('invalid_input', 'Estrutura de torneio inválida para este formato');
+  }
+  if (chosen !== 'swiss' && topCut != null) {
+    throw new DomainError('invalid_input', 'Top cut só existe no suíço');
+  }
+  return chosen;
+}
+
+/** Sorteio (Fisher–Yates) da chave da eliminação simples. */
+function shuffled<T>(list: readonly T[], random: () => number = Math.random): T[] {
+  const out = [...list];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
+}
+
 /** Confere o tamanho do top cut para o tipo de mesa (lança `invalid_input`). */
 function checkTopCut(table: 'pod' | 'pair', topCut: number | null | undefined) {
   if (topCut != null && !isTopCutSize(table, topCut)) {
@@ -660,6 +728,14 @@ export async function reportTable(
   });
 }
 
+/** Encerra o torneio: registra os campeões e avisa quem jogou. */
+async function finish(db: Database, row: TournamentRow, champions: string[], round: number) {
+  await db.update(tournaments).set({ status: 'finished' }).where(eq(tournaments.id, row.id));
+  await log(db, row.id, 'finished', { champions });
+  await notifyEntrants(db, row, 'finished', round);
+  return { finished: true as const };
+}
+
 /**
  * Próxima rodada (quem organiza), quando todas as mesas da atual têm resultado. Depois da última,
  * encerra o torneio.
@@ -683,12 +759,32 @@ export async function nextRound(
   if (tables.some((t) => !t.reportedAt)) {
     throw new DomainError('conflict', 'Ainda há mesas sem resultado nesta rodada');
   }
+  let champions: string[];
+  if (row.structure === 'single_elimination') {
+    const { played } = await topCutState(db, row);
+    const plan = planKnockout({ seeds: await entrantIdsOf(db, row.id), played });
+    if ('next' in plan) {
+      await createRound(db, row, current!.number + 1, undefined, {
+        tables: plan.next,
+        stage: 'top',
+      });
+      return { finished: false as const };
+    }
+    return finish(db, row, [plan.champion], current!.number);
+  }
+  if (row.structure === 'round_robin' && current!.number < (row.rounds ?? 0)) {
+    const schedule = roundRobinSchedule(await entrantIdsOf(db, row.id));
+    await createRound(db, row, current!.number + 1, undefined, {
+      tables: schedule[current!.number]!,
+      stage: 'swiss',
+    });
+    return { finished: false as const };
+  }
   const swissDone = current!.stage === 'top' || current!.number >= (row.rounds ?? 0);
   if (!swissDone) {
     await createRound(db, row, current!.number + 1, input.random);
     return { finished: false as const };
   }
-  let champions: string[];
   if (row.topCut) {
     const { seeds, played } = await topCutState(db, row);
     const plan = planTopCut({
@@ -698,7 +794,10 @@ export async function nextRound(
       played,
     });
     if ('next' in plan) {
-      await createRound(db, row, current!.number + 1, undefined, plan.next);
+      await createRound(db, row, current!.number + 1, undefined, {
+        tables: plan.next,
+        stage: 'top',
+      });
       return { finished: false as const };
     }
     champions = [plan.champion];
@@ -710,10 +809,7 @@ export async function nextRound(
     });
     champions = table.filter((s) => s.rank === 1).map((s) => s.entrant);
   }
-  await db.update(tournaments).set({ status: 'finished' }).where(eq(tournaments.id, row.id));
-  await log(db, row.id, 'finished', { champions });
-  await notifyEntrants(db, row, 'finished', current!.number);
-  return { finished: true as const };
+  return finish(db, row, champions, current!.number);
 }
 
 /**
@@ -839,13 +935,15 @@ async function buildView(
       number: r.number,
       stage: r.stage as 'swiss' | 'top',
       stageName:
-        r.stage === 'top' && row.topCut
-          ? topCutStageName({
-              table: row.tableKind as 'pod' | 'pair',
-              size: row.topCut,
-              index: rounds.filter((x) => x.stage === 'top' && x.number < r.number).length,
-            })
-          : null,
+        r.stage === 'top' && row.structure === 'single_elimination'
+          ? eliminationStageName(row.rounds ?? 1, rounds.filter((x) => x.number < r.number).length)
+          : r.stage === 'top' && row.topCut
+            ? topCutStageName({
+                table: row.tableKind as 'pod' | 'pair',
+                size: row.topCut,
+                index: rounds.filter((x) => x.stage === 'top' && x.number < r.number).length,
+              })
+            : null,
       tables: tables
         .filter((t) => t.roundId === r.id)
         .map((t) => ({

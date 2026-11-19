@@ -393,6 +393,89 @@ export function topCutStageName(input: {
   index: number;
 }): TopCutStage {
   const total = input.table === 'pair' ? Math.log2(input.size) : input.size === 4 ? 1 : 2;
-  const remaining = total - input.index;
-  return remaining <= 1 ? 'final' : remaining === 2 ? 'semifinal' : 'quarterfinal';
+  return eliminationStageName(total, input.index) ?? 'quarterfinal';
 }
+
+/**
+ * Nome da fase numa eliminação de `total` rodadas (`index` = 0 na primeira): final, semifinal e
+ * quartas; antes disso, `null` (a rodada fica só com o número).
+ */
+export function eliminationStageName(total: number, index: number): TopCutStage | null {
+  const remaining = total - index;
+  if (remaining <= 1) return 'final';
+  if (remaining === 2) return 'semifinal';
+  if (remaining === 3) return 'quarterfinal';
+  return null;
+}
+
+/* ─────────────── Estruturas: eliminação simples e todos contra todos (9.4) ─────────────── */
+
+export const TOURNAMENT_STRUCTURES = ['swiss', 'single_elimination', 'round_robin'] as const;
+export type TournamentStructure = (typeof TOURNAMENT_STRUCTURES)[number];
+
+/** Estruturas possíveis: pods só no suíço; mesas de par em qualquer uma. */
+export function structureOptions(table: TournamentTable): TournamentStructure[] {
+  return table === 'pod' ? ['swiss'] : [...TOURNAMENT_STRUCTURES];
+}
+
+export const isTournamentStructure = (value: string): value is TournamentStructure =>
+  (TOURNAMENT_STRUCTURES as readonly string[]).includes(value);
+
+/** Máximo de inscrições no todos contra todos (uma rodada por adversário). */
+export const ROUND_ROBIN_MAX = 16;
+
+/**
+ * Todos contra todos pelo método do círculo: cada par se enfrenta uma vez. Com número ímpar entra
+ * um lugar vazio, e quem cai com ele fica de bye naquela rodada (cada um, uma vez).
+ */
+export function roundRobinSchedule(entrants: readonly string[]): string[][][] {
+  const list: (string | null)[] = [...entrants];
+  if (list.length % 2) list.push(null);
+  const n = list.length;
+  const rounds: string[][][] = [];
+  for (let r = 0; r < n - 1; r++) {
+    const tables: string[][] = [];
+    for (let i = 0; i < n / 2; i++) {
+      const a = list[i];
+      const b = list[n - 1 - i];
+      if (a && b) tables.push(r % 2 ? [b, a] : [a, b]);
+      else if (a || b) tables.push([(a ?? b)!]);
+    }
+    rounds.push(tables);
+    // Gira todos menos o primeiro.
+    list.splice(1, 0, list.pop()!);
+  }
+  return rounds;
+}
+
+/**
+ * Eliminação simples: na primeira rodada, a chave clássica do tamanho da próxima potência de 2
+ * (as primeiras posições do sorteio ganham bye quando faltam inscrições); depois, os vencedores se
+ * enfrentam em ordem. Depois da final, o campeão.
+ */
+export function planKnockout(input: {
+  seeds: readonly string[];
+  played: readonly (readonly TableResult[])[];
+}): { next: string[][] } | { champion: string } {
+  const last = input.played.at(-1);
+  if (!last) {
+    const size = 2 ** Math.ceil(Math.log2(Math.max(2, input.seeds.length)));
+    const order = bracketOrder(size);
+    const at = (seed: number) => input.seeds[seed - 1];
+    const next: string[][] = [];
+    for (let i = 0; i < order.length; i += 2) {
+      next.push([at(order[i]!), at(order[i + 1]!)].filter((e): e is string => Boolean(e)));
+    }
+    return { next };
+  }
+  const seedOf = (e: string) => input.seeds.indexOf(e);
+  const winners = last.map((t) => advancer(t, seedOf));
+  if (last.length === 1) return { champion: winners[0]! };
+  const next: string[][] = [];
+  for (let i = 0; i < winners.length; i += 2) next.push([winners[i]!, winners[i + 1]!]);
+  return { next };
+}
+
+/** Rodadas da eliminação simples: log₂ da chave. */
+export const knockoutRounds = (entrants: number) =>
+  Math.max(1, Math.ceil(Math.log2(Math.max(2, entrants))));

@@ -1,6 +1,11 @@
 import { ApiError } from '@boramarcar/api-client';
 import { GAME_FORMATS, isGameFormat, type GameFormat } from '@boramarcar/core';
-import { topCutOptions, tournamentShape } from '@boramarcar/core/tournaments';
+import {
+  structureOptions,
+  topCutOptions,
+  tournamentShape,
+  type TournamentStructure,
+} from '@boramarcar/core/tournaments';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView } from 'react-native';
@@ -13,10 +18,16 @@ import { formatLabel } from '@/components/table/labels';
 import { AppText, Button, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
-import { formatDateMedium, t } from '@/lib/i18n';
+import { formatDateMedium, t, type MessageKey } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 
 /** Novo torneio (dono e admins): encontro, nome, formato e, no um contra um, melhor de N. */
+
+const STRUCTURE: Record<TournamentStructure, MessageKey> = {
+  swiss: 'tourStructureSwiss',
+  single_elimination: 'tourStructureSingle',
+  round_robin: 'tourStructureRoundRobin',
+};
 export default function NewTournamentScreen() {
   const { encontro } = useLocalSearchParams<{ encontro?: string }>();
   const { group, loading } = useGroup();
@@ -31,6 +42,7 @@ export default function NewTournamentScreen() {
   const [bestOf, setBestOf] = useState<'1' | '3'>('3');
   const [counts, setCounts] = useState(true);
   const [topCut, setTopCut] = useState('');
+  const [structure, setStructure] = useState<TournamentStructure>('swiss');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -48,6 +60,7 @@ export default function NewTournamentScreen() {
   const chosenFormat: GameFormat =
     format ?? (isGameFormat(settings.defaultFormat) ? settings.defaultFormat : 'commander');
   const shape = tournamentShape(chosenFormat);
+  const chosenStructure: TournamentStructure = shape.table === 'pair' ? structure : 'swiss';
 
   const create = async () => {
     if (!chosenEvent) return;
@@ -59,7 +72,9 @@ export default function NewTournamentScreen() {
         format: chosenFormat,
         bestOf: shape.table === 'pair' ? (Number(bestOf) as 1 | 3) : 1,
         countsInRanking: counts,
-        topCut: topCut && shape.entrantSize === 1 ? Number(topCut) : null,
+        topCut:
+          chosenStructure === 'swiss' && topCut && shape.entrantSize === 1 ? Number(topCut) : null,
+        structure: chosenStructure,
       });
       router.replace({ pathname: '/torneios/[id]', params: { id: created.id } });
     } catch (e) {
@@ -109,8 +124,19 @@ export default function NewTournamentScreen() {
               ]}
             />
           )}
-          {/* Top cut (9.2): um contra um e pods; no 2HG ainda não. */}
-          {shape.entrantSize === 1 && (
+          {shape.table === 'pair' && (
+            <Choices
+              label={t('tourStructure')}
+              value={structure}
+              onChange={setStructure}
+              options={structureOptions(shape.table).map((v) => ({
+                value: v,
+                label: t(STRUCTURE[v]),
+              }))}
+            />
+          )}
+          {/* Top cut (9.2): só no suíço; um contra um e pods; no 2HG ainda não. */}
+          {chosenStructure === 'swiss' && shape.entrantSize === 1 && (
             <Choices
               label={t('tourTopCut')}
               value={topCut}

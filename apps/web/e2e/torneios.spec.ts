@@ -95,6 +95,23 @@ test.describe('torneios', () => {
     await expect(page.getByRole('button', { name: /^Top 10 Top cut/ })).toBeVisible();
   });
 
+  test('estrutura na criação: só no um contra um; fora do suíço some o número de rodadas e o top', async ({
+    page,
+  }) => {
+    await page.goto(`/eventos/${E2E_IDS.upcomingEvent}`);
+    await page.getByRole('link', { name: 'Criar torneio neste encontro' }).click();
+    await pick(page, 'Formato', 'Commander');
+    await expect(page.getByRole('button', { name: /Estrutura$/ })).toHaveCount(0);
+    await pick(page, 'Formato', 'Modern');
+    await expect(page.getByRole('textbox', { name: 'Rodadas' })).toBeVisible();
+    await pick(page, 'Estrutura', 'Eliminação simples');
+    await expect(page.getByText(/Chave sorteada: quem perde sai/)).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Rodadas' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Top cut$/ })).toHaveCount(0);
+    await pick(page, 'Estrutura', 'Todos contra todos');
+    await expect(page.getByText(/enfrenta todas as outras uma vez/)).toBeVisible();
+  });
+
   test('Modern em melhor de 3: placar em jogos na mesa e classificação com desempates', async ({
     page,
   }) => {

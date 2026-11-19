@@ -279,12 +279,14 @@ export default function TournamentScreen() {
       {[...v.rounds].reverse().map((round, index) => (
         <Card key={round.id} style={{ gap: 12 }}>
           <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
-            {round.stageName && tour.topCut
-              ? t('tourStageHeading', {
-                  size: tour.topCut,
-                  stage: t(STAGE[round.stageName]),
-                })
-              : t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
+            {round.stageName && tour.structure === 'single_elimination'
+              ? t(STAGE[round.stageName])
+              : round.stageName && tour.topCut
+                ? t('tourStageHeading', {
+                    size: tour.topCut,
+                    stage: t(STAGE[round.stageName]),
+                  })
+                : t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
           </AppText>
           {round.tables.map((table) => {
             const seated = table.entrants.map(
@@ -355,7 +357,7 @@ export default function TournamentScreen() {
         </Card>
       ))}
 
-      {tour.status !== 'registration' && (
+      {tour.status !== 'registration' && tour.structure !== 'single_elimination' && (
         <Card style={{ gap: 8 }}>
           <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
             {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}

@@ -2293,7 +2293,9 @@
       "table_corrected": "Round {round}, table {table} corrected.",
       "finished": "Tournament finished. {champions, select, none {} other {Champion: {champions}.}}",
       "started_top": "After the Swiss rounds, top {size}.",
-      "top_round": "Top cut: {stage} started."
+      "top_round": "Top cut: {stage} started.",
+      "started_structure": "Structure: {structure}.",
+      "elimination_round": "{stage} started."
     },
     "champion": "Champion: {name}",
     "delete": "Delete tournament",
@@ -2333,6 +2335,17 @@
       "ctaButton": "Discover ArcanaKin",
       "link": "Public link",
       "linkHint": "Anyone with the link can follow rounds, tables and standings without signing in. Only each person’s first name shows."
+    },
+    "structure": {
+      "label": "Structure",
+      "swiss": "Swiss",
+      "single_elimination": "Single elimination",
+      "round_robin": "Round robin",
+      "hint": {
+        "swiss": "Everyone plays every round, against people with similar points; you can add a top cut at the end.",
+        "single_elimination": "Random bracket: lose and you’re out. When the numbers don’t fill the bracket, the first in the draw skip round 1. Each table needs a winner.",
+        "round_robin": "Everyone plays everyone else once (up to 16 entries); the standings decide."
+      }
     }
   },
   "stores": {
