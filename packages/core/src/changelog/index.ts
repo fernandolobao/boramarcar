@@ -239,6 +239,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Torneios de um contra um ganham eliminação dupla: quem perde a primeira vez vai para a chave dos perdedores e ainda pode chegar à grande final.',
     en: 'One-on-one tournaments get double elimination: lose once and you go to the losers bracket, with a path back to the grand final.',
   },
+  {
+    date: '2026-11-20',
+    pt: 'O link da retrospectiva do mês agora abre só aquele mês: quem recebe o de outubro não vê os outros meses do grupo. Na loja, quem não é da equipe vê só o primeiro nome de quem joga o torneio.',
+    en: 'The monthly recap link now opens only that month: whoever gets October’s can’t see the group’s other months. In stores, people outside the staff see only the first name of tournament players.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

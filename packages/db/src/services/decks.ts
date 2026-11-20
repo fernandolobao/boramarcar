@@ -23,7 +23,7 @@ import {
   type DeckEntry,
   type ImportedDeck,
 } from '@boramarcar/core';
-import { and, asc, count, desc, eq, inArray, isNull, or, sql, sum } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, ne, or, sql, sum } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
 import { logAdminAccess } from './admin-access';
@@ -313,13 +313,64 @@ export async function listDecks(db: Database, ownerId: string) {
 }
 
 /** Decks (resumo) de vários jogadores — usado ao registrar partidas. */
-export async function listDecksForUsers(db: Database, userIds: readonly string[]) {
+export async function listDecksForUsers(
+  db: Database,
+  userIds: readonly string[],
+  viewerId: string,
+) {
   if (!userIds.length) return [];
   return db
     .select({ id: decks.id, name: decks.name, ownerId: decks.ownerId, format: decks.format })
     .from(decks)
-    .where(inArray(decks.ownerId, [...userIds]))
+    .where(
+      and(
+        inArray(decks.ownerId, [...userIds]),
+        // Deck privado só aparece para o dono (3.12).
+        or(ne(decks.visibility, 'private'), eq(decks.ownerId, viewerId)),
+      ),
+    )
     .orderBy(asc(decks.name));
+}
+
+/**
+ * Decks privados (3.12) que quem vê não pode ver: os de outras pessoas (`viewerId` nulo = página
+ * pública, todos os privados).
+ */
+export async function hiddenDeckIds(
+  db: Database,
+  deckIds: readonly string[],
+  viewerId: string | null,
+): Promise<Set<string>> {
+  const ids = [...new Set(deckIds)];
+  if (!ids.length) return new Set();
+  const rows = await db
+    .select({ id: decks.id })
+    .from(decks)
+    .where(
+      and(
+        inArray(decks.id, ids),
+        eq(decks.visibility, 'private'),
+        viewerId ? ne(decks.ownerId, viewerId) : undefined,
+      ),
+    );
+  return new Set(rows.map((r) => r.id));
+}
+
+/** Tira das linhas de partida o deck que quem vê não pode ver (fica como "sem deck"). */
+export async function withoutHiddenDecks<
+  T extends { deckId: string | null; deckName?: string | null },
+>(db: Database, rows: T[], viewerId: string | null): Promise<T[]> {
+  const hide = await hiddenDeckIds(
+    db,
+    rows.flatMap((r) => (r.deckId ? [r.deckId] : [])),
+    viewerId,
+  );
+  if (!hide.size) return rows;
+  return rows.map((r) =>
+    r.deckId && hide.has(r.deckId)
+      ? { ...r, deckId: null, ...('deckName' in r ? { deckName: null } : {}) }
+      : r,
+  );
 }
 
 /** Os dois usuários participam de algum grupo em comum? */
@@ -575,9 +626,21 @@ export interface DeckCover {
  * Capa de cada deck: o(s) comandante(s); sem comandante, a primeira lendária com imagem
  * ou, por fim, a primeira carta com imagem.
  */
-export async function getDeckCovers(db: Database, deckIds: readonly string[]) {
+export async function getDeckCovers(
+  db: Database,
+  deckIds: readonly string[],
+  /**
+   * Quem vê (página do encontro, estatísticas, resumo público com `null`): deck privado de outra
+   * pessoa fica sem capa. Sem esta opção, só para as telas do próprio dono.
+   */
+  options?: { viewerId: string | null },
+) {
   const covers = new Map<string, DeckCover>();
-  const ids = [...new Set(deckIds)];
+  let ids = [...new Set(deckIds)];
+  if (options) {
+    const hide = await hiddenDeckIds(db, ids, options.viewerId);
+    ids = ids.filter((id) => !hide.has(id));
+  }
   if (!ids.length) return covers;
   const rows = await db
     .select({

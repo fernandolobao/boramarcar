@@ -151,4 +151,36 @@ describe('torneio no evento de loja (10.2b)', () => {
     ).rejects.toMatchObject({ code: 'invalid_input' });
     expect(await getStoreEventTournament(db, { eventId: noite.id, viewerId: null })).toBeNull();
   });
+
+  it('quem não é da equipe vê só primeiros nomes e nenhum ID de conta além do próprio', async () => {
+    const { dono, event } = await storeWithEvent('modern');
+    const ana = await createTestUser(db, { name: 'Ana Souza' });
+    const bia = await createTestUser(db, { name: 'Bia Lima' });
+    const curioso = await createTestUser(db, { name: 'Curioso' });
+    for (const p of [ana, bia])
+      await registerForStoreEvent(db, { eventId: event.id, userId: p.id });
+    const staff = await getStoreEventForStaff(db, { eventId: event.id, userId: dono.id });
+    for (const e of staff.entries)
+      await setCheckIn(db, { entryId: e.id, userId: dono.id, checkedIn: true });
+    const t = await startStoreTournament(db, {
+      eventId: event.id,
+      userId: dono.id,
+      random: fixed(),
+    });
+
+    const outsider = await getTournament(db, { tournamentId: t.id, userId: curioso.id });
+    expect(outsider.entrants.map((e) => e.name).sort()).toEqual(['Ana', 'Bia']);
+    expect(outsider.entrants.flatMap((e) => e.memberIds)).toEqual([]);
+    expect(JSON.stringify(outsider)).not.toContain(ana.id);
+
+    // Quem joga se reconhece (para registrar a própria mesa), mas não vê o ID da outra pessoa.
+    const player = await getTournament(db, { tournamentId: t.id, userId: ana.id });
+    expect(player.entrants.flatMap((e) => e.memberIds)).toEqual([ana.id]);
+    expect(player.myEntrantId).not.toBeNull();
+    expect(JSON.stringify(player)).not.toContain(bia.id);
+
+    // A equipe vê os nomes completos.
+    const forStaff = await getTournament(db, { tournamentId: t.id, userId: dono.id });
+    expect(forStaff.entrants.map((e) => e.name).sort()).toEqual(['Ana Souza', 'Bia Lima']);
+  });
 });

@@ -1,11 +1,11 @@
 import type { NotificationItem } from '@boramarcar/api-client';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { AppText, Button, ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDateTime, formatMonthYear, t, type MessageKey } from '@/lib/i18n';
-import { monthlyRecapUrl } from '@/lib/config';
+import { openMonthlyRecap } from '@/lib/monthly';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
@@ -98,7 +98,7 @@ function open(item: NotificationItem) {
     typeof d.month === 'string'
   ) {
     // A retrospectiva do mês é uma página do site (a mesma que se compartilha).
-    void Linking.openURL(monthlyRecapUrl(d.groupId, d.month));
+    void openMonthlyRecap(d.groupId, d.month);
   }
 }
 

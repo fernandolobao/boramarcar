@@ -8,14 +8,26 @@ import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { ShareButtons } from '@/components/share-buttons';
 import { getDb } from '@/server/db';
-import { monthlyUrl } from '@/server/email';
+import { canSeeMonthlyRecap, monthlyUrl } from '@/server/monthly-link';
 import { pageMetadata } from '@/server/seo';
 import { getSessionUser } from '@/server/session';
 
-type Props = { params: Promise<{ groupId: string; month: string }> };
+type Props = {
+  params: Promise<{ groupId: string; month: string }>;
+  searchParams: Promise<{ k?: string }>;
+};
 
-const load = (groupId: string, month: string) =>
-  getMonthlyRecap(getDb(), { groupId, month }).catch(() => null);
+/**
+ * Só com o código do mês no endereço (`?k=`) ou para quem é do grupo e está logado; senão, a
+ * página não existe (nem no título da aba).
+ */
+async function load(groupId: string, month: string, key: string | undefined) {
+  const userId = await getSessionUser(await headers())
+    .then((u) => u?.id ?? null)
+    .catch(() => null);
+  if (!(await canSeeMonthlyRecap(getDb(), { groupId, month, key, userId }))) return null;
+  return getMonthlyRecap(getDb(), { groupId, month }).catch(() => null);
+}
 
 async function texts(view: MonthlyRecapView) {
   const [t, format] = await Promise.all([getTranslations('monthly'), getFormatter()]);
@@ -32,10 +44,10 @@ async function texts(view: MonthlyRecapView) {
   return { t, format, label, summary };
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { groupId, month } = await params;
   const path = `/retrospectiva/${groupId}/${month}`;
-  const view = await load(groupId, month);
+  const view = await load(groupId, month, (await searchParams).k);
   if (!view) return pageMetadata({ section: 'recap', path });
   const { t, label, summary } = await texts(view);
   return pageMetadata({
@@ -47,12 +59,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /**
- * Retrospectiva do mês do grupo (8.12), pública para quem tem o link, como o resumo da noite:
+ * Retrospectiva do mês do grupo (8.12), para quem tem o link com o código do mês (ou é do grupo):
  * só primeiros nomes, títulos dos encontros e números (nada de nome do grupo, local ou e-mail).
  */
-export default async function MonthlyRecapPage({ params }: Props) {
+export default async function MonthlyRecapPage({ params, searchParams }: Props) {
   const { groupId, month } = await params;
-  const view = await load(groupId, month);
+  const view = await load(groupId, month, (await searchParams).k);
   if (!view) notFound();
   const [{ t, format, label, summary }, tc, signedIn] = await Promise.all([
     texts(view),

@@ -1,6 +1,7 @@
 import { fillDate } from './support/fill-date';
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
+import { monthlyKey } from './support/monthly-key';
 import { E2E_IDS } from './support/seed';
 import { pick } from './support/select';
 
@@ -65,7 +66,7 @@ test.describe('ranking e estatísticas', () => {
     await expect(page).toHaveURL(/\/grupo#recordes$/);
   });
 
-  test('retrospectiva do mês: pública, só primeiros nomes e com compartilhar', async ({
+  test('retrospectiva do mês: pelo link com o código, só primeiros nomes e com compartilhar', async ({
     browser,
   }) => {
     const month = new Intl.DateTimeFormat('en-CA', {
@@ -75,10 +76,14 @@ test.describe('ranking e estatísticas', () => {
     })
       .format(new Date(Date.now() - 7 * 86_400_000))
       .slice(0, 7);
-    // Sem login: a página é pública para quem tem o link.
+    // Sem login: abre só com o código daquele mês no link.
     const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
     const page = await context.newPage();
-    await page.goto(`/retrospectiva/${E2E_IDS.group}/${month}`);
+    const semCodigo = await page.goto(`/retrospectiva/${E2E_IDS.group}/${month}`);
+    expect(semCodigo?.status()).toBe(404);
+    await page.goto(
+      `/retrospectiva/${E2E_IDS.group}/${month}?k=${monthlyKey(E2E_IDS.group, month)}`,
+    );
     await expect(page.getByText('Retrospectiva do mês')).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: 'Compartilhar' })).toBeVisible();
     // Nada de e-mail nem nome do grupo no conteúdo da página.

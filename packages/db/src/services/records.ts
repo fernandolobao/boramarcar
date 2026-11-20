@@ -2,14 +2,15 @@ import { groupFace, groupRecords, type RecordDecks } from '@boramarcar/core/inte
 import { eq, inArray } from 'drizzle-orm';
 import type { Database } from '../client';
 import { events, gamePlayers, games, user } from '../schema';
-import { getDeckCovers } from './decks';
+import { getDeckCovers, withoutHiddenDecks } from './decks';
 import { requireMembership } from './groups';
 
 /** Janela do "meta" (comandantes mais jogados) na cara do grupo. */
 export const META_DAYS = 90;
 
 /** Partidas do grupo (com jogadores e decks) no formato das regras de recordes. */
-export async function loadGroupGames(db: Database, groupId: string) {
+/** `viewerId`: quem vê (recordes); `null` na retrospectiva pública. Deck privado alheio fica de fora. */
+export async function loadGroupGames(db: Database, groupId: string, viewerId: string | null) {
   const gameRows = await db
     .select({
       gameId: games.id,
@@ -21,7 +22,7 @@ export async function loadGroupGames(db: Database, groupId: string) {
     .from(games)
     .where(eq(games.groupId, groupId));
   const ids = gameRows.map((g) => g.gameId);
-  const playerRows = ids.length
+  const rawPlayerRows = ids.length
     ? await db
         .select({
           gameId: gamePlayers.gameId,
@@ -32,6 +33,7 @@ export async function loadGroupGames(db: Database, groupId: string) {
         .from(gamePlayers)
         .where(inArray(gamePlayers.gameId, ids))
     : [];
+  const playerRows = await withoutHiddenDecks(db, rawPlayerRows, viewerId);
   const covers = await getDeckCovers(
     db,
     playerRows.flatMap((p) => (p.deckId ? [p.deckId] : [])),
@@ -63,7 +65,7 @@ export async function getGroupRecords(
 ) {
   await requireMembership(db, input.groupId, input.userId);
   const now = input.now ?? new Date();
-  const { list, decks } = await loadGroupGames(db, input.groupId);
+  const { list, decks } = await loadGroupGames(db, input.groupId, input.userId);
   const records = groupRecords(list, decks);
   const face = groupFace(list, decks, { since: new Date(now.getTime() - META_DAYS * 86_400_000) });
 

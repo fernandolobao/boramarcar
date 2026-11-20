@@ -931,6 +931,15 @@ export function createApiClient(options: ApiClientOptions) {
       /** Recordes e "cara do grupo" (8.12). */
       records: (groupId: string) =>
         request('GET', `/groups/${encodeURIComponent(groupId)}/records`, groupRecordsSchema),
+      /** Endereço da retrospectiva do mês com o código de acesso (abre no navegador, sem login). */
+      monthlyLink: async (groupId: string, month: string) =>
+        (
+          await request(
+            'GET',
+            `/groups/${encodeURIComponent(groupId)}/monthly-link${q({ month })}`,
+            z.object({ url: z.string() }),
+          )
+        ).url,
     },
     seasons: {
       list: async (groupId: string) =>
