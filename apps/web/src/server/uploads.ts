@@ -1,7 +1,7 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { DomainError } from '@boramarcar/core';
-import { checkImageUpload, isOwnUpload } from '@boramarcar/core/images';
+import { checkImageUpload, isUploadOf } from '@boramarcar/core/images';
 import { del, put } from '@vercel/blob';
 import { processUploadedImage } from './images';
 
@@ -49,9 +49,15 @@ export async function saveUploadedImage(
   }
 }
 
-/** Apaga um arquivo enviado (foto ou logo trocado). URL de fora (ex.: Google) não é tocada. */
-export async function deleteUploadedImage(url: string | null | undefined): Promise<void> {
-  if (!isOwnUpload(url)) return;
+/**
+ * Apaga um arquivo enviado (foto ou logo trocado). Só apaga o que é **deste dono** (`avatars/<id>/` ou
+ * `logos/<id>/`): URL de fora (ex.: Google) ou de outra pessoa não é tocada.
+ */
+export async function deleteUploadedImage(
+  url: string | null | undefined,
+  owner: { folder: 'avatars' | 'logos'; ownerId: string },
+): Promise<void> {
+  if (!isUploadOf(url, owner)) return;
   try {
     await del(url!);
   } catch (error) {

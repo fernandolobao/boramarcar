@@ -81,14 +81,26 @@ describe('envio de imagens para o armazenamento', () => {
     warn.mockRestore();
   });
 
-  it('apaga só arquivo nosso, e falha ao apagar não derruba a operação', async () => {
-    await deleteUploadedImage('https://lh3.googleusercontent.com/a/1');
-    await deleteUploadedImage(null);
+  it('apaga só arquivo nosso e do próprio dono; falha ao apagar não derruba a operação', async () => {
+    const me = { folder: 'avatars', ownerId: 'u1' } as const;
+    await deleteUploadedImage('https://lh3.googleusercontent.com/a/1', me);
+    await deleteUploadedImage(null, me);
     expect(del).not.toHaveBeenCalled();
     del.mockRejectedValueOnce(new Error('rede'));
     await expect(
-      deleteUploadedImage('https://x.public.blob.vercel-storage.com/velha.webp'),
+      deleteUploadedImage('https://x.public.blob.vercel-storage.com/avatars/u1/velha.webp', me),
     ).resolves.toBeUndefined();
-    expect(del).toHaveBeenCalledWith('https://x.public.blob.vercel-storage.com/velha.webp');
+    expect(del).toHaveBeenCalledWith(
+      'https://x.public.blob.vercel-storage.com/avatars/u1/velha.webp',
+    );
+  });
+
+  it('URL de outra pessoa ou de uma loja gravada como "imagem anterior" não é apagada', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const me = { folder: 'avatars', ownerId: 'u1' } as const;
+    await deleteUploadedImage('https://x.public.blob.vercel-storage.com/avatars/u2/dela.webp', me);
+    await deleteUploadedImage('https://x.public.blob.vercel-storage.com/logos/s1/logo.webp', me);
+    expect(del).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

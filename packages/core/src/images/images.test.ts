@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { IMAGE_MAX_BYTES, checkImageUpload, isOwnUpload } from './index';
+import { IMAGE_MAX_BYTES, checkImageUpload, isOwnUpload, isUploadOf } from './index';
 
 describe('envio de imagem (foto do perfil e logo da loja)', () => {
   it('aceita JPEG, PNG e WebP até 4 MB', () => {
@@ -22,5 +22,18 @@ describe('envio de imagem (foto do perfil e logo da loja)', () => {
     expect(isOwnUpload('https://lh3.googleusercontent.com/a/xyz')).toBe(false);
     expect(isOwnUpload('https://evil.test/abc.public.blob.vercel-storage.com/x')).toBe(false);
     expect(isOwnUpload(null)).toBe(false);
+  });
+
+  it('arquivo de um dono: só na pasta e no ID de quem pede (não apaga foto ou logo alheio)', () => {
+    const base = 'https://abc.public.blob.vercel-storage.com';
+    const mine = { folder: 'avatars', ownerId: 'u1' } as const;
+    expect(isUploadOf(`${base}/avatars/u1/x.webp`, mine)).toBe(true);
+    expect(isUploadOf(`${base}/avatars/u2/x.webp`, mine)).toBe(false);
+    expect(isUploadOf(`${base}/avatars/u10/x.webp`, mine)).toBe(false);
+    expect(isUploadOf(`${base}/logos/u1/x.webp`, mine)).toBe(false);
+    expect(isUploadOf(`${base}/avatars/u1/../u2/x.webp`, mine)).toBe(false);
+    expect(isUploadOf(`${base}/avatars/u1%2F..%2Fu2/x.webp`, mine)).toBe(false);
+    expect(isUploadOf('https://lh3.googleusercontent.com/avatars/u1/x', mine)).toBe(false);
+    expect(isUploadOf(null, mine)).toBe(false);
   });
 });

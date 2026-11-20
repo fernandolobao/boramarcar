@@ -27,7 +27,7 @@ export const DELETE = authed(async ({ req, db, user }) => {
   const image = await getUserImage(db, user.id);
   const result = await deleteUserAccount(db, user.id);
   // A foto enviada sai do armazenamento junto (LGPD).
-  await deleteUploadedImage(image);
+  await deleteUploadedImage(image, { folder: 'avatars', ownerId: user.id });
   const response = Response.json({ deleted: true, ...result });
   for (const cookie of cleared?.getSetCookie() ?? []) response.headers.append('Set-Cookie', cookie);
   return response;
