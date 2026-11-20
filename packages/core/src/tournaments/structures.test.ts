@@ -17,7 +17,12 @@ const won = (entrants: string[], winner: string): TableResult => ({
 describe('estruturas de torneio (9.4)', () => {
   it('pods só no suíço; um contra um em suíço, eliminação simples ou todos contra todos', () => {
     expect(structureOptions('pod')).toEqual(['swiss']);
-    expect(structureOptions('pair')).toEqual(['swiss', 'single_elimination', 'round_robin']);
+    expect(structureOptions('pair')).toEqual([
+      'swiss',
+      'single_elimination',
+      'double_elimination',
+      'round_robin',
+    ]);
   });
 
   it('todos contra todos: cada par uma vez; com número ímpar, um bye por rodada para cada um', () => {

@@ -135,4 +135,28 @@ describe('estruturas de torneio', () => {
       startTournament(db, { tournamentId: tournament.id, userId: owner.id }),
     ).rejects.toMatchObject({ code: 'invalid_input' });
   });
+
+  it('eliminação dupla com 4: as duas chaves, a grande final e o campeão; mesa com a chave', async () => {
+    const { owner, tournament } = await setup(4, 'modern', { structure: 'double_elimination' });
+    await startTournament(db, { tournamentId: tournament.id, userId: owner.id, random: fixed() });
+    let view = await getTournament(db, { tournamentId: tournament.id, userId: owner.id });
+    expect(view.tournament.structure).toBe('double_elimination');
+    expect(view.rounds[0]!.tables.map((x) => x.bracket)).toEqual(['winners', 'winners']);
+    let guard = 0;
+    while (view.tournament.status === 'running') {
+      guard++;
+      expect(guard).toBeLessThan(10);
+      await play(tournament.id, owner.id);
+      const step = (await getTournament(db, { tournamentId: tournament.id, userId: owner.id }))
+        .nextStep;
+      const last = view.rounds.at(-1)!;
+      expect(step).toBe(last.tables.some((x) => x.bracket === 'final') ? 'finish' : 'round');
+      await nextRound(db, { tournamentId: tournament.id, userId: owner.id });
+      view = await getTournament(db, { tournamentId: tournament.id, userId: owner.id });
+    }
+    const brackets = view.rounds.flatMap((r) => r.tables.map((x) => x.bracket));
+    expect(brackets).toContain('losers');
+    expect(brackets.filter((b) => b === 'final')).toHaveLength(1);
+    expect(view.champion).toBeTruthy();
+  });
 });

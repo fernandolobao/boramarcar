@@ -657,7 +657,9 @@ export const tournamentViewSchema = z
         /** Top cut depois do suíço (9.2), ou `null`. */
         topCut: z.number().nullable().optional(),
         /** Estrutura (9.4): suíço, eliminação simples ou todos contra todos. */
-        structure: z.enum(['swiss', 'single_elimination', 'round_robin']).optional(),
+        structure: z
+          .enum(['swiss', 'single_elimination', 'double_elimination', 'round_robin'])
+          .optional(),
         status: z.string(),
         countsInRanking: z.boolean(),
         createdAt: date,
@@ -686,6 +688,8 @@ export const tournamentViewSchema = z
                 gameWins: z.record(z.string(), z.number()),
                 gameDraws: z.number(),
                 reported: z.boolean(),
+                /** Eliminação dupla (9.4): de qual chave é a mesa. */
+                bracket: z.enum(['winners', 'losers', 'final']).nullable().optional(),
               })
               .loose(),
           ),

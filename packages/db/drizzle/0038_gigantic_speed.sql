@@ -1,0 +1,1 @@
+ALTER TABLE "tournament_tables" ADD COLUMN "bracket" text;

@@ -108,6 +108,9 @@ test.describe('torneios', () => {
     await expect(page.getByText(/Chave sorteada: quem perde sai/)).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Rodadas' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Top cut$/ })).toHaveCount(0);
+    await pick(page, 'Estrutura', 'Eliminação dupla');
+    await expect(page.getByText(/cai para a chave dos perdedores/)).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Rodadas' })).toHaveCount(0);
     await pick(page, 'Estrutura', 'Todos contra todos');
     await expect(page.getByText(/enfrenta todas as outras uma vez/)).toBeVisible();
   });

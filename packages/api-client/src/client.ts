@@ -862,7 +862,7 @@ export function createApiClient(options: ApiClientOptions) {
           /** Top cut depois do suíço (9.2). */
           topCut?: number | null;
           /** Estrutura (9.4). */
-          structure?: 'swiss' | 'single_elimination' | 'round_robin';
+          structure?: 'swiss' | 'single_elimination' | 'double_elimination' | 'round_robin';
         },
       ) =>
         (
