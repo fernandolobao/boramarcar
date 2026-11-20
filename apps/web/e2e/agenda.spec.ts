@@ -122,6 +122,11 @@ test.describe('locais do grupo (2.14)', () => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto('/grupo');
     await expect(page.getByRole('region', { name: 'Mapa dos locais do grupo' })).toBeVisible();
+    // Na lista, os apps de mapa ficam atrás de "Como chegar" (no celular eram 4 botões por local).
+    const howToGet = page.getByRole('button', { name: /^Como chegar ?\(Casa da Ana\)$/ });
+    await expect(howToGet).toHaveAttribute('aria-expanded', 'false');
+    await howToGet.click();
+    await expect(howToGet).toHaveAttribute('aria-expanded', 'true');
     const routes = page.getByRole('list', { name: 'Abrir Casa da Ana em apps de mapa' });
     await expect(routes.getByRole('link', { name: /Google Maps/ })).toHaveAttribute(
       'href',

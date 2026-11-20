@@ -53,38 +53,40 @@ export function LocationsSection({
                 />
               ) : (
                 <>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <h3 className="flex items-center gap-1.5 font-semibold">
-                        <Icon name="location" />
-                        {l.name}
-                      </h3>
-                      {l.address && <p className="text-sm">{l.address}</p>}
-                      {l.details && <p className="muted text-sm">{l.details}</p>}
-                      {l.hostName && (
-                        <p className="muted text-sm">{t('hostedBy', { name: l.hostName })}</p>
-                      )}
-                      {l.lat === null && <p className="muted text-xs">{t('noPin')}</p>}
-                    </div>
+                  <div className="min-w-0">
+                    <h3 className="flex items-center gap-1.5 font-semibold">
+                      <Icon name="location" />
+                      {l.name}
+                    </h3>
+                    {l.address && <p className="text-sm">{l.address}</p>}
+                    {l.details && <p className="muted text-sm">{l.details}</p>}
+                    {l.hostName && (
+                      <p className="muted text-sm">{t('hostedBy', { name: l.hostName })}</p>
+                    )}
+                    {l.lat === null && <p className="muted text-xs">{t('noPin')}</p>}
+                  </div>
+                  {/* Uma linha de botões pequenos; os apps de mapa abrem abaixo dela. */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <DirectionsLinks place={l} collapsible />
                     {canEdit(l) && (
-                      <div className="flex flex-wrap gap-2">
+                      <>
                         <button
                           type="button"
-                          className="btn-secondary"
+                          className="btn-secondary px-3 py-1.5 text-sm"
                           onClick={() => setEditing(l.id)}
                         >
                           <Icon name="edit" />
-                          {t('edit')}
+                          <span className="sr-only sm:not-sr-only">{t('edit')}</span>
                           <span className="sr-only"> ({l.name})</span>
                         </button>
                         <DeleteButton
                           path={`/api/v1/groups/${groupId}/locations/${l.id}`}
                           context={l.name}
+                          small
                         />
-                      </div>
+                      </>
                     )}
                   </div>
-                  <DirectionsLinks place={l} />
                 </>
               )}
             </li>
