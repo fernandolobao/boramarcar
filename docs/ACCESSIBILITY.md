@@ -646,3 +646,9 @@ sem rolagem horizontal em 320px.
 
 - Push do resumo da noite: "Primeira partida com o grupo: …" no texto (o push é lido inteiro pelo leitor de tela do sistema).
 - App, perfil de outra pessoa: placar entre vocês em texto, num cartão (sem depender de cor).
+
+## Seguir loja e avisos para quem segue (21/11/2026)
+
+- "Seguir loja": botão liga/desliga com `aria-pressed` (o nome não muda); o resultado sai em `role="status"`. Sem conta, link "Entre para seguir". No app, `accessibilityState.selected` e região viva.
+- Seção "Quem segue a loja" (equipe): contagem em texto; aviso num `<textarea>` com rótulo, dica e contador de caracteres ligados por `aria-describedby`; "Aviso enviado para N pessoas" em `role="status"`; erros (ex.: limite de 3 por semana) em `FormError`.
+- Sino (site e app): "{loja} marcou {evento} ({data})" e "{loja}: {aviso}", com link para o evento ou a loja. Coberto pelo axe (`a11y.test.tsx`), pelos testes dos componentes e pelo E2E `seguidores.spec.ts`.

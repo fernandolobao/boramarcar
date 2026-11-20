@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildEventPush, buildRecapPush, buildWindowPush } from './push';
+import {
+  buildEventPush,
+  buildRecapPush,
+  buildStoreEventPush,
+  buildStoreNoticePush,
+  buildWindowPush,
+} from './push';
 
 const target = {
   userId: 'u1',
@@ -70,5 +76,27 @@ describe('push do resumo da noite (8.11)', () => {
     expect(withDebut.body).toContain('Primeira partida com o grupo: Caio e Duda');
     const without = buildRecapPush(target, { ...base, debuts: [] });
     expect(without.body).not.toContain('Primeira partida');
+  });
+});
+
+describe('push de loja seguida (10.4)', () => {
+  it('evento novo: loja no título, evento e data no texto; abre o evento no app', () => {
+    const msg = buildStoreEventPush(target, {
+      storeName: 'Loja do Mago',
+      event: { id: 'se1', title: 'Commander de sexta', startsAt: new Date('2026-11-27T22:00:00Z') },
+    });
+    expect(msg.title).toContain('Loja do Mago');
+    expect(msg.body).toContain('Commander de sexta');
+    expect(msg.data).toEqual({ url: '/eventos-loja/se1' });
+  });
+
+  it('aviso da loja: o texto inteiro; abre a loja no app', () => {
+    const msg = buildStoreNoticePush(target, {
+      storeName: 'Loja do Mago',
+      slug: 'loja-do-mago',
+      text: 'Chegou a coleção nova!',
+    });
+    expect(msg).toMatchObject({ title: 'Loja do Mago', body: 'Chegou a coleção nova!' });
+    expect(msg.data).toEqual({ url: '/lojas/loja-do-mago' });
   });
 });

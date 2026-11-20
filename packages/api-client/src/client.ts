@@ -762,6 +762,24 @@ export function createApiClient(options: ApiClientOptions) {
     },
     /** Perfis de loja (10.1). */
     stores: {
+      /** Segue a loja (10.4): eventos novos e avisos chegam no sino. */
+      follow: async (storeId: string) =>
+        (
+          await request(
+            'PUT',
+            `/stores/${encodeURIComponent(storeId)}/follow`,
+            z.object({ following: z.boolean() }),
+          )
+        ).following,
+      /** Deixa de seguir a loja. */
+      unfollow: async (storeId: string) =>
+        (
+          await request(
+            'DELETE',
+            `/stores/${encodeURIComponent(storeId)}/follow`,
+            z.object({ following: z.boolean() }),
+          )
+        ).following,
       /** Envia o logo da loja (dono ou equipe; FormData com o campo `file`). */
       setLogo: async (storeId: string, form: FormData) =>
         (
@@ -776,7 +794,12 @@ export function createApiClient(options: ApiClientOptions) {
         request(
           'GET',
           `/stores/by-slug/${encodeURIComponent(slug)}`,
-          z.object({ store: storePublicSchema, upcoming: z.array(storeEventSummarySchema) }),
+          z.object({
+            store: storePublicSchema,
+            upcoming: z.array(storeEventSummarySchema),
+            /** Se quem pede segue a loja (10.4). */
+            following: z.boolean().optional(),
+          }),
         ),
     },
     /** Eventos de loja (10.2): ver, inscrever-se, desistir, código do balcão e os meus. */

@@ -137,3 +137,36 @@ export const storeEventEntries = pgTable(
     uniqueIndex('store_event_entries_user_idx').on(t.storeEventId, t.userId),
   ],
 );
+
+/** Quem segue a loja (10.4): recebe no sino os eventos novos e os avisos dela. */
+export const storeFollowers = pgTable(
+  'store_followers',
+  {
+    storeId: text('store_id')
+      .notNull()
+      .references(() => stores.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('store_followers_unique_idx').on(t.storeId, t.userId),
+    index('store_followers_user_idx').on(t.userId),
+  ],
+);
+
+/** Aviso da equipe da loja para quem segue (10.4): texto curto, até 3 por semana. */
+export const storeNotices = pgTable(
+  'store_notices',
+  {
+    id: id(),
+    storeId: text('store_id')
+      .notNull()
+      .references(() => stores.id, { onDelete: 'cascade' }),
+    text: text('text').notNull(),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [index('store_notices_store_idx').on(t.storeId, t.createdAt)],
+);

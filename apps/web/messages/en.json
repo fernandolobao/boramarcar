@@ -1702,6 +1702,10 @@
     "invite": {
       "title": "{group} misses you!",
       "body": "Join the next one? {title} · {when}. Tap to RSVP."
+    },
+    "storeEvent": {
+      "title": "{store} scheduled an event",
+      "body": "{title} · {when}"
     }
   },
   "onboarding": {
@@ -2147,7 +2151,9 @@
     "tournamentRound": "{name}: round {round} started. Your table is {table}.",
     "tournamentBye": "{name}: round {round} started. You have a bye (counts as a win).",
     "tournamentFinished": "{name} is over. See the final standings.",
-    "storePromoted": "A spot opened at {title}: you moved off the waitlist and are signed up."
+    "storePromoted": "A spot opened at {title}: you moved off the waitlist and are signed up.",
+    "storeNewEvent": "{store} scheduled {title} ({date}).",
+    "storeNotice": "{store}: {text}"
   },
   "records": {
     "title": "Group records",
@@ -2444,6 +2450,23 @@
       "sealed": "Sealed and accessories",
       "play_space": "Tables to play",
       "tournaments": "Tournaments"
+    },
+    "follow": {
+      "button": "Follow store",
+      "signIn": "Sign in to follow",
+      "on": "You follow {store}: new events and notices arrive in the bell.",
+      "off": "You stopped following {store}."
+    },
+    "followers": {
+      "title": "Who follows the store",
+      "count": "{count, plural, =0 {Nobody follows the store yet.} =1 {1 person follows the store.} other {# people follow the store.}}",
+      "hint": "Followers get new events and the notices below in the bell (and on their phone, if they turned notifications on). You only see how many people follow, not who.",
+      "noticeLabel": "Notice for followers",
+      "noticeHint": "Up to 280 characters and 3 notices a week. E.g. \"The new set arrived!\"",
+      "send": "Send notice",
+      "sent": "Notice sent to {count, plural, =0 {nobody yet} =1 {1 person} other {# people}}.",
+      "recent": "Recent notices",
+      "remaining": "{count} characters left"
     }
   },
   "storeEvents": {

@@ -1,5 +1,5 @@
 import { isGameFormat } from '@boramarcar/core';
-import { getStorePublic, listMyStores, listStoreEvents } from '@boramarcar/db';
+import { getStorePublic, listMyStores, listStoreEvents, isFollowingStore } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { isStoreOffer } from '@boramarcar/core/discovery';
@@ -8,6 +8,7 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
+import { FollowStoreButton } from '@/components/stores/follow-button';
 import { Logo } from '@/components/logo';
 import { StoreMap } from '@/components/stores/store-map';
 import { getDb } from '@/server/db';
@@ -50,9 +51,14 @@ export default async function StorePage({ params }: Props) {
     getSessionUser(await headers()).catch(() => null),
     listStoreEvents(getDb(), { storeId: store.id, when: 'upcoming' }),
   ]);
-  const mine = session
-    ? (await listMyStores(getDb(), { userId: session.id })).some((s) => s.slug === slug)
-    : false;
+  const [mine, following] = session
+    ? await Promise.all([
+        listMyStores(getDb(), { userId: session.id }).then((list) =>
+          list.some((s) => s.slug === slug),
+        ),
+        isFollowingStore(getDb(), { storeId: store.id, userId: session.id }),
+      ])
+    : [false, false];
   const initials = store.name
     .split(/\s+/)
     .filter((w) => /[\p{L}\p{N}]/u.test(w))
@@ -122,6 +128,18 @@ export default async function StorePage({ params }: Props) {
               <Icon name="done" />
               {t('verified')}
             </p>
+          )}
+          {/* Seguir a loja (10.4): a equipe não segue a própria loja. */}
+          {!mine && (
+            <div className="pt-2">
+              <FollowStoreButton
+                storeId={store.id}
+                slug={slug}
+                storeName={store.name}
+                following={following}
+                signedIn={Boolean(session)}
+              />
+            </div>
           )}
         </div>
       </header>

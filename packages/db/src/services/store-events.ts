@@ -12,6 +12,7 @@ import { and, asc, desc, eq, gte, inArray, isNotNull, lt } from 'drizzle-orm';
 import type { Database } from '../client';
 import { storeEventEntries, storeEvents, stores, tournaments, user } from '../schema';
 import { addNotifications } from './inbox';
+import { notifyFollowersOfEvent } from './store-followers';
 import { requireStoreRole } from './stores';
 
 /**
@@ -100,6 +101,8 @@ export async function createStoreEvent(
           createdBy: input.userId,
         })
         .returning();
+      // Quem segue a loja (10.4) fica sabendo no sino.
+      await notifyFollowersOfEvent(db, { storeId: input.storeId, storeEventId: row!.id });
       return row!;
     } catch (error) {
       // Código repetido (raro): tenta outro.

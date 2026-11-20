@@ -740,6 +740,11 @@ const pt = {
   discOfferTournaments: 'Torneios',
   profileVersus:
     'Entre vocês, em partidas juntos ({games}): você venceu {wins}, {name} venceu {losses}.',
+  storeFollow: 'Seguir loja',
+  storeFollowOn: 'Você segue {store}: os eventos novos e os avisos chegam no sino.',
+  storeFollowOff: 'Você deixou de seguir {store}.',
+  notifStoreNewEvent: '{store} marcou {title} ({date}).',
+  notifStoreNotice: '{store}: {text}',
   achievementsTitle: 'Conquistas',
   achievementsTabPending: 'Em aberto ({count})',
   achievementsTabDone: 'Finalizadas ({count})',
@@ -1779,6 +1784,11 @@ const en: Messages = {
   discOfferTournaments: 'Tournaments',
   profileVersus:
     'Between you two, in games together ({games}): you won {wins}, {name} won {losses}.',
+  storeFollow: 'Follow store',
+  storeFollowOn: 'You follow {store}: new events and notices arrive in the bell.',
+  storeFollowOff: 'You stopped following {store}.',
+  notifStoreNewEvent: '{store} scheduled {title} ({date}).',
+  notifStoreNotice: '{store}: {text}',
   achievementsTitle: 'Achievements',
   achievementsTabPending: 'Open ({count})',
   achievementsTabDone: 'Completed ({count})',
