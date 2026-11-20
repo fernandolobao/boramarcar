@@ -121,7 +121,7 @@ function Tile({
 
 /**
  * Painel: o próximo encontro em destaque, os seus números (posição, pontos, aproveitamento,
- * sequência e forma recente), o pódio, a atividade do grupo, os melhores horários e os
+ * sequência e últimas partidas), o pódio, a atividade do grupo, os melhores horários e os
  * comandantes em alta. Nomes de jogadores levam ao perfil; nomes de cartas abrem a carta.
  */
 export default async function DashboardPage() {

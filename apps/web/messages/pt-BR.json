@@ -55,7 +55,7 @@
     "winsOf": "{wins} vitórias em {games} partidas",
     "streak": "Vitórias seguidas",
     "bestStreak": "Melhor sequência: {count}",
-    "form": "Sua forma",
+    "form": "Últimas partidas",
     "formLabel": "Resultados das últimas partidas, da mais antiga à mais recente",
     "formShort": {
       "win": "V",

@@ -55,7 +55,7 @@
     "winsOf": "{wins} wins in {games} games",
     "streak": "Win streak",
     "bestStreak": "Best streak: {count}",
-    "form": "Your form",
+    "form": "Recent games",
     "formLabel": "Results of your latest games, oldest to newest",
     "formShort": {
       "win": "W",
