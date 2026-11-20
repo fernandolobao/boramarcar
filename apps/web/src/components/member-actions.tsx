@@ -180,7 +180,8 @@ function ManagePanel({ name, children }: { name: string; children: React.ReactNo
         onClick={() => setOpen((v) => !v)}
       >
         <Icon name="settings" />
-        {t('manage')}
+        {/* No celular, só o ícone: o texto continua para leitores de tela. */}
+        <span className="sr-only sm:not-sr-only">{t('manage')}</span>
         <span className="sr-only"> ({name})</span>
         <Icon
           name="chevronDown"

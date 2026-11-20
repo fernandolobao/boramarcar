@@ -189,8 +189,11 @@ export function DeleteButton({
   label,
   context,
   redirectTo,
+  small = false,
 }: {
   path: string;
+  /** Versão menor, para linhas de lista. */
+  small?: boolean;
   /** Texto visível (padrão: "Remover"). */
   label?: string;
   /** Contexto só para leitores de tela, ex.: qual item será removido. */
@@ -204,7 +207,7 @@ export function DeleteButton({
     <>
       <button
         type="button"
-        className="btn-danger"
+        className={small ? 'btn-danger px-3 py-1.5 text-sm' : 'btn-danger'}
         disabled={pending}
         onClick={() =>
           void run(
@@ -214,7 +217,10 @@ export function DeleteButton({
         }
       >
         <Icon name="delete" />
-        {label ?? tc('delete')}
+        {/* Versão pequena: no celular, só o ícone (o texto fica para leitores de tela). */}
+        <span className={small ? 'sr-only sm:not-sr-only' : undefined}>
+          {label ?? tc('delete')}
+        </span>
         {context && <span className="sr-only"> ({context})</span>}
       </button>
       <FormError message={error} />

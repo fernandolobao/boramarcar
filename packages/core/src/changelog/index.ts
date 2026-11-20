@@ -244,6 +244,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'O link da retrospectiva do mês agora abre só aquele mês: quem recebe o de outubro não vê os outros meses do grupo. Na loja, quem não é da equipe vê só o primeiro nome de quem joga o torneio.',
     en: 'The monthly recap link now opens only that month: whoever gets October’s can’t see the group’s other months. In stores, people outside the staff see only the first name of tournament players.',
   },
+  {
+    date: '2026-11-20',
+    pt: 'No celular, as listas de membros e de locais do grupo ficaram mais compactas: "Gerenciar" fica ao lado do nome, e as rotas de cada local abrem em "Como chegar".',
+    en: 'On phones, the group’s member and place lists are more compact: "Manage" sits next to the name, and each place’s routes open under "Directions".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

@@ -657,3 +657,13 @@ sem rolagem horizontal em 320px.
 
 - Opção nova no campo "Estrutura" (com a explicação na descrição do Select; no app, `Choices`).
 - Cada mesa diz em texto de qual chave é ("Chave dos vencedores" / "Chave dos perdedores"), sem depender de cor; a rodada da grande final tem o título "Grande final"; as outras, "Rodada N" (o total não é conhecido de antemão).
+
+## Página do grupo no celular (20/11/2026)
+
+- Membros: no celular, "Gerenciar" mostra só o ícone (engrenagem e seta); o texto continua para
+  leitores de tela ("Gerenciar (nome)", `sm:not-sr-only` a partir de telas médias) e o alvo segue com
+  mais de 24 px. O nome ocupa o espaço que sobra, e o botão não pula para outra linha.
+- Locais: "Como chegar (local)" é um disclosure (`aria-expanded`, `aria-controls`) que mostra os
+  quatro apps de mapa; "Editar" e "Remover" ficam menores, na mesma linha, e no celular só com o
+  ícone (o nome acessível continua "Editar (local)" e "Remover (local)"). No encontro e na loja,
+  as rotas continuam à vista.

@@ -170,7 +170,8 @@ export default async function GroupPage() {
                     key={m.userId}
                     className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 text-sm"
                   >
-                    <span className="flex min-w-0 items-center gap-3">
+                    {/* O nome ocupa o que sobra; "Gerenciar" fica sempre na mesma linha. */}
+                    <span className="flex min-w-0 flex-1 items-center gap-3">
                       <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-700 dark:text-white">
                         <AvatarImage name={m.name} image={m.image} sizes="40px" />
                       </span>
