@@ -49,6 +49,9 @@ export function assertLocalDate(date: string) {
   }
 }
 
+/** Maior intervalo que se expande de uma vez (um ano e um dia). */
+export const MAX_RANGE_DAYS = 366;
+
 const addDays = (date: string, days: number) =>
   new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY).toISOString().slice(0, 10);
 
@@ -62,6 +65,11 @@ export function expandWeeklyRules(
   from: Date,
   to: Date,
 ): RuleOccurrence[] {
+  // O laço anda dia a dia: um intervalo enorme (ex.: ano -200000 a +200000) prenderia o servidor.
+  const span = to.getTime() - from.getTime();
+  if (!Number.isFinite(span) || span > MAX_RANGE_DAYS * DAY) {
+    throw new DomainError('invalid_input', 'Intervalo de datas grande demais (máximo de um ano)');
+  }
   const occurrences: RuleOccurrence[] = [];
   for (const rule of rules) {
     assertWeeklyRule(rule);

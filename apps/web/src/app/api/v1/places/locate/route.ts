@@ -1,6 +1,7 @@
 import { DomainError, isDomainError, locateAddress } from '@boramarcar/core';
 import { z } from 'zod';
 import { authed, parseQuery } from '@/server/http';
+import { rateLimit } from '@/server/limits';
 
 const schema = z.object({ q: z.string().min(3).max(200) });
 
@@ -9,8 +10,10 @@ const cache = new Map<string, { at: number; value: { lat: number; lng: number } 
 const TTL = 24 * 60 * 60 * 1000;
 
 /** Ponto exato de um endereço com número (2.14), pelo Nominatim/OpenStreetMap; `null` se não achar. */
-export const GET = authed(async ({ req }) => {
+export const GET = authed(async ({ req, db, user }) => {
   const { q } = parseQuery(req, schema);
+  // O Nominatim bloqueia o servidor inteiro se receber buscas demais.
+  await rateLimit(db, user.id, 'search');
   const key = q.trim().toLowerCase();
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL) return { point: hit.value };

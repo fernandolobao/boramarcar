@@ -1,7 +1,7 @@
 import { DomainError } from '@boramarcar/core';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { errorResponse, parseJson, parseQuery } from './http';
+import { errorResponse, isoDate, parseJson, parseQuery } from './http';
 
 describe('errorResponse', () => {
   it.each([
@@ -55,5 +55,12 @@ describe('parse helpers', () => {
   it('rejeita JSON malformado', async () => {
     const req = new Request('http://x/', { method: 'POST', body: '{' });
     await expect(parseJson(req, z.any())).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+
+  it('datas: só entre 2000 e 2100 (nada de ano 200000 para travar laços)', () => {
+    expect(isoDate.safeParse('2026-11-20T10:00:00Z').success).toBe(true);
+    expect(isoDate.safeParse('+200000-01-01T00:00:00Z').success).toBe(false);
+    expect(isoDate.safeParse('-200000-01-01T00:00:00Z').success).toBe(false);
+    expect(isoDate.safeParse('1990-01-01').success).toBe(false);
   });
 });

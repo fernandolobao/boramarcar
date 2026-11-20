@@ -2,14 +2,15 @@ import { MAX_COLLECTION_COPIES, removeCollectionCard, updateCollectionCard } fro
 import { DomainError } from '@boramarcar/core';
 import { z } from 'zod';
 import { resolveCardById } from '@/server/deck-import';
-import { authed, parseJson } from '@/server/http';
+import { authed, parseJson, scryfallIdSchema } from '@/server/http';
+import { rateLimit } from '@/server/limits';
 
 const schema = z
   .object({
     quantity: z.number().int().min(0).max(MAX_COLLECTION_COPIES).optional(),
     foil: z.boolean().optional(),
     /** Outra impressão da mesma carta. */
-    scryfallId: z.string().min(1).max(64).optional(),
+    scryfallId: scryfallIdSchema.optional(),
     /** Com `scryfallId` ou `foil`: quantas cópias mudam (padrão: todas). */
     copies: z.number().int().min(1).max(MAX_COLLECTION_COPIES).optional(),
   })
@@ -23,6 +24,8 @@ const schema = z
  */
 export const PATCH = authed<{ entryId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, schema);
+  // Trocar a impressão vai ao Scryfall.
+  if (body.scryfallId) await rateLimit(db, user.id, 'search');
   const card = body.scryfallId ? await resolveCardById(db, body.scryfallId) : undefined;
   if (card === null) throw new DomainError('not_found', 'Impressão não encontrada no Scryfall');
   return updateCollectionCard(db, {

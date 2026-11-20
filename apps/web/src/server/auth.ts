@@ -1,5 +1,6 @@
 import 'server-only';
-import { schema } from '@boramarcar/db';
+import { consumeRateLimit, schema } from '@boramarcar/db';
+import { isDomainError } from '@boramarcar/core';
 import { expo } from '@better-auth/expo';
 import { authTrustedOrigins, oauthProxyOptions } from './trusted-origins';
 import { betterAuth } from 'better-auth';
@@ -11,6 +12,7 @@ import { getDb } from './db';
 import { sendResetPasswordEmail, sendVerificationEmail } from './auth-emails';
 import { GOOGLE_SIGN_IN_OPTIONS, syncGoogleProfileImage } from './google-picture';
 import { allowedSignUpImage, cleanUserName } from './user-fields';
+import { hashedKey } from './limits';
 
 function createAuth() {
   const env = getEnv();
@@ -59,6 +61,40 @@ function createAuth() {
     // A rota embutida de atualizar a conta aceitaria nome e foto livres (qualquer URL, até a foto de
     // outra pessoa). O nome e a foto mudam só pelas rotas do app (`/api/v1/me/...`).
     disabledPaths: ['/update-user'],
+    // Limite de tentativas no banco (o padrão fica na memória de cada instância da Vercel, que
+    // reinicia e não se soma). A chave (IP + caminho) vai só como HMAC.
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 100,
+      customRules: {
+        '/sign-in/*': { window: 60, max: 10 },
+        '/sign-up/*': { window: 60 * 60, max: 10 },
+        '/send-verification-email': { window: 5 * 60, max: 3 },
+        '/request-password-reset': { window: 5 * 60, max: 3 },
+        '/forget-password*': { window: 5 * 60, max: 3 },
+        // Lida a cada tela: não vale gravar no banco por isso.
+        '/get-session': false,
+      },
+      customStorage: {
+        consume: async (key, rule) => {
+          try {
+            await consumeRateLimit(getDb(), `auth:${hashedKey(key)}`, {
+              limit: rule.max,
+              windowMs: rule.window * 1000,
+            });
+            return { allowed: true, retryAfter: null };
+          } catch (error) {
+            if (isDomainError(error) && error.code === 'rate_limited') {
+              const retry = (error.details as { retryAfterSeconds?: number } | undefined)
+                ?.retryAfterSeconds;
+              return { allowed: false, retryAfter: retry ?? rule.window };
+            }
+            throw error;
+          }
+        },
+      },
+    },
     databaseHooks: {
       user: {
         // Cadastro (e-mail ou Google): nome limpo e só foto do Google.

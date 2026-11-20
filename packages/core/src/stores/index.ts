@@ -66,10 +66,17 @@ const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CODE_LENGTH = 6;
 
 /** Código curto do evento, para a pessoa digitar no app quando chega na loja. */
-export function eventCode(random: () => number = Math.random): string {
+export function eventCode(random?: () => number): string {
   let code = '';
-  for (let i = 0; i < CODE_LENGTH; i++) {
-    code += CODE_ALPHABET[Math.floor(random() * CODE_ALPHABET.length)];
+  while (code.length < CODE_LENGTH) {
+    if (random) {
+      code += CODE_ALPHABET[Math.floor(random() * CODE_ALPHABET.length)];
+      continue;
+    }
+    // Sorteio criptográfico, descartando bytes acima do maior múltiplo do alfabeto (sem viés).
+    const [byte] = crypto.getRandomValues(new Uint8Array(1));
+    const limit = 256 - (256 % CODE_ALPHABET.length);
+    if (byte! < limit) code += CODE_ALPHABET[byte! % CODE_ALPHABET.length];
   }
   return code;
 }

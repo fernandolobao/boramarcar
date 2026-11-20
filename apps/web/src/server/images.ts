@@ -9,9 +9,16 @@ import sharp from 'sharp';
  * Os metadados (EXIF com a localização da foto, perfil de cor, câmera) não vão junto: o `sharp`
  * só os mantém quando se pede.
  */
+/** Formatos aceitos de verdade (lidos do arquivo, não do tipo que o navegador informou). */
+const FORMATS = new Set(['jpeg', 'png', 'webp']);
+/** Até 25 megapixels (uma foto de celular tem uns 12): impede "bombas" de descompressão. */
+const MAX_PIXELS = 25_000_000;
+
 export async function processUploadedImage(input: Buffer): Promise<Buffer> {
   try {
-    return await sharp(input, { limitInputPixels: 50_000_000 })
+    const { format } = await sharp(input, { limitInputPixels: MAX_PIXELS }).metadata();
+    if (!format || !FORMATS.has(format)) throw new Error(`formato ${format ?? '?'}`);
+    return await sharp(input, { limitInputPixels: MAX_PIXELS, failOn: 'error' })
       .rotate()
       .resize(IMAGE_SIZE, IMAGE_SIZE, { fit: 'cover', position: 'attention' })
       .webp({ quality: 82 })

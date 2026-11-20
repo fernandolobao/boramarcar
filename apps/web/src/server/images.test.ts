@@ -25,4 +25,15 @@ describe('tratamento da imagem enviada', () => {
       code: 'invalid_input',
     });
   });
+
+  it('só JPEG, PNG ou WebP de verdade (o tipo informado pelo navegador não basta)', async () => {
+    const gif = await sharp({
+      create: { width: 10, height: 10, channels: 3, background: { r: 0, g: 0, b: 0 } },
+    })
+      .gif()
+      .toBuffer();
+    await expect(processUploadedImage(gif)).rejects.toMatchObject({ code: 'invalid_input' });
+    const svg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>');
+    await expect(processUploadedImage(svg)).rejects.toMatchObject({ code: 'invalid_input' });
+  });
 });

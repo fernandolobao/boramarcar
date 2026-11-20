@@ -107,4 +107,21 @@ describe('validação', () => {
     expect(() => assertLocalDate('12/11/2026')).toThrow(DomainError);
     expect(() => assertLocalDate('2026-13-40')).toThrow(DomainError);
   });
+
+  it('intervalo de mais de um ano é recusado (não percorre milhões de dias)', () => {
+    expect(() =>
+      expandWeeklyRules(
+        [rule()],
+        new Date('2026-01-01T00:00:00Z'),
+        new Date('2027-06-01T00:00:00Z'),
+      ),
+    ).toThrowError(DomainError);
+    expect(() =>
+      expandWeeklyRules(
+        [rule()],
+        new Date('-200000-01-01T00:00:00Z'),
+        new Date('2026-01-01T00:00:00Z'),
+      ),
+    ).toThrowError(DomainError);
+  });
 });

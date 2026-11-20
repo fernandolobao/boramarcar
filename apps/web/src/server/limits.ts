@@ -1,5 +1,7 @@
 import 'server-only';
+import { createHmac } from 'node:crypto';
 import { consumeRateLimit, type Database } from '@boramarcar/db';
+import { getEnv } from '@/env';
 
 const MINUTE = 60_000;
 
@@ -40,17 +42,23 @@ export const rateLimit = (db: Database, userId: string, kind: RateLimitKind) =>
 
 /**
  * Chave de limite para rotas sem login: o endereço de quem chamou (primeiro do
- * `x-forwarded-for`, posto pela Vercel), guardado só como hash — o IP em si não vai para o banco.
+ * `x-forwarded-for`, posto pela Vercel), guardado só como HMAC com o segredo do servidor — o IP
+ * não vai para o banco, e sem o segredo não dá para testar os 4 bilhões de IPv4 e voltar ao IP.
  */
 export async function clientKey(request: Request) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     request.headers.get('x-real-ip') ||
     'desconhecido';
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip));
-  return Array.from(new Uint8Array(digest).slice(0, 12), (b) =>
-    b.toString(16).padStart(2, '0'),
-  ).join('');
+  return hashedKey(ip);
+}
+
+/** HMAC-SHA256 truncado (24 hex) de um texto que identifica alguém (IP, chave de login). */
+export function hashedKey(value: string) {
+  return createHmac('sha256', getEnv().BETTER_AUTH_SECRET)
+    .update(`limite:${value}`)
+    .digest('hex')
+    .slice(0, 24);
 }
 
 /**
