@@ -33,12 +33,18 @@ export const PUT = authed(async ({ req, db, user }) => {
     folder: 'avatars',
     ownerId: user.id,
   });
-  await deleteUploadedImage(await setUserImage(db, { userId: user.id, image }));
+  await deleteUploadedImage(await setUserImage(db, { userId: user.id, image }), {
+    folder: 'avatars',
+    ownerId: user.id,
+  });
   return withFreshSession(req, { image });
 });
 
 /** Tira a foto (volta às iniciais) e apaga o arquivo. */
 export const DELETE = authed(async ({ req, db, user }) => {
-  await deleteUploadedImage(await setUserImage(db, { userId: user.id, image: null }));
+  await deleteUploadedImage(await setUserImage(db, { userId: user.id, image: null }), {
+    folder: 'avatars',
+    ownerId: user.id,
+  });
   return withFreshSession(req, { image: null });
 });

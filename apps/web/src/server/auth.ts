@@ -10,6 +10,7 @@ import { getBaseUrl, getEnv } from '@/env';
 import { getDb } from './db';
 import { sendResetPasswordEmail, sendVerificationEmail } from './auth-emails';
 import { GOOGLE_SIGN_IN_OPTIONS, syncGoogleProfileImage } from './google-picture';
+import { allowedSignUpImage, cleanUserName } from './user-fields';
 
 function createAuth() {
   const env = getEnv();
@@ -55,7 +56,22 @@ function createAuth() {
         scope: [...GOOGLE_SIGN_IN_OPTIONS.scope],
       },
     },
+    // A rota embutida de atualizar a conta aceitaria nome e foto livres (qualquer URL, até a foto de
+    // outra pessoa). O nome e a foto mudam só pelas rotas do app (`/api/v1/me/...`).
+    disabledPaths: ['/update-user'],
     databaseHooks: {
+      user: {
+        // Cadastro (e-mail ou Google): nome limpo e só foto do Google.
+        create: {
+          before: async (user) => ({
+            data: {
+              ...user,
+              name: cleanUserName(user.name),
+              image: allowedSignUpImage(user.image),
+            },
+          }),
+        },
+      },
       account: {
         // A cada login com o Google a conta é criada (primeiro login) ou recebe tokens novos
         // (logins seguintes): é aí que a foto do Google é sincronizada (ver google-picture.ts).

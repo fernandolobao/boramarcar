@@ -13,6 +13,7 @@ export const PUT = authed<{ storeId: string }>(async ({ req, db, user, params })
   });
   await deleteUploadedImage(
     await setStoreLogo(db, { storeId: params.storeId, userId: user.id, url }),
+    { folder: 'logos', ownerId: params.storeId },
   );
   return { logoUrl: url };
 });
@@ -21,6 +22,7 @@ export const PUT = authed<{ storeId: string }>(async ({ req, db, user, params })
 export const DELETE = authed<{ storeId: string }>(async ({ db, user, params }) => {
   await deleteUploadedImage(
     await setStoreLogo(db, { storeId: params.storeId, userId: user.id, url: null }),
+    { folder: 'logos', ownerId: params.storeId },
   );
   return { logoUrl: null };
 });

@@ -185,6 +185,8 @@ As cores vêm da paleta da marca (`packages/tokens/palette.json`: Arcano, Éter,
 
 A interface segue **WCAG 2.2 AA**. O lint (`jsx-a11y`), os testes de componentes (axe-core) e os testes E2E (axe em todas as telas, claro/escuro, desktop/mobile) bloqueiam regressões na CI. Nos PRs o E2E roda no perfil de computador; o de celular roda na `main` ou com o rótulo `e2e-completo` no PR. Regras e histórico de auditorias em [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) e [CLAUDE.md](CLAUDE.md).
 
+A auditoria de segurança e estabilidade, com a lista do que falta corrigir, está em [docs/SEGURANCA.md](docs/SEGURANCA.md).
+
 ## Integração contínua
 
 Em cada pull request (`.github/workflows/ci.yml`):

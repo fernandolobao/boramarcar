@@ -31,3 +31,19 @@ export function isOwnUpload(url: string | null | undefined): boolean {
     return false;
   }
 }
+
+/**
+ * A URL é de um arquivo nosso **deste dono** (`<pasta>/<id>/…`)? Só assim o servidor apaga a imagem
+ * anterior: uma URL alheia gravada como foto (ou logo) nunca leva o arquivo de outra pessoa junto.
+ */
+export function isUploadOf(
+  url: string | null | undefined,
+  owner: { folder: 'avatars' | 'logos'; ownerId: string },
+): boolean {
+  if (!isOwnUpload(url)) return false;
+  const { pathname } = new URL(url!);
+  const prefix = `/${owner.folder}/${owner.ownerId}/`;
+  if (!pathname.startsWith(prefix)) return false;
+  const rest = pathname.slice(prefix.length);
+  return rest.length > 0 && !/[/%\\]|\.\./.test(rest);
+}
