@@ -1275,6 +1275,16 @@
           "tab": "Tournament",
           "caption": "Group tournaments in any format: round tables, game scores, standings with tiebreakers and a timeline.",
           "alt": "Copa de Modern tournament, best of 3, in progress: round 2 of 3 with three tables, one already reported with its game score and two waiting for a result, with game-win fields for each player."
+        },
+        "lojas": {
+          "tab": "Stores nearby",
+          "caption": "Stores and events in your city, no account needed: tournaments, Commander nights and releases.",
+          "alt": "Stores and events in São Paulo, picked by city name or location: filters by format and type, and the upcoming events, such as Friday Commander at Loja Dragão Dourado 3.7 km away and Saturday’s Modern tournament with 5 of 16 seats taken, each with buttons to add it to your calendar."
+        },
+        "loja": {
+          "tab": "Store page",
+          "caption": "Every store has its own page: hours, map, contacts and an events calendar you can follow.",
+          "alt": "Page of the verified Loja Dragão Dourado: the follow button already on, the description, the address on Av. Paulista, opening hours and the map."
         }
       }
     },
