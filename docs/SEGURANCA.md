@@ -17,7 +17,7 @@ etapas sem transação.
 2. Origens do login (A2, A3) ✅
 3. Dados expostos (M1, M2, M3 e as baixas de dados) ✅
 4. Abuso e negação de serviço (M4, M5 e as baixas de limite) ✅
-5. Concorrência e atomicidade (M6, M7, M8).
+5. Concorrência e atomicidade (M6, M7, M8) ✅
 6. Estabilidade operacional (M9, M10, M11, M12).
 7. Endurecimento (o resto das baixas).
 
@@ -89,17 +89,20 @@ etapas sem transação.
   `from=-200000…&to=+200000…` e prende a CPU até estourar o tempo. Correção: datas entre ±5 anos de hoje
   e intervalo ≤ 120 dias nas rotas de disponibilidade e em `expandWeeklyRules`.
   **Corrigido:** `isoDate` só aceita 2000–2100 (`server/http.ts`) e `expandWeeklyRules` recusa intervalos acima de um ano (`MAX_RANGE_DAYS`).
-- **M6. Inscrição em evento de loja passa da capacidade** (`store-events.ts:301`): conta e insere sem
+- ✅ **M6. Inscrição em evento de loja passa da capacidade** (`store-events.ts:301`): conta e insere sem
   trava; duas inscrições na última vaga entram as duas; `promote` e `cancelStoreEntry` têm a mesma
   corrida; duplicata vira 500 (23505) em vez de 409. Correção: transação com `SELECT … FOR UPDATE` no
   evento; erro de chave única → `conflict` em `errorResponse`.
-- **M7. Começar torneio não é atômico** (`tournaments.ts` `begin`/`startStoreTournament`): clique duplo
+  **Corrigido:** inscrição, desistência e edição de vagas numa transação que trava o evento (`SELECT … FOR UPDATE`, `lockEvent`); inscrição repetida vira 409 (testes de concorrência em `store-events.test.ts`).
+- ✅ **M7. Começar torneio não é atômico** (`tournaments.ts` `begin`/`startStoreTournament`): clique duplo
   começa duas vezes (500 por índice único); falha no meio deixa torneio "rodando" sem rodada ou com
   inscritos pela metade, e o evento da loja fica travado. Correção: transação + `UPDATE … WHERE
 status='registration' RETURNING`; inscritos em lote.
-- **M8. Publicar aviso do ArcanaKin** (`announcements.ts:94`): um INSERT com uma linha por usuário quebra
+  **Corrigido:** `begin` numa transação com `UPDATE … WHERE status = 'registration'`; o torneio de loja trava o evento e cria tudo numa transação, com os inscritos em lote (testes de clique duplo em `tournaments.test.ts` e `store-tournaments.test.ts`).
+- ✅ **M8. Publicar aviso do ArcanaKin** (`announcements.ts:94`): um INSERT com uma linha por usuário quebra
   acima de ~16 mil pessoas (limite de parâmetros do Postgres); status vira "publicado" antes de gravar;
   clique duplo manda duas vezes. Correção: guarda no UPDATE, transação, lotes de 1.000.
+  **Corrigido:** publicação numa transação com guarda de status; `addNotifications` grava em lotes de 1.000 (`announcements-scale.test.ts`, com 17 mil pessoas). E qualquer chave única repetida que escapar vira 409 em `errorResponse` (`isUniqueViolation`).
 - **M9. Cron diário: uma falha derruba o resto do dia** (`app/api/cron/reminders/route.ts`): lembretes,
   métricas, novidades e retrospectivas em sequência; se uma tarefa falha, as outras não rodam (a
   retrospectiva do dia 1 se perde); métricas e novidades podem sair duas vezes. Correção: cada tarefa com

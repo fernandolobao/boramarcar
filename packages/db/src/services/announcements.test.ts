@@ -115,4 +115,25 @@ describe('novidades da semana', () => {
     // Rascunho de novidades aparece no /admin como os outros.
     expect((await listAnnouncements(db)).some((a) => a.id === second!.id)).toBe(true);
   });
+
+  it('clique duplo em "Publicar": as pessoas recebem uma vez, e o outro pedido é conflito', async () => {
+    const admin = await createTestUser(db, { name: 'Admin 2' });
+    const { players, group } = await seedGroup(db, 3);
+    const draft = await createAnnouncement(db, {
+      title: 'Aviso do grupo',
+      body: 'Texto',
+      groupId: group.id,
+      createdBy: admin.id,
+    });
+    const settled = await Promise.allSettled([
+      publishAnnouncement(db, { id: draft.id }),
+      publishAnnouncement(db, { id: draft.id }),
+    ]);
+    expect(settled.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(
+      (settled.find((r) => r.status === 'rejected') as PromiseRejectedResult).reason,
+    ).toMatchObject({ code: 'conflict' });
+    const inbox = await listNotifications(db, { userId: players[0]!.id });
+    expect(inbox.filter((n) => n.kind === 'announcement')).toHaveLength(1);
+  });
 });

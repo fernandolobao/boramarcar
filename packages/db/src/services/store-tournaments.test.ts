@@ -183,4 +183,24 @@ describe('torneio no evento de loja (10.2b)', () => {
     const forStaff = await getTournament(db, { tournamentId: t.id, userId: dono.id });
     expect(forStaff.entrants.map((e) => e.name).sort()).toEqual(['Ana Souza', 'Bia Lima']);
   });
+
+  it('a equipe clica duas vezes em "Começar": um torneio só, e o outro pedido é conflito', async () => {
+    const { dono, event } = await storeWithEvent('modern');
+    const people = await Promise.all([1, 2, 3].map(() => createTestUser(db)));
+    for (const p of people) await registerForStoreEvent(db, { eventId: event.id, userId: p.id });
+    const staff = await getStoreEventForStaff(db, { eventId: event.id, userId: dono.id });
+    for (const e of staff.entries)
+      await setCheckIn(db, { entryId: e.id, userId: dono.id, checkedIn: true });
+    const settled = await Promise.allSettled([
+      startStoreTournament(db, { eventId: event.id, userId: dono.id, random: fixed() }),
+      startStoreTournament(db, { eventId: event.id, userId: dono.id, random: fixed() }),
+    ]);
+    expect(settled.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(
+      (settled.find((r) => r.status === 'rejected') as PromiseRejectedResult).reason,
+    ).toMatchObject({ code: 'conflict' });
+    const live = await getStoreEventTournament(db, { eventId: event.id, viewerId: dono.id });
+    expect(live!.entrants).toHaveLength(3);
+    expect(live!.rounds).toHaveLength(1);
+  });
 });

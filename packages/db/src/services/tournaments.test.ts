@@ -351,4 +351,22 @@ describe('resultado vindo do modo mesa', () => {
     const [game] = await gamesOfEvent(event.id);
     expect(game).toMatchObject({ firstPlayerId: first, winningTurn: 7, durationMinutes: 52 });
   });
+
+  it('clique duplo em "Começar": uma largada só, e o outro pedido é "já começou"', async () => {
+    const { players, owner, tournament } = await setup(4, 'modern');
+    for (const p of players) {
+      await addEntrant(db, { tournamentId: tournament.id, userId: owner.id, memberIds: [p.id] });
+    }
+    const settled = await Promise.allSettled([
+      startTournament(db, { tournamentId: tournament.id, userId: owner.id, random: fixed() }),
+      startTournament(db, { tournamentId: tournament.id, userId: owner.id, random: fixed() }),
+    ]);
+    expect(settled.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(
+      (settled.find((r) => r.status === 'rejected') as PromiseRejectedResult).reason,
+    ).toMatchObject({ code: 'conflict' });
+    const view = await getTournament(db, { tournamentId: tournament.id, userId: owner.id });
+    expect(view.rounds).toHaveLength(1);
+    expect(view.timeline.filter((e) => e.kind === 'started')).toHaveLength(1);
+  });
 });

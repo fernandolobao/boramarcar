@@ -10,6 +10,7 @@ import {
 } from '@boramarcar/core/stores';
 import { and, asc, desc, eq, gte, inArray, isNotNull, lt } from 'drizzle-orm';
 import type { Database } from '../client';
+import { isUniqueViolation } from '../db-errors';
 import { storeEventEntries, storeEvents, stores, tournaments, user } from '../schema';
 import { addNotifications } from './inbox';
 import { notifyFollowersOfEvent } from './store-followers';
@@ -112,7 +113,10 @@ export async function createStoreEvent(
   }
 }
 
-/** Sobe da lista de espera quem cabe nas vagas (depois de uma desistência ou de mais vagas). */
+/**
+ * Sobe da lista de espera quem cabe nas vagas (depois de uma desistência ou de mais vagas). Chame
+ * dentro da transação que travou o evento (`lockEvent`).
+ */
 async function promote(db: Database, event: EventRow) {
   const entries = await db
     .select({
@@ -176,12 +180,15 @@ export async function updateStoreEvent(
     prizes: input.prizes === undefined ? undefined : input.prizes?.trim() || null,
     rules: input.rules === undefined ? undefined : input.rules?.trim() || null,
   };
-  const [updated] = await db
-    .update(storeEvents)
-    .set(Object.fromEntries(Object.entries(set).filter(([, v]) => v !== undefined)))
-    .where(eq(storeEvents.id, event.id))
-    .returning();
-  await promote(db, updated!);
+  await db.transaction(async (tx) => {
+    await lockEvent(tx, event.id);
+    const [updated] = await tx
+      .update(storeEvents)
+      .set(Object.fromEntries(Object.entries(set).filter(([, v]) => v !== undefined)))
+      .where(eq(storeEvents.id, event.id))
+      .returning();
+    await promote(tx, updated!);
+  });
 }
 
 /** Cancela o evento (equipe): some da inscrição; a página mostra que foi cancelado. */
@@ -270,11 +277,43 @@ export async function getStoreEventPublic(
 }
 export type StoreEventPublic = NonNullable<Awaited<ReturnType<typeof getStoreEventPublic>>>;
 
+/**
+ * Trava o evento até o fim da transação: inscrições, desistências e subidas da fila do mesmo
+ * evento passam uma de cada vez (sem isso, duas inscrições na última vaga entravam as duas).
+ * Devolve a linha relida (status e vagas atuais).
+ */
+async function lockEvent(db: Database, eventId: string) {
+  const [row] = await db
+    .select()
+    .from(storeEvents)
+    .where(eq(storeEvents.id, eventId))
+    .for('update');
+  if (!row) throw new DomainError('not_found', 'Evento não encontrado');
+  return row;
+}
+
 async function register(
   db: Database,
-  event: EventRow,
+  loaded: EventRow,
   entry: { userId: string | null; guestName: string | null },
 ) {
+  try {
+    return await db.transaction(async (tx) => registerLocked(tx, loaded.id, entry));
+  } catch (error) {
+    // A outra aba ou o clique duplo chegou primeiro e bateu no índice único (evento + pessoa).
+    if (isUniqueViolation(error)) {
+      throw new DomainError('conflict', 'Você já está inscrito neste evento');
+    }
+    throw error;
+  }
+}
+
+async function registerLocked(
+  db: Database,
+  eventId: string,
+  entry: { userId: string | null; guestName: string | null },
+) {
+  const event = await lockEvent(db, eventId);
   if (event.status !== 'scheduled') {
     throw new DomainError('conflict', 'Este evento não está aberto para inscrição');
   }
@@ -367,8 +406,11 @@ async function loadEntry(db: Database, entryId: string) {
 export async function cancelStoreEntry(db: Database, input: { entryId: string; userId: string }) {
   const { entry, event } = await loadEntry(db, input.entryId);
   if (entry.userId !== input.userId) await requireStaff(db, event, input.userId);
-  await db.delete(storeEventEntries).where(eq(storeEventEntries.id, entry.id));
-  await promote(db, event);
+  await db.transaction(async (tx) => {
+    const locked = await lockEvent(tx, event.id);
+    await tx.delete(storeEventEntries).where(eq(storeEventEntries.id, entry.id));
+    await promote(tx, locked);
+  });
 }
 
 /** Check-in na chegada (equipe). */

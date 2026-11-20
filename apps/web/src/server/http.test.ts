@@ -63,4 +63,13 @@ describe('parse helpers', () => {
     expect(isoDate.safeParse('-200000-01-01T00:00:00Z').success).toBe(false);
     expect(isoDate.safeParse('1990-01-01').success).toBe(false);
   });
+
+  it('chave única repetida (pedido em dobro) vira 409, não 500', async () => {
+    const error = Object.assign(new Error('Failed query: insert into ...'), {
+      cause: Object.assign(new Error('duplicate key value'), { code: '23505' }),
+    });
+    const res = errorResponse(error);
+    expect(res.status).toBe(409);
+    expect((await res.json()).error.code).toBe('conflict');
+  });
 });
