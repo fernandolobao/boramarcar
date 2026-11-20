@@ -2313,7 +2313,8 @@
       "started_top": "Depois do suíço, top {size}.",
       "top_round": "Top cut: {stage} começou.",
       "started_structure": "Estrutura: {structure}.",
-      "elimination_round": "{stage} começou."
+      "elimination_round": "{stage} começou.",
+      "started_no_rounds": "Torneio começou com {entrants} inscrições."
     },
     "champion": "Campeão: {name}",
     "delete": "Apagar torneio",
@@ -2362,9 +2363,17 @@
       "hint": {
         "swiss": "Todo mundo joga todas as rodadas, contra quem tem pontos parecidos; dá para ter top cut no fim.",
         "single_elimination": "Chave sorteada: quem perde sai. Se o número não fecha a chave, os primeiros do sorteio passam direto na 1ª rodada. Cada mesa precisa de um vencedor.",
-        "round_robin": "Cada pessoa enfrenta todas as outras uma vez (até 16 inscrições); a classificação decide."
-      }
-    }
+        "round_robin": "Cada pessoa enfrenta todas as outras uma vez (até 16 inscrições); a classificação decide.",
+        "double_elimination": "Chave sorteada: quem perde a primeira vez cai para a chave dos perdedores; a segunda derrota tira do torneio. A grande final é uma partida só. Cada mesa precisa de um vencedor."
+      },
+      "double_elimination": "Eliminação dupla"
+    },
+    "bracket": {
+      "winners": "Chave dos vencedores",
+      "losers": "Chave dos perdedores",
+      "final": "Grande final"
+    },
+    "roundSimple": "Rodada {number}"
   },
   "stores": {
     "metaDescription": "{name} em {city}: endereço, horários, contatos e formatos de Magic que a loja joga.",

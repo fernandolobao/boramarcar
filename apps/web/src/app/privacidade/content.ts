@@ -21,7 +21,7 @@ export interface PrivacyPolicy {
   sections: PolicySection[];
 }
 
-export const PRIVACY_UPDATED = '2026-11-21';
+export const PRIVACY_UPDATED = '2026-11-20';
 
 export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
   'pt-BR': {

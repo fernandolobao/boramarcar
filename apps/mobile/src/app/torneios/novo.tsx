@@ -26,6 +26,7 @@ import { useAsync } from '@/lib/use-async';
 const STRUCTURE: Record<TournamentStructure, MessageKey> = {
   swiss: 'tourStructureSwiss',
   single_elimination: 'tourStructureSingle',
+  double_elimination: 'tourStructureDouble',
   round_robin: 'tourStructureRoundRobin',
 };
 export default function NewTournamentScreen() {

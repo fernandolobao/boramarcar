@@ -123,6 +123,8 @@ export const tournamentTables = pgTable(
       .references(() => tournaments.id, { onDelete: 'cascade' }),
     number: integer('number').notNull(),
     entrantIds: jsonb('entrant_ids').$type<string[]>().notNull(),
+    /** Eliminação dupla (9.4): `winners`, `losers` ou `final`; `null` nas outras estruturas. */
+    bracket: text('bracket'),
     gameWins: jsonb('game_wins').$type<Record<string, number>>(),
     gameDraws: integer('game_draws').notNull().default(0),
     /** Partidas do grupo criadas por este resultado (refeitas numa correção). */

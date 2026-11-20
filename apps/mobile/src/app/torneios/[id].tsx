@@ -279,14 +279,18 @@ export default function TournamentScreen() {
       {[...v.rounds].reverse().map((round, index) => (
         <Card key={round.id} style={{ gap: 12 }}>
           <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
-            {round.stageName && tour.structure === 'single_elimination'
-              ? t(STAGE[round.stageName])
-              : round.stageName && tour.topCut
-                ? t('tourStageHeading', {
-                    size: tour.topCut,
-                    stage: t(STAGE[round.stageName]),
-                  })
-                : t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
+            {tour.structure === 'double_elimination'
+              ? round.tables.some((x) => x.bracket === 'final')
+                ? t('tourBracketFinal')
+                : t('tourRoundSimple', { number: round.number })
+              : round.stageName && tour.structure === 'single_elimination'
+                ? t(STAGE[round.stageName])
+                : round.stageName && tour.topCut
+                  ? t('tourStageHeading', {
+                      size: tour.topCut,
+                      stage: t(STAGE[round.stageName]),
+                    })
+                  : t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
           </AppText>
           {round.tables.map((table) => {
             const seated = table.entrants.map(
@@ -309,6 +313,9 @@ export default function TournamentScreen() {
               <View key={table.id} style={{ gap: 6 }}>
                 <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
                   {t('tourTable', { number: table.number })}
+                  {table.bracket && table.bracket !== 'final'
+                    ? ` · ${t(table.bracket === 'winners' ? 'tourBracketWinners' : 'tourBracketLosers')}`
+                    : ''}
                 </AppText>
                 <AppText>{seated.map((s, i) => `${i + 1}. ${s.name}`).join('\n')}</AppText>
                 <AppText
@@ -357,29 +364,31 @@ export default function TournamentScreen() {
         </Card>
       ))}
 
-      {tour.status !== 'registration' && tour.structure !== 'single_elimination' && (
-        <Card style={{ gap: 8 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
-            {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}
-          </AppText>
-          {v.standings.map((s) => {
-            const line = t('tourStandingRow', {
-              rank: s.rank,
-              name: nameOf.get(s.entrant) ?? '—',
-              points: s.points,
-              record: `${s.wins + s.byes}-${s.draws}-${s.losses}`,
-            });
-            const tie = `OMW ${percent(s.omw)} · GW ${percent(s.gw)} · OGW ${percent(s.ogw)}`;
-            return (
-              <View key={s.entrant} accessible accessibilityLabel={`${line}. ${tie}`}>
-                <AppText style={{ fontWeight: '600' }}>{line}</AppText>
-                <AppText muted>{tie}</AppText>
-              </View>
-            );
-          })}
-          <AppText muted>{t('tourTiebreakers')}</AppText>
-        </Card>
-      )}
+      {tour.status !== 'registration' &&
+        tour.structure !== 'single_elimination' &&
+        tour.structure !== 'double_elimination' && (
+          <Card style={{ gap: 8 }}>
+            <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+              {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}
+            </AppText>
+            {v.standings.map((s) => {
+              const line = t('tourStandingRow', {
+                rank: s.rank,
+                name: nameOf.get(s.entrant) ?? '—',
+                points: s.points,
+                record: `${s.wins + s.byes}-${s.draws}-${s.losses}`,
+              });
+              const tie = `OMW ${percent(s.omw)} · GW ${percent(s.gw)} · OGW ${percent(s.ogw)}`;
+              return (
+                <View key={s.entrant} accessible accessibilityLabel={`${line}. ${tie}`}>
+                  <AppText style={{ fontWeight: '600' }}>{line}</AppText>
+                  <AppText muted>{tie}</AppText>
+                </View>
+              );
+            })}
+            <AppText muted>{t('tourTiebreakers')}</AppText>
+          </Card>
+        )}
 
       {v.canManage && tour.status !== 'finished' && (
         <Card style={{ gap: 10 }}>

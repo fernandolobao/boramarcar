@@ -48,6 +48,9 @@ export async function TournamentLive({
   const timelineText = (kind: string, data: Record<string, unknown>) => {
     switch (kind) {
       case 'started': {
+        if (String(data.structure) === 'double_elimination') {
+          return `${t('events.started_no_rounds', { entrants: Number(data.entrants ?? 0) })} ${t('events.started_structure', { structure: t('structure.double_elimination') })}`;
+        }
         const started = t('events.started', {
           entrants: Number(data.entrants ?? 0),
           rounds: Number(data.rounds ?? 0),
@@ -66,6 +69,9 @@ export async function TournamentLive({
           return t('events.round_started', { round: Number(data.round ?? 0) });
         }
         const stageName = view.rounds.find((r) => r.number === Number(data.round))?.stageName;
+        if (tour.structure === 'double_elimination') {
+          return t('events.round_started', { round: Number(data.round ?? 0) });
+        }
         if (tour.structure === 'single_elimination') {
           return stageName
             ? t('events.elimination_round', { stage: t(`stage.${stageName}`) })
@@ -106,11 +112,15 @@ export async function TournamentLive({
           aria-labelledby={`torneio-rodada-${round.number}`}
         >
           <h2 id={`torneio-rodada-${round.number}`} className="section-title mb-0">
-            {round.stageName && tour.structure === 'single_elimination'
-              ? t(`stage.${round.stageName}`)
-              : round.stageName && tour.topCut
-                ? t('stageHeading', { size: tour.topCut, stage: t(`stage.${round.stageName}`) })
-                : t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
+            {tour.structure === 'double_elimination'
+              ? round.tables.some((x) => x.bracket === 'final')
+                ? t('bracket.final')
+                : t('roundSimple', { number: round.number })
+              : round.stageName && tour.structure === 'single_elimination'
+                ? t(`stage.${round.stageName}`)
+                : round.stageName && tour.topCut
+                  ? t('stageHeading', { size: tour.topCut, stage: t(`stage.${round.stageName}`) })
+                  : t('roundOf', { number: round.number, total: tour.rounds ?? round.number })}
           </h2>
           <ol className="grid items-start gap-4 md:grid-cols-2">
             {round.tables.map((table) => {
@@ -134,7 +144,13 @@ export async function TournamentLive({
                 index === 0;
               return (
                 <li key={table.id} className="space-y-2 rounded-xl border border-line p-3">
-                  <h3 className="font-semibold">{t('table', { number: table.number })}</h3>
+                  <h3 className="font-semibold">
+                    {t('table', { number: table.number })}
+                    {/* Eliminação dupla: de qual chave é a mesa. */}
+                    {table.bracket && table.bracket !== 'final' && (
+                      <span className="muted font-normal"> · {t(`bracket.${table.bracket}`)}</span>
+                    )}
+                  </h3>
                   <ol className="list-inside list-decimal text-sm">
                     {seated.map((s) => (
                       <li key={s.id}>{s.name}</li>
@@ -200,67 +216,69 @@ export async function TournamentLive({
       ))}
 
       {/* Na eliminação simples, a chave decide (classificação por pontos não faz sentido). */}
-      {tour.status !== 'registration' && tour.structure !== 'single_elimination' && (
-        <section className="card space-y-3" aria-labelledby="torneio-classificacao">
-          <h2 id="torneio-classificacao" className="section-title mb-0">
-            {tour.topCut ? t('standingsSwiss') : t('standings')}
-          </h2>
-          {/* Rolável no celular: com nome e alcançável pelo teclado, como no ranking. */}
-          <div
-            role="region"
-            aria-label={tour.topCut ? t('standingsSwiss') : t('standings')}
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- região rolável precisa de foco pelo teclado
-            tabIndex={0}
-            className="-mx-1 overflow-x-auto px-1 focus-visible:outline-2 focus-visible:outline-focus"
-          >
-            <table className="w-full text-sm whitespace-nowrap">
-              <thead>
-                <tr className="text-start">
-                  <th scope="col" className="py-1 pe-2 text-start">
-                    {t('rank')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 text-start">
-                    {t('player')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 text-end">
-                    {t('pts')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 text-end">
-                    {t('record')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 text-end">
-                    {t('omw')}
-                  </th>
-                  <th scope="col" className="py-1 pe-2 text-end">
-                    {t('gw')}
-                  </th>
-                  <th scope="col" className="py-1 text-end">
-                    {t('ogw')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line tabular-nums">
-                {view.standings.map((s) => (
-                  <tr key={s.entrant}>
-                    <td className="py-1 pe-2">{s.rank}</td>
-                    <th scope="row" className="py-1 pe-2 text-start font-medium">
-                      {entrantName(s.entrant)}
+      {tour.status !== 'registration' &&
+        tour.structure !== 'single_elimination' &&
+        tour.structure !== 'double_elimination' && (
+          <section className="card space-y-3" aria-labelledby="torneio-classificacao">
+            <h2 id="torneio-classificacao" className="section-title mb-0">
+              {tour.topCut ? t('standingsSwiss') : t('standings')}
+            </h2>
+            {/* Rolável no celular: com nome e alcançável pelo teclado, como no ranking. */}
+            <div
+              role="region"
+              aria-label={tour.topCut ? t('standingsSwiss') : t('standings')}
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- região rolável precisa de foco pelo teclado
+              tabIndex={0}
+              className="-mx-1 overflow-x-auto px-1 focus-visible:outline-2 focus-visible:outline-focus"
+            >
+              <table className="w-full text-sm whitespace-nowrap">
+                <thead>
+                  <tr className="text-start">
+                    <th scope="col" className="py-1 pe-2 text-start">
+                      {t('rank')}
                     </th>
-                    <td className="py-1 pe-2 text-end font-semibold">{s.points}</td>
-                    <td className="py-1 pe-2 text-end">
-                      {s.wins + s.byes}-{s.draws}-{s.losses}
-                    </td>
-                    <td className="py-1 pe-2 text-end">{percent(s.omw)}</td>
-                    <td className="py-1 pe-2 text-end">{percent(s.gw)}</td>
-                    <td className="py-1 text-end">{percent(s.ogw)}</td>
+                    <th scope="col" className="py-1 pe-2 text-start">
+                      {t('player')}
+                    </th>
+                    <th scope="col" className="py-1 pe-2 text-end">
+                      {t('pts')}
+                    </th>
+                    <th scope="col" className="py-1 pe-2 text-end">
+                      {t('record')}
+                    </th>
+                    <th scope="col" className="py-1 pe-2 text-end">
+                      {t('omw')}
+                    </th>
+                    <th scope="col" className="py-1 pe-2 text-end">
+                      {t('gw')}
+                    </th>
+                    <th scope="col" className="py-1 text-end">
+                      {t('ogw')}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="muted text-sm">{t('tiebreakers')}</p>
-        </section>
-      )}
+                </thead>
+                <tbody className="divide-y divide-line tabular-nums">
+                  {view.standings.map((s) => (
+                    <tr key={s.entrant}>
+                      <td className="py-1 pe-2">{s.rank}</td>
+                      <th scope="row" className="py-1 pe-2 text-start font-medium">
+                        {entrantName(s.entrant)}
+                      </th>
+                      <td className="py-1 pe-2 text-end font-semibold">{s.points}</td>
+                      <td className="py-1 pe-2 text-end">
+                        {s.wins + s.byes}-{s.draws}-{s.losses}
+                      </td>
+                      <td className="py-1 pe-2 text-end">{percent(s.omw)}</td>
+                      <td className="py-1 pe-2 text-end">{percent(s.gw)}</td>
+                      <td className="py-1 text-end">{percent(s.ogw)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="muted text-sm">{t('tiebreakers')}</p>
+          </section>
+        )}
 
       {view.timeline.length > 0 && (
         <section className="card space-y-3" aria-labelledby="torneio-linha">

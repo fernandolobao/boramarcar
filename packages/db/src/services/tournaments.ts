@@ -4,7 +4,10 @@ import {
   eliminationStageName,
   isTopCutSize,
   knockoutRounds,
+  planDoubleElimination,
   planKnockout,
+  type Bracket,
+  type BracketTable,
   ROUND_ROBIN_MAX,
   roundRobinSchedule,
   structureOptions,
@@ -304,6 +307,30 @@ async function topCutState(db: Database, row: TournamentRow) {
   return { seeds, played };
 }
 
+/** Rodadas da eliminação dupla, com a chave de cada mesa (para o pareamento pelo estado). */
+async function bracketRounds(db: Database, tournamentId: string): Promise<BracketTable[][]> {
+  const rounds = await db
+    .select()
+    .from(tournamentRounds)
+    .where(eq(tournamentRounds.tournamentId, tournamentId))
+    .orderBy(asc(tournamentRounds.number));
+  const tables = await db
+    .select()
+    .from(tournamentTables)
+    .where(eq(tournamentTables.tournamentId, tournamentId))
+    .orderBy(asc(tournamentTables.number));
+  return rounds.map((r) =>
+    tables
+      .filter((t) => t.roundId === r.id)
+      .map((t) => ({
+        bracket: (t.bracket ?? 'winners') as Bracket,
+        entrants: t.entrantIds,
+        gameWins: t.gameWins ?? {},
+        gameDraws: t.gameDraws,
+      })),
+  );
+}
+
 /** Avisa no sino cada pessoa inscrita: a mesa dela na rodada (ou o bye), ou o encerramento. */
 async function notifyEntrants(
   db: Database,
@@ -344,7 +371,7 @@ async function createRound(
    * Mesas já definidas (chave do top cut ou da eliminação, rodada do todos contra todos) e a fase;
    * sem elas, sorteio do suíço.
    */
-  preset?: { tables: string[][]; stage: 'swiss' | 'top' },
+  preset?: { tables: string[][]; stage: 'swiss' | 'top'; brackets?: Bracket[] },
 ) {
   const tables =
     preset?.tables ??
@@ -364,6 +391,7 @@ async function createRound(
         tournamentId: row.id,
         number: i + 1,
         entrantIds,
+        bracket: preset?.brackets?.[i] ?? null,
         // O bye já nasce registrado (vale vitória).
         ...(entrantIds.length === 1 ? { gameWins: {}, reportedAt: new Date() } : {}),
       })),
@@ -397,7 +425,7 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
   if (entrants.length < 2) throw new DomainError('invalid_input', 'Inscreva ao menos 2');
   const structure = row.structure as TournamentStructure;
   let rounds: number;
-  let preset: { tables: string[][]; stage: 'swiss' | 'top' } | undefined;
+  let preset: { tables: string[][]; stage: 'swiss' | 'top'; brackets?: Bracket[] } | undefined;
   if (structure === 'round_robin') {
     if (entrants.length > ROUND_ROBIN_MAX) {
       throw new DomainError(
@@ -408,6 +436,16 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
     const schedule = roundRobinSchedule(entrants);
     rounds = schedule.length;
     preset = { tables: schedule[0]!, stage: 'swiss' };
+  } else if (structure === 'double_elimination') {
+    // Quantas rodadas depende dos resultados: o número fica em aberto.
+    rounds = 0;
+    const plan = planDoubleElimination({ seeds: shuffled(entrants, random), played: [] });
+    const next = 'next' in plan ? plan.next : [];
+    preset = {
+      tables: next.map((x) => x.entrants),
+      stage: 'top',
+      brackets: next.map((x) => x.bracket),
+    };
   } else if (structure === 'single_elimination') {
     rounds = knockoutRounds(entrants.length);
     const plan = planKnockout({ seeds: shuffled(entrants, random), played: [] });
@@ -760,6 +798,21 @@ export async function nextRound(
     throw new DomainError('conflict', 'Ainda há mesas sem resultado nesta rodada');
   }
   let champions: string[];
+  if (row.structure === 'double_elimination') {
+    const plan = planDoubleElimination({
+      seeds: await entrantIdsOf(db, row.id),
+      played: await bracketRounds(db, row.id),
+    });
+    if ('next' in plan) {
+      await createRound(db, row, current!.number + 1, undefined, {
+        tables: plan.next.map((x) => x.entrants),
+        stage: 'top',
+        brackets: plan.next.map((x) => x.bracket),
+      });
+      return { finished: false as const };
+    }
+    return finish(db, row, [plan.champion], current!.number);
+  }
   if (row.structure === 'single_elimination') {
     const { played } = await topCutState(db, row);
     const plan = planKnockout({ seeds: await entrantIdsOf(db, row.id), played });
@@ -828,6 +881,11 @@ function nextStepOf(
   if (current.stage === 'swiss') {
     if (current.number < (row.rounds ?? 0)) return 'round';
     return row.topCut ? 'topCut' : 'finish';
+  }
+  // Eliminação dupla: encerra depois da grande final (rodadas só da chave dos perdedores podem
+  // ter uma mesa só).
+  if (row.structure === 'double_elimination') {
+    return open.some((t) => t.bracket === 'final') ? 'finish' : 'round';
   }
   // No top: depois da mesa única (a final), encerra.
   return open.length === 1 ? 'finish' : 'round';
@@ -953,6 +1011,7 @@ async function buildView(
           gameWins: t.gameWins ?? {},
           gameDraws: t.gameDraws,
           reported: Boolean(t.reportedAt),
+          bracket: t.bracket as Bracket | null,
         })),
     })),
     standings: standings(entrantRows, played, {

@@ -410,7 +410,12 @@ export function eliminationStageName(total: number, index: number): TopCutStage 
 
 /* ─────────────── Estruturas: eliminação simples e todos contra todos (9.4) ─────────────── */
 
-export const TOURNAMENT_STRUCTURES = ['swiss', 'single_elimination', 'round_robin'] as const;
+export const TOURNAMENT_STRUCTURES = [
+  'swiss',
+  'single_elimination',
+  'double_elimination',
+  'round_robin',
+] as const;
 export type TournamentStructure = (typeof TOURNAMENT_STRUCTURES)[number];
 
 /** Estruturas possíveis: pods só no suíço; mesas de par em qualquer uma. */
@@ -479,3 +484,81 @@ export function planKnockout(input: {
 /** Rodadas da eliminação simples: log₂ da chave. */
 export const knockoutRounds = (entrants: number) =>
   Math.max(1, Math.ceil(Math.log2(Math.max(2, entrants))));
+
+/* ───────────────────────── Eliminação dupla (9.4) ───────────────────────── */
+
+export type Bracket = 'winners' | 'losers' | 'final';
+export interface BracketTable extends TableResult {
+  bracket: Bracket;
+}
+
+/**
+ * Eliminação dupla, pareada pelo estado: quem perde a primeira vez cai para a chave dos perdedores
+ * (na mesma rodada em que a dos vencedores segue); quem perde de novo sai. Na dos vencedores, a
+ * ordem da chave (como na eliminação simples, com bye para as primeiras posições do sorteio); na
+ * dos perdedores, quem perdeu há mais tempo primeiro, evitando repetir o último adversário, e bye
+ * quando sobra um. Com um invicto e um de uma derrota, a grande final — uma partida só, sem
+ * "reset": quem vence é campeão.
+ */
+export function planDoubleElimination(input: {
+  seeds: readonly string[];
+  played: readonly (readonly BracketTable[])[];
+}): { next: { bracket: Bracket; entrants: string[] }[] } | { champion: string } {
+  const seedOf = (e: string) => input.seeds.indexOf(e);
+  if (!input.played.length) {
+    const first = planKnockout({ seeds: input.seeds, played: [] });
+    return {
+      next: 'next' in first ? first.next.map((entrants) => ({ bracket: 'winners', entrants })) : [],
+    };
+  }
+  const losses = new Map<string, number>();
+  const firstLoss = new Map<string, number>();
+  const lastOpponent = new Map<string, string>();
+  let winnersOrder: string[] = [];
+  for (const [index, round] of input.played.entries()) {
+    const advancing: string[] = [];
+    for (const table of round) {
+      if (table.entrants.length === 1) {
+        if (table.bracket === 'winners') advancing.push(table.entrants[0]!);
+        continue;
+      }
+      const outcome = tableOutcome(table);
+      const winner = table.entrants.find((e) => outcome[e] === 'win') ?? table.entrants[0]!;
+      if (table.bracket === 'final') return { champion: winner };
+      for (const e of table.entrants) {
+        const other = table.entrants.find((x) => x !== e)!;
+        lastOpponent.set(e, other);
+        if (e === winner) continue;
+        losses.set(e, (losses.get(e) ?? 0) + 1);
+        if (!firstLoss.has(e)) firstLoss.set(e, index);
+      }
+      if (table.bracket === 'winners') advancing.push(winner);
+    }
+    if (round.some((x) => x.bracket === 'winners')) winnersOrder = advancing;
+  }
+  const alive = (e: string) => (losses.get(e) ?? 0) < 2;
+  const winners = winnersOrder.filter((e) => (losses.get(e) ?? 0) === 0);
+  const losers = input.seeds
+    .filter((e) => losses.get(e) === 1)
+    .sort((a, b) => firstLoss.get(a)! - firstLoss.get(b)! || seedOf(a) - seedOf(b));
+
+  if (winners.length === 1 && losers.length === 0) return { champion: winners[0]! };
+  if (winners.length === 1 && losers.length === 1) {
+    return { next: [{ bracket: 'final', entrants: [winners[0]!, losers[0]!] }] };
+  }
+  const next: { bracket: Bracket; entrants: string[] }[] = [];
+  if (winners.length > 1) {
+    for (let i = 0; i < winners.length; i += 2) {
+      next.push({ bracket: 'winners', entrants: winners.slice(i, i + 2) });
+    }
+  }
+  const pool = losers.filter(alive);
+  while (pool.length > 1) {
+    const a = pool.shift()!;
+    const pick = pool.findIndex((b) => lastOpponent.get(a) !== b);
+    const [b] = pool.splice(pick === -1 ? 0 : pick, 1);
+    next.push({ bracket: 'losers', entrants: [a, b!] });
+  }
+  if (pool.length === 1) next.push({ bracket: 'losers', entrants: [pool[0]!] });
+  return { next };
+}

@@ -642,13 +642,18 @@ sem rolagem horizontal em 320px.
 - App, Conta → "Lojas e eventos": campo de cidade com rótulo e dica; as sugestões são botões com "Cidade, UF"; "Usar minha localização" é um botão e o resultado sai em região viva; eventos e lojas são botões com nome completo (título, data, loja, distância); "Adicionar à agenda" leva o título do evento no nome e avisa que abre fora do app.
 - Site, Configurações: "Sua cidade" pelo `CityPicker`, com dica explicando que é opcional e para que serve.
 
-## Integração do grupo, lacunas da entrega 2 (21/11/2026)
+## Integração do grupo, lacunas da entrega 2 (20/11/2026)
 
 - Push do resumo da noite: "Primeira partida com o grupo: …" no texto (o push é lido inteiro pelo leitor de tela do sistema).
 - App, perfil de outra pessoa: placar entre vocês em texto, num cartão (sem depender de cor).
 
-## Seguir loja e avisos para quem segue (21/11/2026)
+## Seguir loja e avisos para quem segue (20/11/2026)
 
 - "Seguir loja": botão liga/desliga com `aria-pressed` (o nome não muda); o resultado sai em `role="status"`. Sem conta, link "Entre para seguir". No app, `accessibilityState.selected` e região viva.
 - Seção "Quem segue a loja" (equipe): contagem em texto; aviso num `<textarea>` com rótulo, dica e contador de caracteres ligados por `aria-describedby`; "Aviso enviado para N pessoas" em `role="status"`; erros (ex.: limite de 3 por semana) em `FormError`.
 - Sino (site e app): "{loja} marcou {evento} ({data})" e "{loja}: {aviso}", com link para o evento ou a loja. Coberto pelo axe (`a11y.test.tsx`), pelos testes dos componentes e pelo E2E `seguidores.spec.ts`.
+
+## Eliminação dupla (20/11/2026)
+
+- Opção nova no campo "Estrutura" (com a explicação na descrição do Select; no app, `Choices`).
+- Cada mesa diz em texto de qual chave é ("Chave dos vencedores" / "Chave dos perdedores"), sem depender de cor; a rodada da grande final tem o título "Grande final"; as outras, "Rodada N" (o total não é conhecido de antemão).

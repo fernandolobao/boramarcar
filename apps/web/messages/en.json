@@ -2313,7 +2313,8 @@
       "started_top": "After the Swiss rounds, top {size}.",
       "top_round": "Top cut: {stage} started.",
       "started_structure": "Structure: {structure}.",
-      "elimination_round": "{stage} started."
+      "elimination_round": "{stage} started.",
+      "started_no_rounds": "Tournament started with {entrants} entries."
     },
     "champion": "Champion: {name}",
     "delete": "Delete tournament",
@@ -2362,9 +2363,17 @@
       "hint": {
         "swiss": "Everyone plays every round, against people with similar points; you can add a top cut at the end.",
         "single_elimination": "Random bracket: lose and you’re out. When the numbers don’t fill the bracket, the first in the draw skip round 1. Each table needs a winner.",
-        "round_robin": "Everyone plays everyone else once (up to 16 entries); the standings decide."
-      }
-    }
+        "round_robin": "Everyone plays everyone else once (up to 16 entries); the standings decide.",
+        "double_elimination": "Random bracket: lose once and you drop to the losers bracket; a second loss knocks you out. The grand final is a single match. Each table needs a winner."
+      },
+      "double_elimination": "Double elimination"
+    },
+    "bracket": {
+      "winners": "Winners bracket",
+      "losers": "Losers bracket",
+      "final": "Grand final"
+    },
+    "roundSimple": "Round {number}"
   },
   "stores": {
     "metaDescription": "{name} in {city}: address, hours, contacts and the Magic formats the store plays.",
