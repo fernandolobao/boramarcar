@@ -738,6 +738,8 @@ const pt = {
   discOfferSealed: 'Selados e acessórios',
   discOfferPlaySpace: 'Mesas para jogar',
   discOfferTournaments: 'Torneios',
+  profileVersus:
+    'Entre vocês, em partidas juntos ({games}): você venceu {wins}, {name} venceu {losses}.',
   storeFollow: 'Seguir loja',
   storeFollowOn: 'Você segue {store}: os eventos novos e os avisos chegam no sino.',
   storeFollowOff: 'Você deixou de seguir {store}.',
@@ -1780,6 +1782,8 @@ const en: Messages = {
   discOfferSealed: 'Sealed and accessories',
   discOfferPlaySpace: 'Tables to play',
   discOfferTournaments: 'Tournaments',
+  profileVersus:
+    'Between you two, in games together ({games}): you won {wins}, {name} won {losses}.',
   storeFollow: 'Follow store',
   storeFollowOn: 'You follow {store}: new events and notices arrive in the bell.',
   storeFollowOff: 'You stopped following {store}.',

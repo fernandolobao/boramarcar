@@ -226,6 +226,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-21',
+    pt: 'O aviso do resumo da noite no celular agora dá as boas-vindas a quem jogou a primeira partida com o grupo, e o perfil de outra pessoa no app mostra o placar entre vocês.',
+    en: 'The night recap notification on your phone now welcomes whoever played their first game with the group, and someone else’s profile in the app shows the score between you two.',
+  },
+  {
+    date: '2026-11-21',
     pt: 'Siga as suas lojas: em "Seguir loja", os eventos novos e os avisos delas chegam no sino e no celular. A equipe da loja manda avisos curtos para quem segue.',
     en: 'Follow your stores: with "Follow store", their new events and notices arrive in your bell and on your phone. The store team sends short notices to followers.',
   },

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildEventPush, buildStoreEventPush, buildStoreNoticePush, buildWindowPush } from './push';
+import {
+  buildEventPush,
+  buildRecapPush,
+  buildStoreEventPush,
+  buildStoreNoticePush,
+  buildWindowPush,
+} from './push';
 
 const target = {
   userId: 'u1',
@@ -60,6 +66,16 @@ describe('textos do push', () => {
     expect(message.title).toBe('A mesa fechou em Mesa de Quinta!');
     expect(message.body).toContain('4 jogadores');
     expect(message.data).toEqual({ url: '/disponibilidade' });
+  });
+});
+
+describe('push do resumo da noite (8.11)', () => {
+  it('quem estreou no grupo aparece no texto; sem estreia, nada muda', () => {
+    const base = { eventId: 'e1', title: 'Sexta', games: 3, top: { name: 'Ana', wins: 2 } };
+    const withDebut = buildRecapPush(target, { ...base, debuts: ['Caio', 'Duda'] });
+    expect(withDebut.body).toContain('Primeira partida com o grupo: Caio e Duda');
+    const without = buildRecapPush(target, { ...base, debuts: [] });
+    expect(without.body).not.toContain('Primeira partida');
   });
 });
 
