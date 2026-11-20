@@ -1,5 +1,6 @@
 export * from './client';
 export * from './connection';
+export * from './db-errors';
 export * as schema from './schema';
 export * from './services/groups';
 export * from './services/availability';

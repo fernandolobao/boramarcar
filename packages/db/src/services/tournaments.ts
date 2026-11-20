@@ -23,7 +23,9 @@ import {
   type TableResult,
 } from '@boramarcar/core/tournaments';
 import { and, asc, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
+import { randomUUID } from 'node:crypto';
 import type { Database } from '../client';
+import { isUniqueViolation } from '../db-errors';
 import {
   events,
   games,
@@ -416,10 +418,15 @@ export async function startTournament(
 ) {
   const { row } = await requireOrganizer(db, input.tournamentId, input.userId);
   if (row.status !== 'registration') throw new DomainError('conflict', 'O torneio já começou');
-  await begin(db, row, input.random);
+  // Tudo ou nada: sem rodada criada, o torneio não fica "rodando" pela metade.
+  await db.transaction((tx) => begin(tx, row, input.random));
 }
 
-/** Fecha a inscrição: rodadas (as recomendadas, sem número definido) e a 1ª rodada sorteada. */
+/**
+ * Fecha a inscrição: rodadas (as recomendadas, sem número definido) e a 1ª rodada sorteada. Chame
+ * dentro de uma transação. A mudança de status só vale se ainda estava em inscrição: um segundo
+ * pedido (clique duplo) espera o primeiro e recebe "já começou".
+ */
 async function begin(db: Database, row: TournamentRow, random?: () => number) {
   const entrants = await entrantIdsOf(db, row.id);
   if (entrants.length < 2) throw new DomainError('invalid_input', 'Inscreva ao menos 2');
@@ -458,8 +465,9 @@ async function begin(db: Database, row: TournamentRow, random?: () => number) {
   const [running] = await db
     .update(tournaments)
     .set({ status: 'running', rounds, topCut })
-    .where(eq(tournaments.id, row.id))
+    .where(and(eq(tournaments.id, row.id), eq(tournaments.status, 'registration')))
     .returning();
+  if (!running) throw new DomainError('conflict', 'O torneio já começou');
   await log(db, row.id, 'started', { entrants: entrants.length, rounds, topCut, structure });
   await createRound(db, running!, 1, random, preset);
   return running!;
@@ -494,6 +502,28 @@ export async function startStoreTournament(
   if (shape.entrantSize !== 1) {
     throw new DomainError('invalid_input', 'Torneio de duplas em loja ainda não é possível');
   }
+  try {
+    // Tudo numa transação, com o evento travado: um segundo "Começar" espera e vê o torneio.
+    return await db.transaction(async (tx) => {
+      await tx
+        .select({ id: storeEvents.id })
+        .from(storeEvents)
+        .where(eq(storeEvents.id, event.id))
+        .for('update');
+      return await startLocked(tx, event, input, shape);
+    });
+  } catch (error) {
+    if (isUniqueViolation(error)) throw new DomainError('conflict', 'Este evento já tem torneio');
+    throw error;
+  }
+}
+
+async function startLocked(
+  db: Database,
+  event: typeof storeEvents.$inferSelect,
+  input: { userId: string; topCut?: number | null; structure?: string; random?: () => number },
+  shape: ReturnType<typeof tournamentShape>,
+) {
   const [existing] = await db
     .select({ id: tournaments.id })
     .from(tournaments)
@@ -529,22 +559,20 @@ export async function startStoreTournament(
       createdBy: input.userId,
     })
     .returning();
-  for (const [i, p] of present.entries()) {
-    const [entrant] = await db
-      .insert(tournamentEntrants)
-      .values({
-        tournamentId: row!.id,
-        guestName: p.userId ? null : p.guestName,
-        // Ordem estável: a da chegada (para a classificação desempatar igual).
-        createdAt: new Date(Date.now() + i),
-      })
-      .returning();
-    if (p.userId) {
-      await db
-        .insert(tournamentEntrantMembers)
-        .values({ entrantId: entrant!.id, tournamentId: row!.id, userId: p.userId });
-    }
-  }
+  // Em lote (até centenas de inscritos): IDs gerados aqui para ligar cada pessoa à sua inscrição.
+  const entrants = present.map((p, i) => ({
+    id: randomUUID(),
+    tournamentId: row!.id,
+    guestName: p.userId ? null : p.guestName,
+    // Ordem estável: a da chegada (para a classificação desempatar igual).
+    createdAt: new Date(Date.now() + i),
+    userId: p.userId,
+  }));
+  await db.insert(tournamentEntrants).values(entrants.map(({ userId: _, ...e }) => e));
+  const members = entrants.flatMap((e) =>
+    e.userId ? [{ entrantId: e.id, tournamentId: row!.id, userId: e.userId }] : [],
+  );
+  if (members.length) await db.insert(tournamentEntrantMembers).values(members);
   return begin(db, row!, input.random);
 }
 

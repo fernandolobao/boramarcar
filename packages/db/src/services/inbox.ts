@@ -27,17 +27,21 @@ import { getGroupRanking } from './ranking';
 
 type NewNotification = { userId: string; groupId: string | null; data: NotificationData };
 
-/** Grava várias notificações de uma vez. */
+/** Linhas por INSERT: o Postgres aceita até 65.535 parâmetros por comando (4 por linha aqui). */
+const NOTIFICATION_BATCH = 1000;
+
+/** Grava várias notificações, em lotes (um aviso para todo mundo pode ter dezenas de milhares). */
 export async function addNotifications(db: Database, list: readonly NewNotification[]) {
-  if (!list.length) return;
-  await db.insert(notifications).values(
-    list.map((n) => ({
-      userId: n.userId,
-      groupId: n.groupId,
-      kind: n.data.kind,
-      data: n.data,
-    })),
-  );
+  for (let i = 0; i < list.length; i += NOTIFICATION_BATCH) {
+    await db.insert(notifications).values(
+      list.slice(i, i + NOTIFICATION_BATCH).map((n) => ({
+        userId: n.userId,
+        groupId: n.groupId,
+        kind: n.data.kind,
+        data: n.data,
+      })),
+    );
+  }
 }
 
 /**

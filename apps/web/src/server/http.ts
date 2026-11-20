@@ -1,6 +1,6 @@
 import 'server-only';
 import { DomainError, type DomainErrorCode } from '@boramarcar/core';
-import type { Database } from '@boramarcar/db';
+import { isUniqueViolation, type Database } from '@boramarcar/db';
 import { z } from 'zod';
 import { getDb } from './db';
 import { getSessionUser, type SessionUser } from './session';
@@ -36,6 +36,13 @@ export function errorResponse(error: unknown): Response {
       error: { code: 'invalid_input', message: 'Dados inválidos', details: z.flattenError(error) },
     };
     return Response.json(body, { status: 400 });
+  }
+  // Pedido repetido (clique duplo, duas abas) que bateu num índice único: conflito, não falha.
+  if (isUniqueViolation(error)) {
+    const body: ApiErrorBody = {
+      error: { code: 'conflict', message: 'Isso já foi feito (pedido repetido)' },
+    };
+    return Response.json(body, { status: 409 });
   }
   console.error(error);
   const body: ApiErrorBody = { error: { code: 'internal_error', message: 'Erro inesperado' } };

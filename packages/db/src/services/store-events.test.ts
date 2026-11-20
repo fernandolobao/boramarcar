@@ -194,4 +194,67 @@ describe('meus eventos de loja', () => {
     expect(mine.map((m) => m.event.title)).toEqual(['Cedo', 'Tarde']);
     expect(mine[0]).toMatchObject({ status: 'registered', store: { slug: store.slug } });
   });
+
+  it('inscrições ao mesmo tempo na última vaga não passam da capacidade', async () => {
+    const { store, dono } = await setup();
+    const ev = await createStoreEvent(db, {
+      storeId: store.id,
+      userId: dono.id,
+      title: 'Lotado',
+      startsAt: soon,
+      format: 'commander',
+      kind: 'casual',
+      capacity: 2,
+    });
+    const people = await Promise.all(Array.from({ length: 6 }, () => createTestUser(db)));
+    const results = await Promise.all(
+      people.map((p) => registerForStoreEvent(db, { eventId: ev.id, userId: p.id })),
+    );
+    expect(results.filter((r) => r.status === 'registered')).toHaveLength(2);
+    expect(results.filter((r) => r.status === 'waitlist')).toHaveLength(4);
+  });
+
+  it('a mesma pessoa clicando duas vezes: uma inscrição, e o outro pedido é "já inscrito"', async () => {
+    const { store, dono } = await setup();
+    const ev = await createStoreEvent(db, {
+      storeId: store.id,
+      userId: dono.id,
+      title: 'Clique duplo',
+      startsAt: soon,
+      format: 'commander',
+      kind: 'casual',
+    });
+    const ana = await createTestUser(db);
+    const settled = await Promise.allSettled([
+      registerForStoreEvent(db, { eventId: ev.id, userId: ana.id }),
+      registerForStoreEvent(db, { eventId: ev.id, userId: ana.id }),
+    ]);
+    expect(settled.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    const failed = settled.find((r) => r.status === 'rejected') as PromiseRejectedResult;
+    expect(failed.reason).toMatchObject({ code: 'conflict' });
+  });
+
+  it('desistência e inscrição ao mesmo tempo: a vaga não é dada duas vezes', async () => {
+    const { store, dono } = await setup();
+    const ev = await createStoreEvent(db, {
+      storeId: store.id,
+      userId: dono.id,
+      title: 'Troca',
+      startsAt: soon,
+      format: 'commander',
+      kind: 'casual',
+      capacity: 1,
+    });
+    const ana = await createTestUser(db);
+    const bia = await createTestUser(db);
+    const caio = await createTestUser(db);
+    const first = await registerForStoreEvent(db, { eventId: ev.id, userId: ana.id });
+    await registerForStoreEvent(db, { eventId: ev.id, userId: bia.id }); // fila
+    await Promise.all([
+      cancelStoreEntry(db, { entryId: first.id, userId: ana.id }),
+      registerForStoreEvent(db, { eventId: ev.id, userId: caio.id }),
+    ]);
+    const staff = await getStoreEventForStaff(db, { eventId: ev.id, userId: dono.id });
+    expect(staff.entries.filter((e) => e.status === 'registered')).toHaveLength(1);
+  });
 });

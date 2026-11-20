@@ -1,5 +1,5 @@
 import { changelogDraft, changelogSince, DomainError, type ChangelogEntry } from '@boramarcar/core';
-import { desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { Database } from '../client';
 import { announcements, groupMembers, groups, user } from '../schema';
 import { addNotifications } from './inbox';
@@ -90,29 +90,36 @@ export async function deleteAnnouncement(db: Database, input: { id: string }) {
   await db.delete(announcements).where(eq(announcements.id, input.id));
 }
 
-/** Publica: cada pessoa do público (todas, ou os membros do grupo) recebe a notificação. */
+/**
+ * Publica: cada pessoa do público (todas, ou os membros do grupo) recebe a notificação. Tudo numa
+ * transação, e o status só muda se ainda era rascunho: um segundo clique em "Publicar" espera o
+ * primeiro e recebe "já publicado", sem mandar tudo de novo.
+ */
 export async function publishAnnouncement(db: Database, input: { id: string; now?: Date }) {
   const draft = await requireDraft(db, input.id);
-  const recipients = draft.groupId
-    ? await db
-        .select({ userId: groupMembers.userId })
-        .from(groupMembers)
-        .where(eq(groupMembers.groupId, draft.groupId))
-    : await db.select({ userId: user.id }).from(user).where(isNull(user.deletedAt));
-  const [row] = await db
-    .update(announcements)
-    .set({ status: 'published', publishedAt: input.now ?? new Date() })
-    .where(eq(announcements.id, draft.id))
-    .returning();
-  await addNotifications(
-    db,
-    recipients.map((r) => ({
-      userId: r.userId,
-      groupId: draft.groupId,
-      data: { kind: 'announcement' as const, announcementId: draft.id },
-    })),
-  );
-  return { ...row!, recipients: recipients.length };
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(announcements)
+      .set({ status: 'published', publishedAt: input.now ?? new Date() })
+      .where(and(eq(announcements.id, draft.id), eq(announcements.status, 'draft')))
+      .returning();
+    if (!row) throw new DomainError('conflict', 'Este aviso já foi publicado');
+    const recipients = draft.groupId
+      ? await tx
+          .select({ userId: groupMembers.userId })
+          .from(groupMembers)
+          .where(eq(groupMembers.groupId, draft.groupId))
+      : await tx.select({ userId: user.id }).from(user).where(isNull(user.deletedAt));
+    await addNotifications(
+      tx,
+      recipients.map((r) => ({
+        userId: r.userId,
+        groupId: draft.groupId,
+        data: { kind: 'announcement' as const, announcementId: draft.id },
+      })),
+    );
+    return { ...row, recipients: recipients.length };
+  });
 }
 
 /** Avisos para o `/admin`: rascunhos e publicados, mais novos primeiro. */
