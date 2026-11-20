@@ -261,6 +261,8 @@ async function main() {
           ['colecao', '/colecao', 'Valor estimado'],
           ['ranking', '/ranking', null],
           ['torneio', `/torneios/${tournamentId}`, null],
+          ['lojas', '/lojas?cidade=sp/sao-paulo', null],
+          ['loja', '/lojas/dragao-dourado', null],
         ] as const) {
           await page.goto(`${BASE}${url}`);
           if (top) {

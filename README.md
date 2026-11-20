@@ -146,7 +146,7 @@ pnpm db:migrate && pnpm build
 pnpm --filter @boramarcar/web showcase
 ```
 
-O script semeia o grupo, importa os decks pelo Scryfall (precisa de rede; espera e tenta de novo se o Scryfall limitar), registra as partidas e grava 6 telas em tema claro e escuro (`apps/web/public/showcase/*.webp`). Confira as imagens antes de comitar.
+O script semeia o grupo, importa os decks pelo Scryfall (precisa de rede; espera e tenta de novo se o Scryfall limitar), registra as partidas, cria três lojas com eventos em São Paulo e grava 9 telas em tema claro e escuro (`apps/web/public/showcase/*.webp`). Confira as imagens antes de comitar.
 
 ## App mobile (Expo)
 

@@ -13,6 +13,8 @@ const SCREENS = [
   { key: 'mesa', height: 889 },
   { key: 'ranking', height: 800 },
   { key: 'torneio', height: 800 },
+  { key: 'lojas', height: 800 },
+  { key: 'loja', height: 800 },
 ] as const;
 
 /**

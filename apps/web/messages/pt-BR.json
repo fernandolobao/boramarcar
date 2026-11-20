@@ -1275,6 +1275,16 @@
           "tab": "Torneio",
           "caption": "Torneios do grupo em qualquer formato: mesas da rodada, placar em jogos, classificação com desempates e linha do tempo.",
           "alt": "Torneio Copa de Modern em melhor de 3, em andamento: rodada 2 de 3 com três mesas, uma já registrada com o placar em jogos e duas esperando o resultado, com os campos de jogos vencidos por cada jogador."
+        },
+        "lojas": {
+          "tab": "Lojas perto",
+          "caption": "Lojas e eventos na sua cidade, sem precisar de conta: torneios, noites de Commander e lançamentos.",
+          "alt": "Lojas e eventos em São Paulo, escolhida pelo nome da cidade ou pela localização: filtros por formato e tipo, e os próximos eventos, como o Commander de sexta na Loja Dragão Dourado a 3,7 km e o torneio de Modern de sábado com 5 de 16 vagas preenchidas, cada um com os botões para pôr na agenda."
+        },
+        "loja": {
+          "tab": "Página da loja",
+          "caption": "Cada loja tem a sua página: horários, mapa, contatos e a agenda de eventos, que dá para seguir.",
+          "alt": "Página da Loja Dragão Dourado, verificada: o botão de seguir já marcado, a descrição, o endereço na Av. Paulista, o horário de funcionamento e o mapa."
         }
       }
     },
