@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { normalizeInstagram, normalizeWebsite, normalizeWhatsapp, storeSlug } from './index';
 
 describe('perfil de loja', () => {
@@ -58,5 +58,15 @@ describe('eventos de loja (10.2)', () => {
     expect(promoteFromWaitlist(entries, 3)).toEqual(['w1', 'w2']);
     expect(promoteFromWaitlist(entries, 1)).toEqual([]);
     expect(promoteFromWaitlist(entries, null)).toEqual(['w1', 'w2']);
+  });
+
+  it('código do balcão sem argumento usa sorteio criptográfico (não Math.random)', async () => {
+    const { eventCode } = await import('./index');
+    const spy = vi.spyOn(Math, 'random');
+    const codes = new Set(Array.from({ length: 50 }, () => eventCode()));
+    expect(spy).not.toHaveBeenCalled();
+    expect(codes.size).toBeGreaterThan(45);
+    for (const c of codes) expect(c).toMatch(/^[A-HJ-KM-NP-Z2-9]{6}$/);
+    spy.mockRestore();
   });
 });

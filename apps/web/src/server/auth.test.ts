@@ -58,4 +58,21 @@ describe('login (Better Auth): o que quem usa pode gravar na própria conta', ()
     expect(row!.name.startsWith('AnaAna')).toBe(true);
     expect(row!.name).not.toMatch(/\p{Cc}/u);
   });
+
+  it('tentativas de login contam no banco (valem entre as instâncias), sem guardar o IP', async () => {
+    const tries: number[] = [];
+    for (let i = 0; i < 11; i += 1) {
+      const res = await post(
+        '/sign-in/email',
+        { email: 'ninguem@example.com', password: `errada-${i}-123` },
+        { 'x-forwarded-for': '203.0.113.7' },
+      );
+      tries.push(res.status);
+    }
+    expect(tries.slice(0, 10).every((s) => s === 401)).toBe(true);
+    expect(tries[10]).toBe(429);
+    const rows = await testState.db!.query.rateLimits.findMany();
+    expect(rows.some((r) => r.key.startsWith('auth:'))).toBe(true);
+    expect(rows.some((r) => r.key.includes('203.0.113.7'))).toBe(false);
+  });
 });

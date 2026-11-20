@@ -2,7 +2,7 @@ import { DECK_BOARDS, MAX_COPIES } from '@boramarcar/core';
 import { addDeckCopies, setDeckLine } from '@boramarcar/db';
 import { z } from 'zod';
 import { resolveCardById, resolveCardByName, resolveDefaultCardByName } from '@/server/deck-import';
-import { authed, parseJson } from '@/server/http';
+import { authed, parseJson, scryfallIdSchema } from '@/server/http';
 import { rateLimit } from '@/server/limits';
 
 const schema = z.object({
@@ -11,7 +11,7 @@ const schema = z.object({
   quantity: z.number().int().min(0).max(MAX_COPIES),
   proxies: z.number().int().min(0).max(MAX_COPIES),
   /** Edição da linha (a mesma carta pode estar em várias edições). */
-  scryfallId: z.string().min(1).max(64).nullable().optional(),
+  scryfallId: scryfallIdSchema.nullable().optional(),
   /** Quantas cópias reais são foil; sem valor, mantém as que já eram. */
   foils: z.number().int().min(0).max(MAX_COPIES).optional(),
   /** Atalho: todas as cópias reais foil ou nenhuma (apps antigos). */

@@ -2,7 +2,8 @@ import { addCollectionCard, listCollection, MAX_COLLECTION_COPIES } from '@boram
 import { DomainError } from '@boramarcar/core';
 import { z } from 'zod';
 import { resolveCardById, resolveCardByName } from '@/server/deck-import';
-import { authed, parseJson } from '@/server/http';
+import { authed, parseJson, scryfallIdSchema } from '@/server/http';
+import { rateLimit } from '@/server/limits';
 
 /** A coleção inteira de quem pede (filtros e ordem ficam no cliente). */
 export const GET = authed(async ({ db, user }) => ({
@@ -12,7 +13,7 @@ export const GET = authed(async ({ db, user }) => ({
 const schema = z.object({
   name: z.string().trim().min(1).max(200),
   /** Impressão escolhida; sem valor, a padrão do Scryfall. */
-  scryfallId: z.string().min(1).max(64).optional(),
+  scryfallId: scryfallIdSchema.optional(),
   quantity: z.number().int().min(1).max(MAX_COLLECTION_COPIES),
   foil: z.boolean().default(false),
 });
@@ -21,6 +22,8 @@ const schema = z.object({
 export const POST = authed(
   async ({ req, db, user }) => {
     const body = await parseJson(req, schema);
+    // Cada carta nova pode ir ao Scryfall.
+    await rateLimit(db, user.id, 'search');
     const card = body.scryfallId
       ? await resolveCardById(db, body.scryfallId)
       : await resolveCardByName(db, body.name);

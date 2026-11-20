@@ -89,4 +89,11 @@ export function authed<P = Record<string, never>>(
 }
 
 /** Schemas reutilizáveis. */
-export const isoDate = z.coerce.date();
+/** ID de carta do Scryfall: letras, números e hífen (UUID na prática); nada de `..` ou `/`. */
+export const scryfallIdSchema = z.string().regex(/^[A-Za-z0-9-]{1,64}$/, 'ID de carta inválido');
+
+/** Data num intervalo razoável (2000 a 2100): datas absurdas não chegam aos laços de calendário. */
+export const isoDate = z.coerce
+  .date()
+  .min(new Date('2000-01-01T00:00:00Z'))
+  .max(new Date('2100-01-01T00:00:00Z'));

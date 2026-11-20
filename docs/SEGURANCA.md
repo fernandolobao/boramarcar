@@ -16,7 +16,7 @@ etapas sem transação.
 1. Conta e imagens (A1) ✅
 2. Origens do login (A2, A3) ✅
 3. Dados expostos (M1, M2, M3 e as baixas de dados) ✅
-4. Abuso e negação de serviço (M4, M5 e as baixas de limite).
+4. Abuso e negação de serviço (M4, M5 e as baixas de limite) ✅
 5. Concorrência e atomicidade (M6, M7, M8).
 6. Estabilidade operacional (M9, M10, M11, M12).
 7. Endurecimento (o resto das baixas).
@@ -79,14 +79,16 @@ etapas sem transação.
   `/%09/site.com` passa no filtro e o navegador lê `//site.com`. Correção: rejeitar caracteres de
   controle e `\`, ou validar com `new URL(valor, base)` exigindo a mesma origem.
   **Corrigido:** `safeCallback` recusa caracteres de controle e `\` (também codificados) e confere a origem com `new URL` (`lib/safe-callback.test.ts`).
-- **M4. Limite de tentativas do login fraco na Vercel** (`apps/web/src/server/auth.ts`): o Better Auth usa
+- ✅ **M4. Limite de tentativas do login fraco na Vercel** (`apps/web/src/server/auth.ts`): o Better Auth usa
   memória por instância → senha adivinhável e "bombardeio" de e-mails de verificação (`sendOnSignIn`).
   Correção: `rateLimit: { enabled: true, storage: 'database', customRules }` para entrar, cadastrar,
   redefinir senha e reenviar verificação.
-- **M5. Disponibilidade sem limite de datas trava a função** (`server/http.ts` `isoDate`;
+  **Corrigido:** `rateLimit` do Better Auth com `customStorage` no contador do banco (`consumeRateLimit`), chave como HMAC; entrar 10/min, cadastro 10/h, reenvio de verificação e redefinição de senha 3 a cada 5 min, por IP; `get-session` fora (`server/auth.ts`, teste em `server/auth.test.ts`).
+- ✅ **M5. Disponibilidade sem limite de datas trava a função** (`server/http.ts` `isoDate`;
   `packages/core/src/availability/recurring.ts:60` percorre dia a dia): um membro pede
   `from=-200000…&to=+200000…` e prende a CPU até estourar o tempo. Correção: datas entre ±5 anos de hoje
   e intervalo ≤ 120 dias nas rotas de disponibilidade e em `expandWeeklyRules`.
+  **Corrigido:** `isoDate` só aceita 2000–2100 (`server/http.ts`) e `expandWeeklyRules` recusa intervalos acima de um ano (`MAX_RANGE_DAYS`).
 - **M6. Inscrição em evento de loja passa da capacidade** (`store-events.ts:301`): conta e insere sem
   trava; duas inscrições na última vaga entram as duas; `promote` e `cancelStoreEntry` têm a mesma
   corrida; duplicata vira 500 (23505) em vez de 409. Correção: transação com `SELECT … FOR UPDATE` no
@@ -122,13 +124,13 @@ status='registration' RETURNING`; inscritos em lote.
 - CSP aplicada com `img-src https:` / `connect-src https:` → promover as listas exatas do modo relatório;
   rotas com ponto no caminho escapam da CSP (`proxy.ts:67` matcher); faltam `COOP`, `CORP`,
   `X-Frame-Options: DENY` e `preload` no HSTS.
-- Upload: conferir o formato real com `sharp().metadata()` (hoje confia no tipo enviado), baixar
+- ✅ Upload: conferir o formato real com `sharp().metadata()` (hoje confia no tipo enviado), baixar
   `limitInputPixels` para ~25M.
 - `.ics`: `\r` solto não é escapado (`packages/core/src/calendar/index.ts:26`).
-- Código do balcão com `Math.random` → `crypto.getRandomValues` (`packages/core/src/stores/index.ts:69`).
-- `places/locate` (Nominatim) e coleção (Scryfall) sem limite de uso; `scryfallId` sem validar UUID.
-- `csp-report` lê o corpo inteiro sem `Content-Length`.
-- Hash do IP no limite de uso sem segredo (HMAC); nomes de deck importado sem limite (Archidekt/texto).
+- ✅ Código do balcão com `Math.random` → `crypto.getRandomValues` (`packages/core/src/stores/index.ts:69`).
+- ✅ `places/locate` (Nominatim) e coleção (Scryfall) sem limite de uso; `scryfallId` sem validar UUID. **Corrigido:** limite `search` nas duas; o ID aceita só letras, números e hífen (`scryfallIdSchema`), porque os testes e o seed usam IDs que não são UUID.
+- ✅ `csp-report` lê o corpo inteiro sem `Content-Length`.
+- ✅ Hash do IP no limite de uso sem segredo (HMAC). — Nomes de deck importado sem limite (Archidekt/texto): fica para o PR 7.
 - Busca da descoberta sem limite superior de data/linhas no SQL; índices faltando (lembretes, limpeza de
   `rate_limits`, `notifications(group_id, kind)`); notificações sem limpeza das antigas.
 - `SKIP_ENV_VALIDATION` em produção usaria segredo fixo → falhar se `VERCEL_ENV=production`.
