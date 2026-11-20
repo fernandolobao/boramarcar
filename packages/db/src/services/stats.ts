@@ -2,7 +2,7 @@ import { computeGroupStats, DomainError, gamesByMonth, type StatsGame } from '@b
 import { and, asc, eq, gte, inArray, lt } from 'drizzle-orm';
 import type { Database } from '../client';
 import { decks, gamePlayers, games, seasons, user } from '../schema';
-import { getDeckCovers } from './decks';
+import { getDeckCovers, withoutHiddenDecks } from './decks';
 import { requireMembership } from './groups';
 
 /* ---------- Temporadas (2.6) ---------- */
@@ -99,7 +99,7 @@ export async function getGroupStats(
         input.format ? eq(games.format, input.format) : undefined,
       ),
     );
-  const playerRows = gameRows.length
+  const rawPlayerRows = gameRows.length
     ? await db
         .select({
           gameId: gamePlayers.gameId,
@@ -122,6 +122,7 @@ export async function getGroupStats(
           ),
         )
     : [];
+  const playerRows = await withoutHiddenDecks(db, rawPlayerRows, input.userId);
 
   const statsGames: StatsGame[] = gameRows.map((g) => ({
     gameId: g.id,

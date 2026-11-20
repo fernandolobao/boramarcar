@@ -1,7 +1,7 @@
 import type { Member } from '@boramarcar/api-client';
 import { Stack, router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, RefreshControl, ScrollView, Share, View } from 'react-native';
+import { RefreshControl, ScrollView, Share, View } from 'react-native';
 import { previousMonth } from '@boramarcar/core/integration';
 import { ConfirmButton } from '@/components/confirm-button';
 import { AttendanceCard } from '@/components/attendance-card';
@@ -11,7 +11,8 @@ import { NoGroup } from '@/components/no-group';
 import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
-import { API_URL, monthlyRecapUrl } from '@/lib/config';
+import { API_URL } from '@/lib/config';
+import { openMonthlyRecap } from '@/lib/monthly';
 import { useGroup } from '@/lib/group';
 import { formatMonthYear, t, type MessageKey } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
@@ -213,7 +214,7 @@ export default function GroupScreen() {
       <Button
         label={t('monthlyLink', { month: formatMonthYear(new Date(`${recapMonth}-15T12:00:00Z`)) })}
         variant="secondary"
-        onPress={() => void Linking.openURL(monthlyRecapUrl(group.id, recapMonth))}
+        onPress={() => void openMonthlyRecap(group.id, recapMonth)}
         style={{ alignSelf: 'flex-start' }}
       />
 

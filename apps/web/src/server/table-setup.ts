@@ -34,6 +34,7 @@ export async function getTableSetup(
   const decks = await listDecksForUsers(
     db,
     members.map((m) => m.userId),
+    input.userId,
   );
   const confirmed = new Set(
     event.participants.filter((p) => p.rsvp === 'yes').map((p) => p.userId),

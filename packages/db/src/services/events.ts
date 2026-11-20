@@ -18,7 +18,7 @@ import {
   locations,
   user,
 } from '../schema';
-import { getDeckCovers } from './decks';
+import { getDeckCovers, withoutHiddenDecks } from './decks';
 import { requireMembership } from './groups';
 
 type RsvpStatus = (typeof eventParticipants.$inferSelect)['rsvp'];
@@ -207,7 +207,7 @@ export async function getEventDetail(db: Database, input: { eventId: string; use
     .from(games)
     .where(eq(games.eventId, event.id))
     .orderBy(asc(games.number));
-  const playerRows = gameRows.length
+  const rawPlayerRows = gameRows.length
     ? await db
         .select({
           gameId: gamePlayers.gameId,
@@ -230,6 +230,8 @@ export async function getEventDetail(db: Database, input: { eventId: string; use
           ),
         )
     : [];
+  // Deck privado de outra pessoa não aparece (nem o nome nem a capa).
+  const playerRows = await withoutHiddenDecks(db, rawPlayerRows, input.userId);
 
   const covers = await getDeckCovers(
     db,

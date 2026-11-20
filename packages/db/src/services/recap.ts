@@ -1,7 +1,7 @@
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
 import type { Database } from '../client';
 import { eventParticipants, events, gamePlayers, games, groups, user } from '../schema';
-import { getDeckCovers } from './decks';
+import { getDeckCovers, withoutHiddenDecks } from './decks';
 
 /**
  * Resumo da noite (8.6): o que dá para mostrar de um encontro finalizado para quem tem o link —
@@ -64,7 +64,7 @@ export async function getEventRecap(db: Database, eventId: string): Promise<Even
     .where(eq(games.eventId, event.id))
     .orderBy(asc(games.number));
   if (gameRows.length === 0) return null;
-  const playerRows = await db
+  const rawPlayerRows = await db
     .select({
       gameId: gamePlayers.gameId,
       userId: gamePlayers.userId,
@@ -80,6 +80,8 @@ export async function getEventRecap(db: Database, eventId: string): Promise<Even
         gameRows.map((g) => g.id),
       ),
     );
+  // Página pública: deck privado não aparece.
+  const playerRows = await withoutHiddenDecks(db, rawPlayerRows, null);
   const names = displayNames(
     [...new Map(playerRows.map((p) => [p.userId, p])).values()].map((p) => ({
       userId: p.userId,

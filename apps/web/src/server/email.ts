@@ -275,9 +275,6 @@ export function buildRecapEmail(
 export const recapUrl = (eventId: string) => `${getBaseUrl()}/resumo/${eventId}`;
 /** Página pública do torneio (9.5). */
 export const tournamentPublicUrl = (id: string) => `${getBaseUrl()}/torneio/${id}`;
-/** Retrospectiva do mês do grupo (pública para quem tem o link). */
-export const monthlyUrl = (groupId: string, month: string) =>
-  `${getBaseUrl()}/retrospectiva/${groupId}/${month}`;
 
 /** E-mails da conta com e-mail e senha: confirmar o e-mail e redefinir a senha. */
 export function buildAccountEmail(

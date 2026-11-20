@@ -826,6 +826,22 @@ describe('cliente da API', () => {
     expect(view.records.longestGame).toBeNull();
   });
 
+  it('retrospectiva: endereço com o código, do servidor', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json({ url: 'https://www.arcanakin.com.br/retrospectiva/g1/2026-10?k=abc' }),
+    );
+    const api = createApiClient({
+      baseUrl: 'https://www.arcanakin.com.br',
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(await api.stats.monthlyLink('g1', '2026-10')).toBe(
+      'https://www.arcanakin.com.br/retrospectiva/g1/2026-10?k=abc',
+    );
+    expect(String((fetchMock.mock.calls[0] as unknown[])[0])).toBe(
+      'https://www.arcanakin.com.br/api/v1/groups/g1/monthly-link?month=2026-10',
+    );
+  });
+
   it('grupo: convite novo, papéis, remoção, posse e locais', async () => {
     const fetchMock = vi
       .fn()

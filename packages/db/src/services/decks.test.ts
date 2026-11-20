@@ -9,6 +9,7 @@ import {
   saveCardRoles,
   deleteDeck,
   getDeck,
+  getDeckCovers,
   getDeckRatings,
   listDecks,
   listDecksForUsers,
@@ -185,16 +186,32 @@ describe('decks', () => {
     expect(after.analysis.proxies).toBe(1);
   });
 
+  it('deck privado: só o dono o vê na escolha de deck, na capa e no resumo público', async () => {
+    const { players } = await seedGroup(db, 2);
+    const [owner, friend] = players;
+    const saved = await saveImportedDeck(db, { ownerId: owner!.id, deck, cards: cardsData });
+    await updateDeck(db, { deckId: saved.id, userId: owner!.id, visibility: 'private' });
+
+    expect(await listDecksForUsers(db, [owner!.id, friend!.id], friend!.id)).toEqual([]);
+    expect(await listDecksForUsers(db, [owner!.id, friend!.id], owner!.id)).toHaveLength(1);
+
+    expect((await getDeckCovers(db, [saved.id], { viewerId: friend!.id })).has(saved.id)).toBe(
+      false,
+    );
+    expect((await getDeckCovers(db, [saved.id], { viewerId: null })).has(saved.id)).toBe(false);
+    expect((await getDeckCovers(db, [saved.id], { viewerId: owner!.id })).has(saved.id)).toBe(true);
+  });
+
   it('controla visibilidade e permissões', async () => {
     const { players } = await seedGroup(db, 2);
     const [owner, friend] = players;
     const stranger = await createTestUser(db);
     const saved = await saveImportedDeck(db, { ownerId: owner!.id, deck, cards: cardsData });
 
-    expect(await listDecksForUsers(db, [owner!.id, friend!.id])).toEqual([
+    expect(await listDecksForUsers(db, [owner!.id, friend!.id], friend!.id)).toEqual([
       { id: saved.id, name: 'Omnath Ramp', ownerId: owner!.id, format: 'commander' },
     ]);
-    expect(await listDecksForUsers(db, [])).toEqual([]);
+    expect(await listDecksForUsers(db, [], friend!.id)).toEqual([]);
     await expect(getDeck(db, { deckId: saved.id, viewerId: friend!.id })).resolves.toMatchObject({
       isOwner: false,
     });

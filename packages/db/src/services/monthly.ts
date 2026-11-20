@@ -38,7 +38,7 @@ export async function getMonthlyRecap(
   if (!timeZone) return null;
   const bounds = monthBounds(input.month, timeZone);
   if (!bounds || bounds.from > (input.now ?? new Date())) return null;
-  const { list, decks } = await loadGroupGames(db, input.groupId);
+  const { list, decks } = await loadGroupGames(db, input.groupId, null);
   const recap = monthlyRecap(list, bounds, decks);
 
   const ids = [

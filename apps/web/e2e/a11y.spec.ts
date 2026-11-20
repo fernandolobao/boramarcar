@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
+import { monthlyKey } from './support/monthly-key';
 import { E2E_IDS, E2E_INVITE_CODE } from './support/seed';
 
 /** Regras WCAG 2.0/2.1/2.2 nível A e AA. */
@@ -40,7 +41,7 @@ const PUBLIC_PAGES = [
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeEvent}`,
   `/lojas/${E2E_IDS.store}/eventos/${E2E_IDS.storeTournamentEvent}`,
   `/loja/convite/${E2E_IDS.storeInvite}`,
-  `/retrospectiva/${E2E_IDS.group}/${PAST_MONTH}`,
+  `/retrospectiva/${E2E_IDS.group}/${PAST_MONTH}?k=${monthlyKey(E2E_IDS.group, PAST_MONTH)}`,
   '/entrar',
   '/cadastro',
   '/esqueci-senha',

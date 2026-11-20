@@ -906,9 +906,51 @@ function championOf(
 export async function getTournament(
   db: Database,
   input: { tournamentId: string; userId: string | null },
-) {
+): Promise<TournamentView> {
   const { row, canManage } = await loadTournament(db, input.tournamentId, input.userId);
-  return buildView(db, row, canManage, input.userId);
+  const full = await buildView(db, row, canManage, input.userId);
+  // Torneio de loja: quem não é da equipe vê como na página pública (primeiros nomes, sem IDs de
+  // conta), menos a própria inscrição, que precisa do ID para registrar a mesa.
+  if (row.storeEventId && !canManage) return anonymized(db, row, full, input.userId);
+  return full;
+}
+
+/**
+ * Tira o que identifica as pessoas: só o primeiro nome (com a inicial do sobrenome quando repete),
+ * sem IDs de conta (exceto os de `keepFor`, a própria pessoa) e sem grupo, encontro ou quem criou.
+ */
+async function anonymized(
+  db: Database,
+  row: TournamentRow,
+  full: TournamentView,
+  keepFor: string | null,
+): Promise<TournamentView> {
+  const people = await db
+    .select({
+      userId: tournamentEntrantMembers.userId,
+      name: user.name,
+      entrantId: tournamentEntrantMembers.entrantId,
+    })
+    .from(tournamentEntrantMembers)
+    .innerJoin(user, eq(user.id, tournamentEntrantMembers.userId))
+    .where(eq(tournamentEntrantMembers.tournamentId, row.id))
+    .orderBy(asc(tournamentEntrantMembers.position));
+  const shown = displayNames(people);
+  const firstOnly = (name: string) => name.trim().split(/\s+/)[0] || name;
+  return {
+    ...full,
+    tournament: { ...full.tournament, groupId: null, eventId: null, createdBy: null },
+    entrants: full.entrants.map((e) => ({
+      ...e,
+      memberIds: keepFor && e.memberIds.includes(keepFor) ? e.memberIds : [],
+      name: e.guest
+        ? firstOnly(e.name)
+        : people
+            .filter((p) => p.entrantId === e.id)
+            .map((p) => shown.get(p.userId)!)
+            .join(' & '),
+    })),
+  };
 }
 
 /** Monta a página do torneio (sem conferir acesso: quem chama já conferiu). */
@@ -1024,12 +1066,13 @@ async function buildView(
     champion: championOf(row, timeline),
   };
 }
-export type TournamentView = Awaited<ReturnType<typeof getTournament>>;
+export type TournamentView = Awaited<ReturnType<typeof buildView>>;
 
 /**
  * Página pública do torneio (9.5), para quem tem o link: rodadas, mesas, classificação e linha
  * do tempo, com só o primeiro nome de cada pessoa (com a inicial do sobrenome quando repete).
- * Nada de grupo, encontro, e-mail, foto ou ids de conta. `null` antes de começar ou se não existe.
+ * O título e a data do encontro aparecem (subtítulo da página); nada de grupo, e-mail, foto ou ids
+ * de conta. `null` antes de começar ou se não existe.
  */
 export async function getPublicTournament(
   db: Database,
@@ -1042,32 +1085,7 @@ export async function getPublicTournament(
     .limit(1);
   if (!row || row.status === 'registration') return null;
   const full = await buildView(db, row, false, null);
-  const people = await db
-    .select({
-      userId: tournamentEntrantMembers.userId,
-      name: user.name,
-      entrantId: tournamentEntrantMembers.entrantId,
-    })
-    .from(tournamentEntrantMembers)
-    .innerJoin(user, eq(user.id, tournamentEntrantMembers.userId))
-    .where(eq(tournamentEntrantMembers.tournamentId, row.id))
-    .orderBy(asc(tournamentEntrantMembers.position));
-  const shown = displayNames(people);
-  const firstOnly = (name: string) => name.trim().split(/\s+/)[0] || name;
-  return {
-    ...full,
-    tournament: { ...full.tournament, groupId: null, eventId: null, createdBy: null },
-    entrants: full.entrants.map((e) => ({
-      ...e,
-      memberIds: [],
-      name: e.guest
-        ? firstOnly(e.name)
-        : people
-            .filter((p) => p.entrantId === e.id)
-            .map((p) => shown.get(p.userId)!)
-            .join(' & '),
-    })),
-  };
+  return anonymized(db, row, full, null);
 }
 
 /** Torneios do grupo, mais novos primeiro. */

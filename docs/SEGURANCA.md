@@ -15,7 +15,7 @@ etapas sem transação.
 
 1. Conta e imagens (A1) ✅
 2. Origens do login (A2, A3) ✅
-3. Dados expostos (M1, M2, M3 e as baixas de dados).
+3. Dados expostos (M1, M2, M3 e as baixas de dados) ✅
 4. Abuso e negação de serviço (M4, M5 e as baixas de limite).
 5. Concorrência e atomicidade (M6, M7, M8).
 6. Estabilidade operacional (M9, M10, M11, M12).
@@ -66,16 +66,19 @@ etapas sem transação.
 
 ### MÉDIA
 
-- **M1. Torneio de loja expõe nomes completos e IDs de conta a qualquer pessoa logada**
+- ✅ **M1. Torneio de loja expõe nomes completos e IDs de conta a qualquer pessoa logada**
   (`packages/db/src/services/tournaments.ts` `loadTournament`/`buildView`): `GET /api/v1/tournaments/:id`
   de torneio de loja devolve `memberIds` e nomes completos, contrariando a página pública (só primeiro
   nome). Correção: quem não é equipe nem inscrito recebe a projeção de `getPublicTournament`.
-- **M2. Retrospectiva do mês com endereço permanente** (`/retrospectiva/<groupId>/<mês>`): um link
+  **Corrigido:** quem não é da equipe vê a projeção da página pública (primeiros nomes, sem IDs de conta), menos a própria inscrição, que precisa do ID para registrar a mesa (`anonymized` em `tournaments.ts`; teste em `store-tournaments.test.ts`).
+- ✅ **M2. Retrospectiva do mês com endereço permanente** (`/retrospectiva/<groupId>/<mês>`): um link
   compartilhado abre todos os meses, para sempre, inclusive para quem saiu do grupo. Correção: token de
   compartilhamento por grupo, que dá para trocar (como o convite); endereço antigo só para membros.
-- **M3. Redirecionamento aberto em `/entrar?para=` e `/cadastro`** (`apps/web/src/lib/safe-callback.ts`):
+  **Corrigido:** cada mês tem um código próprio no link (`?k=`, HMAC com o segredo do servidor, `server/monthly-link.ts`); sem o código, só quem é do grupo e está logado vê. O app pede o link com o código em `GET /api/v1/groups/:id/monthly-link`. Mais simples que um token por grupo e sem migration; o link de um mês continua valendo para sempre, mas só para aquele mês.
+- ✅ **M3. Redirecionamento aberto em `/entrar?para=` e `/cadastro`** (`apps/web/src/lib/safe-callback.ts`):
   `/%09/site.com` passa no filtro e o navegador lê `//site.com`. Correção: rejeitar caracteres de
   controle e `\`, ou validar com `new URL(valor, base)` exigindo a mesma origem.
+  **Corrigido:** `safeCallback` recusa caracteres de controle e `\` (também codificados) e confere a origem com `new URL` (`lib/safe-callback.test.ts`).
 - **M4. Limite de tentativas do login fraco na Vercel** (`apps/web/src/server/auth.ts`): o Better Auth usa
   memória por instância → senha adivinhável e "bombardeio" de e-mails de verificação (`sendOnSignIn`).
   Correção: `rateLimit: { enabled: true, storage: 'database', customRules }` para entrar, cadastrar,
@@ -111,9 +114,9 @@ status='registration' RETURNING`; inscritos em lote.
 
 ### BAIXA (endurecimento)
 
-- Nomes de decks **privados** aparecem para o grupo na página do encontro e no resumo
-  (`listDecksForUsers`/`getDeckCovers` ignoram a visibilidade).
-- `getPublicTournament` ainda devolve o título e a data do encontro do grupo.
+- ✅ Nomes de decks **privados** aparecem para o grupo na página do encontro e no resumo
+  (`listDecksForUsers`/`getDeckCovers` ignoram a visibilidade). **Corrigido:** deck privado de outra pessoa sai da escolha de deck, da página do encontro, das estatísticas, dos recordes, do resumo e da retrospectiva (`hiddenDeckIds`/`withoutHiddenDecks`).
+- ~~`getPublicTournament` ainda devolve o título e a data do encontro do grupo.~~ Não é problema: é o subtítulo da página pública, de propósito (o comentário do código é que estava errado e foi corrigido).
 - Token de push pode ser "tomado" por quem o conhecer (`push.ts:17`) → recusar token de outra conta.
 - 2HG: quem não organiza inscreve outra pessoa como dupla sem ela aceitar.
 - CSP aplicada com `img-src https:` / `connect-src https:` → promover as listas exatas do modo relatório;

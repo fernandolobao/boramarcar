@@ -332,7 +332,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'retrospectiva',
             question: 'O que é a retrospectiva do mês?',
             intro: [
-              'Todo dia 1, quem é de um grupo que jogou no mês anterior recebe no sino o aviso da retrospectiva: quantas partidas e noites, o destaque do mês, as estreias, os feitos do mês (com os recordes do grupo que caíram) e o duelo do mês. Ela também fica na tela do grupo, em "Retrospectiva de…". Como o resumo da noite, dá para compartilhar o link: ela mostra só o primeiro nome de quem jogou, sem o nome do grupo, local ou e-mail.',
+              'Todo dia 1, quem é de um grupo que jogou no mês anterior recebe no sino o aviso da retrospectiva: quantas partidas e noites, o destaque do mês, as estreias, os feitos do mês (com os recordes do grupo que caíram) e o duelo do mês. Ela também fica na tela do grupo, em "Retrospectiva de…". Dá para compartilhar o link: cada mês tem o seu (quem recebe o de outubro não abre os outros meses), e a página mostra só o primeiro nome de quem jogou, sem o nome do grupo, local ou e-mail.',
             ],
           },
           {
@@ -716,7 +716,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'retrospectiva',
             question: 'What is the monthly recap?',
             intro: [
-              'On the 1st of each month, people in a group that played the month before get the recap notice in the bell: how many games and nights, the player of the month, first-timers, the month’s feats (including group records that fell) and the duel of the month. It also lives on the group screen, under "… recap". Like the night recap, you can share the link: it shows only first names, with no group name, place or e-mail.',
+              'On the 1st of each month, people in a group that played the month before get the recap notice in the bell: how many games and nights, the player of the month, first-timers, the month’s feats (including group records that fell) and the duel of the month. It also lives on the group screen, under "… recap". You can share the link: each month has its own (whoever gets October’s can’t open other months), and the page shows only first names, with no group name, place or e-mail.',
             ],
           },
           {

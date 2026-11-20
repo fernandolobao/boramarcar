@@ -78,6 +78,7 @@ const r = {
   settings: await import('../groups/[groupId]/settings/route'),
   stats: await import('../groups/[groupId]/stats/route'),
   records: await import('../groups/[groupId]/records/route'),
+  monthlyLink: await import('../groups/[groupId]/monthly-link/route'),
   partners: await import('../groups/[groupId]/partners/route'),
   beta: await import('../groups/[groupId]/beta/route'),
   transfer: await import('../groups/[groupId]/transfer/route'),
@@ -772,6 +773,12 @@ const outsiderCases: Case[] = [
     () => ({ entryId: ids.collectionEntry! }),
   ],
   ['GET recordes do grupo', r.records.GET as Handler, 'GET', () => ({ groupId: ids.group! })],
+  [
+    'GET link da retrospectiva do grupo',
+    r.monthlyLink.GET as Handler,
+    'GET',
+    () => ({ groupId: ids.group! }),
+  ],
   [
     'GET perfil de quem não divide grupo',
     r.player.GET as Handler,
