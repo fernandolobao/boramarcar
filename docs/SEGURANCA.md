@@ -14,7 +14,7 @@ etapas sem transação.
 ## Ordem das correções
 
 1. Conta e imagens (A1) ✅
-2. Origens do login (A2, A3) — depois, o dono configura um domínio próprio para os previews.
+2. Origens do login (A2, A3) ✅
 3. Dados expostos (M1, M2, M3 e as baixas de dados).
 4. Abuso e negação de serviço (M4, M5 e as baixas de limite).
 5. Concorrência e atomicidade (M6, M7, M8).
@@ -41,23 +41,28 @@ etapas sem transação.
   `@boramarcar/core/images`). Testes: `server/auth.test.ts`, `server/uploads.test.ts`,
   `core/src/images/images.test.ts`.
 
-**A2. Padrão de previews confiável demais no login (`apps/web/src/server/trusted-origins.ts:33`).**
+✅ **A2. Padrão de previews confiável demais no login (`apps/web/src/server/trusted-origins.ts:33`).**
 
 - `https://boramarcar-*-fernandolobaos-projects.vercel.app` (ativo em produção, com o OAuth proxy): o `*`
   aceita qualquer coisa, então um projeto/conta de terceiros na Vercel com nome que case (ex.: equipe
   `x-fernandolobaos-projects`) vira origem confiável → redirecionamento aberto depois do login e destino
   aceito pelo OAuth proxy (risco de levar a sessão para fora; depende do comportamento do proxy).
-- Correção recomendada: previews num domínio próprio (`*.preview.arcanakin.com.br`, configuração na
-  Vercel + DNS, **ação do dono**) e o padrão passa a ser desse domínio; enquanto isso, produção deixa de
-  confiar em previews (login com Google nos previews fica indisponível até o domínio próprio).
+- **Corrigido:** `apps/web/src/server/auth-guard.ts` envolve a rota `/api/auth/*` e recusa (403)
+  pedidos (parâmetros, corpo JSON, `Origin`) e redirecionamentos para qualquer `*.vercel.app` que não
+  seja o endereço de deploy deste projeto (`boramarcar-<9 letras ou números>-fernandolobaos-projects`).
+  Custo: o login nos previews funciona só pelo endereço de deploy, não pelo do branch. Teste:
+  `server/auth-guard.test.ts`. (Domínio próprio para os previews foi descartado pelo custo.)
 
-**A3. Esquema antigo `boramarcar://` confiável no login do app (`trusted-origins.ts:27`, plugin Expo).**
+✅ **A3. Esquema antigo `boramarcar://` confiável no login do app (`trusted-origins.ts:27`, plugin Expo).**
 
 - Depois do login, o plugin Expo põe a sessão no redirecionamento para o esquema do app. Um app malicioso
   no celular que registre `boramarcar://` (esquema antigo, provavelmente livre) recebe a sessão via um
   link de login preparado. O app ainda não foi publicado, então o esquema antigo não tem usuários.
-- Correção: tirar `boramarcar://`; impedir `EXPO_GO_LOGIN=lan` em produção (`VERCEL_ENV !== 'production'`);
-  plano futuro: links universais (https) no app.
+- **Corrigido:** `boramarcar://` saiu das origens confiáveis (`trusted-origins.ts`). Decisão:
+  `EXPO_GO_LOGIN=lan` continua possível em produção, porque o dono testa o app no Expo Go contra
+  produção até as builds próprias; o risco (alguém na mesma rede Wi-Fi recebe a sessão por um link de
+  login preparado) fica documentado: **ligue a variável só enquanto testa e desligue depois**. Com as
+  builds de dezembro, a variável deixa de ser necessária. Plano futuro: links universais (https).
 
 ### MÉDIA
 

@@ -84,7 +84,7 @@ function createAuth() {
       updateAge: 60 * 60 * 24,
       cookieCache: { enabled: true, maxAge: 5 * 60 },
     },
-    // App mobile (Expo): o login social volta para o app (`boramarcar://` ou o Expo Go).
+    // App mobile (Expo): o login social volta para o app (`arcanakin://` ou o Expo Go).
     trustedOrigins: authTrustedOrigins(process.env),
     // nextCookies precisa ser o último plugin. O OAuth proxy permite entrar com o Google nos
     // previews da Vercel (o Google só aceita a URL de produção).

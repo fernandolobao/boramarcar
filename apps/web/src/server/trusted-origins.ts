@@ -7,19 +7,23 @@ const EXPO_GO_LAN = [
 
 /**
  * Para onde o login social pode voltar além do próprio site:
- * - o app instalado (`arcanakin://`; `boramarcar://`, o esquema anterior ao rebranding, continua
- *   aceito até as versões antigas saírem de uso);
+ * - o app instalado (`arcanakin://`). O esquema anterior ao rebranding (`boramarcar://`) saiu: o
+ *   app nunca foi publicado com ele, e outro app poderia registrá-lo e receber a sessão;
  * - o Expo Go: em desenvolvimento, qualquer `exp://`; em produção só com `EXPO_GO_LOGIN=lan`
  *   (para testar o app sem build próprio) e só em IP de rede local — um link `exp://` público
  *   (túnel) poderia entregar a sessão a outro projeto;
- * - na Vercel, os previews deste projeto (login pelo OAuth proxy).
+ * - na Vercel, os previews deste projeto (login pelo OAuth proxy). O padrão abaixo é largo demais
+ *   sozinho; `auth-guard.ts` deixa passar só o endereço de deploy (`boramarcar-<9>-…`).
+ *
+ * `EXPO_GO_LOGIN=lan` em produção: ligue só enquanto testa o app no Expo Go. Quem está na mesma
+ * rede poderia mandar um link de login que entrega a sessão a um `exp://` dele.
  */
 export function authTrustedOrigins(env: {
   NODE_ENV?: string;
   EXPO_GO_LOGIN?: string;
   VERCEL_ENV?: string;
 }) {
-  const app = ['arcanakin://', 'boramarcar://'];
+  const app = ['arcanakin://'];
   if (env.NODE_ENV === 'development') return [...app, 'exp://', 'exp://**'];
   return [
     ...app,
