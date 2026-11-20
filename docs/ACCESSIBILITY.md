@@ -177,7 +177,7 @@ sem rolagem horizontal em 320px.
 
 ### Revisão: painel, nomes clicáveis e foil
 
-- Painel: números em texto (o anel de aproveitamento, as barras de atividade e o pódio são decorativos, com tabela ou texto equivalente); a forma recente usa letras (V/D/E) além da cor e tem o texto por extenso para leitores de tela; avatares decorativos com os nomes em `sr-only`.
+- Painel: números em texto (o anel de aproveitamento, as barras de atividade e o pódio são decorativos, com tabela ou texto equivalente); as "Últimas partidas" usam letras (V/D/E) além da cor e tem o texto por extenso para leitores de tela; avatares decorativos com os nomes em `sr-only`.
 - Nomes de jogador são links com sublinhado (não só cor); nomes de carta são botões (`aria-haspopup="dialog"`) com sublinhado pontilhado, cujo nome acessível é o próprio nome da carta. O diálogo devolve o foco ao botão ao fechar.
 - Foil: caixa de seleção com rótulo visível e o nome da carta para leitores de tela; selo com "✦ Foil" em texto; o brilho é decorativo e para com "reduzir movimento".
 - Achado e corrigido: o diálogo da carta dentro de um parágrafo causava erro de hidratação (o React refazia a página e perdia o tema escuro escolhido). Agora ele é criado no primeiro clique, fora do texto.
