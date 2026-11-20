@@ -271,7 +271,9 @@ describe('editor de deck', () => {
     fireEvent.click(screen.getByLabelText('Como proxy'));
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar carta' }));
     await screen.findByText('Sol Ring adicionada.');
-    expect(calls.at(-1)).toEqual({
+    // Só os POST: a busca do autocompletar pode terminar depois (CI lento) e virar a última chamada.
+    const lastPost = () => calls.filter((c) => c.method === 'POST').at(-1);
+    expect(lastPost()).toEqual({
       url: '/api/v1/decks/d1/lines',
       method: 'POST',
       body: { name: 'Sol Ring', board: 'mainboard', quantity: 2, proxies: 2 },
@@ -282,7 +284,7 @@ describe('editor de deck', () => {
     fireEvent.change(input, { target: { value: 'Forest' } });
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar carta' }));
     await vi.waitFor(() =>
-      expect(calls.at(-1)).toEqual({
+      expect(lastPost()).toEqual({
         url: '/api/v1/decks/d1/lines',
         method: 'POST',
         body: { name: 'Forest', board: 'mainboard', quantity: 1, proxies: 0 },
