@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Icon, type IconName } from './icons';
 import { useLightDismiss } from './use-light-dismiss';
 
@@ -80,5 +80,67 @@ export function ModalButton({
         )}
       </dialog>
     </>
+  );
+}
+
+/**
+ * Janela modal controlada (para quem já tem o próprio gatilho, como um item de menu). Esc, o botão
+ * "Fechar" e um clique no fundo chamam `onClose`; o foco volta para `returnFocus` (o botão do menu).
+ */
+export function Modal({
+  open,
+  onClose,
+  title,
+  returnFocus,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  returnFocus?: RefObject<HTMLElement | null>;
+  children: ReactNode;
+}) {
+  const t = useTranslations('common');
+  const titleId = useId();
+  const ref = useRef<HTMLDialogElement>(null);
+  useLightDismiss(ref);
+
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) d.showModal();
+    if (!open && d.open) d.close();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby={titleId}
+      className="m-auto max-h-[92dvh] w-[min(94vw,44rem)] overflow-y-auto rounded-2xl bg-surface p-5 text-fg shadow-2xl backdrop:bg-noite/70"
+      onClose={() => {
+        onClose();
+        returnFocus?.current?.focus();
+      }}
+    >
+      {open && (
+        <div className="space-y-5">
+          <div className="flex items-start justify-between gap-3">
+            <h2 id={titleId} className="font-display text-2xl font-semibold">
+              {title}
+            </h2>
+            <button
+              type="button"
+              className="btn-secondary px-3"
+              title={t('close')}
+              onClick={() => ref.current?.close()}
+            >
+              <Icon name="close" />
+              <span className="sr-only">{t('close')}</span>
+            </button>
+          </div>
+          {children}
+        </div>
+      )}
+    </dialog>
   );
 }

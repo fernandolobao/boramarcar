@@ -37,9 +37,8 @@ import {
 import { DeckCards } from '@/components/deck-cards';
 import { DeckComparisonCard } from '@/components/deck-comparison';
 import { DeckRoles, RefreshAnalysis } from '@/components/deck-roles';
-import { DeckTools } from '@/components/deck-tools';
+import { DeckActions } from '@/components/deck-tools';
 import { ColorIdentity } from '@/components/deck-visual';
-import { DeckEditDialog } from '@/components/deck-edit-dialog';
 import { runAfterResponse } from '@/server/background';
 import { isAdmin } from '@/server/admin';
 import { requireUser } from '@/server/current-user';
@@ -179,22 +178,33 @@ export default async function DeckPage({ params, searchParams }: Props) {
               className="scale-110 object-cover opacity-25 blur-2xl dark:opacity-20"
             />
           )}
-          {/* Editar deck (só o dono): janela com nome, tipo de jogo, visibilidade e remover. */}
-          {deck.isOwner && (
-            <div className="relative z-10 flex justify-end px-5 pt-4 md:absolute md:top-4 md:right-4 md:p-0">
-              <DeckEditDialog
-                deckId={deck.id}
-                name={deck.name}
-                format={format}
-                visibility={
-                  (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
-                    ? (deck.visibility as DeckVisibility)
-                    : 'group'
-                }
-              />
-            </div>
-          )}
-          <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,15rem)_1fr] md:items-start">
+          {/* Opções do deck (editar, exportar, imprimir, atualizar) num menu no canto do topo. */}
+          <div className="relative z-10 flex justify-end px-5 pt-4 md:absolute md:top-4 md:right-4 md:p-0">
+            <DeckActions
+              deckId={deck.id}
+              isOwner={deck.isOwner}
+              source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
+              proxyCount={deck.lines.reduce((sum, l) => sum + l.proxies, 0)}
+              hasSourceUrl={
+                Boolean(deck.sourceUrl) &&
+                (deck.source === 'archidekt' || deck.source === 'moxfield')
+              }
+              edit={
+                deck.isOwner
+                  ? {
+                      name: deck.name,
+                      format,
+                      visibility: (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
+                        ? (deck.visibility as DeckVisibility)
+                        : 'group',
+                    }
+                  : undefined
+              }
+            />
+          </div>
+          <div
+            className={`relative grid gap-6 p-5 sm:p-6 md:items-start ${hero?.card?.imageUri ? 'md:grid-cols-[minmax(0,15rem)_1fr]' : ''}`}
+          >
             {hero?.card?.imageUri && (
               <ViewTransition name={`deck-${deck.id}`} share="morph" default="none">
                 <DeckHeroCard
@@ -205,7 +215,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
                 />
               </ViewTransition>
             )}
-            <div className={`min-w-0 space-y-3 ${deck.isOwner ? 'md:pe-36' : ''}`}>
+            <div className="min-w-0 space-y-3 md:pe-52">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-ink-950/85 px-2.5 py-1 text-xs font-medium text-white dark:bg-ink-100 dark:text-ink-900">
                   {tf(format)}
@@ -393,16 +403,6 @@ export default async function DeckPage({ params, searchParams }: Props) {
           lines={deck.lines}
           isOwner={deck.isOwner}
           usdBrl={rate?.rate ?? null}
-        />
-
-        <DeckTools
-          deckId={deck.id}
-          isOwner={deck.isOwner}
-          source={deck.source === 'moxfield' ? 'Moxfield' : 'Archidekt'}
-          proxyCount={deck.lines.reduce((sum, l) => sum + l.proxies, 0)}
-          hasSourceUrl={
-            Boolean(deck.sourceUrl) && (deck.source === 'archidekt' || deck.source === 'moxfield')
-          }
         />
       </div>
     </DeckPrintsProvider>

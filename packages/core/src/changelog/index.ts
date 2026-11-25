@@ -279,6 +279,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Tokens e emblemas ganharam categoria própria na lista do deck: não ficam mais em "Talvez" e não contam no total de cartas nem na sua coleção.',
     en: 'Tokens and emblems now have their own section in the deck list: they no longer sit in "Maybe" and don\u2019t count in the card total or your collection.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Na página do deck, editar, copiar e baixar a lista, imprimir proxies e atualizar o deck ficam juntos no menu "Opções do deck", no canto do topo.',
+    en: 'On the deck page, editing, copying and downloading the list, printing proxies and updating the deck are now together in the "Deck options" menu, at the top corner.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

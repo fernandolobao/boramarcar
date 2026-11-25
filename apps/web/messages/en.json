@@ -459,7 +459,7 @@
     "quantityHeader": "Qty.",
     "proxyCount": "{count, plural, =1 {1 proxy} other {# proxies}}",
     "proxiesHeader": "Proxies",
-    "actions": "Actions",
+    "actions": "Deck options",
     "quantityOf": "Quantity of {name}",
     "proxiesOf": "Proxies of {name}",
     "invalidCopies": "Proxies can't exceed the quantity.",
@@ -601,7 +601,9 @@
       "chooseBottom": "Mulligan {count}: choose {count, plural, =1 {1 card} other {# cards}} to put on the bottom of your library ({chosen} chosen).",
       "summary": "{cards, plural, =1 {1 card} other {# cards}} in hand, {lands, plural, =0 {no lands} =1 {1 land} other {# lands}}{mulligans, plural, =0 {} =1 { (after 1 mulligan)} other { (after # mulligans)}}.",
       "tooSmall": "The deck needs at least 7 cards in the main deck to test a hand."
-    }
+    },
+    "printMenu": "Print proxies",
+    "pasteMenu": "Paste an updated list"
   },
   "analysis": {
     "title": "Analysis",

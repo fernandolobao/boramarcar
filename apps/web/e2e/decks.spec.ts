@@ -152,7 +152,9 @@ test.describe('deck', () => {
 
   test('folha de proxies em PDF', async ({ page }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    const link = page.getByRole('link', { name: 'Baixar PDF pronto' });
+    await page.getByRole('button', { name: /Opções do deck/ }).click();
+    await page.getByRole('menuitem', { name: /Imprimir proxies/ }).click();
+    const link = page.getByRole('dialog').getByRole('link', { name: 'Baixar PDF pronto' });
     await expect(link).toHaveAttribute('href', /which=proxies&page=a4/);
     const response = await page.request.get((await link.getAttribute('href'))!);
     expect(response.status()).toBe(200);
@@ -181,9 +183,13 @@ test.describe('deck', () => {
     page,
   }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
+    // Imprimir fica no menu "Opções do deck" (canto do topo) e abre numa janela.
+    await page.getByRole('button', { name: /Opções do deck/ }).click();
+    await page.getByRole('menuitem', { name: /Imprimir proxies/ }).click();
+    const dialog = page.getByRole('dialog', { name: 'Imprimir proxies' });
     // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
-    await page.getByLabel('O deck todo').check({ force: true });
-    await page.getByRole('link', { name: 'Abrir folha para imprimir' }).click();
+    await dialog.getByLabel('O deck todo').check({ force: true });
+    await dialog.getByRole('link', { name: 'Abrir folha para imprimir' }).click();
     await expect(page).toHaveURL(/imprimir\?which=all&page=a4/);
     await expect(page.getByRole('heading', { level: 1, name: 'Imprimir proxies' })).toBeVisible();
     const sheet = page.getByRole('region', { name: 'Página 1 de 5' });

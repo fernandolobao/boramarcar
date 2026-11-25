@@ -692,3 +692,12 @@ sem rolagem horizontal em 320px.
   "Manter" fica desabilitado até escolher a quantidade certa, e "Comprar carta" também enquanto a
   escolha não termina. O selo "Fundo" sobre a carta repete a informação em texto.
 - Fora do mulligan, cada carta é uma `figure` com o nome em `figcaption` (a imagem é decorativa).
+
+## Menu "Opções do deck" (25/11/2026)
+
+- `Menu` do React Aria (`MenuTrigger` + `Popover`): botão com `aria-haspopup`, setas, Home/End,
+  Esc, foco de volta ao botão. Itens com texto e ícone decorativo; os que abrem janela têm "…".
+- "Baixar .txt" é um item com `href` (o servidor responde como anexo).
+- Editar, imprimir e colar lista abrem `<dialog>` (`Modal` controlado): título, "Fechar", Esc e clique
+  fora fecham, e o foco volta ao botão do menu. Os resultados (lista copiada, deck atualizado) são
+  anunciados numa região `role="status"` ao lado do menu.
