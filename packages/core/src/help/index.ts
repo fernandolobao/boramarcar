@@ -229,6 +229,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'mao-inicial',
+            question: 'Como testo a mão inicial do deck?',
+            steps: [
+              'Na página do deck, em "Testar a mão inicial", toque em "Comprar mão inicial": saem 7 cartas do deck principal (comandante, reserva e "talvez" ficam de fora).',
+              'Não gostou? "Mulligan" compra 7 de novo; escolha uma carta para o fundo do grimório para cada mulligan e toque em "Manter".',
+              '"Comprar carta" mostra as próximas compras. As chances de terrenos estão em "Mão inicial", nos detalhes da análise.',
+            ],
+          },
+          {
             id: 'importar-deck',
             question: 'Como trago meu deck do Moxfield ou do Archidekt?',
             steps: [
@@ -627,6 +636,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             intro: [
               'It is a deck for trying ideas. Its cards don\u2019t go into your collection, nobody else sees the deck and it can\u2019t be picked in games. A new deck starts as a draft (you can uncheck it when creating or importing).',
               'When the deck is ready, tap "Publish deck" on its page: the cards start counting in your collection (except proxies and "maybe") and the deck is shown to whoever you chose.',
+            ],
+          },
+          {
+            id: 'mao-inicial',
+            question: 'How do I test the deck\u2019s opening hand?',
+            steps: [
+              'On the deck page, under "Test the opening hand", tap "Draw opening hand": 7 cards come from the main deck (commander, sideboard and "maybe" stay out).',
+              'Don\u2019t like it? "Mulligan" draws 7 again; choose one card to put on the bottom of your library for each mulligan and tap "Keep".',
+              '"Draw a card" shows the next draws. Land odds are under "Opening hand", in the analysis details.',
             ],
           },
           {

@@ -21,6 +21,7 @@ import { DateTimeField } from './ds/date-time-field';
 import { TimeField } from './ds/time-field';
 import { TableSuggestions } from './table-suggestions';
 import { DeckCreateForm, DeckImportForm, PublishDeck } from './deck-forms';
+import { OpeningHand } from './opening-hand';
 import { EmptyState } from './empty-state';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
 import { DeckRoles, RefreshAnalysis } from './deck-roles';
@@ -170,6 +171,13 @@ const cases: [string, ReactElement][] = [
   ['DeckImportForm', <DeckImportForm key="d" />],
   ['DeckCreateForm', <DeckCreateForm key="d2" />],
   ['PublishDeck', <PublishDeck key="d3" deckId="d1" />],
+  [
+    'OpeningHand',
+    <OpeningHand
+      key="oh"
+      lines={[{ name: 'Forest', board: 'mainboard', quantity: 60, isLand: true, imageUri: null }]}
+    />,
+  ],
   ['EmptyState', <EmptyState key="empty">Nenhum encontro marcado.</EmptyState>],
   [
     'EventManage',

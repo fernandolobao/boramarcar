@@ -269,6 +269,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Agora dá para montar um deck do zero, sem importar nada, e deixá-lo como rascunho: as cartas de um rascunho não entram na sua coleção até você publicar o deck.',
     en: 'You can now build a deck from scratch, without importing anything, and keep it as a draft: a draft\u2019s cards don\u2019t go into your collection until you publish the deck.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Na página do deck, "Testar a mão inicial": compre uma mão de 7, faça mulligan escolhendo as cartas que vão para o fundo e veja as próximas compras.',
+    en: 'On the deck page, "Test the opening hand": draw a hand of 7, mulligan by choosing the cards to put on the bottom and see the next draws.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

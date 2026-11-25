@@ -72,6 +72,20 @@ test.describe('deck', () => {
     await expect(page.getByRole('button', { name: /^Sol Ring/ })).toBeVisible();
   });
 
+  test('testar a mão inicial: 7 cartas, mulligan com carta para o fundo (11.3)', async ({
+    page,
+  }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    const section = page.getByRole('region', { name: 'Testar a mão inicial' });
+    await section.getByRole('button', { name: 'Comprar mão inicial' }).click();
+    await expect(section.getByRole('listitem')).toHaveCount(7);
+    await section.getByRole('button', { name: 'Mulligan' }).click();
+    await section.getByRole('listitem').first().getByRole('button').click();
+    await section.getByRole('button', { name: 'Manter com 6 cartas' }).click();
+    await expect(section.getByRole('listitem')).toHaveCount(6);
+    await expect(section.getByRole('status')).toContainText('depois de 1 mulligan');
+  });
+
   test('editor: proxies parciais e lista exportada', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto(`/decks/${E2E_IDS.deck}`);
