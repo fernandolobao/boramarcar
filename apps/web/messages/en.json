@@ -1137,6 +1137,10 @@
       "learn_to_table": {
         "name": "From theory to the table",
         "description": "Play a game after completing the \"Learn to play\" path."
+      },
+      "learn_commander": {
+        "name": "Ready for Commander",
+        "description": "Complete every lesson of \"Commander for beginners\"."
       }
     },
     "tabsLabel": "Achievements",
@@ -2700,6 +2704,7 @@
     "markedDone": "Lesson completed.",
     "markedUndone": "Lesson unmarked.",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "trackProgress": "{done} of {total} completed in this part"
   }
 }

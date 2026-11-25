@@ -45,7 +45,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'aprender',
             question: 'Nunca joguei Magic. Por onde começo?',
             intro: [
-              'Abra "Aprender a jogar" (no rodapé de todas as páginas): sete lições curtas sobre cartas, mana, o turno, combate, a pilha e o Commander, com cartas de exemplo. Não precisa de conta; com conta, o seu progresso fica salvo.',
+              'Abra "Aprender a jogar" (no rodapé de todas as páginas): lições curtas sobre cartas, mana, o turno, combate e a pilha e, depois, "Commander para iniciantes" (comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets), com cartas de exemplo. Não precisa de conta; com conta, o seu progresso fica salvo.',
             ],
           },
           {
@@ -454,7 +454,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'aprender',
             question: "I've never played Magic. Where do I start?",
             intro: [
-              'Open "Learn to play" (in the footer of every page): seven short lessons about cards, mana, the turn, combat, the stack and Commander, with example cards. No account needed; with one, your progress is saved.',
+              'Open "Learn to play" (in the footer of every page): short lessons about cards, mana, the turn, combat and the stack, then "Commander for beginners" (the commander, color identity, the multiplayer table, Rule 0 and brackets), with example cards. No account needed; with one, your progress is saved.',
             ],
           },
           {

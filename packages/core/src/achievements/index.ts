@@ -1,4 +1,4 @@
-import { LESSON_IDS } from '../learn';
+import { LEARN_TRACKS, LESSON_IDS } from '../learn';
 import type { GameResult } from '../ranking';
 
 /** Partida do ponto de vista de um jogador (para calcular conquistas). */
@@ -75,6 +75,7 @@ export const ACHIEVEMENT_IDS = [
   'learn_first',
   'learn_path',
   'learn_to_table',
+  'learn_commander',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -275,10 +276,16 @@ export function computeAchievements(
     .filter((l) => (LESSON_IDS as readonly string[]).includes(l.lessonId))
     .sort((a, b) => a.completedAt.getTime() - b.completedAt.getTime());
   if (lessonsDone[0]) unlock('learn_first', lessonsDone[0].completedAt);
-  const pathDone =
-    new Set(lessonsDone.map((l) => l.lessonId)).size === LESSON_IDS.length
-      ? lessonsDone.at(-1)!.completedAt
-      : null;
+  /** Lições feitas de um bloco e quando o bloco ficou completo (a última lição dele). */
+  const track = (ids: readonly string[]) => {
+    const done = lessonsDone.filter((l) => ids.includes(l.lessonId));
+    const count = new Set(done.map((l) => l.lessonId)).size;
+    return { count, total: ids.length, at: count === ids.length ? done.at(-1)!.completedAt : null };
+  };
+  const basics = track(LEARN_TRACKS.basics);
+  const commanderTrack = track(LEARN_TRACKS.commander);
+  const pathDone = basics.at;
+  if (commanderTrack.at) unlock('learn_commander', commanderTrack.at);
   if (pathDone) unlock('learn_path', pathDone);
   const firstTable = pathDone
     ? ordered.find((g) => g.playedAt.getTime() >= pathDone.getTime())
@@ -319,8 +326,9 @@ export function computeAchievements(
     tournament_top: [firstTop ? 1 : 0, 1],
     tournament_champion: [titlesWon.length ? 1 : 0, 1],
     learn_first: [lessonsDone.length ? 1 : 0, 1],
-    learn_path: [new Set(lessonsDone.map((l) => l.lessonId)).size, LESSON_IDS.length],
+    learn_path: [basics.count, basics.total],
     learn_to_table: [firstTable ? 1 : 0, 1],
+    learn_commander: [commanderTrack.count, commanderTrack.total],
   };
 
   return ACHIEVEMENT_IDS.map((id) => {

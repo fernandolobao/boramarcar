@@ -22,6 +22,8 @@ export interface LessonSection {
 export interface Lesson {
   /** Vira o endereço (`/aprender/<id>`) e a chave do progresso. */
   id: LessonId;
+  /** Bloco da trilha: o básico (12.1) ou Commander para iniciantes (12.2). */
+  track: TrackId;
   title: string;
   summary: string;
   /** Tempo de leitura, em minutos. */
@@ -35,18 +37,27 @@ export interface LearnContent {
   title: string;
   intro: string;
   official: { title: string; text: string; rules: string; glossary: string };
+  tracks: Record<TrackId, { title: string; intro: string }>;
   lessons: Lesson[];
 }
 
-export const LESSON_IDS = [
-  'o-que-e-magic',
-  'tipos-de-carta',
-  'mana-e-terrenos',
-  'o-turno',
-  'combate',
-  'a-pilha',
-  'como-se-vence',
-] as const;
+/** Blocos da trilha, cada um com as suas lições em ordem. */
+export const LEARN_TRACKS = {
+  basics: [
+    'o-que-e-magic',
+    'tipos-de-carta',
+    'mana-e-terrenos',
+    'o-turno',
+    'combate',
+    'a-pilha',
+    'como-se-vence',
+  ],
+  commander: ['commander-o-formato', 'identidade-de-cor', 'mesa-de-commander', 'rule-0-e-brackets'],
+} as const;
+export type TrackId = keyof typeof LEARN_TRACKS;
+export const TRACK_IDS = ['basics', 'commander'] as const satisfies readonly TrackId[];
+
+export const LESSON_IDS = [...LEARN_TRACKS.basics, ...LEARN_TRACKS.commander] as const;
 export type LessonId = (typeof LESSON_IDS)[number];
 
 export const isLessonId = (value: string): value is LessonId =>
@@ -68,16 +79,28 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
   'pt-BR': {
     title: 'Aprender a jogar',
     intro:
-      'Sete lições curtas para quem nunca jogou Magic: The Gathering. Em meia hora você entende o jogo e chega pronto para a primeira mesa do grupo.',
+      'Lições curtas para quem nunca jogou Magic: The Gathering. Em meia hora você entende o jogo e chega pronto para a primeira mesa do grupo; depois, o Commander, o formato mais jogado em grupo.',
     official: {
       title: 'Regras oficiais',
       text: 'Estas lições explicam o jogo com as nossas palavras. As regras completas e o glossário oficial estão no site da Wizards of the Coast.',
       rules: 'Regras do Magic (Wizards of the Coast)',
       glossary: 'Glossário de palavras-chave (Wizards of the Coast)',
     },
+    tracks: {
+      basics: {
+        title: 'O básico',
+        intro: 'Do zero até a primeira partida: cartas, mana, o turno, combate e a pilha.',
+      },
+      commander: {
+        title: 'Commander para iniciantes',
+        intro:
+          'O formato mais jogado em grupo: comandante, identidade de cor, a mesa com várias pessoas e a conversa antes do jogo.',
+      },
+    },
     lessons: [
       {
         id: 'o-que-e-magic',
+        track: 'basics',
         title: 'O que é Magic',
         summary: 'Um duelo entre magos: cada jogador tem um deck e tenta zerar a vida do outro.',
         minutes: 3,
@@ -116,6 +139,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'tipos-de-carta',
+        track: 'basics',
         title: 'Tipos de carta',
         summary:
           'Terrenos, criaturas, mágicas instantâneas, feitiços, artefatos, encantamentos e planeswalkers.',
@@ -157,6 +181,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'mana-e-terrenos',
+        track: 'basics',
         title: 'Mana e terrenos',
         summary:
           'As cinco cores, como pagar o custo de uma carta e por que jogar um terreno por turno.',
@@ -197,6 +222,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'o-turno',
+        track: 'basics',
         title: 'O turno',
         summary: 'Início, primeira fase principal, combate, segunda fase principal e final.',
         minutes: 4,
@@ -234,6 +260,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'combate',
+        track: 'basics',
         title: 'Combate',
         summary: 'Atacar, bloquear e causar dano, com as habilidades mais comuns.',
         minutes: 5,
@@ -273,6 +300,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'a-pilha',
+        track: 'basics',
         title: 'A pilha e as respostas',
         summary: 'Como responder a uma mágica e por que a última a entrar resolve primeiro.',
         minutes: 4,
@@ -303,6 +331,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'como-se-vence',
+        track: 'basics',
         title: 'Como se vence',
         summary: 'Vida a zero, grimório vazio, veneno e o que muda no Commander.',
         minutes: 3,
@@ -336,21 +365,190 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
           'Commander: 100 cartas, 40 de vida, 21 de dano de comandante.',
         ],
       },
+      {
+        id: 'commander-o-formato',
+        track: 'commander',
+        title: 'O que é Commander',
+        summary: 'Cem cartas, uma de cada, um comandante na zona de comando e 40 de vida.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'deck',
+            heading: 'Cem cartas, uma de cada',
+            paragraphs: [
+              'Um deck de Commander tem exatamente 100 cartas, contando o comandante. Fora os terrenos básicos, só pode haver uma cópia de cada carta.',
+              'Por isso cada partida é diferente: você raramente compra a mesma carta duas vezes.',
+            ],
+          },
+          {
+            id: 'comandante',
+            heading: 'O comandante',
+            paragraphs: [
+              'O comandante é uma criatura lendária escolhida para liderar o deck. Ele começa a partida fora do grimório, virado para cima na zona de comando, e você pode lançá-lo de lá como qualquer outra mágica.',
+              'Cada vez que você lança o comandante da zona de comando, ele custa {2} a mais do que da vez anterior: é o imposto do comandante.',
+              'Se o comandante for para o cemitério ou para o exílio, você pode devolvê-lo à zona de comando para lançá-lo de novo depois.',
+            ],
+            cards: ['Omnath, Locus of Mana'],
+          },
+          {
+            id: 'mesa',
+            heading: 'A mesa',
+            paragraphs: [
+              'Commander costuma ser jogado com três a cinco pessoas, cada uma contra todas. A vida começa em 40, e a partida vai até sobrar um jogador.',
+              'Algumas cartas aparecem em quase todo deck porque ajudam a gerar mana de qualquer cor do comandante.',
+            ],
+            cards: ['Sol Ring', 'Command Tower', 'Arcane Signet'],
+          },
+        ],
+        remember: [
+          '100 cartas, uma de cada (exceto terrenos básicos).',
+          'O comandante começa na zona de comando e custa {2} a mais a cada vez.',
+          'Vida 40, todos contra todos.',
+        ],
+      },
+      {
+        id: 'identidade-de-cor',
+        track: 'commander',
+        title: 'Identidade de cor',
+        summary: 'Por que o comandante decide quais cartas podem entrar no deck.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'o-que-e',
+            heading: 'O que é a identidade de cor',
+            paragraphs: [
+              'A identidade de cor de uma carta são todas as cores dos símbolos de mana que aparecem nela: no custo e também no texto das habilidades.',
+              'Exemplo: o custo de Kenrith, o Rei Retornado, é {4}{W}, mas o texto tem habilidades com {R}, {G}, {U} e {B}. A identidade dele tem as cinco cores.',
+            ],
+            cards: ['Kenrith, the Returned King'],
+          },
+          {
+            id: 'regra',
+            heading: 'A regra do deck',
+            paragraphs: [
+              'Toda carta do deck precisa ter a identidade dentro da identidade do comandante. Com Omnath ({G}), só entram cartas verdes e incolores.',
+              'Vale para terrenos: uma Ilha só entra num deck com azul na identidade. Cartas incolores, como Sol Ring, entram em qualquer deck.',
+              'Símbolos híbridos contam as duas cores. Alguns comandantes têm parceiro: dois comandantes juntos, e a identidade do deck é a soma dos dois.',
+            ],
+            cards: ["Atraxa, Praetors' Voice"],
+          },
+          {
+            id: 'no-arcanakin',
+            heading: 'No ArcanaKin',
+            paragraphs: [
+              'A validação do deck aponta qualquer carta fora da identidade do comandante, com o nome da carta, para você trocar antes da partida.',
+            ],
+          },
+        ],
+        remember: [
+          'Identidade = cores do custo e do texto da carta.',
+          'Tudo no deck cabe na identidade do comandante.',
+          'Incolor entra em qualquer deck.',
+        ],
+      },
+      {
+        id: 'mesa-de-commander',
+        track: 'commander',
+        title: 'Jogar com várias pessoas',
+        summary: 'Dano de comandante, quem atacar e a conversa na mesa.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'dano',
+            heading: 'Dano de comandante',
+            paragraphs: [
+              'Quem recebe 21 de dano de combate de um mesmo comandante perde a partida, mesmo com vida sobrando. Por isso um comandante grande atacando é uma ameaça de verdade.',
+              'O dano de cada comandante é contado à parte: anote quanto você já recebeu de cada um.',
+            ],
+          },
+          {
+            id: 'quem-atacar',
+            heading: 'Quem atacar',
+            paragraphs: [
+              'Com vários oponentes, você escolhe quem atacar em cada combate e pode dividir as criaturas entre eles.',
+              'Uma boa pergunta antes de atacar: quem está mais perto de vencer? Às vezes vale ajudar a mesa a parar essa pessoa, em vez de atacar quem está mais fraco.',
+            ],
+          },
+          {
+            id: 'conversa',
+            heading: 'A conversa na mesa',
+            paragraphs: [
+              'Acordos ("não me ataca e eu não te ataco") fazem parte do jogo, mas não obrigam ninguém: cada um decide na hora.',
+              'Anuncie em voz alta o que você lança e os alvos, deixe a vida à vista e responda quando alguém perguntar o que uma carta sua faz.',
+            ],
+          },
+        ],
+        remember: [
+          '21 de dano de combate do mesmo comandante: derrota.',
+          'Você escolhe quem atacar.',
+          'Anuncie o que joga; acordos não obrigam ninguém.',
+        ],
+      },
+      {
+        id: 'rule-0-e-brackets',
+        track: 'commander',
+        title: 'Rule 0 e brackets',
+        summary:
+          'A conversa antes do jogo e os níveis de poder oficiais para a mesa ser divertida para todos.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'rule-0',
+            heading: 'Rule 0: a conversa antes do jogo',
+            paragraphs: [
+              'Antes de embaralhar, a mesa conversa: que tipo de deck cada um trouxe, se vale proxy, se há alguma regra da casa. É a chamada Rule 0.',
+              'O objetivo é todo mundo jogar no mesmo nível. Um deck muito mais forte que os outros deixa a partida chata, até para quem ganha.',
+            ],
+          },
+          {
+            id: 'brackets',
+            heading: 'Os brackets',
+            paragraphs: [
+              'A Wizards of the Coast criou cinco níveis de poder, os brackets, para facilitar essa conversa: 1 Exhibition (temático, bem casual), 2 Core (como um deck pré-montado), 3 Upgraded (melhorado), 4 Optimized (forte, sem limites) e 5 cEDH (competitivo).',
+              'Cada nível tem orientações sobre Game Changers (uma lista oficial de cartas muito fortes), combos de duas cartas, destruição de terrenos em massa e turnos extras. Nos níveis 1 e 2, nenhum Game Changer.',
+            ],
+          },
+          {
+            id: 'no-arcanakin',
+            heading: 'No ArcanaKin',
+            paragraphs: [
+              'A análise do deck estima o bracket e lista os Game Changers que ele tem. Leve isso para a conversa da Rule 0 e combine o nível com o grupo.',
+            ],
+          },
+        ],
+        remember: [
+          'Converse antes de jogar: nível do deck, proxies, regras da casa.',
+          'Brackets: 1 Exhibition, 2 Core, 3 Upgraded, 4 Optimized, 5 cEDH.',
+          'O ArcanaKin estima o bracket do seu deck.',
+        ],
+      },
     ],
   },
   en: {
     title: 'Learn to play',
     intro:
-      'Seven short lessons for anyone who has never played Magic: The Gathering. In half an hour you understand the game and are ready for your first table with the group.',
+      'Short lessons for anyone who has never played Magic: The Gathering. In half an hour you understand the game and are ready for your first table with the group; then Commander, the format most played in groups.',
     official: {
       title: 'Official rules',
       text: 'These lessons explain the game in our own words. The full rules and the official glossary are on the Wizards of the Coast website.',
       rules: 'Magic rules (Wizards of the Coast)',
       glossary: 'Keyword glossary (Wizards of the Coast)',
     },
+    tracks: {
+      basics: {
+        title: 'The basics',
+        intro: 'From zero to your first game: cards, mana, the turn, combat and the stack.',
+      },
+      commander: {
+        title: 'Commander for beginners',
+        intro:
+          'The format most played in groups: the commander, color identity, the multiplayer table and the talk before the game.',
+      },
+    },
     lessons: [
       {
         id: 'o-que-e-magic',
+        track: 'basics',
         title: 'What Magic is',
         summary:
           'A duel between wizards: each player has a deck and tries to bring the other to zero life.',
@@ -390,6 +588,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'tipos-de-carta',
+        track: 'basics',
         title: 'Card types',
         summary:
           'Lands, creatures, instants, sorceries, artifacts, enchantments and planeswalkers.',
@@ -431,6 +630,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'mana-e-terrenos',
+        track: 'basics',
         title: 'Mana and lands',
         summary: "The five colors, how to pay a card's cost and why you play one land per turn.",
         minutes: 4,
@@ -470,6 +670,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'o-turno',
+        track: 'basics',
         title: 'The turn',
         summary: 'Beginning, first main phase, combat, second main phase and end.',
         minutes: 4,
@@ -507,6 +708,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'combate',
+        track: 'basics',
         title: 'Combat',
         summary: 'Attacking, blocking and dealing damage, with the most common abilities.',
         minutes: 5,
@@ -546,6 +748,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'a-pilha',
+        track: 'basics',
         title: 'The stack and responses',
         summary: 'How to respond to a spell and why the last one in resolves first.',
         minutes: 4,
@@ -576,6 +779,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
       },
       {
         id: 'como-se-vence',
+        track: 'basics',
         title: 'How you win',
         summary: 'Zero life, an empty library, poison and what changes in Commander.',
         minutes: 3,
@@ -607,6 +811,163 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
         remember: [
           'Life 0, empty library or 10 poison: you lose.',
           'Commander: 100 cards, 40 life, 21 commander damage.',
+        ],
+      },
+      {
+        id: 'commander-o-formato',
+        track: 'commander',
+        title: 'What Commander is',
+        summary: 'One hundred cards, one of each, a commander in the command zone and 40 life.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'deck',
+            heading: 'One hundred cards, one of each',
+            paragraphs: [
+              'A Commander deck has exactly 100 cards, counting the commander. Apart from basic lands, there can be only one copy of each card.',
+              "That's why every game is different: you rarely draw the same card twice.",
+            ],
+          },
+          {
+            id: 'comandante',
+            heading: 'The commander',
+            paragraphs: [
+              'The commander is a legendary creature chosen to lead the deck. It starts the game outside your library, face up in the command zone, and you can cast it from there like any other spell.',
+              'Each time you cast your commander from the command zone, it costs {2} more than the previous time: the commander tax.',
+              'If your commander would go to the graveyard or to exile, you can return it to the command zone to cast it again later.',
+            ],
+            cards: ['Omnath, Locus of Mana'],
+          },
+          {
+            id: 'mesa',
+            heading: 'The table',
+            paragraphs: [
+              'Commander is usually played with three to five people, everyone against everyone. Life starts at 40, and the game goes on until one player is left.',
+              "Some cards show up in almost every deck because they help make mana of any of the commander's colors.",
+            ],
+            cards: ['Sol Ring', 'Command Tower', 'Arcane Signet'],
+          },
+        ],
+        remember: [
+          '100 cards, one of each (except basic lands).',
+          'The commander starts in the command zone and costs {2} more each time.',
+          'Life 40, everyone against everyone.',
+        ],
+      },
+      {
+        id: 'identidade-de-cor',
+        track: 'commander',
+        title: 'Color identity',
+        summary: 'Why the commander decides which cards can go in the deck.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'o-que-e',
+            heading: 'What color identity is',
+            paragraphs: [
+              "A card's color identity is every color of the mana symbols on it: in the cost and also in the rules text.",
+              'Example: Kenrith, the Returned King costs {4}{W}, but its text has abilities with {R}, {G}, {U} and {B}. Its identity has all five colors.',
+            ],
+            cards: ['Kenrith, the Returned King'],
+          },
+          {
+            id: 'regra',
+            heading: 'The deck rule',
+            paragraphs: [
+              "Every card in the deck must have its identity within the commander's identity. With Omnath ({G}), only green and colorless cards go in.",
+              'Lands too: an Island only goes in a deck with blue in its identity. Colorless cards, like Sol Ring, go in any deck.',
+              "Hybrid symbols count both colors. Some commanders have partner: two commanders together, and the deck's identity is both combined.",
+            ],
+            cards: ["Atraxa, Praetors' Voice"],
+          },
+          {
+            id: 'no-arcanakin',
+            heading: 'On ArcanaKin',
+            paragraphs: [
+              "The deck validation points out any card outside the commander's identity, by name, so you can swap it before the game.",
+            ],
+          },
+        ],
+        remember: [
+          "Identity = colors in the card's cost and text.",
+          "Everything in the deck fits the commander's identity.",
+          'Colorless goes in any deck.',
+        ],
+      },
+      {
+        id: 'mesa-de-commander',
+        track: 'commander',
+        title: 'Playing with several people',
+        summary: 'Commander damage, who to attack and table talk.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'dano',
+            heading: 'Commander damage',
+            paragraphs: [
+              'A player who takes 21 combat damage from the same commander loses the game, even with life left. That is why a big commander attacking is a real threat.',
+              "Each commander's damage is tracked separately: keep note of how much you've taken from each one.",
+            ],
+          },
+          {
+            id: 'quem-atacar',
+            heading: 'Who to attack',
+            paragraphs: [
+              'With several opponents, you choose who to attack in each combat and can split your creatures among them.',
+              'A good question before attacking: who is closest to winning? Sometimes it pays to help the table stop that person instead of attacking whoever is weakest.',
+            ],
+          },
+          {
+            id: 'conversa',
+            heading: 'Table talk',
+            paragraphs: [
+              'Deals ("don\'t attack me and I won\'t attack you") are part of the game, but they bind no one: everyone decides in the moment.',
+              'Announce out loud what you cast and its targets, keep your life total visible and answer when someone asks what one of your cards does.',
+            ],
+          },
+        ],
+        remember: [
+          '21 combat damage from the same commander: you lose.',
+          'You choose who to attack.',
+          'Announce what you play; deals bind no one.',
+        ],
+      },
+      {
+        id: 'rule-0-e-brackets',
+        track: 'commander',
+        title: 'Rule 0 and brackets',
+        summary:
+          'The talk before the game and the official power levels, so the table is fun for everyone.',
+        minutes: 4,
+        sections: [
+          {
+            id: 'rule-0',
+            heading: 'Rule 0: the talk before the game',
+            paragraphs: [
+              "Before shuffling, the table talks: what kind of deck each person brought, whether proxies are OK, any house rules. It's called Rule 0.",
+              'The goal is for everyone to play at the same level. A deck much stronger than the others makes the game dull, even for the winner.',
+            ],
+          },
+          {
+            id: 'brackets',
+            heading: 'The brackets',
+            paragraphs: [
+              'Wizards of the Coast created five power levels, the brackets, to make that talk easier: 1 Exhibition (themed, very casual), 2 Core (like a preconstructed deck), 3 Upgraded, 4 Optimized (strong, no limits) and 5 cEDH (competitive).',
+              'Each level has guidelines about Game Changers (an official list of very strong cards), two-card combos, mass land destruction and extra turns. Levels 1 and 2 have no Game Changers.',
+            ],
+          },
+          {
+            id: 'no-arcanakin',
+            heading: 'On ArcanaKin',
+            paragraphs: [
+              'The deck analysis estimates the bracket and lists the Game Changers it has. Bring that to the Rule 0 talk and agree on the level with your group.',
+            ],
+          },
+        ],
+        remember: [
+          'Talk before playing: deck level, proxies, house rules.',
+          'Brackets: 1 Exhibition, 2 Core, 3 Upgraded, 4 Optimized, 5 cEDH.',
+          'ArcanaKin estimates the bracket of your deck.',
         ],
       },
     ],

@@ -23,6 +23,7 @@ export const ACHIEVEMENT_ICON: Record<AchievementId, IconName> = {
   learn_first: 'learn',
   learn_path: 'lessons',
   learn_to_table: 'table',
+  learn_commander: 'lessons',
   games_100: 'veteran',
   wins_25: 'ranking',
   wins_50: 'ranking',

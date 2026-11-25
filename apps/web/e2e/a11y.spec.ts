@@ -33,6 +33,7 @@ const PUBLIC_PAGES = [
   '/ajuda',
   '/aprender',
   '/aprender/combate',
+  '/aprender/identidade-de-cor',
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,

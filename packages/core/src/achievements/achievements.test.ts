@@ -351,6 +351,21 @@ describe('conquistas da trilha "Aprender a jogar" (12.1)', () => {
     expect(find(onlyBefore, 'learn_to_table').unlocked).toBe(false);
   });
 
+  it('"pronto para o Commander": o bloco de Commander; o básico não depende dele', () => {
+    const commander = [
+      'commander-o-formato',
+      'identidade-de-cor',
+      'mesa-de-commander',
+      'rule-0-e-brackets',
+    ];
+    const list = computeAchievements('me', [], [], { lessons: lessons([...all, ...commander]) });
+    expect(find(list, 'learn_commander')).toMatchObject({ unlocked: true, unlockedAt: at(11) });
+    expect(find(list, 'learn_path')).toMatchObject({ unlocked: true, unlockedAt: at(7) });
+    const onlyCommander = computeAchievements('me', [], [], { lessons: lessons(commander) });
+    expect(find(onlyCommander, 'learn_commander').unlocked).toBe(true);
+    expect(find(onlyCommander, 'learn_path')).toMatchObject({ unlocked: false, progress: 0 });
+  });
+
   it('lição que não existe mais não conta', () => {
     const list = computeAchievements('me', [], [], {
       lessons: lessons([...all.slice(0, 6), 'licao-antiga']),

@@ -1137,6 +1137,10 @@
       "learn_to_table": {
         "name": "Da teoria à mesa",
         "description": "Jogar uma partida depois de concluir a trilha \"Aprender a jogar\"."
+      },
+      "learn_commander": {
+        "name": "Pronto para o Commander",
+        "description": "Concluir todas as lições de \"Commander para iniciantes\"."
       }
     },
     "tabsLabel": "Conquistas",
@@ -2700,6 +2704,7 @@
     "markedDone": "Lição concluída.",
     "markedUndone": "Lição desmarcada.",
     "previous": "Anterior",
-    "next": "Próxima"
+    "next": "Próxima",
+    "trackProgress": "{done} de {total} concluídas neste bloco"
   }
 }
