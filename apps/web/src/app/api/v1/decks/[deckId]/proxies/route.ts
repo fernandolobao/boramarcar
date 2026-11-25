@@ -1,4 +1,5 @@
 import { DomainError, slugify } from '@boramarcar/core';
+import { outsideDeck } from '@boramarcar/core';
 import { getDeck } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseQuery } from '@/server/http';
@@ -21,7 +22,7 @@ export const GET = authed<{ deckId: string }>(async ({ req, db, user, params }) 
   const deck = await getDeck(db, { deckId: params.deckId, viewerId: user.id });
   const { pdf, cards, missingImages } = await buildProxySheet({
     deckName: deck.name,
-    lines: deck.lines.filter((l) => l.board !== 'maybeboard'),
+    lines: deck.lines.filter((l) => !outsideDeck(l.board)),
     which,
     page,
   });

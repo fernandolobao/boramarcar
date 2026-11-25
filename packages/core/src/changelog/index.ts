@@ -269,6 +269,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Agora dá para montar um deck do zero, sem importar nada, e deixá-lo como rascunho: as cartas de um rascunho não entram na sua coleção até você publicar o deck.',
     en: 'You can now build a deck from scratch, without importing anything, and keep it as a draft: a draft\u2019s cards don\u2019t go into your collection until you publish the deck.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Tokens e emblemas ganharam categoria própria na lista do deck: não ficam mais em "Talvez" e não contam no total de cartas nem na sua coleção.',
+    en: 'Tokens and emblems now have their own section in the deck list: they no longer sit in "Maybe" and don\u2019t count in the card total or your collection.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

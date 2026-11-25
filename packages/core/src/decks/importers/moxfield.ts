@@ -36,6 +36,7 @@ const moxfieldDeckSchema = z.object({
     mainboard: boardSchema,
     sideboard: boardSchema,
     maybeboard: boardSchema,
+    tokens: boardSchema.optional(),
   }),
 });
 
@@ -58,6 +59,7 @@ const BOARD_MAP: Record<string, DeckBoard> = {
   mainboard: 'mainboard',
   sideboard: 'sideboard',
   maybeboard: 'maybeboard',
+  tokens: 'tokens',
 };
 
 /**

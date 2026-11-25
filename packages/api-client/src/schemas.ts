@@ -432,7 +432,7 @@ export const deckLineSchema = z
   .object({
     key: z.string(),
     name: z.string(),
-    board: z.enum(['commander', 'mainboard', 'sideboard', 'maybeboard']),
+    board: z.enum(['commander', 'mainboard', 'sideboard', 'maybeboard', 'tokens']),
     quantity: z.number(),
     proxies: z.number(),
     scryfallId: z.string().nullable(),

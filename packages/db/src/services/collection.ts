@@ -1,5 +1,5 @@
 import { DomainError, type CardData } from '@boramarcar/core';
-import { and, asc, eq, ne, sql } from 'drizzle-orm';
+import { and, asc, eq, notInArray, sql } from 'drizzle-orm';
 import type { Database } from '../client';
 import { cards, collectionCards, deckCards, decks } from '../schema';
 import { toCardData, upsertCards } from './decks';
@@ -9,7 +9,7 @@ export const MAX_COLLECTION_COPIES = 999;
 
 /**
  * Garante que a coleção tenha pelo menos as cartas dos decks da pessoa: para cada carta,
- * impressão e acabamento, a soma das cópias não proxy em todos os decks (fora o maybeboard).
+ * impressão e acabamento, a soma das cópias não proxy em todos os decks (fora o maybeboard e os tokens).
  * Só acrescenta: tirar uma carta de um deck não tira da coleção, porque ela continua sendo sua.
  */
 export async function syncCollectionFromDecks(db: Database, userId: string) {
@@ -20,7 +20,7 @@ export async function syncCollectionFromDecks(db: Database, userId: string) {
     from ${deckCards} dc
     join ${decks} d on d.id = dc.deck_id
     where d.owner_id = ${userId} and d.status = 'published' and dc.is_proxy = false
-      and dc.board <> 'maybeboard'
+      and dc.board not in ('maybeboard', 'tokens')
     group by dc.card_name, dc.scryfall_id, dc.is_foil
     on conflict (user_id, card_name, coalesce(scryfall_id, ''), is_foil)
     do update set
@@ -74,7 +74,7 @@ export async function listCollection(db: Database, userId: string): Promise<Coll
       })
       .from(deckCards)
       .innerJoin(decks, eq(decks.id, deckCards.deckId))
-      .where(and(eq(decks.ownerId, userId), ne(deckCards.board, 'maybeboard')))
+      .where(and(eq(decks.ownerId, userId), notInArray(deckCards.board, ['maybeboard', 'tokens'])))
       .groupBy(
         sql`lower(${deckCards.cardName})`,
         deckCards.scryfallId,
@@ -202,7 +202,7 @@ async function moveDeckCopies(
       v.scryfallId ? eq(deckCards.scryfallId, v.scryfallId) : sql`${deckCards.scryfallId} is null`,
       eq(deckCards.isFoil, v.foil),
       eq(deckCards.isProxy, false),
-      ne(deckCards.board, 'maybeboard'),
+      notInArray(deckCards.board, ['maybeboard', 'tokens']),
     );
   const rows = await tx.select().from(deckCards).where(same(input.from)).orderBy(asc(deckCards.id));
   const inDecks = rows.reduce((n, r) => n + r.quantity, 0);

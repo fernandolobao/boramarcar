@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { outsideDeck } from '@boramarcar/core';
 import { PublishDeck } from '@/components/deck-forms';
 import {
   artCropUrl,
@@ -102,7 +103,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
       ),
     ),
   ];
-  const price = deckPrice(deck.entries.filter((e) => e.board !== 'maybeboard'));
+  const price = deckPrice(deck.entries.filter((e) => !outsideDeck(e.board)));
   const usd = (value: number) => fmt.number(value, { style: 'currency', currency: 'USD' });
   const brl = (value: number) => fmt.number(value, { style: 'currency', currency: 'BRL' });
   const rate = price.total > 0 ? await getUsdBrlRate() : null;

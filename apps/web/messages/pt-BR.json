@@ -397,7 +397,8 @@
       "commander": "Comandante",
       "mainboard": "Deck",
       "sideboard": "Sideboard",
-      "maybeboard": "Talvez"
+      "maybeboard": "Talvez",
+      "tokens": "Tokens e emblemas"
     },
     "importMode": "Forma de importação",
     "deleteDeck": "Remover deck {name}",

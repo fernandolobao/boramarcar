@@ -397,7 +397,8 @@
       "commander": "Commander",
       "mainboard": "Deck",
       "sideboard": "Sideboard",
-      "maybeboard": "Maybe"
+      "maybeboard": "Maybe",
+      "tokens": "Tokens and emblems"
     },
     "importMode": "Import method",
     "deleteDeck": "Remove deck {name}",

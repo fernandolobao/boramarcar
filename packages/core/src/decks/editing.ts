@@ -101,6 +101,7 @@ const SECTION_TITLE: Record<DeckBoard, string> = {
   mainboard: 'Deck',
   sideboard: 'Sideboard',
   maybeboard: 'Maybeboard',
+  tokens: 'Tokens',
 };
 
 export type ExportFormat = 'plain' | 'proxies';

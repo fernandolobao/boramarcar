@@ -1,5 +1,6 @@
 import {
   analyzeDeck,
+  boardOf,
   comparableCards,
   compareWithDecks,
   type AnalyzableCard,
@@ -12,6 +13,7 @@ import {
   artCropUrl,
   DECK_VISIBILITIES,
   isGameFormat,
+  isTokenTypeLine,
   attachCardData,
   DomainError,
   mergeDeckLines,
@@ -23,7 +25,7 @@ import {
   type DeckEntry,
   type ImportedDeck,
 } from '@boramarcar/core';
-import { and, asc, count, desc, eq, inArray, isNull, ne, or, sql, sum } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
 import { logAdminAccess } from './admin-access';
@@ -280,7 +282,8 @@ export async function saveImportedDeck(
         cardName: entry.card?.name ?? entry.name,
         scryfallId: entry.card?.scryfallId ?? null,
         quantity: entry.quantity,
-        board: entry.board,
+        // Token e emblema vão para "tokens", de qualquer origem (Archidekt põe em "talvez").
+        board: boardOf(entry.board, entry.card?.typeLine),
         isProxy: entry.isProxy ?? false,
         isFoil: entry.isFoil ?? false,
       };
@@ -365,7 +368,11 @@ export async function listDecks(db: Database, ownerId: string) {
       source: decks.source,
       sourceUrl: decks.sourceUrl,
       updatedAt: decks.updatedAt,
-      cardCount: sum(deckCards.quantity).mapWith(Number),
+      // Só as cartas do deck: "talvez" e tokens ficam de fora do total.
+      cardCount:
+        sql<number>`coalesce(sum(case when ${deckCards.board} in ('maybeboard', 'tokens') then 0 else ${deckCards.quantity} end), 0)`.mapWith(
+          Number,
+        ),
       proxyCount:
         sql<number>`coalesce(sum(case when ${deckCards.isProxy} then ${deckCards.quantity} else 0 end), 0)`.mapWith(
           Number,
@@ -531,7 +538,7 @@ export async function getDeckRatings(db: Database, deckIds: readonly string[]) {
       .map(({ entry, card }) => ({
         name: entry.cardName,
         quantity: entry.quantity,
-        board: entry.board,
+        board: boardOf(entry.board, card?.typeLine),
         isProxy: entry.isProxy,
         card: card ? toCardData(card) : null,
       }));
@@ -571,12 +578,29 @@ export async function getDeck(
     .where(eq(deckCards.deckId, deck.id))
     .orderBy(asc(deckCards.board), asc(deckCards.cardName));
 
+  // Tokens e emblemas guardados em outra categoria (decks importados antes de "tokens" existir)
+  // passam de vez para "tokens", para o editor achar a linha onde ela aparece.
+  const misplaced = rows.filter(
+    ({ entry, card }) => entry.board !== 'tokens' && isTokenTypeLine(card?.typeLine),
+  );
+  if (misplaced.length) {
+    await db
+      .update(deckCards)
+      .set({ board: 'tokens' })
+      .where(
+        inArray(
+          deckCards.id,
+          misplaced.map((m) => m.entry.id),
+        ),
+      )
+      .catch(() => undefined);
+  }
   const entries = rows.map(({ entry, card }) => ({
     id: entry.id,
     name: entry.cardName,
     scryfallId: entry.scryfallId,
     quantity: entry.quantity,
-    board: entry.board,
+    board: boardOf(entry.board, card?.typeLine),
     isProxy: entry.isProxy,
     isFoil: entry.isFoil,
     card: card ? toCardData(card) : null,
@@ -1298,7 +1322,7 @@ export async function compareWithCommanderDecks(
       .map(({ entry, card }) => ({
         name: entry.cardName,
         quantity: entry.quantity,
-        board: entry.board,
+        board: boardOf(entry.board, card?.typeLine),
         isProxy: entry.isProxy,
         card: card ? toCardData(card) : null,
       }));

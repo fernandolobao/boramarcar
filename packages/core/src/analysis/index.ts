@@ -1,4 +1,4 @@
-import type { CardData, DeckBoard } from '../decks/types';
+import { outsideDeck, type CardData, type DeckBoard } from '../decks/types';
 import { deckFormatProfile, type DeckFormatProfile } from './formats';
 import { canPairCommanders } from './partners';
 import { manaBase, openingHandOdds, type ColorSourceRow, type OpeningHandOdds } from './mana';
@@ -213,7 +213,7 @@ export function validateDeck(
 
   const identity = new Set(commanders.flatMap((c) => c.card?.colorIdentity ?? []));
   // Cópias contam principal + reserva (regra dos formatos construídos).
-  const counted = cards.filter((c) => c.board !== 'maybeboard');
+  const counted = cards.filter((c) => !outsideDeck(c.board));
   const quantities = new Map<
     string,
     { name: string; quantity: number; card: CardData | null; inDeck: boolean }

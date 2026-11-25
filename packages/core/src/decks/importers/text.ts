@@ -18,6 +18,10 @@ const SECTION_ALIASES: Record<string, DeckBoard> = {
   maybeboard: 'maybeboard',
   maybe: 'maybeboard',
   considering: 'maybeboard',
+  tokens: 'tokens',
+  token: 'tokens',
+  emblems: 'tokens',
+  emblem: 'tokens',
   companion: 'sideboard',
 };
 

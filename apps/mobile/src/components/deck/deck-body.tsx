@@ -146,7 +146,7 @@ export function DeckBody({
   const groups = groupEntriesByType(
     deck.lines.filter((l) => l.board === 'mainboard').map((l) => ({ ...l, isProxy: false })),
   );
-  const others = (['sideboard', 'maybeboard'] as const)
+  const others = (['sideboard', 'maybeboard', 'tokens'] as const)
     .map((board) => ({ board, lines: deck.lines.filter((l) => l.board === board) }))
     .filter((b) => b.lines.length > 0);
   const count = (lines: readonly DeckLine[]) => lines.reduce((sum, l) => sum + l.quantity, 0);
