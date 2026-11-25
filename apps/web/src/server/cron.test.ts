@@ -13,7 +13,7 @@ vi.mock('@/env', () => ({
   getBaseUrl: () => 'https://www.arcanakin.com.br',
 }));
 
-const { runCron } = await import('./cron');
+const { runCron, runSteps } = await import('./cron');
 
 const request = () =>
   new Request('https://x/api/cron/reminders', {
@@ -56,5 +56,33 @@ describe('runCron', () => {
         text: expect.stringContaining('banco fora do ar'),
       }),
     ]);
+  });
+});
+
+describe('runSteps (tarefas do cron diário)', () => {
+  it('uma tarefa que falha não impede as outras; a falha vai ao Sentry e é relatada no fim', async () => {
+    const ran: string[] = [];
+    const run = runSteps({
+      lembretes: async () => {
+        ran.push('lembretes');
+        return 3;
+      },
+      metricas: async () => {
+        throw new Error('Resend fora do ar');
+      },
+      retrospectiva: async () => {
+        ran.push('retrospectiva');
+        return 2;
+      },
+    });
+    await expect(run).rejects.toThrow(/metricas/);
+    expect(ran).toEqual(['lembretes', 'retrospectiva']);
+    expect(sentry.captureException).toHaveBeenCalledWith(expect.any(Error), {
+      tags: { cronStep: 'metricas' },
+    });
+  });
+
+  it('sem falhas, devolve o resultado de cada tarefa', async () => {
+    expect(await runSteps({ a: async () => 1, b: async () => 'ok' })).toEqual({ a: 1, b: 'ok' });
   });
 });

@@ -1,6 +1,9 @@
 import { DomainError } from '@boramarcar/core';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
+const sentry = vi.hoisted(() => ({ captureException: vi.fn() }));
+vi.mock('@sentry/nextjs', () => sentry);
+
 import { errorResponse, isoDate, parseJson, parseQuery } from './http';
 
 describe('errorResponse', () => {
@@ -71,5 +74,20 @@ describe('parse helpers', () => {
     const res = errorResponse(error);
     expect(res.status).toBe(409);
     expect((await res.json()).error.code).toBe('conflict');
+  });
+
+  it('erro inesperado vai ao Sentry e ao log sem os parâmetros da consulta (e-mails, nomes)', () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = Object.assign(
+      new Error('Failed query: select * from "user" where email = $1\nparams: ana@exemplo.test'),
+      { cause: Object.assign(new Error('connection reset'), { code: 'ECONNRESET' }) },
+    );
+    const res = errorResponse(error);
+    expect(res.status).toBe(500);
+    const sentToSentry = sentry.captureException.mock.calls.at(-1)![0] as Error;
+    expect(sentToSentry.message).not.toContain('ana@exemplo.test');
+    expect(sentToSentry.message).toContain('ECONNRESET');
+    expect(JSON.stringify(log.mock.calls)).not.toContain('ana@exemplo.test');
+    log.mockRestore();
   });
 });

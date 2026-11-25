@@ -1,4 +1,5 @@
 import 'server-only';
+import * as Sentry from '@sentry/nextjs';
 import { DomainError, type DomainErrorCode } from '@boramarcar/core';
 import { isUniqueViolation, type Database } from '@boramarcar/db';
 import { z } from 'zod';
@@ -17,6 +18,22 @@ const STATUS_BY_CODE: Record<DomainErrorCode, number> = {
 
 export interface ApiErrorBody {
   error: { code: DomainErrorCode | 'internal_error'; message: string; details?: unknown };
+}
+
+/**
+ * Erro do Drizzle traz a consulta e os **parâmetros** na mensagem ("Failed query: … params: …"),
+ * que podem ter e-mail e nome de alguém. Para o log e o Sentry vai só a causa (código e mensagem
+ * do driver), mantendo a pilha.
+ */
+function withoutQueryParams(error: unknown): Error {
+  if (!(error instanceof Error)) return new Error(String(error));
+  if (!error.message.startsWith('Failed query')) return error;
+  const cause = error.cause as { code?: unknown; message?: unknown } | undefined;
+  const safe = new Error(
+    `Falha no banco${cause?.code ? ` (${String(cause.code)})` : ''}: ${String(cause?.message ?? 'sem detalhe')}`,
+  );
+  safe.stack = `${safe.message}\n${error.stack?.split('\n').slice(1).join('\n') ?? ''}`;
+  return safe;
 }
 
 export function errorResponse(error: unknown): Response {
@@ -44,7 +61,9 @@ export function errorResponse(error: unknown): Response {
     };
     return Response.json(body, { status: 409 });
   }
-  console.error(error);
+  const safe = withoutQueryParams(error);
+  console.error('[api] erro inesperado:', safe.message);
+  Sentry.captureException(safe);
   const body: ApiErrorBody = { error: { code: 'internal_error', message: 'Erro inesperado' } };
   return Response.json(body, { status: 500 });
 }

@@ -1,3 +1,4 @@
+import { SECURITY_HEADERS } from './src/lib/security-headers';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs/config';
 import createNextIntlPlugin from 'next-intl/plugin';
@@ -17,21 +18,12 @@ const nextConfig: NextConfig = {
       permanent: true,
     }));
   },
-  // Cabeçalhos de segurança em tudo (a CSP, que muda a cada página, vem do `proxy.ts`).
+  // Cabeçalhos de segurança em tudo (ver lib/security-headers.ts).
   async headers() {
     return [
       {
         source: '/:path*',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
-          {
-            key: 'Permissions-Policy',
-            value:
-              'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()',
-          },
-        ],
+        headers: SECURITY_HEADERS,
       },
     ];
   },

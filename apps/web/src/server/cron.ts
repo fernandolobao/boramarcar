@@ -57,6 +57,36 @@ export async function runCron(
   }
 }
 
+/**
+ * Tarefas independentes de um mesmo cron (ex.: lembretes, métricas, retrospectiva): cada uma roda
+ * mesmo que outra falhe. Cada falha vai ao Sentry com o nome da tarefa; no fim, se alguma falhou,
+ * o erro lista quais (o monitor marca o cron como falho e o aviso por e-mail sai).
+ */
+export async function runSteps<T extends Record<string, () => Promise<unknown>>>(
+  steps: T,
+): Promise<{ [K in keyof T]: Awaited<ReturnType<T[K]>> }> {
+  const results: Record<string, unknown> = {};
+  const failed: string[] = [];
+  for (const [name, step] of Object.entries(steps)) {
+    try {
+      results[name] = await step();
+    } catch (error) {
+      failed.push(name);
+      Sentry.captureException(error, { tags: { cronStep: name } });
+      console.error(
+        `[cron] a tarefa "${name}" falhou`,
+        error instanceof Error ? error.message : error,
+      );
+    }
+  }
+  if (failed.length) {
+    throw new Error(
+      `Tarefas que falharam: ${failed.join(', ')} (as outras rodaram: ${JSON.stringify(results)})`,
+    );
+  }
+  return results as { [K in keyof T]: Awaited<ReturnType<T[K]>> };
+}
+
 /** E-mail curto para o dono do projeto: qual cron falhou, quando e a mensagem do erro. */
 async function notifyCronFailure(slug: string, error: unknown) {
   const to = adminEmails();

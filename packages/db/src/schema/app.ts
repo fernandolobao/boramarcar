@@ -632,3 +632,18 @@ export const adminAccessLog = pgTable(
   },
   (t) => [index('admin_access_log_target_idx').on(t.targetUserId, t.createdAt)],
 );
+
+/**
+ * Tarefas de cron que só podem acontecer uma vez por período (ex.: e-mail de métricas da semana).
+ * A linha é o "já feito": um cron repetido ou reexecutado não manda de novo (ver `onceFor`).
+ */
+export const cronRuns = pgTable(
+  'cron_runs',
+  {
+    task: text('task').notNull(),
+    /** Período da tarefa (ex.: a segunda-feira da semana, `2026-11-23`). */
+    period: text('period').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.task, t.period] })],
+);

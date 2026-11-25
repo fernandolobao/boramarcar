@@ -61,6 +61,22 @@ test.describe('descoberta de lojas e eventos', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Esteio, RS/ })).toBeVisible();
   });
 
+  test('"Usar minha localização" funciona (o cabeçalho de permissões deixa o site pedir a posição)', async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      geolocation: { latitude: -30.0346, longitude: -51.2177 },
+      permissions: ['geolocation'],
+    });
+    const page = await context.newPage();
+    await page.goto('/lojas');
+    await page.getByRole('button', { name: 'Usar minha localização' }).click();
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Ordenado pela distância da sua localização' }),
+    ).toBeVisible();
+    await context.close();
+  });
+
   test('sitemap lista a página da cidade com loja', async ({ request }) => {
     const xml = await (await request.get('/sitemap.xml')).text();
     expect(xml).toContain('/lojas/em/rs/porto-alegre');

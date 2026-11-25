@@ -18,7 +18,7 @@ etapas sem transação.
 3. Dados expostos (M1, M2, M3 e as baixas de dados) ✅
 4. Abuso e negação de serviço (M4, M5 e as baixas de limite) ✅
 5. Concorrência e atomicidade (M6, M7, M8) ✅
-6. Estabilidade operacional (M9, M10, M11, M12).
+6. Estabilidade operacional (M9, M10, M11, M12) ✅
 7. Endurecimento (o resto das baixas).
 
 ### ALTA
@@ -103,19 +103,23 @@ status='registration' RETURNING`; inscritos em lote.
   acima de ~16 mil pessoas (limite de parâmetros do Postgres); status vira "publicado" antes de gravar;
   clique duplo manda duas vezes. Correção: guarda no UPDATE, transação, lotes de 1.000.
   **Corrigido:** publicação numa transação com guarda de status; `addNotifications` grava em lotes de 1.000 (`announcements-scale.test.ts`, com 17 mil pessoas). E qualquer chave única repetida que escapar vira 409 em `errorResponse` (`isUniqueViolation`).
-- **M9. Cron diário: uma falha derruba o resto do dia** (`app/api/cron/reminders/route.ts`): lembretes,
+- ✅ **M9. Cron diário: uma falha derruba o resto do dia** (`app/api/cron/reminders/route.ts`): lembretes,
   métricas, novidades e retrospectivas em sequência; se uma tarefa falha, as outras não rodam (a
   retrospectiva do dia 1 se perde); métricas e novidades podem sair duas vezes. Correção: cada tarefa com
   seu `try/catch` e relatório; marcas "já enviado" por dia; retrospectiva recupera o mês se falhar no dia 1.
-- **M10. Pool do banco sem tratamento de erro** (`packages/db/src/client.ts`): sem `pool.on('error')`, uma
+  **Corrigido:** cada tarefa do cron diário roda isolada (`runSteps` em `server/cron.ts`; a falha vai ao Sentry com o nome da tarefa e o cron é marcado como falho no fim); métricas e novidades saem uma vez por semana (`onceFor`, tabela `cron_runs`, migration 0039); a retrospectiva tenta do dia 1 ao 7 sem repetir.
+- ✅ **M10. Pool do banco sem tratamento de erro** (`packages/db/src/client.ts`): sem `pool.on('error')`, uma
   conexão derrubada pelo Neon pode derrubar o processo; sem tempo limite de conexão e de consulta.
   Correção: `pool.on('error')`, `connectionTimeoutMillis`, `idleTimeoutMillis`, `statement_timeout`.
-- **M11. Erros 500 da API não chegam ao Sentry e vazam parâmetros no log** (`server/http.ts:40`): só
+  **Corrigido:** `pool.on('error')`, `connectionTimeoutMillis` 5 s, `idleTimeoutMillis` 10 s e `statement_timeout` 15 s (`packages/db/src/client.ts`).
+- ✅ **M11. Erros 500 da API não chegam ao Sentry e vazam parâmetros no log** (`server/http.ts:40`): só
   `console.error`; erros do Drizzle trazem os parâmetros da consulta (e-mails, nomes). Correção:
   `Sentry.captureException` e registrar só código/mensagem do erro do banco.
-- **M12. "Usar minha localização" não funciona no site** (`next.config.ts`
+  **Corrigido:** `errorResponse` manda o erro ao Sentry e ao log sem a consulta nem os parâmetros (só o código e a mensagem do driver).
+- ✅ **M12. "Usar minha localização" não funciona no site** (`next.config.ts`
   `Permissions-Policy: geolocation=()`): o próprio cabeçalho bloqueia a geolocalização. Correção:
   `geolocation=(self)`. (Defeito funcional do 10.3.)
+  **Corrigido:** `geolocation=(self)` (`lib/security-headers.ts`), com E2E de localização simulada.
 
 ### BAIXA (endurecimento)
 
