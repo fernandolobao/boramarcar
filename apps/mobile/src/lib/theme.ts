@@ -1,4 +1,4 @@
-import { themes } from '@boramarcar/tokens';
+import { palette, scales, themes } from '@boramarcar/tokens';
 import { useColorScheme } from 'react-native';
 
 /** Cores do app a partir dos design tokens do ArcanaKin (os mesmos do site, contraste AA testado). */
@@ -20,6 +20,12 @@ const fromTokens = (t: (typeof themes)['light']) => ({
   onAccent: t.onAccent,
   danger: t.danger,
   success: t.success,
+  /** Quantidade sobre a carta (×2): escuro translúcido, igual ao do site nos dois temas. */
+  badgeBg: `${palette.noite}d9`,
+  badgeText: palette.pergaminho,
+  /** Selo "Foil" sobre a carta (igual ao do site, nos dois temas). */
+  foilBg: scales.teal[100],
+  foilText: scales.teal[900],
 });
 
 const light = fromTokens(themes.light);

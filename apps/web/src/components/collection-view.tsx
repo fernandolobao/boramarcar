@@ -265,51 +265,54 @@ function GalleryTile({
   const td = useTranslations('decks');
   const image = entry.card?.imageUri;
   return (
-    <div className="relative space-y-1">
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        aria-label={`${t('open', { name: entry.name })} (${t('copies', { count: entry.quantity })}${entry.foil ? `, ${td('foil')}` : ''})`}
-        className={`relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-surface-muted shadow-sm ${
-          entry.foil && image ? 'holo' : ''
-        }`}
-        onClick={(e) => onOpen(entry, e.currentTarget)}
-      >
-        {image ? (
-          <Image
-            src={image}
-            alt=""
-            fill
-            unoptimized
-            loading="lazy"
-            sizes="(min-width: 1280px) 12vw, (min-width: 768px) 16vw, 33vw"
-            className="object-cover"
-          />
-        ) : (
-          <span className="absolute inset-0 grid place-items-center p-1 text-center text-xs font-medium">
-            {entry.name}
-          </span>
-        )}
-        {entry.foil && image && <span aria-hidden="true" className="foil-sheen" />}
-        {entry.foil && image && <HoloLayers foil />}
-      </button>
-      {/* Fora do botão (o nome dele já diz as cópias), para o texto visível bater com o nome. */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute top-1 left-1 rounded-md bg-noite/85 px-1.5 py-0.5 text-xs font-bold text-pergaminho tabular-nums"
-      >
-        ×{entry.quantity}
-      </span>
-      {/* Selo de foil sobre a imagem (como na galeria do deck), para as legendas terem o mesmo
-          espaço em todas as cartas; o "foil" já está no nome do botão. */}
-      {entry.foil && (
+    <div className="space-y-1">
+      {/* Imagem e selos num bloco só: os cantos são os da carta, não os da legenda. */}
+      <div className="relative">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-label={`${t('open', { name: entry.name })} (${t('copies', { count: entry.quantity })}${entry.foil ? `, ${td('foil')}` : ''})`}
+          className={`relative block aspect-[488/680] w-full overflow-hidden rounded-[4.5%/3.2%] bg-surface-muted shadow-sm ${
+            entry.foil && image ? 'holo' : ''
+          }`}
+          onClick={(e) => onOpen(entry, e.currentTarget)}
+        >
+          {image ? (
+            <Image
+              src={image}
+              alt=""
+              fill
+              unoptimized
+              loading="lazy"
+              sizes="(min-width: 1280px) 12vw, (min-width: 768px) 16vw, 33vw"
+              className="object-cover"
+            />
+          ) : (
+            <span className="absolute inset-0 grid place-items-center p-1 text-center text-xs font-medium">
+              {entry.name}
+            </span>
+          )}
+          {entry.foil && image && <span aria-hidden="true" className="foil-sheen" />}
+          {entry.foil && image && <HoloLayers foil />}
+        </button>
+        {/* Fora do botão (o nome dele já diz as cópias), para o texto visível bater com o nome. */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute top-1 right-1 rounded-md bg-teal-100 px-1.5 py-0.5 text-xs font-bold text-teal-900"
+          className="pointer-events-none absolute top-1 left-1 rounded-md bg-noite/85 px-1.5 py-0.5 text-xs font-bold text-pergaminho tabular-nums"
         >
-          ✦ {td('foil')}
+          ×{entry.quantity}
         </span>
-      )}
+        {/* Selo de foil no canto inferior esquerdo (o mesmo lugar da galeria do deck e do app), para as legendas terem o mesmo
+            espaço em todas as cartas; o "foil" já está no nome do botão. */}
+        {entry.foil && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-[6%] left-1.5 rounded-md bg-teal-100 px-1.5 py-0.5 text-xs font-bold text-teal-900"
+          >
+            ✦ {td('foil')}
+          </span>
+        )}
+      </div>
       <p className="flex flex-wrap items-center gap-1 text-xs">
         {/* Mesmo tamanho, peso e cor nos dois casos: o texto já diz se está em algum deck. */}
         <span className="inline-flex items-center gap-0.5 font-medium text-fg-muted">
