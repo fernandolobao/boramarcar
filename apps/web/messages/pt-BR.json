@@ -914,6 +914,7 @@
   "groupSettings": {
     "title": "Configurações do grupo",
     "readOnly": "Só o dono ou um admin pode alterar.",
+    "tableGroup": "Quando a mesa fecha",
     "tableSize": "Jogadores para a mesa fechar",
     "tableSizeHint": "Usado nas sugestões de horário e no aviso \"a mesa fechou!\".",
     "minDuration": "Duração mínima da janela (minutos)",
@@ -2173,22 +2174,22 @@
     "empty": "Ainda não há partidas registradas. Os recordes aparecem depois da primeira noite de jogo.",
     "recordsTitle": "Recordes",
     "someone": "alguém",
-    "event": "encontro",
+    "event": "sem título",
     "fastestWin": {
       "title": "Vitória mais rápida",
-      "body": "<who></who> {count, plural, =1 {venceu} other {venceram}} no turno {turn}, em <event></event> ({date})."
+      "body": "<who></who> {count, plural, =1 {venceu} other {venceram}} no turno {turn}, no encontro “<event></event>” ({date})."
     },
     "longestGame": {
       "title": "Partida mais longa",
-      "body": "{minutes} minutos de partida, em <event></event> ({date})."
+      "body": "{minutes} minutos de partida, no encontro “<event></event>” ({date})."
     },
     "longestStreak": {
       "title": "Maior sequência de vitórias",
-      "body": "<who></who> venceu {length} partidas seguidas, até <event></event> ({date})."
+      "body": "<who></who> venceu {length} partidas seguidas; a última no encontro “<event></event>” ({date})."
     },
     "busiestNight": {
       "title": "Noite com mais partidas",
-      "body": "{games} partidas em <event></event> ({date})."
+      "body": "{games} partidas no encontro “<event></event>” ({date})."
     },
     "topCommander": {
       "title": "Comandante com mais vitórias",

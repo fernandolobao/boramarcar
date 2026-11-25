@@ -24,11 +24,11 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.16",
+    "@electric-sql/pglite": "^0.5.17",
     "@types/node": "^22.19.0",
     "@types/pg": "^8.15.6",
     "drizzle-kit": "^0.31.11",
     "typescript": "~6.0.3",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   }
 }
