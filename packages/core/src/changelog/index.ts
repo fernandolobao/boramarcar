@@ -254,6 +254,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Imprimir proxies agora está liberado para todo mundo: na página do deck, abra a folha para imprimir (cartas em tamanho real) ou baixe o PDF.',
     en: 'Printing proxies is now open to everyone: on the deck page, open the print sheet (real-size cards) or download the PDF.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'As páginas de lojas, eventos de loja, torneio, resumo e retrospectiva ganharam "Voltar ao painel" no topo, para quem usa o ArcanaKin instalado no celular.',
+    en: 'Store, store event, tournament, recap and monthly recap pages now have "Back to dashboard" at the top, for people using ArcanaKin installed on their phone.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

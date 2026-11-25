@@ -1,9 +1,9 @@
 import { getStoreInvite } from '@boramarcar/db';
+import { PublicTopBar } from '@/components/public-top-bar';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
-import { Logo } from '@/components/logo';
 import { AcceptStoreInvite } from '@/components/stores/store-manage';
 import { getDb } from '@/server/db';
 import { pageMetadata } from '@/server/seo';
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function StoreInvitePage({ params }: Props) {
   const { token } = await params;
-  const [invite, t, tc, session] = await Promise.all([
+  const [invite, t, , session] = await Promise.all([
     getStoreInvite(getDb(), { token }).catch(() => null),
     getTranslations('stores'),
     getTranslations('common'),
@@ -41,12 +41,7 @@ export default async function StoreInvitePage({ params }: Props) {
       tabIndex={-1}
       className="mx-auto flex min-h-dvh max-w-xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
       <h1 className="page-title">{t('inviteTitle')}</h1>
       {!invite ? (
         <p>{t('inviteMissing')}</p>

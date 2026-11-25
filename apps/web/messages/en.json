@@ -2626,5 +2626,10 @@
     "clearFilters": "Clear filters",
     "metaDescription": "Magic tournaments, game nights and stores in {city}: dates, spots and directions.",
     "results": "{events, plural, =0 {no events} =1 {1 event} other {# events}} and {stores, plural, =0 {no stores} =1 {1 store} other {# stores}}."
+  },
+  "publicNav": {
+    "label": "Navigation",
+    "dashboard": "Back to dashboard",
+    "signIn": "Sign in"
   }
 }

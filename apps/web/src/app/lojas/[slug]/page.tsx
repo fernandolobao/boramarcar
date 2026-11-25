@@ -1,4 +1,5 @@
 import { isGameFormat } from '@boramarcar/core';
+import { PublicTopBar } from '@/components/public-top-bar';
 import { getStorePublic, listMyStores, listStoreEvents, isFollowingStore } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -9,7 +10,6 @@ import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
 import { FollowStoreButton } from '@/components/stores/follow-button';
-import { Logo } from '@/components/logo';
 import { StoreMap } from '@/components/stores/store-map';
 import { getDb } from '@/server/db';
 import { pageMetadata } from '@/server/seo';
@@ -89,12 +89,7 @@ export default async function StorePage({ params }: Props) {
       tabIndex={-1}
       className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
 
       <header className="flex items-center gap-4">
         {store.logoUrl ? (

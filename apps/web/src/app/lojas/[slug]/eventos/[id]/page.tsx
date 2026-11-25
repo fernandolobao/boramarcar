@@ -1,4 +1,5 @@
 import { isGameFormat } from '@boramarcar/core';
+import { PublicTopBar } from '@/components/public-top-bar';
 import { getStoreEventPublic, getStoreEventTournament, listMyStores } from '@boramarcar/db';
 import type { Metadata } from 'next';
 import { googleCalendarUrl } from '@boramarcar/core/calendar';
@@ -7,7 +8,6 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
-import { Logo } from '@/components/logo';
 import { StoreEventRegistration } from '@/components/stores/store-events';
 import { TournamentLive } from '@/components/tournaments/tournament-live';
 import { getDb } from '@/server/db';
@@ -70,12 +70,7 @@ export default async function StoreEventPage({ params }: Props) {
       tabIndex={-1}
       className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
       <div className="space-y-2">
         <p className="inline-flex rounded-full bg-accent px-3 py-1 text-sm font-medium text-on-accent">
           {t(`kind.${event.kind as 'tournament' | 'casual'}`)} · {formatName}

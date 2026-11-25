@@ -1,11 +1,11 @@
 import { getMonthlyRecap, type MonthlyRecapView } from '@boramarcar/db';
+import { PublicTopBar } from '@/components/public-top-bar';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
-import { Logo } from '@/components/logo';
 import { ShareButtons } from '@/components/share-buttons';
 import { getDb } from '@/server/db';
 import { canSeeMonthlyRecap, monthlyUrl } from '@/server/monthly-link';
@@ -66,7 +66,7 @@ export default async function MonthlyRecapPage({ params, searchParams }: Props) 
   const { groupId, month } = await params;
   const view = await load(groupId, month, (await searchParams).k);
   if (!view) notFound();
-  const [{ t, format, label, summary }, tc, signedIn] = await Promise.all([
+  const [{ t, format, label, summary }, , signedIn] = await Promise.all([
     texts(view),
     getTranslations('common'),
     getSessionUser(await headers())
@@ -138,12 +138,7 @@ export default async function MonthlyRecapPage({ params, searchParams }: Props) 
       tabIndex={-1}
       className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
 
       <div className="space-y-2">
         <p className="inline-flex rounded-full bg-accent px-3 py-1 text-sm font-medium text-on-accent">

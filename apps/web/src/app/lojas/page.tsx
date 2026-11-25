@@ -1,11 +1,11 @@
 import { citiesWithStores, getUserPreferences } from '@boramarcar/db';
+import { PublicTopBar } from '@/components/public-top-bar';
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { DiscoveryView } from '@/components/discovery/discovery-view';
 import { CITY_COOKIE } from '@/lib/discovery';
-import { Logo } from '@/components/logo';
 import { getDb } from '@/server/db';
 import { cityFromParam, discoveryFor } from '@/server/discovery';
 import { pageMetadata } from '@/server/seo';
@@ -35,7 +35,7 @@ export default async function DiscoveryPage({ searchParams }: Props) {
     : profileCity
       ? await cityFromParam(db, `${profileCity.uf}/${profileCity.slug}`)
       : null;
-  const [t, tc] = await Promise.all([getTranslations('discovery'), getTranslations('common')]);
+  const t = await getTranslations('discovery');
   const found = city ? await discoveryFor(db, city) : null;
   const cities = city ? [] : await citiesWithStores(db);
 
@@ -45,12 +45,7 @@ export default async function DiscoveryPage({ searchParams }: Props) {
       tabIndex={-1}
       className="mx-auto flex min-h-dvh max-w-5xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
       <div className="space-y-2">
         <h1 className="page-title">
           {city ? t('titleCity', { city: `${city.name}, ${city.uf}` }) : t('title')}
