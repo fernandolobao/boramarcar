@@ -271,6 +271,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-25',
+    pt: 'Na página do deck, "Testar a mão inicial": compre uma mão de 7, faça mulligan escolhendo as cartas que vão para o fundo e veja as próximas compras.',
+    en: 'On the deck page, "Test the opening hand": draw a hand of 7, mulligan by choosing the cards to put on the bottom and see the next draws.',
+  },
+  {
+    date: '2026-11-25',
     pt: 'Tokens e emblemas ganharam categoria própria na lista do deck: não ficam mais em "Talvez" e não contam no total de cartas nem na sua coleção.',
     en: 'Tokens and emblems now have their own section in the deck list: they no longer sit in "Maybe" and don\u2019t count in the card total or your collection.',
   },

@@ -683,3 +683,12 @@ sem rolagem horizontal em 320px.
 - Selo "Rascunho" com texto e ícone (não só cor), no mesmo formato do selo de visibilidade.
 - Publicar: depois de publicar, a página recarrega sem o aviso do rascunho e anuncia "Deck publicado"
   numa região `role="status"` (a confirmação vem pelo endereço, para não se perder no recarregamento).
+
+## Testar a mão inicial (25/11/2026)
+
+- Seção com título (`region` "Testar a mão inicial"); o resultado (cartas, terrenos, mulligans) é
+  anunciado numa região `role="status"`.
+- No mulligan, cada carta vira um botão de alternar (`aria-pressed`) com nome "Pôr {carta} no fundo";
+  "Manter" fica desabilitado até escolher a quantidade certa, e "Comprar carta" também enquanto a
+  escolha não termina. O selo "Fundo" sobre a carta repete a informação em texto.
+- Fora do mulligan, cada carta é uma `figure` com o nome em `figcaption` (a imagem é decorativa).

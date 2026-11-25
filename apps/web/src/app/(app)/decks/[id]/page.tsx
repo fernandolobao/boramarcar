@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { outsideDeck } from '@boramarcar/core';
+import { OpeningHand } from '@/components/opening-hand';
 import { PublishDeck } from '@/components/deck-forms';
 import {
   artCropUrl,
@@ -331,6 +332,26 @@ export default async function DeckPage({ params, searchParams }: Props) {
             </section>
           )}
         </StackSections>
+
+        {/* Testar a mão inicial (11.3): só o deck principal; a face da frente diz se é terreno. */}
+        <section className="card space-y-4" aria-labelledby="deck-opening-hand">
+          <div className="space-y-1">
+            <h2 id="deck-opening-hand" className="section-title mb-0 flex items-center gap-2">
+              <Icon name="openingHand" />
+              {t('hand.title')}
+            </h2>
+            <p className="muted text-sm">{t('hand.intro')}</p>
+          </div>
+          <OpeningHand
+            lines={deck.lines.map((l) => ({
+              name: l.name,
+              board: l.board,
+              quantity: l.quantity,
+              isLand: (l.card?.typeLine ?? '').split('//')[0]!.includes('Land'),
+              imageUri: l.card?.imageUri ?? null,
+            }))}
+          />
+        </section>
 
         {/* Detalhes para quem quer ir fundo; fechados por padrão para a página não cansar. */}
         <details className="card">
