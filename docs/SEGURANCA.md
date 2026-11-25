@@ -141,8 +141,8 @@ status='registration' RETURNING`; inscritos em lote.
 - Busca da descoberta sem limite superior de data/linhas no SQL; índices faltando (lembretes, limpeza de
   `rate_limits`, `notifications(group_id, kind)`); notificações sem limpeza das antigas.
 - `SKIP_ENV_VALIDATION` em produção usaria segredo fixo → falhar se `VERCEL_ENV=production`.
-- Migrations rodam em dois lugares (build da Vercel e workflow) → manter um só.
-- GitHub Actions de terceiros por tag (fixar por SHA).
+- ✅ Migrations rodam em dois lugares (build da Vercel e workflow) → manter um só. **Corrigido:** só a build de produção da Vercel migra; o `migrate.yml` virou botão manual.
+- ✅ GitHub Actions de terceiros por tag (fixar por SHA). **Corrigido:** todas as ações por SHA, com a tag no comentário (o Dependabot atualiza).
 - App: convite pendente entra no grupo sozinho depois do login (mostrar a confirmação).
 - Sessão revogada vale até 5 min (cache do cookie) — aceitável, documentar.
 
