@@ -116,15 +116,19 @@ export function DiscoveryView({
 
   return (
     <div className="space-y-6">
-      <div className="card flex flex-wrap items-end gap-3">
-        <div className="min-w-64 flex-1">
-          <CityPicker label={t('cityLabel')} value={city} onChange={chooseCity} />
-        </div>
-        <button type="button" className="btn-secondary" onClick={useLocation}>
-          <Icon name="location" />
-          {t('useLocation')}
-        </button>
-        <p role="status" className="w-full text-sm">
+      <div className="card space-y-2">
+        <CityPicker
+          label={t('cityLabel')}
+          value={city}
+          onChange={chooseCity}
+          action={
+            <button type="button" className="btn-secondary" onClick={useLocation}>
+              <Icon name="location" />
+              {t('useLocation')}
+            </button>
+          }
+        />
+        <p role="status" className="text-sm">
           {status}
         </p>
       </div>

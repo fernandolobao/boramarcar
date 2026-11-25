@@ -1,4 +1,5 @@
 import { getPublicTournament, getStoreEventPublic } from '@boramarcar/db';
+import { PublicTopBar } from '@/components/public-top-bar';
 import { isGameFormat } from '@boramarcar/core';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -7,7 +8,6 @@ import { notFound, redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { AutoRefresh } from '@/components/auto-refresh';
 import { Icon } from '@/components/icons';
-import { Logo } from '@/components/logo';
 import { ShareButtons } from '@/components/share-buttons';
 import { TournamentLive } from '@/components/tournaments/tournament-live';
 import { getDb } from '@/server/db';
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PublicTournamentPage({ params }: Props) {
   const { id } = await params;
   const view = await load(id);
-  const [t, tf, tc, format, signedIn] = await Promise.all([
+  const [t, tf, , format, signedIn] = await Promise.all([
     getTranslations('tournaments'),
     getTranslations('formats'),
     getTranslations('common'),
@@ -68,12 +68,7 @@ export default async function PublicTournamentPage({ params }: Props) {
       className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
       {running && <AutoRefresh />}
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
 
       <div className="space-y-2">
         <p className="inline-flex rounded-full bg-accent px-3 py-1 text-sm font-medium text-on-accent">

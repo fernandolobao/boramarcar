@@ -2626,5 +2626,10 @@
     "clearFilters": "Limpar filtros",
     "metaDescription": "Torneios, noites de jogo e lojas de Magic em {city}: datas, vagas e como chegar.",
     "results": "{events, plural, =0 {nenhum evento} =1 {1 evento} other {# eventos}} e {stores, plural, =0 {nenhuma loja} =1 {1 loja} other {# lojas}}."
+  },
+  "publicNav": {
+    "label": "Navegação",
+    "dashboard": "Voltar ao painel",
+    "signIn": "Entrar"
   }
 }

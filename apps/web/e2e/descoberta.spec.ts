@@ -82,5 +82,14 @@ test.describe('descoberta de lojas e eventos', () => {
       await page.goto('/lojas');
       await expect(page.getByRole('heading', { level: 1, name: /Porto Alegre, RS/ })).toBeVisible();
     });
+
+    test('páginas públicas têm saída para o painel (no site instalado não há o voltar do navegador)', async ({
+      page,
+    }) => {
+      await page.goto('/lojas?cidade=rs/porto-alegre');
+      const nav = page.getByRole('navigation', { name: 'Navegação' });
+      await nav.getByRole('link', { name: 'Voltar ao painel' }).click();
+      await expect(page).toHaveURL(/\/painel$/);
+    });
   });
 });

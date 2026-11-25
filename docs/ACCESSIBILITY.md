@@ -667,3 +667,11 @@ sem rolagem horizontal em 320px.
   quatro apps de mapa; "Editar" e "Remover" ficam menores, na mesma linha, e no celular só com o
   ícone (o nome acessível continua "Editar (local)" e "Remover (local)"). No encontro e na loja,
   as rotas continuam à vista.
+
+## Páginas públicas com saída (25/11/2026)
+
+- `PublicTopBar` (lojas, eventos de loja, convite de loja, torneio, resumo e retrospectiva): um
+  `<nav aria-label="Navegação">` com o logo e "Voltar ao painel" (com conta) ou "Entrar" (sem conta).
+  No site instalado como app não há o botão de voltar do navegador, e essas páginas não têm o menu.
+- Busca de lojas: "Usar minha localização" fica ao lado do campo de cidade (abaixo dele no celular), e a
+  dica vem depois dos dois (`aria-describedby` continua no campo).

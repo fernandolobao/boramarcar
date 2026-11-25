@@ -1,10 +1,9 @@
 import { citiesWithStores, getMunicipality } from '@boramarcar/db';
+import { PublicTopBar } from '@/components/public-top-bar';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { DiscoveryView } from '@/components/discovery/discovery-view';
-import { Logo } from '@/components/logo';
 import { getBaseUrl } from '@/env';
 import { getDb } from '@/server/db';
 import { discoveryFor } from '@/server/discovery';
@@ -42,7 +41,7 @@ export default async function CityDiscoveryPage({ params }: Props) {
   const { uf, cidade } = await params;
   const city = await load(uf, cidade);
   if (!city) notFound();
-  const [t, tc] = await Promise.all([getTranslations('discovery'), getTranslations('common')]);
+  const t = await getTranslations('discovery');
   const { data } = await discoveryFor(getDb(), city);
   const base = getBaseUrl();
   // Dados estruturados (schema.org) para os buscadores: as lojas e os eventos da cidade.
@@ -87,12 +86,7 @@ export default async function CityDiscoveryPage({ params }: Props) {
         // Texto JSON (não é código executado); `<` escapado para não fechar a tag.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
       <div className="space-y-2">
         <h1 className="page-title">{t('titleCity', { city: `${city.name}, ${city.uf}` })}</h1>
         <p className="muted">{t('intro')}</p>

@@ -1,11 +1,11 @@
 import { getEventRecap } from '@boramarcar/db';
+import { PublicTopBar } from '@/components/public-top-bar';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
-import { Logo } from '@/components/logo';
 import { ShareButtons } from '@/components/share-buttons';
 import { getDb } from '@/server/db';
 import { recapUrl } from '@/server/email';
@@ -40,7 +40,7 @@ export default async function RecapPage({ params }: Props) {
   const { eventId } = await params;
   const recap = await getEventRecap(getDb(), eventId).catch(() => null);
   if (!recap) notFound();
-  const [t, tc, format, signedIn] = await Promise.all([
+  const [t, , format, signedIn] = await Promise.all([
     getTranslations('recap'),
     getTranslations('common'),
     getFormatter(),
@@ -61,12 +61,7 @@ export default async function RecapPage({ params }: Props) {
       tabIndex={-1}
       className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 px-4 py-10 focus:outline-none sm:px-6"
     >
-      <Link
-        href="/"
-        className="self-start rounded focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <Logo title={tc('appName')} className="h-7 w-auto text-arcano dark:text-pergaminho" />
-      </Link>
+      <PublicTopBar />
 
       <div className="space-y-2">
         <p className="inline-flex rounded-full bg-accent px-3 py-1 text-sm font-medium text-on-accent">
