@@ -130,10 +130,13 @@ export function DeckCards({
   lines,
   isOwner,
   usdBrl = null,
+  inCollection = {},
 }: {
   deckId: string;
   lines: DeckLineView[];
   isOwner: boolean;
+  /** Rascunho: cópias livres na coleção por carta (nome em minúsculas), em qualquer edição. */
+  inCollection?: Record<string, number>;
   /** Cotação do dólar para mostrar o preço da carta também em reais. */
   usdBrl?: number | null;
 }) {
@@ -301,6 +304,16 @@ export function DeckCards({
                         ✦ {t('foil')}
                       </span>
                     )}
+                    {/* Rascunho: você já tem cópias livres desta carta na coleção (canto livre). */}
+                    {inCollection[line.name.toLowerCase()] && (
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute right-1.5 bottom-[6%] inline-flex items-center gap-1 rounded-md border border-line-strong bg-surface px-1.5 py-0.5 text-xs font-bold text-fg"
+                      >
+                        <Icon name="collection" className="size-3.5 shrink-0" />
+                        {inCollection[line.name.toLowerCase()]}
+                      </span>
+                    )}
                     {line.proxies > 0 && (
                       <span
                         aria-hidden="true"
@@ -332,6 +345,14 @@ export function DeckCards({
                       </span>
                     )}
                     {foilsOf(line) > 0 && <span className="sr-only"> ({t('foil')})</span>}
+                    {inCollection[line.name.toLowerCase()] && (
+                      <span className="sr-only">
+                        {' '}
+                        (
+                        {t('draft.inCollection', { count: inCollection[line.name.toLowerCase()]! })}
+                        )
+                      </span>
+                    )}
                   </p>
                 </li>
               ))}
@@ -374,6 +395,15 @@ export function DeckCards({
                         <span className="muted text-xs"> · {printLabel(line.card)}</span>
                       )}
                       {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
+                      {inCollection[line.name.toLowerCase()] && (
+                        <span className="muted text-xs">
+                          {' '}
+                          ·{' '}
+                          {t('draft.inCollection', {
+                            count: inCollection[line.name.toLowerCase()]!,
+                          })}
+                        </span>
+                      )}
                       {foilsOf(line) > 0 && (
                         <>
                           {' '}

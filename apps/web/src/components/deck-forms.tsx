@@ -1,6 +1,6 @@
 'use client';
 
-import { formatRules, GAME_FORMATS, type GameFormat } from '@boramarcar/core';
+import { formatRules, GAME_FORMATS, type DeckBoard, type GameFormat } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -8,8 +8,10 @@ import { api, ApiError } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
 import { Checkbox } from '@/components/ds/checkbox';
+import { Choices } from '@/components/ds/choices';
 import { Select } from '@/components/ds/select';
 import { CardSearch } from './card-search';
+import { ModalButton } from './modal-button';
 
 interface MoxfieldBlocked {
   url: string;
@@ -281,11 +283,65 @@ export function DeckCreateForm() {
   );
 }
 
-/** Aviso do rascunho na página do deck (dono) e o botão de publicar (11.2). */
-export function PublishDeck({ deckId }: { deckId: string }) {
+/** Carta do rascunho com cópias livres na coleção: a escolha na janela de publicar. */
+export interface PublishCandidate {
+  key: string;
+  name: string;
+  board: DeckBoard;
+  fromScryfallId: string | null;
+  /** Edição da linha no deck ("CMM #400"), ou `null` se não informada. */
+  fromLabel: string | null;
+  options: {
+    scryfallId: string | null;
+    foil: boolean;
+    free: number;
+    /** Edição da cópia da coleção ("LTC #12"). */
+    label: string | null;
+  }[];
+}
+
+/**
+ * Aviso do rascunho na página do deck (dono) e o botão de publicar (11.2). Com cartas que você já
+ * tem livres na coleção, publicar abre uma janela para escolher, carta a carta, usar a da coleção
+ * (a carta do deck passa para essa edição) ou adicionar uma nova.
+ */
+export function PublishDeck({
+  deckId,
+  candidates = [],
+}: {
+  deckId: string;
+  candidates?: PublishCandidate[];
+}) {
   const t = useTranslations('decks.draft');
   const router = useRouter();
   const { run, error, pending } = useApiAction();
+  /** Por linha: índice da edição da coleção escolhida, ou `null` = adicionar como nova. */
+  const [picks, setPicks] = useState<Record<string, number | null>>(() =>
+    Object.fromEntries(candidates.map((c) => [c.key, 0])),
+  );
+  const publish = () =>
+    void run(
+      () =>
+        api(`/api/v1/decks/${deckId}/publish`, {
+          method: 'POST',
+          body: {
+            choices: candidates.map((c) => {
+              const pick = picks[c.key];
+              const option = pick == null ? null : c.options[pick];
+              return {
+                name: c.name,
+                board: c.board,
+                fromScryfallId: c.fromScryfallId,
+                use: option ? { scryfallId: option.scryfallId, foil: option.foil } : null,
+              };
+            }),
+          },
+        }),
+      // A página recarrega sem o aviso; a confirmação vem pelo endereço (anunciada lá).
+      () => router.replace(`/decks/${deckId}?publicado=1`),
+    );
+  const editionOf = (label: string | null) => label ?? t('unknownEdition');
+
   return (
     <div className="space-y-2 rounded-xl border border-line-strong bg-surface p-4">
       <p className="flex items-center gap-2 font-semibold">
@@ -293,22 +349,65 @@ export function PublishDeck({ deckId }: { deckId: string }) {
         {t('title')}
       </p>
       <p className="text-sm">{t('body')}</p>
-      <button
-        type="button"
-        className="btn-primary"
-        disabled={pending}
-        onClick={() =>
-          void run(
-            () => api(`/api/v1/decks/${deckId}/publish`, { method: 'POST' }),
-            // A página recarrega sem o aviso; a confirmação vem pelo endereço (anunciada lá).
-            () => router.replace(`/decks/${deckId}?publicado=1`),
-          )
-        }
-      >
-        <Icon name="publish" />
-        {t('publish')}
-      </button>
-      <FormError message={error} />
+      {candidates.length === 0 ? (
+        <button type="button" className="btn-primary" disabled={pending} onClick={publish}>
+          <Icon name="publish" />
+          {t('publish')}
+        </button>
+      ) : (
+        <ModalButton
+          label={t('publish')}
+          title={t('publishTitle')}
+          icon="publish"
+          variant="primary"
+        >
+          <div className="space-y-4">
+            <p className="text-sm">{t('publishIntro')}</p>
+            {candidates.map((c) => {
+              const pick = picks[c.key] ?? null;
+              const set = (value: number | null) => setPicks((p) => ({ ...p, [c.key]: value }));
+              return (
+                <div key={c.key} className="space-y-2 rounded-xl border border-line p-3">
+                  <Choices
+                    label={c.name}
+                    description={t('deckEdition', { edition: editionOf(c.fromLabel) })}
+                    variant="cards"
+                    orientation="vertical"
+                    value={pick === null ? 'new' : 'use'}
+                    onChange={(v) => set(v === 'use' ? 0 : null)}
+                    options={[
+                      { value: 'use', label: t('useCollection') },
+                      { value: 'new', label: t('addNew') },
+                    ]}
+                  />
+                  {pick !== null && (
+                    <Select
+                      label={t('collectionEdition')}
+                      id={`pub-${c.key}-edition`}
+                      value={String(pick)}
+                      onChange={(v) => set(Number(v))}
+                      options={c.options.map((o, i) => ({
+                        value: String(i),
+                        label: t('option', {
+                          edition: editionOf(o.label),
+                          foil: String(o.foil),
+                          free: o.free,
+                        }),
+                      }))}
+                    />
+                  )}
+                </div>
+              );
+            })}
+            <button type="button" className="btn-primary" disabled={pending} onClick={publish}>
+              <Icon name="publish" />
+              {t('confirm')}
+            </button>
+            <FormError message={error} />
+          </div>
+        </ModalButton>
+      )}
+      {candidates.length === 0 && <FormError message={error} />}
     </div>
   );
 }

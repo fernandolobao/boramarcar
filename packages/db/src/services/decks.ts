@@ -25,7 +25,7 @@ import {
   type DeckEntry,
   type ImportedDeck,
 } from '@boramarcar/core';
-import { and, asc, count, desc, eq, inArray, isNull, ne, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, ne, notInArray, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Database } from '../client';
 import { logAdminAccess } from './admin-access';
@@ -345,8 +345,157 @@ export async function createDeck(
 }
 
 /** Publica o rascunho (11.2): o deck vira de verdade e as cartas entram na coleção. */
-export async function publishDeck(db: Database, input: { deckId: string; userId: string }) {
+/** Uma edição da coleção com cópias livres (sem uso em outro deck publicado). */
+export interface CollectionOption {
+  scryfallId: string | null;
+  foil: boolean;
+  free: number;
+  setCode: string | null;
+  setName: string | null;
+  collectorNumber: string | null;
+  imageUri: string | null;
+}
+
+/**
+ * Rascunho (11.2): cartas do deck que você já tem livres na coleção, em qualquer edição. Livre =
+ * cópias na coleção daquela edição e acabamento menos as usadas em **outros decks publicados**.
+ * Só cartas reais do deck (sem proxies, "talvez" e tokens).
+ */
+export async function draftCollectionMatches(
+  db: Database,
+  input: { deckId: string; userId: string },
+) {
+  await requireOwnedDeck(db, input.deckId, input.userId);
+  const lines = await db
+    .select({ name: deckCards.cardName })
+    .from(deckCards)
+    .where(
+      and(
+        eq(deckCards.deckId, input.deckId),
+        eq(deckCards.isProxy, false),
+        notInArray(deckCards.board, ['maybeboard', 'tokens']),
+      ),
+    );
+  const wanted = [...new Set(lines.map((l) => l.name.toLowerCase()))];
+  if (!wanted.length) return [];
+  const [owned, used] = await Promise.all([
+    db
+      .select({
+        name: collectionCards.cardName,
+        scryfallId: collectionCards.scryfallId,
+        foil: collectionCards.isFoil,
+        quantity: collectionCards.quantity,
+        setCode: cards.setCode,
+        setName: cards.setName,
+        collectorNumber: cards.collectorNumber,
+        imageUri: cards.imageUri,
+      })
+      .from(collectionCards)
+      .leftJoin(cards, eq(cards.scryfallId, collectionCards.scryfallId))
+      .where(
+        and(
+          eq(collectionCards.userId, input.userId),
+          inArray(sql`lower(${collectionCards.cardName})`, wanted),
+        ),
+      ),
+    db
+      .select({
+        name: sql<string>`lower(${deckCards.cardName})`,
+        scryfallId: deckCards.scryfallId,
+        foil: deckCards.isFoil,
+        quantity: sql<number>`sum(${deckCards.quantity})`.mapWith(Number),
+      })
+      .from(deckCards)
+      .innerJoin(decks, eq(decks.id, deckCards.deckId))
+      .where(
+        and(
+          eq(decks.ownerId, input.userId),
+          eq(decks.status, 'published'),
+          ne(decks.id, input.deckId),
+          eq(deckCards.isProxy, false),
+          notInArray(deckCards.board, ['maybeboard', 'tokens']),
+          inArray(sql`lower(${deckCards.cardName})`, wanted),
+        ),
+      )
+      .groupBy(sql`lower(${deckCards.cardName})`, deckCards.scryfallId, deckCards.isFoil),
+  ]);
+  const usedOf = (name: string, scryfallId: string | null, foil: boolean) =>
+    used
+      .filter(
+        (u) => u.name === name.toLowerCase() && u.scryfallId === scryfallId && u.foil === foil,
+      )
+      .reduce((sum, u) => sum + u.quantity, 0);
+  const byName = new Map<string, { name: string; free: number; options: CollectionOption[] }>();
+  for (const row of owned) {
+    const free = row.quantity - usedOf(row.name, row.scryfallId, row.foil);
+    if (free <= 0) continue;
+    const key = row.name.toLowerCase();
+    const entry = byName.get(key) ?? { name: row.name, free: 0, options: [] };
+    entry.free += free;
+    entry.options.push({
+      scryfallId: row.scryfallId,
+      foil: row.foil,
+      free,
+      setCode: row.setCode ?? null,
+      setName: row.setName ?? null,
+      collectorNumber: row.collectorNumber ?? null,
+      imageUri: row.imageUri ?? null,
+    });
+    byName.set(key, entry);
+  }
+  return [...byName.values()]
+    .map((e) => ({ ...e, options: e.options.sort((a, b) => b.free - a.free) }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+export type DraftCollectionMatch = Awaited<ReturnType<typeof draftCollectionMatches>>[number];
+
+/** Escolha ao publicar, por carta: usar uma cópia livre da coleção (`use`) ou entrar como nova. */
+export interface PublishChoice {
+  name: string;
+  board: DeckBoard;
+  /** Edição da linha no deck. */
+  fromScryfallId: string | null;
+  /** Edição e acabamento da coleção a usar; `null` = adicionar como nova. */
+  use: { scryfallId: string | null; foil: boolean } | null;
+}
+
+/**
+ * Publica o rascunho (11.2): o deck vira de verdade e as cartas entram na coleção. Para cada carta
+ * em que você escolheu "usar a da coleção", as cópias reais passam para a edição e o acabamento que
+ * você já tem (até o que está livre) — ainda em rascunho, sem mexer na coleção — e a sincronização
+ * depois não soma nada para elas.
+ */
+export async function publishDeck(
+  db: Database,
+  input: { deckId: string; userId: string; choices?: readonly PublishChoice[] },
+) {
   const deck = await requireOwnedDeck(db, input.deckId, input.userId);
+  const uses = (input.choices ?? []).filter((c) => c.use);
+  if (deck.status === 'draft' && uses.length) {
+    const matches = await draftCollectionMatches(db, input);
+    // 1º confere todas as escolhas (nada muda se uma delas não vale); depois aplica.
+    const plan: { choice: PublishChoice; option: CollectionOption; copies: number }[] = [];
+    for (const choice of uses) {
+      const option = matches
+        .find((m) => m.name.toLowerCase() === choice.name.toLowerCase())
+        ?.options.find(
+          (o) => o.scryfallId === choice.use!.scryfallId && o.foil === choice.use!.foil,
+        );
+      const from = await lineState(db, { ...input, ...choice, scryfallId: choice.fromScryfallId });
+      const copies = option ? Math.min(from.real, option.free) : 0;
+      if (!option || copies <= 0) {
+        throw new DomainError(
+          'invalid_input',
+          `Não há ${choice.name} livre nessa edição da coleção`,
+        );
+      }
+      // A mesma cópia livre não serve duas linhas (o rascunho não conta como uso).
+      option.free -= copies;
+      plan.push({ choice, option, copies });
+    }
+    for (const step of plan)
+      await useCollectionCopies(db, input, step.choice, step.option, step.copies);
+  }
   if (deck.status !== 'published') {
     await db
       .update(decks)
@@ -355,6 +504,78 @@ export async function publishDeck(db: Database, input: { deckId: string; userId:
   }
   await syncCollectionFromDecks(db, input.userId);
   return { ...deck, status: 'published' };
+}
+
+/** Linha do deck numa edição: cópias reais, proxies e quantas reais são foil. */
+async function lineState(
+  db: Database,
+  input: { deckId: string; board: DeckBoard; name: string; scryfallId: string | null },
+) {
+  const rows = await db
+    .select({ quantity: deckCards.quantity, isProxy: deckCards.isProxy, isFoil: deckCards.isFoil })
+    .from(deckCards)
+    .where(
+      and(
+        eq(deckCards.deckId, input.deckId),
+        eq(deckCards.board, input.board),
+        sql`lower(${deckCards.cardName}) = ${input.name.toLowerCase()}`,
+        input.scryfallId === null
+          ? isNull(deckCards.scryfallId)
+          : eq(deckCards.scryfallId, input.scryfallId),
+      ),
+    );
+  const sum = (f: (r: (typeof rows)[number]) => boolean) =>
+    rows.filter(f).reduce((n, r) => n + r.quantity, 0);
+  return {
+    real: sum((r) => !r.isProxy),
+    proxies: sum((r) => r.isProxy),
+    foils: sum((r) => !r.isProxy && r.isFoil),
+  };
+}
+
+async function useCollectionCopies(
+  db: Database,
+  input: { deckId: string; userId: string },
+  choice: PublishChoice,
+  option: CollectionOption,
+  copies: number,
+) {
+  if (!option.scryfallId) return;
+  const [target] = await db
+    .select()
+    .from(cards)
+    .where(eq(cards.scryfallId, option.scryfallId))
+    .limit(1);
+  if (!target) return;
+  if (option.scryfallId !== choice.fromScryfallId) {
+    await moveLinePrint(db, {
+      deckId: input.deckId,
+      userId: input.userId,
+      board: choice.board,
+      name: choice.name,
+      fromScryfallId: choice.fromScryfallId,
+      card: toCardData(target),
+      quantity: copies,
+    });
+  }
+  // Acabamento igual ao da cópia da coleção (senão a sincronização somaria a outra versão).
+  const at = await lineState(db, { ...input, ...choice, scryfallId: option.scryfallId });
+  const foils = option.foil
+    ? Math.min(at.real, at.foils + copies)
+    : Math.min(at.foils, at.real - copies);
+  if (foils !== at.foils) {
+    await setDeckLine(db, {
+      deckId: input.deckId,
+      userId: input.userId,
+      board: choice.board,
+      name: choice.name,
+      quantity: at.real + at.proxies,
+      proxies: at.proxies,
+      card: toCardData(target),
+      scryfallId: option.scryfallId,
+      foils: Math.max(0, foils),
+    });
+  }
 }
 
 export async function listDecks(db: Database, ownerId: string) {

@@ -1013,15 +1013,54 @@ export function createApiClient(options: ApiClientOptions) {
             { kind: 'empty', ...input },
           )
         ).deck,
-      /** Publica o rascunho: as cartas entram na coleção (dono). */
-      publish: async (deckId: string) =>
+      /**
+       * Publica o rascunho: as cartas entram na coleção (dono). `choices`: por carta com cópias
+       * livres na coleção, usar uma delas (`use`) ou entrar como nova (`use: null`).
+       */
+      publish: async (
+        deckId: string,
+        choices: {
+          name: string;
+          board: string;
+          fromScryfallId: string | null;
+          use: { scryfallId: string | null; foil: boolean } | null;
+        }[] = [],
+      ) =>
         (
           await request(
             'POST',
             `/decks/${encodeURIComponent(deckId)}/publish`,
             z.object({ deck: z.object({ id: z.string() }).loose() }),
+            { choices },
           )
         ).deck,
+      /** Cartas do deck que você já tem livres na coleção, em qualquer edição (dono). */
+      collectionMatches: async (deckId: string) =>
+        (
+          await request(
+            'GET',
+            `/decks/${encodeURIComponent(deckId)}/collection-matches`,
+            z.object({
+              matches: z.array(
+                z.object({
+                  name: z.string(),
+                  free: z.number(),
+                  options: z.array(
+                    z
+                      .object({
+                        scryfallId: z.string().nullable(),
+                        foil: z.boolean(),
+                        free: z.number(),
+                        setCode: z.string().nullable(),
+                        setName: z.string().nullable(),
+                      })
+                      .loose(),
+                  ),
+                }),
+              ),
+            }),
+          )
+        ).matches,
       /** Nome, tipo de jogo e quem vê (dono). */
       update: async (
         deckId: string,
