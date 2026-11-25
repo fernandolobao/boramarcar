@@ -272,7 +272,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'compartilhar-deck',
             question: 'Como compartilho um deck?',
             steps: [
-              'No site, abra o deck, toque em "Editar deck" (no canto do topo da página) e mude a visibilidade para "Público".',
+              'No site, abra o deck, toque em "Opções do deck" (no canto do topo da página), escolha "Editar deck" e mude a visibilidade para "Público".',
               'Abra "Compartilhar deck": copie o link, mande pelo WhatsApp ou baixe o QR Code.',
             ],
             notes: [
@@ -283,7 +283,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'proxies',
             question: 'Como marco e imprimo proxies?',
             intro: [
-              'No modo Editar, marque quantas cópias de cada carta são proxy. Em "Imprimir proxies" sai um PDF em tamanho real, só com os proxies ou com o deck todo.',
+              'No modo Editar, marque quantas cópias de cada carta são proxy. Em "Opções do deck" (no canto do topo), "Imprimir proxies" monta a folha em tamanho real, só com os proxies ou com o deck todo. No mesmo menu ficam copiar e baixar a lista e atualizar o deck.',
             ],
           },
         ],
@@ -681,7 +681,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'compartilhar-deck',
             question: 'How do I share a deck?',
             steps: [
-              'On the website, open the deck, tap "Edit deck" (in the top corner of the page) and set the visibility to "Public".',
+              'On the website, open the deck, tap "Deck options" (in the top corner of the page), choose "Edit deck" and set the visibility to "Public".',
               'Open "Share deck": copy the link, send it on WhatsApp or download the QR code.',
             ],
             notes: [
@@ -692,7 +692,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'proxies',
             question: 'How do I mark and print proxies?',
             intro: [
-              'In Edit mode, mark how many copies of each card are proxies. "Print proxies" produces a real-size PDF with only the proxies or the whole deck.',
+              'In Edit mode, mark how many copies of each card are proxies. In "Deck options" (top corner), "Print proxies" builds the real-size sheet with only the proxies or the whole deck. The same menu has copying and downloading the list and updating the deck.',
             ],
           },
         ],

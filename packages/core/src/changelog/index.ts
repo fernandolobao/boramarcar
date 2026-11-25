@@ -281,6 +281,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-25',
+    pt: 'Na página do deck, editar, copiar e baixar a lista, imprimir proxies e atualizar o deck ficam juntos no menu "Opções do deck", no canto do topo.',
+    en: 'On the deck page, editing, copying and downloading the list, printing proxies and updating the deck are now together in the "Deck options" menu, at the top corner.',
+  },
+  {
+    date: '2026-11-25',
     pt: 'Nova trilha "Aprender a jogar": sete lições curtas para quem nunca jogou Magic, com cartas de exemplo e o progresso salvo na sua conta. Está no rodapé de todas as páginas.',
     en: 'New "Learn to play" path: seven short lessons for anyone who has never played Magic, with example cards and progress saved to your account. It is in the footer of every page.',
   },

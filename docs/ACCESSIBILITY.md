@@ -693,6 +693,15 @@ sem rolagem horizontal em 320px.
   (radiogroup com nome da carta e descrição da edição do deck) e, em "Usar a da coleção", um `Select`
   com as edições livres. O padrão é usar a da coleção.
 
+## Menu "Opções do deck" (25/11/2026)
+
+- `Menu` do React Aria (`MenuTrigger` + `Popover`): botão com `aria-haspopup`, setas, Home/End,
+  Esc, foco de volta ao botão. Itens com texto e ícone decorativo; os que abrem janela têm "…".
+- "Baixar .txt" é um item com `href` (o servidor responde como anexo).
+- Editar, imprimir e colar lista abrem `<dialog>` (`Modal` controlado): título, "Fechar", Esc e clique
+  fora fecham, e o foco volta ao botão do menu. Os resultados (lista copiada, deck atualizado) são
+  anunciados numa região `role="status"` ao lado do menu.
+
 ## Aprender a jogar (25/11/2026)
 
 - `/aprender`: lista ordenada (`<ol>`) de links; o número da lição e o "Concluída" estão em texto

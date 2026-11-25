@@ -459,7 +459,7 @@
     "quantityHeader": "Qtd.",
     "proxyCount": "{count, plural, =1 {1 proxy} other {# proxies}}",
     "proxiesHeader": "Proxies",
-    "actions": "Ações",
+    "actions": "Opções do deck",
     "quantityOf": "Quantidade de {name}",
     "proxiesOf": "Proxies de {name}",
     "invalidCopies": "Proxies não podem passar da quantidade.",
@@ -597,7 +597,9 @@
       "option": "{edition}{foil, select, true { (foil)} other {}} — {free, plural, =1 {1 livre} other {# livres}}",
       "confirm": "Publicar com estas escolhas",
       "unknownEdition": "edição não informada"
-    }
+    },
+    "printMenu": "Imprimir proxies",
+    "pasteMenu": "Colar lista atualizada"
   },
   "analysis": {
     "title": "Análise",
