@@ -5,6 +5,7 @@ import { HistoryBackLink } from '@/components/history-back-link';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { pageMetadata } from '@/server/seo';
+import { TRACK_IDS } from '@boramarcar/core/learn';
 import { learnContext } from './content';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -77,44 +78,60 @@ export default async function LearnPage() {
         )}
       </header>
 
-      <section aria-labelledby="licoes" className="space-y-3">
-        <h2 id="licoes" className="section-title mb-0">
-          {t('lessons')}
-        </h2>
-        <ol className="space-y-3">
-          {content.lessons.map((lesson, i) => {
-            const done = completed.includes(lesson.id);
-            return (
-              <li key={lesson.id}>
-                <Link
-                  href={`/aprender/${lesson.id}`}
-                  className="card flex items-start gap-4 hover:border-line-strong"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`flex size-9 shrink-0 items-center justify-center rounded-full border font-semibold ${
-                      done ? 'border-primary bg-primary text-on-primary' : 'border-line-strong'
-                    }`}
-                  >
-                    {done ? <Icon name="done" /> : i + 1}
-                  </span>
-                  <span className="min-w-0 space-y-1">
-                    <span className="block font-semibold">
-                      <span className="sr-only">{t('lessonOf', { n: i + 1, total })}: </span>
-                      {lesson.title}
-                    </span>
-                    <span className="block text-sm">{lesson.summary}</span>
-                    <span className="muted block text-sm">
-                      {t('minutes', { count: lesson.minutes })}
-                      {done && ` · ${t('done')}`}
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
+      {TRACK_IDS.map((track) => {
+        const lessons = content.lessons.filter((l) => l.track === track);
+        const doneInTrack = lessons.filter((l) => completed.includes(l.id)).length;
+        return (
+          <section key={track} aria-labelledby={`bloco-${track}`} className="space-y-3">
+            <div className="space-y-1">
+              <h2 id={`bloco-${track}`} className="section-title mb-0">
+                {content.tracks[track].title}
+              </h2>
+              <p className="text-sm">{content.tracks[track].intro}</p>
+              {user && (
+                <p className="muted text-sm">
+                  {t('trackProgress', { done: doneInTrack, total: lessons.length })}
+                </p>
+              )}
+            </div>
+            <ol className="space-y-3">
+              {lessons.map((lesson, i) => {
+                const done = completed.includes(lesson.id);
+                return (
+                  <li key={lesson.id}>
+                    <Link
+                      href={`/aprender/${lesson.id}`}
+                      className="card flex items-start gap-4 hover:border-line-strong"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`flex size-9 shrink-0 items-center justify-center rounded-full border font-semibold ${
+                          done ? 'border-primary bg-primary text-on-primary' : 'border-line-strong'
+                        }`}
+                      >
+                        {done ? <Icon name="done" /> : i + 1}
+                      </span>
+                      <span className="min-w-0 space-y-1">
+                        <span className="block font-semibold">
+                          <span className="sr-only">
+                            {t('lessonOf', { n: i + 1, total: lessons.length })}:{' '}
+                          </span>
+                          {lesson.title}
+                        </span>
+                        <span className="block text-sm">{lesson.summary}</span>
+                        <span className="muted block text-sm">
+                          {t('minutes', { count: lesson.minutes })}
+                          {done && ` · ${t('done')}`}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        );
+      })}
 
       <section aria-labelledby="oficial" className="card space-y-2">
         <h2 id="oficial" className="section-title mb-0">

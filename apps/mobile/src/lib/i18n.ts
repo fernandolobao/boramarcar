@@ -844,6 +844,9 @@ const pt = {
   achievement_learn_to_table_name: 'Da teoria à mesa',
   achievement_learn_to_table_description:
     'Jogar uma partida depois de concluir a trilha "Aprender a jogar".',
+  achievement_learn_commander_name: 'Pronto para o Commander',
+  achievement_learn_commander_description:
+    'Concluir todas as lições de "Commander para iniciantes".',
   eventTitleLabel: 'Título',
   eventDefaultTitle: 'Commander',
   eventDay: 'Dia',
@@ -1908,6 +1911,8 @@ const en: Messages = {
   achievement_learn_path_description: 'Complete every lesson of the "Learn to play" path.',
   achievement_learn_to_table_name: 'From theory to the table',
   achievement_learn_to_table_description: 'Play a game after completing the "Learn to play" path.',
+  achievement_learn_commander_name: 'Ready for Commander',
+  achievement_learn_commander_description: 'Complete every lesson of "Commander for beginners".',
   eventTitleLabel: 'Title',
   eventDefaultTitle: 'Commander',
   eventDay: 'Day',

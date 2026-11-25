@@ -289,6 +289,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Nova trilha "Aprender a jogar" (no rodapé): sete lições curtas para quem nunca jogou Magic, com o progresso salvo na conta e três conquistas para quem fizer a trilha.',
     en: 'New "Learn to play" path (in the footer): seven short lessons for anyone new to Magic, with progress saved to your account and three achievements for completing it.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Novo bloco "Commander para iniciantes" em "Aprender a jogar": comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets, com uma conquista para quem concluir.',
+    en: 'New "Commander for beginners" part in "Learn to play": the commander, color identity, the multiplayer table, Rule 0 and brackets, with an achievement for completing it.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

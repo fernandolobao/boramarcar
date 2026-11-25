@@ -41,7 +41,8 @@ export default async function LessonPage({ params }: Props) {
   const { content, lesson, index, user, completed } = await lessonOf(params);
   const t = await getTranslations('learn');
   const tc = await getTranslations('common');
-  const total = content.lessons.length;
+  const inTrack = content.lessons.filter((l) => l.track === lesson.track);
+  const position = inTrack.findIndex((l) => l.id === lesson.id);
   const prev = content.lessons[index - 1];
   const next = content.lessons[index + 1];
   const images = await exampleCardImages(
@@ -70,7 +71,9 @@ export default async function LessonPage({ params }: Props) {
 
       <header className="space-y-2">
         <p className="muted text-sm">
-          {t('lessonOf', { n: index + 1, total })} · {t('minutes', { count: lesson.minutes })}
+          {content.tracks[lesson.track].title} ·{' '}
+          {t('lessonOf', { n: position + 1, total: inTrack.length })} ·{' '}
+          {t('minutes', { count: lesson.minutes })}
         </p>
         <h1 className="page-title">{lesson.title}</h1>
         <p>{lesson.summary}</p>

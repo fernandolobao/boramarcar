@@ -17,6 +17,15 @@ test.describe('aprender a jogar (12.1)', () => {
     await expect(
       page.getByRole('link', { name: 'Entre para salvar o seu progresso' }),
     ).toHaveAttribute('href', '/entrar?para=/aprender/mana-e-terrenos');
+    // Commander para iniciantes (12.2): bloco próprio, numeração do bloco, e o básico leva a ele.
+    await page.goto('/aprender');
+    const commander = page.getByRole('region', { name: 'Commander para iniciantes' });
+    await expect(
+      commander.getByRole('link', { name: /Lição 2 de 4: Identidade de cor/ }),
+    ).toBeVisible();
+    await page.goto('/aprender/como-se-vence');
+    await page.getByRole('link', { name: /Próxima: O que é Commander/ }).click();
+    await expect(page.getByText(/Commander para iniciantes · Lição 1 de 4/)).toBeVisible();
     expect((await page.goto('/aprender/nao-existe'))?.status()).toBe(404);
   });
 
@@ -35,7 +44,7 @@ test.describe('aprender a jogar (12.1)', () => {
         'true',
       );
       await page.goto('/aprender');
-      await expect(page.getByText(/de 7 lições concluídas/)).toBeVisible();
+      await expect(page.getByText(/de 11 lições concluídas/)).toBeVisible();
       await expect(page.getByRole('link', { name: /A pilha e as respostas/ })).toContainText(
         'Concluída',
       );
