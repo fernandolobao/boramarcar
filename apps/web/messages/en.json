@@ -1125,6 +1125,18 @@
       "tournament_champion": {
         "name": "Tournament champion",
         "description": "Win a tournament."
+      },
+      "learn_first": {
+        "name": "First lesson",
+        "description": "Complete a lesson of the \"Learn to play\" path."
+      },
+      "learn_path": {
+        "name": "Ready for the table",
+        "description": "Complete every lesson of the \"Learn to play\" path."
+      },
+      "learn_to_table": {
+        "name": "From theory to the table",
+        "description": "Play a game after completing the \"Learn to play\" path."
       }
     },
     "tabsLabel": "Achievements",

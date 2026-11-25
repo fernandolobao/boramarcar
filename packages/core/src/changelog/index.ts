@@ -286,8 +286,8 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-25',
-    pt: 'Nova trilha "Aprender a jogar": sete lições curtas para quem nunca jogou Magic, com cartas de exemplo e o progresso salvo na sua conta. Está no rodapé de todas as páginas.',
-    en: 'New "Learn to play" path: seven short lessons for anyone who has never played Magic, with example cards and progress saved to your account. It is in the footer of every page.',
+    pt: 'Nova trilha "Aprender a jogar" (no rodapé): sete lições curtas para quem nunca jogou Magic, com o progresso salvo na conta e três conquistas para quem fizer a trilha.',
+    en: 'New "Learn to play" path (in the footer): seven short lessons for anyone new to Magic, with progress saved to your account and three achievements for completing it.',
   },
 ];
 

@@ -1125,6 +1125,18 @@
       "tournament_champion": {
         "name": "Campeão de torneio",
         "description": "Vencer um torneio."
+      },
+      "learn_first": {
+        "name": "Primeira lição",
+        "description": "Concluir uma lição da trilha \"Aprender a jogar\"."
+      },
+      "learn_path": {
+        "name": "Pronto para a mesa",
+        "description": "Concluir todas as lições da trilha \"Aprender a jogar\"."
+      },
+      "learn_to_table": {
+        "name": "Da teoria à mesa",
+        "description": "Jogar uma partida depois de concluir a trilha \"Aprender a jogar\"."
       }
     },
     "tabsLabel": "Conquistas",

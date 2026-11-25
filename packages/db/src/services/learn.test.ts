@@ -38,3 +38,14 @@ describe('progresso da trilha (12.1)', () => {
     expect(await getLearnProgress(db, u.id)).toEqual([]);
   });
 });
+
+describe('conquistas da trilha', () => {
+  it('concluir lições aparece nas conquistas da pessoa', async () => {
+    const { getUserAchievements } = await import('./profiles');
+    const u = await createTestUser(db);
+    await setLessonCompleted(db, { userId: u.id, lessonId: 'combate', completed: true });
+    const list = await getUserAchievements(db, u.id);
+    expect(list.find((a) => a.id === 'learn_first')).toMatchObject({ unlocked: true });
+    expect(list.find((a) => a.id === 'learn_path')).toMatchObject({ progress: 1, target: 7 });
+  });
+});

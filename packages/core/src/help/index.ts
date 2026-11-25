@@ -303,7 +303,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'O que são as conquistas?',
             intro: [
-              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano, estreia em torneio, chegar ao top cut, campeão de torneio e outros. Abra o perfil (toque no seu nome no ranking): a aba "Em aberto" mostra o que falta, as mais perto de sair primeiro, e "Finalizadas" mostra as que você já ganhou, com a data.',
+              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano, estreia em torneio, chegar ao top cut, campeão de torneio, as lições da trilha "Aprender a jogar" e outros. Abra o perfil (toque no seu nome no ranking): a aba "Em aberto" mostra o que falta, as mais perto de sair primeiro, e "Finalizadas" mostra as que você já ganhou, com a data.',
               'Quando você ganha conquistas novas, uma janela mostra todas juntas na próxima vez que abrir o painel ou o seu perfil, mesmo que tenham vindo de várias partidas.',
             ],
           },
@@ -712,7 +712,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'What are achievements?',
             intro: [
-              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year, a tournament debut, making the top cut, tournament champion and more. Open a profile (tap a name in the ranking): the "Open" tab shows what is left, closest first, and "Completed" shows the ones you already have, with the date.',
+              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year, a tournament debut, making the top cut, tournament champion, the "Learn to play" lessons and more. Open a profile (tap a name in the ranking): the "Open" tab shows what is left, closest first, and "Completed" shows the ones you already have, with the date.',
               'When you earn new achievements, a window shows them all together the next time you open the dashboard or your profile, even if they came from several games.',
             ],
           },

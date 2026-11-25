@@ -1,3 +1,4 @@
+import { LESSON_IDS } from '../learn';
 import type { GameResult } from '../ranking';
 
 /** Partida do ponto de vista de um jogador (para calcular conquistas). */
@@ -30,6 +31,8 @@ export interface AchievementContext {
   timeZone?: string;
   /** Torneios encerrados de que a pessoa participou (9.2): se chegou ao top cut e se venceu. */
   tournaments?: readonly { finishedAt: Date; champion: boolean; topCut: boolean }[];
+  /** Lições concluídas da trilha "Aprender a jogar" (12.1). */
+  lessons?: readonly { lessonId: string; completedAt: Date }[];
 }
 
 export interface SeasonTitle {
@@ -69,6 +72,9 @@ export const ACHIEVEMENT_IDS = [
   'tournament_first',
   'tournament_top',
   'tournament_champion',
+  'learn_first',
+  'learn_path',
+  'learn_to_table',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -264,6 +270,20 @@ export function computeAchievements(
   if (firstCup) unlock('tournament_first', firstCup.finishedAt);
   if (firstTop) unlock('tournament_top', firstTop.finishedAt);
   if (titlesWon[0]) unlock('tournament_champion', titlesWon[0].finishedAt);
+  // Trilha "Aprender a jogar": só lições que existem hoje contam.
+  const lessonsDone = (context.lessons ?? [])
+    .filter((l) => (LESSON_IDS as readonly string[]).includes(l.lessonId))
+    .sort((a, b) => a.completedAt.getTime() - b.completedAt.getTime());
+  if (lessonsDone[0]) unlock('learn_first', lessonsDone[0].completedAt);
+  const pathDone =
+    new Set(lessonsDone.map((l) => l.lessonId)).size === LESSON_IDS.length
+      ? lessonsDone.at(-1)!.completedAt
+      : null;
+  if (pathDone) unlock('learn_path', pathDone);
+  const firstTable = pathDone
+    ? ordered.find((g) => g.playedAt.getTime() >= pathDone.getTime())
+    : undefined;
+  if (firstTable) unlock('learn_to_table', firstTable.playedAt);
   const titles = [...seasonTitles].sort((a, b) => a.endsAt.getTime() - b.endsAt.getTime());
   if (titles.length) unlock('season_champion', titles[0]!.endsAt);
 
@@ -298,6 +318,9 @@ export function computeAchievements(
     tournament_first: [cups.length ? 1 : 0, 1],
     tournament_top: [firstTop ? 1 : 0, 1],
     tournament_champion: [titlesWon.length ? 1 : 0, 1],
+    learn_first: [lessonsDone.length ? 1 : 0, 1],
+    learn_path: [new Set(lessonsDone.map((l) => l.lessonId)).size, LESSON_IDS.length],
+    learn_to_table: [firstTable ? 1 : 0, 1],
   };
 
   return ACHIEVEMENT_IDS.map((id) => {
