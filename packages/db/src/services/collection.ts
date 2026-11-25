@@ -19,7 +19,8 @@ export async function syncCollectionFromDecks(db: Database, userId: string) {
            sum(dc.quantity)::integer, dc.is_foil
     from ${deckCards} dc
     join ${decks} d on d.id = dc.deck_id
-    where d.owner_id = ${userId} and dc.is_proxy = false and dc.board <> 'maybeboard'
+    where d.owner_id = ${userId} and d.status = 'published' and dc.is_proxy = false
+      and dc.board <> 'maybeboard'
     group by dc.card_name, dc.scryfall_id, dc.is_foil
     on conflict (user_id, card_name, coalesce(scryfall_id, ''), is_foil)
     do update set

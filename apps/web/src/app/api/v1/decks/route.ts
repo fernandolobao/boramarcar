@@ -1,9 +1,9 @@
-import { GAME_FORMATS } from '@boramarcar/core';
-import { getDeckRatings, listDecks } from '@boramarcar/db';
+import { DomainError, formatRules, GAME_FORMATS } from '@boramarcar/core';
+import { createDeck, getDeckRatings, listDecks } from '@boramarcar/db';
 import { z } from 'zod';
 import { runAfterResponse } from '@/server/background';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
-import { importDeck } from '@/server/deck-import';
+import { importDeck, resolveCardByName } from '@/server/deck-import';
 import { authed, parseJson } from '@/server/http';
 import { rateLimit } from '@/server/limits';
 
@@ -22,26 +22,57 @@ export const GET = authed(async ({ db, user }) => {
   };
 });
 
-const importSchema = z.discriminatedUnion('kind', [
+const createSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('url'),
     url: z.url(),
     name: z.string().trim().max(120).optional(),
     format: z.enum(GAME_FORMATS).optional(),
+    /** Rascunho (11.2): as cartas não entram na coleção até publicar. */
+    draft: z.boolean().default(false),
   }),
   z.object({
     kind: z.literal('text'),
     name: z.string().trim().max(120).optional(),
     text: z.string().min(1).max(50_000),
     format: z.enum(GAME_FORMATS).optional(),
+    draft: z.boolean().default(false),
+  }),
+  // Do zero (11.1): nome, formato e, se quiser, o comandante pelo nome.
+  z.object({
+    kind: z.literal('empty'),
+    name: z.string().trim().min(1).max(120),
+    format: z.enum(GAME_FORMATS),
+    commander: z.string().trim().min(1).max(200).optional(),
+    draft: z.boolean().default(true),
   }),
 ]);
 
 export const POST = authed(
   async ({ req, db, user }) => {
-    const { format, ...input } = await parseJson(req, importSchema);
+    const body = await parseJson(req, createSchema);
+    if (body.kind === 'empty') {
+      if (body.commander && !formatRules(body.format).usesCommander) {
+        throw new DomainError('invalid_input', 'Este formato não tem comandante');
+      }
+      const commander = body.commander
+        ? await rateLimit(db, user.id, 'search').then(() => resolveCardByName(db, body.commander!))
+        : null;
+      if (body.commander && !commander) {
+        throw new DomainError('not_found', 'Comandante não encontrado no Scryfall');
+      }
+      const deck = await createDeck(db, {
+        ownerId: user.id,
+        name: body.name,
+        format: body.format,
+        commander,
+        draft: body.draft,
+      });
+      return { deck, notFound: [] };
+    }
+    const { format, draft, ...input } = body;
     await rateLimit(db, user.id, 'import');
-    const result = await importDeck(db, user.id, input, fetch, format);
+    const result = await importDeck(db, user.id, input, fetch, format, { draft });
     // Tagger e Spellbook em segundo plano: a importação não espera por eles.
     runAfterResponse(() => refreshDeckAnalysis(db, { deckId: result.deck.id, viewerId: user.id }));
     return result;

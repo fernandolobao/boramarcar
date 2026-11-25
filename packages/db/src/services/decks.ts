@@ -240,7 +240,14 @@ export async function saveBracketSignals(
 /** Salva um deck importado junto com o cache das cartas encontradas no Scryfall. */
 export async function saveImportedDeck(
   db: Database,
-  input: { ownerId: string; deck: ImportedDeck; cards: readonly CardData[]; format?: string },
+  input: {
+    ownerId: string;
+    deck: ImportedDeck;
+    cards: readonly CardData[];
+    format?: string;
+    /** Rascunho (11.2): as cartas não entram na coleção até publicar. */
+    draft?: boolean;
+  },
 ) {
   const format = input.format ?? 'commander';
   if (!isGameFormat(format)) throw new DomainError('invalid_input', 'Formato inválido');
@@ -262,6 +269,7 @@ export async function saveImportedDeck(
         source: input.deck.source,
         sourceId: input.deck.sourceId ?? null,
         sourceUrl: input.deck.sourceUrl ?? null,
+        status: input.draft ? 'draft' : 'published',
       })
       .returning();
     // Entradas diferentes podem cair na mesma impressão (ex.: edição não encontrada → padrão).
@@ -289,6 +297,63 @@ export async function saveImportedDeck(
   return result;
 }
 
+/**
+ * Deck do zero (11.1): nome, formato e, se quiser, o comandante; as outras cartas entram pelo
+ * editor. `draft` (padrão no site): rascunho, fora da coleção até publicar (11.2).
+ */
+export async function createDeck(
+  db: Database,
+  input: {
+    ownerId: string;
+    name: string;
+    format: string;
+    commander?: CardData | null;
+    draft: boolean;
+  },
+) {
+  const name = input.name.replace(/\s+/g, ' ').trim().slice(0, 120).trim();
+  if (!name) throw new DomainError('invalid_input', 'Informe o nome do deck');
+  if (!isGameFormat(input.format)) throw new DomainError('invalid_input', 'Formato inválido');
+  if (input.commander) await upsertCards(db, [input.commander]);
+  const deck = await db.transaction(async (tx) => {
+    const [row] = await tx
+      .insert(decks)
+      .values({
+        ownerId: input.ownerId,
+        name,
+        format: input.format,
+        source: 'manual',
+        status: input.draft ? 'draft' : 'published',
+      })
+      .returning();
+    if (input.commander) {
+      await tx.insert(deckCards).values({
+        deckId: row!.id,
+        cardName: input.commander.name,
+        scryfallId: input.commander.scryfallId,
+        board: 'commander',
+        quantity: 1,
+      });
+    }
+    return row!;
+  });
+  if (!input.draft) await syncCollectionFromDecks(db, input.ownerId);
+  return deck;
+}
+
+/** Publica o rascunho (11.2): o deck vira de verdade e as cartas entram na coleção. */
+export async function publishDeck(db: Database, input: { deckId: string; userId: string }) {
+  const deck = await requireOwnedDeck(db, input.deckId, input.userId);
+  if (deck.status !== 'published') {
+    await db
+      .update(decks)
+      .set({ status: 'published', updatedAt: new Date() })
+      .where(eq(decks.id, deck.id));
+  }
+  await syncCollectionFromDecks(db, input.userId);
+  return { ...deck, status: 'published' };
+}
+
 export async function listDecks(db: Database, ownerId: string) {
   return db
     .select({
@@ -296,6 +361,7 @@ export async function listDecks(db: Database, ownerId: string) {
       name: decks.name,
       format: decks.format,
       visibility: decks.visibility,
+      status: decks.status,
       source: decks.source,
       sourceUrl: decks.sourceUrl,
       updatedAt: decks.updatedAt,
@@ -328,6 +394,8 @@ export async function listDecksForUsers(
         inArray(decks.ownerId, [...userIds]),
         // Deck privado só aparece para o dono (3.12).
         or(ne(decks.visibility, 'private'), eq(decks.ownerId, viewerId)),
+        // Rascunho (11.2) não entra numa partida, nem do próprio dono.
+        eq(decks.status, 'published'),
       ),
     )
     .orderBy(asc(decks.name));
@@ -350,7 +418,7 @@ export async function hiddenDeckIds(
     .where(
       and(
         inArray(decks.id, ids),
-        eq(decks.visibility, 'private'),
+        or(eq(decks.visibility, 'private'), eq(decks.status, 'draft')),
         viewerId ? ne(decks.ownerId, viewerId) : undefined,
       ),
     );
@@ -394,10 +462,13 @@ export async function sharesGroup(db: Database, a: string, b: string) {
  */
 async function canView(
   db: Database,
-  deck: { ownerId: string; visibility: string },
+  deck: { ownerId: string; visibility: string; status?: string },
   viewerId: string,
 ) {
-  if (deck.ownerId === viewerId || deck.visibility === 'public') return true;
+  if (deck.ownerId === viewerId) return true;
+  // Rascunho (11.2) é só do dono, qualquer que seja a visibilidade escolhida.
+  if (deck.status === 'draft') return false;
+  if (deck.visibility === 'public') return true;
   if (deck.visibility === 'private') return false;
   return sharesGroup(db, deck.ownerId, viewerId);
 }
@@ -766,7 +837,7 @@ export async function setDeckLine(
   if (!name) throw new DomainError('invalid_input', 'Informe a carta');
   validateLine(input.quantity, input.proxies);
   const real = input.quantity - input.proxies;
-  await requireOwnedDeck(db, input.deckId, input.userId);
+  const owned = await requireOwnedDeck(db, input.deckId, input.userId);
   if (input.card) await upsertCards(db, [input.card]);
 
   let foils = 0;
@@ -800,7 +871,8 @@ export async function setDeckLine(
     const plainAfter = real - foils;
     // Cópias reais que trocaram de acabamento (foil ↔ comum) mudam de versão na coleção:
     // saem da versão antiga (a nova entra pela sincronia com os decks).
-    if (!anyPrint) {
+    // Rascunho (11.2): as cartas não estão na coleção, então nada sai dela.
+    if (!anyPrint && owned.status === 'published') {
       const toPlain = Math.min(foilsBefore - foils, plainAfter - plainBefore);
       const toFoil = Math.min(plainBefore - plainAfter, foils - foilsBefore);
       for (const [foil, quantity] of [
@@ -917,7 +989,7 @@ export async function moveLinePrint(
     foil?: boolean;
   },
 ) {
-  await requireOwnedDeck(db, input.deckId, input.userId);
+  const owned = await requireOwnedDeck(db, input.deckId, input.userId);
   if (input.card.name.toLowerCase() !== input.name.trim().toLowerCase()) {
     throw new DomainError('invalid_input', 'A edição escolhida é de outra carta');
   }
@@ -990,8 +1062,8 @@ export async function moveLinePrint(
       }
     }
     await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
-    // Cópias reais que mudaram de edição saem da versão antiga na coleção.
-    for (const [foil, quantity] of realMoved) {
+    // Cópias reais que mudaram de edição saem da versão antiga na coleção (rascunho não tem).
+    for (const [foil, quantity] of owned.status === 'published' ? realMoved : []) {
       await takeFromCollection(tx, {
         userId: input.userId,
         name: input.card.name,
@@ -1084,7 +1156,8 @@ export async function listDecksVisibleTo(
   if (input.ownerId === input.viewerId) return all;
   const shared = await sharesGroup(db, input.ownerId, input.viewerId);
   const visible = all.filter(
-    (d) => d.visibility === 'public' || (d.visibility === 'group' && shared),
+    (d) =>
+      d.status !== 'draft' && (d.visibility === 'public' || (d.visibility === 'group' && shared)),
   );
   if (!input.viewerIsAdmin || visible.length === all.length) return visible;
   await logAdminAccess(db, {
@@ -1191,6 +1264,7 @@ export async function compareWithCommanderDecks(
             id: decks.id,
             ownerId: decks.ownerId,
             visibility: decks.visibility,
+            status: decks.status,
             format: decks.format,
           })
           .from(decks)
@@ -1200,8 +1274,8 @@ export async function compareWithCommanderDecks(
         .filter(
           (d) =>
             d.ownerId === input.viewerId ||
-            d.visibility === 'public' ||
-            (d.visibility === 'group' && mates.has(d.ownerId)),
+            (d.status !== 'draft' &&
+              (d.visibility === 'public' || (d.visibility === 'group' && mates.has(d.ownerId)))),
         )
         .slice(0, COMPARISON_MAX_DECKS)
     : [];
@@ -1243,11 +1317,17 @@ export async function compareWithCommanderDecks(
  */
 export async function getPublicDeckPreview(db: Database, deckId: string) {
   const [deck] = await db
-    .select({ id: decks.id, name: decks.name, format: decks.format, visibility: decks.visibility })
+    .select({
+      id: decks.id,
+      name: decks.name,
+      format: decks.format,
+      visibility: decks.visibility,
+      status: decks.status,
+    })
     .from(decks)
     .where(eq(decks.id, deckId))
     .limit(1);
-  if (!deck || deck.visibility !== 'public') return null;
+  if (!deck || deck.visibility !== 'public' || deck.status === 'draft') return null;
   const cover = (await getDeckCovers(db, [deck.id])).get(deck.id);
   return {
     id: deck.id,

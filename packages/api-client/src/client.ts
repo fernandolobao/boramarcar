@@ -989,8 +989,8 @@ export function createApiClient(options: ApiClientOptions) {
       /** Importa pelo link (Archidekt) ou por uma lista colada; devolve o deck e as cartas não achadas. */
       import: (
         input:
-          | { kind: 'url'; url: string; name?: string; format?: string }
-          | { kind: 'text'; text: string; name?: string; format?: string },
+          | { kind: 'url'; url: string; name?: string; format?: string; draft?: boolean }
+          | { kind: 'text'; text: string; name?: string; format?: string; draft?: boolean },
       ) =>
         request(
           'POST',
@@ -998,6 +998,30 @@ export function createApiClient(options: ApiClientOptions) {
           z.object({ deck: z.object({ id: z.string() }).loose(), notFound: z.array(z.string()) }),
           input,
         ),
+      /** Deck do zero (11.1): nome, formato, comandante opcional; rascunho por padrão (11.2). */
+      create: async (input: {
+        name: string;
+        format: string;
+        commander?: string;
+        draft?: boolean;
+      }) =>
+        (
+          await request(
+            'POST',
+            '/decks',
+            z.object({ deck: z.object({ id: z.string() }).loose() }),
+            { kind: 'empty', ...input },
+          )
+        ).deck,
+      /** Publica o rascunho: as cartas entram na coleção (dono). */
+      publish: async (deckId: string) =>
+        (
+          await request(
+            'POST',
+            `/decks/${encodeURIComponent(deckId)}/publish`,
+            z.object({ deck: z.object({ id: z.string() }).loose() }),
+          )
+        ).deck,
       /** Nome, tipo de jogo e quem vê (dono). */
       update: async (
         deckId: string,

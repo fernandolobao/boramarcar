@@ -16,6 +16,8 @@ const autocomplete = await import('../cards/autocomplete/route');
 const proxiesPdf = await import('../decks/[deckId]/proxies/route');
 const linePrint = await import('../decks/[deckId]/lines/print/route');
 const prints = await import('../cards/prints/route');
+const publish = await import('../decks/[deckId]/publish/route');
+const collection = await import('../collection/route');
 
 let close: () => Promise<void>;
 
@@ -464,6 +466,42 @@ describe('API v1 — decks', () => {
       vi.fn(async () => new Response('erro', { status: 500 })),
     );
     expect((await add({ quantity: 1 })).body).toMatchObject({ found: true });
+  });
+
+  it('cria deck do zero como rascunho e publica depois (11.1 e 11.2)', async () => {
+    const owner = await createTestUser(testState.db!, { name: 'Construtora' });
+    asUser(owner);
+    const created = await call(decks.POST, {
+      method: 'POST',
+      body: { kind: 'empty', name: 'Ideia nova', format: 'pauper', draft: true },
+    });
+    expect(created.status).toBe(201);
+    expect(created.body!.deck).toMatchObject({
+      name: 'Ideia nova',
+      format: 'pauper',
+      status: 'draft',
+    });
+    // Todos os formatos têm rascunho; só os com comandante (Commander, Brawl…) aceitam comandante.
+    const noCommander = await call(decks.POST, {
+      method: 'POST',
+      body: { kind: 'empty', name: 'X', format: 'pauper', commander: 'Sol Ring', draft: true },
+    });
+    expect(noCommander.status).toBe(400);
+    const deckId = created.body!.deck.id as string;
+    await call(lines.PUT, {
+      method: 'PUT',
+      params: { deckId },
+      body: { name: 'Forest', board: 'mainboard', quantity: 4, proxies: 0 },
+    });
+    expect((await call(collection.GET)).body!.cards).toEqual([]);
+    const published = await call(publish.POST, { method: 'POST', params: { deckId } });
+    expect(published.status).toBe(200);
+    expect(published.body!.deck.status).toBe('published');
+    expect((await call(collection.GET)).body!.cards.map((c: { name: string }) => c.name)).toEqual([
+      'Forest',
+    ]);
+    const list = await call(decks.GET);
+    expect(list.body!.decks.find((d: { id: string }) => d.id === deckId).status).toBe('published');
   });
 
   it('limita importações por pessoa (429 com Retry-After)', async () => {

@@ -165,6 +165,8 @@ export const deckSummarySchema = z
     name: z.string(),
     format: z.string(),
     visibility: z.string(),
+    /** Rascunho (11.2) ou publicado. Servidores antigos não mandam: publicado. */
+    status: z.enum(['draft', 'published']).default('published'),
     cardCount: z.number().nullable(),
     proxyCount: z.number(),
     /** Nota 0–100 (null quando o formato não tem nota). Servidores antigos não mandam. */
@@ -487,6 +489,7 @@ export const deckDetailSchema = z
     name: z.string(),
     format: z.string(),
     visibility: z.string(),
+    status: z.enum(['draft', 'published']).default('published'),
     ownerName: z.string(),
     isOwner: z.boolean(),
     /** Origem da importação (archidekt, moxfield, text…) e o link, quando houver. */

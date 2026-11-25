@@ -1,13 +1,15 @@
 'use client';
 
-import { GAME_FORMATS, type GameFormat } from '@boramarcar/core';
+import { formatRules, GAME_FORMATS, type GameFormat } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { FormError, useApiAction } from './use-api-action';
 import { Icon } from './icons';
+import { Checkbox } from '@/components/ds/checkbox';
 import { Select } from '@/components/ds/select';
+import { CardSearch } from './card-search';
 
 interface MoxfieldBlocked {
   url: string;
@@ -32,6 +34,7 @@ export function DeckImportForm() {
   const [name, setName] = useState('');
   const [text, setText] = useState('');
   const [notFound, setNotFound] = useState<string[]>([]);
+  const [draft, setDraft] = useState(false);
   const [moxfieldBlocked, setMoxfieldBlocked] = useState<MoxfieldBlocked | null>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
 
@@ -49,8 +52,8 @@ export function DeckImportForm() {
         const chosen = format === 'auto' ? undefined : format;
         const body =
           mode === 'url'
-            ? { kind: 'url', url, name: name || undefined, format: chosen }
-            : { kind: 'text', name: name || undefined, text, format: chosen };
+            ? { kind: 'url', url, name: name || undefined, format: chosen, draft }
+            : { kind: 'text', name: name || undefined, text, format: chosen, draft };
         void run(
           async () => {
             try {
@@ -175,6 +178,13 @@ export function DeckImportForm() {
         />
       </div>
 
+      <Checkbox
+        label={t('draft.label')}
+        description={t('draft.importHint')}
+        checked={draft}
+        onChange={setDraft}
+      />
+
       <button className="btn-primary" disabled={pending}>
         <Icon name="upload" />
         {t('import')}
@@ -184,5 +194,121 @@ export function DeckImportForm() {
         <p className="muted">{t('notFound', { names: notFound.join(', ') })}</p>
       )}
     </form>
+  );
+}
+
+/**
+ * Deck do zero (11.1): nome, tipo de jogo e, se quiser, o comandante; as cartas entram pelo editor
+ * na página do deck. Começa como rascunho (11.2): as cartas ficam fora da coleção até publicar.
+ */
+export function DeckCreateForm() {
+  const t = useTranslations('decks');
+  const tc = useTranslations('common');
+  const tf = useTranslations('formats');
+  const router = useRouter();
+  const { run, error, pending } = useApiAction();
+  const [name, setName] = useState('');
+  const [format, setFormat] = useState<GameFormat>('commander');
+  const [commander, setCommander] = useState('');
+  const [draft, setDraft] = useState(true);
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void run(
+          () =>
+            api<{ deck: { id: string } }>('/api/v1/decks', {
+              method: 'POST',
+              body: {
+                kind: 'empty',
+                name,
+                format,
+                commander:
+                  formatRules(format).usesCommander && commander.trim() ? commander : undefined,
+                draft,
+              },
+            }),
+          (result) => router.push(`/decks/${result.deck.id}`),
+        );
+      }}
+    >
+      <div>
+        <label className="label" htmlFor="new-deck-name">
+          {t('name')}
+        </label>
+        <input
+          id="new-deck-name"
+          className="input"
+          required
+          maxLength={120}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+      <Select
+        label={t('format')}
+        id="new-deck-format"
+        value={String(format)}
+        onChange={(v) => setFormat(v as GameFormat)}
+        options={GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) }))}
+      />
+      {/* Só nos formatos com comandante (Commander, Brawl, Oathbreaker…); os outros não têm. */}
+      {formatRules(format).usesCommander && (
+        <div>
+          <CardSearch
+            id="new-deck-commander"
+            label={`${t('create.commander')} (${tc('optional')})`}
+            value={commander}
+            onChange={setCommander}
+            required={false}
+          />
+          <p className="muted mt-1 text-sm">{t('create.commanderHint')}</p>
+        </div>
+      )}
+      <Checkbox
+        label={t('draft.label')}
+        description={t('draft.createHint')}
+        checked={draft}
+        onChange={setDraft}
+      />
+      <button className="btn-primary" disabled={pending}>
+        <Icon name="add" />
+        {t('create.submit')}
+      </button>
+      <FormError message={error} />
+    </form>
+  );
+}
+
+/** Aviso do rascunho na página do deck (dono) e o botão de publicar (11.2). */
+export function PublishDeck({ deckId }: { deckId: string }) {
+  const t = useTranslations('decks.draft');
+  const router = useRouter();
+  const { run, error, pending } = useApiAction();
+  return (
+    <div className="space-y-2 rounded-xl border border-line-strong bg-surface p-4">
+      <p className="flex items-center gap-2 font-semibold">
+        <Icon name="draft" />
+        {t('title')}
+      </p>
+      <p className="text-sm">{t('body')}</p>
+      <button
+        type="button"
+        className="btn-primary"
+        disabled={pending}
+        onClick={() =>
+          void run(
+            () => api(`/api/v1/decks/${deckId}/publish`, { method: 'POST' }),
+            // A página recarrega sem o aviso; a confirmação vem pelo endereço (anunciada lá).
+            () => router.replace(`/decks/${deckId}?publicado=1`),
+          )
+        }
+      >
+        <Icon name="publish" />
+        {t('publish')}
+      </button>
+      <FormError message={error} />
+    </div>
   );
 }

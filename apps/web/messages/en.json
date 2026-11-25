@@ -567,7 +567,26 @@
     "deleteDeckHint": "Deletes the deck and its cards. Games where it was used stay in the history.",
     "removeDeck": "Delete deck",
     "confirmRemove": "Confirm deletion",
-    "viewedAsAdmin": "You are viewing this deck as an ArcanaKin admin (it is not normally visible to you). This access is logged."
+    "viewedAsAdmin": "You are viewing this deck as an ArcanaKin admin (it is not normally visible to you). This access is logged.",
+    "new": "New deck",
+    "create": {
+      "title": "New deck",
+      "intro": "Start from scratch: name it, pick the game type and, if you like, the commander. You add cards on the deck page, through the search.",
+      "commander": "Commander",
+      "commanderHint": "You can leave it for later: the commander can also be added in the deck editor.",
+      "submit": "Create deck",
+      "orImport": "Already have the list somewhere else? Import it by link or by pasting the list."
+    },
+    "draft": {
+      "label": "Start as a draft",
+      "badge": "Draft",
+      "createHint": "For trying ideas: a draft’s cards don’t go into your collection, the deck isn’t shown to your group and can’t be used in games. Publish it whenever you want.",
+      "importHint": "The cards stay out of your collection until you publish the deck.",
+      "title": "This deck is a draft",
+      "body": "Its cards aren’t in your collection, nobody else sees the deck and it can’t be picked in games. Publishing adds the cards to your collection (except proxies and \"maybe\").",
+      "publish": "Publish deck",
+      "published": "Deck published: the cards were added to your collection."
+    }
   },
   "analysis": {
     "title": "Analysis",

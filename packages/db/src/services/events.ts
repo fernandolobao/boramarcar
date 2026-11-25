@@ -317,7 +317,7 @@ async function prepareGame(db: Database, groupId: string, defaultFormat: string,
   const deckChecks = players.filter((p) => p.deckId);
   if (deckChecks.length) {
     const owned = await db
-      .select({ id: decks.id, ownerId: decks.ownerId })
+      .select({ id: decks.id, ownerId: decks.ownerId, status: decks.status })
       .from(decks)
       .where(
         inArray(
@@ -329,6 +329,12 @@ async function prepareGame(db: Database, groupId: string, defaultFormat: string,
       const deck = owned.find((d) => d.id === player.deckId);
       if (!deck || deck.ownerId !== player.userId) {
         throw new DomainError('invalid_input', 'O deck informado não pertence ao jogador');
+      }
+      if (deck.status === 'draft') {
+        throw new DomainError(
+          'invalid_input',
+          'Deck em rascunho não entra numa partida: publique antes',
+        );
       }
     }
   }
