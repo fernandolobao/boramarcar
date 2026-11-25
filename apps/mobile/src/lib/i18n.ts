@@ -418,6 +418,11 @@ const pt = {
   tableCommanderDamage: 'Dano de comandante recebido',
   tableCommanderDamageHint: 'Também tira a vida. 21 de um mesmo comandante elimina.',
   tableFrom: 'De {name}',
+  tableFromCommander: 'De {name} — {commander}',
+  tableFromNth: 'De {name} — {n}º comandante',
+  tableTwoCommanders: 'Dois comandantes (parceiros)',
+  tableTwoCommandersHint:
+    'Ligue quando o deck de {name} tem dois comandantes: o dano de cada um conta à parte nas outras áreas.',
   tableCountersTitle: 'Marcadores',
   tableCountersPoison: 'Veneno',
   tableCountersEnergy: 'Energia',
@@ -1487,6 +1492,11 @@ const en: Messages = {
   tableCommanderDamage: 'Commander damage taken',
   tableCommanderDamageHint: 'Also removes life. 21 from the same commander eliminates.',
   tableFrom: 'From {name}',
+  tableFromCommander: 'From {name} — {commander}',
+  tableFromNth: 'From {name} — commander {n}',
+  tableTwoCommanders: 'Two commanders (partners)',
+  tableTwoCommandersHint:
+    "Turn on when {name}'s deck has two commanders: each one's damage counts separately in the other areas.",
   tableCountersTitle: 'Counters',
   tableCountersPoison: 'Poison',
   tableCountersEnergy: 'Energy',

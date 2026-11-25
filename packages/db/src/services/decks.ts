@@ -607,6 +607,24 @@ export async function listDecks(db: Database, ownerId: string) {
     .orderBy(desc(decks.updatedAt));
 }
 
+/** Nomes dos comandantes de cada deck (o modo mesa separa o dano de parceiros). */
+export async function deckCommanderNames(db: Database, deckIds: readonly string[]) {
+  const ids = [...new Set(deckIds)];
+  const names = new Map<string, string[]>();
+  if (!ids.length) return names;
+  const rows = await db
+    .select({ deckId: deckCards.deckId, name: deckCards.cardName })
+    .from(deckCards)
+    .where(and(inArray(deckCards.deckId, ids), eq(deckCards.board, 'commander')))
+    .orderBy(asc(deckCards.cardName));
+  for (const r of rows) {
+    const list = names.get(r.deckId) ?? [];
+    if (!list.includes(r.name)) list.push(r.name);
+    names.set(r.deckId, list);
+  }
+  return names;
+}
+
 /** Decks (resumo) de vários jogadores — usado ao registrar partidas. */
 export async function listDecksForUsers(
   db: Database,

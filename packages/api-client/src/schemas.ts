@@ -337,7 +337,14 @@ export const tableSetupSchema = z
         userId: z.string(),
         name: z.string(),
         confirmed: z.boolean(),
-        decks: z.array(z.object({ id: z.string(), name: z.string() })),
+        decks: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            /** Comandantes do deck (dois com parceiros); servidores antigos não mandam. */
+            commanders: z.array(z.string()).default([]),
+          }),
+        ),
       }),
     ),
   })

@@ -299,6 +299,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Glossário de palavras-chave em "Aprender a jogar", com busca em português ou inglês. No modo mesa, ele abre pelo botão do centro, sem sair da partida.',
     en: 'Keyword glossary in "Learn to play", searchable in English or Portuguese. In table mode it opens from the centre button, without leaving the game.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'No modo mesa, decks com dois comandantes (parceiros) têm o dano de cada comandante contado à parte, com o nome dele, no site e no app.',
+    en: 'In table mode, decks with two commanders (partners) now track each commander’s damage separately, by name, on the website and in the app.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

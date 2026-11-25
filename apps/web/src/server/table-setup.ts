@@ -1,5 +1,6 @@
 import type { GameFormat } from '@boramarcar/core';
 import {
+  deckCommanderNames,
   getEventDetail,
   getGroupSettings,
   listDecksForUsers,
@@ -17,7 +18,8 @@ export interface TableSetup {
     userId: string;
     name: string;
     confirmed: boolean;
-    decks: { id: string; name: string }[];
+    /** `commanders`: nomes dos comandantes do deck (dois com parceiros). */
+    decks: { id: string; name: string; commanders: string[] }[];
   }[];
 }
 
@@ -36,6 +38,10 @@ export async function getTableSetup(
     members.map((m) => m.userId),
     input.userId,
   );
+  const commanders = await deckCommanderNames(
+    db,
+    decks.map((d) => d.id),
+  );
   const confirmed = new Set(
     event.participants.filter((p) => p.rsvp === 'yes').map((p) => p.userId),
   );
@@ -45,7 +51,9 @@ export async function getTableSetup(
       userId: m.userId,
       name: m.name,
       confirmed: confirmed.has(m.userId),
-      decks: decks.filter((d) => d.ownerId === m.userId).map((d) => ({ id: d.id, name: d.name })),
+      decks: decks
+        .filter((d) => d.ownerId === m.userId)
+        .map((d) => ({ id: d.id, name: d.name, commanders: commanders.get(d.id) ?? [] })),
     }));
   return {
     eventId: event.id,
