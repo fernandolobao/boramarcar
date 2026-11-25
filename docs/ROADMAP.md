@@ -209,6 +209,64 @@ Mesmo documento de desenho. O beta de fevereiro precisa que lojas criem torneios
 | 10.4 | **Seguidores e avisos da loja** (só para quem segue)                                                                     | P       | ✅ (20/11/2026): seguir loja (site e app), evento novo e avisos no sino e no push                             |
 | 10.5 | **Piloto com 1–3 lojas** (o 8.9)                                                                                         | —       | Depois do beta                                                                                                |
 
+## Fase 11 — Decks do zero, rascunhos e mão inicial (pedido de 25/11/2026)
+
+Objetivo: montar deck sem importar nada, explorar ideias sem bagunçar a coleção e testar a mão inicial.
+
+| #    | Item                                                                                                                                                                                                                                                                                                                                                                                      | Tamanho | Status   |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| 11.1 | **Criar deck do zero** (site e app): nome, formato e comandante pela busca de cartas; depois o editor que já existe (autocompletar, cópias, proxies, pilhas). Importar continua como atalho                                                                                                                                                                                               | M       | Pendente |
+| 11.2 | **Rascunho**: todo deck novo pode nascer como rascunho (padrão para "criar do zero"). As cartas de rascunho **não entram na coleção** (`syncCollectionFromDecks` ignora) e o deck aparece com o selo "Rascunho"; não pode ser escolhido numa partida nem na mesa. **Publicar** tira o selo e soma as cartas à coleção (uma vez, como hoje). Rascunho não aparece no perfil para os outros | M       | Pendente |
+| 11.3 | **Testar a mão inicial** (site e app): sorteia 7 do deck, mulligan de Londres (compra 7 e põe N embaixo), comprar as próximas cartas, nova mão; probabilidades em texto (ex.: "chance de 2 a 4 terrenos na mão inicial: 74%", pela hipergeométrica, em `packages/core`). Para Commander, o comandante fica fora do sorteio                                                                | M       | Pendente |
+| 11.4 | **Mesa de testes solo** (depois do 11.3): turnos de mentira com a mão, terrenos e mana disponível, sem regras automáticas — para "ver o deck girar"                                                                                                                                                                                                                                       | G       | Depois   |
+
+## Fase 12 — Aprender a jogar (pedido de 25/11/2026)
+
+Objetivo: quem nunca jogou aprende o básico pelo ArcanaKin e chega pronto para a primeira mesa do grupo.
+
+**O que podemos usar (Política de Conteúdo de Fãs da Wizards):** explicar as regras com texto **nosso** e **linkar** as fontes oficiais (página de regras da Wizards, com as Regras Básicas e as Regras Abrangentes, e o glossário de palavras-chave em português). Não copiamos as Regras Abrangentes em bloco (o texto é da Wizards) nem usamos logotipos; o aviso de conteúdo de fã, que o rodapé já tem, continua. Imagens de cartas como exemplo, pelo Scryfall, como no resto do app.
+
+| #    | Item                                                                                                                                                                                                                                                                                                                                   | Tamanho | Status   |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| 12.1 | **Trilha "Aprender a jogar"** (`/aprender`, aberta sem conta, e no app): lições curtas com ilustração e exemplo de carta — o que é Magic, tipos de carta, mana e terrenos, as fases do turno, combate, a pilha e as respostas, como se vence. Progresso salvo para quem tem conta                                                      | G       | Pendente |
+| 12.2 | **Commander para iniciantes**: comandante, identidade de cor, 100 cartas, 40 de vida, dano de comandante, a zona de comando, etiqueta de mesa e "Rule 0" (a conversa antes do jogo), brackets                                                                                                                                          | M       | Pendente |
+| 12.3 | **Glossário** de palavras-chave em português (voar, atropelar, toque mortífero…), com link para o glossário oficial; usado também nas dicas do modo mesa                                                                                                                                                                               | M       | Pendente |
+| 12.4 | **Desafios guiados** ("simular um jogo"): cenários prontos sobre a interface do modo mesa — "você tem estas cartas e o oponente ataca: o que fazer?" — com resposta comentada. Um simulador com todas as regras automáticas está fora de alcance (milhares de regras e de cartas); os desafios ensinam o essencial e cabem numa pessoa | G       | Pendente |
+| 12.5 | **Primeiro jogo com o grupo**: o convite para o grupo oferece a trilha; quem completa ganha uma conquista e o grupo vê "pronto para a primeira mesa"                                                                                                                                                                                   | P       | Pendente |
+
+## Fase 13 — Monetização: cobrir os custos (pedido de 25/11/2026)
+
+Objetivo: **empatar as contas** (não lucro, por enquanto), sem tirar nenhuma funcionalidade de quem não paga.
+
+**Regra que limita o desenho:** a Política de Conteúdo de Fãs não permite cobrar pelo acesso a conteúdo da Wizards. Então **nada que envolva cartas fica atrás de pagamento**: decks, coleção, análise, imagens, proxies e a trilha de aprendizado são livres e sem limite. Os limites numéricos ficam nas ferramentas de organização do ArcanaKin (grupo, loja, histórico, torneio). Antes de lançar, confirmar o desenho com a Wizards (pedido pelo canal de ajuda deles) e com um advogado.
+
+| #    | Item                                                                                                                                                                                                                                                                                                                                          | Tamanho | Status   |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| 13.1 | **Custos mensais medidos**: Vercel, Neon, Resend, Blob, Sentry, domínio e contas de loja de apps (Apple anual, Google uma vez), em reais; a meta de receita é esse número + impostos/taxas. Painel no `/admin` com custo × receita                                                                                                            | P       | Pendente |
+| 13.2 | **Plano para lojas** (a maior fonte esperada): grátis até 4 eventos por mês e torneios de até 32 inscritos; plano "Loja" (ex.: R$ 79/mês) com eventos e inscritos sem limite, avisos a mais por semana, relatório de público (quem veio, retorno) e exportar a lista. A descoberta de lojas continua igual para todas (sem pagar por posição) | M       | Pendente |
+| 13.3 | **Apoiador** (pessoa): ex.: R$ 9,90/mês ou R$ 99/ano. Ganha selo no perfil, mais grupos (grátis até 3), histórico de estatísticas sem limite de tempo (grátis: 12 meses no painel; os dados nunca são apagados), temas da mesa e prioridade nos pedidos. **Grupo apoiado**: o apoio de uma pessoa libera para o grupo todo o limite de grupo  | M       | Pendente |
+| 13.4 | **Pagamento** com Pix e cartão (assinatura recorrente) por um provedor brasileiro ou com operação no Brasil; nota fiscal (MEI ou CNPJ). No app, a assinatura é feita no site (regras das lojas de apps), e o app só mostra o estado                                                                                                           | G       | Pendente |
+| 13.5 | **Transparência**: página "Quanto custa manter o ArcanaKin" com custo do mês × apoio, sem números pessoais                                                                                                                                                                                                                                    | P       | Pendente |
+
+Conta de padeiro (para validar em 13.1): se o custo for ~R$ 600/mês, empata com ~8 lojas no plano ou ~65 apoiadores, ou uma mistura.
+
+## Fase 14 — App com a cara do site (pedido de 25/11/2026)
+
+Objetivo: o app ter o mesmo apelo visual do site — hoje está cru. Trabalho num branch próprio, testado no aparelho (Expo Go) junto com o dono, em rodadas.
+
+| #    | Item                                                                                                                                     | Tamanho | Status   |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| 14.1 | **Símbolos de mana** no texto das cartas e no custo (hoje aparece `{W}{U}`); mesmo mapa de símbolos do site                              | P       | Pendente |
+| 14.2 | **Coleção e deck em grade como no site**: selo "Foil" e quantidade sobre a carta, brilho de foil, capas dos decks com a arte             | M       | Pendente |
+| 14.3 | **Painel e grupo**: cabeçalho com a arte do comandante, cartões de números com ícones e anéis, pódio — o mesmo desenho do painel do site | M       | Pendente |
+| 14.4 | Tipografia da marca (fontes do site), espaçamentos e sombras dos tokens, ícones Lucide iguais aos do site, estados vazios ilustrados     | M       | Pendente |
+| 14.5 | Revisão tela a tela comparando com o site (lista no PR), no claro e no escuro                                                            | G       | Pendente |
+
+## Divulgação (contínuo)
+
+- Contato com perfis e canais que movimentam grupos de Magic (lojas, ligas locais, criadores de conteúdo, servidores de comunidade). A lista de contatos fica **fora do repositório** (documento privado do dono), com o que foi enviado e a resposta.
+- Material: as capturas de "Veja por dentro", um vídeo curto do modo mesa e da agenda do grupo, e o convite para o beta.
+
 ## Transversal (contínuo)
 
 | Item                                                                                                                                                                                                                                                                                                                                                  | Tamanho | Status            |
