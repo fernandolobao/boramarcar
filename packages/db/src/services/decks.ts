@@ -244,7 +244,8 @@ export async function saveImportedDeck(
 ) {
   const format = input.format ?? 'commander';
   if (!isGameFormat(format)) throw new DomainError('invalid_input', 'Formato inválido');
-  const name = input.deck.name.trim();
+  // Nome vindo de fora (lista colada, Archidekt, Moxfield): espaços juntados e até 120 caracteres.
+  const name = input.deck.name.replace(/\s+/g, ' ').trim().slice(0, 120).trim();
   if (!name) throw new DomainError('invalid_input', 'Informe o nome do deck');
   if (!input.deck.entries.length) throw new DomainError('invalid_input', 'O deck está vazio');
 

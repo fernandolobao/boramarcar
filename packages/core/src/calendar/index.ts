@@ -26,7 +26,7 @@ const toIcsDate = (date: Date) =>
 export const escapeIcsText = (value: string) =>
   value
     .replace(/\\/g, '\\\\')
-    .replace(/\r?\n/g, '\\n')
+    .replace(/\r\n|\r|\n/g, '\\n')
     .replace(/([,;])/g, '\\$1');
 
 /** Quebra linhas com mais de 75 octetos (RFC 5545 §3.1), sem partir caracteres UTF-8. */

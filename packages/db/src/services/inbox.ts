@@ -1,5 +1,5 @@
 import type { NotificationData, NotificationKind } from '@boramarcar/core';
-import { and, count, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNotNull, isNull, lt } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   announcements,
@@ -26,6 +26,19 @@ import { getGroupRanking } from './ranking';
  */
 
 type NewNotification = { userId: string; groupId: string | null; data: NotificationData };
+
+/**
+ * Limpeza (cron diário): notificações **lidas** há mais de `days` dias saem (o sino mostra só as
+ * mais recentes). As não lidas ficam, por mais antigas que sejam. Devolve quantas saíram.
+ */
+export async function purgeOldNotifications(db: Database, now = new Date(), days = 180) {
+  const before = new Date(now.getTime() - days * 86_400_000);
+  const removed = await db
+    .delete(notifications)
+    .where(and(isNotNull(notifications.readAt), lt(notifications.createdAt, before)))
+    .returning({ id: notifications.id });
+  return removed.length;
+}
 
 /** Linhas por INSERT: o Postgres aceita até 65.535 parâmetros por comando (4 por linha aqui). */
 const NOTIFICATION_BATCH = 1000;

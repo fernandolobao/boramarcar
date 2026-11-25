@@ -85,4 +85,9 @@ describe('link do Google Agenda (10.3)', () => {
     expect(url.searchParams.get('dates')).toBe('20261127T220000Z/20261128T020000Z');
     expect(url.searchParams.get('location')).toBe('Loja do Mago');
   });
+
+  it('\\r solto também vira quebra escapada (senão um leitor tolerante criaria uma propriedade nova)', () => {
+    expect(escapeIcsText('Título\rLOCATION:falso')).toBe('Título\\nLOCATION:falso');
+    expect(escapeIcsText('a\r\nb')).toBe('a\\nb');
+  });
 });

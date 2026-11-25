@@ -38,6 +38,10 @@ let cached: Env | null = null;
 export function getEnv(): Env {
   if (cached) return cached;
   if (process.env.SKIP_ENV_VALIDATION) {
+    // Só para build e testes: em produção, o segredo do login viraria um valor conhecido.
+    if (process.env.VERCEL_ENV === 'production') {
+      throw new Error('SKIP_ENV_VALIDATION não pode estar ligado em produção');
+    }
     cached = {
       DATABASE_URL: process.env.DATABASE_URL ?? 'postgres://localhost:5432/boramarcar',
       BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? 'x'.repeat(32),

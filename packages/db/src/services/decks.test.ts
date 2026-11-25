@@ -759,4 +759,15 @@ describe('comparação com decks do mesmo comandante', () => {
       }),
     ).toBeNull();
   });
+
+  it('nome importado enorme (lista colada, origem externa) é cortado em 120 caracteres', async () => {
+    const owner = await createTestUser(db);
+    const saved = await saveImportedDeck(db, {
+      ownerId: owner.id,
+      deck: { ...deck, name: `  ${'Deck '.repeat(200)}  ` },
+      cards: cardsData,
+    });
+    expect(saved.name.length).toBeLessThanOrEqual(120);
+    expect(saved.name.startsWith('Deck Deck')).toBe(true);
+  });
 });

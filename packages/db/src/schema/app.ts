@@ -292,7 +292,13 @@ export const events = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index('events_group_time_idx').on(t.groupId, t.startsAt)],
+  (t) => [
+    index('events_group_time_idx').on(t.groupId, t.startsAt),
+    // Cron de lembretes: encontros marcados que ainda não receberam lembrete, por horário.
+    index('events_reminder_due_idx')
+      .on(t.startsAt)
+      .where(sql`${t.status} = 'scheduled' and ${t.reminderSentAt} is null`),
+  ],
 );
 
 export const eventParticipants = pgTable(
@@ -559,7 +565,11 @@ export const rateLimits = pgTable(
     windowStart: timestamp('window_start', { withTimezone: true }).notNull(),
     count: integer('count').notNull().default(0),
   },
-  (t) => [primaryKey({ columns: [t.key, t.windowStart] })],
+  (t) => [
+    primaryKey({ columns: [t.key, t.windowStart] }),
+    // Limpeza diária das janelas antigas.
+    index('rate_limits_window_start_idx').on(t.windowStart),
+  ],
 );
 
 /**
@@ -579,7 +589,11 @@ export const notifications = pgTable(
     createdAt: createdAt(),
     readAt: timestamp('read_at', { withTimezone: true }),
   },
-  (t) => [index('notifications_user_created_idx').on(t.userId, t.createdAt)],
+  (t) => [
+    index('notifications_user_created_idx').on(t.userId, t.createdAt),
+    // Retrospectiva do mês: "este grupo já foi avisado?".
+    index('notifications_group_kind_idx').on(t.groupId, t.kind),
+  ],
 );
 
 /**

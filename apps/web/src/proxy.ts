@@ -63,6 +63,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Tudo menos API, arquivos do Next, o túnel do Sentry e arquivos com extensão (public/).
-  matcher: ['/((?!api/|_next/static|_next/image|monitoring|.*\\.[a-z0-9]+$).*)'],
+  // Fora do proxy só o que é estático de verdade: as pastas do `public`, os arquivos de metadados
+  // do Next e o túnel do Sentry. (Antes, qualquer endereço terminado em ".algo" escapava da CSP e
+  // da exigência de login, inclusive páginas como /jogadores/a.b.)
+  matcher: [
+    '/((?!api/|_next/static|_next/image|monitoring|brand/|fonts/|icons/|showcase/|favicon\\.ico$|icon\\.svg$|apple-icon\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$).*)',
+  ],
 };
