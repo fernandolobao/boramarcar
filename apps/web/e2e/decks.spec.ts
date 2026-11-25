@@ -72,18 +72,25 @@ test.describe('deck', () => {
     await expect(page.getByRole('button', { name: /^Sol Ring/ })).toBeVisible();
   });
 
-  test('testar a mão inicial: 7 cartas, mulligan com carta para o fundo (11.3)', async ({
+  test('rascunho aponta cartas livres na coleção; publicar pergunta carta a carta', async ({
     page,
   }) => {
-    await page.goto(`/decks/${E2E_IDS.deck}`);
-    const section = page.getByRole('region', { name: 'Testar a mão inicial' });
-    await section.getByRole('button', { name: 'Comprar mão inicial' }).click();
-    await expect(section.getByRole('listitem')).toHaveCount(7);
-    await section.getByRole('button', { name: 'Mulligan' }).click();
-    await section.getByRole('listitem').first().getByRole('button').click();
-    await section.getByRole('button', { name: 'Manter com 6 cartas' }).click();
-    await expect(section.getByRole('listitem')).toHaveCount(6);
-    await expect(section.getByRole('status')).toContainText('depois de 1 mulligan');
+    test.skip(test.info().project.name !== 'chromium', 'cria dados: só no desktop');
+    // Duas Sol Ring a mais na coleção (sem uso em outro deck) e um rascunho com uma Sol Ring.
+    await page.request.post('/api/v1/collection', {
+      data: { name: 'Sol Ring', scryfallId: 'e2e-sol', quantity: 2, foil: false },
+    });
+    const created = await page.request.post('/api/v1/decks', {
+      data: { kind: 'text', name: 'Rascunho com coleção E2E', text: '1 Sol Ring', draft: true },
+    });
+    const { deck } = (await created.json()) as { deck: { id: string } };
+    await page.goto(`/decks/${deck.id}`);
+    await expect(page.getByText(/livres? na coleção/).first()).toBeAttached();
+    await page.getByRole('button', { name: 'Publicar deck' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByRole('radio', { name: 'Usar a da coleção' })).toBeChecked();
+    await dialog.getByRole('button', { name: 'Publicar com estas escolhas' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Deck publicado' })).toBeVisible();
   });
 
   test('editor: proxies parciais e lista exportada', async ({ page }) => {

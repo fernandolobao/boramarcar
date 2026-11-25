@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
+import { printLabel } from '@/lib/print-label';
 import { outsideDeck } from '@boramarcar/core';
-import { OpeningHand } from '@/components/opening-hand';
 import { PublishDeck } from '@/components/deck-forms';
 import {
   artCropUrl,
@@ -17,7 +17,12 @@ import {
 } from '@boramarcar/core';
 import Link from 'next/link';
 import { DraftBadge, VisibilityBadge } from '@/components/deck-grid';
-import { compareWithCommanderDecks, getDeck, listDismissedTips } from '@boramarcar/db';
+import {
+  compareWithCommanderDecks,
+  draftCollectionMatches,
+  getDeck,
+  listDismissedTips,
+} from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { ViewTransition } from 'react';
@@ -88,6 +93,31 @@ export default async function DeckPage({ params, searchParams }: Props) {
     'deck-analysis',
   );
   const t = await getTranslations('decks');
+  // Rascunho do próprio dono: cartas que ele já tem livres na coleção (selos e janela de publicar).
+  const matches =
+    deck.status === 'draft' && deck.isOwner
+      ? await draftCollectionMatches(getDb(), { deckId: deck.id, userId: user.id })
+      : [];
+  const matchOf = new Map(matches.map((m) => [m.name.toLowerCase(), m]));
+  const inCollection = Object.fromEntries(matches.map((m) => [m.name.toLowerCase(), m.free]));
+  const publishCandidates = deck.lines
+    .filter(
+      (l) =>
+        !outsideDeck(l.board) && l.quantity - l.proxies > 0 && matchOf.has(l.name.toLowerCase()),
+    )
+    .map((l) => ({
+      key: l.key,
+      name: l.name,
+      board: l.board,
+      fromScryfallId: l.scryfallId,
+      fromLabel: printLabel(l.card),
+      options: matchOf.get(l.name.toLowerCase())!.options.map((o) => ({
+        scryfallId: o.scryfallId,
+        foil: o.foil,
+        free: o.free,
+        label: printLabel(o),
+      })),
+    }));
   const ta = await getTranslations('analysis');
   const tc = await getTranslations('common');
   const tf = await getTranslations('formats');
@@ -215,7 +245,9 @@ export default async function DeckPage({ params, searchParams }: Props) {
                 <VisibilityBadge visibility={deck.visibility} />
               </div>
               <h1 className="page-title">{deck.name}</h1>
-              {deck.status === 'draft' && deck.isOwner && <PublishDeck deckId={deck.id} />}
+              {deck.status === 'draft' && deck.isOwner && (
+                <PublishDeck deckId={deck.id} candidates={publishCandidates} />
+              )}
               {justPublished && deck.status === 'published' && (
                 <p role="status" className="flex items-center gap-2 font-medium">
                   <Icon name="publish" />
@@ -333,26 +365,6 @@ export default async function DeckPage({ params, searchParams }: Props) {
           )}
         </StackSections>
 
-        {/* Testar a mão inicial (11.3): só o deck principal; a face da frente diz se é terreno. */}
-        <section className="card space-y-4" aria-labelledby="deck-opening-hand">
-          <div className="space-y-1">
-            <h2 id="deck-opening-hand" className="section-title mb-0 flex items-center gap-2">
-              <Icon name="openingHand" />
-              {t('hand.title')}
-            </h2>
-            <p className="muted text-sm">{t('hand.intro')}</p>
-          </div>
-          <OpeningHand
-            lines={deck.lines.map((l) => ({
-              name: l.name,
-              board: l.board,
-              quantity: l.quantity,
-              isLand: (l.card?.typeLine ?? '').split('//')[0]!.includes('Land'),
-              imageUri: l.card?.imageUri ?? null,
-            }))}
-          />
-        </section>
-
         {/* Detalhes para quem quer ir fundo; fechados por padrão para a página não cansar. */}
         <details className="card">
           <summary className="cursor-pointer font-semibold">{ta('moreDetails')}</summary>
@@ -392,6 +404,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
           deckId={deck.id}
           lines={deck.lines}
           isOwner={deck.isOwner}
+          inCollection={inCollection}
           usdBrl={rate?.rate ?? null}
         />
 

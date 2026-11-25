@@ -271,13 +271,13 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-25',
-    pt: 'Na página do deck, "Testar a mão inicial": compre uma mão de 7, faça mulligan escolhendo as cartas que vão para o fundo e veja as próximas compras.',
-    en: 'On the deck page, "Test the opening hand": draw a hand of 7, mulligan by choosing the cards to put on the bottom and see the next draws.',
+    pt: 'Tokens e emblemas ganharam categoria própria na lista do deck: não ficam mais em "Talvez" e não contam no total de cartas nem na sua coleção.',
+    en: 'Tokens and emblems now have their own section in the deck list: they no longer sit in "Maybe" and don\u2019t count in the card total or your collection.',
   },
   {
     date: '2026-11-25',
-    pt: 'Tokens e emblemas ganharam categoria própria na lista do deck: não ficam mais em "Talvez" e não contam no total de cartas nem na sua coleção.',
-    en: 'Tokens and emblems now have their own section in the deck list: they no longer sit in "Maybe" and don\u2019t count in the card total or your collection.',
+    pt: 'Nos rascunhos de deck, as cartas que você já tem livres na coleção ganham um selo. Ao publicar, você escolhe carta a carta se usa a que já tem ou se adiciona uma nova à coleção.',
+    en: 'In draft decks, cards you already have free in your collection get a badge. When publishing, you choose card by card whether to use the one you have or add a new one to your collection.',
   },
 ];
 

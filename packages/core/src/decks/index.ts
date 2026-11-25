@@ -8,4 +8,3 @@ export * from './import';
 export * from './presentation';
 export * from './editing';
 export * from './proxies';
-export * from './hand';
