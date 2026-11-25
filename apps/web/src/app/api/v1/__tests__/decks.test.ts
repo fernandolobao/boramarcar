@@ -1,7 +1,6 @@
 import { cachedExternal } from '@boramarcar/db';
 import { createTestDb, createTestUser } from '@boramarcar/db/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { resetEnvCache } from '@/env';
 import { asUser, call, dbMock, sessionMock, testState } from '@/test/api';
 
 vi.mock('@/server/session', () => sessionMock);
@@ -277,12 +276,7 @@ describe('API v1 — decks', () => {
     );
 
     asUser(owner);
-    // Impressão de proxies: atrás da flag `print-proxy` e só para admin (senão, 404).
-    expect((await call(proxiesPdf.GET, { params: { deckId } })).status).toBe(404);
-    process.env.FLAG_PRINT_PROXY = 'true';
-    expect((await call(proxiesPdf.GET, { params: { deckId } })).status).toBe(404);
-    process.env.ADMIN_EMAILS = owner.email;
-    resetEnvCache();
+    // Impressão de proxies: para qualquer pessoa que veja o deck (sem flag, sem ser admin).
     // Sem nenhuma carta proxy, a folha só de proxies fica vazia (400); a do deck todo sai.
     await put({ name: 'Forest', board: 'mainboard', quantity: 10, proxies: 0 });
     const noProxies = await call(proxiesPdf.GET, { params: { deckId } });
@@ -294,9 +288,13 @@ describe('API v1 — decks', () => {
     expect(allCards.headers.get('content-disposition')).toBe(
       'attachment; filename="proxies-omnath-ramp.pdf"',
     );
-    delete process.env.FLAG_PRINT_PROXY;
-    delete process.env.ADMIN_EMAILS;
-    resetEnvCache();
+    // Gerar o PDF baixa as imagens: limite por pessoa (20 por hora).
+    const statuses: number[] = [];
+    for (let i = 0; i < 19; i += 1) {
+      statuses.push((await call(proxiesPdf.GET, { params: { deckId } })).status);
+    }
+    expect(statuses.slice(0, 18).every((s) => s === 400)).toBe(true);
+    expect(statuses[18]).toBe(429);
     const suggestions = await call(autocomplete.GET, { path: '/?q=sol' });
     expect(suggestions.body).toEqual({ names: ['Sol Ring', 'Solemn Simulacrum'], printed: {} });
     expect((await call(autocomplete.GET, { path: '/?q=s' })).body).toEqual({
