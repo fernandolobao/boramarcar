@@ -675,3 +675,12 @@ sem rolagem horizontal em 320px.
   No site instalado como app não há o botão de voltar do navegador, e essas páginas não têm o menu.
 - Busca de lojas: "Usar minha localização" fica ao lado do campo de cidade (abaixo dele no celular), e a
   dica vem depois dos dois (`aria-describedby` continua no campo).
+
+## Testar a mão inicial (25/11/2026)
+
+- Seção com título (`region` "Testar a mão inicial"); o resultado (cartas, terrenos, mulligans) é
+  anunciado numa região `role="status"`.
+- No mulligan, cada carta vira um botão de alternar (`aria-pressed`) com nome "Pôr {carta} no fundo";
+  "Manter" fica desabilitado até escolher a quantidade certa, e "Comprar carta" também enquanto a
+  escolha não termina. O selo "Fundo" sobre a carta repete a informação em texto.
+- Fora do mulligan, cada carta é uma `figure` com o nome em `figcaption` (a imagem é decorativa).

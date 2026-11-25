@@ -567,7 +567,21 @@
     "deleteDeckHint": "Remove o deck e as cartas dele. As partidas em que ele foi usado continuam no histórico.",
     "removeDeck": "Remover deck",
     "confirmRemove": "Confirmar remoção",
-    "viewedAsAdmin": "Você está vendo este deck como admin do ArcanaKin (ele não está visível para você normalmente). O acesso fica registrado."
+    "viewedAsAdmin": "Você está vendo este deck como admin do ArcanaKin (ele não está visível para você normalmente). O acesso fica registrado.",
+    "hand": {
+      "title": "Testar a mão inicial",
+      "intro": "Embaralhe o deck e veja uma mão de 7, como na mesa. Comandante, reserva e \"talvez\" ficam de fora.",
+      "draw": "Comprar mão inicial",
+      "newHand": "Nova mão",
+      "mulligan": "Mulligan",
+      "drawNext": "Comprar carta",
+      "toBottom": "Fundo",
+      "pickBottom": "Pôr {name} no fundo",
+      "keep": "Manter com {count, plural, =1 {1 carta} other {# cartas}}",
+      "chooseBottom": "Mulligan {count}: escolha {count, plural, =1 {1 carta} other {# cartas}} para o fundo do grimório ({chosen} {chosen, plural, =1 {escolhida} other {escolhidas}}).",
+      "summary": "{cards, plural, =1 {1 carta} other {# cartas}} na mão, {lands, plural, =0 {nenhum terreno} =1 {1 terreno} other {# terrenos}}{mulligans, plural, =0 {} =1 { (depois de 1 mulligan)} other { (depois de # mulligans)}}.",
+      "tooSmall": "O deck precisa de pelo menos 7 cartas no deck principal para testar a mão."
+    }
   },
   "analysis": {
     "title": "Análise",

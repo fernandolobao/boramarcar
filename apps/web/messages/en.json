@@ -567,7 +567,21 @@
     "deleteDeckHint": "Deletes the deck and its cards. Games where it was used stay in the history.",
     "removeDeck": "Delete deck",
     "confirmRemove": "Confirm deletion",
-    "viewedAsAdmin": "You are viewing this deck as an ArcanaKin admin (it is not normally visible to you). This access is logged."
+    "viewedAsAdmin": "You are viewing this deck as an ArcanaKin admin (it is not normally visible to you). This access is logged.",
+    "hand": {
+      "title": "Test the opening hand",
+      "intro": "Shuffle the deck and see a hand of 7, like at the table. Commander, sideboard and \"maybe\" stay out.",
+      "draw": "Draw opening hand",
+      "newHand": "New hand",
+      "mulligan": "Mulligan",
+      "drawNext": "Draw a card",
+      "toBottom": "Bottom",
+      "pickBottom": "Put {name} on the bottom",
+      "keep": "Keep {count, plural, =1 {1 card} other {# cards}}",
+      "chooseBottom": "Mulligan {count}: choose {count, plural, =1 {1 card} other {# cards}} to put on the bottom of your library ({chosen} chosen).",
+      "summary": "{cards, plural, =1 {1 card} other {# cards}} in hand, {lands, plural, =0 {no lands} =1 {1 land} other {# lands}}{mulligans, plural, =0 {} =1 { (after 1 mulligan)} other { (after # mulligans)}}.",
+      "tooSmall": "The deck needs at least 7 cards in the main deck to test a hand."
+    }
   },
   "analysis": {
     "title": "Analysis",

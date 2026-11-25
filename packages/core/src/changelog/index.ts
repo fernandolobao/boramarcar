@@ -264,6 +264,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Na busca de lojas e eventos, "Usar minha localização" agora funciona no site: os eventos aparecem pela distância de onde você está (a posição não é guardada).',
     en: 'In the store and event search, "Use my location" now works on the website: events are sorted by distance from where you are (your position is not stored).',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Na página do deck, "Testar a mão inicial": compre uma mão de 7, faça mulligan escolhendo as cartas que vão para o fundo e veja as próximas compras.',
+    en: 'On the deck page, "Test the opening hand": draw a hand of 7, mulligan by choosing the cards to put on the bottom and see the next draws.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
