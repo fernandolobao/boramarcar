@@ -1,11 +1,12 @@
+import { ANNOUNCEMENT_BODY_MAX, ANNOUNCEMENT_TITLE_MAX } from '@boramarcar/core';
 import { deleteAnnouncement, updateAnnouncement } from '@boramarcar/db';
 import { z } from 'zod';
 import { assertAdmin } from '@/server/admin';
 import { authed, parseJson } from '@/server/http';
 
 const schema = z.object({
-  title: z.string().max(120).optional(),
-  body: z.string().max(4000).optional(),
+  title: z.string().max(ANNOUNCEMENT_TITLE_MAX).optional(),
+  body: z.string().max(ANNOUNCEMENT_BODY_MAX).optional(),
   groupId: z.string().min(1).nullable().optional(),
 });
 

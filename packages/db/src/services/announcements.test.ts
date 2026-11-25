@@ -136,4 +136,25 @@ describe('novidades da semana', () => {
     const inbox = await listNotifications(db, { userId: players[0]!.id });
     expect(inbox.filter((n) => n.kind === 'announcement')).toHaveLength(1);
   });
+
+  it('semana cheia de novidades (47, ~6.500 caracteres): o rascunho dá para editar e publicar', async () => {
+    const entries = Array.from({ length: 47 }, (_, i) => ({
+      date: '2026-12-15',
+      pt: `Novidade ${i}: ${'uma frase com detalhes do que mudou para quem usa. '.repeat(2)}`,
+      en: `News ${i}`,
+    }));
+    const draft = await createChangelogDraft(db, {
+      entries,
+      now: new Date('2026-12-16T13:00:00Z'),
+    });
+    expect(draft!.body.length).toBeGreaterThan(4000);
+    const edited = await updateAnnouncement(db, {
+      id: draft!.id,
+      body: `${draft!.body}\n• Uma linha acrescentada pelo admin.`,
+    });
+    expect(edited.body).toContain('acrescentada pelo admin');
+    await expect(publishAnnouncement(db, { id: draft!.id })).resolves.toMatchObject({
+      status: 'published',
+    });
+  });
 });

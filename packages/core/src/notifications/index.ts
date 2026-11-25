@@ -53,3 +53,10 @@ export type NotificationData =
       round: number;
       table: number | null;
     };
+
+/**
+ * Tamanho dos avisos do ArcanaKin. O texto cabe uma semana cheia de novidades (o rascunho semanal
+ * junta todas; em novembro de 2026 uma semana passou de 6.500 caracteres).
+ */
+export const ANNOUNCEMENT_TITLE_MAX = 120;
+export const ANNOUNCEMENT_BODY_MAX = 12_000;
