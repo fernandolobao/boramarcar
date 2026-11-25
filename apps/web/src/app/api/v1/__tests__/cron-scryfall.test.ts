@@ -85,6 +85,7 @@ describe('cron do cache do Scryfall', () => {
       updated: 1,
       missing: 1,
       purged: { cache: 0, rateLimits: 0 },
+      oldNotifications: 0,
     });
     expect(requested[0]!.sort()).toEqual(['gone', 'sol']);
     const all = await db.select().from(schema.cards);

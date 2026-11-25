@@ -27,6 +27,7 @@
     "./tournaments": "./src/tournaments/index.ts",
     "./stores": "./src/stores/index.ts",
     "./images": "./src/images/index.ts",
+    "./mana": "./src/mana/index.ts",
     "./discovery": "./src/discovery/index.ts",
     "./notifications": "./src/notifications/index.ts",
     "./changelog": "./src/changelog/index.ts"
