@@ -482,18 +482,32 @@ export function ManaBaseTable({
 }
 
 /** Chances da mão inicial e das jogadas de terreno (4.9). */
-export function HandOdds({ odds }: { odds: OpeningHandOdds }) {
+export function HandOdds({
+  odds,
+  action,
+}: {
+  odds: OpeningHandOdds;
+  /** Ação no canto da seção (ex.: "Sortear mão inicial"). */
+  action?: React.ReactNode;
+}) {
   const t = useTranslations('analysis');
   const percent = usePercent();
   const format = useFormatter();
   const max = Math.max(...odds.distribution);
   return (
     <div className="space-y-4">
-      <h2 className="section-title mb-0 flex items-center gap-2">
-        <Icon name="openingHand" />
-        {t('handTitle')}
-      </h2>
-      <p className="muted text-sm">{t('handHint', { library: odds.library, lands: odds.lands })}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <h2 className="section-title mb-0 flex items-center gap-2">
+            <Icon name="openingHand" />
+            {t('handTitle')}
+          </h2>
+          <p className="muted text-sm">
+            {t('handHint', { library: odds.library, lands: odds.lands })}
+          </p>
+        </div>
+        {action}
+      </div>
       <ul className="space-y-1 text-sm">
         <li>
           {t('handExpected', {

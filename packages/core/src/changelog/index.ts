@@ -294,6 +294,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Novo bloco "Commander para iniciantes" em "Aprender a jogar": comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets, com uma conquista para quem concluir.',
     en: 'New "Commander for beginners" part in "Learn to play": the commander, color identity, the multiplayer table, Rule 0 and brackets, with an achievement for completing it.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Na análise do deck, em "Mão inicial", o botão "Sortear mão inicial" abre o teste da mão: compre 7, faça mulligan escolhendo as cartas do fundo e veja as próximas compras.',
+    en: 'In the deck analysis, under "Opening hand", the "Draw a sample hand" button opens the hand test: draw 7, mulligan by choosing the bottom cards and see the next draws.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

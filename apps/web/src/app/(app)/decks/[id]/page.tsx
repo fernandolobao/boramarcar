@@ -40,6 +40,8 @@ import {
   ManaCurve,
 } from '@/components/deck-analysis';
 import { DeckCards } from '@/components/deck-cards';
+import { ModalButton } from '@/components/modal-button';
+import { OpeningHand } from '@/components/opening-hand';
 import { DeckComparisonCard } from '@/components/deck-comparison';
 import { DeckRoles, RefreshAnalysis } from '@/components/deck-roles';
 import { DeckActions } from '@/components/deck-tools';
@@ -404,7 +406,24 @@ export default async function DeckPage({ params, searchParams }: Props) {
             )}
             {analysis.handOdds && (
               <section className="border-t border-line pt-6">
-                <HandOdds odds={analysis.handOdds} />
+                <HandOdds
+                  odds={analysis.handOdds}
+                  action={
+                    <ModalButton label={t('hand.open')} title={t('hand.title')} icon="openingHand">
+                      <p className="muted text-sm">{t('hand.intro')}</p>
+                      {/* Só o deck principal; a face da frente diz se é terreno. */}
+                      <OpeningHand
+                        lines={deck.lines.map((l) => ({
+                          name: l.name,
+                          board: l.board,
+                          quantity: l.quantity,
+                          isLand: (l.card?.typeLine ?? '').split('//')[0]!.includes('Land'),
+                          imageUri: l.card?.imageUri ?? null,
+                        }))}
+                      />
+                    </ModalButton>
+                  }
+                />
               </section>
             )}
           </div>

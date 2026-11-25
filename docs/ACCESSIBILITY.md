@@ -713,3 +713,13 @@ sem rolagem horizontal em 320px.
 - "Marcar como concluída" é um botão de alternar (`aria-pressed`) com resultado em `role="status"`.
   Anterior/próxima numa `<nav>` com rótulo, e o texto "Anterior:/Próxima:" em `sr-only`.
 - Links para as regras oficiais avisam que abrem em nova aba.
+
+## Testar a mão inicial (25/11/2026, restaurado)
+
+- Botão "Sortear mão inicial" no canto da seção "Mão inicial" (análise), que abre o teste num
+  `<dialog>` (`ModalButton`, foco volta ao botão). O resultado (cartas, terrenos, mulligans) é
+  anunciado numa região `role="status"`.
+- No mulligan, cada carta vira um botão de alternar (`aria-pressed`) com nome "Pôr {carta} no fundo";
+  "Manter" fica desabilitado até escolher a quantidade certa, e "Comprar carta" também enquanto a
+  escolha não termina. O selo "Fundo" sobre a carta repete a informação em texto.
+- Fora do mulligan, cada carta é uma `figure` com o nome em `figcaption` (a imagem é decorativa).
