@@ -294,6 +294,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Novo bloco "Commander para iniciantes" em "Aprender a jogar": comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets, com uma conquista para quem concluir.',
     en: 'New "Commander for beginners" part in "Learn to play": the commander, color identity, the multiplayer table, Rule 0 and brackets, with an achievement for completing it.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'No modo mesa, decks com dois comandantes (parceiros) têm o dano de cada comandante contado à parte, com o nome dele, no site e no app.',
+    en: 'In table mode, decks with two commanders (partners) now track each commander’s damage separately, by name, on the website and in the app.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

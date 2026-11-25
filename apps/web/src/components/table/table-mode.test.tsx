@@ -263,6 +263,25 @@ describe('tela acesa e tela cheia', () => {
     Reflect.deleteProperty(document, 'exitFullscreen');
   });
 
+  it('parceiros: "dois comandantes" separa o dano de cada comandante', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    let dialog = screen.getByRole('dialog', { name: 'Bia' });
+    const toggle = within(dialog).getByRole('button', { name: 'Dois comandantes (parceiros)' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Fechar' }));
+    fireEvent.click(screen.getByRole('button', { name: /opções de Ana/ }));
+    dialog = screen.getByRole('dialog', { name: 'Ana' });
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Aumentar De Bia — 2º comandante' }),
+    );
+    expect(
+      within(dialog).getByRole('button', { name: 'Aumentar De Bia — 1º comandante' }),
+    ).toBeInTheDocument();
+  });
+
   it('sem API de tela cheia (iPhone), explica como instalar na tela inicial', () => {
     start();
     fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));

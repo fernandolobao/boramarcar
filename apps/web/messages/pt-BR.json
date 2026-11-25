@@ -1585,7 +1585,11 @@
     "awakeOn": "Tela acesa enquanto a mesa estiver aberta.",
     "awakeUnavailable": "Não deu para manter a tela acesa: desligue o bloqueio automático nos ajustes do celular ou saia do modo de baixo consumo.",
     "tournamentIntro": "{name} · mesa {table}: os jogadores e o formato já vêm do torneio. Ao registrar, o resultado vai para a mesa do torneio.",
-    "backToTournament": "Voltar ao torneio"
+    "backToTournament": "Voltar ao torneio",
+    "fromCommander": "De {name} — {commander}",
+    "fromNth": "De {name} — {n}º comandante",
+    "twoCommanders": "Dois comandantes (parceiros)",
+    "twoCommandersHint": "Ligue quando o deck de {name} tem dois comandantes: o dano de cada um conta à parte nas outras áreas."
   },
   "consent": {
     "title": "Cookies e gravação de sessão",

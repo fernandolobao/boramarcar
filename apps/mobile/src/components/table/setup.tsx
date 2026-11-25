@@ -231,6 +231,8 @@ export function TableSetupScreen({
                 userId,
                 name: byId.get(userId)!.name,
                 deckId: decks[userId] ?? null,
+                commanders:
+                  byId.get(userId)!.decks.find((d) => d.id === decks[userId])?.commanders ?? [],
               })),
             }),
           )
