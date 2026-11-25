@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  commanderCountOf,
+  commanderSources,
   defeatReason,
   formatRules,
   rollDie,
@@ -17,6 +19,7 @@ import {
 } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
+import { GlossarySearch } from '../glossary';
 import { Icon } from '../icons';
 import { useLightDismiss } from '../use-light-dismiss';
 import { isStandalone, type KeepAwakeStatus } from './use-table';
@@ -338,10 +341,12 @@ export function TableBoard({
   /** Tela acesa e tela cheia (ver `useKeepAwake`/`useFullscreen`). */
   screen: TableScreen;
 }) {
+  const tg = useTranslations('learn.glossary');
   const t = useTranslations('table');
   const layout = tableLayout(state.players.length);
   const [playerOpen, setPlayerOpen] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const [roll, setRoll] = useState('');
   /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
   const [swapping, setSwapping] = useState<string | null>(null);
@@ -451,24 +456,52 @@ export function TableBoard({
                 <h3 className="font-semibold">{t('commanderDamage')}</h3>
                 <p className="muted text-sm">{t('commanderDamageHint')}</p>
                 <ul>
-                  {state.players
-                    .filter((p) => p.userId !== selected.userId)
-                    .map((p) => (
+                  {commanderSources(state, selected.userId).map((source, _i, all) => {
+                    const twoFromSame =
+                      all.filter((s) => s.fromUserId === source.fromUserId).length > 1;
+                    return (
                       <Stepper
-                        key={p.userId}
-                        label={t('from', { name: p.name })}
-                        value={selected.commanderDamage[p.userId] ?? 0}
+                        key={source.key}
+                        label={
+                          source.commander
+                            ? t('fromCommander', {
+                                name: source.name,
+                                commander: source.commander,
+                              })
+                            : twoFromSame
+                              ? t('fromNth', { name: source.name, n: source.index + 1 })
+                              : t('from', { name: source.name })
+                        }
+                        value={selected.commanderDamage[source.key] ?? 0}
                         onChange={(delta) =>
                           dispatch({
                             type: 'commander',
                             userId: selected.userId,
-                            fromUserId: p.userId,
+                            fromUserId: source.fromUserId,
+                            index: source.index,
                             delta,
                           })
                         }
                       />
-                    ))}
+                    );
+                  })}
                 </ul>
+                {/* Parceiros: o dano de cada comandante conta à parte (21 do mesmo derruba). */}
+                <button
+                  type="button"
+                  className={commanderCountOf(selected) === 2 ? 'btn-primary' : 'btn-secondary'}
+                  aria-pressed={commanderCountOf(selected) === 2}
+                  onClick={() =>
+                    dispatch({
+                      type: 'commanders',
+                      userId: selected.userId,
+                      count: commanderCountOf(selected) === 2 ? 1 : 2,
+                    })
+                  }
+                >
+                  {t('twoCommanders')}
+                </button>
+                <p className="muted text-sm">{t('twoCommandersHint', { name: selected.name })}</p>
               </section>
             )}
             <section>
@@ -578,6 +611,18 @@ export function TableBoard({
             <Icon name="swap" />
             {t('swap')}
           </button>
+          <button
+            type="button"
+            className="btn-secondary col-span-2"
+            aria-haspopup="dialog"
+            onClick={() => {
+              setMenuOpen(false);
+              setGlossaryOpen(true);
+            }}
+          >
+            <Icon name="lessons" />
+            {tg('open')}
+          </button>
         </div>
         <p role="status" className="min-h-6 text-center text-lg font-semibold">
           {roll}
@@ -615,6 +660,11 @@ export function TableBoard({
           </button>
         </div>
         <p className="muted text-sm">{t('exitHint')}</p>
+      </Dialog>
+
+      {/* Glossário (12.3): para tirar a dúvida de uma palavra-chave sem sair da partida. */}
+      <Dialog open={glossaryOpen} title={tg('title')} onClose={() => setGlossaryOpen(false)}>
+        <GlossarySearch showLessons={false} />
       </Dialog>
     </div>
   );

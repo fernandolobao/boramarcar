@@ -1,5 +1,7 @@
 import { formatRules } from '@boramarcar/core/games';
 import {
+  commanderCountOf,
+  commanderSources,
   fieldDelta,
   defeatReason,
   nextRotation,
@@ -158,30 +160,49 @@ function PlayerOptions({
         {usesCommander && (
           <View style={{ gap: 6 }}>
             <Text style={board.panelSection}>{t('tableCommanderDamage')}</Text>
-            {state.players
-              .filter((p) => p.userId !== player.userId)
-              .map((p) => (
+            {commanderSources(state, player.userId).map((source, _i, all) => {
+              const twoFromSame = all.filter((s) => s.fromUserId === source.fromUserId).length > 1;
+              const label = source.commander
+                ? t('tableFromCommander', { name: source.name, commander: source.commander })
+                : twoFromSame
+                  ? t('tableFromNth', { name: source.name, n: source.index + 1 })
+                  : t('tableFrom', { name: source.name });
+              const current = player.commanderDamage[source.key] ?? 0;
+              return (
                 <NumberField
-                  key={p.userId}
+                  key={source.key}
                   tone="onDark"
                   compact
                   min={0}
-                  label={t('tableFrom', { name: p.name })}
-                  value={player.commanderDamage[p.userId] ?? 0}
+                  label={label}
+                  value={current}
                   onChange={(v) => {
                     // Campo vazio não zera: a pessoa está apagando para digitar outro número.
-                    const delta = fieldDelta(v, player.commanderDamage[p.userId] ?? 0);
+                    const delta = fieldDelta(v, current);
                     if (delta !== null) {
                       dispatch({
                         type: 'commander',
                         userId: player.userId,
-                        fromUserId: p.userId,
+                        fromUserId: source.fromUserId,
+                        index: source.index,
                         delta,
                       });
                     }
                   }}
                 />
-              ))}
+              );
+            })}
+            {/* Parceiros: o dano de cada comandante conta à parte (21 do mesmo derruba). */}
+            {toggle(t('tableTwoCommanders'), commanderCountOf(player) === 2, () =>
+              dispatch({
+                type: 'commanders',
+                userId: player.userId,
+                count: commanderCountOf(player) === 2 ? 1 : 2,
+              }),
+            )}
+            <Text style={board.panelHint}>
+              {t('tableTwoCommandersHint', { name: player.name })}
+            </Text>
           </View>
         )}
         <View style={{ gap: 6 }}>
@@ -759,6 +780,7 @@ const board = StyleSheet.create({
   },
   optionsCloseText: { color: '#ffffff', fontSize: 26, fontWeight: '700', lineHeight: 28 },
   panelSection: { color: '#ffffff', fontSize: 13, fontWeight: '800', opacity: 0.8 },
+  panelHint: { color: '#ffffff', fontSize: 12, opacity: 0.8 },
   panelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   panelLabel: { flex: 1, color: '#ffffff', fontSize: 15 },
   panelStep: {

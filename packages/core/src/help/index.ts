@@ -46,6 +46,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'Nunca joguei Magic. Por onde começo?',
             intro: [
               'Abra "Aprender a jogar" (no rodapé de todas as páginas): lições curtas sobre cartas, mana, o turno, combate e a pilha e, depois, "Commander para iniciantes" (comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets), com cartas de exemplo. Não precisa de conta; com conta, o seu progresso fica salvo.',
+              'Esqueceu o que faz uma palavra-chave (voar, atropelar, toque mortífero…)? O glossário fica em "Aprender a jogar" e também no botão do centro do modo mesa.',
             ],
           },
           {
@@ -198,6 +199,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Escolha o tipo de jogo (a vida inicial já vem certa: 40 no Commander), marque quem está jogando e, se quiser, o deck de cada um. Toque em "Começar".',
               'Deite o celular no meio da mesa: cada um tem uma área do mesmo tamanho, virada para quem está daquele lado (com 3 ou 5 jogadores sobra um canto vazio, como um lugar livre na mesa). Toque para tirar ou somar 1 de vida, segure para 10.',
               'O botão do centro tem dado, moeda, sorteio de quem começa, desfazer e trocar lugares. O botão de cada jogador abre, virados para ele, dano de comandante, veneno e outros marcadores.',
+              'Deck com dois comandantes (parceiros)? Se o deck foi escolhido na mesa, o dano de cada comandante já aparece separado, com o nome dele. Sem deck, abra as opções de quem joga com parceiros e ligue "Dois comandantes": 21 de dano do mesmo comandante derrubam.',
               'Quando sobrar um jogador, o app sugere o vencedor. Toque em "Encerrar e registrar", confira e salve.',
             ],
             notes: [
@@ -456,6 +458,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: "I've never played Magic. Where do I start?",
             intro: [
               'Open "Learn to play" (in the footer of every page): short lessons about cards, mana, the turn, combat and the stack, then "Commander for beginners" (the commander, color identity, the multiplayer table, Rule 0 and brackets), with example cards. No account needed; with one, your progress is saved.',
+              'Forgot what a keyword does (flying, trample, deathtouch…)? The glossary is in "Learn to play" and also in the centre button of table mode.',
             ],
           },
           {
@@ -608,6 +611,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Choose the game type (starting life is already right: 40 in Commander), mark who is playing and, optionally, each deck. Tap "Start".',
               'Lay the phone in the middle of the table: everyone gets an area of the same size, facing the person on that side (with 3 or 5 players one corner stays empty, like a free seat). Tap to lose or gain 1 life, hold for 10.',
               'The centre button has a die, a coin, a first-player draw, undo and swap seats. Each player’s button opens commander damage, poison and other counters, facing that player.',
+              'Deck with two commanders (partners)? If the deck was chosen at the table, each commander’s damage already shows separately, with its name. Without a deck, open the options of whoever plays partners and turn on "Two commanders": 21 damage from the same commander knocks a player out.',
               'When one player is left, the app suggests the winner. Tap "End and record", check and save.',
             ],
             notes: [

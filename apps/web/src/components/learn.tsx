@@ -18,10 +18,10 @@ export function LessonComplete({ lessonId, done }: { lessonId: string; done: boo
   const [message, setMessage] = useState('');
   const { run, error, pending } = useApiAction();
   return (
-    <div className="space-y-2">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <button
         type="button"
-        className={completed ? 'btn-secondary' : 'btn-primary'}
+        className="btn-secondary"
         aria-pressed={completed}
         disabled={pending}
         onClick={() =>
@@ -42,7 +42,7 @@ export function LessonComplete({ lessonId, done }: { lessonId: string; done: boo
         <Icon name="done" />
         {completed ? t('done') : t('markDone')}
       </button>
-      <p role="status" className="text-sm">
+      <p role="status" className="muted text-sm">
         {message}
       </p>
       <FormError message={error} />

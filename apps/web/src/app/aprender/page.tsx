@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { HistoryBackLink } from '@/components/history-back-link';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { pageMetadata } from '@/server/seo';
@@ -34,13 +33,14 @@ export default async function LearnPage() {
         <Link href="/" className="rounded-lg py-1">
           <Logo title={tc('appName')} className="h-6 w-auto text-arcano dark:text-pergaminho" />
         </Link>
-        <HistoryBackLink
-          fallback={user ? '/painel' : '/'}
+        {/* Destino fixo: voltar no histórico levaria à última lição aberta, não ao painel. */}
+        <Link
+          href={user ? '/painel' : '/'}
           className="inline-flex min-h-6 items-center gap-1.5 text-sm font-medium text-link underline-offset-2 hover:underline"
         >
           <Icon name="back" />
           {tc('back')}
-        </HistoryBackLink>
+        </Link>
       </div>
       <header className="space-y-3">
         <h1 className="page-title flex items-center gap-2">
@@ -61,14 +61,20 @@ export default async function LearnPage() {
             </div>
           </div>
         )}
-        <Link href={`/aprender/${next.id}`} className="btn-primary">
-          <Icon name="next" />
-          {completed.length === 0
-            ? t('start')
-            : completed.length === total
-              ? t('review')
-              : t('continue')}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/aprender/${next.id}`} className="btn-primary">
+            <Icon name="next" />
+            {completed.length === 0
+              ? t('start')
+              : completed.length === total
+                ? t('review')
+                : t('continue')}
+          </Link>
+          <Link href="/aprender/glossario" className="btn-secondary">
+            <Icon name="lessons" />
+            {t('glossary.title')}
+          </Link>
+        </div>
         {!user && (
           <p className="muted text-sm">
             <Link href="/entrar?para=/aprender" className="text-link underline underline-offset-2">

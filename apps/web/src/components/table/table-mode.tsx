@@ -39,7 +39,7 @@ export interface TablePlayerOption {
   userId: string;
   name: string;
   confirmed: boolean;
-  decks: { id: string; name: string }[];
+  decks: { id: string; name: string; commanders?: string[] }[];
 }
 
 const MAX_PLAYERS = 6;
@@ -176,6 +176,8 @@ function Setup({
                 userId,
                 name: byId.get(userId)!.name,
                 deckId: decks[userId] || null,
+                commanders:
+                  byId.get(userId)!.decks.find((d) => d.id === decks[userId])?.commanders ?? [],
               })),
             }),
           );
