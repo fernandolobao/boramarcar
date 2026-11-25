@@ -68,6 +68,7 @@ export function mapArchidektDeck(payload: unknown): ImportedDeck {
     if (names.includes('commander')) return 'commander';
     if (names.includes('sideboard')) return 'sideboard';
     if (names.includes('maybeboard')) return 'maybeboard';
+    if (names.some((n) => n === 'tokens' || n === 'token' || n === 'emblems')) return 'tokens';
     const primary = names[0];
     const info = primary ? categoryInfo.get(primary) : undefined;
     if (info && info.includedInDeck === false) return 'maybeboard';

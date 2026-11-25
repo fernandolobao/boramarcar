@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { outsideDeck } from '@boramarcar/core';
 import { CARD_MM, expandPrintList, isDomainError, PAGE_MM, type PageSize } from '@boramarcar/core';
 import { getDeck } from '@boramarcar/db';
 import Link from 'next/link';
@@ -48,7 +49,7 @@ export default async function PrintProxiesPage({ params, searchParams }: Props) 
   const paper: PageSize = query.page === 'letter' ? 'letter' : 'a4';
   const size = PAGE_MM[paper];
   const items = expandPrintList(
-    deck.lines.filter((l) => l.board !== 'maybeboard'),
+    deck.lines.filter((l) => !outsideDeck(l.board)),
     which,
   );
   const pages = Array.from({ length: Math.ceil(items.length / (COLS * ROWS)) }, (_, i) =>

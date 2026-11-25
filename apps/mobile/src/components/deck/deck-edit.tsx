@@ -19,6 +19,7 @@ const BOARD_LABEL: Record<DeckBoard, MessageKey> = {
   mainboard: 'deckBoardMainboard',
   sideboard: 'deckBoardSideboard',
   maybeboard: 'deckBoardMaybeboard',
+  tokens: 'deckBoardTokens',
 };
 
 /** Mesmo filtro do site: código + número, parte do nome da edição ou ilustrador. */

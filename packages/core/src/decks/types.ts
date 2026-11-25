@@ -1,6 +1,21 @@
 import type { GameFormat } from '../games';
-export const DECK_BOARDS = ['commander', 'mainboard', 'sideboard', 'maybeboard'] as const;
+export const DECK_BOARDS = ['commander', 'mainboard', 'sideboard', 'maybeboard', 'tokens'] as const;
 export type DeckBoard = (typeof DECK_BOARDS)[number];
+
+/** Token ou emblema, pela linha de tipo do Scryfall ("Token Creature — Soldier", "Emblem — Liliana"). */
+export const isTokenTypeLine = (typeLine: string | null | undefined) =>
+  /^(token|emblem)\b/i.test((typeLine ?? '').trim());
+
+/**
+ * Categoria em que a linha aparece: token e emblema vão para "tokens", mesmo que tenham sido
+ * guardados antes em "talvez" (decks importados antes da categoria existir).
+ */
+export const boardOf = (board: DeckBoard, typeLine: string | null | undefined): DeckBoard =>
+  isTokenTypeLine(typeLine) ? 'tokens' : board;
+
+/** "Talvez" e tokens não são cartas do deck: ficam fora do total, do preço, da coleção e da impressão. */
+export const outsideDeck = (board: DeckBoard | string) =>
+  board === 'maybeboard' || board === 'tokens';
 
 /** Quem vê o deck: só o dono, quem divide grupo com ele, ou qualquer pessoa com conta. */
 export const DECK_VISIBILITIES = ['private', 'group', 'public'] as const;

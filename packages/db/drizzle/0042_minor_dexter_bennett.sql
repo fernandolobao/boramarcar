@@ -1,0 +1,1 @@
+ALTER TYPE "public"."deck_board" ADD VALUE 'tokens';

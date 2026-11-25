@@ -122,4 +122,15 @@ describe('mergeDuplicates com edições', () => {
       [null, 1],
     ]);
   });
+
+  it('seção de tokens e emblemas vira a categoria "tokens"', () => {
+    const entries = parseDeckText(
+      ['Deck', '1 Cultivate', '', 'Tokens', '2 Soldier', '1 Emblem — Liliana'].join('\n'),
+    );
+    expect(entries.map((e) => [e.name, e.board])).toEqual([
+      ['Cultivate', 'mainboard'],
+      ['Soldier', 'tokens'],
+      ['Emblem — Liliana', 'tokens'],
+    ]);
+  });
 });
