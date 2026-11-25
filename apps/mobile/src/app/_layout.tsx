@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { api } from '@/lib/api';
 import { StatusBar } from 'expo-status-bar';
 import { authClient } from '@/lib/auth';
-import { GroupProvider } from '@/lib/group';
+import { GroupProvider, takePendingInvite } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { usePushNotifications } from '@/lib/push';
 import { useColors } from '@/lib/theme';
@@ -36,6 +36,16 @@ function GuideLauncher() {
 }
 
 /** Raiz: sessão do Better Auth; sem sessão só a tela de entrada fica acessível. */
+/** Convite guardado antes do login: abre a tela do convite para confirmar (não entra sozinho). */
+function PendingInvite() {
+  useEffect(() => {
+    void takePendingInvite().then((code) => {
+      if (code) router.push({ pathname: '/convite/[codigo]', params: { codigo: code } });
+    });
+  }, []);
+  return null;
+}
+
 function RootLayout() {
   const { data: session, isPending } = authClient.useSession();
   const colors = useColors();
@@ -89,6 +99,7 @@ function RootLayout() {
       {signedIn ? (
         <GroupProvider>
           {content}
+          <PendingInvite />
           <PushNotifications />
           <GuideLauncher />
         </GroupProvider>

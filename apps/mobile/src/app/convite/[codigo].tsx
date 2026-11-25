@@ -8,7 +8,7 @@ import { savePendingInvite, useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
-/** Sem login: guarda o convite e vai para a entrada; o grupo é aberto logo depois do login. */
+/** Sem login: guarda o convite e vai para a entrada; depois do login, esta tela volta para confirmar. */
 function SaveAndSignIn({ code }: { code: string }) {
   const [saved, setSaved] = useState(false);
   useEffect(() => {
@@ -70,7 +70,7 @@ function JoinInvite({ code }: { code: string }) {
 
 /**
  * Convite pelo link `arcanakin://convite/CÓDIGO` (o botão "Abrir no app" da página do convite):
- * entra no grupo — na hora, ou logo depois do login.
+ * a pessoa confirma e entra no grupo — na hora, ou logo depois do login (sem entrar sozinha).
  */
 export default function InviteScreen() {
   const { codigo } = useLocalSearchParams<{ codigo: string }>();

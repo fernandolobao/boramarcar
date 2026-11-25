@@ -34,6 +34,16 @@ interface GroupState {
 
 const GroupContext = createContext<GroupState | null>(null);
 
+/**
+ * Convite aberto antes do login (`arcanakin://convite/CÓDIGO`): depois de entrar, o app abre a tela
+ * do convite para a pessoa **confirmar** — ninguém entra num grupo sem escolher. Lê e apaga o código.
+ */
+export async function takePendingInvite(): Promise<string | null> {
+  const pending = await SecureStore.getItemAsync(PENDING_INVITE);
+  if (pending) await SecureStore.deleteItemAsync(PENDING_INVITE);
+  return pending;
+}
+
 /** Grupo ativo do app (lembrado no aparelho), como o seletor de grupo do site. */
 export function GroupProvider({ children }: { children: ReactNode }) {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -44,13 +54,6 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      // Convite aberto antes do login: entra no grupo agora e o deixa ativo.
-      const pending = await SecureStore.getItemAsync(PENDING_INVITE);
-      if (pending) {
-        await SecureStore.deleteItemAsync(PENDING_INVITE);
-        const joined = await api.groups.join(pending).catch(() => null);
-        if (joined) await SecureStore.setItemAsync(KEY, joined.id);
-      }
       const [list, saved] = await Promise.all([api.groups.list(), SecureStore.getItemAsync(KEY)]);
       setGroups(list);
       setActiveId(list.some((g) => g.id === saved) ? saved : (list[0]?.id ?? null));
