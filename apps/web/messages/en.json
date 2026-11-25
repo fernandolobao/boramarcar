@@ -459,7 +459,7 @@
     "quantityHeader": "Qty.",
     "proxyCount": "{count, plural, =1 {1 proxy} other {# proxies}}",
     "proxiesHeader": "Proxies",
-    "actions": "Actions",
+    "actions": "Deck options",
     "quantityOf": "Quantity of {name}",
     "proxiesOf": "Proxies of {name}",
     "invalidCopies": "Proxies can't exceed the quantity.",
@@ -597,7 +597,9 @@
       "option": "{edition}{foil, select, true { (foil)} other {}} — {free} free",
       "confirm": "Publish with these choices",
       "unknownEdition": "edition not set"
-    }
+    },
+    "printMenu": "Print proxies",
+    "pasteMenu": "Paste an updated list"
   },
   "analysis": {
     "title": "Analysis",

@@ -279,6 +279,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Nos rascunhos de deck, as cartas que você já tem livres na coleção ganham um selo. Ao publicar, você escolhe carta a carta se usa a que já tem ou se adiciona uma nova à coleção.',
     en: 'In draft decks, cards you already have free in your collection get a badge. When publishing, you choose card by card whether to use the one you have or add a new one to your collection.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Na página do deck, editar, copiar e baixar a lista, imprimir proxies e atualizar o deck ficam juntos no menu "Opções do deck", no canto do topo.',
+    en: 'On the deck page, editing, copying and downloading the list, printing proxies and updating the deck are now together in the "Deck options" menu, at the top corner.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

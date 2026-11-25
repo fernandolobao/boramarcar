@@ -40,8 +40,9 @@ test.describe('perfis e conquistas', () => {
   test('deck privado some do perfil para os outros', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    // "Editar deck" abre uma janela no topo da página; salvar fecha e atualiza a página.
-    await page.getByRole('button', { name: 'Editar deck' }).click();
+    // "Editar deck" fica no menu "Opções do deck" e abre uma janela; salvar fecha e atualiza.
+    await page.getByRole('button', { name: /Opções do deck/ }).click();
+    await page.getByRole('menuitem', { name: /Editar deck/ }).click();
     let dialog = page.getByRole('dialog', { name: 'Editar deck' });
     // Rádio do React Aria: o input fica escondido sob o rótulo, que recebe o clique.
     await dialog.getByRole('radio', { name: /Privado/ }).check({ force: true });
@@ -52,7 +53,8 @@ test.describe('perfis e conquistas', () => {
     const decks = (await api.json()).player.decks as { id: string; visibility: string }[];
     expect(decks.find((d) => d.id === E2E_IDS.deck)?.visibility).toBe('private');
     // Volta ao padrão para não afetar os outros testes.
-    await page.getByRole('button', { name: 'Editar deck' }).click();
+    await page.getByRole('button', { name: /Opções do deck/ }).click();
+    await page.getByRole('menuitem', { name: /Editar deck/ }).click();
     dialog = page.getByRole('dialog', { name: 'Editar deck' });
     await dialog.getByRole('radio', { name: /Grupo/ }).check({ force: true });
     await dialog.getByRole('button', { name: 'Salvar' }).click();
