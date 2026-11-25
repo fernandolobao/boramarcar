@@ -692,3 +692,15 @@ sem rolagem horizontal em 320px.
 - Publicar com cartas da coleção abre um `<dialog>` (`ModalButton`): cada carta é um `Choices`
   (radiogroup com nome da carta e descrição da edição do deck) e, em "Usar a da coleção", um `Select`
   com as edições livres. O padrão é usar a da coleção.
+
+## Aprender a jogar (25/11/2026)
+
+- `/aprender`: lista ordenada (`<ol>`) de links; o número da lição e o "Concluída" estão em texto
+  (o círculo com o número ou o visto é decorativo), e o progresso aparece por extenso ("3 de 7
+  lições concluídas"); a barra é `aria-hidden`.
+- Lição: um `<h1>`, uma seção com `<h2>` por tópico; símbolos de mana no texto são decorativos e
+  levam o nome por extenso em `sr-only` (`ManaText`). Cartas de exemplo em `figure` com o nome no
+  `figcaption` (imagem com `alt=""`, sem repetir o nome).
+- "Marcar como concluída" é um botão de alternar (`aria-pressed`) com resultado em `role="status"`.
+  Anterior/próxima numa `<nav>` com rótulo, e o texto "Anterior:/Próxima:" em `sr-only`.
+- Links para as regras oficiais avisam que abrem em nova aba.

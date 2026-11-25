@@ -242,6 +242,17 @@ export function createApiClient(options: ApiClientOptions) {
           | 'tip-table'
           | 'tip-collection',
       ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
+      /** Lições da trilha "Aprender a jogar" (12.1) já concluídas. */
+      learnProgress: async () =>
+        (await request('GET', '/me/learn', z.object({ completed: z.array(z.string()) }))).completed,
+      /** Marca (ou desmarca) uma lição como concluída; devolve as concluídas. */
+      setLessonCompleted: async (lessonId: string, completed: boolean) =>
+        (
+          await request('POST', '/me/learn', z.object({ completed: z.array(z.string()) }), {
+            lessonId,
+            completed,
+          })
+        ).completed,
       /** Central de notificações: as mais recentes e quantas ainda não foram lidas. */
       notifications: () =>
         request(

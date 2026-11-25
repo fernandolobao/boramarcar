@@ -279,6 +279,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Nos rascunhos de deck, as cartas que você já tem livres na coleção ganham um selo. Ao publicar, você escolhe carta a carta se usa a que já tem ou se adiciona uma nova à coleção.',
     en: 'In draft decks, cards you already have free in your collection get a badge. When publishing, you choose card by card whether to use the one you have or add a new one to your collection.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Nova trilha "Aprender a jogar": sete lições curtas para quem nunca jogou Magic, com cartas de exemplo e o progresso salvo na sua conta. Está no rodapé de todas as páginas.',
+    en: 'New "Learn to play" path: seven short lessons for anyone who has never played Magic, with example cards and progress saved to your account. It is in the footer of every page.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

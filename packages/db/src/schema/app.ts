@@ -227,6 +227,19 @@ export const onboardingSteps = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.step] })],
 );
 
+/** Trilha "Aprender a jogar" (12.1): lições que a pessoa marcou como concluídas. */
+export const learnProgress = pgTable(
+  'learn_progress',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    lessonId: text('lesson_id').notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.lessonId] })],
+);
+
 /**
  * Feedback do beta (8.4): o que a pessoa contou pelo site ou pelo app. Some com a conta (LGPD);
  * a página guarda só o caminho, sem query string.

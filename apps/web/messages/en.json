@@ -1599,7 +1599,8 @@
     "privacy": "Privacy Policy",
     "help": "Help",
     "feedback": "Feedback",
-    "stores": "Stores and events"
+    "stores": "Stores and events",
+    "learn": "Learn to play"
   },
   "collection": {
     "title": "Collection",
@@ -2033,6 +2034,10 @@
     "discovery": {
       "title": "Stores and events",
       "description": "Magic tournaments, game nights and stores near you."
+    },
+    "learn": {
+      "title": "Learn to play",
+      "description": "Short lessons to learn Magic: The Gathering from scratch: cards, mana, the turn, combat, the stack and Commander."
     }
   },
   "beta": {
@@ -2661,5 +2666,26 @@
     "label": "Navigation",
     "dashboard": "Back to dashboard",
     "signIn": "Sign in"
+  },
+  "learn": {
+    "title": "Learn to play",
+    "lessons": "Lessons",
+    "lessonsNav": "Previous and next lessons",
+    "lessonOf": "Lesson {n} of {total}",
+    "minutes": "{count, plural, =1 {1 minute} other {# minutes}}",
+    "progress": "{done} of {total} lessons completed",
+    "start": "Start the path",
+    "continue": "Continue where I left off",
+    "review": "Review from the start",
+    "signInToSave": "Sign in to save your progress",
+    "allLessons": "All lessons",
+    "remember": "To remember",
+    "examples": "Example cards",
+    "markDone": "Mark as completed",
+    "done": "Completed",
+    "markedDone": "Lesson completed.",
+    "markedUndone": "Lesson unmarked.",
+    "previous": "Previous",
+    "next": "Next"
   }
 }

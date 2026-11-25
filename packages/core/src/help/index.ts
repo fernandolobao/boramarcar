@@ -42,6 +42,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         title: 'Começar',
         questions: [
           {
+            id: 'aprender',
+            question: 'Nunca joguei Magic. Por onde começo?',
+            intro: [
+              'Abra "Aprender a jogar" (no rodapé de todas as páginas): sete lições curtas sobre cartas, mana, o turno, combate, a pilha e o Commander, com cartas de exemplo. Não precisa de conta; com conta, o seu progresso fica salvo.',
+            ],
+          },
+          {
             id: 'entrar-grupo',
             question: 'Como entro no grupo da minha mesa?',
             steps: [
@@ -443,6 +450,13 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         id: 'comecar',
         title: 'Getting started',
         questions: [
+          {
+            id: 'aprender',
+            question: "I've never played Magic. Where do I start?",
+            intro: [
+              'Open "Learn to play" (in the footer of every page): seven short lessons about cards, mana, the turn, combat, the stack and Commander, with example cards. No account needed; with one, your progress is saved.',
+            ],
+          },
           {
             id: 'entrar-grupo',
             question: 'How do I join my table’s group?',

@@ -31,6 +31,8 @@ const PUBLIC_PAGES = [
   '/',
   '/privacidade',
   '/ajuda',
+  '/aprender',
+  '/aprender/combate',
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,
@@ -49,6 +51,8 @@ const PUBLIC_PAGES = [
 ];
 const AUTH_PAGES = [
   '/',
+  '/aprender',
+  '/aprender/mana-e-terrenos',
   '/painel',
   '/boas-vindas?passo=1',
   '/boas-vindas?passo=2',

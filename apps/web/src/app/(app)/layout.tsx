@@ -138,6 +138,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <Link href="/lojas" className="muted underline underline-offset-2 hover:text-fg">
           {tl('stores')}
         </Link>
+        <Link href="/aprender" className="muted underline underline-offset-2 hover:text-fg">
+          {tl('learn')}
+        </Link>
         <Link href="/ajuda" className="muted underline underline-offset-2 hover:text-fg">
           {tl('help')}
         </Link>
