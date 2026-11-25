@@ -2173,22 +2173,22 @@
     "empty": "No games recorded yet. Records show up after the first game night.",
     "recordsTitle": "Records",
     "someone": "someone",
-    "event": "meetup",
+    "event": "untitled",
     "fastestWin": {
       "title": "Fastest win",
-      "body": "<who></who> won on turn {turn}, at <event></event> ({date})."
+      "body": "<who></who> won on turn {turn}, at the “<event></event>” meetup ({date})."
     },
     "longestGame": {
       "title": "Longest game",
-      "body": "A {minutes}-minute game, at <event></event> ({date})."
+      "body": "A {minutes}-minute game, at the “<event></event>” meetup ({date})."
     },
     "longestStreak": {
       "title": "Longest winning streak",
-      "body": "<who></who> won {length} games in a row, up to <event></event> ({date})."
+      "body": "<who></who> won {length} games in a row; the last one at the “<event></event>” meetup ({date})."
     },
     "busiestNight": {
       "title": "Night with the most games",
-      "body": "{games} games at <event></event> ({date})."
+      "body": "{games} games at the “<event></event>” meetup ({date})."
     },
     "topCommander": {
       "title": "Commander with the most wins",
