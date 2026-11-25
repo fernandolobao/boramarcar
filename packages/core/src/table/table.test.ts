@@ -17,6 +17,7 @@ import {
   tableReducer,
   tableResult,
   tableSupportsFormat,
+  commanderSources,
   type TableAction,
   type TableState,
 } from './index';
@@ -277,5 +278,62 @@ describe('editar um marcador pelo campo', () => {
     expect(fieldDelta(5, 3)).toBe(2);
     expect(fieldDelta(0, 3)).toBe(-3);
     expect(fieldDelta(3, 3)).toBeNull();
+  });
+});
+
+describe('dano de comandante por comandante (parceiros)', () => {
+  const withPartners = () =>
+    createTable({
+      format: 'commander',
+      players: [
+        { userId: 'a', name: 'Ana', commanders: ['Thrasios, Triton Hero', 'Tymna the Weaver'] },
+        { userId: 'b', name: 'Bia', commanders: ['Omnath, Locus of Mana'] },
+        { userId: 'c', name: 'Caio' },
+      ],
+    });
+
+  it('cada comandante do oponente vira uma fonte de dano, com o nome quando o deck diz', () => {
+    const t = withPartners();
+    expect(commanderSources(t, 'b')).toEqual([
+      { key: 'a', fromUserId: 'a', index: 0, name: 'Ana', commander: 'Thrasios, Triton Hero' },
+      { key: 'a#2', fromUserId: 'a', index: 1, name: 'Ana', commander: 'Tymna the Weaver' },
+      { key: 'c', fromUserId: 'c', index: 0, name: 'Caio', commander: null },
+    ]);
+  });
+
+  it('o dano de cada comandante conta à parte: 21 do mesmo comandante derruba', () => {
+    let t = run(
+      withPartners(),
+      { type: 'commander', userId: 'b', fromUserId: 'a', delta: 15 },
+      { type: 'commander', userId: 'b', fromUserId: 'a', index: 1, delta: 15 },
+    );
+    expect(t.players[1]).toMatchObject({ life: 10, commanderDamage: { a: 15, 'a#2': 15 } });
+    expect(defeatReason(t.players[1]!, 'commander')).toBeNull();
+    t = run(t, { type: 'commander', userId: 'b', fromUserId: 'a', index: 1, delta: 6 });
+    expect(defeatReason(t.players[1]!, 'commander')).toBe('commander');
+  });
+
+  it('"dois comandantes" liga a segunda fonte para quem não tem deck; desligar limpa o dano dela', () => {
+    let t = run(withPartners(), { type: 'commanders', userId: 'c', count: 2 });
+    expect(commanderSources(t, 'b').filter((s) => s.fromUserId === 'c')).toHaveLength(2);
+    t = run(
+      t,
+      { type: 'commander', userId: 'b', fromUserId: 'c', index: 1, delta: 21 },
+      { type: 'commanders', userId: 'c', count: 1 },
+    );
+    expect(t.players[1]!.commanderDamage).toEqual({});
+    expect(defeatReason(t.players[1]!, 'commander')).toBeNull();
+    // Desfazer devolve a segunda fonte e o dano dela.
+    t = run(t, { type: 'undo' });
+    expect(t.players[1]!.commanderDamage).toEqual({ 'c#2': 21 });
+  });
+
+  it('partida salva antes da mudança (sem os campos novos) continua funcionando', () => {
+    const old = createTable({ format: 'commander', players });
+    const legacy: TableState = {
+      ...old,
+      players: old.players.map(({ commanders: _c, commanderCount: _n, ...p }) => p),
+    };
+    expect(commanderSources(legacy, 'a').map((s) => s.key)).toEqual(['b', 'c', 'd']);
   });
 });

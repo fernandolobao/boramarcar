@@ -159,7 +159,8 @@
       "nudged": "Invited",
       "nudgedLabel": "{name}: invited",
       "sent": "Invite sent to {name}.",
-      "noNext": "Schedule a meetup to be able to invite someone."
+      "noNext": "Schedule a meetup to be able to invite someone.",
+      "nudgeColumn": "Call for the next meetup"
     },
     "inviteButton": "Invite",
     "settingsButton": "Settings",
@@ -1600,7 +1601,11 @@
     "awakeOn": "The screen stays on while the table is open.",
     "awakeUnavailable": "Couldn't keep the screen on: turn off auto-lock in your phone's settings or leave Low Power Mode.",
     "tournamentIntro": "{name} · table {table}: players and format come from the tournament. When you save, the result goes to the tournament table.",
-    "backToTournament": "Back to the tournament"
+    "backToTournament": "Back to the tournament",
+    "fromCommander": "From {name} — {commander}",
+    "fromNth": "From {name} — commander {n}",
+    "twoCommanders": "Two commanders (partners)",
+    "twoCommandersHint": "Turn on when {name}'s deck has two commanders: each one's damage counts separately in the other areas."
   },
   "consent": {
     "title": "Cookies and session recording",
@@ -2181,7 +2186,7 @@
     "dismiss": "Got it",
     "dismissLabel": "Got it, dismiss the tip",
     "deck-analysis": "The score compares the deck with the format’s reference targets: in Commander, lands, ramp, card draw, removal, board wipes and curve; in 60-card formats, lands, curve, interaction and consistency; in 40-card ones, creatures instead of consistency. Tap an item to see the math and which cards count. Roles, mana base and opening hand are under \"More details\". It’s a guide, not a rule.",
-    "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.",
+    "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo, swap seats and the keyword glossary.",
     "collection": "Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.",
     "toggle": "Tip about this screen"
   },
@@ -2720,6 +2725,15 @@
     "markedUndone": "Lesson unmarked.",
     "previous": "Previous",
     "next": "Next",
-    "trackProgress": "{done} of {total} completed in this part"
+    "trackProgress": "{done} of {total} completed in this part",
+    "glossary": {
+      "title": "Glossary",
+      "intro": "Card keywords and game terms, explained in a few words, with the Portuguese name in parentheses.",
+      "search": "Search the glossary (in English or Portuguese)",
+      "count": "{count, plural, =0 {No terms found} =1 {1 term} other {# terms}}",
+      "keyword": "keyword",
+      "seeLesson": "See the lesson",
+      "open": "Glossary"
+    }
   }
 }

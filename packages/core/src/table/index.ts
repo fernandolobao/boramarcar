@@ -15,8 +15,15 @@ export interface TablePlayer {
   deckId: string | null;
   life: number;
   counters: Record<TableCounter, number>;
-  /** Dano de comandante recebido, por jogador de origem. */
+  /**
+   * Dano de comandante recebido, por comandante de origem: a chave é o id de quem atacou e, para
+   * o segundo comandante (parceiros), `id#2` (ver `commanderDamageKey`).
+   */
   commanderDamage: Record<string, number>;
+  /** Nomes dos comandantes do deck escolhido (vazio quando não se sabe). */
+  commanders?: string[];
+  /** Quantos comandantes o jogador tem (2 com parceiros); sem valor, o que o deck diz ou 1. */
+  commanderCount?: 1 | 2;
   conceded: boolean;
   /** Passo do histórico em que caiu (para a ordem de eliminação); `null` = na mesa. */
   defeatedAt: number | null;
@@ -42,7 +49,10 @@ export interface TableState {
 export type TableAction =
   | { type: 'life'; userId: string; delta: number }
   | { type: 'counter'; userId: string; counter: TableCounter; delta: number }
-  | { type: 'commander'; userId: string; fromUserId: string; delta: number }
+  /** Dano de comandante: `index` 1 é o segundo comandante de quem atacou (parceiros). */
+  | { type: 'commander'; userId: string; fromUserId: string; index?: 0 | 1; delta: number }
+  /** Quantos comandantes o jogador tem (para quem não escolheu deck com dois). */
+  | { type: 'commanders'; userId: string; count: 1 | 2 }
   | { type: 'concede'; userId: string; conceded: boolean }
   | { type: 'monarch'; userId: string | null }
   | { type: 'first'; userId: string | null }
@@ -63,9 +73,41 @@ export function startingLifeFor(format: GameFormat): number {
 export const tableSupportsFormat = (format: GameFormat) =>
   formatRules(format).structure !== 'teams';
 
+/** Chave do dano de comandante: o primeiro comandante usa o id; o segundo, `id#2`. */
+export const commanderDamageKey = (fromUserId: string, index: 0 | 1 = 0) =>
+  index === 1 ? `${fromUserId}#2` : fromUserId;
+
+/** Quantos comandantes o jogador tem: o escolhido na mesa, senão o que o deck diz. */
+export const commanderCountOf = (player: TablePlayer): 1 | 2 =>
+  player.commanderCount ?? ((player.commanders?.length ?? 0) >= 2 ? 2 : 1);
+
+/**
+ * Fontes de dano de comandante para quem recebe: cada comandante de cada oponente, com o nome
+ * do comandante quando o deck diz (para a linha "De Ana — Thrasios").
+ */
+export function commanderSources(state: TableState, userId: string) {
+  return state.players
+    .filter((p) => p.userId !== userId)
+    .flatMap((p) =>
+      ([0, 1] as const).slice(0, commanderCountOf(p)).map((index) => ({
+        key: commanderDamageKey(p.userId, index),
+        fromUserId: p.userId,
+        index,
+        name: p.name,
+        commander: p.commanders?.[index] ?? null,
+      })),
+    );
+}
+
 export function createTable(input: {
   format: GameFormat;
-  players: readonly { userId: string; name: string; deckId?: string | null }[];
+  players: readonly {
+    userId: string;
+    name: string;
+    deckId?: string | null;
+    /** Comandantes do deck (nomes), para separar o dano de parceiros. */
+    commanders?: readonly string[];
+  }[];
   startingLife?: number;
   now?: Date;
 }): TableState {
@@ -80,6 +122,7 @@ export function createTable(input: {
       life,
       counters: { poison: 0, energy: 0, experience: 0, tax: 0 },
       commanderDamage: {},
+      commanders: [...(p.commanders ?? [])].slice(0, 2),
       conceded: false,
       defeatedAt: null,
     })),
@@ -169,16 +212,34 @@ export function tableReducer(state: TableState, action: TableAction): TableState
     case 'commander':
       return withDefeats(
         updatePlayer(base, action.userId, (p) => {
-          const current = p.commanderDamage[action.fromUserId] ?? 0;
+          const key = commanderDamageKey(action.fromUserId, action.index);
+          const current = p.commanderDamage[key] ?? 0;
           const next = Math.max(0, current + action.delta);
           // Dano de comandante também é perda de vida (e "desfazer" devolve a vida).
           return {
             ...p,
             life: p.life - (next - current),
-            commanderDamage: { ...p.commanderDamage, [action.fromUserId]: next },
+            commanderDamage: { ...p.commanderDamage, [key]: next },
           };
         }),
       );
+    case 'commanders': {
+      const withCount = updatePlayer(base, action.userId, (p) => ({
+        ...p,
+        commanderCount: action.count,
+      }));
+      if (action.count === 2) return withCount;
+      // Sem o segundo comandante, o dano dele sai da conta de todos (a vida perdida fica).
+      const gone = commanderDamageKey(action.userId, 1);
+      return withDefeats({
+        ...withCount,
+        players: withCount.players.map((p) => {
+          if (!(gone in p.commanderDamage)) return p;
+          const { [gone]: _removed, ...rest } = p.commanderDamage;
+          return { ...p, commanderDamage: rest };
+        }),
+      });
+    }
     case 'concede':
       return withDefeats(
         updatePlayer(base, action.userId, (p) => ({ ...p, conceded: action.conceded })),

@@ -3,6 +3,7 @@
  * Auditoria automática (axe-core) dos componentes interativos. Todo componente novo
  * com formulário ou controles deve entrar aqui. Contraste é verificado no E2E (navegador real).
  */
+import { GlossarySearch } from './glossary';
 import axe from 'axe-core';
 import { cleanup, render } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
@@ -735,6 +736,10 @@ describe('acessibilidade dos componentes (axe-core)', () => {
         />,
       ),
     ).toEqual([]);
+  });
+
+  it('glossário com busca sem violações', async () => {
+    expect(await audit(<GlossarySearch />)).toEqual([]);
   });
 
   it('seletor de idioma sem violações e com o idioma atual marcado', async () => {
