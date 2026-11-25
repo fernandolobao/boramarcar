@@ -31,6 +31,8 @@ export const RATE_LIMITS = {
   storeCode: { limit: 20, windowMs: 10 * MINUTE },
   /** Descoberta de lojas e eventos (10.3), aberta, por endereço. */
   discovery: { limit: 60, windowMs: MINUTE },
+  /** PDF de proxies (baixa as imagens de todas as cartas do deck). */
+  proxies: { limit: 20, windowMs: 60 * MINUTE },
   /** Envio de foto do perfil e logo da loja. */
   upload: { limit: 20, windowMs: 60 * MINUTE },
 } as const;

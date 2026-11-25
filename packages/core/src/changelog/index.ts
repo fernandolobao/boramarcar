@@ -249,6 +249,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No celular, as listas de membros e de locais do grupo ficaram mais compactas: "Gerenciar" fica ao lado do nome, e as rotas de cada local abrem em "Como chegar".',
     en: 'On phones, the group’s member and place lists are more compact: "Manage" sits next to the name, and each place’s routes open under "Directions".',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Imprimir proxies agora está liberado para todo mundo: na página do deck, abra a folha para imprimir (cartas em tamanho real) ou baixe o PDF.',
+    en: 'Printing proxies is now open to everyone: on the deck page, open the print sheet (real-size cards) or download the PDF.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

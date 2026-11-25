@@ -16,7 +16,7 @@ export function DeckTools({
   source,
   hasSourceUrl,
   proxyCount = 0,
-  canPrint = false,
+  canPrint = true,
 }: {
   deckId: string;
   isOwner: boolean;

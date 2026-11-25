@@ -27,12 +27,10 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
-        // A Ana do seed é admin nos testes (/admin, beta) e a flag `print-proxy` vem ligada
-        // (fora da Vercel ela é lida de FLAG_PRINT_PROXY).
+        // A Ana do seed é admin nos testes (/admin, beta).
         env: {
           ...process.env,
           ADMIN_EMAILS: process.env.ADMIN_EMAILS ?? 'ana@e2e.test',
-          FLAG_PRINT_PROXY: process.env.FLAG_PRINT_PROXY ?? 'true',
         } as Record<string, string>,
       },
 });

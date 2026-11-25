@@ -98,12 +98,17 @@ describe('DeckTools', () => {
     expect(screen.getByText(/Nenhuma carta está marcada como proxy/)).toBeInTheDocument();
   });
 
-  it('sem a flag `print-proxy` (ou sem ser admin), a impressão não aparece', () => {
-    wrap(<DeckTools deckId="d1" isOwner source="Archidekt" hasSourceUrl={false} proxyCount={3} />);
-    expect(
-      screen.queryByRole('link', { name: 'Abrir folha para imprimir' }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Baixar PDF pronto' })).not.toBeInTheDocument();
+  it('a impressão aparece para qualquer pessoa que vê o deck (não só admin)', () => {
+    wrap(
+      <DeckTools
+        deckId="d1"
+        isOwner={false}
+        source="Archidekt"
+        hasSourceUrl={false}
+        proxyCount={3}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Abrir folha para imprimir' })).toBeInTheDocument();
   });
 
   it('quem não é dono só exporta', () => {
