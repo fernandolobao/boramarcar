@@ -59,7 +59,7 @@ describe('AttendanceCard', () => {
       within(table)
         .getAllByRole('columnheader')
         .map((h) => h.textContent),
-    ).toEqual(['Pessoa', 'Presença', 'Última partida']);
+    ).toEqual(['Pessoa', 'Presença', 'Última partida', 'Chamar para o próximo encontro']);
     const bia = within(table).getByRole('row', { name: /Bia/ });
     expect(bia).toHaveTextContent('1 de 8');
     expect(bia).toHaveTextContent('Sem aparecer há 6 semanas');

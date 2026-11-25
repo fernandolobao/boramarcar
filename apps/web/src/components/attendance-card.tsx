@@ -91,8 +91,11 @@ export function AttendanceCard({
             <th scope="col" className="py-2 pe-2 text-start font-semibold">
               {t('attendance')}
             </th>
-            <th scope="col" className="py-2 text-start font-semibold">
+            <th scope="col" className="py-2 pe-2 text-start font-semibold">
               {t('lastGame')}
+            </th>
+            <th scope="col" className="py-2 text-end font-semibold">
+              <span className="sr-only">{t('nudgeColumn')}</span>
             </th>
           </tr>
         </thead>
@@ -103,7 +106,7 @@ export function AttendanceCard({
               : 0;
             const isNudged = nudged.has(m.userId);
             return (
-              <tr key={m.userId} className="align-top">
+              <tr key={m.userId} className="align-middle">
                 <th scope="row" className="py-2 pe-2 text-start font-medium">
                   <span className="block">{m.name}</span>
                   {m.awaySince && (
@@ -112,8 +115,18 @@ export function AttendanceCard({
                       {t('away', { weeks })}
                     </span>
                   )}
+                </th>
+                <td className="py-2 pe-2 tabular-nums">
+                  {t('attended', { attended: m.attended, of: m.of })}
+                </td>
+                <td className="py-2 pe-2">
+                  {m.lastGameAt
+                    ? format.dateTime(new Date(m.lastGameAt), { day: 'numeric', month: 'short' })
+                    : t('never')}
+                </td>
+                <td className="py-2 text-end">
                   {nextEvent && m.userId !== viewerId && !confirmedNext.includes(m.userId) && (
-                    <span className="mt-1 block">
+                    <span className="inline-block whitespace-nowrap">
                       {isNudged ? (
                         <button
                           type="button"
@@ -137,14 +150,6 @@ export function AttendanceCard({
                       )}
                     </span>
                   )}
-                </th>
-                <td className="py-2 pe-2 tabular-nums">
-                  {t('attended', { attended: m.attended, of: m.of })}
-                </td>
-                <td className="py-2">
-                  {m.lastGameAt
-                    ? format.dateTime(new Date(m.lastGameAt), { day: 'numeric', month: 'short' })
-                    : t('never')}
                 </td>
               </tr>
             );

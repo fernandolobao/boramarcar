@@ -60,6 +60,9 @@ test.describe('aprender a jogar (12.1)', () => {
       await expect(page.getByRole('link', { name: /A pilha e as respostas/ })).toContainText(
         'Concluída',
       );
+      // Depois de passear pelas lições, "Voltar" leva ao painel, não à última lição aberta.
+      await page.getByRole('link', { name: 'Voltar', exact: true }).click();
+      await expect(page).toHaveURL(/\/painel$/);
     });
   });
 });

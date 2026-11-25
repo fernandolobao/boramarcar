@@ -159,7 +159,8 @@
       "nudged": "Chamado",
       "nudgedLabel": "{name}: chamado",
       "sent": "Aviso enviado para {name}.",
-      "noNext": "Marque um encontro para poder chamar alguém."
+      "noNext": "Marque um encontro para poder chamar alguém.",
+      "nudgeColumn": "Chamar para o próximo encontro"
     },
     "inviteButton": "Convidar",
     "settingsButton": "Configurações",

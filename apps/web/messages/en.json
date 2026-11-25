@@ -159,7 +159,8 @@
       "nudged": "Invited",
       "nudgedLabel": "{name}: invited",
       "sent": "Invite sent to {name}.",
-      "noNext": "Schedule a meetup to be able to invite someone."
+      "noNext": "Schedule a meetup to be able to invite someone.",
+      "nudgeColumn": "Call for the next meetup"
     },
     "inviteButton": "Invite",
     "settingsButton": "Settings",
