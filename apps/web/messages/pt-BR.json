@@ -159,7 +159,8 @@
       "nudged": "Chamado",
       "nudgedLabel": "{name}: chamado",
       "sent": "Aviso enviado para {name}.",
-      "noNext": "Marque um encontro para poder chamar alguém."
+      "noNext": "Marque um encontro para poder chamar alguém.",
+      "nudgeColumn": "Chamar para o próximo encontro"
     },
     "inviteButton": "Convidar",
     "settingsButton": "Configurações",
@@ -2170,7 +2171,7 @@
     "dismiss": "Entendi",
     "dismissLabel": "Entendi, dispensar a dica",
     "deck-analysis": "A nota compara o deck com metas de referência do formato: em Commander, terrenos, ramp, compra, remoção, board wipes e curva; em 60 cartas, terrenos, curva, interação e consistência; em 40, criaturas no lugar da consistência. Toque num item para ver o cálculo e as cartas que contam. Funções, base de mana e mão inicial ficam em \"Mais detalhes\". É um guia, não uma regra.",
-    "table": "Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer e trocar lugares.",
+    "table": "Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer, trocar lugares e o glossário de palavras-chave.",
     "collection": "As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.",
     "toggle": "Dica sobre esta tela"
   },
@@ -2709,6 +2710,15 @@
     "markedUndone": "Lição desmarcada.",
     "previous": "Anterior",
     "next": "Próxima",
-    "trackProgress": "{done} de {total} concluídas neste bloco"
+    "trackProgress": "{done} de {total} concluídas neste bloco",
+    "glossary": {
+      "title": "Glossário",
+      "intro": "Palavras-chave das cartas e termos do jogo, explicados em poucas palavras, com o nome em inglês (o das cartas em inglês) entre parênteses.",
+      "search": "Buscar no glossário (em português ou inglês)",
+      "count": "{count, plural, =0 {Nenhum termo encontrado} =1 {1 termo} other {# termos}}",
+      "keyword": "palavra-chave",
+      "seeLesson": "Ver a lição",
+      "open": "Glossário"
+    }
   }
 }

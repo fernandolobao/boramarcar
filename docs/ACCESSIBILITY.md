@@ -714,6 +714,13 @@ sem rolagem horizontal em 320px.
   Anterior/próxima numa `<nav>` com rótulo, e o texto "Anterior:/Próxima:" em `sr-only`.
 - Links para as regras oficiais avisam que abrem em nova aba.
 
+## Glossário (25/11/2026)
+
+- Busca com `<label>` e o total encontrado anunciado (`role="status"`, ligado ao campo por
+  `aria-describedby`). A lista é uma `<dl>` (termo/definição); o nome no outro idioma leva `lang`.
+- No modo mesa, abre num diálogo pelo menu do centro, como os outros diálogos da mesa, e sem links
+  que tirariam a pessoa da partida.
+
 ## Dano de comandante com parceiros (25/11/2026)
 
 - Uma linha (stepper) por comandante, com o nome do comandante no rótulo ("De Ana — Thrasios") ou

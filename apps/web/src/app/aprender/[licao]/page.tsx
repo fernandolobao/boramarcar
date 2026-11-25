@@ -144,46 +144,44 @@ export default async function LessonPage({ params }: Props) {
         </ul>
       </aside>
 
-      {user ? (
-        <LessonComplete lessonId={lesson.id} done={completed.includes(lesson.id)} />
-      ) : (
-        <p className="muted text-sm">
+      {/* Rodapé da lição: concluir à esquerda, anterior/próxima à direita (a próxima em destaque). */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
+        {user ? (
+          <LessonComplete lessonId={lesson.id} done={completed.includes(lesson.id)} />
+        ) : (
           <Link
             href={`/entrar?para=/aprender/${lesson.id}`}
-            className="text-link underline underline-offset-2"
+            className="text-sm text-link underline underline-offset-2"
           >
             {t('signInToSave')}
           </Link>
-        </p>
-      )}
-
-      <nav aria-label={t('lessonsNav')} className="flex flex-wrap justify-between gap-3">
-        {prev ? (
-          <Link href={`/aprender/${prev.id}`} className="btn-secondary">
-            <Icon name="previous" />
-            <span>
-              <span className="sr-only">{t('previous')}: </span>
-              {prev.title}
-            </span>
-          </Link>
-        ) : (
-          <span />
         )}
-        {next ? (
-          <Link href={`/aprender/${next.id}`} className="btn-primary">
-            <span>
-              <span className="sr-only">{t('next')}: </span>
-              {next.title}
-            </span>
-            <Icon name="next" />
-          </Link>
-        ) : (
-          <Link href="/aprender" className="btn-primary">
-            {t('allLessons')}
-            <Icon name="next" />
-          </Link>
-        )}
-      </nav>
+        <nav aria-label={t('lessonsNav')} className="flex flex-wrap gap-2">
+          {prev && (
+            <Link href={`/aprender/${prev.id}`} className="btn-secondary">
+              <Icon name="previous" />
+              <span>
+                <span className="sr-only">{t('previous')}: </span>
+                {prev.title}
+              </span>
+            </Link>
+          )}
+          {next ? (
+            <Link href={`/aprender/${next.id}`} className="btn-primary">
+              <span>
+                <span className="sr-only">{t('next')}: </span>
+                {next.title}
+              </span>
+              <Icon name="next" />
+            </Link>
+          ) : (
+            <Link href="/aprender" className="btn-primary">
+              {t('allLessons')}
+              <Icon name="next" />
+            </Link>
+          )}
+        </nav>
+      </div>
     </main>
   );
 }

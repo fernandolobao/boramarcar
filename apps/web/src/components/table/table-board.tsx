@@ -19,6 +19,7 @@ import {
 } from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
+import { GlossarySearch } from '../glossary';
 import { Icon } from '../icons';
 import { useLightDismiss } from '../use-light-dismiss';
 import { isStandalone, type KeepAwakeStatus } from './use-table';
@@ -340,10 +341,12 @@ export function TableBoard({
   /** Tela acesa e tela cheia (ver `useKeepAwake`/`useFullscreen`). */
   screen: TableScreen;
 }) {
+  const tg = useTranslations('learn.glossary');
   const t = useTranslations('table');
   const layout = tableLayout(state.players.length);
   const [playerOpen, setPlayerOpen] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const [roll, setRoll] = useState('');
   /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
   const [swapping, setSwapping] = useState<string | null>(null);
@@ -608,6 +611,18 @@ export function TableBoard({
             <Icon name="swap" />
             {t('swap')}
           </button>
+          <button
+            type="button"
+            className="btn-secondary col-span-2"
+            aria-haspopup="dialog"
+            onClick={() => {
+              setMenuOpen(false);
+              setGlossaryOpen(true);
+            }}
+          >
+            <Icon name="lessons" />
+            {tg('open')}
+          </button>
         </div>
         <p role="status" className="min-h-6 text-center text-lg font-semibold">
           {roll}
@@ -645,6 +660,11 @@ export function TableBoard({
           </button>
         </div>
         <p className="muted text-sm">{t('exitHint')}</p>
+      </Dialog>
+
+      {/* Glossário (12.3): para tirar a dúvida de uma palavra-chave sem sair da partida. */}
+      <Dialog open={glossaryOpen} title={tg('title')} onClose={() => setGlossaryOpen(false)}>
+        <GlossarySearch showLessons={false} />
       </Dialog>
     </div>
   );

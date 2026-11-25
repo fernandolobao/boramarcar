@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })),
     { url: `${base()}/aprender`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${base()}/aprender/glossario`, changeFrequency: 'monthly', priority: 0.6 },
     ...LESSON_IDS.map((id) => ({
       url: `${base()}/aprender/${id}`,
       changeFrequency: 'monthly' as const,
