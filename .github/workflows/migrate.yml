@@ -1,11 +1,12 @@
 name: Migrar banco de produção
 
-# Aplica as migrations no Neon de produção quando elas mudam na main.
+# Botão manual (Actions → "Migrar banco de produção" → Run workflow) para aplicar as migrations no
+# Neon de produção numa emergência. O caminho normal é a build de produção da Vercel
+# (`apps/web/scripts/vercel-build.sh`), que migra logo antes do deploy: se falhar, a versão anterior
+# continua no ar. Antes este workflow também rodava a cada push na main, em paralelo com a build, e
+# podia aplicar um schema antes do código que o usa estar no ar.
 # Requer o secret DATABASE_URL (URL direta, sem "-pooler") no environment "production".
 on:
-  push:
-    branches: [main]
-    paths: ['packages/db/drizzle/**']
   workflow_dispatch:
 
 concurrency:
@@ -26,11 +27,11 @@ jobs:
       - name: Secret ausente
         if: env.DATABASE_URL == ''
         run: echo "::warning::Secret DATABASE_URL não configurado no environment production; nada a fazer."
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: env.DATABASE_URL != ''
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5
         if: env.DATABASE_URL != ''
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         if: env.DATABASE_URL != ''
         with:
           node-version-file: .nvmrc
