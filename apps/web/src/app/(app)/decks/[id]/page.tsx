@@ -227,6 +227,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
                       visibility: (DECK_VISIBILITIES as readonly string[]).includes(deck.visibility)
                         ? (deck.visibility as DeckVisibility)
                         : 'group',
+                      draft: deck.status === 'draft',
                     }
                   : undefined
               }

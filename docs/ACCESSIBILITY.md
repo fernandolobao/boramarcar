@@ -727,3 +727,10 @@ sem rolagem horizontal em 320px.
   a ordem ("De Ana — 2º comandante") quando o deck não é conhecido.
 - "Dois comandantes (parceiros)" é um botão de alternar (`aria-pressed` no site; `switch` com
   `checked` no app), com uma explicação em texto logo abaixo.
+
+## Visibilidade do rascunho (25/11/2026)
+
+- Em "Editar deck", o rascunho mostra "Privado" marcado e as três opções desabilitadas, com o
+  motivo em texto na descrição do radiogroup.
+- "Publicar deck" abre sempre a janela; o primeiro campo é o radiogroup "Quem vê o deck depois de
+  publicado" (padrão: Grupo), depois as cartas da coleção, quando houver.

@@ -12,6 +12,7 @@ import {
   type BracketSignals,
   artCropUrl,
   DECK_VISIBILITIES,
+  type DeckVisibility,
   isGameFormat,
   isTokenTypeLine,
   attachCardData,
@@ -272,6 +273,8 @@ export async function saveImportedDeck(
         sourceId: input.deck.sourceId ?? null,
         sourceUrl: input.deck.sourceUrl ?? null,
         status: input.draft ? 'draft' : 'published',
+        // Rascunho é sempre privado; a visibilidade é escolhida ao publicar.
+        ...(input.draft ? { visibility: 'private' } : {}),
       })
       .returning();
     // Entradas diferentes podem cair na mesma impressão (ex.: edição não encontrada → padrão).
@@ -327,6 +330,8 @@ export async function createDeck(
         format: input.format,
         source: 'manual',
         status: input.draft ? 'draft' : 'published',
+        // Rascunho é sempre privado; a visibilidade é escolhida ao publicar.
+        ...(input.draft ? { visibility: 'private' } : {}),
       })
       .returning();
     if (input.commander) {
@@ -467,9 +472,17 @@ export interface PublishChoice {
  */
 export async function publishDeck(
   db: Database,
-  input: { deckId: string; userId: string; choices?: readonly PublishChoice[] },
+  input: {
+    deckId: string;
+    userId: string;
+    choices?: readonly PublishChoice[];
+    /** Quem vê o deck publicado; sem escolha, o grupo (o padrão dos decks). */
+    visibility?: DeckVisibility;
+  },
 ) {
   const deck = await requireOwnedDeck(db, input.deckId, input.userId);
+  const visibility: DeckVisibility =
+    deck.status === 'draft' ? (input.visibility ?? 'group') : (deck.visibility as DeckVisibility);
   const uses = (input.choices ?? []).filter((c) => c.use);
   if (deck.status === 'draft' && uses.length) {
     const matches = await draftCollectionMatches(db, input);
@@ -499,11 +512,11 @@ export async function publishDeck(
   if (deck.status !== 'published') {
     await db
       .update(decks)
-      .set({ status: 'published', updatedAt: new Date() })
+      .set({ status: 'published', visibility, updatedAt: new Date() })
       .where(eq(decks.id, deck.id));
   }
   await syncCollectionFromDecks(db, input.userId);
-  return { ...deck, status: 'published' };
+  return { ...deck, status: 'published', visibility };
 }
 
 /** Linha do deck numa edição: cópias reais, proxies e quantas reais são foil. */
@@ -1048,9 +1061,15 @@ export async function updateDeck(
       throw new DomainError('invalid_input', 'Tipo de jogo inválido');
     changes.format = input.format;
   }
-  if (input.visibility !== undefined) {
+  if (input.visibility !== undefined && input.visibility !== deck.visibility) {
     if (!(DECK_VISIBILITIES as readonly string[]).includes(input.visibility)) {
       throw new DomainError('invalid_input', 'Visibilidade inválida');
+    }
+    if (deck.status === 'draft') {
+      throw new DomainError(
+        'invalid_input',
+        'Rascunho é sempre privado: escolha quem vê o deck ao publicar',
+      );
     }
     changes.visibility = input.visibility;
   }

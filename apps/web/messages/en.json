@@ -597,7 +597,10 @@
       "addNew": "Add as a new one to my collection",
       "option": "{edition}{foil, select, true { (foil)} other {}} — {free} free",
       "confirm": "Publish with these choices",
-      "unknownEdition": "edition not set"
+      "unknownEdition": "edition not set",
+      "visibilityLocked": "A draft is always private. You choose who sees the deck when you publish it.",
+      "publishVisibility": "Who sees the deck once published",
+      "publishNoCandidates": "The deck's cards are added to your collection (except proxies, \"maybe\" and tokens)."
     },
     "printMenu": "Print proxies",
     "pasteMenu": "Paste an updated list"

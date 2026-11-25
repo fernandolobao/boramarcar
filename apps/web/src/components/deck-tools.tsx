@@ -38,7 +38,7 @@ export function DeckActions({
   /** Cópias marcadas como proxy (para a folha de impressão). */
   proxyCount?: number;
   /** Dados para "Editar deck" (só o dono). */
-  edit?: { name: string; format: GameFormat; visibility: DeckVisibility };
+  edit?: { name: string; format: GameFormat; visibility: DeckVisibility; draft?: boolean };
 }) {
   const t = useTranslations('decks');
   const trigger = useRef<HTMLButtonElement>(null);

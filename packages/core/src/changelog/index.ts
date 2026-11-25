@@ -304,6 +304,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No modo mesa, decks com dois comandantes (parceiros) têm o dano de cada comandante contado à parte, com o nome dele, no site e no app.',
     en: 'In table mode, decks with two commanders (partners) now track each commander’s damage separately, by name, on the website and in the app.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Deck em rascunho agora é sempre privado. Ao publicar, você escolhe quem vê: só você, o grupo ou qualquer pessoa com o link.',
+    en: 'Draft decks are now always private. When you publish, you choose who sees it: only you, the group or anyone with the link.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
