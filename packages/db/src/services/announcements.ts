@@ -1,4 +1,11 @@
-import { changelogDraft, changelogSince, DomainError, type ChangelogEntry } from '@boramarcar/core';
+import {
+  ANNOUNCEMENT_BODY_MAX,
+  ANNOUNCEMENT_TITLE_MAX,
+  changelogDraft,
+  changelogSince,
+  DomainError,
+  type ChangelogEntry,
+} from '@boramarcar/core';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { Database } from '../client';
 import { announcements, groupMembers, groups, user } from '../schema';
@@ -11,8 +18,8 @@ import { addNotifications } from './inbox';
 
 export type AnnouncementKind = 'admin' | 'changelog';
 
-const TITLE_MAX = 120;
-const BODY_MAX = 4000;
+const TITLE_MAX = ANNOUNCEMENT_TITLE_MAX;
+const BODY_MAX = ANNOUNCEMENT_BODY_MAX;
 
 const clean = (input: { title?: string; body?: string }) => {
   const title = input.title?.trim();

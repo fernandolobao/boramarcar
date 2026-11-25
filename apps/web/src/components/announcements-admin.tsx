@@ -1,5 +1,6 @@
 'use client';
 
+import { ANNOUNCEMENT_BODY_MAX, ANNOUNCEMENT_TITLE_MAX } from '@boramarcar/core';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useId, useState } from 'react';
@@ -85,7 +86,7 @@ export function AnnouncementsAdmin({
             id={`${id}-title`}
             className="input"
             required
-            maxLength={120}
+            maxLength={ANNOUNCEMENT_TITLE_MAX}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -98,7 +99,7 @@ export function AnnouncementsAdmin({
             id={`${id}-body`}
             className="input min-h-32 py-2"
             required
-            maxLength={4000}
+            maxLength={ANNOUNCEMENT_BODY_MAX}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             aria-describedby={`${id}-body-hint`}
