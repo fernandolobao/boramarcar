@@ -914,6 +914,7 @@
   "groupSettings": {
     "title": "Configurações do grupo",
     "readOnly": "Só o dono ou um admin pode alterar.",
+    "tableGroup": "Quando a mesa fecha",
     "tableSize": "Jogadores para a mesa fechar",
     "tableSizeHint": "Usado nas sugestões de horário e no aviso \"a mesa fechou!\".",
     "minDuration": "Duração mínima da janela (minutos)",

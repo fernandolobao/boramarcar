@@ -47,7 +47,7 @@ export function GroupSettingsForm({
 
   return (
     <form
-      className="space-y-4"
+      className="space-y-5"
       onSubmit={(e) => {
         e.preventDefault();
         setSaved(false);
@@ -58,36 +58,44 @@ export function GroupSettingsForm({
       }}
     >
       {!canEdit && <p className="muted text-sm">{t('readOnly')}</p>}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div>
-          <label className="label" htmlFor="settings-tableSize">
-            {t('tableSize')}
-          </label>
-          <input {...number('tableSize', 2, 8)} aria-describedby="settings-tableSize-hint" />
+      {/* Blocos com título; campos alinhados pela base quando um rótulo quebra a linha. */}
+      <fieldset className="space-y-2">
+        <legend className="mb-2 font-semibold">{t('tableGroup')}</legend>
+        <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
+          <div>
+            <label className="label" htmlFor="settings-tableSize">
+              {t('tableSize')}
+            </label>
+            <input {...number('tableSize', 2, 8)} aria-describedby="settings-tableSize-hint" />
+          </div>
+          <div>
+            <label className="label" htmlFor="settings-minDurationMinutes">
+              {t('minDuration')}
+            </label>
+            <input
+              {...number('minDurationMinutes', 30, 720)}
+              step={15}
+              aria-describedby="settings-tableSize-hint"
+            />
+          </div>
         </div>
-        <div>
-          <label className="label" htmlFor="settings-minDurationMinutes">
-            {t('minDuration')}
-          </label>
-          <input {...number('minDurationMinutes', 30, 720)} step={15} />
-        </div>
-        <div>
-          <Select
-            label={t('defaultFormat')}
-            id="settings-defaultFormat"
-            value={String(values.defaultFormat)}
-            onChange={(v) => set('defaultFormat', v as GameFormat)}
-            disabled={!canEdit}
-            options={GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) }))}
-          />
-        </div>
+        <p id="settings-tableSize-hint" className="muted text-sm">
+          {t('tableSizeHint')}
+        </p>
+      </fieldset>
+      <div className="border-t border-line pt-4">
+        <Select
+          label={t('defaultFormat')}
+          id="settings-defaultFormat"
+          value={String(values.defaultFormat)}
+          onChange={(v) => set('defaultFormat', v as GameFormat)}
+          disabled={!canEdit}
+          options={GAME_FORMATS.map((f) => ({ value: String(f), label: tf(f) }))}
+        />
       </div>
-      <p id="settings-tableSize-hint" className="muted -mt-2 text-sm">
-        {t('tableSizeHint')}
-      </p>
-      <fieldset>
-        <legend className="label">{t('points')}</legend>
-        <div className="grid grid-cols-3 gap-3 sm:max-w-md">
+      <fieldset className="space-y-2 border-t border-line pt-4">
+        <legend className="float-left mb-2 w-full font-semibold">{t('points')}</legend>
+        <div className="clear-both grid grid-cols-3 gap-3">
           {(
             [
               ['pointsWin', t('pointsWin'), 0],
@@ -103,7 +111,7 @@ export function GroupSettingsForm({
             </div>
           ))}
         </div>
-        <p id="settings-points-hint" className="muted mt-1 text-sm">
+        <p id="settings-points-hint" className="muted text-sm">
           {t('pointsHint')}
         </p>
       </fieldset>

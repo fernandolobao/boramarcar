@@ -914,6 +914,7 @@
   "groupSettings": {
     "title": "Group settings",
     "readOnly": "Only the owner or an admin can change these.",
+    "tableGroup": "When the table fills",
     "tableSize": "Players for a full table",
     "tableSizeHint": "Used for suggested times and the \"the table is full!\" notice.",
     "minDuration": "Minimum window length (minutes)",
