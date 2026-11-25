@@ -1,6 +1,13 @@
 'use client';
 
-import { formatRules, GAME_FORMATS, type DeckBoard, type GameFormat } from '@boramarcar/core';
+import {
+  DECK_VISIBILITIES,
+  formatRules,
+  GAME_FORMATS,
+  type DeckBoard,
+  type DeckVisibility,
+  type GameFormat,
+} from '@boramarcar/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -313,8 +320,11 @@ export function PublishDeck({
   candidates?: PublishCandidate[];
 }) {
   const t = useTranslations('decks.draft');
+  const td = useTranslations('decks');
   const router = useRouter();
   const { run, error, pending } = useApiAction();
+  /** Quem vê o deck depois de publicado (o rascunho é sempre privado). */
+  const [visibility, setVisibility] = useState<DeckVisibility>('group');
   /** Por linha: índice da edição da coleção escolhida, ou `null` = adicionar como nova. */
   const [picks, setPicks] = useState<Record<string, number | null>>(() =>
     Object.fromEntries(candidates.map((c) => [c.key, 0])),
@@ -325,6 +335,7 @@ export function PublishDeck({
         api(`/api/v1/decks/${deckId}/publish`, {
           method: 'POST',
           body: {
+            visibility,
             choices: candidates.map((c) => {
               const pick = picks[c.key];
               const option = pick == null ? null : c.options[pick];
@@ -349,65 +360,67 @@ export function PublishDeck({
         {t('title')}
       </p>
       <p className="text-sm">{t('body')}</p>
-      {candidates.length === 0 ? (
-        <button type="button" className="btn-primary" disabled={pending} onClick={publish}>
-          <Icon name="publish" />
-          {t('publish')}
-        </button>
-      ) : (
-        <ModalButton
-          label={t('publish')}
-          title={t('publishTitle')}
-          icon="publish"
-          variant="primary"
-        >
-          <div className="space-y-4">
-            <p className="text-sm">{t('publishIntro')}</p>
-            {candidates.map((c) => {
-              const pick = picks[c.key] ?? null;
-              const set = (value: number | null) => setPicks((p) => ({ ...p, [c.key]: value }));
-              return (
-                <div key={c.key} className="space-y-2 rounded-xl border border-line p-3">
-                  <Choices
-                    label={c.name}
-                    description={t('deckEdition', { edition: editionOf(c.fromLabel) })}
-                    variant="cards"
-                    orientation="vertical"
-                    value={pick === null ? 'new' : 'use'}
-                    onChange={(v) => set(v === 'use' ? 0 : null)}
-                    options={[
-                      { value: 'use', label: t('useCollection') },
-                      { value: 'new', label: t('addNew') },
-                    ]}
+      <ModalButton label={t('publish')} title={t('publishTitle')} icon="publish" variant="primary">
+        <div className="space-y-4">
+          <Choices
+            label={t('publishVisibility')}
+            variant="cards"
+            name="publish-visibility"
+            value={visibility}
+            onChange={setVisibility}
+            options={DECK_VISIBILITIES.map((v) => ({
+              value: v,
+              label: td(`visibility.${v}`),
+              description: td(`visibilityHint.${v}`),
+            }))}
+            icons={Object.fromEntries(DECK_VISIBILITIES.map((v) => [v, <Icon key={v} name={v} />]))}
+          />
+          <p className="text-sm">
+            {candidates.length ? t('publishIntro') : t('publishNoCandidates')}
+          </p>
+          {candidates.map((c) => {
+            const pick = picks[c.key] ?? null;
+            const set = (value: number | null) => setPicks((p) => ({ ...p, [c.key]: value }));
+            return (
+              <div key={c.key} className="space-y-2 rounded-xl border border-line p-3">
+                <Choices
+                  label={c.name}
+                  description={t('deckEdition', { edition: editionOf(c.fromLabel) })}
+                  variant="cards"
+                  orientation="vertical"
+                  value={pick === null ? 'new' : 'use'}
+                  onChange={(v) => set(v === 'use' ? 0 : null)}
+                  options={[
+                    { value: 'use', label: t('useCollection') },
+                    { value: 'new', label: t('addNew') },
+                  ]}
+                />
+                {pick !== null && (
+                  <Select
+                    label={t('collectionEdition')}
+                    id={`pub-${c.key}-edition`}
+                    value={String(pick)}
+                    onChange={(v) => set(Number(v))}
+                    options={c.options.map((o, i) => ({
+                      value: String(i),
+                      label: t('option', {
+                        edition: editionOf(o.label),
+                        foil: String(o.foil),
+                        free: o.free,
+                      }),
+                    }))}
                   />
-                  {pick !== null && (
-                    <Select
-                      label={t('collectionEdition')}
-                      id={`pub-${c.key}-edition`}
-                      value={String(pick)}
-                      onChange={(v) => set(Number(v))}
-                      options={c.options.map((o, i) => ({
-                        value: String(i),
-                        label: t('option', {
-                          edition: editionOf(o.label),
-                          foil: String(o.foil),
-                          free: o.free,
-                        }),
-                      }))}
-                    />
-                  )}
-                </div>
-              );
-            })}
-            <button type="button" className="btn-primary" disabled={pending} onClick={publish}>
-              <Icon name="publish" />
-              {t('confirm')}
-            </button>
-            <FormError message={error} />
-          </div>
-        </ModalButton>
-      )}
-      {candidates.length === 0 && <FormError message={error} />}
+                )}
+              </div>
+            );
+          })}
+          <button type="button" className="btn-primary" disabled={pending} onClick={publish}>
+            <Icon name="publish" />
+            {t('confirm')}
+          </button>
+          <FormError message={error} />
+        </div>
+      </ModalButton>
     </div>
   );
 }

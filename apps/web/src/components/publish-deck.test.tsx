@@ -87,14 +87,22 @@ describe('PublishDeck', () => {
     expect(body.choices[0].use).toBeNull();
   });
 
-  it('sem cartas na coleção: publica direto, sem janela', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => Response.json({ deck: { id: 'd1' } })),
-    );
+  it('sem cartas na coleção: a janela pergunta só a visibilidade (padrão: grupo)', async () => {
+    const fetchMock = vi.fn(async () => Response.json({ deck: { id: 'd1' } }));
+    vi.stubGlobal('fetch', fetchMock);
     show([]);
     fireEvent.click(screen.getByRole('button', { name: 'Publicar deck' }));
-    expect(screen.queryByRole('dialog')).toBeNull();
+    const dialog = screen.getByRole('dialog');
+    const who = within(dialog).getByRole('radiogroup', {
+      name: 'Quem vê o deck depois de publicado',
+    });
+    expect(within(who).getByRole('radio', { name: /^Grupo/ })).toBeChecked();
+    fireEvent.click(within(who).getByRole('radio', { name: /^Público/ }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Publicar com estas escolhas' }));
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/decks/d1?publicado=1'));
+    const body = JSON.parse(
+      String((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body),
+    );
+    expect(body).toEqual({ visibility: 'public', choices: [] });
   });
 });

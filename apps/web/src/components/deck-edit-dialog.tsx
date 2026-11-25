@@ -19,12 +19,15 @@ export function DeckEditContent({
   name,
   format,
   visibility,
+  draft = false,
   onSaved,
 }: {
   deckId: string;
   name: string;
   format: GameFormat;
   visibility: DeckVisibility;
+  /** Rascunho: visibilidade travada em privado (escolhida ao publicar). */
+  draft?: boolean;
   onSaved: () => void;
 }) {
   const t = useTranslations('decks');
@@ -39,6 +42,7 @@ export function DeckEditContent({
         name={name}
         format={format}
         visibility={visibility}
+        draft={draft}
         onSaved={onSaved}
       />
       <section

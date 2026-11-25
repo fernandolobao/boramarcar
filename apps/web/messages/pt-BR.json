@@ -596,7 +596,10 @@
       "addNew": "Adicionar como nova à coleção",
       "option": "{edition}{foil, select, true { (foil)} other {}} — {free, plural, =1 {1 livre} other {# livres}}",
       "confirm": "Publicar com estas escolhas",
-      "unknownEdition": "edição não informada"
+      "unknownEdition": "edição não informada",
+      "visibilityLocked": "Rascunho é sempre privado. Você escolhe quem vê o deck ao publicar.",
+      "publishVisibility": "Quem vê o deck depois de publicado",
+      "publishNoCandidates": "As cartas do deck entram na sua coleção (menos proxies, \"talvez\" e tokens)."
     },
     "printMenu": "Imprimir proxies",
     "pasteMenu": "Colar lista atualizada"

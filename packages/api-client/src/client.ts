@@ -1036,13 +1036,15 @@ export function createApiClient(options: ApiClientOptions) {
           fromScryfallId: string | null;
           use: { scryfallId: string | null; foil: boolean } | null;
         }[] = [],
+        /** Quem vê o deck publicado; sem escolha, o grupo. */
+        visibility?: 'private' | 'group' | 'public',
       ) =>
         (
           await request(
             'POST',
             `/decks/${encodeURIComponent(deckId)}/publish`,
             z.object({ deck: z.object({ id: z.string() }).loose() }),
-            { choices },
+            { choices, ...(visibility ? { visibility } : {}) },
           )
         ).deck,
       /** Cartas do deck que você já tem livres na coleção, em qualquer edição (dono). */

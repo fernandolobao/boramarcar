@@ -294,6 +294,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Novo bloco "Commander para iniciantes" em "Aprender a jogar": comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets, com uma conquista para quem concluir.',
     en: 'New "Commander for beginners" part in "Learn to play": the commander, color identity, the multiplayer table, Rule 0 and brackets, with an achievement for completing it.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Deck em rascunho agora é sempre privado. Ao publicar, você escolhe quem vê: só você, o grupo ou qualquer pessoa com o link.',
+    en: 'Draft decks are now always private. When you publish, you choose who sees it: only you, the group or anyone with the link.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
