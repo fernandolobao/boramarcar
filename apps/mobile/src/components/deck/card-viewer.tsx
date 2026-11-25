@@ -2,6 +2,7 @@ import type { DeckLine } from '@boramarcar/api-client';
 import { useState } from 'react';
 import { Image, Modal, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ManaText } from '@/components/mana';
 import { AppText, Button, styles } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -58,7 +59,7 @@ export function CardViewer({ line, onClose }: { line: DeckLine | null; onClose: 
                   })}
                 </AppText>
               )}
-              {card.oracleText ? <AppText>{card.oracleText}</AppText> : null}
+              {card.oracleText ? <ManaText text={card.oracleText} /> : null}
             </View>
           )}
           <Button label={t('deckClose')} onPress={onClose} />

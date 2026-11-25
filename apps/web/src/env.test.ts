@@ -45,3 +45,12 @@ describe('getBaseUrl', () => {
     expect(getBaseUrl(base)).toBe('http://localhost:3000');
   });
 });
+
+describe('SKIP_ENV_VALIDATION', () => {
+  it('em produção, não sobe com a validação desligada (o segredo seria um valor conhecido)', async () => {
+    vi.stubEnv('SKIP_ENV_VALIDATION', '1');
+    vi.stubEnv('VERCEL_ENV', 'production');
+    const { getEnv } = await load();
+    expect(() => getEnv()).toThrow(/SKIP_ENV_VALIDATION/);
+  });
+});

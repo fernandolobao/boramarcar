@@ -388,24 +388,42 @@ export default function CollectionScreen() {
               <View
                 style={{
                   position: 'absolute',
-                  right: 4,
-                  bottom: 4,
+                  left: 4,
+                  top: 4,
                   paddingHorizontal: 6,
-                  borderRadius: 8,
-                  backgroundColor: colors.surface,
+                  borderRadius: 6,
+                  backgroundColor: colors.badgeBg,
                 }}
               >
-                <AppText style={{ fontWeight: '700' }}>×{item.quantity}</AppText>
+                <AppText style={{ fontSize: 12, fontWeight: '700', color: colors.badgeText }}>
+                  ×{item.quantity}
+                </AppText>
               </View>
+              {/* Selo de foil no canto inferior esquerdo, como no site (deck e coleção): as legendas ficam com a mesma altura
+                  em todas as cartas (o "foil" já está no nome acessível do botão). */}
+              {item.foil && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: 6,
+                    bottom: '6%',
+                    paddingHorizontal: 6,
+                    paddingVertical: 2,
+                    borderRadius: 6,
+                    backgroundColor: colors.foilBg,
+                  }}
+                  importantForAccessibility="no-hide-descendants"
+                  accessibilityElementsHidden
+                >
+                  <AppText style={{ fontSize: 12, fontWeight: '700', color: colors.foilText }}>
+                    ✦ {t('collectionFoil')}
+                  </AppText>
+                </View>
+              )}
             </View>
             <AppText numberOfLines={1} style={{ fontSize: 13, fontWeight: '600' }}>
               {item.name}
             </AppText>
-            {item.foil && (
-              <AppText muted style={{ fontSize: 12 }}>
-                {t('collectionFoil')}
-              </AppText>
-            )}
           </Pressable>
         )}
         ListFooterComponent={

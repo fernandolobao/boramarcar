@@ -6,7 +6,7 @@ import {
   type Point,
   type StoreOffer,
 } from '@boramarcar/core/discovery';
-import { and, asc, count, eq, gte, inArray, isNotNull, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gte, inArray, isNotNull, lt, sql } from 'drizzle-orm';
 import type { Database } from '../client';
 import { municipalities, storeEventEntries, storeEvents, stores } from '../schema';
 
@@ -85,9 +85,12 @@ export async function findNearby(
         ),
         eq(storeEvents.status, 'scheduled'),
         gte(storeEvents.startsAt, now),
+        // A janela da busca já no banco (antes vinham todos os eventos futuros das lojas).
+        lt(storeEvents.startsAt, until),
       ),
     )
-    .orderBy(asc(storeEvents.startsAt));
+    .orderBy(asc(storeEvents.startsAt))
+    .limit(500);
   const inWindow = upcoming.filter(
     (e) =>
       e.startsAt < until &&

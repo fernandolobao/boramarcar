@@ -201,7 +201,7 @@ Recomendado: em _Settings → Branches_, proteger a `main` exigindo esses checks
 
 O workflow `contract.yml` roda toda segunda-feira chamando Scryfall, Archidekt e Moxfield de verdade (os testes de PR usam respostas simuladas) e abre uma issue se alguma integração quebrar.
 
-O workflow `migrate.yml` aplica as migrations no banco de produção quando elas mudam na `main` (requer o secret `DATABASE_URL` no environment `production`).
+As migrations de produção rodam na build de produção da Vercel (`apps/web/scripts/vercel-build.sh`), logo antes do deploy. O workflow `migrate.yml` é só o botão manual de emergência (Actions → Run workflow; requer o secret `DATABASE_URL` no environment `production`).
 
 ## Deploy na Vercel
 
