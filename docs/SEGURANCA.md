@@ -128,19 +128,19 @@ status='registration' RETURNING`; inscritos em lote.
 - ~~`getPublicTournament` ainda devolve o título e a data do encontro do grupo.~~ Não é problema: é o subtítulo da página pública, de propósito (o comentário do código é que estava errado e foi corrigido).
 - Token de push pode ser "tomado" por quem o conhecer (`push.ts:17`) → recusar token de outra conta.
 - 2HG: quem não organiza inscreve outra pessoa como dupla sem ela aceitar.
-- CSP aplicada com `img-src https:` / `connect-src https:` → promover as listas exatas do modo relatório;
+- ✅ CSP aplicada com `img-src https:` / `connect-src https:` → promover as listas exatas do modo relatório;
   rotas com ponto no caminho escapam da CSP (`proxy.ts:67` matcher); faltam `COOP`, `CORP`,
-  `X-Frame-Options: DENY` e `preload` no HSTS.
+  `X-Frame-Options: DENY` e `preload` no HSTS. **Corrigido:** faltavam `X-Frame-Options: DENY` e `Cross-Origin-Opener-Policy: same-origin` (`lib/security-headers.ts`) e o `proxy.ts` deixava de fora qualquer endereço com ponto; agora a lista de estáticos é explícita. **Ainda em aberto:** promover as listas exatas de `img-src`/`connect-src` do modo relatório (esperar os relatórios de produção), `Cross-Origin-Resource-Policy` (pode afetar imagens nos e-mails) e `preload` no HSTS (decisão do dono: compromete o domínio na lista dos navegadores).
 - ✅ Upload: conferir o formato real com `sharp().metadata()` (hoje confia no tipo enviado), baixar
   `limitInputPixels` para ~25M.
-- `.ics`: `\r` solto não é escapado (`packages/core/src/calendar/index.ts:26`).
+- ✅ `.ics`: `\r` solto não é escapado (`packages/core/src/calendar/index.ts:26`). **Corrigido:** `\r` solto vira `\n` escapado.
 - ✅ Código do balcão com `Math.random` → `crypto.getRandomValues` (`packages/core/src/stores/index.ts:69`).
 - ✅ `places/locate` (Nominatim) e coleção (Scryfall) sem limite de uso; `scryfallId` sem validar UUID. **Corrigido:** limite `search` nas duas; o ID aceita só letras, números e hífen (`scryfallIdSchema`), porque os testes e o seed usam IDs que não são UUID.
 - ✅ `csp-report` lê o corpo inteiro sem `Content-Length`.
-- ✅ Hash do IP no limite de uso sem segredo (HMAC). — Nomes de deck importado sem limite (Archidekt/texto): fica para o PR 7.
-- Busca da descoberta sem limite superior de data/linhas no SQL; índices faltando (lembretes, limpeza de
-  `rate_limits`, `notifications(group_id, kind)`); notificações sem limpeza das antigas.
-- `SKIP_ENV_VALIDATION` em produção usaria segredo fixo → falhar se `VERCEL_ENV=production`.
+- ✅ Hash do IP no limite de uso sem segredo (HMAC). — ✅ Nomes de deck importado: espaços juntados e até 120 caracteres (`saveImportedDeck`).
+- ✅ Busca da descoberta sem limite superior de data/linhas no SQL; índices faltando (lembretes, limpeza de
+  `rate_limits`, `notifications(group_id, kind)`); notificações sem limpeza das antigas. **Corrigido:** janela de datas e `limit(500)` no SQL; índices `events_reminder_due_idx` (parcial), `rate_limits_window_start_idx` e `notifications_group_kind_idx` (migration 0040); notificações lidas há mais de 180 dias saem no cron diário (`purgeOldNotifications`).
+- ✅ `SKIP_ENV_VALIDATION` em produção usaria segredo fixo → falhar se `VERCEL_ENV=production`. **Corrigido:** `getEnv` recusa subir com ela em produção.
 - Migrations rodam em dois lugares (build da Vercel e workflow) → manter um só.
 - GitHub Actions de terceiros por tag (fixar por SHA).
 - App: convite pendente entra no grupo sozinho depois do login (mostrar a confirmação).

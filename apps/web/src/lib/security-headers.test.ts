@@ -13,4 +13,9 @@ describe('cabeçalhos de segurança', () => {
     expect(header('X-Content-Type-Options')).toBe('nosniff');
     expect(header('Strict-Transport-Security')).toContain('max-age=63072000');
   });
+
+  it('a página não pode ser posta num iframe de outro site nem dividir a janela com ele', () => {
+    expect(header('X-Frame-Options')).toBe('DENY');
+    expect(header('Cross-Origin-Opener-Policy')).toBe('same-origin');
+  });
 });

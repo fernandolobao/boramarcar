@@ -32,4 +32,17 @@ test.describe('segurança', () => {
     const b = (await request.get('/privacidade')).headers()['content-security-policy'];
     expect(a).not.toBe(b);
   });
+
+  test('endereço de página com ponto (ex.: /jogadores/a.b) também recebe a CSP', async ({
+    request,
+  }) => {
+    const res = await request.get('/jogadores/a.b', { maxRedirects: 0 });
+    expect(res.headers()['content-security-policy']).toMatch(/'nonce-[^']+'/);
+  });
+
+  test('arquivos estáticos continuam fora do proxy (sem CSP por página)', async ({ request }) => {
+    const res = await request.get('/showcase/painel-light.webp');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-security-policy']).toBeUndefined();
+  });
 });
