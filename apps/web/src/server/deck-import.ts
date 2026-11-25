@@ -38,6 +38,8 @@ export async function importDeck(
   fetchFn: FetchLike = fetch,
   /** Formato escolhido; sem escolha, o detectado na origem ou Commander. */
   format?: GameFormat,
+  /** Rascunho (11.2): as cartas não entram na coleção até publicar. */
+  options: { draft?: boolean } = {},
 ) {
   const deck = await resolveDeckImport(input, {
     fetch: fetchFn,
@@ -64,6 +66,7 @@ export async function importDeck(
       format ??
       deck.format ??
       (deck.entries.some((e) => e.board === 'commander') ? 'commander' : 'other'),
+    draft: options.draft,
   });
   return { deck: saved, notFound };
 }

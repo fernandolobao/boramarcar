@@ -675,3 +675,11 @@ sem rolagem horizontal em 320px.
   No site instalado como app não há o botão de voltar do navegador, e essas páginas não têm o menu.
 - Busca de lojas: "Usar minha localização" fica ao lado do campo de cidade (abaixo dele no celular), e a
   dica vem depois dos dois (`aria-describedby` continua no campo).
+
+## Deck do zero e rascunho (25/11/2026)
+
+- `/decks/novo`: campos com rótulo, a busca do comandante é a mesma combobox ARIA do editor, e
+  "Começar como rascunho" é um `Checkbox` com descrição (o que muda para a coleção e o grupo).
+- Selo "Rascunho" com texto e ícone (não só cor), no mesmo formato do selo de visibilidade.
+- Publicar: depois de publicar, a página recarrega sem o aviso do rascunho e anuncia "Deck publicado"
+  numa região `role="status"` (a confirmação vem pelo endereço, para não se perder no recarregamento).

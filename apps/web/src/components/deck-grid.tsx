@@ -12,6 +12,8 @@ export interface DeckSummary {
   name: string;
   format: string;
   visibility: string;
+  /** Rascunho (11.2) ou publicado; sem valor, publicado. */
+  status?: string;
   cardCount: number | null;
 }
 
@@ -28,6 +30,17 @@ export async function VisibilityBadge({ visibility }: { visibility: string }) {
     <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
       <Icon name={VISIBILITY_ICON[key]} className="size-3.5 shrink-0" />
       {t(key)}
+    </span>
+  );
+}
+
+/** Selo "Rascunho" (11.2), no mesmo formato do selo de visibilidade (texto + ícone). */
+export async function DraftBadge() {
+  const t = await getTranslations('decks.draft');
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-on-accent">
+      <Icon name="draft" className="size-3.5 shrink-0" />
+      {t('badge')}
     </span>
   );
 }
@@ -115,7 +128,10 @@ export async function DeckGrid({
               )}
               <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
                 <p className="muted text-sm">{t('cards', { count: deck.cardCount ?? 0 })}</p>
-                {showVisibility && <VisibilityBadge visibility={deck.visibility} />}
+                <span className="flex flex-wrap items-center gap-1">
+                  {deck.status === 'draft' && <DraftBadge />}
+                  {showVisibility && <VisibilityBadge visibility={deck.visibility} />}
+                </span>
               </div>
             </div>
           </li>

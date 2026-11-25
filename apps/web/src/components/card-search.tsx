@@ -14,8 +14,11 @@ export function CardSearch({
   value,
   onChange,
   onPick,
+  required = true,
 }: {
   id: string;
+  /** Campo obrigatório (padrão); no deck do zero, o comandante é opcional. */
+  required?: boolean;
   label: string;
   value: string;
   onChange: (value: string) => void;
@@ -84,7 +87,7 @@ export function CardSearch({
         aria-describedby={`${listId}-hint`}
         autoComplete="off"
         spellCheck={false}
-        required
+        required={required}
         value={value}
         onChange={(e) => {
           onChange(e.target.value);

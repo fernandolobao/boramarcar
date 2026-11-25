@@ -397,6 +397,11 @@ export const decks = pgTable(
     format: text('format').notNull().default('commander'),
     /** `private` | `group` | `public` (ver `DECK_VISIBILITIES`). */
     visibility: text('visibility').notNull().default('group'),
+    /**
+     * `draft` (rascunho, 11.2): ideia de deck, só o dono vê e as cartas não entram na coleção;
+     * `published`: deck de verdade. Publicar soma as cartas à coleção.
+     */
+    status: text('status').notNull().default('published'),
     source: deckSource('source').notNull().default('manual'),
     sourceId: text('source_id'),
     sourceUrl: text('source_url'),

@@ -48,6 +48,7 @@ const r = {
   analysis: await import('../decks/[deckId]/analysis/route'),
   deckCard: await import('../decks/[deckId]/cards/[cardId]/route'),
   exportDeck: await import('../decks/[deckId]/export/route'),
+  publishDeck: await import('../decks/[deckId]/publish/route'),
   linePrint: await import('../decks/[deckId]/lines/print/route'),
   lines: await import('../decks/[deckId]/lines/route'),
   proxies: await import('../decks/[deckId]/proxies/route'),
@@ -362,6 +363,7 @@ const deckCases = (key: 'privateDeck' | 'groupDeck'): Case[] => [
   [`DELETE deck (${key})`, r.deck.DELETE as Handler, 'DELETE', () => ({ deckId: ids[key]! })],
   [`export (${key})`, r.exportDeck.GET as Handler, 'GET', () => ({ deckId: ids[key]! })],
   [`proxies (${key})`, r.proxies.GET as Handler, 'GET', () => ({ deckId: ids[key]! })],
+  [`publicar (${key})`, r.publishDeck.POST as Handler, 'POST', () => ({ deckId: ids[key]! })],
   [
     `alternativas (${key})`,
     r.alternatives.GET as Handler,

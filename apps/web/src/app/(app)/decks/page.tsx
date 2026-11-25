@@ -25,10 +25,16 @@ export default async function DecksPage() {
           <h1 className="page-title">{t('title')}</h1>
           <p className="muted">{t('subtitle', { count: decks.length })}</p>
         </div>
-        <Link href="/decks/importar" className="btn-primary">
-          <Icon name="upload" />
-          {t('import')}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/decks/novo" className="btn-primary">
+            <Icon name="add" />
+            {t('new')}
+          </Link>
+          <Link href="/decks/importar" className="btn-secondary">
+            <Icon name="upload" />
+            {t('import')}
+          </Link>
+        </div>
       </div>
       {decks.length === 0 ? (
         <EmptyState>{t('empty')}</EmptyState>
