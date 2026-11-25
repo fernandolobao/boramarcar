@@ -61,14 +61,20 @@ export default async function LearnPage() {
             </div>
           </div>
         )}
-        <Link href={`/aprender/${next.id}`} className="btn-primary">
-          <Icon name="next" />
-          {completed.length === 0
-            ? t('start')
-            : completed.length === total
-              ? t('review')
-              : t('continue')}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/aprender/${next.id}`} className="btn-primary">
+            <Icon name="next" />
+            {completed.length === 0
+              ? t('start')
+              : completed.length === total
+                ? t('review')
+                : t('continue')}
+          </Link>
+          <Link href="/aprender/glossario" className="btn-secondary">
+            <Icon name="lessons" />
+            {t('glossary.title')}
+          </Link>
+        </div>
         {!user && (
           <p className="muted text-sm">
             <Link href="/entrar?para=/aprender" className="text-link underline underline-offset-2">

@@ -294,6 +294,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Novo bloco "Commander para iniciantes" em "Aprender a jogar": comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets, com uma conquista para quem concluir.',
     en: 'New "Commander for beginners" part in "Learn to play": the commander, color identity, the multiplayer table, Rule 0 and brackets, with an achievement for completing it.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Glossário de palavras-chave em "Aprender a jogar", com busca em português ou inglês. No modo mesa, ele abre pelo botão do centro, sem sair da partida.',
+    en: 'Keyword glossary in "Learn to play", searchable in English or Portuguese. In table mode it opens from the centre button, without leaving the game.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

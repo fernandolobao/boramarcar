@@ -11,6 +11,8 @@
 
 export type LearnLocale = 'pt-BR' | 'en';
 
+export * from './glossary';
+
 export interface LessonSection {
   id: string;
   heading: string;
