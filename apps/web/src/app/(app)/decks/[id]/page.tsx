@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { OpeningHand } from '@/components/opening-hand';
+import { PublishDeck } from '@/components/deck-forms';
 import {
   artCropUrl,
   DECK_BOARDS,
@@ -14,7 +15,7 @@ import {
   type DeckVisibility,
 } from '@boramarcar/core';
 import Link from 'next/link';
-import { VisibilityBadge } from '@/components/deck-grid';
+import { DraftBadge, VisibilityBadge } from '@/components/deck-grid';
 import { compareWithCommanderDecks, getDeck, listDismissedTips } from '@boramarcar/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -54,7 +55,10 @@ import { DeckShare } from '@/components/deck-share';
 import { getBaseUrl } from '@/env';
 import { linkQrCode } from '@/server/invite';
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ publicado?: string }>;
+};
 
 /** Título da aba com o nome do deck (WCAG 2.4.2). */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -64,7 +68,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return deckMetadata(id, deck?.name ?? (await getTranslations('nav'))('decks'));
 }
 
-export default async function DeckPage({ params }: Props) {
+export default async function DeckPage({ params, searchParams }: Props) {
+  const justPublished = (await searchParams).publicado === '1';
   const { id } = await params;
   const user = await requireUser();
   const deck = await getDeck(getDb(), {
@@ -205,9 +210,17 @@ export default async function DeckPage({ params }: Props) {
                   {tf(format)}
                 </span>
                 <ColorIdentity colors={identity} />
+                {deck.status === 'draft' && <DraftBadge />}
                 <VisibilityBadge visibility={deck.visibility} />
               </div>
               <h1 className="page-title">{deck.name}</h1>
+              {deck.status === 'draft' && deck.isOwner && <PublishDeck deckId={deck.id} />}
+              {justPublished && deck.status === 'published' && (
+                <p role="status" className="flex items-center gap-2 font-medium">
+                  <Icon name="publish" />
+                  {t('draft.published')}
+                </p>
+              )}
               {!deck.isOwner && (
                 <p className="text-sm">
                   <Link

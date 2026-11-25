@@ -7,6 +7,7 @@
  */
 import {
   Award,
+  BadgeCheck,
   Bell,
   CalendarCheck,
   CalendarRange,
@@ -102,6 +103,7 @@ import {
   Lightbulb,
   Compass,
   Info,
+  NotebookPen,
 } from 'lucide-react';
 
 export type { LucideIcon };
@@ -158,6 +160,10 @@ export const Icons = {
   switchGroup: ArrowLeftRight,
   swap: ArrowLeftRight,
   done: Check,
+  /** Deck em rascunho (11.2). */
+  draft: NotebookPen,
+  /** Publicar o rascunho. */
+  publish: BadgeCheck,
   makeAdmin: ShieldCheck,
   removeAdmin: ShieldMinus,
   transfer: Crown,

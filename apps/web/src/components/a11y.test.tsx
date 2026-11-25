@@ -20,7 +20,7 @@ import { DateField } from './ds/date-field';
 import { DateTimeField } from './ds/date-time-field';
 import { TimeField } from './ds/time-field';
 import { TableSuggestions } from './table-suggestions';
-import { DeckImportForm } from './deck-forms';
+import { DeckCreateForm, DeckImportForm, PublishDeck } from './deck-forms';
 import { OpeningHand } from './opening-hand';
 import { EmptyState } from './empty-state';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
@@ -169,6 +169,8 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['DeckImportForm', <DeckImportForm key="d" />],
+  ['DeckCreateForm', <DeckCreateForm key="d2" />],
+  ['PublishDeck', <PublishDeck key="d3" deckId="d1" />],
   [
     'OpeningHand',
     <OpeningHand

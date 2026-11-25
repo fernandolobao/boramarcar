@@ -568,6 +568,25 @@
     "removeDeck": "Remover deck",
     "confirmRemove": "Confirmar remoção",
     "viewedAsAdmin": "Você está vendo este deck como admin do ArcanaKin (ele não está visível para você normalmente). O acesso fica registrado.",
+    "new": "Novo deck",
+    "create": {
+      "title": "Novo deck",
+      "intro": "Comece do zero: dê um nome, escolha o tipo de jogo e, se quiser, o comandante. As cartas você acrescenta na página do deck, pela busca.",
+      "commander": "Comandante",
+      "commanderHint": "Pode deixar para depois: o comandante também entra pelo editor do deck.",
+      "submit": "Criar deck",
+      "orImport": "Já tem a lista em outro lugar? Importe pelo link ou colando a lista."
+    },
+    "draft": {
+      "label": "Começar como rascunho",
+      "badge": "Rascunho",
+      "createHint": "Para testar ideias: as cartas de um rascunho não entram na sua coleção, o deck não aparece para o grupo e não pode ser usado em partidas. Quando quiser, publique.",
+      "importHint": "As cartas ficam fora da sua coleção até você publicar o deck.",
+      "title": "Este deck é um rascunho",
+      "body": "As cartas dele não estão na sua coleção, ninguém mais vê o deck e ele não pode ser escolhido em partidas. Publicar soma as cartas à coleção (exceto proxies e \"talvez\").",
+      "publish": "Publicar deck",
+      "published": "Deck publicado: as cartas entraram na sua coleção."
+    },
     "hand": {
       "title": "Testar a mão inicial",
       "intro": "Embaralhe o deck e veja uma mão de 7, como na mesa. Comandante, reserva e \"talvez\" ficam de fora.",

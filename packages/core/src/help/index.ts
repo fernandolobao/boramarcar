@@ -212,6 +212,23 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         title: 'Decks',
         questions: [
           {
+            id: 'deck-do-zero',
+            question: 'Como monto um deck do zero?',
+            steps: [
+              'No site, abra Decks e toque em "Novo deck".',
+              'Dê um nome, escolha o tipo de jogo e, em Commander, o comandante (pode ficar para depois).',
+              'Na página do deck, toque em "Editar" e acrescente as cartas pela busca.',
+            ],
+          },
+          {
+            id: 'deck-rascunho',
+            question: 'O que é um deck em rascunho?',
+            intro: [
+              'É um deck para testar ideias. As cartas dele não entram na sua coleção, ninguém mais vê o deck e ele não pode ser escolhido em partidas. Deck novo começa como rascunho (dá para desmarcar ao criar ou importar).',
+              'Quando o deck estiver pronto, toque em "Publicar deck" na página dele: as cartas passam a contar na sua coleção (menos proxies e "talvez") e o deck aparece para quem você escolheu.',
+            ],
+          },
+          {
             id: 'mao-inicial',
             question: 'Como testo a mão inicial do deck?',
             steps: [
@@ -604,6 +621,23 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         id: 'decks',
         title: 'Decks',
         questions: [
+          {
+            id: 'deck-do-zero',
+            question: 'How do I build a deck from scratch?',
+            steps: [
+              'On the website, open Decks and tap "New deck".',
+              'Give it a name, pick the game type and, in Commander, the commander (it can wait).',
+              'On the deck page, tap "Edit" and add cards through the search.',
+            ],
+          },
+          {
+            id: 'deck-rascunho',
+            question: 'What is a draft deck?',
+            intro: [
+              'It is a deck for trying ideas. Its cards don\u2019t go into your collection, nobody else sees the deck and it can\u2019t be picked in games. A new deck starts as a draft (you can uncheck it when creating or importing).',
+              'When the deck is ready, tap "Publish deck" on its page: the cards start counting in your collection (except proxies and "maybe") and the deck is shown to whoever you chose.',
+            ],
+          },
           {
             id: 'mao-inicial',
             question: 'How do I test the deck\u2019s opening hand?',

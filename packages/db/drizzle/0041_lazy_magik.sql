@@ -1,0 +1,1 @@
+ALTER TABLE "decks" ADD COLUMN "status" text DEFAULT 'published' NOT NULL;

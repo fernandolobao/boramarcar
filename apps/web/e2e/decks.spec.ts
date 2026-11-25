@@ -223,4 +223,28 @@ test.describe('compartilhar deck público', () => {
       await set('group');
     }
   });
+
+  test('deck do zero começa como rascunho; publicar põe as cartas na coleção (11.1 e 11.2)', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== 'chromium', 'cria dados: só no desktop');
+    await page.goto('/decks');
+    await page.getByRole('link', { name: 'Novo deck' }).click();
+    await expect(page).toHaveURL(/\/decks\/novo$/);
+    // Todos os formatos; o comandante só aparece nos que têm comandante.
+    await expect(page.getByRole('combobox', { name: /Comandante/ })).toBeVisible();
+    await pick(page, 'Tipo de jogo', 'Pauper');
+    await expect(page.getByRole('combobox', { name: /Comandante/ })).toHaveCount(0);
+    await pick(page, 'Tipo de jogo', 'Commander');
+    await page.getByLabel('Nome do deck').fill('Ideia de rascunho E2E');
+    await expect(page.getByRole('checkbox', { name: 'Começar como rascunho' })).toBeChecked();
+    await page.getByRole('button', { name: 'Criar deck' }).click();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Ideia de rascunho E2E' }),
+    ).toBeVisible();
+    await expect(page.getByText('Este deck é um rascunho')).toBeVisible();
+    await page.getByRole('button', { name: 'Publicar deck' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Deck publicado' })).toBeVisible();
+    await expect(page.getByText('Este deck é um rascunho')).toHaveCount(0);
+  });
 });
