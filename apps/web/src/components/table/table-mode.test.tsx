@@ -263,6 +263,19 @@ describe('tela acesa e tela cheia', () => {
     Reflect.deleteProperty(document, 'exitFullscreen');
   });
 
+  it('o glossário abre pelo menu, sem sair da partida (12.3)', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Glossário' }));
+    const dialog = screen.getByRole('dialog', { name: 'Glossário' });
+    fireEvent.change(within(dialog).getByLabelText(/Buscar no glossário/), {
+      target: { value: 'toque' },
+    });
+    expect(within(dialog).getByText(/Toque mortífero/)).toBeInTheDocument();
+    // Na mesa, sem links para as lições (sairiam da partida).
+    expect(within(dialog).queryByRole('link')).toBeNull();
+  });
+
   it('sem API de tela cheia (iPhone), explica como instalar na tela inicial', () => {
     start();
     fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));

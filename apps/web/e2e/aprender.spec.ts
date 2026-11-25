@@ -29,6 +29,18 @@ test.describe('aprender a jogar (12.1)', () => {
     expect((await page.goto('/aprender/nao-existe'))?.status()).toBe(404);
   });
 
+  test('glossário: busca sem acento e pelo nome em inglês', async ({ page }) => {
+    await page.goto('/aprender');
+    await page.getByRole('link', { name: 'Glossário', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Glossário' })).toBeVisible();
+    const search = page.getByLabel('Buscar no glossário (em português ou inglês)');
+    await search.fill('trample');
+    await expect(page.getByRole('status').filter({ hasText: '1 termo' })).toBeVisible();
+    await expect(page.getByRole('term')).toHaveText(/Atropelar\s*\(Trample\)/);
+    await search.fill('impeto');
+    await expect(page.getByRole('term').first()).toContainText('Ímpeto');
+  });
+
   test.describe('com conta', () => {
     test.use({ storageState: AUTH_STATE });
 
