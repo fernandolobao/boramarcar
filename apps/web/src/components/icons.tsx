@@ -52,6 +52,7 @@ import {
   CalendarPlus,
   CalendarX2,
   Check,
+  GraduationCap,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -224,6 +225,8 @@ export const Icons = {
   guide: Compass,
   info: Info,
   learn: Lightbulb,
+  /** Trilha "Aprender a jogar" (12.1). */
+  lessons: GraduationCap,
   transparency: Eye,
   email: Mail,
   feedback: MessageSquareText,

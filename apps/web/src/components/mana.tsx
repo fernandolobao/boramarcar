@@ -73,3 +73,27 @@ export function useColorName() {
   const t = useTranslations('mana');
   return (c: string) => t(`colors.${c.toLowerCase() as ColorKey}`);
 }
+
+/**
+ * Texto com símbolos de mana: "{2}{G}" e "{T}" viram os símbolos, com o nome por extenso para
+ * leitores de tela (o símbolo é decorativo).
+ */
+export function ManaText({ text }: { text: string }) {
+  const nameOf = useSymbolName();
+  const parts = text.split(/(\{[^}]+\})/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        const m = /^\{([^}]+)\}$/.exec(part);
+        if (!m) return part;
+        const symbol = m[1]!.toUpperCase();
+        return (
+          <span key={i} className="inline-flex align-middle">
+            <ManaSymbol symbol={symbol} />
+            <span className="sr-only">{nameOf(symbol)}</span>
+          </span>
+        );
+      })}
+    </>
+  );
+}

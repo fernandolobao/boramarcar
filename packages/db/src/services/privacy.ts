@@ -23,6 +23,7 @@ import {
   games,
   groupMembers,
   groups,
+  learnProgress,
   locations,
   onboardingSteps,
   pushTokens,
@@ -193,6 +194,11 @@ export async function exportUserData(db: Database, userId: string) {
     .select({ step: onboardingSteps.step, at: onboardingSteps.createdAt })
     .from(onboardingSteps)
     .where(eq(onboardingSteps.userId, userId));
+  // Trilha "Aprender a jogar" (12.1): lições concluídas.
+  const learn = await db
+    .select({ lesson: learnProgress.lessonId, at: learnProgress.completedAt })
+    .from(learnProgress)
+    .where(eq(learnProgress.userId, userId));
   // "Chamar para o próximo": para quais encontros a pessoa foi chamada (sem quem chamou).
   const invitations = await db
     .select({
@@ -280,6 +286,7 @@ export async function exportUserData(db: Database, userId: string) {
     logins,
     pushDevices: devices,
     onboarding,
+    learn,
     feedback: sentFeedback,
     groups: memberships,
     hostedPlaces: hosted,
@@ -362,6 +369,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(session).where(eq(session.userId, userId));
     await tx.delete(pushTokens).where(eq(pushTokens.userId, userId));
     await tx.delete(onboardingSteps).where(eq(onboardingSteps.userId, userId));
+    await tx.delete(learnProgress).where(eq(learnProgress.userId, userId));
     // Chamados recebidos são da pessoa; os que ela mandou ficam para o grupo, sem autor.
     await tx.delete(eventNudges).where(eq(eventNudges.userId, userId));
     await tx.delete(notifications).where(eq(notifications.userId, userId));

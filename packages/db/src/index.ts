@@ -12,6 +12,7 @@ export * from './services/users';
 export * from './services/notifications';
 export * from './services/push';
 export * from './services/onboarding';
+export * from './services/learn';
 export * from './services/feedback';
 export * from './services/metrics';
 export * from './services/beta';

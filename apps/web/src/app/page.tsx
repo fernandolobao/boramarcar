@@ -472,6 +472,9 @@ export default async function HomePage({
             <Link href="/lojas" className="underline underline-offset-2">
               {tl('stores')}
             </Link>
+            <Link href="/aprender" className="underline underline-offset-2">
+              {tl('learn')}
+            </Link>
             <Link href="/ajuda" className="underline underline-offset-2">
               {tl('help')}
             </Link>

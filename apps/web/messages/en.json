@@ -1125,6 +1125,18 @@
       "tournament_champion": {
         "name": "Tournament champion",
         "description": "Win a tournament."
+      },
+      "learn_first": {
+        "name": "First lesson",
+        "description": "Complete a lesson of the \"Learn to play\" path."
+      },
+      "learn_path": {
+        "name": "Ready for the table",
+        "description": "Complete every lesson of the \"Learn to play\" path."
+      },
+      "learn_to_table": {
+        "name": "From theory to the table",
+        "description": "Play a game after completing the \"Learn to play\" path."
       }
     },
     "tabsLabel": "Achievements",
@@ -1601,7 +1613,8 @@
     "privacy": "Privacy Policy",
     "help": "Help",
     "feedback": "Feedback",
-    "stores": "Stores and events"
+    "stores": "Stores and events",
+    "learn": "Learn to play"
   },
   "collection": {
     "title": "Collection",
@@ -2035,6 +2048,10 @@
     "discovery": {
       "title": "Stores and events",
       "description": "Magic tournaments, game nights and stores near you."
+    },
+    "learn": {
+      "title": "Learn to play",
+      "description": "Short lessons to learn Magic: The Gathering from scratch: cards, mana, the turn, combat, the stack and Commander."
     }
   },
   "beta": {
@@ -2663,5 +2680,26 @@
     "label": "Navigation",
     "dashboard": "Back to dashboard",
     "signIn": "Sign in"
+  },
+  "learn": {
+    "title": "Learn to play",
+    "lessons": "Lessons",
+    "lessonsNav": "Previous and next lessons",
+    "lessonOf": "Lesson {n} of {total}",
+    "minutes": "{count, plural, =1 {1 minute} other {# minutes}}",
+    "progress": "{done} of {total} lessons completed",
+    "start": "Start the path",
+    "continue": "Continue where I left off",
+    "review": "Review from the start",
+    "signInToSave": "Sign in to save your progress",
+    "allLessons": "All lessons",
+    "remember": "To remember",
+    "examples": "Example cards",
+    "markDone": "Mark as completed",
+    "done": "Completed",
+    "markedDone": "Lesson completed.",
+    "markedUndone": "Lesson unmarked.",
+    "previous": "Previous",
+    "next": "Next"
   }
 }

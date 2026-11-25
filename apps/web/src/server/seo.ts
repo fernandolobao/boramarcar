@@ -10,6 +10,7 @@ export const SECTIONS = [
   'home',
   'privacy',
   'help',
+  'learn',
   'invite',
   'dashboard',
   'availability',

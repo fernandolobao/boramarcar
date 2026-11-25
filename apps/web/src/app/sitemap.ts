@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { LESSON_IDS } from '@boramarcar/core/learn';
 import { citiesWithStores } from '@boramarcar/db';
 import { getDb } from '@/server/db';
 
@@ -23,6 +24,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${base()}/lojas/em/${c.uf.toLowerCase()}/${c.slug}`,
       changeFrequency: 'daily' as const,
       priority: 0.7,
+    })),
+    { url: `${base()}/aprender`, changeFrequency: 'monthly', priority: 0.7 },
+    ...LESSON_IDS.map((id) => ({
+      url: `${base()}/aprender/${id}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
     { url: `${base()}/ajuda`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base()}/privacidade`, changeFrequency: 'yearly', priority: 0.3 },

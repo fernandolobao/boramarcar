@@ -14,6 +14,7 @@ import {
   games,
   groupMembers,
   groups,
+  learnProgress,
   seasons,
   tournamentEntrantMembers,
   tournamentEvents,
@@ -139,16 +140,22 @@ async function listTournamentResults(db: Database, userId: string) {
  * encontros desses grupos que tiveram partida (para "4 encontros seguidos") e o fuso dele.
  */
 async function achievementContext(db: Database, userId: string): Promise<AchievementContext> {
-  const [mine, [person], cups] = await Promise.all([
+  const [mine, [person], cups, lessons] = await Promise.all([
     db
       .select({ groupId: groupMembers.groupId })
       .from(groupMembers)
       .where(eq(groupMembers.userId, userId)),
     db.select({ timeZone: user.timeZone }).from(user).where(eq(user.id, userId)).limit(1),
     listTournamentResults(db, userId),
+    db
+      .select({ lessonId: learnProgress.lessonId, completedAt: learnProgress.completedAt })
+      .from(learnProgress)
+      .where(eq(learnProgress.userId, userId)),
   ]);
   const groupIds = mine.map((m) => m.groupId);
-  if (!groupIds.length) return { timeZone: person?.timeZone ?? undefined, tournaments: cups };
+  if (!groupIds.length) {
+    return { timeZone: person?.timeZone ?? undefined, tournaments: cups, lessons };
+  }
   const [members, held] = await Promise.all([
     db
       .select({
@@ -174,6 +181,7 @@ async function achievementContext(db: Database, userId: string): Promise<Achieve
     groupEvents: held,
     timeZone: person?.timeZone ?? undefined,
     tournaments: cups,
+    lessons,
   };
 }
 

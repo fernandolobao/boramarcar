@@ -1125,6 +1125,18 @@
       "tournament_champion": {
         "name": "Campeão de torneio",
         "description": "Vencer um torneio."
+      },
+      "learn_first": {
+        "name": "Primeira lição",
+        "description": "Concluir uma lição da trilha \"Aprender a jogar\"."
+      },
+      "learn_path": {
+        "name": "Pronto para a mesa",
+        "description": "Concluir todas as lições da trilha \"Aprender a jogar\"."
+      },
+      "learn_to_table": {
+        "name": "Da teoria à mesa",
+        "description": "Jogar uma partida depois de concluir a trilha \"Aprender a jogar\"."
       }
     },
     "tabsLabel": "Conquistas",
@@ -1601,7 +1613,8 @@
     "privacy": "Política de Privacidade",
     "help": "Ajuda",
     "feedback": "Feedback",
-    "stores": "Lojas e eventos"
+    "stores": "Lojas e eventos",
+    "learn": "Aprender a jogar"
   },
   "collection": {
     "title": "Coleção",
@@ -2035,6 +2048,10 @@
     "discovery": {
       "title": "Lojas e eventos",
       "description": "Torneios, noites de jogo e lojas de Magic perto de você."
+    },
+    "learn": {
+      "title": "Aprender a jogar",
+      "description": "Lições curtas para aprender Magic: The Gathering do zero: cartas, mana, turno, combate, a pilha e o Commander."
     }
   },
   "beta": {
@@ -2663,5 +2680,26 @@
     "label": "Navegação",
     "dashboard": "Voltar ao painel",
     "signIn": "Entrar"
+  },
+  "learn": {
+    "title": "Aprender a jogar",
+    "lessons": "Lições",
+    "lessonsNav": "Lições anterior e próxima",
+    "lessonOf": "Lição {n} de {total}",
+    "minutes": "{count, plural, =1 {1 minuto} other {# minutos}}",
+    "progress": "{done} de {total} lições concluídas",
+    "start": "Começar a trilha",
+    "continue": "Continuar de onde parei",
+    "review": "Rever desde o começo",
+    "signInToSave": "Entre para salvar o seu progresso",
+    "allLessons": "Todas as lições",
+    "remember": "Para lembrar",
+    "examples": "Cartas de exemplo",
+    "markDone": "Marcar como concluída",
+    "done": "Concluída",
+    "markedDone": "Lição concluída.",
+    "markedUndone": "Lição desmarcada.",
+    "previous": "Anterior",
+    "next": "Próxima"
   }
 }

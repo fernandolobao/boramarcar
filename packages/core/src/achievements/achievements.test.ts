@@ -317,3 +317,44 @@ describe('conquistas de torneio', () => {
     }
   });
 });
+
+describe('conquistas da trilha "Aprender a jogar" (12.1)', () => {
+  const find = (list: Achievement[], id: AchievementId) => list.find((a) => a.id === id)!;
+  const at = (d: number) => new Date(Date.UTC(2026, 10, d));
+  const lessons = (ids: readonly string[]) =>
+    ids.map((lessonId, i) => ({ lessonId, completedAt: at(i + 1) }));
+  const all = [
+    'o-que-e-magic',
+    'tipos-de-carta',
+    'mana-e-terrenos',
+    'o-turno',
+    'combate',
+    'a-pilha',
+    'como-se-vence',
+  ];
+
+  it('primeira lição e trilha completa, com a data da última lição', () => {
+    const partial = computeAchievements('me', [], [], { lessons: lessons(all.slice(0, 3)) });
+    expect(find(partial, 'learn_first')).toMatchObject({ unlocked: true, unlockedAt: at(1) });
+    expect(find(partial, 'learn_path')).toMatchObject({ unlocked: false, progress: 3, target: 7 });
+    const full = computeAchievements('me', [], [], { lessons: lessons(all) });
+    expect(find(full, 'learn_path')).toMatchObject({ unlocked: true, unlockedAt: at(7) });
+    expect(find(full, 'learn_to_table')).toMatchObject({ unlocked: false, progress: 0 });
+  });
+
+  it('"da teoria à mesa": a primeira partida depois de concluir a trilha', () => {
+    const before = { ...game('loss'), playedAt: at(5) };
+    const after = { ...game('loss'), playedAt: at(9) };
+    const list = computeAchievements('me', [before, after], [], { lessons: lessons(all) });
+    expect(find(list, 'learn_to_table')).toMatchObject({ unlocked: true, unlockedAt: at(9) });
+    const onlyBefore = computeAchievements('me', [before], [], { lessons: lessons(all) });
+    expect(find(onlyBefore, 'learn_to_table').unlocked).toBe(false);
+  });
+
+  it('lição que não existe mais não conta', () => {
+    const list = computeAchievements('me', [], [], {
+      lessons: lessons([...all.slice(0, 6), 'licao-antiga']),
+    });
+    expect(find(list, 'learn_path')).toMatchObject({ unlocked: false, progress: 6 });
+  });
+});

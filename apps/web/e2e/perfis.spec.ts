@@ -4,6 +4,9 @@ import { createDb } from '@boramarcar/db';
 import { E2E_IDS } from './support/seed';
 
 test.describe('perfis e conquistas', () => {
+  // Em sequência: o teste da janela de conquistas novas "esquece" uma conquista vista da Ana, e
+  // a janela abriria por cima do perfil se os dois rodassem ao mesmo tempo.
+  test.describe.configure({ mode: 'serial' });
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
   test.use({ storageState: AUTH_STATE });
 
@@ -18,7 +21,7 @@ test.describe('perfis e conquistas', () => {
     await achievements.getByRole('tab', { name: /^Finalizadas \(\d+\)$/ }).click();
     await expect(achievements.getByText('Primeira vitória')).toBeVisible();
     await expect(achievements.getByText(/Conquistada em/).first()).toBeVisible();
-    await expect(achievements.getByText(/de 30 conquistadas/)).toBeVisible();
+    await expect(achievements.getByText(/de 33 conquistadas/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Omnath Ramp' })).toBeVisible();
   });
 
