@@ -76,6 +76,22 @@ describe('resumo semanal das métricas (8.3)', () => {
     });
   });
 
+  it('cron repetido na mesma segunda (reexecução, retry da Vercel): o resumo sai uma vez só', async () => {
+    sent.splice(0);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-30T11:17:00Z')); // segunda
+    const req = () =>
+      new Request('http://localhost/api/cron/reminders', {
+        headers: { Authorization: 'Bearer segredo-do-cron-123' },
+      });
+    const first = await (await cron.GET(req())).json();
+    const second = await (await cron.GET(req())).json();
+    vi.useRealTimers();
+    expect(first.metricsEmails).toBe(1);
+    expect(second.metricsEmails).toBe(0);
+    expect(sent.filter((m) => m.subject === 'ArcanaKin: resumo semanal do beta')).toHaveLength(1);
+  });
+
   it('tempo do registro pós-jogo em texto curto', () => {
     expect(formatMinutes(45)).toBe('45 min');
     expect(formatMinutes(200)).toBe('3 h 20 min');

@@ -259,6 +259,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'As páginas de lojas, eventos de loja, torneio, resumo e retrospectiva ganharam "Voltar ao painel" no topo, para quem usa o ArcanaKin instalado no celular.',
     en: 'Store, store event, tournament, recap and monthly recap pages now have "Back to dashboard" at the top, for people using ArcanaKin installed on their phone.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Na busca de lojas e eventos, "Usar minha localização" agora funciona no site: os eventos aparecem pela distância de onde você está (a posição não é guardada).',
+    en: 'In the store and event search, "Use my location" now works on the website: events are sorted by distance from where you are (your position is not stored).',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

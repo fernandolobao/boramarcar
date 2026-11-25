@@ -20,6 +20,17 @@ export function createDb(connectionString: string, options: CreateDbOptions = {}
   const pool = new Pool({
     connectionString: normalizeConnectionString(connectionString),
     max: options.max ?? 5,
+    // Sem resposta do banco: falha em 5 s em vez de prender a função até o tempo dela acabar.
+    connectionTimeoutMillis: 5_000,
+    // O Neon fecha conexões paradas; o pool larga as ociosas antes disso.
+    idleTimeoutMillis: 10_000,
+    // Nenhuma consulta de tela passa disso; uma que trave não segura a conexão.
+    statement_timeout: 15_000,
+  });
+  // Erro numa conexão ociosa (ex.: o Neon a derrubou) chega aqui. Sem este ouvinte, o Node trata
+  // como erro não tratado e derruba o processo; com ele, a conexão sai do pool e a próxima é nova.
+  pool.on('error', (error) => {
+    console.error('[db] conexão ociosa do pool falhou:', error.message);
   });
   const db = drizzle(pool, { schema });
   return { db: db as unknown as Database, pool };
