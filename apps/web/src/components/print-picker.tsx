@@ -21,11 +21,9 @@ export interface PrintLine {
   card: { setCode?: string | null; collectorNumber?: string | null } | null;
 }
 
-/** "CMM #400" — ou `null` quando a edição não é conhecida. */
-export function printLabel(card: PrintLine['card']) {
-  if (!card?.setCode) return null;
-  return `${card.setCode.toUpperCase()}${card.collectorNumber ? ` #${card.collectorNumber}` : ''}`;
-}
+import { printLabel } from '@/lib/print-label';
+
+export { printLabel };
 
 /** Versão do formato das impressões (ver o pedido abaixo). */
 const PRINTS_VERSION = 2;

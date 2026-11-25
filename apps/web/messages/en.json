@@ -586,21 +586,17 @@
       "title": "This deck is a draft",
       "body": "Its cards aren’t in your collection, nobody else sees the deck and it can’t be picked in games. Publishing adds the cards to your collection (except proxies and \"maybe\").",
       "publish": "Publish deck",
-      "published": "Deck published: the cards were added to your collection."
-    },
-    "hand": {
-      "title": "Test the opening hand",
-      "intro": "Shuffle the deck and see a hand of 7, like at the table. Commander, sideboard and \"maybe\" stay out.",
-      "draw": "Draw opening hand",
-      "newHand": "New hand",
-      "mulligan": "Mulligan",
-      "drawNext": "Draw a card",
-      "toBottom": "Bottom",
-      "pickBottom": "Put {name} on the bottom",
-      "keep": "Keep {count, plural, =1 {1 card} other {# cards}}",
-      "chooseBottom": "Mulligan {count}: choose {count, plural, =1 {1 card} other {# cards}} to put on the bottom of your library ({chosen} chosen).",
-      "summary": "{cards, plural, =1 {1 card} other {# cards}} in hand, {lands, plural, =0 {no lands} =1 {1 land} other {# lands}}{mulligans, plural, =0 {} =1 { (after 1 mulligan)} other { (after # mulligans)}}.",
-      "tooSmall": "The deck needs at least 7 cards in the main deck to test a hand."
+      "published": "Deck published: the cards were added to your collection.",
+      "inCollection": "{count, plural, =1 {1 free in your collection} other {# free in your collection}}",
+      "publishTitle": "Publish deck",
+      "publishIntro": "You already have some of these cards in your collection, unused by other decks. For each one, choose whether the deck uses the one you have (the deck card switches to that edition) or a new one goes into your collection.",
+      "deckEdition": "In the deck: {edition}",
+      "useCollection": "Use the one from my collection",
+      "collectionEdition": "Collection edition",
+      "addNew": "Add as a new one to my collection",
+      "option": "{edition}{foil, select, true { (foil)} other {}} — {free} free",
+      "confirm": "Publish with these choices",
+      "unknownEdition": "edition not set"
     },
     "printMenu": "Print proxies",
     "pasteMenu": "Paste an updated list"
