@@ -19,7 +19,7 @@ etapas sem transação.
 4. Abuso e negação de serviço (M4, M5 e as baixas de limite) ✅
 5. Concorrência e atomicidade (M6, M7, M8) ✅
 6. Estabilidade operacional (M9, M10, M11, M12) ✅
-7. Endurecimento (o resto das baixas).
+7. Endurecimento (o resto das baixas) ✅ — em aberto só o que depende de dados de produção ou de decisão (ver BAIXA).
 
 ### ALTA
 
@@ -126,8 +126,8 @@ status='registration' RETURNING`; inscritos em lote.
 - ✅ Nomes de decks **privados** aparecem para o grupo na página do encontro e no resumo
   (`listDecksForUsers`/`getDeckCovers` ignoram a visibilidade). **Corrigido:** deck privado de outra pessoa sai da escolha de deck, da página do encontro, das estatísticas, dos recordes, do resumo e da retrospectiva (`hiddenDeckIds`/`withoutHiddenDecks`).
 - ~~`getPublicTournament` ainda devolve o título e a data do encontro do grupo.~~ Não é problema: é o subtítulo da página pública, de propósito (o comentário do código é que estava errado e foi corrigido).
-- Token de push pode ser "tomado" por quem o conhecer (`push.ts:17`) → recusar token de outra conta.
-- 2HG: quem não organiza inscreve outra pessoa como dupla sem ela aceitar.
+- Token de push pode ser "tomado" por quem o conhecer (`push.ts:17`) → recusar token de outra conta. **Decisão: fica como está.** O token do Expo não é adivinhável e passar o token para quem entrou agora é o caso legítimo de um aparelho compartilhado (sair e entrar com outra conta).
+- 2HG: quem não organiza inscreve outra pessoa como dupla sem ela aceitar. **Fica para o roadmap** (convite de dupla com aceite; hoje a pessoa pode sair da inscrição).
 - CSP aplicada com `img-src https:` / `connect-src https:` → promover as listas exatas do modo relatório;
   rotas com ponto no caminho escapam da CSP (`proxy.ts:67` matcher); faltam `COOP`, `CORP`,
   `X-Frame-Options: DENY` e `preload` no HSTS.
@@ -143,8 +143,8 @@ status='registration' RETURNING`; inscritos em lote.
 - `SKIP_ENV_VALIDATION` em produção usaria segredo fixo → falhar se `VERCEL_ENV=production`.
 - Migrations rodam em dois lugares (build da Vercel e workflow) → manter um só.
 - GitHub Actions de terceiros por tag (fixar por SHA).
-- App: convite pendente entra no grupo sozinho depois do login (mostrar a confirmação).
-- Sessão revogada vale até 5 min (cache do cookie) — aceitável, documentar.
+- ✅ App: convite pendente entra no grupo sozinho depois do login (mostrar a confirmação). **Corrigido:** depois do login o app abre a tela do convite para confirmar (`takePendingInvite`).
+- ✅ Sessão revogada vale até 5 min (cache do cookie) — aceitável, documentado aqui: é o custo de não consultar o banco a cada página; excluir a conta e trocar a senha apagam as sessões no banco.
 
 ### Verificado e OK
 
