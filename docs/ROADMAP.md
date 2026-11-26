@@ -265,6 +265,16 @@ Objetivo: o app ter o mesmo apelo visual do site — hoje está cru. Trabalho nu
 | 14.4 | Tipografia da marca (fontes do site), espaçamentos e sombras dos tokens, ícones Lucide iguais aos do site, estados vazios ilustrados     | M       | Pendente                                                                                                                          |
 | 14.5 | Revisão tela a tela comparando com o site (lista no PR), no claro e no escuro                                                            | G       | Pendente                                                                                                                          |
 
+## Fase 15 — Layout para tablet (pedido de 26/11/2026)
+
+Objetivo: tablet ter um layout próprio. Hoje o site e o app têm layouts para celular e computador, e o tablet (768–1024 px, em pé ou deitado) cai nas regras do celular e fica ruim: colunas estreitas e muito espaço sobrando. No app, `supportsTablet` está ligado, mas nenhuma tela se adapta à largura.
+
+| #    | Item                                                                                                                                                                                                                                    | Tamanho | Status   |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
+| 15.1 | **Levantamento**: capturas das telas principais (painel, agenda, encontro, partidas, decks e editor, coleção, modo mesa, torneio, loja) em iPad e tablet Android, em pé e deitado, no site e no app; lista do que quebra, com o dono    | P       | Pendente |
+| 15.2 | **Site**: faixa de tablet nos tokens e no design system (navegação, largura do conteúdo, grades de cartas e decks, tabelas, diálogos em tela cheia ou não), tela a tela pela lista do 15.1; capturas de tablet no E2E de acessibilidade | M       | Pendente |
+| 15.3 | **App**: telas que usam a largura (duas colunas no painel, grupo e deck; grade de cartas com mais colunas; modo mesa com o tabuleiro deitado), pelo `useWindowDimensions`, testado no aparelho junto com a fase 14                      | M       | Pendente |
+
 ## Divulgação (contínuo)
 
 - Contato com perfis e canais que movimentam grupos de Magic (lojas, ligas locais, criadores de conteúdo, servidores de comunidade). A lista de contatos fica **fora do repositório** (documento privado do dono), com o que foi enviado e a resposta.
