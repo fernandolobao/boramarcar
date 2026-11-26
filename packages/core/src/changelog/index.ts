@@ -364,6 +364,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Na coleção, as cartas aparecem já na primeira tela. No celular, as abas do topo mostram quando há mais para o lado.',
     en: 'In your collection, the cards show up on the first screen. On phones, the top tabs show when there are more to the side.',
   },
+  {
+    date: '2026-11-26',
+    pt: 'No app, quem está na lateral do modo mesa pode deslizar no próprio cartão sem fechar a mesa sem querer. Para sair, use "Sair" no botão do centro.',
+    en: 'In the app, players on the sides of table mode can swipe on their own area without closing the table by accident. To leave, use "Leave" in the center button.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
