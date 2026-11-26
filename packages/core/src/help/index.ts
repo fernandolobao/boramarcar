@@ -221,6 +221,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         title: 'Decks',
         questions: [
           {
+            id: 'mao-inicial',
+            question: 'Como testo a mão inicial do deck?',
+            steps: [
+              'Na página do deck, em "Mão inicial" (nos detalhes da análise), toque em "Sortear mão inicial": abre uma janela com 7 cartas do deck principal (comandante, reserva e "talvez" ficam de fora).',
+              'Não gostou? "Mulligan" compra 7 de novo; escolha uma carta para o fundo do grimório para cada mulligan e toque em "Manter".',
+              '"Comprar carta" mostra as próximas compras. As chances de terrenos ficam na mesma seção.',
+            ],
+          },
+          {
             id: 'deck-do-zero',
             question: 'Como monto um deck do zero?',
             steps: [
@@ -632,6 +641,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         id: 'decks',
         title: 'Decks',
         questions: [
+          {
+            id: 'mao-inicial',
+            question: 'How do I test the deck\u2019s opening hand?',
+            steps: [
+              'On the deck page, under "Opening hand" (in the analysis details), tap "Draw a sample hand": a window opens with 7 cards from the main deck (commander, sideboard and "maybe" stay out).',
+              'Don\u2019t like it? "Mulligan" draws 7 again; choose one card to put on the bottom of your library for each mulligan and tap "Keep".',
+              '"Draw a card" shows the next draws. Land odds are in the same section.',
+            ],
+          },
           {
             id: 'deck-do-zero',
             question: 'How do I build a deck from scratch?',

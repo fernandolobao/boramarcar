@@ -24,6 +24,7 @@ import { TableSuggestions } from './table-suggestions';
 import { DeckCreateForm, DeckImportForm, PublishDeck } from './deck-forms';
 import { EmptyState } from './empty-state';
 import { BracketCard, HandOdds, ManaBaseTable } from './deck-analysis';
+import { OpeningHand } from './opening-hand';
 import { DeckRoles, RefreshAnalysis } from './deck-roles';
 import { DeckComparisonCard } from './deck-comparison';
 import { openingHandOdds } from '@boramarcar/core';
@@ -439,6 +440,13 @@ const cases: [string, ReactElement][] = [
     />,
   ],
   ['HandOdds', <HandOdds key="ho" odds={openingHandOdds({ library: 99, lands: 37, ramp: 10 })} />],
+  [
+    'OpeningHand',
+    <OpeningHand
+      key="oh"
+      lines={[{ name: 'Forest', board: 'mainboard', quantity: 60, isLand: true, imageUri: null }]}
+    />,
+  ],
   [
     'DeckComparisonCard',
     <DeckComparisonCard

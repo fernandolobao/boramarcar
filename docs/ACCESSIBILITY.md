@@ -728,6 +728,16 @@ sem rolagem horizontal em 320px.
 - "Dois comandantes (parceiros)" é um botão de alternar (`aria-pressed` no site; `switch` com
   `checked` no app), com uma explicação em texto logo abaixo.
 
+## Testar a mão inicial (25/11/2026, restaurado)
+
+- Botão "Sortear mão inicial" no canto da seção "Mão inicial" (análise), que abre o teste num
+  `<dialog>` (`ModalButton`, foco volta ao botão). O resultado (cartas, terrenos, mulligans) é
+  anunciado numa região `role="status"`.
+- No mulligan, cada carta vira um botão de alternar (`aria-pressed`) com nome "Pôr {carta} no fundo";
+  "Manter" fica desabilitado até escolher a quantidade certa, e "Comprar carta" também enquanto a
+  escolha não termina. O selo "Fundo" sobre a carta repete a informação em texto.
+- Fora do mulligan, cada carta é uma `figure` com o nome em `figcaption` (a imagem é decorativa).
+
 ## Visibilidade do rascunho (25/11/2026)
 
 - Em "Editar deck", o rascunho mostra "Privado" marcado e as três opções desabilitadas, com o

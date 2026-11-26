@@ -157,6 +157,22 @@ test.describe('deck', () => {
     await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toHaveCount(0);
   });
 
+  test('mão inicial: botão abre o teste numa janela; mulligan com carta para o fundo (11.3)', async ({
+    page,
+  }) => {
+    await page.goto(`/decks/${E2E_IDS.deck}`);
+    await page.getByText('Mais detalhes da análise').click();
+    await page.getByRole('button', { name: 'Sortear mão inicial' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Testar a mão inicial' });
+    await dialog.getByRole('button', { name: 'Comprar mão inicial' }).click();
+    await expect(dialog.getByRole('listitem')).toHaveCount(7);
+    await dialog.getByRole('button', { name: 'Mulligan' }).click();
+    await dialog.getByRole('listitem').first().getByRole('button').click();
+    await dialog.getByRole('button', { name: 'Manter com 6 cartas' }).click();
+    await expect(dialog.getByRole('listitem')).toHaveCount(6);
+    await expect(dialog.getByRole('status')).toContainText('depois de 1 mulligan');
+  });
+
   test('folha de proxies em PDF', async ({ page }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
     await page.getByRole('button', { name: /Opções do deck/ }).click();
