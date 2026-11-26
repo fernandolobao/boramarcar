@@ -8,11 +8,13 @@ import { DeckTools } from '@/components/deck/deck-tools';
 import { ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAsync } from '@/lib/use-async';
+import { useLayout } from '@/lib/layout';
 
 /** Deck no app (5.8): seções em pilha de cartas (nota, validação, curva, funções e cartas). */
 export default function DeckScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const deck = useAsync(() => api.decks.get(id), [id]);
+  const layout = useLayout();
   if (deck.loading) return <Loading />;
   if (deck.error || !deck.data) return <ErrorState error={deck.error} onRetry={deck.refresh} />;
   const { analysis } = deck.data;
@@ -26,7 +28,9 @@ export default function DeckScreen() {
     <>
       <Aura stops={flow} />
       <StackScrollView
-        contentContainerStyle={{ padding: 16, gap: 16 }}
+        // Tablet: análise e cartas lado a lado (sem a pilha, que é de uma coluna só).
+        stacked={!layout.wide}
+        contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
         refreshControl={<RefreshControl refreshing={deck.refreshing} onRefresh={deck.refresh} />}
       >
         <Stack.Screen options={{ title: deck.data.name }} />

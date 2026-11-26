@@ -3,6 +3,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useReduceMotion } from '@/components/stack';
+import { gridColumns } from '@/lib/layout';
 import { AppText } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -108,7 +109,10 @@ export function CardTile({
   );
 }
 
-/** Grade de cartas em 3 colunas (a última linha completa com espaços vazios). */
+/**
+ * Grade de cartas: 3 colunas no celular e mais no tablet (pela largura disponível, cartas de no
+ * mínimo 100 pt, até 8). A última linha completa com espaços vazios.
+ */
 export function CardGrid<T>({
   items,
   render,
@@ -118,10 +122,12 @@ export function CardGrid<T>({
   render: (item: T) => React.ReactNode;
   keyOf: (item: T) => string;
 }) {
+  const [width, setWidth] = useState(0);
+  const columns = width ? gridColumns(width, { min: 100, max: 8 }) : 3;
   const rows: T[][] = [];
-  for (let i = 0; i < items.length; i += 3) rows.push(items.slice(i, i + 3));
+  for (let i = 0; i < items.length; i += columns) rows.push(items.slice(i, i + columns));
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: 8 }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {rows.map((row) => (
         <View key={row.map(keyOf).join('|')} style={{ flexDirection: 'row', gap: 8 }}>
           {row.map((item) => (
@@ -129,7 +135,7 @@ export function CardGrid<T>({
               {render(item)}
             </View>
           ))}
-          {Array.from({ length: 3 - row.length }, (_, i) => (
+          {Array.from({ length: columns - row.length }, (_, i) => (
             <View key={`empty-${i}`} style={{ flex: 1 }} />
           ))}
         </View>

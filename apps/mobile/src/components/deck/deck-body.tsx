@@ -17,6 +17,7 @@ import { AppText, Button, styles } from '@/components/ui';
 import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Icon } from '@/components/icons';
+import { useLayout } from '@/lib/layout';
 
 const cap = (s: string) =>
   s
@@ -124,6 +125,7 @@ export function DeckBody({
   onChanged?: () => Promise<void> | void;
 }) {
   const colors = useColors();
+  const { wide } = useLayout();
   const [open, setOpen] = useState<DeckLine | null>(null);
   const [editing, setEditing] = useState(false);
   const [view, setView] = useState<'list' | 'gallery'>('list');
@@ -184,35 +186,9 @@ export function DeckBody({
   let stackIndex = 0;
   const next = () => stackIndex++;
 
-  return (
+  // As seções, na ordem da pilha (o índice segue a ordem em que são montadas).
+  const analysisSections = (
     <>
-      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
-        {art ? (
-          <Image
-            source={{ uri: art }}
-            accessibilityIgnoresInvertColors
-            accessible={false}
-            style={{ width: 96, aspectRatio: 63 / 88, borderRadius: 8 }}
-          />
-        ) : null}
-        <View style={{ flex: 1, gap: 4 }}>
-          <AppText accessibilityRole="header" style={styles.title}>
-            {deck.name}
-          </AppText>
-          <AppText muted>
-            {formatLabel(deck.format as GameFormat)} · {t('deckOwner', { name: deck.ownerName })}
-          </AppText>
-          <AppText muted>
-            {t('deckSummary', {
-              cards: a.totalCards,
-              lands: a.lands,
-              cmc: new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(a.averageCmc),
-            })}
-          </AppText>
-          {a.proxies > 0 && <AppText muted>{t('deckProxiesCount', { count: a.proxies })}</AppText>}
-        </View>
-      </View>
-
       {(a.score !== null || deck.bracket) && (
         <Section title={t('deckScore')} index={next()}>
           {a.score !== null && <Tip id="deck-analysis" />}
@@ -312,62 +288,107 @@ export function DeckBody({
           ))}
         </Section>
       )}
-
-      <Section title={t('deckCardsTitle')} index={next()}>
-        {deck.isOwner && onChanged && (
-          <View style={{ gap: 8 }}>
-            <Button
-              label={editing ? t('deckEditDone') : t('deckEditCards')}
-              variant="secondary"
-              accessibilityState={{ expanded: editing }}
-              onPress={() => setEditing((e) => !e)}
-              style={{ alignSelf: 'flex-start' }}
-            />
-            <AppText muted accessibilityLiveRegion="polite">
-              {editMessage}
-            </AppText>
-            {editing && <AddCardForm deckId={deck.id} onChanged={changed} />}
-          </View>
-        )}
-        {!editing && (
-          <Choices
-            label={t('deckViewLabel')}
-            value={view}
-            options={[
-              { value: 'list', label: t('deckViewList') },
-              { value: 'gallery', label: t('deckViewGallery') },
-            ]}
-            onChange={setView}
+    </>
+  );
+  const cardsSection = (
+    <Section title={t('deckCardsTitle')} index={next()}>
+      {deck.isOwner && onChanged && (
+        <View style={{ gap: 8 }}>
+          <Button
+            label={editing ? t('deckEditDone') : t('deckEditCards')}
+            variant="secondary"
+            accessibilityState={{ expanded: editing }}
+            onPress={() => setEditing((e) => !e)}
+            style={{ alignSelf: 'flex-start' }}
           />
-        )}
-        {commanders.length > 0 && (
-          <View>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 4 }}>
-              {t('deckGroupCount', {
-                group: t('deckBoardCommander'),
-                count: count(commanders),
-              })}
-            </AppText>
-            {list(commanders)}
-          </View>
-        )}
-        {groups.map(({ group, entries, count: total }) => (
-          <View key={group}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
-              {t('deckGroupCount', { group: tKey('deckType', group), count: total })}
-            </AppText>
-            {list(entries)}
-          </View>
-        ))}
-        {others.map(({ board, lines }) => (
-          <View key={board}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
-              {t('deckGroupCount', { group: tKey('deckBoard', board), count: count(lines) })}
-            </AppText>
-            {list(lines)}
-          </View>
-        ))}
-      </Section>
+          <AppText muted accessibilityLiveRegion="polite">
+            {editMessage}
+          </AppText>
+          {editing && <AddCardForm deckId={deck.id} onChanged={changed} />}
+        </View>
+      )}
+      {!editing && (
+        <Choices
+          label={t('deckViewLabel')}
+          value={view}
+          options={[
+            { value: 'list', label: t('deckViewList') },
+            { value: 'gallery', label: t('deckViewGallery') },
+          ]}
+          onChange={setView}
+        />
+      )}
+      {commanders.length > 0 && (
+        <View>
+          <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 4 }}>
+            {t('deckGroupCount', {
+              group: t('deckBoardCommander'),
+              count: count(commanders),
+            })}
+          </AppText>
+          {list(commanders)}
+        </View>
+      )}
+      {groups.map(({ group, entries, count: total }) => (
+        <View key={group}>
+          <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
+            {t('deckGroupCount', { group: tKey('deckType', group), count: total })}
+          </AppText>
+          {list(entries)}
+        </View>
+      ))}
+      {others.map(({ board, lines }) => (
+        <View key={board}>
+          <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
+            {t('deckGroupCount', { group: tKey('deckBoard', board), count: count(lines) })}
+          </AppText>
+          {list(lines)}
+        </View>
+      ))}
+    </Section>
+  );
+
+  return (
+    <>
+      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+        {art ? (
+          <Image
+            source={{ uri: art }}
+            accessibilityIgnoresInvertColors
+            accessible={false}
+            style={{ width: 96, aspectRatio: 63 / 88, borderRadius: 8 }}
+          />
+        ) : null}
+        <View style={{ flex: 1, gap: 4 }}>
+          <AppText accessibilityRole="header" style={styles.title}>
+            {deck.name}
+          </AppText>
+          <AppText muted>
+            {formatLabel(deck.format as GameFormat)} · {t('deckOwner', { name: deck.ownerName })}
+          </AppText>
+          <AppText muted>
+            {t('deckSummary', {
+              cards: a.totalCards,
+              lands: a.lands,
+              cmc: new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(a.averageCmc),
+            })}
+          </AppText>
+          {a.proxies > 0 && <AppText muted>{t('deckProxiesCount', { count: a.proxies })}</AppText>}
+        </View>
+      </View>
+
+      {wide ? (
+        // Tablet: análise à esquerda e cartas à direita (a pilha fica desligada).
+        <View style={{ flexDirection: 'row', gap: 16, alignItems: 'flex-start' }}>
+          <View style={{ flex: 1, gap: 16 }}>{analysisSections}</View>
+          <View style={{ flex: 1.3, gap: 16 }}>{cardsSection}</View>
+        </View>
+      ) : (
+        <>
+          {analysisSections}
+          {cardsSection}
+        </>
+      )}
 
       {printPicker.picker}
       <CardViewer line={open} onClose={() => setOpen(null)} />

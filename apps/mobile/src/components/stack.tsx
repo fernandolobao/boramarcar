@@ -83,7 +83,15 @@ export function useReduceMotion() {
 }
 
 /** ScrollView que empilha as `StackSection` de dentro (filhos diretos do conteúdo). */
-export function StackScrollView({ children, ...props }: ScrollViewProps & { children: ReactNode }) {
+export function StackScrollView({
+  children,
+  stacked = true,
+  ...props
+}: ScrollViewProps & {
+  children: ReactNode;
+  /** Pilha ligada (uma coluna). No tablet, com as seções em colunas, fica desligada. */
+  stacked?: boolean;
+}) {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [viewport, setViewport] = useState(0);
   const [layouts, setLayouts] = useState<(Layout | undefined)[]>([]);
@@ -105,7 +113,7 @@ export function StackScrollView({ children, ...props }: ScrollViewProps & { chil
   );
   return (
     <StackContext.Provider
-      value={{ scrollY, enabled: !reduce && plan !== null, layouts, plan, report }}
+      value={{ scrollY, enabled: stacked && !reduce && plan !== null, layouts, plan, report }}
     >
       <Animated.ScrollView
         {...props}

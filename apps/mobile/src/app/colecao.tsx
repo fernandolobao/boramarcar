@@ -16,6 +16,7 @@ import { useAsync } from '@/lib/use-async';
 import { NumberField } from '@/components/ds/number-field';
 import { Choices } from '@/components/ds/choices';
 import { Checkbox } from '@/components/ds/checkbox';
+import { gridColumns, useLayout } from '@/lib/layout';
 
 type Sort = 'name' | 'value' | 'recent';
 type FoilFilter = 'all' | 'foil' | 'nonfoil';
@@ -253,6 +254,11 @@ function EntrySheet({
 /** Coleção (paridade com /colecao): o que a pessoa tem de verdade, com busca, filtros e totais. */
 export default function CollectionScreen() {
   const collection = useAsync(() => api.collection.list(), []);
+  // Tablet: mais cartas por linha (3 no celular, até 8 no iPad deitado).
+  const layout = useLayout();
+  const columns = gridColumns(layout.innerWidth, { min: 110, max: 8 });
+  // Largura fixa: na última linha incompleta, as cartas não esticam.
+  const itemWidth = (layout.innerWidth - 8 * (columns - 1)) / columns;
   const [search, setSearch] = useState('');
   const [foilFilter, setFoilFilter] = useState<FoilFilter>('all');
   const [sort, setSort] = useState<Sort>('name');
@@ -288,11 +294,13 @@ export default function CollectionScreen() {
     <>
       <Stack.Screen options={{ title: t('collectionTitle') }} />
       <FlatList
+        // Trocar o número de colunas exige uma lista nova (o React Native não muda ao vivo).
+        key={`cols-${columns}`}
         data={visible.slice(0, limit)}
         keyExtractor={(e) => e.id}
-        numColumns={3}
+        numColumns={columns}
         columnWrapperStyle={{ gap: 8 }}
-        contentContainerStyle={{ padding: 16, gap: 8 }}
+        contentContainerStyle={[layout.contentStyle, { gap: 8 }]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={collection.refreshing} onRefresh={collection.refresh} />
@@ -355,24 +363,26 @@ export default function CollectionScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <CardTile
-            name={item.name}
-            imageUri={item.card?.imageUri}
-            quantity={item.quantity}
-            foil={item.foil}
-            showName
-            accessibilityLabel={t('collectionOpen', {
-              name: item.name,
-              count: item.quantity,
-              extra: [
-                item.foil ? t('collectionFoil') : null,
-                item.card?.setCode?.toUpperCase() ?? null,
-              ]
-                .filter(Boolean)
-                .join(', '),
-            })}
-            onPress={() => setOpenId(item.id)}
-          />
+          <View style={{ width: itemWidth }}>
+            <CardTile
+              name={item.name}
+              imageUri={item.card?.imageUri}
+              quantity={item.quantity}
+              foil={item.foil}
+              showName
+              accessibilityLabel={t('collectionOpen', {
+                name: item.name,
+                count: item.quantity,
+                extra: [
+                  item.foil ? t('collectionFoil') : null,
+                  item.card?.setCode?.toUpperCase() ?? null,
+                ]
+                  .filter(Boolean)
+                  .join(', '),
+              })}
+              onPress={() => setOpenId(item.id)}
+            />
+          </View>
         )}
         ListFooterComponent={
           visible.length > limit ? (
