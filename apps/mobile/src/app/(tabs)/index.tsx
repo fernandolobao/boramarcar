@@ -1,4 +1,4 @@
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { Aura } from '@/components/aura';
 import { BetaBanner } from '@/components/beta-banner';
@@ -10,9 +10,14 @@ import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
 import { NoGroup } from '@/components/no-group';
 import { EmptyState } from '@/components/empty-state';
+import { gridColumns, useLayout } from '@/lib/layout';
 
 /** Próximos encontros do grupo ativo. */
 export default function EventsScreen() {
+  // Tablet: encontros em 2 ou 3 colunas.
+  const layout = useLayout();
+  const columns = gridColumns(layout.innerWidth, { min: 320, max: 3, gap: 12 });
+  const itemWidth = (layout.innerWidth - 12 * (columns - 1)) / columns;
   const { group, loading: loadingGroup, error: groupError, reload } = useGroup();
   const colors = useColors();
   const events = useAsync(
@@ -31,9 +36,13 @@ export default function EventsScreen() {
     <>
       <Aura />
       <FlatList
+        // Trocar o número de colunas exige uma lista nova (o React Native não muda ao vivo).
+        key={`cols-${columns}`}
         data={events.data ?? []}
         keyExtractor={(e) => e.id}
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        numColumns={columns}
+        columnWrapperStyle={columns > 1 ? { gap: 12 } : undefined}
+        contentContainerStyle={[layout.contentStyle, { gap: 12 }]}
         refreshControl={
           <RefreshControl refreshing={events.refreshing} onRefresh={events.refresh} />
         }
@@ -55,12 +64,13 @@ export default function EventsScreen() {
         }
         ListEmptyComponent={<EmptyState>{t('noEvents')}</EmptyState>}
         renderItem={({ item }) => (
-          <Link href={{ pathname: '/encontros/[id]', params: { id: item.id } }} asChild>
+          <View style={{ width: itemWidth }}>
             <Pressable
               accessibilityRole="link"
               accessibilityLabel={`${item.title}, ${formatDateTime(item.startsAt)}, ${
                 item.locationName ?? t('locationTbd')
               }${item.status === 'cancelled' ? `, ${t('statusCancelled')}` : ''}`}
+              onPress={() => router.push({ pathname: '/encontros/[id]', params: { id: item.id } })}
               style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
             >
               <Card>
@@ -74,7 +84,7 @@ export default function EventsScreen() {
                 <AppText muted>{item.locationName ?? t('locationTbd')}</AppText>
               </Card>
             </Pressable>
-          </Link>
+          </View>
         )}
       />
     </>

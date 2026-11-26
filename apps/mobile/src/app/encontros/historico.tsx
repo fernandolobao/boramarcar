@@ -1,5 +1,5 @@
 import type { EventHistoryItem } from '@boramarcar/api-client';
-import { Link, Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { TextField } from '@/components/fields';
@@ -150,40 +150,39 @@ export default function HistoryScreen() {
         }
         ListEmptyComponent={history.loading ? <Loading /> : undefined}
         renderItem={({ item }) => (
-          <Link href={{ pathname: '/encontros/[id]', params: { id: item.id } }} asChild>
-            <Pressable
-              accessibilityRole="link"
-              accessibilityLabel={[
-                item.title,
-                item.status !== 'scheduled' ? t(STATUS_LABEL[item.status]) : null,
-                formatDateTime(item.startsAt),
-                item.locationName ?? t('locationTbd'),
-                summary(item),
-              ]
-                .filter(Boolean)
-                .join(', ')}
-              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-            >
-              <Card>
-                <AppText style={{ fontWeight: '700' }}>
-                  {item.title}
-                  {item.status !== 'scheduled' && (
-                    <AppText
-                      style={{
-                        color: item.status === 'cancelled' ? colors.danger : colors.success,
-                      }}
-                    >
-                      {' '}
-                      · {t(STATUS_LABEL[item.status])}
-                    </AppText>
-                  )}
-                </AppText>
-                <AppText muted>{formatDateTime(item.startsAt)}</AppText>
-                <AppText muted>{item.locationName ?? t('locationTbd')}</AppText>
-                <AppText>{summary(item)}</AppText>
-              </Card>
-            </Pressable>
-          </Link>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push({ pathname: '/encontros/[id]', params: { id: item.id } })}
+            accessibilityLabel={[
+              item.title,
+              item.status !== 'scheduled' ? t(STATUS_LABEL[item.status]) : null,
+              formatDateTime(item.startsAt),
+              item.locationName ?? t('locationTbd'),
+              summary(item),
+            ]
+              .filter(Boolean)
+              .join(', ')}
+            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+          >
+            <Card>
+              <AppText style={{ fontWeight: '700' }}>
+                {item.title}
+                {item.status !== 'scheduled' && (
+                  <AppText
+                    style={{
+                      color: item.status === 'cancelled' ? colors.danger : colors.success,
+                    }}
+                  >
+                    {' '}
+                    · {t(STATUS_LABEL[item.status])}
+                  </AppText>
+                )}
+              </AppText>
+              <AppText muted>{formatDateTime(item.startsAt)}</AppText>
+              <AppText muted>{item.locationName ?? t('locationTbd')}</AppText>
+              <AppText>{summary(item)}</AppText>
+            </Card>
+          </Pressable>
         )}
         ListFooterComponent={
           data && data.pages > 1 ? (

@@ -1,6 +1,6 @@
 import type { GameWindow, GroupStats, PartnerHint } from '@boramarcar/api-client';
 import { isNewMember, rivalriesFor } from '@boramarcar/core/integration';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { Aura } from '@/components/aura';
 import { BetaBanner } from '@/components/beta-banner';
@@ -14,6 +14,8 @@ import { formatDate, formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { DashboardHero, NumberTiles, Podium, RecentForm } from '@/components/dashboard';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 function Windows({ windows }: { windows: GameWindow[] | null }) {
   const top = windows?.slice(0, 3) ?? [];
@@ -175,6 +177,7 @@ function Rivalries({ stats, userId }: { stats: GroupStats | null; userId: string
 
 /** Painel (paridade com /painel do site): próximo encontro, seus números, pódio, horários e comandantes. */
 export default function DashboardScreen() {
+  const layout = useLayout();
   const { group, loading: loadingGroup, error: groupError, reload } = useGroup();
   const { data: session } = authClient.useSession();
   const events = useAsync(
@@ -232,7 +235,7 @@ export default function DashboardScreen() {
       {/* Conquistas ganhas desde a última visita (abre sozinha). */}
       <NewAchievements />
       <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        contentContainerStyle={[layout.contentStyle, { gap: 12 }]}
         refreshControl={
           <RefreshControl
             refreshing={events.refreshing || ranking.refreshing || stats.refreshing}
@@ -260,30 +263,43 @@ export default function DashboardScreen() {
           bestStreak={mine?.bestStreak ?? 0}
         />
         <RecentForm recent={mine?.recent ?? []} />
-        <Podium ranking={ranking.data} />
-        <Rivalries stats={stats.data} userId={userId} />
-        <Partners hints={partners.data} />
-        <Windows windows={windows.data} />
-        <Commanders stats={stats.data} />
-        {upcoming.length > 1 && (
-          <Card style={{ gap: 8 }}>
-            <AppText accessibilityRole="header" style={styles.sectionTitle}>
-              {t('dashMoreEvents')}
-            </AppText>
-            {upcoming.slice(1, 4).map((e) => (
-              <Link key={e.id} href={{ pathname: '/encontros/[id]', params: { id: e.id } }} asChild>
-                <Pressable
-                  accessibilityRole="link"
-                  accessibilityLabel={`${e.title}, ${formatDateTime(e.startsAt)}`}
-                  style={({ pressed }) => ({ minHeight: 44, opacity: pressed ? 0.8 : 1 })}
-                >
-                  <AppText style={{ fontWeight: '600' }}>{e.title}</AppText>
-                  <AppText muted>{formatDateTime(e.startsAt)}</AppText>
-                </Pressable>
-              </Link>
-            ))}
-          </Card>
-        )}
+        {/* Tablet: duas colunas; celular: a mesma ordem, uma embaixo da outra. */}
+        <SplitColumns
+          left={
+            <>
+              <Podium ranking={ranking.data} />
+              <Rivalries stats={stats.data} userId={userId} />
+              <Partners hints={partners.data} />
+            </>
+          }
+          right={
+            <>
+              <Windows windows={windows.data} />
+              <Commanders stats={stats.data} />
+              {upcoming.length > 1 && (
+                <Card style={{ gap: 8 }}>
+                  <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                    {t('dashMoreEvents')}
+                  </AppText>
+                  {upcoming.slice(1, 4).map((e) => (
+                    <Pressable
+                      key={e.id}
+                      accessibilityRole="link"
+                      accessibilityLabel={`${e.title}, ${formatDateTime(e.startsAt)}`}
+                      onPress={() =>
+                        router.push({ pathname: '/encontros/[id]', params: { id: e.id } })
+                      }
+                      style={({ pressed }) => ({ minHeight: 44, opacity: pressed ? 0.8 : 1 })}
+                    >
+                      <AppText style={{ fontWeight: '600' }}>{e.title}</AppText>
+                      <AppText muted>{formatDateTime(e.startsAt)}</AppText>
+                    </Pressable>
+                  ))}
+                </Card>
+              )}
+            </>
+          }
+        />
       </ScrollView>
     </>
   );
