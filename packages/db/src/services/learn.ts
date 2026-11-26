@@ -1,7 +1,7 @@
-import { LEARN_ITEM_IDS, type LearnItemId } from '@boramarcar/core';
-import { and, eq } from 'drizzle-orm';
+import { LEARN_ITEM_IDS, LEARN_TRACKS, type LearnItemId } from '@boramarcar/core';
+import { and, eq, inArray } from 'drizzle-orm';
 import type { Database } from '../client';
-import { learnProgress } from '../schema';
+import { gamePlayers, learnProgress } from '../schema';
 
 /** Lições (12.1) e desafios (12.4) concluídos pela pessoa, na ordem da trilha. */
 export async function getLearnProgress(db: Database, userId: string): Promise<LearnItemId[]> {
@@ -31,4 +31,31 @@ export async function setLessonCompleted(
       );
   }
   return getLearnProgress(db, input.userId);
+}
+
+/**
+ * "Pronto para a primeira mesa" (12.5): dessas pessoas, quem já concluiu o básico da trilha
+ * "Aprender a jogar" e ainda não jogou nenhuma partida registrada.
+ */
+export async function readyForFirstTable(
+  db: Database,
+  userIds: readonly string[],
+): Promise<Set<string>> {
+  const ids = [...new Set(userIds)];
+  if (!ids.length) return new Set();
+  const basics = LEARN_TRACKS.basics as readonly string[];
+  const [rows, played] = await Promise.all([
+    db
+      .select({ userId: learnProgress.userId, lessonId: learnProgress.lessonId })
+      .from(learnProgress)
+      .where(and(inArray(learnProgress.userId, ids), inArray(learnProgress.lessonId, [...basics]))),
+    db
+      .selectDistinct({ userId: gamePlayers.userId })
+      .from(gamePlayers)
+      .where(inArray(gamePlayers.userId, ids)),
+  ]);
+  const count = new Map<string, number>();
+  for (const r of rows) count.set(r.userId, (count.get(r.userId) ?? 0) + 1);
+  const hasGames = new Set(played.map((p) => p.userId));
+  return new Set(ids.filter((id) => count.get(id) === basics.length && !hasGames.has(id)));
 }

@@ -49,3 +49,43 @@ describe('conquistas da trilha', () => {
     expect(list.find((a) => a.id === 'learn_path')).toMatchObject({ progress: 1, target: 7 });
   });
 });
+
+describe('pronto para a primeira mesa (12.5)', () => {
+  it('quem concluiu o básico da trilha e ainda não jogou nenhuma partida', async () => {
+    const { LEARN_TRACKS } = await import('@boramarcar/core');
+    const { seedGroup } = await import('../test/helpers');
+    const { createEvent, recordGame } = await import('./events');
+    const { readyForFirstTable } = await import('./learn');
+    const { group, players, owner } = await seedGroup(db, 3);
+    const ana = players[0]!;
+    const bia = players[1]!;
+    const caio = players[2]!;
+    const finish = async (userId: string, ids: readonly string[]) => {
+      for (const lessonId of ids) {
+        await setLessonCompleted(db, { userId, lessonId: lessonId as never, completed: true });
+      }
+    };
+    await finish(ana.id, LEARN_TRACKS.basics);
+    await finish(bia.id, LEARN_TRACKS.basics);
+    await finish(caio.id, LEARN_TRACKS.basics.slice(0, 3));
+    // Bia já jogou: não é mais "primeira mesa".
+    const event = await createEvent(db, {
+      groupId: group.id,
+      userId: owner.id,
+      title: 'Noite',
+      startsAt: new Date('2026-11-20T22:00:00Z'),
+    });
+    await recordGame(db, {
+      eventId: event.id,
+      userId: owner.id,
+      format: 'commander',
+      players: [
+        { userId: bia.id, result: 'win' },
+        { userId: caio.id, result: 'loss' },
+      ],
+    });
+    const ready = await readyForFirstTable(db, [ana.id, bia.id, caio.id]);
+    expect([...ready]).toEqual([ana.id]);
+    expect([...(await readyForFirstTable(db, []))]).toEqual([]);
+  });
+});

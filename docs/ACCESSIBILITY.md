@@ -771,3 +771,9 @@ sem rolagem horizontal em 320px.
 - As respostas são um radiogroup com a pergunta como rótulo; "Responder" fica desabilitado até
   escolher. O resultado ("Certo!" / "Ainda não.", com ícone e texto) e os comentários aparecem numa
   região `role="status"`.
+
+## Primeira mesa (25/11/2026)
+
+- Convite: bloco "Nunca jogou Magic?" como `section` com título (`h2`) e link com texto.
+- Página do grupo: o selo "Pronto para a primeira mesa" tem ícone decorativo e texto, dentro do item
+  do membro.

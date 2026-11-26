@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { getFormatter, getTranslations } from 'next-intl/server';
+import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { SignInButton } from '@/components/auth-buttons';
 import { JoinInviteButton } from '@/components/invite';
@@ -120,6 +121,17 @@ export default async function InvitePage({ params }: Props) {
               </a>
             </p>
           )}
+          {/* Primeiro jogo (12.5): quem nunca jogou aprende antes da primeira mesa. */}
+          <section aria-labelledby="aprender" className="card space-y-2">
+            <h2 id="aprender" className="flex items-center gap-2 font-semibold">
+              <Icon name="lessons" />
+              {t('learnTitle')}
+            </h2>
+            <p className="text-sm">{t('learnText')}</p>
+            <Link href="/aprender" className="btn-secondary">
+              {t('learnCta')}
+            </Link>
+          </section>
           {!member && (
             <section aria-labelledby="como-funciona" className="space-y-2">
               <h2 id="como-funciona" className="font-semibold">

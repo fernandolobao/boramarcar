@@ -164,7 +164,8 @@
     },
     "inviteButton": "Convidar",
     "settingsButton": "Configurações",
-    "membersCount": "{count, plural, =1 {1 pessoa} other {# pessoas}} no grupo"
+    "membersCount": "{count, plural, =1 {1 pessoa} other {# pessoas}} no grupo",
+    "readyForFirstTable": "Pronto para a primeira mesa"
   },
   "availability": {
     "title": "Disponibilidade",
@@ -869,7 +870,10 @@
     "how3": "Quando a mesa fecha, o grupo marca o encontro e você recebe o aviso.",
     "appHint": "Já tem o app do ArcanaKin? Use o código {code} ou",
     "openInApp": "abra o convite no app",
-    "signInEmail": "Entrar com e-mail"
+    "signInEmail": "Entrar com e-mail",
+    "learnTitle": "Nunca jogou Magic?",
+    "learnText": "Antes da primeira mesa, faça a trilha \"Aprender a jogar\": lições curtas, sem precisar de conta. Quem conclui aparece no grupo como pronto para a primeira mesa.",
+    "learnCta": "Aprender a jogar"
   },
   "profile": {
     "title": "Perfil",

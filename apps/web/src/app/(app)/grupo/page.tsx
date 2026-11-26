@@ -1,5 +1,11 @@
 import { isGameFormat } from '@boramarcar/core';
-import { getGroupAttendance, lastRecapMonth, listLocations, listMembers } from '@boramarcar/db';
+import {
+  getGroupAttendance,
+  lastRecapMonth,
+  listLocations,
+  listMembers,
+  readyForFirstTable,
+} from '@boramarcar/db';
 import Link from 'next/link';
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { AttendanceCard } from '@/components/attendance-card';
@@ -31,6 +37,11 @@ export default async function GroupPage() {
   const [members, locations] = active
     ? await Promise.all([listMembers(db, active.id), listLocations(db, active.id)])
     : [[], []];
+  // Quem concluiu "Aprender a jogar" e ainda não jogou: "pronto para a primeira mesa" (12.5).
+  const ready = await readyForFirstTable(
+    db,
+    members.map((m) => m.userId),
+  ).catch(() => new Set<string>());
   // "Quem anda sumido": só dono e admins.
   const now = new Date();
   const attendance =
@@ -184,6 +195,12 @@ export default async function GroupPage() {
                         </Link>
                         {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
                         <span className="muted block">{t(`roles.${m.role}`)}</span>
+                        {ready.has(m.userId) && (
+                          <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-line-strong bg-surface px-2 py-0.5 text-xs font-medium">
+                            <Icon name="lessons" className="size-3.5 shrink-0" />
+                            {t('readyForFirstTable')}
+                          </span>
+                        )}
                       </span>
                     </span>
                     <MemberActions
