@@ -8,6 +8,7 @@ import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components
 import { api } from '@/lib/api';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
+import { EmptyState } from '@/components/empty-state';
 
 const STATUS: Record<string, MessageKey> = {
   registered: 'storeEvRegistered',
@@ -70,7 +71,7 @@ export default function MyStoreEventsScreen() {
         {t('storeEvMine')}
       </AppText>
       {(mine.data ?? []).length === 0 ? (
-        <AppText muted>{t('storeEvMineEmpty')}</AppText>
+        <EmptyState>{t('storeEvMineEmpty')}</EmptyState>
       ) : (
         (mine.data ?? []).map((m) => (
           <Pressable

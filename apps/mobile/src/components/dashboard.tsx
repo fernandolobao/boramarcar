@@ -7,6 +7,7 @@ import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { AppText, Card } from '@/components/ui';
 import { formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { EmptyState } from '@/components/empty-state';
 
 /**
  * Painel do app com o desenho do site (14.3): destaque roxo com a arte do comandante em alta e o
@@ -354,7 +355,7 @@ export function Podium({ ranking }: { ranking: Ranking | null }) {
         </Pressable>
       </View>
       {top.length === 0 ? (
-        <AppText muted>{t('rankingEmpty')}</AppText>
+        <EmptyState>{t('rankingEmpty')}</EmptyState>
       ) : (
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8 }}>
           {order.map((st, i) => {

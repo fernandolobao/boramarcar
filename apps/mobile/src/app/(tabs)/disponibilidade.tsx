@@ -13,6 +13,7 @@ import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { ConfirmButton } from '@/components/confirm-button';
 import { NoGroup } from '@/components/no-group';
+import { EmptyState } from '@/components/empty-state';
 
 /** Disponibilidade (5.4): melhores horários, adicionar, regras semanais e o que o grupo marcou. */
 export default function AvailabilityScreen() {
@@ -180,7 +181,7 @@ export default function AvailabilityScreen() {
           {t('availEveryone')}
         </AppText>
         {slots.length === 0 ? (
-          <AppText muted>{t('availEmpty')}</AppText>
+          <EmptyState>{t('availEmpty')}</EmptyState>
         ) : (
           slots.map((slot) => {
             const when = rangeLabel(slot.startsAt, slot.endsAt, timeZone);

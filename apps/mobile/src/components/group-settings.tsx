@@ -15,6 +15,7 @@ import { useAsync } from '@/lib/use-async';
 import { NumberField } from '@/components/ds/number-field';
 import { DateField } from '@/components/ds/date-field';
 import { Select } from '@/components/ds/select';
+import { EmptyState } from '@/components/empty-state';
 
 const isFormat = (v: string): v is GameFormat => (GAME_FORMATS as readonly string[]).includes(v);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -168,7 +169,7 @@ export function SeasonsCard({ groupId, canManage }: { groupId: string; canManage
       {seasons.loading ? (
         <Loading />
       ) : (seasons.data?.length ?? 0) === 0 ? (
-        <AppText muted>{t('seasonsEmpty')}</AppText>
+        <EmptyState>{t('seasonsEmpty')}</EmptyState>
       ) : (
         (seasons.data ?? []).map((s) => (
           <View key={s.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>

@@ -13,6 +13,7 @@ import { useAsync } from '@/lib/use-async';
 import { NoGroup } from '@/components/no-group';
 import { Choices } from '@/components/ds/choices';
 import { Select } from '@/components/ds/select';
+import { EmptyState } from '@/components/empty-state';
 
 /** Ranking do grupo ativo (todas as partidas). */
 export default function RankingScreen() {
@@ -89,7 +90,7 @@ export default function RankingScreen() {
         </View>
       }
       ListEmptyComponent={
-        ranking.loading ? <Loading /> : <AppText muted>{t('rankingEmpty')}</AppText>
+        ranking.loading ? <Loading /> : <EmptyState>{t('rankingEmpty')}</EmptyState>
       }
       renderItem={({ item }) => (
         <Pressable
