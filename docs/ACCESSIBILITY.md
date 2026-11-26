@@ -763,3 +763,9 @@ sem rolagem horizontal em 320px.
   "Adicionar mesmo assim". "Adicionar ao Talvez" é um botão com texto.
 - Validação: "Mover para Talvez" e "Remover" com nome em contexto ("Remover Lightning Bolt do
   deck"); remover pede dois cliques.
+
+## Primeira mesa (25/11/2026)
+
+- Convite: bloco "Nunca jogou Magic?" como `section` com título (`h2`) e link com texto.
+- Página do grupo: o selo "Pronto para a primeira mesa" tem ícone decorativo e texto, dentro do item
+  do membro.

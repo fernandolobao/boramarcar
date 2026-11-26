@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { LEARN_TRACKS } from '@boramarcar/core';
+import { createDb } from '@boramarcar/db';
 import { AUTH_STATE } from './support/global-setup';
+import { E2E_IDS } from './support/seed';
 
 /** Página do grupo: convite, configurações e cadastro de local em modais (a página é do grupo). */
 test.describe('página do grupo', () => {
@@ -41,5 +44,42 @@ test.describe('página do grupo', () => {
     await dialog.getByRole('button', { name: /Salvar|Adicionar/ }).click();
     await expect(dialog).toBeHidden();
     await expect(section.getByRole('heading', { name })).toBeVisible();
+  });
+
+  test('quem concluiu "Aprender a jogar" e nunca jogou aparece pronto para a primeira mesa (12.5)', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
+    const { pool } = createDb(process.env.E2E_DATABASE_URL!, { max: 1 });
+    const id = 'e2e-novata';
+    try {
+      await pool.query(
+        `insert into "user" (id, name, email, email_verified) values ($1, 'Novata', 'novata@e2e.test', true) on conflict do nothing`,
+        [id],
+      );
+      await pool.query(
+        `insert into group_members (group_id, user_id) values ($1, $2) on conflict do nothing`,
+        [E2E_IDS.group, id],
+      );
+      for (const lesson of LEARN_TRACKS.basics) {
+        await pool.query(
+          `insert into learn_progress (user_id, lesson_id) values ($1, $2) on conflict do nothing`,
+          [id, lesson],
+        );
+      }
+      await page.goto('/grupo');
+      const row = page.getByRole('listitem').filter({ hasText: 'Novata' });
+      await expect(row.getByText('Pronto para a primeira mesa')).toBeVisible();
+      // Quem já jogou não ganha o selo.
+      await expect(
+        page
+          .getByRole('listitem')
+          .filter({ hasText: 'Bia' })
+          .getByText('Pronto para a primeira mesa'),
+      ).toHaveCount(0);
+    } finally {
+      await pool.query(`delete from "user" where id = $1`, [id]);
+      await pool.end();
+    }
   });
 });

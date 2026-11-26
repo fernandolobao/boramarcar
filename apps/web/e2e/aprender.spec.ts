@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
+import { E2E_INVITE_CODE } from './support/seed';
 
 test.describe('aprender a jogar (12.1)', () => {
   test('sem conta: trilha aberta, lição com símbolos de mana e convite para entrar', async ({
@@ -39,6 +40,13 @@ test.describe('aprender a jogar (12.1)', () => {
     await expect(page.getByRole('term')).toHaveText(/Atropelar\s*\(Trample\)/);
     await search.fill('impeto');
     await expect(page.getByRole('term').first()).toContainText('Ímpeto');
+  });
+
+  test('o convite do grupo oferece a trilha (12.5)', async ({ page }) => {
+    await page.goto(`/convite/${E2E_INVITE_CODE}`);
+    const block = page.getByRole('region', { name: 'Nunca jogou Magic?' });
+    await block.getByRole('link', { name: 'Aprender a jogar' }).click();
+    await expect(page).toHaveURL(/\/aprender$/);
   });
 
   test.describe('com conta', () => {
