@@ -49,6 +49,7 @@ import { ColorIdentity } from '@/components/deck-visual';
 import { runAfterResponse } from '@/server/background';
 import { isAdmin } from '@/server/admin';
 import { requireUser } from '@/server/current-user';
+import { canScanCards } from '@/server/features';
 import { TitleWithTip } from '@/components/tip';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
@@ -490,6 +491,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
           inCollection={inCollection}
           identity={commanderIdentity}
           commanderLabel={commanderLabel}
+          canScan={deck.isOwner && (await canScanCards(user))}
           usdBrl={rate?.rate ?? null}
         />
       </div>

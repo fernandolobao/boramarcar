@@ -415,3 +415,23 @@ O Google só aceita endereços de retorno exatos, e cada preview tem um endereç
 ## Internacionalização
 
 next-intl sem prefixo de idioma na URL. O idioma vem do cookie `NEXT_LOCALE`; sem ele, do idioma salvo no perfil de quem entrou (`user.locale`, lido em `i18n/request.ts`) e, por último, do `Accept-Language`; padrão `pt-BR`. Num navegador novo ou no endereço de um preview (que não tem o cookie de produção), a página vem no idioma salvo, não no do navegador, e `LocaleSync` grava o cookie. Com cookie, ele manda (é a escolha feita naquele navegador). As mensagens são tipadas a partir de `messages/pt-BR.json` e um teste garante que `en.json` tem as mesmas chaves. Cada usuário tem um fuso (`user.time_zone`), detectado no navegador no primeiro acesso e editável em /perfil; ele é espelhado no cookie `bm_tz`, lido pelo next-intl a cada requisição. Os horários digitados em `datetime-local` são convertidos para UTC no fuso do usuário (`zonedLocalToUtc` em `core/time`). Sem preferência, o padrão é `America/Sao_Paulo`.
+
+## Feature flags e leitura de cartas pela câmera
+
+- **Flags** (Vercel Flags, Flags SDK com `vercelAdapter`): declaradas em `apps/web/src/flags.ts` e
+  avaliadas no servidor. O `identify` manda para as regras só o **id da pessoa** e o **grupo ativo**
+  (id e nome), sem e-mail. Flags Explorer em `/.well-known/vercel/flags`. Fora da Vercel (dev, testes,
+  E2E) cada flag tem uma variável de ambiente (ver `server/features.ts`).
+- **`card-scanner`** (leitura pela câmera): desligada por padrão; no painel da Vercel, a regra libera
+  os grupos da lista ("group.name é um destes: …"). Fora da Vercel: `FLAG_CARD_SCANNER_GROUPS`
+  (nomes separados por vírgula; `*` libera todos). Sem a flag, o botão não aparece e
+  `POST /api/v1/cards/scan` responde 404.
+- **Como lê:** a câmera e o leitor de texto (Tesseract.js, WebAssembly, arquivos servidos de
+  `public/ocr`) rodam **no aparelho**; a imagem nunca sai do celular. Só o texto lido vai para
+  `POST /api/v1/cards/scan`, que interpreta (`core/decks/scan.ts`: nomes, edição, número e língua) e
+  acha a carta no Scryfall nesta ordem: edição + número conferidos com o nome lido; nome aproximado
+  (com semelhança mínima); nome impresso em português; e, por último, edição + número sem conferir.
+  Limite `scan` (40 por minuto por pessoa). A pessoa confere cada carta (edição, foil) antes de
+  adicionar à coleção ou ao deck.
+- Para o WebAssembly, a CSP tem `'wasm-unsafe-eval'` (só compilar WASM, sem `eval`); a câmera é
+  liberada só para o próprio site (`Permissions-Policy: camera=(self)`).

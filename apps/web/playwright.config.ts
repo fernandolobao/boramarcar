@@ -31,6 +31,9 @@ export default defineConfig({
         env: {
           ...process.env,
           ADMIN_EMAILS: process.env.ADMIN_EMAILS ?? 'ana@e2e.test',
+          // Leitura pela câmera (flag `card-scanner`): fora da Vercel, a lista de grupos vem
+          // daqui; o grupo do seed está liberado.
+          FLAG_CARD_SCANNER_GROUPS: process.env.FLAG_CARD_SCANNER_GROUPS ?? 'Mesa de Quinta',
         } as Record<string, string>,
       },
 });

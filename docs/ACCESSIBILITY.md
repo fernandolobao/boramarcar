@@ -777,3 +777,14 @@ sem rolagem horizontal em 320px.
 - Convite: bloco "Nunca jogou Magic?" como `section` com título (`h2`) e link com texto.
 - Página do grupo: o selo "Pronto para a primeira mesa" tem ícone decorativo e texto, dentro do item
   do membro.
+
+## Leitura de cartas pela câmera (26/11/2026, atrás da flag `card-scanner`)
+
+- "Ler pela câmera" abre um `<dialog>` (`ModalButton`; o foco volta ao botão e a câmera desliga ao
+  fechar). O vídeo tem nome ("Imagem da câmera"); a moldura é decorativa.
+- "Ler carta" e "Tirar foto" são botões com texto (o campo de arquivo fica escondido e fora do Tab).
+  O andamento e o resultado ("Achei: …", "Não reconheci…") são anunciados em `role="status"`; câmera
+  negada vira `role="alert"` com o caminho alternativo ("Tirar foto").
+- A lista de cartas lidas tem título com a contagem; cada carta tem foil (checkbox com o nome da
+  carta), "Trocar edição" (o seletor de edições) e "Remover {carta} da lista". Nada é gravado sem
+  "Adicionar N cartas". Digitar o nome continua disponível ao lado.
