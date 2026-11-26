@@ -2790,7 +2790,7 @@
   "scan": {
     "open": "Scan with camera",
     "title": "Scan cards with the camera",
-    "hint": "Fit the card in the frame, with good light and no glare, and tap “Scan card”. Scan as many as you like and check the list before adding. The image stays on your device: only the text read is sent to ArcanaKin to find the card.",
+    "hint": "Fit the card in the frame, with good light and no glare. With continuous scan on, just keep swapping cards: each new card is added to the list on its own. For the same card again, take it out of view and put it back. Check the list before adding. The image stays on your device: only the text read is sent to ArcanaKin to find the card.",
     "preview": "Camera image",
     "read": "Scan card",
     "photo": "Take photo",
@@ -2812,6 +2812,7 @@
     "removeLabel": "Remove {name} from the list",
     "add": "{count, plural, =0 {Add} =1 {Add 1 card} other {Add # cards}}",
     "saveError": "Couldn't add the cards. Try again.",
-    "added": "{count, plural, =1 {1 card added.} other {# cards added.}}"
+    "added": "{count, plural, =1 {1 card added.} other {# cards added.}}",
+    "continuous": "Continuous scan"
   }
 }

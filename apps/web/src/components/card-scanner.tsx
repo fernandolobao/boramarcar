@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import type { Worker } from 'tesseract.js';
+import { readCardText } from '@boramarcar/core';
 import { api } from '@/lib/api';
 import { Checkbox } from './ds/checkbox';
 import { Icon } from './icons';
@@ -160,30 +161,61 @@ function ScannerPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- só ao abrir/fechar
   }, []);
 
-  /** Lê a carta numa imagem (o recorte da moldura, ou a foto inteira). */
-  const read = async (image: HTMLCanvasElement, nameZone: number, maxWidth: number) => {
+  /** Em andamento (ref: o laço da leitura contínua não pode depender do estado da renderização). */
+  const busyRef = useRef(false);
+  /** Leitura contínua: o que estava na moldura na última volta e a última carta adicionada. */
+  const lastKey = useRef('');
+  const lastAdded = useRef('');
+
+  /**
+   * Lê a carta numa imagem (o recorte da moldura, ou a foto inteira). Na leitura contínua
+   * (`auto`), o texto é interpretado aqui primeiro: o servidor só é consultado quando aparece uma
+   * carta nova na moldura, e a mesma carta não entra de novo enquanto não sair da frente da câmera.
+   */
+  const read = async (
+    image: HTMLCanvasElement,
+    nameZone: number,
+    maxWidth: number,
+    auto = false,
+  ) => {
+    busyRef.current = true;
     setBusy(true);
-    setStatus(t('reading'));
+    if (!auto) setStatus(t('reading'));
     try {
       const w = await getWorker();
       const prepared = prepare(image, maxWidth);
       const { data } = await w.recognize(prepared);
+      const lines = (data.lines ?? []).slice(0, 120).map((l) => ({
+        text: l.text.slice(0, 300),
+        top: Math.min(1, Math.max(0, l.bbox.y0 / prepared.height)),
+      }));
+      if (auto) {
+        const reading = readCardText({ text: data.text, lines, nameZone });
+        const key =
+          reading.set && reading.number
+            ? `${reading.set}#${reading.number}`
+            : (reading.candidates[0] ?? '');
+        // Moldura vazia (ou ilegível): a carta saiu; a próxima, mesmo igual, conta de novo.
+        if (!key) {
+          lastKey.current = '';
+          lastAdded.current = '';
+          return;
+        }
+        if (key === lastKey.current) return;
+        lastKey.current = key;
+      }
       const res = await api<ScanResponse>('/api/v1/cards/scan', {
         method: 'POST',
-        body: {
-          text: data.text.slice(0, 4000),
-          lines: (data.lines ?? []).slice(0, 120).map((l) => ({
-            text: l.text.slice(0, 300),
-            top: Math.min(1, Math.max(0, l.bbox.y0 / prepared.height)),
-          })),
-          nameZone,
-        },
+        body: { text: data.text.slice(0, 4000), lines, nameZone },
       });
       const m = res.match;
       if (!m) {
-        setStatus(t('notFound'));
+        if (!auto) setStatus(t('notFound'));
         return;
       }
+      // A mesma carta lida de novo (o texto mudou um pouco) não entra duas vezes seguidas.
+      if (auto && m.card.scryfallId === lastAdded.current) return;
+      lastAdded.current = m.card.scryfallId;
       setCards((list) => [
         ...list,
         {
@@ -199,15 +231,18 @@ function ScannerPanel({
         },
       ]);
       setStatus(t('found', { name: m.printedName ?? m.card.name }));
+      // Aviso tátil (Android); o iPhone não deixa o site vibrar.
+      navigator.vibrate?.(40);
     } catch {
-      setStatus(t('error'));
+      if (!auto) setStatus(t('error'));
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   };
 
-  /** Recorta do vídeo exatamente a área da moldura mostrada na tela. */
-  const capture = () => {
+  /** Recorte da área da moldura mostrada na tela. */
+  const frame = () => {
     const v = video.current!;
     const { gw, gh } = guideOf(v.videoWidth, v.videoHeight);
     const card = document.createElement('canvas');
@@ -216,8 +251,28 @@ function ScannerPanel({
     card
       .getContext('2d')!
       .drawImage(v, (v.videoWidth - gw) / 2, (v.videoHeight - gh) / 2, gw, gh, 0, 0, gw, gh);
-    void read(card, 0.22, 1600);
+    return card;
   };
+  const capture = () => void read(frame(), 0.22, 1600);
+
+  /** Leitura contínua: lê a moldura sem parar (pausa com a aba escondida e ao fechar a janela). */
+  const [auto, setAuto] = useState(true);
+  useEffect(() => {
+    if (!auto || !dims) return;
+    let stop = false;
+    void (async () => {
+      while (!stop) {
+        if (!busyRef.current && document.visibilityState === 'visible') {
+          await read(frame(), 0.22, 1400, true);
+        }
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    })();
+    return () => {
+      stop = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- liga/desliga pelo botão
+  }, [auto, dims]);
 
   /** Foto da câmera do sistema: lê a foto inteira (a carta pode estar em qualquer lugar). */
   const fromFile = async (f: File) => {
@@ -272,7 +327,22 @@ function ScannerPanel({
         </p>
       )}
       <div className="flex flex-wrap gap-2">
-        <button type="button" className="btn-primary" disabled={busy || !dims} onClick={capture}>
+        <button
+          type="button"
+          className={auto ? 'btn-primary' : 'btn-secondary'}
+          aria-pressed={auto}
+          disabled={!dims}
+          onClick={() => setAuto((a) => !a)}
+        >
+          <Icon name="refresh" />
+          {t('continuous')}
+        </button>
+        <button
+          type="button"
+          className={auto ? 'btn-secondary' : 'btn-primary'}
+          disabled={busy || !dims}
+          onClick={capture}
+        >
           <Icon name="camera" />
           {t('read')}
         </button>
