@@ -58,7 +58,7 @@ function prepare(src: HTMLCanvasElement, maxWidth = 1600) {
 
 /** Palavra com cara de nome de carta: "Ring", "Sol", "of", "Llanowar", "Praetors'". */
 const NAME_WORD =
-  /^([A-ZÀ-Ý][a-zà-ÿ'’,-]+[a-zA-Zà-ÿÀ-Ý'’,-]*|of|the|and|to|a|in|from|for|with|on|de|do|da|dos|das|e|o|os|as|no|na|em)$/;
+  /^([A-ZÀ-Ý][a-zà-ÿ'’,-]+[a-zA-Zà-ÿÀ-Ý'’,-]*|of|the|and|to|a|in|from|for|with|on|de|do|da|dos|das|e|o|os|as|no|na|nos|nas|em|por|para|com|sem|ao|aos|à|às|pelo|pela|pelos|pelas|um|uma|sob|sobre|entre|contra)$/;
 /** Palavras da linha de tipo: não são nome de carta. */
 const TYPE_WORDS = new Set(
   'Artifact Creature Instant Sorcery Enchantment Land Legendary Basic Token Planeswalker Battle Tribal Kindred Snow World Aura Equipment Vehicle'.split(
@@ -285,7 +285,11 @@ export function CardScanner() {
         .slice(0, 3);
       const candidates = [...new Set(names.flatMap(variants))].slice(0, 4);
       // Edição e número (cartas novas): "0123 C … DMU • EN" ou "190/332 M … 2XM • EN".
-      const setMatch = /\b([A-Za-z0-9]{3,5})\W{0,3}(EN|PT|ES|JP|DE|FR|IT)\b/.exec(text);
+      // Código da edição: 3 a 5 caracteres com ao menos uma letra ("038" é o número, não a edição).
+      const setMatch =
+        /\b((?=[A-Za-z0-9]{0,4}[A-Za-z])[A-Za-z0-9]{3,5})\W{0,3}(EN|PT|ES|JP|DE|FR|IT)\b/.exec(
+          text,
+        );
       const set = setMatch?.[1]?.toUpperCase();
       const lang = setMatch?.[2]?.toLowerCase() ?? 'en';
       const before = setMatch ? text.slice(Math.max(0, setMatch.index - 40), setMatch.index) : '';
@@ -342,8 +346,8 @@ export function CardScanner() {
           match = { ...fuzzy, how: 'nome (aproximado)' };
         }
       }
-      // Cartas em português: pelo nome impresso.
-      for (const candidate of names) {
+      // Cartas em português: pelo nome impresso (também sem o lixo do fim).
+      for (const candidate of candidates.slice(0, 4)) {
         if (match) break;
         tried.push(`pt: ${candidate}`);
         const pt = await byPrintedName(candidate);
