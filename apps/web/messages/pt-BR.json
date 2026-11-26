@@ -2790,7 +2790,7 @@
   "scan": {
     "open": "Ler pela câmera",
     "title": "Ler cartas pela câmera",
-    "hint": "Encaixe a carta na moldura, com boa luz e sem reflexo, e toque em “Ler carta”. Leia quantas quiser e confira a lista antes de adicionar. A imagem fica no seu aparelho: só o texto lido vai para o ArcanaKin achar a carta.",
+    "hint": "Encaixe a carta na moldura, com boa luz e sem reflexo. Com a leitura contínua ligada, é só ir trocando as cartas: cada carta nova entra na lista sozinha. Para a mesma carta de novo, tire-a da frente da câmera e coloque de novo. Confira a lista antes de adicionar. A imagem fica no seu aparelho: só o texto lido vai para o ArcanaKin achar a carta.",
     "preview": "Imagem da câmera",
     "read": "Ler carta",
     "photo": "Tirar foto",
@@ -2812,6 +2812,7 @@
     "removeLabel": "Remover {name} da lista",
     "add": "{count, plural, =0 {Adicionar} =1 {Adicionar 1 carta} other {Adicionar # cartas}}",
     "saveError": "Não deu para adicionar as cartas. Tente de novo.",
-    "added": "{count, plural, =1 {1 carta adicionada.} other {# cartas adicionadas.}}"
+    "added": "{count, plural, =1 {1 carta adicionada.} other {# cartas adicionadas.}}",
+    "continuous": "Leitura contínua"
   }
 }

@@ -788,3 +788,6 @@ sem rolagem horizontal em 320px.
 - A lista de cartas lidas tem título com a contagem; cada carta tem foil (checkbox com o nome da
   carta), "Trocar edição" (o seletor de edições) e "Remover {carta} da lista". Nada é gravado sem
   "Adicionar N cartas". Digitar o nome continua disponível ao lado.
+- Leitura contínua (26/11/2026): ligada por padrão; é um botão de alternar ("Leitura contínua",
+  `aria-pressed`). Ela só anuncia em `role="status"` quando uma carta nova entra na lista (nada de
+  avisos a cada volta). "Ler carta" continua para quem prefere ler uma por vez.
