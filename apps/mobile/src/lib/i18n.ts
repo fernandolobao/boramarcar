@@ -968,6 +968,10 @@ const pt = {
   deckLine: '{quantity} × {name}',
   deckProxyTag: 'proxy',
   ptTitle: 'Mesa de testes',
+  ptSize: 'Tamanho das cartas',
+  ptSizeSmall: 'Pequeno',
+  ptSizeMedium: 'Médio',
+  ptSizeLarge: 'Grande',
   ptOpen: 'Testar o deck',
   ptIntro:
     'Jogue turnos de mentira com o deck para ver se ele gira bem. Não há regras automáticas e nada é gravado.',
@@ -2132,6 +2136,10 @@ const en: Messages = {
   deckLine: '{quantity} × {name}',
   deckProxyTag: 'proxy',
   ptTitle: 'Playtest table',
+  ptSize: 'Card size',
+  ptSizeSmall: 'Small',
+  ptSizeMedium: 'Medium',
+  ptSizeLarge: 'Large',
   ptOpen: 'Playtest the deck',
   ptIntro:
     'Play fake turns with the deck to see if it runs well. There are no automatic rules and nothing is saved.',

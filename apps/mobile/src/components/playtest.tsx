@@ -24,6 +24,7 @@ import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
 const CARD_RATIO = 63 / 88;
+const SIZE_LABEL = { small: 'ptSizeSmall', medium: 'ptSizeMedium', large: 'ptSizeLarge' } as const;
 const learnLocale = locale === 'en' ? 'en' : 'pt-BR';
 const site = (path: string) => `${API_URL.replace(/\/+$/, '')}${path}`;
 const openSite = (path: string) => void WebBrowser.openBrowserAsync(site(path));
@@ -82,6 +83,30 @@ function useDismissedHints() {
       return next;
     });
   return { dismissed, dismiss };
+}
+
+/** Tamanho das cartas na mesa (largura em pt), escolhido pela pessoa e guardado no aparelho. */
+const CARD_WIDTH = { small: 86, medium: 120, large: 160 } as const;
+type CardSize = keyof typeof CARD_WIDTH;
+const SIZE_KEY = 'arcanakin.playtest-size';
+function useCardSize() {
+  const [size, setSize] = useState<CardSize>('medium');
+  useEffect(() => {
+    let alive = true;
+    void SecureStore.getItemAsync(SIZE_KEY)
+      .then((saved) => {
+        if (alive && (saved === 'small' || saved === 'large')) setSize(saved);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const choose = (next: CardSize) => {
+    setSize(next);
+    void SecureStore.setItemAsync(SIZE_KEY, next).catch(() => undefined);
+  };
+  return [size, choose] as const;
 }
 
 /** "?" ao lado de um termo: mostra a definição do glossário, com o link para o site. */
@@ -163,7 +188,8 @@ function Hint({
 function CardFace({ card, width }: { card: PlaytestCard; width: number }) {
   const colors = useColors();
   return (
-    <View style={{ width, transform: card.tapped ? [{ rotate: '90deg' }] : [] }}>
+    // Virada: gira e encolhe para caber no mesmo espaço (sem cobrir as vizinhas).
+    <View style={{ width, transform: card.tapped ? [{ rotate: '90deg' }, { scale: 0.72 }] : [] }}>
       {card.imageUri ? (
         <Image
           source={{ uri: card.imageUri }}
@@ -420,6 +446,7 @@ export function PlaytestTable({
   const [tokenCount, setTokenCount] = useState('1');
   const [tokenForm, setTokenForm] = useState(false);
   const hints = useDismissedHints();
+  const [size, chooseSize] = useCardSize();
   const state = history[history.length - 1]!;
   const mana = manaAvailable(state);
   const choosing = state.turn === 0;
@@ -462,9 +489,9 @@ export function PlaytestTable({
           ? dispatch({ type: 'bottom', uid: c.uid }, t('ptSentToBottom', { name: c.name }))
           : setOpen({ uid: c.uid, zone })
       }
-      style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1, padding: c.tapped ? 18 : 0 })}
+      style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
     >
-      <CardFace card={c} width={86} />
+      <CardFace card={c} width={CARD_WIDTH[size]} />
       {note ? (
         <AppText muted style={{ fontSize: 12, textAlign: 'center' }}>
           {note}
@@ -564,6 +591,19 @@ export function PlaytestTable({
       <AppText muted accessibilityLiveRegion="polite">
         {status}
       </AppText>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+        <AppText style={{ fontWeight: '600' }}>{t('ptSize')}</AppText>
+        {(['small', 'medium', 'large'] as const).map((value) => (
+          <Button
+            key={value}
+            label={t(SIZE_LABEL[value])}
+            variant="secondary"
+            selected={size === value}
+            accessibilityLabel={`${t('ptSize')}: ${t(SIZE_LABEL[value])}`}
+            onPress={() => chooseSize(value)}
+          />
+        ))}
+      </View>
     </Card>
   );
 
