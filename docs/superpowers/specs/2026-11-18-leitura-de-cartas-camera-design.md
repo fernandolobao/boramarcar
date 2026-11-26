@@ -1,6 +1,55 @@
 # Leitura de cartas pela câmera (5.9) — plano
 
-Data: 18/11/2026. Situação: **plano para seguir em dezembro de 2026**, junto com as contas de desenvolvedor da Apple e do Google. **Precisa estar pronto antes do beta de fevereiro.**
+Data: 18/11/2026 (atualizado em 26/11/2026). Situação: **plano para seguir em dezembro de 2026**, junto com as contas de desenvolvedor da Apple e do Google. **Precisa estar pronto antes do beta de fevereiro.**
+
+## Atualização de 26/11/2026: plano de dezembro
+
+Desde este plano, a leitura pela câmera saiu **no site** (11.6, #261 e #263, atrás da flag `card-scanner`) e foi testada com cartas reais no iPhone do dono. Muito do que este plano previa construir **já existe** e o app reaproveita.
+
+**Já existe (servidor e `core`):**
+
+- **Interpretação do texto:** `readCardText`, em `packages/core/src/decks/scan.ts`, testada com leituras reais: nomes em inglês e português, código da edição em minúsculas, número sem o ano, linhas de copyright e de tipo descartadas.
+- **Rota:** `POST /api/v1/cards/scan` (em vez da `/cards/recognize` prevista abaixo), com limite de 40 por minuto, flag por grupo e 404 sem a flag. A busca vai nesta ordem: edição + número conferidos com o nome; nome aproximado com semelhança mínima; nome impresso em português; edição + número sem conferir.
+- **Comportamento validado no site:**
+  - leitura contínua, em que cada carta nova entra sozinha;
+  - a mesma carta parada não entra de novo, e a moldura vazia "zera";
+  - o servidor só é consultado quando aparece uma carta nova;
+  - lista para conferir com edição, foil, "Trocar edição" e remover.
+
+**O que falta, só no app:**
+
+1. **Build de desenvolvimento** (`expo-dev-client`, perfis no `eas.json`). O Expo Go não tem câmera com leitura de texto.
+2. **Câmera e leitura no aparelho:**
+   - Google ML Kit (texto), mais rápido e preciso que o Tesseract do site;
+   - a imagem não sai do aparelho, e só o texto e as linhas (com a altura relativa) vão para a rota que já existe;
+   - na primeira semana, conferir a compatibilidade do Vision Camera e do plugin de ML Kit com o Expo SDK 58 (ver Riscos). Se não houver plugin mantido, começar com foto + ML Kit sobre a imagem parada.
+3. **Tela de leitura:**
+   - moldura, leitura contínua ligada por padrão, vibração ao adicionar e lanterna;
+   - a mesma lógica do site: interpretar no aparelho com `readCardText` e só consultar o servidor quando a carta muda.
+4. **Revisão:** lista com edição (o seletor que já existe), foil e remover; depois "Adicionar N cartas" na coleção ou no deck (board escolhido), com as mesmas rotas do site.
+5. **Flag no app:** o app pergunta ao servidor se pode ler cartas (`canScan` no `/api/v1/me` ou numa rota de recursos) e mostra o botão só para os grupos liberados, como no site.
+
+**Ordem em dezembro (um PR por item):**
+
+| #   | Entrega                                                                                                                                      | Precisa de                                                                                           |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1   | Build de desenvolvimento (Android e iPhone), guia no `AGENTS.md`/README e Sentry com mapas de código (#177)                                  | Dono: `eas login` (conta grátis da Expo) e as contas da Apple/Google; ou Android Studio/Xcode no Mac |
+| 2   | Prova de conceito: câmera + ML Kit numa tela escondida, com o texto lido na tela; teste com 50 cartas (normais, foil, antigas, em português) | Dono testa no aparelho                                                                               |
+| 3   | `canScan` no servidor e no `api-client` (com casos em `autorizacao.test.ts`)                                                                 | —                                                                                                    |
+| 4   | Tela de leitura contínua e revisão na **coleção**                                                                                            | —                                                                                                    |
+| 5   | No **deck** (board escolhido) e ajustes do teste                                                                                             | Dono testa com o grupo                                                                               |
+| 6   | Tirar a flag (site e app), com ajuda, novidade e capturas                                                                                    | Teste com o grupo aprovado                                                                           |
+
+**Decisões que já valem:**
+
+- leitura contínua ligada por padrão, com "Ler carta" manual como alternativa;
+- coleção primeiro, depois o deck;
+- confirmar a lista antes de gravar;
+- imagem só no aparelho.
+
+**Ainda em aberto:** a câmera ao vivo (Vision Camera) ou a foto. A prova de conceito decide.
+
+O restante deste documento é o plano original (18/11), mantido como referência.
 
 ## O que é
 
