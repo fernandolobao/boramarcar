@@ -107,9 +107,17 @@ export function DashboardHero({
                       key={p.userId}
                       style={[s.avatar, { marginLeft: i ? -8 : 0, borderColor: palette.arcano }]}
                     >
-                      <AppText style={{ color: palette.arcano, fontSize: 12, fontWeight: '700' }}>
-                        {initials(p.name)}
-                      </AppText>
+                      {p.image ? (
+                        <Image
+                          source={{ uri: p.image }}
+                          accessible={false}
+                          style={{ width: '100%', height: '100%' }}
+                        />
+                      ) : (
+                        <AppText style={{ color: palette.arcano, fontSize: 12, fontWeight: '700' }}>
+                          {initials(p.name)}
+                        </AppText>
+                      )}
                     </View>
                   ))}
                 </View>
@@ -444,6 +452,7 @@ const s = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    overflow: 'hidden',
     borderWidth: 2,
     backgroundColor: palette.pergaminho,
     alignItems: 'center',

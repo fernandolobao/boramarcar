@@ -29,30 +29,29 @@ import { FirstSteps } from '@/components/first-steps';
 import { NewAchievements } from '@/components/new-achievements';
 import { Stat } from '@/components/ds/stat';
 import { HeroArt } from '@/components/hero-art';
+import { AvatarImage } from '@/components/avatar-image';
 
 export const generateMetadata = navMetadata('dashboard');
 
 const DAY = 24 * 60 * 60 * 1000;
 
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]!.toUpperCase())
-    .join('');
-
-/** Bolinhas com as iniciais (decorativas: os nomes estão em texto ao lado). */
-function Avatars({ people, max = 6 }: { people: readonly { name: string }[]; max?: number }) {
+/** Fotos de quem confirmou (ou as iniciais, sem foto); decorativas: os nomes estão em texto ao lado. */
+function Avatars({
+  people,
+  max = 6,
+}: {
+  people: readonly { name: string; image?: string | null }[];
+  max?: number;
+}) {
   const shown = people.slice(0, max);
   return (
     <span className="flex -space-x-2" aria-hidden="true">
       {shown.map((p, i) => (
         <span
           key={`${p.name}-${i}`}
-          className="inline-flex size-9 items-center justify-center rounded-full bg-pergaminho text-xs font-bold text-arcano ring-2 ring-arcano"
+          className="relative inline-flex size-9 items-center justify-center overflow-hidden rounded-full bg-pergaminho text-xs font-bold text-arcano ring-2 ring-arcano"
         >
-          {initials(p.name)}
+          <AvatarImage name={p.name} image={p.image} sizes="36px" />
         </span>
       ))}
       {people.length > max && (
