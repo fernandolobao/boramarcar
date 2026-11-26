@@ -18,7 +18,7 @@ import {
 } from '@boramarcar/core';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useId, useMemo, useRef, useState } from 'react';
+import { createContext, useContext, useId, useMemo, useRef, useState } from 'react';
 import { Button, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components';
 import { Icon } from '@/components/icons';
 import { ManaCost, ManaSymbol, ManaText } from '@/components/mana';
@@ -151,6 +151,20 @@ function Hint({ children, onDismiss }: { children: React.ReactNode; onDismiss: (
   );
 }
 
+/** Tamanho das cartas na mesa (largura), escolhido pela pessoa e guardado neste navegador. */
+const CARD_SIZES = {
+  small: 'w-24 sm:w-28',
+  medium: 'w-36 sm:w-40',
+  large: 'w-48 sm:w-56',
+} as const;
+type CardSize = keyof typeof CARD_SIZES;
+const SIZE_KEY = 'arcanakin:playtest-size';
+
+const TableView = createContext<{ size: CardSize; show: (card: PlaytestCard) => void }>({
+  size: 'medium',
+  show: () => undefined,
+});
+
 /**
  * Mesa de testes solo (11.4): turnos de mentira com o deck, sem regras automáticas. Tudo roda no
  * navegador (nada é gravado); cada ação guarda o estado anterior, para "Desfazer".
@@ -169,6 +183,25 @@ export function PlaytestTable({
   const [status, setStatus] = useState('');
   const [searching, setSearching] = useState(false);
   const searchButton = useRef<HTMLButtonElement>(null);
+  // Carta em destaque (painel ao lado, em telas largas): a última com o mouse ou o foco.
+  const [shown, setShown] = useState<PlaytestCard | null>(null);
+  const [size, setSize] = useState<CardSize>(() => {
+    if (typeof window === 'undefined') return 'medium';
+    try {
+      const saved = localStorage.getItem(SIZE_KEY);
+      return saved === 'small' || saved === 'large' ? saved : 'medium';
+    } catch {
+      return 'medium';
+    }
+  });
+  const chooseSize = (next: CardSize) => {
+    setSize(next);
+    try {
+      localStorage.setItem(SIZE_KEY, next);
+    } catch {
+      // Sem armazenamento: vale só nesta visita.
+    }
+  };
   const state = history[history.length - 1]!;
 
   const dispatch = (action: PlaytestAction, message?: string) => {
@@ -214,315 +247,357 @@ export function PlaytestTable({
   const choosing = state.turn === 0;
 
   return (
-    <div className="space-y-6">
-      {/* Barra do turno: sempre à mão, no topo. */}
-      <section
-        aria-label={t('bar')}
-        className="card sticky top-2 z-10 flex flex-wrap items-center gap-x-6 gap-y-3"
-      >
-        <p className="font-display text-2xl font-semibold">
-          {choosing ? t('openingHand') : t('turn', { turn: state.turn })}
-        </p>
-        <div className="flex items-center gap-2" role="group" aria-label={t('life')}>
-          <button
-            type="button"
-            className="btn-secondary px-3"
-            onClick={() => dispatch({ type: 'life', delta: -1 })}
-            aria-label={t('lifeMinus')}
-          >
-            −
-          </button>
-          <p className="min-w-16 text-center text-xl font-semibold tabular-nums">
-            <span className="sr-only">{t('life')}: </span>
-            {state.life}
+    <TableView.Provider value={{ size, show: setShown }}>
+      <div className="space-y-6">
+        {/* Barra do turno: sempre à mão, no topo. */}
+        <section
+          aria-label={t('bar')}
+          className="card sticky top-2 z-10 flex flex-wrap items-center gap-x-6 gap-y-3"
+        >
+          <p className="font-display text-2xl font-semibold">
+            {choosing ? t('openingHand') : t('turn', { turn: state.turn })}
           </p>
-          <button
-            type="button"
-            className="btn-secondary px-3"
-            onClick={() => dispatch({ type: 'life', delta: 1 })}
-            aria-label={t('lifePlus')}
-          >
-            +
-          </button>
-        </div>
-        <p className="flex flex-wrap items-center gap-1.5">
-          <span>{t('mana', { count: mana.total })}</span>
-          <span aria-hidden="true" className="inline-flex flex-wrap gap-1">
-            {mana.sources.map((s, i) => (
-              <span key={i} className="inline-flex">
-                {s.split('').map((c, j) => (
-                  <ManaSymbol key={j} symbol={c} />
-                ))}
-              </span>
-            ))}
-          </span>
-        </p>
-        <p className="muted inline-flex items-center gap-2">
-          {t('library', { count: state.zones.library.length })}
-          <TermHelp id="grimorio" />
-        </p>
-        <div className="flex flex-wrap gap-2 sm:ms-auto">
-          {!choosing && (
+          <div className="flex items-center gap-2" role="group" aria-label={t('life')}>
             <button
               type="button"
-              className="btn-primary"
-              onClick={() =>
-                dispatch({ type: 'nextTurn' }, t('nextTurnDone', { turn: state.turn + 1 }))
-              }
+              className="btn-secondary px-3"
+              onClick={() => dispatch({ type: 'life', delta: -1 })}
+              aria-label={t('lifeMinus')}
             >
-              <Icon name="next" />
-              {t('nextTurn')}
+              −
             </button>
-          )}
-          {!choosing && (
+            <p className="min-w-16 text-center text-xl font-semibold tabular-nums">
+              <span className="sr-only">{t('life')}: </span>
+              {state.life}
+            </p>
             <button
               type="button"
-              className="btn-secondary"
-              onClick={() => dispatch({ type: 'draw' }, t('drew'))}
+              className="btn-secondary px-3"
+              onClick={() => dispatch({ type: 'life', delta: 1 })}
+              aria-label={t('lifePlus')}
             >
-              {t('draw')}
+              +
             </button>
-          )}
-          <button
-            ref={searchButton}
-            type="button"
-            className="btn-secondary"
-            onClick={() => setSearching(true)}
-          >
-            <Icon name="filter" />
-            {t('search')}
-          </button>
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={undo}
-            disabled={history.length <= 1}
-          >
-            <Icon name="undo" />
-            {t('undo')}
-          </button>
-          <button type="button" className="btn-secondary" onClick={restart}>
-            <Icon name="refresh" />
-            {t('restart')}
-          </button>
-        </div>
-      </section>
-      <p role="status" className="sr-only">
-        {status}
-      </p>
-
-      {/* Avisos da trilha no momento certo (uma vez por aparelho). */}
-      {state.turn >= 2 && !hints.dismissed.includes('turn') && (
-        <Hint onDismiss={() => hints.dismiss('turn')}>
-          {t('hintTurn')}{' '}
-          <Link href="/aprender/o-turno" className="text-link underline underline-offset-2">
-            {t('lesson', { title: lessonTitle('o-turno') })}
-          </Link>
-        </Hint>
-      )}
-      {mana.total > 0 && !hints.dismissed.includes('mana') && (
-        <Hint onDismiss={() => hints.dismiss('mana')}>
-          {t('hintMana')}{' '}
-          <Link href="/aprender/mana-e-terrenos" className="text-link underline underline-offset-2">
-            {t('lesson', { title: lessonTitle('mana-e-terrenos') })}
-          </Link>
-        </Hint>
-      )}
-      {taxed && !hints.dismissed.includes('tax') && (
-        <Hint onDismiss={() => hints.dismiss('tax')}>
-          {t('hintTax')}{' '}
-          <Link
-            href="/aprender/glossario#imposto-do-comandante"
-            className="text-link underline underline-offset-2"
-          >
-            {t('inGlossary')}
-          </Link>
-          {' · '}
-          <Link
-            href="/aprender/commander-o-formato"
-            className="text-link underline underline-offset-2"
-          >
-            {t('lesson', { title: lessonTitle('commander-o-formato') })}
-          </Link>
-        </Hint>
-      )}
-
-      {choosing && (
-        <section className="card space-y-3" aria-labelledby="mesa-mulligan">
-          <div className="flex flex-wrap items-start gap-2">
-            <h2 id="mesa-mulligan" className="section-title mb-0">
-              {t('mulliganTitle', { count: state.mulligans })}
-            </h2>
-            <TermHelp id="mulligan" />
           </div>
-          {state.toBottom > 0 ? (
-            <p className="font-semibold">{t('chooseBottom', { count: state.toBottom })}</p>
-          ) : (
-            <p className="muted">{t('mulliganHint')}</p>
-          )}
-          <div className="flex flex-wrap items-center gap-3">
+          <p className="flex flex-wrap items-center gap-1.5">
+            <span>{t('mana', { count: mana.total })}</span>
+            <span aria-hidden="true" className="inline-flex flex-wrap gap-1">
+              {mana.sources.map((s, i) => (
+                <span key={i} className="inline-flex">
+                  {s.split('').map((c, j) => (
+                    <ManaSymbol key={j} symbol={c} />
+                  ))}
+                </span>
+              ))}
+            </span>
+          </p>
+          <p className="muted inline-flex items-center gap-2">
+            {t('library', { count: state.zones.library.length })}
+            <TermHelp id="grimorio" />
+          </p>
+          <div className="flex flex-wrap gap-2 sm:ms-auto">
+            {!choosing && (
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() =>
+                  dispatch({ type: 'nextTurn' }, t('nextTurnDone', { turn: state.turn + 1 }))
+                }
+              >
+                <Icon name="next" />
+                {t('nextTurn')}
+              </button>
+            )}
+            {!choosing && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => dispatch({ type: 'draw' }, t('drew'))}
+              >
+                {t('draw')}
+              </button>
+            )}
             <button
+              ref={searchButton}
               type="button"
-              className="btn-primary"
-              onClick={keep}
-              disabled={state.toBottom > 0}
+              className="btn-secondary"
+              onClick={() => setSearching(true)}
             >
-              <Icon name="done" />
-              {t('keep')}
+              <Icon name="filter" />
+              {t('search')}
             </button>
             <button
               type="button"
               className="btn-secondary"
-              onClick={() => dispatch({ type: 'mulligan' }, t('mulliganed'))}
-              disabled={state.mulligans >= 6}
+              onClick={undo}
+              disabled={history.length <= 1}
             >
-              <Icon name="refresh" />
-              {t('mulligan')}
+              <Icon name="undo" />
+              {t('undo')}
             </button>
-            <label className="inline-flex min-h-11 items-center gap-2">
-              <input
-                type="checkbox"
-                checked={playFirst}
-                onChange={(e) => setPlayFirst(e.target.checked)}
-              />
-              {t('playFirst')}
-            </label>
+            <button type="button" className="btn-secondary" onClick={restart}>
+              <Icon name="refresh" />
+              {t('restart')}
+            </button>
           </div>
         </section>
-      )}
+        <p role="status" className="sr-only">
+          {status}
+        </p>
 
-      {state.zones.command.length > 0 && (
-        <Zone
-          title={t('zones.command')}
-          count={state.zones.command.length}
-          term="imposto-do-comandante"
-        >
-          {state.zones.command.map((c) => (
-            <CardMenu
-              key={c.uid}
-              card={c}
-              zone="command"
-              note={t('tax', { tax: commanderTax(state, c.uid) })}
-              targets={targetsFor(c, 'command')}
-              zoneName={zoneName}
-              onMove={(to) => move(c, to)}
-            />
-          ))}
-        </Zone>
-      )}
-
-      <Zone title={t('lands')} count={lands.length} term="virar">
-        {lands.map((c) => (
-          <CardMenu
-            key={c.uid}
-            card={c}
-            zone="battlefield"
-            targets={targetsFor(c, 'battlefield')}
-            zoneName={zoneName}
-            onMove={(to) => move(c, to)}
-            onTap={() =>
-              dispatch(
-                { type: 'toggleTap', uid: c.uid },
-                t(c.tapped ? 'untapped' : 'tapped', { name: c.name }),
-              )
-            }
-          />
-        ))}
-      </Zone>
-
-      <Zone
-        title={t('permanents')}
-        count={permanents.length}
-        term="ficha"
-        action={
-          <CreateToken
-            onCreate={(name, count) =>
-              dispatch({ type: 'createToken', name, count }, t('tokensCreated', { count, name }))
-            }
-          />
-        }
-      >
-        {permanents.map((c) => (
-          <CardMenu
-            key={c.uid}
-            card={c}
-            zone="battlefield"
-            targets={targetsFor(c, 'battlefield')}
-            zoneName={zoneName}
-            onMove={(to) => move(c, to)}
-            onTap={() =>
-              dispatch(
-                { type: 'toggleTap', uid: c.uid },
-                t(c.tapped ? 'untapped' : 'tapped', { name: c.name }),
-              )
-            }
-          />
-        ))}
-      </Zone>
-
-      <Zone title={t('zones.hand')} count={state.zones.hand.length}>
-        {state.zones.hand.map((c) =>
-          choosing && state.toBottom > 0 ? (
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('size')}>
+          <span className="text-sm font-semibold">{t('size')}</span>
+          {(['small', 'medium', 'large'] as const).map((value) => (
             <button
-              key={c.uid}
+              key={value}
               type="button"
-              className="text-left"
-              onClick={() =>
-                dispatch({ type: 'bottom', uid: c.uid }, t('sentToBottom', { name: c.name }))
-              }
-              aria-label={t('sendToBottom', { name: c.name })}
+              aria-pressed={size === value}
+              className={size === value ? 'btn-primary' : 'btn-secondary'}
+              onClick={() => chooseSize(value)}
             >
-              <CardFace card={c} />
+              {t(`sizes.${value}`)}
             </button>
-          ) : (
-            <CardMenu
-              key={c.uid}
-              card={c}
-              zone="hand"
-              targets={targetsFor(c, 'hand')}
-              zoneName={zoneName}
-              onMove={(to) => move(c, to)}
-            />
-          ),
-        )}
-      </Zone>
+          ))}
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {(['graveyard', 'exile'] as const).map((zone) => (
-          <Zone
-            key={zone}
-            title={t(`zones.${zone}`)}
-            count={state.zones[zone].length}
-            term={zone === 'graveyard' ? 'cemiterio' : 'exilio'}
+        {/* Em telas largas: as zonas à esquerda e a carta em destaque à direita, para ler o texto. */}
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-6">
+          <div className="space-y-6">
+            {/* Avisos da trilha no momento certo (uma vez por aparelho). */}
+            {state.turn >= 2 && !hints.dismissed.includes('turn') && (
+              <Hint onDismiss={() => hints.dismiss('turn')}>
+                {t('hintTurn')}{' '}
+                <Link href="/aprender/o-turno" className="text-link underline underline-offset-2">
+                  {t('lesson', { title: lessonTitle('o-turno') })}
+                </Link>
+              </Hint>
+            )}
+            {mana.total > 0 && !hints.dismissed.includes('mana') && (
+              <Hint onDismiss={() => hints.dismiss('mana')}>
+                {t('hintMana')}{' '}
+                <Link
+                  href="/aprender/mana-e-terrenos"
+                  className="text-link underline underline-offset-2"
+                >
+                  {t('lesson', { title: lessonTitle('mana-e-terrenos') })}
+                </Link>
+              </Hint>
+            )}
+            {taxed && !hints.dismissed.includes('tax') && (
+              <Hint onDismiss={() => hints.dismiss('tax')}>
+                {t('hintTax')}{' '}
+                <Link
+                  href="/aprender/glossario#imposto-do-comandante"
+                  className="text-link underline underline-offset-2"
+                >
+                  {t('inGlossary')}
+                </Link>
+                {' · '}
+                <Link
+                  href="/aprender/commander-o-formato"
+                  className="text-link underline underline-offset-2"
+                >
+                  {t('lesson', { title: lessonTitle('commander-o-formato') })}
+                </Link>
+              </Hint>
+            )}
+
+            {choosing && (
+              <section className="card space-y-3" aria-labelledby="mesa-mulligan">
+                <div className="flex flex-wrap items-start gap-2">
+                  <h2 id="mesa-mulligan" className="section-title mb-0">
+                    {t('mulliganTitle', { count: state.mulligans })}
+                  </h2>
+                  <TermHelp id="mulligan" />
+                </div>
+                {state.toBottom > 0 ? (
+                  <p className="font-semibold">{t('chooseBottom', { count: state.toBottom })}</p>
+                ) : (
+                  <p className="muted">{t('mulliganHint')}</p>
+                )}
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={keep}
+                    disabled={state.toBottom > 0}
+                  >
+                    <Icon name="done" />
+                    {t('keep')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => dispatch({ type: 'mulligan' }, t('mulliganed'))}
+                    disabled={state.mulligans >= 6}
+                  >
+                    <Icon name="refresh" />
+                    {t('mulligan')}
+                  </button>
+                  <label className="inline-flex min-h-11 items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={playFirst}
+                      onChange={(e) => setPlayFirst(e.target.checked)}
+                    />
+                    {t('playFirst')}
+                  </label>
+                </div>
+              </section>
+            )}
+
+            {state.zones.command.length > 0 && (
+              <Zone
+                title={t('zones.command')}
+                count={state.zones.command.length}
+                term="imposto-do-comandante"
+              >
+                {state.zones.command.map((c) => (
+                  <CardMenu
+                    key={c.uid}
+                    card={c}
+                    zone="command"
+                    note={t('tax', { tax: commanderTax(state, c.uid) })}
+                    targets={targetsFor(c, 'command')}
+                    zoneName={zoneName}
+                    onMove={(to) => move(c, to)}
+                  />
+                ))}
+              </Zone>
+            )}
+
+            <Zone title={t('lands')} count={lands.length} term="virar">
+              {lands.map((c) => (
+                <CardMenu
+                  key={c.uid}
+                  card={c}
+                  zone="battlefield"
+                  targets={targetsFor(c, 'battlefield')}
+                  zoneName={zoneName}
+                  onMove={(to) => move(c, to)}
+                  onTap={() =>
+                    dispatch(
+                      { type: 'toggleTap', uid: c.uid },
+                      t(c.tapped ? 'untapped' : 'tapped', { name: c.name }),
+                    )
+                  }
+                />
+              ))}
+            </Zone>
+
+            <Zone
+              title={t('permanents')}
+              count={permanents.length}
+              term="ficha"
+              action={
+                <CreateToken
+                  onCreate={(name, count) =>
+                    dispatch(
+                      { type: 'createToken', name, count },
+                      t('tokensCreated', { count, name }),
+                    )
+                  }
+                />
+              }
+            >
+              {permanents.map((c) => (
+                <CardMenu
+                  key={c.uid}
+                  card={c}
+                  zone="battlefield"
+                  targets={targetsFor(c, 'battlefield')}
+                  zoneName={zoneName}
+                  onMove={(to) => move(c, to)}
+                  onTap={() =>
+                    dispatch(
+                      { type: 'toggleTap', uid: c.uid },
+                      t(c.tapped ? 'untapped' : 'tapped', { name: c.name }),
+                    )
+                  }
+                />
+              ))}
+            </Zone>
+
+            <Zone title={t('zones.hand')} count={state.zones.hand.length}>
+              {state.zones.hand.map((c) =>
+                choosing && state.toBottom > 0 ? (
+                  <button
+                    key={c.uid}
+                    type="button"
+                    className="text-left"
+                    onClick={() =>
+                      dispatch({ type: 'bottom', uid: c.uid }, t('sentToBottom', { name: c.name }))
+                    }
+                    aria-label={t('sendToBottom', { name: c.name })}
+                  >
+                    <CardFace card={c} />
+                  </button>
+                ) : (
+                  <CardMenu
+                    key={c.uid}
+                    card={c}
+                    zone="hand"
+                    targets={targetsFor(c, 'hand')}
+                    zoneName={zoneName}
+                    onMove={(to) => move(c, to)}
+                  />
+                ),
+              )}
+            </Zone>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {(['graveyard', 'exile'] as const).map((zone) => (
+                <Zone
+                  key={zone}
+                  title={t(`zones.${zone}`)}
+                  count={state.zones[zone].length}
+                  term={zone === 'graveyard' ? 'cemiterio' : 'exilio'}
+                >
+                  {state.zones[zone].map((c) => (
+                    <CardMenu
+                      key={c.uid}
+                      card={c}
+                      zone={zone}
+                      targets={targetsFor(c, zone)}
+                      zoneName={zoneName}
+                      onMove={(to) => move(c, to)}
+                    />
+                  ))}
+                </Zone>
+              ))}
+            </div>
+          </div>
+          <aside
+            aria-label={t('featured')}
+            className="card sticky top-24 hidden max-h-[calc(100dvh-7rem)] overflow-y-auto lg:block"
           >
-            {state.zones[zone].map((c) => (
-              <CardMenu
-                key={c.uid}
-                card={c}
-                zone={zone}
-                targets={targetsFor(c, zone)}
-                zoneName={zoneName}
-                onMove={(to) => move(c, to)}
-              />
-            ))}
-          </Zone>
-        ))}
-      </div>
+            <h2 className="section-title">{t('featured')}</h2>
+            {shown ? (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">{shown.name}</h3>
+                <CardInfo card={shown} />
+              </div>
+            ) : (
+              <p className="muted text-sm">{t('featuredHint')}</p>
+            )}
+          </aside>
+        </div>
 
-      <SearchLibrary
-        open={searching}
-        onClose={() => setSearching(false)}
-        returnFocus={searchButton}
-        library={state.zones.library}
-        onPick={(card, to) => {
-          dispatch(
-            { type: 'search', uid: card.uid, to },
-            t('searched', { name: card.name, zone: zoneName(to) }),
-          );
-          setSearching(false);
-        }}
-      />
-    </div>
+        <SearchLibrary
+          open={searching}
+          onClose={() => setSearching(false)}
+          returnFocus={searchButton}
+          library={state.zones.library}
+          onPick={(card, to) => {
+            dispatch(
+              { type: 'search', uid: card.uid, to },
+              t('searched', { name: card.name, zone: zoneName(to) }),
+            );
+            setSearching(false);
+          }}
+        />
+      </div>
+    </TableView.Provider>
   );
 }
 
@@ -570,9 +645,11 @@ function Zone({
 
 /** A carta na mesa: imagem (virada, se estiver) ou o nome, quando não há imagem. */
 function CardFace({ card }: { card: PlaytestCard }) {
+  const { size } = useContext(TableView);
   return (
     <span
-      className={`block w-24 transition-transform motion-reduce:transition-none sm:w-28 ${card.tapped ? 'rotate-90' : ''}`}
+      // Virada: gira e encolhe para caber no mesmo espaço (sem cobrir as vizinhas).
+      className={`block transition-transform motion-reduce:transition-none ${CARD_SIZES[size]} ${card.tapped ? 'rotate-90 scale-[0.72]' : ''}`}
     >
       {card.imageUri ? (
         // eslint-disable-next-line @next/next/no-img-element -- imagem do Scryfall, já em cache
@@ -610,6 +687,7 @@ function CardMenu({
 }) {
   const t = useTranslations('playtest');
   const [viewing, setViewing] = useState(false);
+  const view = useContext(TableView);
   const label = [
     card.name,
     card.tapped ? t('isTapped') : '',
@@ -622,6 +700,8 @@ function CardMenu({
     <>
       <MenuTrigger>
         <Button
+          onHoverStart={() => view.show(card)}
+          onFocus={() => view.show(card)}
           aria-label={t('cardActions', { card: label })}
           className="cursor-pointer rounded-lg outline-none data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-focus"
         >
@@ -676,6 +756,67 @@ function CardMenu({
  * A carta aberta: imagem, custo, tipo, texto e as palavras-chave dela, com a definição do
  * glossário e os links para o glossário e a lição (ensina enquanto joga).
  */
+/** A carta para ler: imagem grande, custo, tipo, texto e as palavras-chave (glossário e lição). */
+function CardInfo({ card }: { card: PlaytestCard }) {
+  const t = useTranslations('playtest');
+  const locale = learnLocale(useLocale());
+  const lessonTitle = useLessonTitle();
+  const keywords = glossaryKeywordsIn(card.oracleText, locale);
+  return (
+    <div className="grid gap-4">
+      {card.imageUri ? (
+        // eslint-disable-next-line @next/next/no-img-element -- imagem do Scryfall, já em cache
+        <img
+          src={card.imageUri}
+          alt=""
+          className="aspect-[63/88] w-full max-w-72 rounded-xl shadow"
+        />
+      ) : null}
+      <div className="min-w-0 space-y-3">
+        <p className="muted flex flex-wrap items-center gap-2 text-sm">
+          {card.typeLine}
+          <ManaCost cost={card.manaCost} />
+        </p>
+        {card.oracleText ? (
+          <div className="space-y-1 text-sm whitespace-pre-line">
+            <ManaText text={card.oracleText} />
+          </div>
+        ) : null}
+        {keywords.length > 0 && (
+          <section aria-label={t('keywords')} className="space-y-2">
+            <h3 className="font-semibold">{t('keywords')}</h3>
+            <ul className="space-y-2 text-sm">
+              {keywords.map((k) => (
+                <li key={k.id}>
+                  <strong>{k.term}:</strong> {k.text}{' '}
+                  <Link
+                    href={`/aprender/glossario#${k.id}`}
+                    className="text-link underline underline-offset-2"
+                  >
+                    {t('inGlossary')}
+                    <span className="sr-only"> ({k.term})</span>
+                  </Link>
+                  {k.lesson && (
+                    <>
+                      {' · '}
+                      <Link
+                        href={`/aprender/${k.lesson}`}
+                        className="text-link underline underline-offset-2"
+                      >
+                        {t('lesson', { title: lessonTitle(k.lesson) })}
+                      </Link>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CardDetail({
   card,
   open,
@@ -685,59 +826,9 @@ function CardDetail({
   open: boolean;
   onClose: () => void;
 }) {
-  const t = useTranslations('playtest');
-  const locale = learnLocale(useLocale());
-  const lessonTitle = useLessonTitle();
-  const keywords = glossaryKeywordsIn(card.oracleText, locale);
   return (
     <Modal open={open} onClose={onClose} title={card.name}>
-      <div className="grid gap-4 sm:grid-cols-[12rem_1fr]">
-        {card.imageUri ? (
-          // eslint-disable-next-line @next/next/no-img-element -- imagem do Scryfall, já em cache
-          <img src={card.imageUri} alt="" className="aspect-[63/88] w-48 rounded-xl shadow" />
-        ) : null}
-        <div className="min-w-0 space-y-3">
-          <p className="muted flex flex-wrap items-center gap-2 text-sm">
-            {card.typeLine}
-            <ManaCost cost={card.manaCost} />
-          </p>
-          {card.oracleText ? (
-            <div className="space-y-1 text-sm whitespace-pre-line">
-              <ManaText text={card.oracleText} />
-            </div>
-          ) : null}
-          {keywords.length > 0 && (
-            <section aria-label={t('keywords')} className="space-y-2">
-              <h3 className="font-semibold">{t('keywords')}</h3>
-              <ul className="space-y-2 text-sm">
-                {keywords.map((k) => (
-                  <li key={k.id}>
-                    <strong>{k.term}:</strong> {k.text}{' '}
-                    <Link
-                      href={`/aprender/glossario#${k.id}`}
-                      className="text-link underline underline-offset-2"
-                    >
-                      {t('inGlossary')}
-                      <span className="sr-only"> ({k.term})</span>
-                    </Link>
-                    {k.lesson && (
-                      <>
-                        {' · '}
-                        <Link
-                          href={`/aprender/${k.lesson}`}
-                          className="text-link underline underline-offset-2"
-                        >
-                          {t('lesson', { title: lessonTitle(k.lesson) })}
-                        </Link>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </div>
-      </div>
+      <CardInfo card={card} />
     </Modal>
   );
 }

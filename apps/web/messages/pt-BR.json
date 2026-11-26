@@ -3030,6 +3030,14 @@
     "gotIt": "Entendi",
     "hintTurn": "Novo no Magic? Cada turno tem etapas: desvirar, manutenção, comprar, fases principais, combate e final.",
     "hintMana": "A mana disponível conta os terrenos desvirados; vire um terreno para \"gastar\" a mana dele.",
-    "hintTax": "Imposto do comandante: cada vez que o comandante volta para a zona de comando e é jogado de novo, custa {2} a mais."
+    "hintTax": "Imposto do comandante: cada vez que o comandante volta para a zona de comando e é jogado de novo, custa {2} a mais.",
+    "size": "Tamanho das cartas",
+    "sizes": {
+      "small": "Pequeno",
+      "medium": "Médio",
+      "large": "Grande"
+    },
+    "featured": "Carta em destaque",
+    "featuredHint": "Passe o mouse (ou o foco do teclado) numa carta para vê-la aqui, grande e com o texto."
   }
 }

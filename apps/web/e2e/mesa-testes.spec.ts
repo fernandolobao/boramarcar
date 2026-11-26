@@ -15,6 +15,16 @@ test.describe('mesa de testes solo (11.4)', () => {
     const hand = page.getByRole('region', { name: /^Mão/ });
     await expect(hand.getByRole('button', { name: /^Ações:/ })).toHaveCount(7);
 
+    // Tamanho das cartas: médio por padrão; dá para trocar.
+    await expect(page.getByRole('button', { name: 'Médio' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await page.getByRole('button', { name: 'Grande' }).click();
+    await expect(page.getByRole('button', { name: 'Grande' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
     await page.getByRole('button', { name: 'Manter' }).click();
     await expect(page.getByText('Turno 1', { exact: true })).toBeVisible();
 
@@ -44,6 +54,17 @@ test.describe('mesa de testes solo (11.4)', () => {
     await page.getByLabel('Quantidade').fill('2');
     await page.getByRole('button', { name: 'Criar', exact: true }).click();
     await expect(page.getByRole('button', { name: /Elf Warrior, ficha/ })).toHaveCount(2);
+
+    // Em tela larga, a carta com o mouse aparece grande no painel "Carta em destaque".
+    if (test.info().project.name === 'chromium') {
+      await hand
+        .getByRole('button', { name: /^Ações:/ })
+        .first()
+        .hover();
+      const featured = page.getByRole('complementary', { name: 'Carta em destaque' });
+      await expect(featured.getByRole('heading', { level: 3 })).toBeVisible();
+      await expect(featured.getByText(/Passe o mouse/)).toHaveCount(0);
+    }
 
     // "?" do cemitério: a definição do glossário, com o link.
     await page.getByRole('button', { name: 'O que é Cemitério?' }).click();
