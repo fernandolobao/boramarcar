@@ -16,7 +16,7 @@ test.describe('lojas', () => {
     }) => {
       test.skip(test.info().project.name !== 'chromium', 'cria dados: só no desktop');
       const name = `Loja Nova ${Date.now()}`;
-      await page.goto('/admin');
+      await page.goto('/admin?aba=lojas');
       const section = page.getByRole('region', { name: 'Lojas' });
       await section.getByLabel('Nome da loja').fill(name);
       // Cidade da lista do IBGE (10.3): digitar e escolher.

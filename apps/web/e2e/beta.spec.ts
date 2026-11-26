@@ -13,7 +13,7 @@ test.describe('beta assistido', () => {
   }) => {
     // Dispensar a faixa fica guardado no servidor: roda uma vez só.
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
-    await page.goto('/admin');
+    await page.goto('/admin?aba=beta');
     const beta = page.getByRole('region', { name: 'Beta assistido' });
     const groups = beta.getByRole('group', { name: 'Grupos do beta' });
     await groups
@@ -29,7 +29,7 @@ test.describe('beta assistido', () => {
     await page.goto('/painel');
     await expect(page.getByRole('region', { name: /está no beta/ })).toHaveCount(0);
 
-    await page.goto('/admin');
+    await page.goto('/admin?aba=beta');
     await page
       .getByRole('region', { name: 'Beta assistido' })
       .getByRole('button', { name: 'Começar agora' })
@@ -53,7 +53,7 @@ test.describe('beta assistido', () => {
     await page.reload();
     await expect(page.getByRole('region', { name: /está no beta/ })).toHaveCount(0);
 
-    await page.goto('/admin');
+    await page.goto('/admin?aba=beta');
     const end = page
       .getByRole('region', { name: 'Beta assistido' })
       .getByRole('button', { name: /Encerrar beta|Confirmar/ });

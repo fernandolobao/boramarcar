@@ -63,7 +63,7 @@ test.describe('avisos do ArcanaKin', () => {
   test('admin escreve, publica em dois cliques e o aviso chega na central', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
     const title = `Aviso E2E ${Date.now()}`;
-    await page.goto('/admin');
+    await page.goto('/admin?aba=avisos');
     const section = page.getByRole('region', { name: 'Avisos do ArcanaKin' });
     await section.getByLabel('Título').fill(title);
     await section.getByLabel('Texto').fill('Linha 1\nLinha 2');
