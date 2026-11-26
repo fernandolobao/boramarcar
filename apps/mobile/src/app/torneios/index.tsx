@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
+import { EmptyState } from '@/components/empty-state';
 
 const STATUS: Record<string, MessageKey> = {
   registration: 'tourStatusRegistration',
@@ -43,7 +44,7 @@ export default function TournamentsScreen() {
         />
       )}
       {(list.data ?? []).length === 0 ? (
-        <AppText muted>{t('tourEmpty')}</AppText>
+        <EmptyState>{t('tourEmpty')}</EmptyState>
       ) : (
         (list.data ?? []).map((item) => (
           <Pressable
