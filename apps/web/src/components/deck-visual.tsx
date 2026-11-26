@@ -47,12 +47,15 @@ export function DeckSettingsForm({
   name,
   format,
   visibility = 'group',
+  draft = false,
   onSaved,
 }: {
   deckId: string;
   name: string;
   format: GameFormat;
   visibility?: DeckVisibility;
+  /** Rascunho: sempre privado; a visibilidade é escolhida ao publicar. */
+  draft?: boolean;
   /** Depois de salvar (ex.: fechar a janela de edição). */
   onSaved?: () => void;
 }) {
@@ -70,7 +73,12 @@ export function DeckSettingsForm({
         e.preventDefault();
         setSaved(false);
         void run(
-          () => api(`/api/v1/decks/${deckId}`, { method: 'PATCH', body: values }),
+          () =>
+            api(`/api/v1/decks/${deckId}`, {
+              method: 'PATCH',
+              // Rascunho não muda de visibilidade (o servidor recusa).
+              body: draft ? { name: values.name, format: values.format } : values,
+            }),
           () => {
             setSaved(true);
             // A página mostra o nome, o formato e a visibilidade novos (e o "Compartilhar deck").
@@ -107,12 +115,14 @@ export function DeckSettingsForm({
         label={t('visibilityLabel')}
         variant="cards"
         name="deck-visibility"
-        value={values.visibility}
+        value={draft ? 'private' : values.visibility}
         onChange={(v) => setValues((s) => ({ ...s, visibility: v }))}
+        description={draft ? t('draft.visibilityLocked') : undefined}
         options={DECK_VISIBILITIES.map((v) => ({
           value: v,
           label: t(`visibility.${v}`),
           description: t(`visibilityHint.${v}`),
+          disabled: draft,
         }))}
         icons={Object.fromEntries(DECK_VISIBILITIES.map((v) => [v, <Icon key={v} name={v} />]))}
       />

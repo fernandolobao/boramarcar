@@ -738,6 +738,13 @@ sem rolagem horizontal em 320px.
   escolha não termina. O selo "Fundo" sobre a carta repete a informação em texto.
 - Fora do mulligan, cada carta é uma `figure` com o nome em `figcaption` (a imagem é decorativa).
 
+## Visibilidade do rascunho (25/11/2026)
+
+- Em "Editar deck", o rascunho mostra "Privado" marcado e as três opções desabilitadas, com o
+  motivo em texto na descrição do radiogroup.
+- "Publicar deck" abre sempre a janela; o primeiro campo é o radiogroup "Quem vê o deck depois de
+  publicado" (padrão: Grupo), depois as cartas da coleção, quando houver.
+
 ## Análise do deck em abas (25/11/2026)
 
 - `PillTabs` (`components/ds/tabs.tsx`, React Aria): `tablist` com rótulo "Partes da análise",

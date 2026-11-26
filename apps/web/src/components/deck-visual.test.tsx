@@ -497,6 +497,24 @@ describe('ColorIdentity e DeckSettingsForm', () => {
       visibility: 'private',
     });
   });
+
+  it('rascunho: "Privado" marcado, opções desabilitadas e a visibilidade não vai no salvar', async () => {
+    const fetchMock = vi.fn(async () => Response.json({ deck: {} }));
+    vi.stubGlobal('fetch', fetchMock);
+    const { container } = wrap(
+      <DeckSettingsForm deckId="d1" name="Ideia" format="commander" visibility="group" draft />,
+    );
+    expect(await audit(container)).toEqual([]);
+    expect(screen.getByRole('radio', { name: /Privado/ })).toBeChecked();
+    for (const name of [/Privado/, /Grupo/, /Público/]) {
+      expect(screen.getByRole('radio', { name })).toBeDisabled();
+    }
+    expect(screen.getByText(/Rascunho é sempre privado/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Deck salvo.');
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(JSON.parse(init.body as string)).toEqual({ name: 'Ideia', format: 'commander' });
+  });
 });
 
 describe('foilTiming', () => {

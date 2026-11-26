@@ -283,8 +283,20 @@ test.describe('compartilhar deck público', () => {
       page.getByRole('heading', { level: 1, name: 'Ideia de rascunho E2E' }),
     ).toBeVisible();
     await expect(page.getByText('Este deck é um rascunho')).toBeVisible();
+    // Rascunho é privado: a visibilidade fica travada em "Editar deck".
+    await page.getByRole('button', { name: /Opções do deck/ }).click();
+    await page.getByRole('menuitem', { name: /Editar deck/ }).click();
+    const edit = page.getByRole('dialog', { name: 'Editar deck' });
+    await expect(edit.getByRole('radio', { name: /^Privado/ })).toBeChecked();
+    await expect(edit.getByRole('radio', { name: /^Público/ })).toBeDisabled();
+    await edit.getByRole('button', { name: 'Fechar' }).click();
+    // Publicar pergunta quem vê o deck.
     await page.getByRole('button', { name: 'Publicar deck' }).click();
+    const publish = page.getByRole('dialog', { name: 'Publicar deck' });
+    await publish.getByRole('radio', { name: /^Público/ }).check({ force: true });
+    await publish.getByRole('button', { name: 'Publicar com estas escolhas' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Deck publicado' })).toBeVisible();
+    await expect(page.getByText('Público', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Este deck é um rascunho')).toHaveCount(0);
   });
 });

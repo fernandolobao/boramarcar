@@ -11,6 +11,7 @@ import {
   listDecksForUsers,
   publishDeck,
   saveImportedDeck,
+  updateDeck,
 } from './decks';
 import { createEvent, recordGame } from './events';
 
@@ -132,5 +133,50 @@ describe('deck do zero e rascunho (11.1 e 11.2)', () => {
         ],
       }),
     ).rejects.toMatchObject({ code: 'invalid_input' });
+  });
+});
+
+describe('visibilidade do rascunho', () => {
+  it('rascunho nasce privado, não muda de visibilidade e ganha a escolhida ao publicar', async () => {
+    const { players } = await seedGroup(db, 1);
+    const ana = players[0]!;
+    const deck = await createDeck(db, {
+      ownerId: ana.id,
+      name: 'Privado até publicar',
+      format: 'commander',
+      draft: true,
+    });
+    expect(deck.visibility).toBe('private');
+    await expect(
+      updateDeck(db, { deckId: deck.id, userId: ana.id, visibility: 'public' }),
+    ).rejects.toMatchObject({ code: 'invalid_input' });
+    // Renomear o rascunho continua valendo.
+    expect(
+      (await updateDeck(db, { deckId: deck.id, userId: ana.id, name: 'Novo nome' })).name,
+    ).toBe('Novo nome');
+    const published = await publishDeck(db, {
+      deckId: deck.id,
+      userId: ana.id,
+      visibility: 'public',
+    });
+    expect(published).toMatchObject({ status: 'published', visibility: 'public' });
+  });
+
+  it('importar como rascunho também nasce privado; publicar sem escolher vai para o grupo', async () => {
+    const { players } = await seedGroup(db, 1);
+    const ana = players[0]!;
+    const saved = await saveImportedDeck(db, {
+      ownerId: ana.id,
+      deck: {
+        name: 'Importado',
+        source: 'text',
+        entries: [{ name: 'Forest', quantity: 1, board: 'mainboard' }],
+      },
+      cards: [],
+      draft: true,
+    });
+    const id = saved.id;
+    expect(saved.visibility).toBe('private');
+    expect((await publishDeck(db, { deckId: id, userId: ana.id })).visibility).toBe('group');
   });
 });
