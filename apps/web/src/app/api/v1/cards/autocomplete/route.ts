@@ -1,9 +1,20 @@
-import { fetchScryfallAutocomplete, fetchScryfallPrintedNames } from '@boramarcar/core';
+import {
+  fetchScryfallAutocomplete,
+  fetchScryfallNamesInIdentity,
+  fetchScryfallPrintedNames,
+} from '@boramarcar/core';
 import { z } from 'zod';
 import { authed, parseQuery } from '@/server/http';
 import { PUBLIC_CDN_CACHE, rateLimit } from '@/server/limits';
 
-const schema = z.object({ q: z.string().max(100).default('') });
+const schema = z.object({
+  q: z.string().max(100).default(''),
+  /** Identidade de cor do comandante (ex.: `WU`; `C` = incolor): só cartas que cabem nela. */
+  identity: z
+    .string()
+    .regex(/^[WUBRGC]{1,5}$/)
+    .optional(),
+});
 
 /** Poucas sugestões em inglês: vale a pena procurar também pelo nome impresso em português. */
 const FEW = 5;
@@ -15,9 +26,15 @@ const FEW = 5;
  * Iguais para todos: ficam no CDN da Vercel.
  */
 export const GET = authed(async ({ req, db, user }) => {
-  const { q } = parseQuery(req, schema);
+  const { q, identity } = parseQuery(req, schema);
   await rateLimit(db, user.id, 'search');
   const fetchFn: typeof fetch = (u, i) => fetch(u, i);
+  if (identity) {
+    // Com o filtro da identidade (11.5): a busca do Scryfall, que entende `id<=…`.
+    const colors = identity.replace('C', '').split('');
+    const names = await fetchScryfallNamesInIdentity(q, colors, { fetch: fetchFn });
+    return Response.json({ names, printed: {} }, { headers: PUBLIC_CDN_CACHE });
+  }
   const names = await fetchScryfallAutocomplete(q, { fetch: fetchFn });
   const printed: Record<string, string> = {};
   if (names.length < FEW) {

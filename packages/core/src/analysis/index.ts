@@ -53,11 +53,27 @@ export type ValidationIssue =
   | { code: 'not_singleton'; name: string; quantity: number }
   | { code: 'too_many_copies'; name: string; quantity: number; max: number }
   | { code: 'sideboard_size'; max: number; actual: number }
-  | { code: 'color_identity'; name: string }
+  /** `colors`: as cores da carta que ficam fora da identidade do comandante (WUBRG). */
+  | { code: 'color_identity'; name: string; colors: string[] }
   | { code: 'banned'; name: string }
   | { code: 'restricted'; name: string; quantity: number }
   | { code: 'not_legal'; name: string }
   | { code: 'unknown_card'; name: string };
+
+const WUBRG = ['W', 'U', 'B', 'R', 'G'];
+
+/**
+ * Cores da identidade de uma carta que ficam fora da identidade do comandante (11.5), na ordem
+ * WUBRG. Vazio = a carta cabe no deck (incolor cabe em qualquer um).
+ */
+export function outsideIdentity(
+  cardIdentity: readonly string[],
+  commanderIdentity: readonly string[],
+): string[] {
+  const allowed = new Set(commanderIdentity.map((c) => c.toUpperCase()));
+  const out = new Set(cardIdentity.map((c) => c.toUpperCase()).filter((c) => !allowed.has(c)));
+  return WUBRG.filter((c) => out.has(c));
+}
 
 export type Suggestion =
   | { code: 'more_lands'; missing: number }
@@ -243,13 +259,9 @@ export function validateDeck(
           : { code: 'too_many_copies', name, quantity, max: profile.maxCopies },
       );
     }
-    if (
-      profile.commanders &&
-      playing &&
-      commanderCount > 0 &&
-      card.colorIdentity.some((color) => !identity.has(color))
-    ) {
-      issues.push({ code: 'color_identity', name });
+    const outside = outsideIdentity(card.colorIdentity, [...identity]);
+    if (profile.commanders && playing && commanderCount > 0 && outside.length) {
+      issues.push({ code: 'color_identity', name, colors: outside });
     }
     // Lista de banidas/restritas do formato, pelos dados de legalidade do Scryfall.
     const legality = profile.scryfallFormat ? card.legalities?.[profile.scryfallFormat] : undefined;

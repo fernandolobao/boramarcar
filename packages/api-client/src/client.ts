@@ -1047,6 +1047,14 @@ export function createApiClient(options: ApiClientOptions) {
             { choices, ...(visibility ? { visibility } : {}) },
           )
         ).deck,
+      /** Move todas as cópias de uma carta para outro board, ou remove (`to: null`). Dono. */
+      moveCard: (deckId: string, input: { name: string; from: string; to: string | null }) =>
+        request(
+          'POST',
+          `/decks/${encodeURIComponent(deckId)}/lines/move`,
+          z.object({ moved: z.number() }),
+          input,
+        ),
       /** Cartas do deck que você já tem livres na coleção, em qualquer edição (dono). */
       collectionMatches: async (deckId: string) =>
         (

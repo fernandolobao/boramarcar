@@ -753,3 +753,13 @@ sem rolagem horizontal em 320px.
   validação") vai em `sr-only` dentro da aba.
 - A aba escolhida fica no endereço (`?aba=mao`) sem rolar a página; links e a ajuda abrem direto
   nela.
+
+## Identidade de cor no editor (25/11/2026)
+
+- Aviso "Fora da identidade" abaixo da carta (galeria) e na linha (lista): ícone, texto e os
+  símbolos das cores com o nome por extenso (`ManaText`), sem depender só da cor.
+- "Adicionar carta": o filtro "Só cartas da identidade de …" é um checkbox com rótulo; o aviso antes
+  de adicionar fica numa região `aria-live="polite"` e o botão principal muda o texto para
+  "Adicionar mesmo assim". "Adicionar ao Talvez" é um botão com texto.
+- Validação: "Mover para Talvez" e "Remover" com nome em contexto ("Remover Lightning Bolt do
+  deck"); remover pede dois cliques.

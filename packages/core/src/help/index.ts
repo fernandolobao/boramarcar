@@ -221,6 +221,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         title: 'Decks',
         questions: [
           {
+            id: 'identidade-de-cor',
+            question: 'E se eu puser uma carta fora da identidade de cor do comandante?',
+            intro: [
+              'Em "Adicionar carta", a busca mostra só cartas da identidade do comandante (desligue "Só cartas da identidade de…" para ver todas). Se você escolher uma carta fora dela, o ArcanaKin avisa quais cores quebram a regra antes de adicionar: dá para "Adicionar mesmo assim" ou "Adicionar ao Talvez".',
+              'No deck, a carta fica com o aviso "Fora da identidade" e as cores. Na análise, em "Visão geral", a validação aponta a carta com "Mover para Talvez" e "Remover".',
+            ],
+          },
+          {
             id: 'mao-inicial',
             question: 'Como testo a mão inicial do deck?',
             steps: [
@@ -641,6 +649,14 @@ export const HELP: Record<HelpLocale, HelpContent> = {
         id: 'decks',
         title: 'Decks',
         questions: [
+          {
+            id: 'identidade-de-cor',
+            question: 'What if I add a card outside the commander\u2019s color identity?',
+            intro: [
+              'In "Add card", the search shows only cards in the commander\u2019s identity (turn off "Only cards in …\u2019s identity" to see all). If you pick a card outside it, ArcanaKin tells you which colors break the rule before adding: you can "Add anyway" or "Add to Maybe".',
+              'In the deck, the card shows an "Outside identity" note with the colors. In the analysis "Overview" tab, the validation points out the card with "Move to Maybe" and "Remove".',
+            ],
+          },
           {
             id: 'mao-inicial',
             question: 'How do I test the deck\u2019s opening hand?',

@@ -15,8 +15,11 @@ export function CardSearch({
   onChange,
   onPick,
   required = true,
+  identity,
 }: {
   id: string;
+  /** Só sugere cartas dessa identidade de cor (ex.: `WU`; `C` = incolor). */
+  identity?: string;
   /** Campo obrigatório (padrão); no deck do zero, o comandante é opcional. */
   required?: boolean;
   label: string;
@@ -43,7 +46,7 @@ export function CardSearch({
       setLoading(true);
       try {
         const result = await api<{ names: string[]; printed?: Record<string, string> }>(
-          `/api/v1/cards/autocomplete?q=${encodeURIComponent(q)}`,
+          `/api/v1/cards/autocomplete?q=${encodeURIComponent(q)}${identity ? `&identity=${identity}` : ''}`,
         );
         if (!cancelled) {
           setOptions(result.names.slice(0, 10));
@@ -60,7 +63,7 @@ export function CardSearch({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [value]);
+  }, [value, identity]);
 
   const visible = open && value.trim().length >= 2 && options.length > 0;
   const choose = (name: string) => {
