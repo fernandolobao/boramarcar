@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
-import { GAME_FORMATS, ROLE_POINTS, TAGGER_ROLES } from '@boramarcar/core';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { SignInButton } from '@/components/auth-buttons';
-import { AppPreview } from '@/components/home/app-preview';
 import { ProductTour } from '@/components/home/product-tour';
+import { Screenshot } from '@/components/home/screenshot';
 import { Icon, type IconName } from '@/components/icons';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { Logo } from '@/components/logo';
@@ -24,79 +23,47 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const FEATURES = [
-  ['availability', 'availability'],
-  ['events', 'events'],
-  ['games', 'games'],
-  ['ranking', 'ranking'],
-  ['profiles', 'achievement'],
-  ['decks', 'decks'],
-  ['analysis', 'bracket'],
-  ['mobile', 'mobile'],
-] as const satisfies readonly (readonly [string, IconName])[];
-const SOURCES = [
-  ['scryfall', 'https://scryfall.com'],
-  ['spellbook', 'https://commanderspellbook.com'],
-  ['bcb', 'https://www.bcb.gov.br'],
-  ['importers', null],
-  ['links', null],
-  ['group', null],
-] as const;
-const STEPS = [
-  'format',
-  'roles',
-  'score',
-  'suggestions',
-  'bracket',
-  'mana',
-  'compare',
-  'group',
-] as const;
 /**
- * Partes da nota e a cor de cada uma. Seis cores distintas das três famílias da marca (roxo,
- * mana, dourado), alternando a família a cada parte; validadas para daltonismo (ΔE ≥ 12 entre
- * vizinhas). A lista ao lado traz os pontos e o nome, então a cor nunca é a única pista.
+ * Três recursos, cada um com uma tela real do app (capturas de "Veja por dentro") e os itens que
+ * ele cobre. Layouts diferentes: texto e tela lado a lado, invertido, e tela larga embaixo.
  */
-const SCORE_PARTS = [
-  ['lands', 25, 'bg-brand-800 dark:bg-brand-600'],
-  ['ramp', ROLE_POINTS.ramp, 'bg-teal-500'],
-  ['draw', ROLE_POINTS.draw, 'bg-gold-600'],
-  ['removal', ROLE_POINTS.removal, 'bg-brand-400'],
-  ['wipe', ROLE_POINTS.wipe, 'bg-teal-600'],
-  ['curve', 10, 'bg-gold-500'],
-] as const;
-/**
- * Cores da paleta ArcanaKin (tokens), só como detalhe visual (o texto carrega a informação).
- * Todas com ícone branco ≥ 3:1 por cima.
- */
-const ACCENTS = [
-  'var(--color-primary)',
-  'var(--color-teal-700)',
-  'var(--color-gold-700)',
-  'var(--color-arcano)',
-  'var(--color-brand-700)',
-  'var(--color-teal-800)',
-];
+const SPOTLIGHTS = [
+  {
+    key: 'agenda',
+    shot: 'disponibilidade',
+    points: [
+      ['availability', 'availability'],
+      ['events', 'events'],
+      ['games', 'games'],
+    ],
+  },
+  {
+    key: 'decks',
+    shot: 'deck',
+    points: [
+      ['decks', 'decks'],
+      ['analysis', 'bracket'],
+      ['proxies', 'print'],
+    ],
+  },
+  {
+    key: 'group',
+    shot: 'ranking',
+    points: [
+      ['ranking', 'ranking'],
+      ['profiles', 'achievement'],
+    ],
+  },
+] as const satisfies readonly {
+  key: string;
+  shot: string;
+  points: readonly (readonly [string, IconName])[];
+}[];
+const FAQ = ['free', 'account', 'formats', 'mobile', 'data', 'wizards'] as const;
 
-function SectionHeading({
-  id,
-  index,
-  title,
-  subtitle,
-}: {
-  id: string;
-  index: string;
-  title: string;
-  subtitle?: string;
-}) {
+function SectionHeading({ id, title, subtitle }: { id: string; title: string; subtitle?: string }) {
   return (
-    <div className="mb-10 max-w-2xl space-y-3">
-      <p
-        className="inline-flex rounded-full bg-accent px-3 py-0.5 text-sm font-semibold text-on-accent tabular-nums"
-        aria-hidden="true"
-      >
-        {index}
-      </p>
+    <div className="mb-12 max-w-2xl space-y-3">
       <h2
         id={id}
         className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
@@ -109,8 +76,9 @@ function SectionHeading({
 }
 
 /**
- * Página inicial (pública, igual para quem entrou ou não): apresenta o ArcanaKin, as
- * funcionalidades, as fontes de dados, a metodologia da análise, os valores e o convite aos testes.
+ * Página inicial (pública, igual para quem entrou ou não), refeita na revisão de design
+ * (26/11/2026): o produto grande no topo, três recursos com telas reais, "Veja por dentro", os
+ * valores, um FAQ curto e o convite aos testes. Fontes e metodologia ficam em `/metodologia`.
  */
 export default async function HomePage({
   searchParams,
@@ -124,7 +92,7 @@ export default async function HomePage({
   const t = await getTranslations('home');
   const tc = await getTranslations('common');
   const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t('join.emailSubject'))}`;
-  const sections = ['features', 'tour', 'sources', 'method', 'values', 'join'] as const;
+  const sections = ['features', 'tour', 'faq'] as const;
 
   const dashboardButton = (size: 'sm' | 'lg') =>
     user ? (
@@ -167,7 +135,7 @@ export default async function HomePage({
               className="h-5 w-auto text-arcano min-[400px]:h-6 dark:text-pergaminho"
             />
           </Link>
-          <nav aria-label={t('nav.label')} className="hidden xl:block">
+          <nav aria-label={t('nav.label')} className="hidden lg:block">
             <ul className="flex gap-1 text-sm">
               {sections.map((s) => (
                 <li key={s}>
@@ -179,6 +147,14 @@ export default async function HomePage({
                   </a>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/metodologia"
+                  className="rounded-lg px-3 py-2 whitespace-nowrap hover:bg-surface-muted"
+                >
+                  {t('nav.methodology')}
+                </Link>
+              </li>
             </ul>
           </nav>
           <div className="flex shrink-0 items-center gap-2 whitespace-nowrap sm:gap-3">
@@ -194,15 +170,14 @@ export default async function HomePage({
             {tp('accountDeleted')}
           </p>
         )}
-        {/* Hero no visual da plataforma: fundo pergaminho, título em Fraunces e uma prévia do app
-            montada com os mesmos cartões das telas. */}
+        {/* Topo: a promessa e, logo abaixo, o produto grande (o painel de verdade). */}
         <section aria-labelledby="home-title" className="relative isolate overflow-hidden">
           <div
             aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_85%_10%,color-mix(in_oklab,var(--color-primary)_14%,transparent),transparent),radial-gradient(50%_50%_at_0%_100%,color-mix(in_oklab,var(--color-accent)_18%,transparent),transparent)]"
+            className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_85%_0%,color-mix(in_oklab,var(--color-primary)_16%,transparent),transparent),radial-gradient(50%_40%_at_0%_40%,color-mix(in_oklab,var(--color-accent)_16%,transparent),transparent)]"
           />
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_1fr]">
-            <div>
+          <div className="mx-auto max-w-6xl px-4 pt-16 sm:px-6 sm:pt-24">
+            <div className="max-w-3xl motion-safe:animate-[enter_450ms_ease-out_both]">
               <p className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-on-accent">
                 {t('hero.eyebrow')}
               </p>
@@ -210,248 +185,185 @@ export default async function HomePage({
                 id="home-title"
                 className="font-display text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
               >
-                {t('hero.title')}
+                {/* Uma frase por linha ("A mesa fecha." / "O ArcanaKin cuida do resto."). */}
+                {t('hero.title')
+                  .split(/(?<=\.)\s+/)
+                  .map((sentence) => (
+                    <span key={sentence} className="block">
+                      {sentence}
+                    </span>
+                  ))}
               </h1>
-              <p className="muted mt-6 max-w-xl text-lg sm:text-xl">{t('hero.subtitle')}</p>
-              <div className="mt-10 flex flex-wrap gap-3">
-                {dashboardButton('lg')}
-                <a href="#join" className="btn-secondary px-6 text-base">
-                  <Icon name="email" />
-                  {t('hero.join')}
-                </a>
-              </div>
+              <p className="muted mt-6 max-w-2xl text-lg sm:text-xl">{t('hero.subtitle')}</p>
+              <div className="mt-10 flex flex-wrap gap-3">{dashboardButton('lg')}</div>
             </div>
-            <AppPreview />
+            <div className="mt-14 motion-safe:animate-[enter_900ms_ease-out_150ms_both] sm:mt-20">
+              <Screenshot
+                name="painel"
+                alt={t('tour.items.painel.alt')}
+                url="arcanakin.com.br/painel"
+                sizes="(min-width: 1152px) 1104px, 100vw"
+              />
+            </div>
           </div>
         </section>
 
-        <section aria-labelledby="intro" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-[3fr_2fr] lg:items-center">
-            <div className="space-y-4">
-              <h2
-                id="intro"
-                className="font-display text-3xl font-semibold tracking-tight sm:text-4xl"
-              >
-                {t('intro.title')}
-              </h2>
-              <p className="muted text-lg">{t('intro.body')}</p>
-              <p className="muted text-lg">{t('intro.name')}</p>
+        <section aria-labelledby="features" className="scroll-mt-20 py-24 sm:py-32">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <SectionHeading
+              id="features"
+              title={t('features.title')}
+              subtitle={t('features.subtitle')}
+            />
+            <div className="space-y-24 sm:space-y-32">
+              {SPOTLIGHTS.map(({ key, shot, points }, i) => {
+                const wide = i === SPOTLIGHTS.length - 1;
+                const text = (
+                  <div className={wide ? 'grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-end' : ''}>
+                    <div>
+                      <p className="text-sm font-semibold tracking-wide text-link uppercase">
+                        {t(`features.spotlights.${key}.eyebrow`)}
+                      </p>
+                      <h3 className="mt-2 font-display text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+                        {t(`features.spotlights.${key}.title`)}
+                      </h3>
+                      <p className="muted mt-4 text-lg">{t(`features.spotlights.${key}.body`)}</p>
+                    </div>
+                    <ul className={`space-y-5 ${wide ? '' : 'mt-8'}`}>
+                      {points.map(([point, icon]) => (
+                        <li key={point} className="flex gap-4">
+                          <span
+                            className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-link"
+                            aria-hidden="true"
+                          >
+                            <Icon name={icon} className="size-5" />
+                          </span>
+                          <div>
+                            <h4 className="font-semibold">{t(`features.items.${point}.title`)}</h4>
+                            <p className="muted mt-0.5">{t(`features.items.${point}.body`)}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+                const image = (
+                  <Screenshot
+                    name={shot}
+                    alt={t(`tour.items.${shot}.alt`)}
+                    sizes={
+                      wide
+                        ? '(min-width: 1152px) 1104px, 100vw'
+                        : '(min-width: 1024px) 560px, 100vw'
+                    }
+                  />
+                );
+                return wide ? (
+                  <article key={key} className="space-y-12">
+                    {text}
+                    {image}
+                  </article>
+                ) : (
+                  <article key={key} className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                    {text}
+                    <div className={i % 2 === 1 ? 'lg:order-first' : ''}>{image}</div>
+                  </article>
+                );
+              })}
             </div>
-            <dl className="grid grid-cols-3 gap-4">
-              {(
-                [
-                  ['formats', GAME_FORMATS.length - 1],
-                  ['roles', TAGGER_ROLES.length],
-                  ['languages', 2],
-                ] as const
-              ).map(([key, value]) => (
-                <div key={key} className="card flex flex-col-reverse justify-end text-center">
-                  <dt className="muted text-sm">{t(`intro.stats.${key}`)}</dt>
-                  <dd className="font-display text-4xl font-semibold text-link">{value}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </section>
 
         <section
-          aria-labelledby="features"
-          className="scroll-mt-20 border-y border-line bg-surface py-20"
+          aria-labelledby="tour"
+          className="scroll-mt-20 border-y border-line bg-surface py-24 sm:py-32"
         >
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading
-              id="features"
-              index="01"
-              title={t('features.title')}
-              subtitle={t('features.subtitle')}
-            />
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map(([key, icon], i) => (
-                <li key={key} className="rounded-2xl border border-line bg-canvas p-6 shadow-sm">
-                  <span
-                    className="mb-4 inline-flex size-11 items-center justify-center rounded-xl text-white"
-                    style={{ backgroundColor: ACCENTS[i % ACCENTS.length] }}
-                    aria-hidden="true"
-                  >
-                    <Icon name={icon} className="size-5" />
-                  </span>
-                  <h3 className="mb-2 text-lg font-semibold">{t(`features.items.${key}.title`)}</h3>
-                  <p className="muted">{t(`features.items.${key}.body`)}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section aria-labelledby="tour" className="scroll-mt-20 py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading
-              id="tour"
-              index="02"
-              title={t('tour.title')}
-              subtitle={t('tour.subtitle')}
-            />
+            <SectionHeading id="tour" title={t('tour.title')} subtitle={t('tour.subtitle')} />
             <ProductTour />
           </div>
         </section>
 
-        <section aria-labelledby="sources" className="scroll-mt-20 py-20">
+        <section aria-labelledby="values" className="scroll-mt-20 py-24 sm:py-32">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading
-              id="sources"
-              index="03"
-              title={t('sources.title')}
-              subtitle={t('sources.subtitle')}
-            />
-            <dl className="grid gap-x-10 gap-y-8 md:grid-cols-2">
-              {SOURCES.map(([key, url]) => (
-                <div key={key} className="border-s-4 border-accent ps-5">
-                  <dt className="text-lg font-semibold">
-                    {url ? (
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline-offset-4 hover:underline"
-                      >
-                        {t(`sources.items.${key}.name`)}
-                        <span className="sr-only"> {tc('newTab')}</span>
-                      </a>
-                    ) : (
-                      t(`sources.items.${key}.name`)
-                    )}
-                  </dt>
-                  <dd className="muted mt-1">{t(`sources.items.${key}.body`)}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </section>
-
-        <section
-          aria-labelledby="method"
-          className="scroll-mt-20 border-y border-line bg-surface py-20"
-        >
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading
-              id="method"
-              index="04"
-              title={t('method.title')}
-              subtitle={t('method.subtitle')}
-            />
-            <figure className="mb-12">
-              <figcaption className="mb-3 font-semibold">{t('method.scoreCaption')}</figcaption>
-              {/* Barra decorativa: os mesmos números estão na lista ao lado. */}
-              <div className="flex h-4 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
-                {SCORE_PARTS.map(([key, points, color]) => (
-                  <span
-                    key={key}
-                    className={`h-full ${color}`}
-                    style={{ flexGrow: points, flexBasis: 0 }}
-                  />
-                ))}
-              </div>
-              <ul className="mt-4 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-                {SCORE_PARTS.map(([key, points, color]) => (
-                  <li key={key} className="flex items-center gap-2">
-                    <span className={`size-3 shrink-0 rounded-sm ${color}`} aria-hidden="true" />
-                    <span className="font-semibold tabular-nums">
-                      {t('method.points', { count: points })}
-                    </span>
-                    <span className="muted">· {t(`method.parts.${key}`)}</span>
-                  </li>
-                ))}
-              </ul>
-            </figure>
-            <ol className="grid gap-6 md:grid-cols-2">
-              {STEPS.map((key) => (
-                <li key={key} className="rounded-2xl border border-line p-6">
-                  <h3 className="mb-2 text-lg font-semibold">{t(`method.steps.${key}.title`)}</h3>
-                  <p className="muted">{t(`method.steps.${key}.body`)}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section aria-labelledby="values" className="scroll-mt-20 py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading
-              id="values"
-              index="05"
-              title={t('values.title')}
-              subtitle={t('values.subtitle')}
-            />
-            <ul className="grid gap-6 md:grid-cols-3">
-              {/* O valor que vem primeiro, em destaque. */}
-              <li className="flex overflow-hidden rounded-2xl border border-line bg-surface shadow-sm md:col-span-3">
-                <span className="w-2 shrink-0 bg-accent" aria-hidden="true" />
-                <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:p-8">
-                  <span
-                    className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-accent text-on-accent"
-                    aria-hidden="true"
-                  >
-                    <Icon name="fun" className="size-7" />
-                  </span>
-                  <div>
-                    <h3 className="mb-2 font-display text-2xl font-semibold sm:text-3xl">
-                      {t('values.items.fun.title')}
-                    </h3>
-                    <p className="muted max-w-3xl text-lg">{t('values.items.fun.body')}</p>
-                  </div>
-                </div>
-              </li>
+            <h2 id="values" className="text-sm font-semibold tracking-wide text-link uppercase">
+              {t('values.title')}
+            </h2>
+            <p className="mt-6 max-w-4xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+              {t('values.items.fun.title')}.
+            </p>
+            <p className="muted mt-6 max-w-3xl text-lg sm:text-xl">{t('values.items.fun.body')}</p>
+            <ul className="mt-16 grid gap-10 md:grid-cols-3">
               {(['learn', 'transparency', 'accessible'] as const).map((key) => (
-                <li key={key} className="card flex flex-col gap-4 p-6">
-                  <span
-                    className="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300"
-                    aria-hidden="true"
-                  >
-                    <Icon name={key} className="size-6" />
-                  </span>
-                  <div>
-                    <h3 className="mb-2 text-xl font-semibold">{t(`values.items.${key}.title`)}</h3>
-                    <p className="muted">{t(`values.items.${key}.body`)}</p>
-                    {key === 'transparency' && (
-                      <a
-                        href="#method"
-                        className="mt-3 inline-flex items-center gap-1 font-medium text-link underline underline-offset-4"
-                      >
-                        {t('values.items.transparency.link')}
-                      </a>
-                    )}
-                  </div>
+                <li key={key} className="border-t border-line-strong pt-6">
+                  <Icon name={key} className="size-6 text-link" />
+                  <h3 className="mt-4 text-lg font-semibold">{t(`values.items.${key}.title`)}</h3>
+                  <p className="muted mt-2">{t(`values.items.${key}.body`)}</p>
+                  {key === 'transparency' && (
+                    <Link
+                      href="/metodologia"
+                      className="mt-3 inline-flex items-center gap-1 font-medium text-link underline underline-offset-4"
+                    >
+                      {t('values.items.transparency.link')}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
         </section>
 
-        <section aria-labelledby="join" className="scroll-mt-20 px-4 pb-20 sm:px-6">
-          <div className="mx-auto flex max-w-6xl overflow-hidden rounded-3xl border border-line bg-surface shadow-sm">
-            <span className="w-3 shrink-0 bg-primary" aria-hidden="true" />
-            <div className="flex-1 px-6 py-14 sm:px-12">
-              <p
-                className="inline-flex rounded-full bg-accent px-3 py-0.5 text-sm font-semibold text-on-accent tabular-nums"
-                aria-hidden="true"
-              >
-                05
-              </p>
+        <section
+          aria-labelledby="faq"
+          className="scroll-mt-20 border-t border-line bg-surface py-24 sm:py-32"
+        >
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <div className="space-y-4">
               <h2
-                id="join"
-                className="mt-4 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-5xl"
+                id="faq"
+                className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
               >
-                {t('join.title')}
+                {t('faq.title')}
               </h2>
-              <p className="muted mt-5 max-w-2xl text-lg">{t('join.body')}</p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <a href={mailto} className="btn-secondary px-6 text-base">
-                  <Icon name="email" />
-                  {t('join.email')}
-                </a>
-                <span className="muted">{t('join.or')}</span>
-                {dashboardButton('lg')}
-              </div>
+              <Link
+                href="/metodologia"
+                className="inline-flex items-center gap-1 font-medium text-link underline underline-offset-4"
+              >
+                {t('faq.methodLink')}
+              </Link>
+            </div>
+            <div className="divide-y divide-line border-y border-line">
+              {FAQ.map((key) => (
+                <details key={key} className="group py-5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg text-lg font-semibold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus [&::-webkit-details-marker]:hidden">
+                    {t(`faq.items.${key}.q`)}
+                    <Icon
+                      name="add"
+                      className="size-5 shrink-0 text-fg-muted transition-transform group-open:rotate-45 motion-reduce:transition-none"
+                    />
+                  </summary>
+                  <p className="muted mt-3 max-w-2xl">{t(`faq.items.${key}.a`)}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="join" className="scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
+          <div className="mx-auto max-w-4xl text-center">
+            <h2
+              id="join"
+              className="font-display text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
+            >
+              {t('join.title')}
+            </h2>
+            <p className="muted mx-auto mt-6 max-w-2xl text-lg sm:text-xl">{t('join.body')}</p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              {dashboardButton('lg')}
+              <a href={mailto} className="btn-secondary px-6 text-base">
+                <Icon name="email" />
+                {t('join.email')}
+              </a>
             </div>
           </div>
         </section>
@@ -474,6 +386,9 @@ export default async function HomePage({
             </Link>
             <Link href="/aprender" className="underline underline-offset-2">
               {tl('learn')}
+            </Link>
+            <Link href="/metodologia" className="underline underline-offset-2">
+              {tl('methodology')}
             </Link>
             <Link href="/ajuda" className="underline underline-offset-2">
               {tl('help')}

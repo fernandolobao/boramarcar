@@ -61,10 +61,25 @@ body {
 
 /* Classes utilitárias do app (Tailwind v4: @utility permite reutilizar com @apply). */
 @utility card {
-  @apply rounded-2xl border border-line bg-surface p-5 shadow-sm;
+  @apply rounded-2xl border border-line bg-surface p-5 shadow-sm transition-[translate,box-shadow] duration-200 ease-out motion-reduce:transition-none;
 }
+/*
+ * Botões: sobem 1px sob o ponteiro e afundam no clique (camada de movimento da revisão de design).
+ * Sem movimento para quem pede menos movimento.
+ */
 @utility btn {
-  @apply inline-flex cursor-pointer min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-medium transition motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex cursor-pointer min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-medium transition duration-150 ease-out motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50;
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover:not(:disabled) {
+      translate: 0 -1px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:active:not(:disabled) {
+      translate: 0 1px;
+      transition-duration: 50ms;
+    }
+  }
 }
 @utility btn-primary {
   @apply btn bg-primary text-on-primary hover:bg-primary-hover;
@@ -120,6 +135,20 @@ input[type='datetime-local']::-webkit-date-and-time-value {
   @apply mb-3 font-display text-xl font-semibold;
   font-optical-sizing: auto;
 }
+/*
+ * Cartão que é um link (ou contém o link principal): sobe 2px e ganha a sombra elevada sob o
+ * ponteiro. Vale para `<a class="card">`, para o cartão dentro de um link e para o cartão com um
+ * link "esticado" (`data-card-link`).
+ */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a.card:hover,
+  a:hover > .card,
+  .card[data-card-link]:hover {
+    translate: 0 -2px;
+    box-shadow: var(--shadow-lg);
+  }
+}
+
 /* Texto secundário: fg-muted mantém ≥ 4,5:1 sobre canvas, surface e surface-muted (testado nos tokens). */
 @utility muted {
   @apply text-sm text-fg-muted;
@@ -470,10 +499,24 @@ input[type='radio'] {
   z-index: -1;
   opacity: 0.85;
 }
-@media (max-width: 639px) {
-  /* No celular a faixa passa atrás de mais texto: mais discreta. */
+@media (min-width: 1024px) {
+  /* Desktop: a faixa fica nas margens e some sob a coluna do conteúdo (max-w-5xl), para não
+     passar por trás de tabelas e formulários. */
   .mana-flow {
-    opacity: 0.55;
+    mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(50% - 36rem),
+      transparent calc(50% - 31rem),
+      transparent calc(50% + 31rem),
+      #000 calc(50% + 36rem)
+    );
+  }
+}
+@media (max-width: 1023px) {
+  /* Tablet e celular: a coluna ocupa a tela toda; a faixa fica bem discreta. */
+  .mana-flow {
+    opacity: 0.35;
   }
 }
 @media print {
@@ -679,5 +722,17 @@ button[aria-busy='true']::before {
   select,
   textarea {
     font-size: 16px;
+  }
+}
+
+/* Entrada do topo da página inicial (uma vez, ao carregar; só com movimento liberado). */
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
   }
 }

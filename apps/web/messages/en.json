@@ -369,6 +369,7 @@
       "start": "First day",
       "end": "Last day",
       "create": "Create season",
+      "new": "New season",
       "range": "{start} to {end}",
       "remove": "Remove season {name}",
       "created": "Season created."
@@ -1266,10 +1267,8 @@
       "label": "Page sections",
       "features": "Features",
       "tour": "Take a look",
-      "sources": "Where data comes from",
-      "method": "Methodology",
-      "values": "Values",
-      "join": "Join"
+      "faq": "Questions",
+      "methodology": "Methodology"
     },
     "goToDashboard": "Go to dashboard",
     "signInToDashboard": "Sign in to dashboard",
@@ -1278,18 +1277,7 @@
     "hero": {
       "eyebrow": "In testing with Commander groups",
       "title": "The table comes together. ArcanaKin handles the rest.",
-      "subtitle": "Everyone marks when and where they can play. The app finds when the table comes together, records games, keeps the ranking and helps improve your decks.",
-      "join": "Join the tests"
-    },
-    "intro": {
-      "title": "What is ArcanaKin",
-      "body": "A place for your Magic group to organize life away from the table: no more polls in the group chat, rankings in spreadsheets or lost decklists. It was born at a four-friend Commander table and is growing with help from players.",
-      "stats": {
-        "formats": "game formats",
-        "roles": "card roles analyzed",
-        "languages": "languages (Portuguese and English)"
-      },
-      "name": "The name blends arcana, the secrets of magic, and kin, your people: a home for your Magic family."
+      "subtitle": "Everyone marks when and where they can play. The app finds when the table comes together, records games, keeps the ranking and helps improve your decks."
     },
     "features": {
       "title": "Features",
@@ -1331,6 +1319,23 @@
           "title": "Android and iOS app",
           "body": "In development: meetups, RSVPs, ranking and decks in your pocket, with Google sign-in."
         }
+      },
+      "spotlights": {
+        "agenda": {
+          "eyebrow": "Schedule",
+          "title": "From “who can play?” to a game night",
+          "body": "No more polls in the group chat: everyone marks when they can play, and ArcanaKin shows when the table comes together. Creating the game night is one tap away."
+        },
+        "decks": {
+          "eyebrow": "Decks",
+          "title": "Decks you understand",
+          "body": "Import your list and see the score explained, part by part. Before game night, try opening hands on the playtest table."
+        },
+        "group": {
+          "eyebrow": "Group",
+          "title": "Your table’s ranking, no spreadsheet",
+          "body": "Every recorded game updates everyone’s ranking, seasons and achievements, and the group can run tournaments too."
+        }
       }
     },
     "tour": {
@@ -1356,7 +1361,7 @@
         "colecao": {
           "tab": "Collection",
           "caption": "The cards you own, with the estimated value and which decks each one is in.",
-          "alt": "Collection with 136 copies of 84 cards, estimated value of R$ 16,178.39, and the card gallery with quantity, foil and how many decks each card is in."
+          "alt": "Collection with 136 copies of 84 cards, the estimated value in reais and the card gallery with quantity, foil and how many decks each card is in."
         },
         "mesa": {
           "tab": "Table mode",
@@ -1385,6 +1390,78 @@
         }
       }
     },
+    "values": {
+      "title": "What we believe in",
+      "subtitle": "ArcanaKin was born at a table of friends who wanted to round out their decks and understand the game better. That guides every choice.",
+      "items": {
+        "fun": {
+          "title": "Fun above all",
+          "body": "Magic is about getting together with friends. Everything here exists to leave more time to play: plan the night without polls, track life without paper and keep the ranking lighthearted. If something makes the table less fun, it stays out."
+        },
+        "learn": {
+          "title": "Better decks, better games",
+          "body": "It all started with one question: what is my deck missing? The analysis shows lands, ramp, card draw, removal and curve, and explains every score so you can understand and decide. It's a guide, not a rule."
+        },
+        "transparency": {
+          "title": "Transparency",
+          "body": "You know where every number comes from: the methodology is open, sources are credited and prices say they are estimates. We don't sell data, and you decide who sees your decks.",
+          "link": "See the methodology"
+        },
+        "accessible": {
+          "title": "Everyone at the table",
+          "body": "No one is left out: we follow WCAG 2.2 level AA, with keyboard, screen reader and good contrast in light and dark themes. Every new screen is audited before it ships."
+        }
+      }
+    },
+    "join": {
+      "title": "Join the tests",
+      "body": "ArcanaKin is being tested with Commander groups. Use it with your table and tell us what worked, what was missing and what broke: every message becomes an improvement.",
+      "email": "Send feedback by email",
+      "emailSubject": "ArcanaKin — testing",
+      "or": "or start now:"
+    },
+    "footer": {
+      "credits": "Card data by Scryfall; combos by Commander Spellbook; dollar rate by the Central Bank of Brazil.",
+      "disclaimer": "ArcanaKin is a fan project and is not affiliated with Wizards of the Coast. Magic: The Gathering is a trademark of Wizards of the Coast LLC.",
+      "contact": "Contact"
+    },
+    "signUpEmail": "Create account with e-mail",
+    "faq": {
+      "title": "Frequently asked questions",
+      "methodLink": "Read the full methodology",
+      "items": {
+        "free": {
+          "q": "Does ArcanaKin cost anything?",
+          "a": "No. Everything in ArcanaKin is free today."
+        },
+        "account": {
+          "q": "Does everyone in the group need an account?",
+          "a": "Yes: each person signs in with Google or with email and password. Whoever creates the group shares an invite link, and opening it joins the group."
+        },
+        "formats": {
+          "q": "Is it only for Commander?",
+          "a": "No. You can record games of Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Modern, Draft and other formats. Deck validation follows each format’s rules."
+        },
+        "mobile": {
+          "q": "Does it work on phones?",
+          "a": "Yes, the site works on phones and tablets. The Android and iOS app is in development."
+        },
+        "data": {
+          "q": "Where does the card data come from?",
+          "a": "From Scryfall (cards, images and US dollar prices), Commander Spellbook (combos) and the Central Bank of Brazil (exchange rate). The methodology explains every number."
+        },
+        "wizards": {
+          "q": "Is ArcanaKin made by Wizards of the Coast?",
+          "a": "No. It is a fan project, not affiliated with Wizards of the Coast, the owner of Magic: The Gathering."
+        }
+      }
+    }
+  },
+  "methodology": {
+    "metaTitle": "Methodology — where the data comes from and how ArcanaKin rates decks",
+    "metaDescription": "ArcanaKin’s data sources and the deck analysis rules: score from 0 to 100, card roles, bracket, mana base and suggestions.",
+    "title": "Methodology",
+    "intro": "Where every number ArcanaKin shows comes from, and how deck analysis reaches its score and suggestions.",
     "sources": {
       "title": "Where the data comes from",
       "subtitle": "We only use sources that allow it and we credit them. What belongs to your group stays in your group.",
@@ -1462,55 +1539,7 @@
         "curve": "Curve (average MV up to 3)"
       },
       "points": "{count} points"
-    },
-    "values": {
-      "title": "What we believe in",
-      "subtitle": "ArcanaKin was born at a table of friends who wanted to round out their decks and understand the game better. That guides every choice.",
-      "items": {
-        "fun": {
-          "title": "Fun above all",
-          "body": "Magic is about getting together with friends. Everything here exists to leave more time to play: plan the night without polls, track life without paper and keep the ranking lighthearted. If something makes the table less fun, it stays out."
-        },
-        "learn": {
-          "title": "Better decks, better games",
-          "body": "It all started with one question: what is my deck missing? The analysis shows lands, ramp, card draw, removal and curve, and explains every score so you can understand and decide. It's a guide, not a rule."
-        },
-        "transparency": {
-          "title": "Transparency",
-          "body": "You know where every number comes from: the methodology is open, sources are credited and prices say they are estimates. We don't sell data, and you decide who sees your decks.",
-          "link": "See the methodology"
-        },
-        "accessible": {
-          "title": "Everyone at the table",
-          "body": "No one is left out: we follow WCAG 2.2 level AA, with keyboard, screen reader and good contrast in light and dark themes. Every new screen is audited before it ships."
-        }
-      }
-    },
-    "join": {
-      "title": "Join the tests",
-      "body": "ArcanaKin is being tested with Commander groups. Use it with your table and tell us what worked, what was missing and what broke: every message becomes an improvement.",
-      "email": "Send feedback by email",
-      "emailSubject": "ArcanaKin — testing",
-      "or": "or start now:"
-    },
-    "footer": {
-      "credits": "Card data by Scryfall; combos by Commander Spellbook; dollar rate by the Central Bank of Brazil.",
-      "disclaimer": "ArcanaKin is a fan project and is not affiliated with Wizards of the Coast. Magic: The Gathering is a trademark of Wizards of the Coast LLC.",
-      "contact": "Contact"
-    },
-    "preview": {
-      "label": "ArcanaKin example: the next meetup with who's coming, the alert that the table filled up and the night's standings.",
-      "nextEvent": "Next meetup",
-      "eventTitle": "Friday Commander",
-      "eventWhen": "Friday, 8:00 PM",
-      "eventWhere": "Ana's place",
-      "confirmed": "4 coming",
-      "windowTitle": "The table filled up!",
-      "windowBody": "4 players are free on Saturday, 3–7 PM",
-      "recap": "Tonight's standings",
-      "wins": "{wins, plural, =1 {1 win} other {# wins}}"
-    },
-    "signUpEmail": "Create account with e-mail"
+    }
   },
   "places": {
     "name": "Location name",
@@ -1670,7 +1699,8 @@
     "help": "Help",
     "feedback": "Feedback",
     "stores": "Stores and events",
-    "learn": "Learn to play"
+    "learn": "Learn to play",
+    "methodology": "Methodology"
   },
   "collection": {
     "title": "Collection",

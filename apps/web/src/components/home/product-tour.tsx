@@ -6,15 +6,17 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components';
 
 /** Telas capturadas por `pnpm --filter @boramarcar/web showcase` (grupo fictício). */
 const SCREENS = [
-  { key: 'painel', height: 800 },
-  { key: 'disponibilidade', height: 800 },
-  { key: 'deck', height: 800 },
-  { key: 'colecao', height: 800 },
+  // As telas que a página inicial ainda não mostrou vêm primeiro (painel, agenda, deck e ranking
+  // já aparecem no topo e nos recursos).
   { key: 'mesa', height: 889 },
-  { key: 'ranking', height: 800 },
+  { key: 'colecao', height: 800 },
   { key: 'torneio', height: 800 },
   { key: 'lojas', height: 800 },
   { key: 'loja', height: 800 },
+  { key: 'painel', height: 800 },
+  { key: 'disponibilidade', height: 800 },
+  { key: 'deck', height: 800 },
+  { key: 'ranking', height: 800 },
 ] as const;
 
 /**

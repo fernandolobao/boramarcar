@@ -349,6 +349,21 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Na mesa de testes, "Ver carta" explica as palavras-chave da carta e leva ao glossário e à lição; a trilha "Aprender a jogar" termina com um convite para praticar sozinho.',
     en: 'On the playtest table, "View card" explains the card\u2019s keywords and links to the glossary and the lesson; the "Learn to play" path ends with an invitation to practice on your own.',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Página inicial nova: mostra o app de verdade e responde às dúvidas mais comuns. A metodologia da análise ganhou página própria.',
+    en: 'A new home page: it shows the real app and answers common questions. The analysis methodology has its own page.',
+  },
+  {
+    date: '2026-11-26',
+    pt: 'No encontro, quem vai aparece com foto, ao lado das partidas. No ranking, os três primeiros ganham medalha.',
+    en: 'On a game night, who is coming shows with photos, next to the games. In the ranking, the top three get medals.',
+  },
+  {
+    date: '2026-11-26',
+    pt: 'Na coleção, as cartas aparecem já na primeira tela. No celular, as abas do topo mostram quando há mais para o lado.',
+    en: 'In your collection, the cards show up on the first screen. On phones, the top tabs show when there are more to the side.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

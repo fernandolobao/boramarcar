@@ -190,6 +190,42 @@ export const themes: { light: ThemeTokens; dark: ThemeTokens } = {
 };
 
 /**
+ * Cantos (px): uma escala curta para tudo parecer do mesmo sistema. `tiny` para marcadores
+ * pequenos (pips, contadores), `small` para miniaturas e etiquetas, `control` para botões e
+ * campos, `card` para cartões e diálogos, `pill` para pílulas e avatares.
+ */
+export const radius = { tiny: 4, small: 8, control: 12, card: 16, pill: 999 } as const;
+
+/**
+ * Sombras: duas só. `rest` para o que está apoiado na página (cartões); `raised` para o que
+ * flutua (diálogos, menus, cartão com link sob o ponteiro). Cor da sombra: Noite.
+ */
+export const shadow = {
+  rest: '0 1px 2px rgb(11 7 22 / 0.06), 0 1px 1px rgb(11 7 22 / 0.04)',
+  raised: '0 14px 32px -12px rgb(11 7 22 / 0.3), 0 4px 10px -4px rgb(11 7 22 / 0.12)',
+} as const;
+
+/** Como o Tailwind chama cada canto e sombra: as classes antigas caem na escala acima. */
+const tailwindRadius = {
+  xs: radius.tiny,
+  sm: radius.tiny,
+  md: radius.small,
+  lg: radius.small,
+  xl: radius.control,
+  '2xl': radius.card,
+  '3xl': radius.card,
+} as const;
+const tailwindShadow = {
+  '2xs': shadow.rest,
+  xs: shadow.rest,
+  sm: shadow.rest,
+  md: shadow.rest,
+  lg: shadow.raised,
+  xl: shadow.raised,
+  '2xl': shadow.raised,
+} as const;
+
+/**
  * Logotipo (palavra "ArcanaKin"), numa cor só: o site e o app pintam com a cor do texto.
  * Fonte: `logotipo.svg` do design (8 caminhos unidos num só).
  */
@@ -257,6 +293,13 @@ export function renderCss(): string {
   lines.push('', '  /* Cores por função (mudam com o tema) */');
   for (const name of Object.keys(themes.light)) {
     lines.push(`  --color-${kebab(name)}: var(--ak-${kebab(name)});`);
+  }
+  lines.push('', '  /* Cantos e sombras: escala curta (as classes do Tailwind caem nela) */');
+  for (const [name, px] of Object.entries(tailwindRadius)) {
+    lines.push(`  --radius-${name}: ${px / 16}rem;`);
+  }
+  for (const [name, value] of Object.entries(tailwindShadow)) {
+    lines.push(`  --shadow-${name}: ${value};`);
   }
   lines.push(
     '}',

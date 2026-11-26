@@ -165,7 +165,10 @@ export default async function DashboardPage() {
   const maybe = next?.participants.filter((p) => p.rsvp === 'maybe') ?? [];
   const myRsvp = next?.participants.find((p) => p.userId === user.id)?.rsvp ?? null;
   const podium = ranking.standings.slice(0, 3);
-  const maxMonth = Math.max(1, ...stats.activity.map((m) => m.games));
+  // Atividade a partir do primeiro mês com partidas: meses zerados antes disso só ocupam espaço.
+  const firstActive = stats.activity.findIndex((m) => m.games > 0);
+  const activity = firstActive < 0 ? [] : stats.activity.slice(firstActive);
+  const maxMonth = Math.max(1, ...activity.map((m) => m.games));
   const monthLabel = (month: string) =>
     format.dateTime(new Date(`${month}-15T12:00:00Z`), { month: 'short', timeZone: 'UTC' });
   const recent = mine?.recent ?? [];
@@ -481,41 +484,47 @@ export default async function DashboardPage() {
           <h2 id="painel-atividade" className="section-title">
             {t('activity')}
           </h2>
-          {/* Barras decorativas; os mesmos números estão na tabela para leitores de tela. */}
-          <div className="flex h-36 items-end gap-2" aria-hidden="true">
-            {stats.activity.map((m) => (
-              <div
-                key={m.month}
-                className="flex h-full flex-1 flex-col items-center justify-end gap-1"
-                title={`${monthLabel(m.month)}: ${t('gamesCount', { count: m.games })}`}
-              >
-                <span className="text-xs font-semibold tabular-nums">{m.games}</span>
-                <span
-                  className="w-full max-w-10 rounded-t bg-primary"
-                  style={{ height: `${(m.games / maxMonth) * 100}%`, minHeight: m.games ? 4 : 0 }}
-                />
-                <span className="muted text-xs capitalize">{monthLabel(m.month)}</span>
-              </div>
-            ))}
-          </div>
-          <table className="sr-only">
-            <caption>{t('activityCaption')}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t('month')}</th>
-                <th scope="col">{t('games')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.activity.map((m) => (
-                <tr key={m.month}>
-                  <th scope="row">{monthLabel(m.month)}</th>
-                  <td>{m.games}</td>
-                </tr>
+          {/* Barras decorativas (com 2 meses ou mais); os números estão na tabela para leitores de tela. */}
+          {activity.length >= 2 && (
+            <div className="flex h-36 items-end gap-2" aria-hidden="true">
+              {activity.map((m) => (
+                <div
+                  key={m.month}
+                  className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+                  title={`${monthLabel(m.month)}: ${t('gamesCount', { count: m.games })}`}
+                >
+                  <span className="text-xs font-semibold tabular-nums">{m.games}</span>
+                  <span
+                    className="w-full max-w-10 rounded-t bg-primary"
+                    style={{ height: `${(m.games / maxMonth) * 100}%`, minHeight: m.games ? 4 : 0 }}
+                  />
+                  <span className="muted text-xs capitalize">{monthLabel(m.month)}</span>
+                </div>
               ))}
-            </tbody>
-          </table>
-          <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
+            </div>
+          )}
+          {activity.length > 0 && (
+            <table className="sr-only">
+              <caption>{t('activityCaption')}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{t('month')}</th>
+                  <th scope="col">{t('games')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activity.map((m) => (
+                  <tr key={m.month}>
+                    <th scope="row">{monthLabel(m.month)}</th>
+                    <td>{m.games}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <dl
+            className={`grid grid-cols-3 gap-2 text-center ${activity.length >= 2 ? 'mt-4' : ''}`}
+          >
             <Stat size="sm" label={t('totalGames')} value={String(stats.totalGames)} />
             <Stat
               size="sm"

@@ -77,6 +77,22 @@
   --color-mana-text: var(--ak-mana-text);
   --color-success: var(--ak-success);
   --color-danger: var(--ak-danger);
+
+  /* Cantos e sombras: escala curta (as classes do Tailwind caem nela) */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1rem;
+  --shadow-2xs: 0 1px 2px rgb(11 7 22 / 0.06), 0 1px 1px rgb(11 7 22 / 0.04);
+  --shadow-xs: 0 1px 2px rgb(11 7 22 / 0.06), 0 1px 1px rgb(11 7 22 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(11 7 22 / 0.06), 0 1px 1px rgb(11 7 22 / 0.04);
+  --shadow-md: 0 1px 2px rgb(11 7 22 / 0.06), 0 1px 1px rgb(11 7 22 / 0.04);
+  --shadow-lg: 0 14px 32px -12px rgb(11 7 22 / 0.3), 0 4px 10px -4px rgb(11 7 22 / 0.12);
+  --shadow-xl: 0 14px 32px -12px rgb(11 7 22 / 0.3), 0 4px 10px -4px rgb(11 7 22 / 0.12);
+  --shadow-2xl: 0 14px 32px -12px rgb(11 7 22 / 0.3), 0 4px 10px -4px rgb(11 7 22 / 0.12);
 }
 
 :root {

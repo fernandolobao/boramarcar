@@ -838,3 +838,14 @@ sem rolagem horizontal em 320px.
   Cemitério?") e `aria-expanded`, que mostra a definição logo abaixo (sem janela). "Ver carta" abre
   numa janela; os links "Ver no glossário" levam o termo no nome (`sr-only`). Os avisos da trilha
   são texto comum com "Entendi" (dispensados neste aparelho), sem roubar o foco.
+
+## Revisão de design da web (26/11/2026)
+
+- **Movimento:** botões sobem 1px no hover e afundam no clique; cartões com link sobem 2px. Tudo só com `prefers-reduced-motion: no-preference` (e o hover só em `hover: hover`). A entrada do topo da página inicial (esmaecer + subir 16px, uma vez) também é `motion-safe`. O E2E de acessibilidade espera as animações finitas terminarem antes do axe (contraste medido no estado final), nas páginas públicas e logadas.
+- **Fundo animado (fluxo de mana):** no desktop fica só nas margens (máscara sob a coluna do conteúdo); no tablet e no celular, mais discreto. Nunca passa por trás de texto de tabelas e formulários no desktop.
+- **Abas do topo no celular:** degradê na borda que tem mais abas (pista de que a faixa rola) e a aba atual rola para a vista ao trocar de seção (só a faixa rola, não a página). O degradê é decorativo; as abas continuam todas no teclado e no leitor de tela.
+- **Página inicial:** um `h1` (uma frase por linha), seções com `h2` e recursos com `h3`/`h4`. As telas reais do app têm texto alternativo descritivo (os de "Veja por dentro"); a do tema inativo fica `display: none`. FAQ com `<details>/<summary>` nativos (teclado: Enter/Espaço), ícone "+" decorativo. Metodologia em página própria (`/metodologia`, no axe claro/escuro, desktop/celular).
+- **Encontro:** duas colunas no desktop (participantes, local e compartilhar à esquerda; partidas à direita), na mesma ordem do documento no celular, com quem vai primeiro. Participantes em lista com foto (decorativa, o nome vem ao lado) e a resposta em texto. "Editar encontro" virou `<details>` com o `h2` dentro do `<summary>`.
+- **Ranking:** os três primeiros com medalha (ouro, prata, bronze) atrás do número, que continua escrito: a cor não é a única pista. "Nova temporada" recolhida em `<details>`.
+- **Dica das telas:** fundo `surface-muted` sem borda forte, texto `fg` (contraste ≥ 4,5:1 nos dois temas), botão "Entendi" ao lado no desktop.
+- **Ladrilhos de número (`Stat`):** fundo `canvas` dentro do cartão (`fg-muted` sobre `canvas` ≥ 4,5:1, testado nos tokens).
