@@ -2,7 +2,7 @@ import type { Achievement, PlayerProfile } from '@boramarcar/api-client';
 import { NewAchievements } from '@/components/new-achievements';
 import { ApiError } from '@boramarcar/api-client';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { AppText, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDateMedium, formatMonthYear, formatPercent, t, type MessageKey } from '@/lib/i18n';
@@ -15,6 +15,7 @@ import { useGroup } from '@/lib/group';
 import { authClient } from '@/lib/auth';
 import { headToHeadBetween } from '@boramarcar/core/integration';
 import { Stat } from '@/components/ds/stat';
+import { Avatar } from '@/components/avatar';
 
 const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = {
   owner: 'roleOwner',
@@ -26,36 +27,6 @@ const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = 
 const BRACKET_SHORT = { 2: '1–2', 3: '3', 4: '4–5' } as const;
 
 /** Foto ou iniciais; decorativo (o nome está no título ao lado). */
-function Avatar({ name, image }: { name: string; image?: string | null }) {
-  const colors = useColors();
-  const initials = name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0] ?? '')
-    .join('')
-    .toUpperCase();
-  return (
-    <View
-      style={{
-        width: 72,
-        height: 72,
-        borderRadius: 36,
-        overflow: 'hidden',
-        backgroundColor: colors.surfaceMuted,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-    >
-      {image ? (
-        <Image source={{ uri: image }} style={{ width: 72, height: 72 }} />
-      ) : (
-        <AppText style={{ fontSize: 24, fontWeight: '800' }}>{initials}</AppText>
-      )}
-    </View>
-  );
-}
 
 function achievementStatus(a: Achievement) {
   if (!a.unlocked) {
@@ -203,7 +174,7 @@ export default function PlayerScreen() {
         ) : null;
       })()}
       <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
-        <Avatar name={p.name} image={p.image} />
+        <Avatar size={72} name={p.name} image={p.image} />
         <View style={{ flex: 1 }}>
           <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
             {p.name}

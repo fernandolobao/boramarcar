@@ -1,8 +1,9 @@
 import type { Member } from '@boramarcar/api-client';
 import { Stack, router } from 'expo-router';
 import { useState } from 'react';
-import { RefreshControl, ScrollView, Share, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Share, View } from 'react-native';
 import { previousMonth } from '@boramarcar/core/integration';
+import { Avatar } from '@/components/avatar';
 import { ConfirmButton } from '@/components/confirm-button';
 import { AttendanceCard } from '@/components/attendance-card';
 import { GroupSettingsCard, SeasonsCard } from '@/components/group-settings';
@@ -15,6 +16,7 @@ import { API_URL } from '@/lib/config';
 import { openMonthlyRecap } from '@/lib/monthly';
 import { useGroup } from '@/lib/group';
 import { formatMonthYear, t, type MessageKey } from '@/lib/i18n';
+import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
 type Role = Member['role'];
@@ -61,55 +63,92 @@ function MemberRow({
     }
   };
 
+  const hasActions = canPromote || canDemote || canTransfer || canRemove || isSelf;
+  const [open, setOpen] = useState(false);
+  const colors = useColors();
+
   return (
-    <View style={{ gap: 8, paddingVertical: 8 }}>
-      <Button
-        label={`${member.name}${isSelf ? ` (${t('groupYou')})` : ''}`}
-        variant="secondary"
-        accessibilityLabel={t('profileOpen', { name: member.name })}
-        onPress={() => router.push({ pathname: '/jogadores/[id]', params: { id: member.userId } })}
-      />
-      <AppText muted>{t(ROLE_LABEL[member.role])}</AppText>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {(canPromote || canDemote) && (
+    <View style={{ paddingVertical: 10, gap: 8, borderTopWidth: 1, borderTopColor: colors.line }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        {/* Foto, nome e papel: tocar abre o perfil (como no site). */}
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={`${t('profileOpen', { name: member.name })}${isSelf ? ` (${t('groupYou')})` : ''}, ${t(ROLE_LABEL[member.role])}`}
+          onPress={() =>
+            router.push({ pathname: '/jogadores/[id]', params: { id: member.userId } })
+          }
+          style={({ pressed }) => ({
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            minHeight: 44,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
+          <Avatar name={member.name} image={member.image} />
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontWeight: '600' }} numberOfLines={1}>
+              {member.name}
+              {isSelf ? <AppText muted>{` (${t('groupYou')})`}</AppText> : null}
+            </AppText>
+            <AppText muted style={{ fontSize: 13 }}>
+              {t(ROLE_LABEL[member.role])}
+            </AppText>
+          </View>
+        </Pressable>
+        {hasActions && (
           <Button
-            label={t(canPromote ? 'groupMakeAdmin' : 'groupRemoveAdmin')}
+            label={t('groupManage')}
             variant="secondary"
-            accessibilityLabel={`${t(canPromote ? 'groupMakeAdmin' : 'groupRemoveAdmin')}: ${member.name}`}
-            onPress={() =>
-              void run(() =>
-                api.groups.setRole(groupId, member.userId, canPromote ? 'admin' : 'member'),
-              )
-            }
-          />
-        )}
-        {canTransfer && (
-          <ConfirmButton
-            label={t('groupTransfer')}
-            confirmLabel={t('groupConfirmTransfer')}
-            context={member.name}
-            onConfirm={() => run(() => api.groups.transfer(groupId, member.userId))}
-          />
-        )}
-        {canRemove && (
-          <ConfirmButton
-            label={t('groupRemoveMember')}
-            confirmLabel={t('groupConfirmRemove')}
-            context={member.name}
-            onConfirm={() => run(() => api.groups.removeMember(groupId, member.userId))}
-          />
-        )}
-        {isSelf && (
-          <ConfirmButton
-            label={t('groupLeave')}
-            confirmLabel={t('groupConfirmLeave')}
-            context={member.name}
-            disabled={ownerMustTransfer}
-            onConfirm={() => run(() => api.groups.removeMember(groupId, member.userId), true)}
+            accessibilityLabel={`${t('groupManage')}: ${member.name}`}
+            accessibilityState={{ expanded: open }}
+            onPress={() => setOpen((o) => !o)}
           />
         )}
       </View>
-      {isSelf && actorRole === 'owner' && (
+      {open && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {(canPromote || canDemote) && (
+            <Button
+              label={t(canPromote ? 'groupMakeAdmin' : 'groupRemoveAdmin')}
+              variant="secondary"
+              accessibilityLabel={`${t(canPromote ? 'groupMakeAdmin' : 'groupRemoveAdmin')}: ${member.name}`}
+              onPress={() =>
+                void run(() =>
+                  api.groups.setRole(groupId, member.userId, canPromote ? 'admin' : 'member'),
+                )
+              }
+            />
+          )}
+          {canTransfer && (
+            <ConfirmButton
+              label={t('groupTransfer')}
+              confirmLabel={t('groupConfirmTransfer')}
+              context={member.name}
+              onConfirm={() => run(() => api.groups.transfer(groupId, member.userId))}
+            />
+          )}
+          {canRemove && (
+            <ConfirmButton
+              label={t('groupRemoveMember')}
+              confirmLabel={t('groupConfirmRemove')}
+              context={member.name}
+              onConfirm={() => run(() => api.groups.removeMember(groupId, member.userId))}
+            />
+          )}
+          {isSelf && (
+            <ConfirmButton
+              label={t('groupLeave')}
+              confirmLabel={t('groupConfirmLeave')}
+              context={member.name}
+              disabled={ownerMustTransfer}
+              onConfirm={() => run(() => api.groups.removeMember(groupId, member.userId), true)}
+            />
+          )}
+        </View>
+      )}
+      {open && isSelf && actorRole === 'owner' && (
         <AppText muted>
           {t(ownerMustTransfer ? 'groupLeaveOwnerHint' : 'groupLeaveLastHint')}
         </AppText>
@@ -193,30 +232,38 @@ export default function GroupScreen() {
       }
     >
       <Stack.Screen options={{ title: t('groupTitle') }} />
-      <AppText accessibilityRole="header" style={styles.title}>
-        {group.name}
-      </AppText>
-      {/* Recordes e a cara do grupo (8.12). */}
-      <Button
-        label={t('recordsLink')}
-        variant="secondary"
-        onPress={() => router.push('/recordes')}
-        style={{ alignSelf: 'flex-start' }}
-      />
-      {/* Torneios do grupo (9.1). */}
-      <Button
-        label={t('tourLink')}
-        variant="secondary"
-        onPress={() => router.push('/torneios')}
-        style={{ alignSelf: 'flex-start' }}
-      />
-      {/* Retrospectiva do mês que passou (página do site, a mesma que se compartilha). */}
-      <Button
-        label={t('monthlyLink', { month: formatMonthYear(new Date(`${recapMonth}-15T12:00:00Z`)) })}
-        variant="secondary"
-        onPress={() => void openMonthlyRecap(group.id, recapMonth)}
-        style={{ alignSelf: 'flex-start' }}
-      />
+      {/* Cabeçalho do grupo (como no site): nome, membros e as ações juntas. */}
+      <Card style={{ gap: 12 }}>
+        <View>
+          <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
+            {group.name}
+          </AppText>
+          <AppText muted>{t('groupMembersCount', { count: members.data?.length ?? 0 })}</AppText>
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Button label={t('groupShareInvite')} onPress={share} />
+          {/* Recordes e a cara do grupo (8.12). */}
+          <Button
+            label={t('recordsLink')}
+            variant="secondary"
+            onPress={() => router.push('/recordes')}
+          />
+          {/* Torneios do grupo (9.1). */}
+          <Button
+            label={t('tourLink')}
+            variant="secondary"
+            onPress={() => router.push('/torneios')}
+          />
+          {/* Retrospectiva do mês que passou (página do site, a mesma que se compartilha). */}
+          <Button
+            label={t('monthlyLink', {
+              month: formatMonthYear(new Date(`${recapMonth}-15T12:00:00Z`)),
+            })}
+            variant="secondary"
+            onPress={() => void openMonthlyRecap(group.id, recapMonth)}
+          />
+        </View>
+      </Card>
 
       <Card style={{ gap: 10 }}>
         <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
@@ -231,7 +278,7 @@ export default function GroupScreen() {
           <AppText style={{ fontWeight: '700', letterSpacing: 2 }}>{code}</AppText>
         </AppText>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Button label={t('groupShareInvite')} onPress={share} />
+          <Button label={t('groupShareInvite')} variant="secondary" onPress={share} />
           {canManage && (
             <ConfirmButton
               label={t('groupRegenerate')}
@@ -248,7 +295,7 @@ export default function GroupScreen() {
 
       <Card style={{ gap: 4 }}>
         <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-          {t('groupMembers')} ({members.data?.length ?? 0})
+          {t('groupMembers')}
         </AppText>
         {members.loading ? (
           <Loading />
