@@ -105,7 +105,7 @@ export default function RecordsScreen() {
             ))}
           </Card>
           <Card style={{ gap: 8 }}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+            <AppText accessibilityRole="header" style={styles.sectionTitle}>
               {t('recordsFaceTitle')}
             </AppText>
             {colorTotal > 0 ? (

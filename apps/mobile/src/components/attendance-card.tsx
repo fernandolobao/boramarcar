@@ -1,7 +1,7 @@
 import { ApiError } from '@boramarcar/api-client';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { AppText, Button, Card, Loading } from '@/components/ui';
+import { AppText, Button, Card, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDate, formatDateTime, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -39,7 +39,7 @@ export function AttendanceCard({ groupId, viewerId }: { groupId: string; viewerI
 
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('attendanceTitle')}
       </AppText>
       <AppText muted>{t('attendanceHint')}</AppText>

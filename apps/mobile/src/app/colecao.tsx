@@ -63,7 +63,7 @@ function AddCard({ onAdded }: { onAdded: (message: string) => void }) {
   };
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('collectionAddTitle')}
       </AppText>
       <TextField

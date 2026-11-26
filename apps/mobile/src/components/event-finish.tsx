@@ -2,7 +2,7 @@ import type { EventDetail } from '@boramarcar/api-client';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Share, View } from 'react-native';
-import { AppText, Button, Card } from '@/components/ui';
+import { AppText, Button, Card, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { t } from '@/lib/i18n';
@@ -38,7 +38,7 @@ export function FinishEvent({ event, onDone }: { event: EventDetail; onDone: () 
 
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('finishTitle')}
       </AppText>
       <AppText muted>{event.games.length ? t('finishHint') : t('finishHintNoGames')}</AppText>
@@ -71,7 +71,7 @@ export function EventRecap({ event }: { event: EventDetail }) {
 
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('recapTitle')}
       </AppText>
       <AppText>{summary}</AppText>

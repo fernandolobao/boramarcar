@@ -59,7 +59,8 @@
         {
           "locationWhenInUsePermission": "O ArcanaKin usa a sua localização só para mostrar lojas e eventos perto de você, na hora da busca; ela não é guardada."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

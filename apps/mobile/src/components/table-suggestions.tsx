@@ -1,7 +1,7 @@
 import { formatRules, isGameFormat, MIN_PLAYERS_FOR_TABLES, suggestTables } from '@boramarcar/core';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { AppText, Button, Card } from '@/components/ui';
+import { AppText, Button, Card, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
@@ -45,7 +45,7 @@ export function TableSuggestions({ eventId, confirmed }: { eventId: string; conf
 
   return (
     <Card style={{ gap: 12 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('tablesTitle')}
       </AppText>
       <AppText muted>{t('tablesHint')}</AppText>
@@ -60,7 +60,7 @@ export function TableSuggestions({ eventId, confirmed }: { eventId: string; conf
             gap: 4,
           }}
         >
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('tablesTable', { number: i + 1 })}
           </AppText>
           <AppText>

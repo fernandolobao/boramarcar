@@ -547,7 +547,7 @@ function TableMenu({
           onPress={onSwap}
         />
         <View style={{ gap: 8, paddingVertical: 4 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={ui.sectionTitle}>
             {t('tableLayoutTitle')}
           </AppText>
           <AppText muted>{t('tableLayoutHint')}</AppText>

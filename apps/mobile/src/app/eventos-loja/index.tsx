@@ -47,7 +47,7 @@ export default function MyStoreEventsScreen() {
         {t('storeEvTitle')}
       </AppText>
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('storeEvCodeTitle')}
         </AppText>
         <AppText muted>{t('storeEvCodeIntro')}</AppText>
@@ -66,7 +66,7 @@ export default function MyStoreEventsScreen() {
           onPress={() => void join()}
         />
       </Card>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('storeEvMine')}
       </AppText>
       {(mine.data ?? []).length === 0 ? (
