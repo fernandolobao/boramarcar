@@ -9,6 +9,7 @@ import { formatDateTime, t } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
 import { NoGroup } from '@/components/no-group';
+import { EmptyState } from '@/components/empty-state';
 
 /** Próximos encontros do grupo ativo. */
 export default function EventsScreen() {
@@ -52,7 +53,7 @@ export default function EventsScreen() {
             </View>
           </View>
         }
-        ListEmptyComponent={<AppText muted>{t('noEvents')}</AppText>}
+        ListEmptyComponent={<EmptyState>{t('noEvents')}</EmptyState>}
         renderItem={({ item }) => (
           <Link href={{ pathname: '/encontros/[id]', params: { id: item.id } }} asChild>
             <Pressable

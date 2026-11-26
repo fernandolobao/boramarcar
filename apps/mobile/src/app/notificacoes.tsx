@@ -8,6 +8,7 @@ import { formatDateTime, formatMonthYear, t, type MessageKey } from '@/lib/i18n'
 import { openMonthlyRecap } from '@/lib/monthly';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { EmptyState } from '@/components/empty-state';
 
 /** Texto da notificação no idioma do aparelho. */
 function notificationText(item: NotificationItem) {
@@ -139,7 +140,7 @@ export default function NotificationsScreen() {
         />
       ) : null}
       {items.length === 0 ? (
-        <AppText muted>{t('notifEmpty')}</AppText>
+        <EmptyState>{t('notifEmpty')}</EmptyState>
       ) : (
         items.map((item) => {
           const text = notificationText(item);

@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { useGroup } from '@/lib/group';
 import { formatDateMedium, formatPercent, t, type MessageKey } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
+import { EmptyState } from '@/components/empty-state';
 
 const COLOR_KEYS = ['W', 'U', 'B', 'R', 'G', 'C'] as const;
 
@@ -93,7 +94,7 @@ export default function RecordsScreen() {
         {t('recordsTitle')}
       </AppText>
       {totalGames === 0 ? (
-        <AppText muted>{t('recordsEmpty')}</AppText>
+        <EmptyState>{t('recordsEmpty')}</EmptyState>
       ) : (
         <>
           <Card style={{ gap: 12 }}>

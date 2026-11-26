@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
+import { EmptyState } from '@/components/empty-state';
 
 /** Rótulo curto do bracket mínimo (2 = "1–2", 4 = "4–5"). */
 const BRACKET_SHORT = { 2: '1–2', 3: '3', 4: '4–5' } as const;
@@ -41,7 +42,7 @@ export default function DecksScreen() {
           </View>
         </View>
       }
-      ListEmptyComponent={<AppText muted>{t('decksEmpty')}</AppText>}
+      ListEmptyComponent={<EmptyState>{t('decksEmpty')}</EmptyState>}
       renderItem={({ item }) => <DeckCard deck={item} />}
     />
   );
