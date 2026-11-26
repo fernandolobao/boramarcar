@@ -240,6 +240,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             ],
           },
           {
+            id: 'mesa-de-testes',
+            question: 'Como jogo turnos de teste com o meu deck?',
+            steps: [
+              'Na página do deck, abra "Opções do deck" → "Testar o deck" (ou o botão na aba "Mão inicial" da análise).',
+              'Mantenha a mão ou faça mulligan; depois, toque numa carta para jogar, virar ou mandar para o cemitério, o exílio ou o grimório. "Próximo turno" desvira tudo e compra uma carta.',
+              'A barra mostra o turno, a vida e a mana disponível (terrenos desvirados). Há "Procurar no grimório", "Criar ficha" e "Desfazer". Não há regras automáticas e nada é gravado.',
+            ],
+          },
+          {
             id: 'deck-do-zero',
             question: 'Como monto um deck do zero?',
             steps: [
@@ -668,6 +677,15 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'On the deck page, in the analysis "Opening hand" tab, tap "Draw a sample hand": a window opens with 7 cards from the main deck (commander, sideboard and "maybe" stay out).',
               'Don\u2019t like it? "Mulligan" draws 7 again; choose one card to put on the bottom of your library for each mulligan and tap "Keep".',
               '"Draw a card" shows the next draws. Land odds are in the same section.',
+            ],
+          },
+          {
+            id: 'mesa-de-testes',
+            question: 'How do I play test turns with my deck?',
+            steps: [
+              'On the deck page, open "Deck options" → "Playtest the deck" (or the button in the analysis "Opening hand" tab).',
+              'Keep the hand or mulligan; then tap a card to play it, tap it, or send it to the graveyard, exile or library. "Next turn" untaps everything and draws a card.',
+              'The bar shows the turn, life and available mana (untapped lands). There is "Search library", "Create token" and "Undo". There are no automatic rules and nothing is saved.',
             ],
           },
           {

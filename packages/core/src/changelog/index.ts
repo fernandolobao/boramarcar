@@ -339,6 +339,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No iPhone, tocar num campo não dá mais zoom na página: o site deixava de caber na tela e ficava cortado à direita.',
     en: 'On iPhone, tapping a field no longer zooms the page in: the site used to stop fitting the screen and got cut off on the right.',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Mesa de testes: jogue turnos de mentira com o seu deck (mão inicial, terrenos, mana disponível, fichas e desfazer) para ver se ele gira bem. Fica em "Opções do deck" → "Testar o deck".',
+    en: 'Playtest table: play fake turns with your deck (opening hand, lands, available mana, tokens and undo) to see if it runs well. It\u2019s in "Deck options" → "Playtest the deck".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

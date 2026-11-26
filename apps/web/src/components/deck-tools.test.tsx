@@ -142,6 +142,7 @@ describe('DeckActions (menu "Opções do deck")', () => {
       .getAllByRole('menuitem')
       .map((i) => i.textContent);
     expect(names).toEqual([
+      'Testar o deck',
       'Copiar lista',
       'Copiar com proxies (#proxy)',
       'Baixar .txt',
