@@ -809,3 +809,9 @@ sem rolagem horizontal em 320px.
   `FormError`, confirmações em `role="status"`.
 - "Apagar" em dois cliques, com o serviço e o mês no nome acessível. axe no componente e no E2E do
   `/admin` (claro/escuro).
+
+## App: brilho de foil (26/11/2026)
+
+- Decorativo e escondido dos leitores de tela; o "Foil" já está no nome da carta e no selo.
+- Com "reduzir movimento" ligado no aparelho (`AccessibilityInfo`), a faixa fica parada.
+- Sem piscar: um movimento lento (9–13 s por volta) e uma variação de opacidade suave (75–100%).
