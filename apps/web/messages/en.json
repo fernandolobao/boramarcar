@@ -3030,6 +3030,14 @@
     "gotIt": "Got it",
     "hintTurn": "New to Magic? Each turn has steps: untap, upkeep, draw, main phases, combat and end.",
     "hintMana": "Available mana counts your untapped lands; tap a land to \"spend\" its mana.",
-    "hintTax": "Commander tax: each time your commander goes back to the command zone and is cast again, it costs {2} more."
+    "hintTax": "Commander tax: each time your commander goes back to the command zone and is cast again, it costs {2} more.",
+    "size": "Card size",
+    "sizes": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "featured": "Featured card",
+    "featuredHint": "Hover (or move the keyboard focus to) a card to see it here, large and with its text."
   }
 }
