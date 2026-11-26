@@ -257,13 +257,13 @@ Conta de padeiro (para validar em 13.1): se o custo for ~R$ 600/mês, empata com
 
 Objetivo: o app ter o mesmo apelo visual do site — hoje está cru. Trabalho num branch próprio, testado no aparelho (Expo Go) junto com o dono, em rodadas.
 
-| #    | Item                                                                                                                                     | Tamanho | Status   |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
-| 14.1 | **Símbolos de mana** no texto das cartas e no custo (hoje aparece `{W}{U}`); mesmo mapa de símbolos do site                              | P       | Pendente |
-| 14.2 | **Coleção e deck em grade como no site**: selo "Foil" e quantidade sobre a carta, brilho de foil, capas dos decks com a arte             | M       | Pendente |
-| 14.3 | **Painel e grupo**: cabeçalho com a arte do comandante, cartões de números com ícones e anéis, pódio — o mesmo desenho do painel do site | M       | Pendente |
-| 14.4 | Tipografia da marca (fontes do site), espaçamentos e sombras dos tokens, ícones Lucide iguais aos do site, estados vazios ilustrados     | M       | Pendente |
-| 14.5 | Revisão tela a tela comparando com o site (lista no PR), no claro e no escuro                                                            | G       | Pendente |
+| #    | Item                                                                                                                                     | Tamanho | Status                                                                                                                            |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 14.1 | **Símbolos de mana** no texto das cartas e no custo (hoje aparece `{W}{U}`); mesmo mapa de símbolos do site                              | P       | ✅ (26/11/2026): no texto da carta (#239), no custo de cada linha do deck e na carta aberta; símbolos baixados uma vez por sessão |
+| 14.2 | **Coleção e deck em grade como no site**: selo "Foil" e quantidade sobre a carta, brilho de foil, capas dos decks com a arte             | M       | Pendente                                                                                                                          |
+| 14.3 | **Painel e grupo**: cabeçalho com a arte do comandante, cartões de números com ícones e anéis, pódio — o mesmo desenho do painel do site | M       | Pendente                                                                                                                          |
+| 14.4 | Tipografia da marca (fontes do site), espaçamentos e sombras dos tokens, ícones Lucide iguais aos do site, estados vazios ilustrados     | M       | Pendente                                                                                                                          |
+| 14.5 | Revisão tela a tela comparando com o site (lista no PR), no claro e no escuro                                                            | G       | Pendente                                                                                                                          |
 
 ## Divulgação (contínuo)
 

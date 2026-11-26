@@ -1,6 +1,7 @@
 import { manaSymbolUrl, splitManaText } from '@boramarcar/core/mana';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, type TextStyle } from 'react-native';
-import { SvgUri } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 import { t, type MessageKey } from '@/lib/i18n';
 import { AppText } from './ui';
 
@@ -26,9 +27,46 @@ export function manaSymbolName(symbol: string): string {
   return phyrexian ? t('manaPhyrexian', { name }) : name;
 }
 
+/**
+ * SVGs já baixados, por endereço: cada símbolo é buscado uma vez por sessão do app (uma lista de
+ * deck com 100 cartas repete os mesmos poucos símbolos). Falha de rede não fica guardada.
+ */
+const svgCache = new Map<string, string>();
+const svgLoading = new Map<string, Promise<string | null>>();
+
+function loadSvg(uri: string): Promise<string | null> {
+  let pending = svgLoading.get(uri);
+  if (!pending) {
+    pending = fetch(uri)
+      .then((r) => (r.ok ? r.text() : null))
+      .then((xml) => {
+        if (xml) svgCache.set(uri, xml);
+        return xml;
+      })
+      .catch(() => null)
+      .finally(() => svgLoading.delete(uri));
+    svgLoading.set(uri, pending);
+  }
+  return pending;
+}
+
+function useSvg(uri: string | null) {
+  const [xml, setXml] = useState(() => (uri ? (svgCache.get(uri) ?? null) : null));
+  useEffect(() => {
+    if (!uri || svgCache.has(uri)) return;
+    let alive = true;
+    void loadSvg(uri).then((x) => alive && setXml(x));
+    return () => {
+      alive = false;
+    };
+  }, [uri]);
+  return xml;
+}
+
 /** Um símbolo (SVG oficial, do tamanho do texto); sem imagem conhecida, o texto entre chaves. */
 export function ManaSymbol({ symbol, size = 16 }: { symbol: string; size?: number }) {
   const uri = manaSymbolUrl(symbol);
+  const xml = useSvg(uri);
   if (!uri) return <AppText>{`{${symbol}}`}</AppText>;
   return (
     <View
@@ -36,7 +74,7 @@ export function ManaSymbol({ symbol, size = 16 }: { symbol: string; size?: numbe
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      <SvgUri uri={uri} width={size} height={size} />
+      {xml ? <SvgXml xml={xml} width={size} height={size} /> : null}
     </View>
   );
 }
@@ -57,6 +95,12 @@ export function ManaText({ text, style }: { text: string; style?: TextStyle }) {
   );
 }
 
+/** Custo de mana por extenso para leitores de tela ("Custo de mana: 2, verde"); vazio sem custo. */
+export function manaCostLabel(cost: string | null | undefined): string {
+  const symbols = splitManaText(cost ?? '').flatMap((p) => ('symbol' in p ? [p.symbol] : []));
+  return symbols.length ? t('manaCost', { symbols: symbols.map(manaSymbolName).join(', ') }) : '';
+}
+
 /** Custo de mana numa linha ("{2}{G}"). */
 export function ManaCost({ cost, size = 18 }: { cost: string | null | undefined; size?: number }) {
   const symbols = splitManaText(cost ?? '').flatMap((p) => ('symbol' in p ? [p.symbol] : []));
@@ -66,7 +110,7 @@ export function ManaCost({ cost, size = 18 }: { cost: string | null | undefined;
       style={s.cost}
       accessible
       accessibilityRole="image"
-      accessibilityLabel={t('manaCost', { symbols: symbols.map(manaSymbolName).join(', ') })}
+      accessibilityLabel={manaCostLabel(cost)}
     >
       {symbols.map((sym, i) => (
         <ManaSymbol key={i} symbol={sym} size={size} />
