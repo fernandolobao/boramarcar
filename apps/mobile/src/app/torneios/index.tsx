@@ -8,6 +8,8 @@ import { useGroup } from '@/lib/group';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { EmptyState } from '@/components/empty-state';
+import { useLayout } from '@/lib/layout';
+import { ResponsiveGrid } from '@/components/responsive-grid';
 
 const STATUS: Record<string, MessageKey> = {
   registration: 'tourStatusRegistration',
@@ -17,6 +19,7 @@ const STATUS: Record<string, MessageKey> = {
 
 /** Torneios do grupo (9.1): lista; dono e admins criam novos. */
 export default function TournamentsScreen() {
+  const layout = useLayout();
   const { group, loading } = useGroup();
   const list = useAsync(
     () => (group ? api.tournaments.list(group.id) : Promise.resolve([])),
@@ -29,7 +32,7 @@ export default function TournamentsScreen() {
   const canCreate = group.role !== 'member';
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 12 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 12 }]}
       refreshControl={<RefreshControl refreshing={list.refreshing} onRefresh={list.refresh} />}
     >
       <AppText accessibilityRole="header" style={styles.title}>
@@ -46,23 +49,25 @@ export default function TournamentsScreen() {
       {(list.data ?? []).length === 0 ? (
         <EmptyState>{t('tourEmpty')}</EmptyState>
       ) : (
-        (list.data ?? []).map((item) => (
-          <Pressable
-            key={item.id}
-            accessibilityRole="button"
-            accessibilityLabel={`${item.name}. ${formatLabel(item.format)}, ${t('tourEntrants', { count: item.entrants })}, ${t(STATUS[item.status] ?? 'tourStatusRunning')}`}
-            onPress={() => router.push({ pathname: '/torneios/[id]', params: { id: item.id } })}
-            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-          >
-            <Card style={{ gap: 2 }}>
-              <AppText style={{ fontWeight: '700', fontSize: 17 }}>{item.name}</AppText>
-              <AppText muted>
-                {formatLabel(item.format)} · {t('tourEntrants', { count: item.entrants })}
-              </AppText>
-              <AppText>{t(STATUS[item.status] ?? 'tourStatusRunning')}</AppText>
-            </Card>
-          </Pressable>
-        ))
+        <ResponsiveGrid>
+          {(list.data ?? []).map((item) => (
+            <Pressable
+              key={item.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.name}. ${formatLabel(item.format)}, ${t('tourEntrants', { count: item.entrants })}, ${t(STATUS[item.status] ?? 'tourStatusRunning')}`}
+              onPress={() => router.push({ pathname: '/torneios/[id]', params: { id: item.id } })}
+              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+            >
+              <Card style={{ gap: 2 }}>
+                <AppText style={{ fontWeight: '700', fontSize: 17 }}>{item.name}</AppText>
+                <AppText muted>
+                  {formatLabel(item.format)} · {t('tourEntrants', { count: item.entrants })}
+                </AppText>
+                <AppText>{t(STATUS[item.status] ?? 'tourStatusRunning')}</AppText>
+              </Card>
+            </Pressable>
+          ))}
+        </ResponsiveGrid>
       )}
     </ScrollView>
   );

@@ -5,6 +5,8 @@ export { gridColumns };
 
 /** Espaço dos lados do conteúdo (padding das telas). */
 export const SCREEN_PADDING = 16;
+/** Largura máxima de leitura (texto e formulários) no tablet. */
+export const READABLE_MAX_WIDTH = 760;
 
 /**
  * Faixa de largura da tela (celular, tablet, tablet grande) e a largura útil do conteúdo.
@@ -22,6 +24,13 @@ export function useLayout() {
       padding: SCREEN_PADDING,
       width: '100%',
       maxWidth: info.contentWidth,
+      alignSelf: 'center',
+    } as const,
+    /** Telas de leitura e formulários (ranking, conta, ajuda): largura confortável, centralizada. */
+    readableStyle: {
+      padding: SCREEN_PADDING,
+      width: '100%',
+      maxWidth: Math.min(info.contentWidth, READABLE_MAX_WIDTH),
       alignSelf: 'center',
     } as const,
   };

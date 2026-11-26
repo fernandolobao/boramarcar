@@ -8,6 +8,7 @@ import { t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { Choices } from '@/components/ds/choices';
 import { Switch } from '@/components/ds/switch';
+import { useLayout } from '@/lib/layout';
 
 type Locale = 'pt-BR' | 'en';
 const LOCALES: readonly Locale[] = ['pt-BR', 'en'];
@@ -15,6 +16,7 @@ const LOCALE_LABEL: Record<Locale, string> = { 'pt-BR': 'Português (Brasil)', e
 
 /** Configurações (paridade com /configuracoes do site): fuso, idioma e avisos por e-mail. */
 export default function SettingsScreen() {
+  const layout = useLayout();
   const prefs = useAsync(() => api.me.preferences(), []);
   const [timeZone, setTimeZone] = useState('');
   const [locale, setLocale] = useState<Locale>('pt-BR');
@@ -51,7 +53,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView contentContainerStyle={[layout.readableStyle, { gap: 16 }]}>
       <Stack.Screen options={{ title: t('settingsTitle') }} />
       <AppText muted>{t('settingsIntro')}</AppText>
 

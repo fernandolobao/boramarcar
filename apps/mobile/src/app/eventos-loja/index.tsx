@@ -9,6 +9,8 @@ import { api } from '@/lib/api';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { EmptyState } from '@/components/empty-state';
+import { useLayout } from '@/lib/layout';
+import { ResponsiveGrid } from '@/components/responsive-grid';
 
 const STATUS: Record<string, MessageKey> = {
   registered: 'storeEvRegistered',
@@ -17,6 +19,7 @@ const STATUS: Record<string, MessageKey> = {
 
 /** Eventos de loja (10.2c): os meus próximos e o código do balcão. */
 export default function MyStoreEventsScreen() {
+  const layout = useLayout();
   const mine = useAsync(() => api.storeEvents.mine(), []);
   useRefreshOnFocus(mine.refresh);
   const [code, setCode] = useState('');
@@ -41,7 +44,7 @@ export default function MyStoreEventsScreen() {
   if (mine.error) return <ErrorState error={mine.error} onRetry={mine.refresh} />;
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       refreshControl={<RefreshControl refreshing={mine.refreshing} onRefresh={mine.refresh} />}
     >
       <AppText accessibilityRole="header" style={styles.title}>
@@ -73,26 +76,28 @@ export default function MyStoreEventsScreen() {
       {(mine.data ?? []).length === 0 ? (
         <EmptyState>{t('storeEvMineEmpty')}</EmptyState>
       ) : (
-        (mine.data ?? []).map((m) => (
-          <Pressable
-            key={m.entryId}
-            accessibilityRole="button"
-            accessibilityLabel={`${m.event.title}, ${m.store.name}. ${formatDateTime(m.event.startsAt)}. ${t(STATUS[m.status] ?? 'storeEvRegistered')}`}
-            onPress={() =>
-              router.push({ pathname: '/eventos-loja/[id]', params: { id: m.event.id } })
-            }
-            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-          >
-            <Card style={{ gap: 2 }}>
-              <AppText style={{ fontWeight: '700' }}>{m.event.title}</AppText>
-              <AppText muted>
-                {m.store.name} · {formatLabel(m.event.format)}
-              </AppText>
-              <AppText muted>{formatDateTime(m.event.startsAt)}</AppText>
-              <AppText>{t(STATUS[m.status] ?? 'storeEvRegistered')}</AppText>
-            </Card>
-          </Pressable>
-        ))
+        <ResponsiveGrid>
+          {(mine.data ?? []).map((m) => (
+            <Pressable
+              key={m.entryId}
+              accessibilityRole="button"
+              accessibilityLabel={`${m.event.title}, ${m.store.name}. ${formatDateTime(m.event.startsAt)}. ${t(STATUS[m.status] ?? 'storeEvRegistered')}`}
+              onPress={() =>
+                router.push({ pathname: '/eventos-loja/[id]', params: { id: m.event.id } })
+              }
+              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+            >
+              <Card style={{ gap: 2 }}>
+                <AppText style={{ fontWeight: '700' }}>{m.event.title}</AppText>
+                <AppText muted>
+                  {m.store.name} · {formatLabel(m.event.format)}
+                </AppText>
+                <AppText muted>{formatDateTime(m.event.startsAt)}</AppText>
+                <AppText>{t(STATUS[m.status] ?? 'storeEvRegistered')}</AppText>
+              </Card>
+            </Pressable>
+          ))}
+        </ResponsiveGrid>
       )}
     </ScrollView>
   );

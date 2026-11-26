@@ -9,6 +9,7 @@ import { openMonthlyRecap } from '@/lib/monthly';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 import { EmptyState } from '@/components/empty-state';
+import { useLayout } from '@/lib/layout';
 
 /** Texto da notificação no idioma do aparelho. */
 function notificationText(item: NotificationItem) {
@@ -105,6 +106,7 @@ function open(item: NotificationItem) {
 
 /** Central de notificações: ao abrir, tudo passa a contar como lido. */
 export default function NotificationsScreen() {
+  const layout = useLayout();
   const colors = useColors();
   const inbox = useAsync(() => api.me.notifications(), []);
   // Lidas nesta visita (a lista não é recarregada a cada toque).
@@ -128,7 +130,7 @@ export default function NotificationsScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 8 }}
+      contentContainerStyle={[layout.readableStyle, { gap: 8 }]}
       refreshControl={<RefreshControl refreshing={inbox.refreshing} onRefresh={inbox.refresh} />}
     >
       {unread > 0 ? (

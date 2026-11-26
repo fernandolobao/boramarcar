@@ -18,6 +18,8 @@ import { Stat } from '@/components/ds/stat';
 import { Avatar } from '@/components/avatar';
 import { Icon } from '@/components/icons';
 import { ACHIEVEMENT_ICON } from '@/components/achievement-icons';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = {
   owner: 'roleOwner',
@@ -122,6 +124,7 @@ function Achievements({ achievements }: { achievements: readonly Achievement[] }
 
 /** Perfil de um jogador (o próprio ou alguém de um grupo em comum): resumo, títulos, conquistas e decks. */
 export default function PlayerScreen() {
+  const layout = useLayout();
   const { id } = useLocalSearchParams<{ id: string }>();
   const profile = useAsync(() => api.players.get(id), [id]);
   const colors = useColors();
@@ -149,7 +152,7 @@ export default function PlayerScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       refreshControl={
         <RefreshControl refreshing={profile.refreshing} onRefresh={profile.refresh} />
       }
@@ -188,75 +191,91 @@ export default function PlayerScreen() {
         </View>
       </View>
 
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('profileSummary')}
-        </AppText>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Stat label={t('profileGames')} value={String(p.games)} />
-          <Stat label={t('profileWins')} value={String(p.wins)} />
-          <Stat label={t('profileWinRate')} value={formatPercent(p.winRate)} />
-          <Stat label={t('profileDecks')} value={String(p.decks.length)} />
-        </View>
-        {p.seasonTitles.length > 0 && (
-          <View style={{ gap: 4 }}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '600' }}>
-              {t('profileSeasonTitles')}
-            </AppText>
-            {p.seasonTitles.map((s) => (
-              <AppText key={`${s.groupName}-${s.seasonName}`} style={{ color: colors.accent }}>
-                🏆 {t('profileSeasonTitle', { season: s.seasonName, group: s.groupName })}
+      {/* Tablet: números e conquistas à esquerda; decks à direita. */}
+      <SplitColumns
+        gap={16}
+        left={
+          <>
+            <Card style={{ gap: 10 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('profileSummary')}
               </AppText>
-            ))}
-          </View>
-        )}
-        {p.groups.length > 0 && (
-          <View style={{ gap: 4 }}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '600' }}>
-              {t(p.isSelf ? 'profileGroups' : 'profileSharedGroups')}
-            </AppText>
-            {p.groups.map((g) => (
-              <AppText key={g.id}>
-                {g.name} · <AppText muted>{t(ROLE_LABEL[g.role])}</AppText>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                <Stat label={t('profileGames')} value={String(p.games)} />
+                <Stat label={t('profileWins')} value={String(p.wins)} />
+                <Stat label={t('profileWinRate')} value={formatPercent(p.winRate)} />
+                <Stat label={t('profileDecks')} value={String(p.decks.length)} />
+              </View>
+              {p.seasonTitles.length > 0 && (
+                <View style={{ gap: 4 }}>
+                  <AppText accessibilityRole="header" style={{ fontWeight: '600' }}>
+                    {t('profileSeasonTitles')}
+                  </AppText>
+                  {p.seasonTitles.map((s) => (
+                    <AppText
+                      key={`${s.groupName}-${s.seasonName}`}
+                      style={{ color: colors.accent }}
+                    >
+                      🏆 {t('profileSeasonTitle', { season: s.seasonName, group: s.groupName })}
+                    </AppText>
+                  ))}
+                </View>
+              )}
+              {p.groups.length > 0 && (
+                <View style={{ gap: 4 }}>
+                  <AppText accessibilityRole="header" style={{ fontWeight: '600' }}>
+                    {t(p.isSelf ? 'profileGroups' : 'profileSharedGroups')}
+                  </AppText>
+                  {p.groups.map((g) => (
+                    <AppText key={g.id}>
+                      {g.name} · <AppText muted>{t(ROLE_LABEL[g.role])}</AppText>
+                    </AppText>
+                  ))}
+                </View>
+              )}
+            </Card>
+
+            <Achievements achievements={p.achievements} />
+          </>
+        }
+        right={
+          <>
+            <View style={{ gap: 8 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('profileDecks')}
               </AppText>
-            ))}
-          </View>
-        )}
-      </Card>
-
-      <Achievements achievements={p.achievements} />
-
-      <View style={{ gap: 8 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('profileDecks')}
-        </AppText>
-        {p.decks.length === 0 ? (
-          <AppText muted>{t('profileNoDecks')}</AppText>
-        ) : (
-          p.decks.map((d) => (
-            <Pressable
-              key={d.id}
-              accessibilityRole="button"
-              accessibilityLabel={t('deckOpen', { name: d.name })}
-              onPress={() => router.push({ pathname: '/decks/[id]', params: { id: d.id } })}
-              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-            >
-              <Card>
-                <AppText style={{ fontWeight: '700' }}>{d.name}</AppText>
-                <AppText muted>
-                  {[
-                    t('cards', { count: d.cardCount ?? 0 }),
-                    d.score != null ? t('deckListScore', { score: d.score }) : null,
-                    d.bracket ? t('deckListBracket', { value: BRACKET_SHORT[d.bracket] }) : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </AppText>
-              </Card>
-            </Pressable>
-          ))
-        )}
-      </View>
+              {p.decks.length === 0 ? (
+                <AppText muted>{t('profileNoDecks')}</AppText>
+              ) : (
+                p.decks.map((d) => (
+                  <Pressable
+                    key={d.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('deckOpen', { name: d.name })}
+                    onPress={() => router.push({ pathname: '/decks/[id]', params: { id: d.id } })}
+                    style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+                  >
+                    <Card>
+                      <AppText style={{ fontWeight: '700' }}>{d.name}</AppText>
+                      <AppText muted>
+                        {[
+                          t('cards', { count: d.cardCount ?? 0 }),
+                          d.score != null ? t('deckListScore', { score: d.score }) : null,
+                          d.bracket
+                            ? t('deckListBracket', { value: BRACKET_SHORT[d.bracket] })
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </AppText>
+                    </Card>
+                  </Pressable>
+                ))
+              )}
+            </View>
+          </>
+        }
+      />
     </ScrollView>
   );
 }

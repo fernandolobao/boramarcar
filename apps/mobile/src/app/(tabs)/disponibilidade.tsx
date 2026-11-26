@@ -14,9 +14,12 @@ import { useAsync } from '@/lib/use-async';
 import { ConfirmButton } from '@/components/confirm-button';
 import { NoGroup } from '@/components/no-group';
 import { EmptyState } from '@/components/empty-state';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 /** Disponibilidade (5.4): melhores horários, adicionar, regras semanais e o que o grupo marcou. */
 export default function AvailabilityScreen() {
+  const layout = useLayout();
   const { group } = useGroup();
   const { data: session } = authClient.useSession();
   const colors = useColors();
@@ -60,7 +63,7 @@ export default function AvailabilityScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       refreshControl={<RefreshControl refreshing={data.refreshing} onRefresh={data.refresh} />}
       keyboardShouldPersistTaps="handled"
     >
@@ -73,160 +76,187 @@ export default function AvailabilityScreen() {
         </AppText>
       )}
 
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('availWindows')}
-        </AppText>
-        {windows.length === 0 ? (
-          <AppText muted>{t('availNoWindows')}</AppText>
-        ) : (
-          windows.map((w) => {
-            const key = `${w.start.toISOString()}-${w.locationId}`;
-            return (
-              <View
-                key={key}
-                style={{ gap: 6, paddingTop: 10, borderTopWidth: 1, borderColor: colors.border }}
-              >
-                <AppText style={{ fontWeight: '700' }}>
-                  {rangeLabel(w.start, w.end, timeZone)}
-                </AppText>
-                <AppText muted>
-                  {w.locationName ?? t('locationTbd')} · {w.players.map((p) => p.name).join(', ')}
-                </AppText>
-                <Button
-                  label={t('availCreateEvent')}
-                  accessibilityLabel={`${t('availCreateEvent')}: ${rangeLabel(w.start, w.end, timeZone)}`}
-                  disabled={creating !== null}
-                  onPress={async () => {
-                    setCreating(key);
-                    try {
-                      const event = await api.events.create(group.id, {
-                        title: t('availDefaultTitle'),
-                        startsAt: w.start,
-                        endsAt: w.end,
-                        locationId: w.locationId,
-                        participantIds: w.userIds,
-                      });
-                      router.push({ pathname: '/encontros/[id]', params: { id: event.id } });
-                    } catch {
-                      setMessage(t('availSaveError'));
-                    } finally {
-                      setCreating(null);
-                    }
-                  }}
-                />
-              </View>
-            );
-          })
-        )}
-      </Card>
-
-      <AddAvailability
-        groupId={group.id}
-        locations={locations}
-        onAdded={() => void data.refresh()}
-      />
-
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('availMyRules')}
-        </AppText>
-        {myRules.length === 0 ? (
-          <AppText muted>{t('availNoRules')}</AppText>
-        ) : (
-          myRules.map((rule) => (
-            <View
-              key={rule.id}
-              style={{ gap: 6, paddingTop: 10, borderTopWidth: 1, borderColor: colors.border }}
-            >
-              <AppText style={{ fontWeight: '700' }}>{ruleSummary(rule)}</AppText>
-              <AppText muted>
-                {where(rule.locationIds)}
-                {rule.note ? ` · ${rule.note}` : ''}
+      {/* Tablet: sua disponibilidade e o formulário à esquerda; o grupo à direita. */}
+      <SplitColumns
+        gap={16}
+        left={
+          <>
+            <Card style={{ gap: 10 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('availWindows')}
               </AppText>
-              {rule.exceptions.length > 0 && (
-                <View style={{ gap: 6 }}>
-                  <AppText muted>{t('availSkipped')}</AppText>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                    {rule.exceptions.map((date) => (
+              {windows.length === 0 ? (
+                <AppText muted>{t('availNoWindows')}</AppText>
+              ) : (
+                windows.map((w) => {
+                  const key = `${w.start.toISOString()}-${w.locationId}`;
+                  return (
+                    <View
+                      key={key}
+                      style={{
+                        gap: 6,
+                        paddingTop: 10,
+                        borderTopWidth: 1,
+                        borderColor: colors.border,
+                      }}
+                    >
+                      <AppText style={{ fontWeight: '700' }}>
+                        {rangeLabel(w.start, w.end, timeZone)}
+                      </AppText>
+                      <AppText muted>
+                        {w.locationName ?? t('locationTbd')} ·{' '}
+                        {w.players.map((p) => p.name).join(', ')}
+                      </AppText>
                       <Button
-                        key={date}
-                        label={`↺ ${dayLabel(date)}`}
-                        accessibilityLabel={t('availUnskip', { date: dayLabel(date) })}
-                        variant="secondary"
-                        onPress={() =>
-                          void act(
-                            () => api.rules.setException(rule.id, date, false),
-                            t('availUnskipped', { date: dayLabel(date) }),
-                          )
-                        }
+                        label={t('availCreateEvent')}
+                        accessibilityLabel={`${t('availCreateEvent')}: ${rangeLabel(w.start, w.end, timeZone)}`}
+                        disabled={creating !== null}
+                        onPress={async () => {
+                          setCreating(key);
+                          try {
+                            const event = await api.events.create(group.id, {
+                              title: t('availDefaultTitle'),
+                              startsAt: w.start,
+                              endsAt: w.end,
+                              locationId: w.locationId,
+                              participantIds: w.userIds,
+                            });
+                            router.push({ pathname: '/encontros/[id]', params: { id: event.id } });
+                          } catch {
+                            setMessage(t('availSaveError'));
+                          } finally {
+                            setCreating(null);
+                          }
+                        }}
                       />
-                    ))}
-                  </View>
-                </View>
+                    </View>
+                  );
+                })
               )}
-              <ConfirmButton
-                confirmLabel={t('availConfirm')}
-                label={t('availRemove')}
-                context={ruleSummary(rule)}
-                onConfirm={() => act(() => api.rules.remove(rule.id), t('availRemoved'))}
-              />
-            </View>
-          ))
-        )}
-      </Card>
+            </Card>
 
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('availEveryone')}
-        </AppText>
-        {slots.length === 0 ? (
-          <EmptyState>{t('availEmpty')}</EmptyState>
-        ) : (
-          slots.map((slot) => {
-            const when = rangeLabel(slot.startsAt, slot.endsAt, timeZone);
-            const mine = slot.userId === me;
-            return (
-              <View
-                key={slot.id}
-                style={{ gap: 6, paddingTop: 10, borderTopWidth: 1, borderColor: colors.border }}
-              >
-                <AppText style={{ fontWeight: '700' }}>
-                  {slot.userName} · {when}
-                  {slot.kind === 'weekly' ? `  ↻ ${t('availWeeklyTag')}` : ''}
-                </AppText>
-                <AppText muted>
-                  {where(slot.locationIds)}
-                  {slot.note ? ` · ${slot.note}` : ''}
-                </AppText>
-                {mine &&
-                  (slot.kind === 'weekly' && slot.ruleId && slot.date ? (
-                    <Button
-                      label={t('availSkip')}
-                      accessibilityLabel={t('availSkipLabel', { date: dayLabel(slot.date) })}
-                      variant="secondary"
-                      onPress={() =>
-                        void act(
-                          () => api.rules.setException(slot.ruleId!, slot.date!, true),
-                          t('availSkippedDone', { date: dayLabel(slot.date!) }),
-                        )
-                      }
-                    />
-                  ) : (
+            <AddAvailability
+              groupId={group.id}
+              locations={locations}
+              onAdded={() => void data.refresh()}
+            />
+          </>
+        }
+        right={
+          <>
+            <Card style={{ gap: 10 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('availMyRules')}
+              </AppText>
+              {myRules.length === 0 ? (
+                <AppText muted>{t('availNoRules')}</AppText>
+              ) : (
+                myRules.map((rule) => (
+                  <View
+                    key={rule.id}
+                    style={{
+                      gap: 6,
+                      paddingTop: 10,
+                      borderTopWidth: 1,
+                      borderColor: colors.border,
+                    }}
+                  >
+                    <AppText style={{ fontWeight: '700' }}>{ruleSummary(rule)}</AppText>
+                    <AppText muted>
+                      {where(rule.locationIds)}
+                      {rule.note ? ` · ${rule.note}` : ''}
+                    </AppText>
+                    {rule.exceptions.length > 0 && (
+                      <View style={{ gap: 6 }}>
+                        <AppText muted>{t('availSkipped')}</AppText>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                          {rule.exceptions.map((date) => (
+                            <Button
+                              key={date}
+                              label={`↺ ${dayLabel(date)}`}
+                              accessibilityLabel={t('availUnskip', { date: dayLabel(date) })}
+                              variant="secondary"
+                              onPress={() =>
+                                void act(
+                                  () => api.rules.setException(rule.id, date, false),
+                                  t('availUnskipped', { date: dayLabel(date) }),
+                                )
+                              }
+                            />
+                          ))}
+                        </View>
+                      </View>
+                    )}
                     <ConfirmButton
                       confirmLabel={t('availConfirm')}
                       label={t('availRemove')}
-                      context={when}
-                      onConfirm={() =>
-                        act(() => api.availability.remove(slot.id), t('availRemoved'))
-                      }
+                      context={ruleSummary(rule)}
+                      onConfirm={() => act(() => api.rules.remove(rule.id), t('availRemoved'))}
                     />
-                  ))}
-              </View>
-            );
-          })
-        )}
-      </Card>
+                  </View>
+                ))
+              )}
+            </Card>
+
+            <Card style={{ gap: 10 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('availEveryone')}
+              </AppText>
+              {slots.length === 0 ? (
+                <EmptyState>{t('availEmpty')}</EmptyState>
+              ) : (
+                slots.map((slot) => {
+                  const when = rangeLabel(slot.startsAt, slot.endsAt, timeZone);
+                  const mine = slot.userId === me;
+                  return (
+                    <View
+                      key={slot.id}
+                      style={{
+                        gap: 6,
+                        paddingTop: 10,
+                        borderTopWidth: 1,
+                        borderColor: colors.border,
+                      }}
+                    >
+                      <AppText style={{ fontWeight: '700' }}>
+                        {slot.userName} · {when}
+                        {slot.kind === 'weekly' ? `  ↻ ${t('availWeeklyTag')}` : ''}
+                      </AppText>
+                      <AppText muted>
+                        {where(slot.locationIds)}
+                        {slot.note ? ` · ${slot.note}` : ''}
+                      </AppText>
+                      {mine &&
+                        (slot.kind === 'weekly' && slot.ruleId && slot.date ? (
+                          <Button
+                            label={t('availSkip')}
+                            accessibilityLabel={t('availSkipLabel', { date: dayLabel(slot.date) })}
+                            variant="secondary"
+                            onPress={() =>
+                              void act(
+                                () => api.rules.setException(slot.ruleId!, slot.date!, true),
+                                t('availSkippedDone', { date: dayLabel(slot.date!) }),
+                              )
+                            }
+                          />
+                        ) : (
+                          <ConfirmButton
+                            confirmLabel={t('availConfirm')}
+                            label={t('availRemove')}
+                            context={when}
+                            onConfirm={() =>
+                              act(() => api.availability.remove(slot.id), t('availRemoved'))
+                            }
+                          />
+                        ))}
+                    </View>
+                  );
+                })
+              )}
+            </Card>
+          </>
+        }
+      />
     </ScrollView>
   );
 }
