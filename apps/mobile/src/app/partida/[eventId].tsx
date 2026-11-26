@@ -26,7 +26,7 @@ const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
 function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {title}
       </AppText>
       {hint ? <AppText muted>{hint}</AppText> : null}

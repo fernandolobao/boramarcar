@@ -4,7 +4,8 @@ import { Link, router } from 'expo-router';
 import { useId } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { AppText, Card } from '@/components/ui';
+import { AppText, Card, styles } from '@/components/ui';
+import { fonts } from '@/lib/fonts';
 import { formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
@@ -61,7 +62,7 @@ export function DashboardHero({
       <AppText style={{ color: gold, fontWeight: '600' }}>{groupName}</AppText>
       <AppText
         accessibilityRole="header"
-        style={{ color: palette.pergaminho, fontSize: 34, fontWeight: '700', marginTop: 2 }}
+        style={{ color: palette.pergaminho, fontSize: 36, fontFamily: fonts.display, marginTop: 2 }}
       >
         {t('dashHello', { name: firstName })}
       </AppText>
@@ -209,7 +210,7 @@ function Tile({
         <AppText muted style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6 }}>
           {label.toUpperCase()}
         </AppText>
-        <AppText style={{ fontSize: 30, fontWeight: '700', fontVariant: ['tabular-nums'] }}>
+        <AppText style={{ fontSize: 32, fontFamily: fonts.display, fontVariant: ['tabular-nums'] }}>
           {value}
         </AppText>
         {detail ? (
@@ -320,7 +321,7 @@ function Step({ place, height }: { place: 1 | 2 | 3; height: number }) {
         style={{
           color: palette.noite,
           fontSize: 28,
-          fontWeight: '700',
+          fontFamily: fonts.display,
           textAlign: 'center',
           paddingTop: 6,
         }}
@@ -340,7 +341,7 @@ export function Podium({ ranking }: { ranking: Ranking | null }) {
   return (
     <Card style={{ gap: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('dashPodium')}
         </AppText>
         <Pressable

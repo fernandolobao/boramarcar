@@ -81,7 +81,7 @@ export default function StoreScreen() {
       </View>
       {store.about ? (
         <Card style={{ gap: 6 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('storeAbout')}
           </AppText>
           <AppText>{store.about}</AppText>
@@ -116,7 +116,7 @@ export default function StoreScreen() {
           {t('storeFormats')}: {store.formats.map(formatLabel).join(', ')}
         </AppText>
       )}
-      <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('storeEvUpcoming')}
       </AppText>
       {upcoming.length === 0 ? (

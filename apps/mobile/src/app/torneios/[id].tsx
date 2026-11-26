@@ -197,7 +197,7 @@ export default function TournamentScreen() {
 
       {tour.status === 'registration' && (
         <Card style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('tourEntrantsTitle')} · {t('tourEntrants', { count: v.entrants.length })}
           </AppText>
           {v.entrants.length === 0 ? <AppText muted>{t('tourNoEntrants')}</AppText> : null}
@@ -278,7 +278,7 @@ export default function TournamentScreen() {
 
       {[...v.rounds].reverse().map((round, index) => (
         <Card key={round.id} style={{ gap: 12 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {tour.structure === 'double_elimination'
               ? round.tables.some((x) => x.bracket === 'final')
                 ? t('tourBracketFinal')
@@ -311,7 +311,7 @@ export default function TournamentScreen() {
               (v.canManage || (atTable && !table.reported));
             return (
               <View key={table.id} style={{ gap: 6 }}>
-                <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
                   {t('tourTable', { number: table.number })}
                   {table.bracket && table.bracket !== 'final'
                     ? ` · ${t(table.bracket === 'winners' ? 'tourBracketWinners' : 'tourBracketLosers')}`
@@ -368,7 +368,7 @@ export default function TournamentScreen() {
         tour.structure !== 'single_elimination' &&
         tour.structure !== 'double_elimination' && (
           <Card style={{ gap: 8 }}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+            <AppText accessibilityRole="header" style={styles.sectionTitle}>
               {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}
             </AppText>
             {v.standings.map((s) => {
@@ -392,7 +392,7 @@ export default function TournamentScreen() {
 
       {v.canManage && tour.status !== 'finished' && (
         <Card style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('tourManage')}
           </AppText>
           {tour.status === 'registration' && (

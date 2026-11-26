@@ -288,7 +288,7 @@ export function AddCardForm({
   };
   return (
     <View style={{ gap: 10, paddingTop: 8 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('deckAddCard')}
       </AppText>
       <TextField

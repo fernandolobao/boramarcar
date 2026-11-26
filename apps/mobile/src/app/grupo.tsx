@@ -266,7 +266,7 @@ export default function GroupScreen() {
       </Card>
 
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('groupInviteTitle')}
         </AppText>
         <AppText muted>{t('groupInviteHint')}</AppText>
@@ -294,7 +294,7 @@ export default function GroupScreen() {
       </Card>
 
       <Card style={{ gap: 4 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('groupMembers')}
         </AppText>
         {members.loading ? (
@@ -324,7 +324,7 @@ export default function GroupScreen() {
       {canManage && <AttendanceCard groupId={group.id} viewerId={me} />}
 
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('groupLocations')}
         </AppText>
         {locations.error ? (

@@ -9,7 +9,7 @@ import { ConfirmButton } from '@/components/confirm-button';
 import { TextField } from '@/components/fields';
 import { StackSection } from '@/components/stack';
 import { formatLabel } from '@/components/table/labels';
-import { AppText, Button } from '@/components/ui';
+import { AppText, Button, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t, type MessageKey } from '@/lib/i18n';
 import { Choices } from '@/components/ds/choices';
@@ -82,7 +82,7 @@ export function DeckTools({
     <StackSection index={index} title={t('deckTools')}>
       <View style={{ gap: 16 }}>
         <View style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('deckSettings')}
           </AppText>
           <TextField label={t('deckName')} value={name} onChangeText={setName} maxLength={120} />
@@ -113,7 +113,7 @@ export function DeckTools({
         </View>
 
         <View style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('deckSync')}
           </AppText>
           {deck.sourceUrl ? (
@@ -147,7 +147,7 @@ export function DeckTools({
         </View>
 
         <View style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('deckExport')}
           </AppText>
           <AppText muted>{t('deckExportHint')}</AppText>
@@ -168,7 +168,7 @@ export function DeckTools({
         </View>
 
         <View style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('deckDelete')}
           </AppText>
           <AppText muted>{t('deckDeleteHint')}</AppText>
