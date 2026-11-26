@@ -1,6 +1,6 @@
 import type { EventDetail, EventSummary, Ranking } from '@boramarcar/api-client';
 import { palette, podium, scales } from '@boramarcar/tokens';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useId } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
@@ -119,17 +119,27 @@ export function DashboardHero({
               </AppText>
             </View>
           )}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
-            <Link href={{ pathname: '/encontros/[id]', params: { id: event.id } }} asChild>
-              <Pressable
-                accessibilityRole="link"
-                style={({ pressed }) => [s.cta, { opacity: pressed ? 0.85 : 1 }]}
-              >
-                <AppText style={{ color: palette.noite, fontWeight: '700', fontSize: 16 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 10,
+              marginTop: 10,
+            }}
+          >
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push({ pathname: '/encontros/[id]', params: { id: event.id } })}
+              style={({ pressed }) => [styles.button, s.cta, { opacity: pressed ? 0.85 : 1 }]}
+            >
+              <View style={s.ctaRow}>
+                <Icon name="events" color={palette.noite} />
+                <AppText style={[styles.buttonText, { color: palette.noite }]}>
                   {mine ? t('dashOpenEvent') : t('dashAnswerRsvp')}
                 </AppText>
-              </Pressable>
-            </Link>
+              </View>
+            </Pressable>
             {mine && (
               <View style={s.rsvp}>
                 <AppText style={{ color: palette.pergaminho, fontSize: 14 }}>
@@ -145,11 +155,18 @@ export function DashboardHero({
           <Pressable
             accessibilityRole="link"
             onPress={() => router.push('/disponibilidade')}
-            style={({ pressed }) => [s.cta, { opacity: pressed ? 0.85 : 1 }]}
+            style={({ pressed }) => [
+              styles.button,
+              s.cta,
+              { alignSelf: 'flex-start', opacity: pressed ? 0.85 : 1 },
+            ]}
           >
-            <AppText style={{ color: palette.noite, fontWeight: '700', fontSize: 16 }}>
-              {t('availTitle')}
-            </AppText>
+            <View style={s.ctaRow}>
+              <Icon name="availability" color={palette.noite} />
+              <AppText style={[styles.buttonText, { color: palette.noite }]}>
+                {t('availTitle')}
+              </AppText>
+            </View>
           </Pressable>
         </View>
       )}
@@ -209,7 +226,13 @@ function Tile({
     >
       {ring !== undefined && <Ring value={ring} />}
       <View style={{ flex: 1 }}>
-        <AppText muted style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6 }}>
+        <AppText
+          muted
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          style={{ fontSize: 12, fontWeight: '600', letterSpacing: 0.6 }}
+        >
           {label.toUpperCase()}
         </AppText>
         <AppText style={{ fontSize: 32, fontFamily: fonts.display, fontVariant: ['tabular-nums'] }}>
@@ -245,7 +268,7 @@ export function NumberTiles({
         detail={me ? t('dashOfPlayers', { count: playerCount }) : t('dashNoGamesYet')}
       />
       <Tile
-        label={t('points')}
+        label={t('dashPointsLabel')}
         value={me ? String(me.points) : '—'}
         detail={
           me ? t('dashRecord', { wins: me.wins, losses: me.losses, draws: me.draws }) : undefined
@@ -417,22 +440,17 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cta: {
-    minHeight: 48,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    backgroundColor: palette.dourado,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  /** Mesmo tamanho dos botões do app (`styles.button`), em dourado como no site. */
+  cta: { backgroundColor: palette.dourado, borderColor: palette.dourado },
+  ctaRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  /** "Sua resposta": selo (não é botão). */
   rsvp: {
-    minHeight: 48,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
     borderWidth: 1,
     borderColor: `${palette.pergaminho}40`,
     backgroundColor: `${palette.pergaminho}1a`,
-    justifyContent: 'center',
   },
   form: {
     width: 32,
