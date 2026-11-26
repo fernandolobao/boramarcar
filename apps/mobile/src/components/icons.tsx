@@ -1,0 +1,268 @@
+/**
+ * Ícones do app (Lucide), com os mesmos nomes semânticos e desenhos do site
+ * (`apps/web/src/components/icons.tsx`): a mesma ação tem o mesmo ícone no site e no app.
+ *
+ * Acessibilidade: o ícone é decorativo (escondido dos leitores de tela) e acompanha um texto
+ * visível; botão só com ícone precisa de `accessibilityLabel`.
+ */
+import {
+  Award,
+  BadgeCheck,
+  Bell,
+  CalendarCheck,
+  CalendarRange,
+  Shield,
+  Target,
+  TrendingUp,
+  UsersRound,
+  Circle,
+  Gamepad2,
+  Skull,
+  MapPin,
+  Store,
+  Maximize,
+  Minimize,
+  Navigation,
+  Accessibility,
+  Mail,
+  Pause,
+  Play,
+  Smartphone,
+  FlipHorizontal2,
+  Monitor,
+  Moon,
+  Sun,
+  Gauge,
+  Hand,
+  Shuffle,
+  TriangleAlert,
+  Footprints,
+  Gem,
+  Heart,
+  Shapes,
+  Star,
+  Swords,
+  Zap,
+  Flame,
+  Globe,
+  Languages,
+  Lock,
+  Ban,
+  CalendarDays,
+  CalendarPlus,
+  CalendarX2,
+  Camera,
+  Check,
+  GraduationCap,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  CircleHelp,
+  CircleUserRound,
+  ClipboardPaste,
+  Clock,
+  Copy,
+  Crown,
+  Download,
+  ExternalLink,
+  Layers,
+  LibraryBig,
+  LayoutGrid,
+  List,
+  Medal,
+  Settings,
+  LayoutDashboard,
+  Link2,
+  ListFilter,
+  LogIn,
+  LogOut,
+  MessageCircle,
+  MessageSquareText,
+  Pencil,
+  Printer,
+  Plus,
+  Repeat,
+  ArrowLeft,
+  ArrowLeftRight,
+  RefreshCw,
+  RotateCcw,
+  Save,
+  Share2,
+  ShieldCheck,
+  ShieldMinus,
+  Trash2,
+  Trophy,
+  Undo2,
+  Upload,
+  UserMinus,
+  UserPlus,
+  Users,
+  X,
+  type LucideIcon,
+  Dices,
+  Eye,
+  Lightbulb,
+  Compass,
+  Info,
+  NotebookPen,
+} from 'lucide-react-native';
+
+export const Icons = {
+  // Ações genéricas
+  add: Plus,
+  edit: Pencil,
+  delete: Trash2,
+  save: Save,
+  undo: Undo2,
+  copy: Copy,
+  copied: Check,
+  download: Download,
+  print: Printer,
+  upload: Upload,
+  share: Share2,
+  externalLink: ExternalLink,
+  refresh: RefreshCw,
+  settings: Settings,
+  filter: ListFilter,
+  close: X,
+  // Navegação
+  dashboard: LayoutDashboard,
+  availability: Clock,
+  events: CalendarDays,
+  ranking: Trophy,
+  decks: Layers,
+  collection: LibraryBig,
+  group: Users,
+  profile: CircleUserRound,
+  back: ArrowLeft,
+  previous: ChevronLeft,
+  chevronDown: ChevronDown,
+  next: ChevronRight,
+  signIn: LogIn,
+  signOut: LogOut,
+  // Agenda
+  once: CalendarDays,
+  weekly: Repeat,
+  createEvent: CalendarPlus,
+  addToCalendar: CalendarPlus,
+  skipDate: CalendarX2,
+  finish: CircleCheck,
+  cancel: Ban,
+  reopen: RotateCcw,
+  rsvpYes: Check,
+  rsvpMaybe: CircleHelp,
+  rsvpNo: X,
+  winner: Medal,
+  whatsapp: MessageCircle,
+  // Grupo
+  join: UserPlus,
+  switchGroup: ArrowLeftRight,
+  swap: ArrowLeftRight,
+  done: Check,
+  /** Deck em rascunho (11.2). */
+  draft: NotebookPen,
+  /** Publicar o rascunho. */
+  publish: BadgeCheck,
+  makeAdmin: ShieldCheck,
+  removeAdmin: ShieldMinus,
+  transfer: Crown,
+  removeMember: UserMinus,
+  leave: LogOut,
+  // Visibilidade
+  private: Lock,
+  public: Globe,
+  // Idioma
+  language: Languages,
+  // Notificações
+  notifications: Bell,
+  // Conquistas
+  achievement: Award,
+  firstGame: Footprints,
+  streak: Flame,
+  fastWin: Zap,
+  firstPlayer: Swords,
+  loyal: Heart,
+  variety: Gem,
+  versatile: Shapes,
+  team: Users,
+  champion: Crown,
+  veteran: Star,
+  crowd: UsersRound,
+  nemesis: Target,
+  underdog: Shield,
+  comeback: TrendingUp,
+  eventStreak: CalendarCheck,
+  allYear: CalendarRange,
+  // Decks
+  fromUrl: Link2,
+  fromText: ClipboardPaste,
+  gallery: LayoutGrid,
+  list: List,
+  // Análise de deck
+  ok: CircleCheck,
+  warning: TriangleAlert,
+  alternatives: Shuffle,
+  bracket: Gauge,
+  /** Critério do bracket que ainda não conta (a marcação é `ok`). */
+  unmarked: Circle,
+  openingHand: Hand,
+  flip: FlipHorizontal2,
+  location: MapPin,
+  store: Store,
+  directions: Navigation,
+  // Modo mesa
+  monarch: Crown,
+  poison: Skull,
+  table: Gamepad2,
+  // Página inicial
+  games: Swords,
+  mobile: Smartphone,
+  accessible: Accessibility,
+  privacy: ShieldCheck,
+  fun: Dices,
+  guide: Compass,
+  info: Info,
+  learn: Lightbulb,
+  /** Ler cartas pela câmera. */
+  camera: Camera,
+  /** Trilha "Aprender a jogar" (12.1). */
+  lessons: GraduationCap,
+  transparency: Eye,
+  email: Mail,
+  feedback: MessageSquareText,
+  pause: Pause,
+  fullscreen: Maximize,
+  exitFullscreen: Minimize,
+  play: Play,
+  // Tema
+  themeSystem: Monitor,
+  themeLight: Sun,
+  themeDark: Moon,
+} satisfies Record<string, LucideIcon>;
+
+export type IconName = keyof typeof Icons;
+
+/** Ícone decorativo (16 pt por padrão, como nos botões do site), na cor do texto ao lado. */
+export function Icon({
+  name,
+  size = 16,
+  color,
+  strokeWidth = 2,
+}: {
+  name: IconName;
+  size?: number;
+  color: string;
+  strokeWidth?: number;
+}) {
+  const Component = Icons[name];
+  return (
+    <Component
+      size={size}
+      color={color}
+      strokeWidth={strokeWidth}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
+}

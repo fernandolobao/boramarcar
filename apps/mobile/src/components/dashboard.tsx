@@ -7,6 +7,7 @@ import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { AppText, Card } from '@/components/ui';
 import { formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Icon } from '@/components/icons';
 
 /**
  * Painel do app com o desenho do site (14.3): destaque roxo com a arte do comandante em alta e o
@@ -381,7 +382,7 @@ export function Podium({ ranking }: { ranking: Ranking | null }) {
                   opacity: pressed ? 0.8 : 1,
                 })}
               >
-                {place === 1 && <AppText style={{ fontSize: 20 }}>👑</AppText>}
+                {place === 1 && <Icon name="champion" size={24} color={colors.accentText} />}
                 <AppText numberOfLines={1} style={{ fontWeight: '700', fontSize: 14 }}>
                   {st.name}
                 </AppText>

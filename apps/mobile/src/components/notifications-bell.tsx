@@ -1,7 +1,7 @@
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
+import { Icon } from '@/components/icons';
 import { AppText } from '@/components/ui';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
@@ -42,13 +42,7 @@ export function NotificationsBell() {
         justifyContent: 'center',
       }}
     >
-      <MaterialCommunityIcons
-        name="bell-outline"
-        size={24}
-        color={colors.text}
-        accessibilityElementsHidden
-        importantForAccessibility="no"
-      />
+      <Icon name="notifications" size={24} color={colors.text} />
       {unread > 0 ? (
         <View
           style={{

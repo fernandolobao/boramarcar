@@ -4,6 +4,7 @@ import { Modal, Pressable, ScrollView, View } from 'react-native';
 import { AppText, Button } from '@/components/ui';
 import { t, tRaw } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Icon } from '@/components/icons';
 
 const fill = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
@@ -54,9 +55,7 @@ export function Select<T extends string>({
         <AppText style={{ fontSize: 16, flexShrink: 1 }} numberOfLines={1}>
           {shown}
         </AppText>
-        <AppText muted importantForAccessibility="no" accessibilityElementsHidden>
-          ▾
-        </AppText>
+        <Icon name="chevronDown" color={colors.muted} />
       </Pressable>
       {description ? <AppText muted>{description}</AppText> : null}
       {error ? (
@@ -107,11 +106,7 @@ export function Select<T extends string>({
                   <AppText style={{ fontSize: 16, fontWeight: selected ? '700' : '400' }}>
                     {o.label}
                   </AppText>
-                  {selected ? (
-                    <AppText importantForAccessibility="no" accessibilityElementsHidden>
-                      ✓
-                    </AppText>
-                  ) : null}
+                  {selected ? <Icon name="done" color={colors.text} /> : null}
                 </Pressable>
               );
             })}

@@ -6,10 +6,13 @@ import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components
 import { api } from '@/lib/api';
 import { formatDateTime, t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
+import { Icon } from '@/components/icons';
+import { useColors } from '@/lib/theme';
 
 /** Perfil da loja (10.1, no app): dados, contatos, formatos e os próximos eventos. */
 export default function StoreScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const colors = useColors();
   const view = useAsync(() => api.stores.get(slug), [slug]);
   const [followOverride, setFollowOverride] = useState<boolean | null>(null);
   const [followBusy, setFollowBusy] = useState(false);
@@ -54,7 +57,12 @@ export default function StoreScreen() {
           {store.name}
         </AppText>
         <AppText muted>{store.city}</AppText>
-        {store.verified && <AppText style={{ fontWeight: '700' }}>✓ {t('storeVerified')}</AppText>}
+        {store.verified && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon name="done" color={colors.text} />
+            <AppText style={{ fontWeight: '700' }}>{t('storeVerified')}</AppText>
+          </View>
+        )}
         {/* Seguir a loja (10.4): botão liga/desliga; o nome não muda. */}
         <Button
           label={t('storeFollow')}
