@@ -95,6 +95,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
     'deck-analysis',
   );
   const t = await getTranslations('decks');
+  const tTable = await getTranslations('playtest');
   // Rascunho do próprio dono: cartas que ele já tem livres na coleção (selos e janela de publicar).
   const matches =
     deck.status === 'draft' && deck.isOwner
@@ -414,23 +415,31 @@ export default async function DeckPage({ params, searchParams }: Props) {
                         <HandOdds
                           odds={analysis.handOdds}
                           action={
-                            <ModalButton
-                              label={t('hand.open')}
-                              title={t('hand.title')}
-                              icon="openingHand"
-                            >
-                              <p className="muted text-sm">{t('hand.intro')}</p>
-                              {/* Só o deck principal; a face da frente diz se é terreno. */}
-                              <OpeningHand
-                                lines={deck.lines.map((l) => ({
-                                  name: l.name,
-                                  board: l.board,
-                                  quantity: l.quantity,
-                                  isLand: (l.card?.typeLine ?? '').split('//')[0]!.includes('Land'),
-                                  imageUri: l.card?.imageUri ?? null,
-                                }))}
-                              />
-                            </ModalButton>
+                            <div className="flex flex-wrap gap-2">
+                              <Link href={`/decks/${deck.id}/testar`} className="btn-secondary">
+                                <Icon name="play" />
+                                {tTable('open')}
+                              </Link>
+                              <ModalButton
+                                label={t('hand.open')}
+                                title={t('hand.title')}
+                                icon="openingHand"
+                              >
+                                <p className="muted text-sm">{t('hand.intro')}</p>
+                                {/* Só o deck principal; a face da frente diz se é terreno. */}
+                                <OpeningHand
+                                  lines={deck.lines.map((l) => ({
+                                    name: l.name,
+                                    board: l.board,
+                                    quantity: l.quantity,
+                                    isLand: (l.card?.typeLine ?? '')
+                                      .split('//')[0]!
+                                      .includes('Land'),
+                                    imageUri: l.card?.imageUri ?? null,
+                                  }))}
+                                />
+                              </ModalButton>
+                            </div>
                           }
                         />
                       ),

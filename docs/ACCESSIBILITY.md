@@ -823,3 +823,14 @@ sem rolagem horizontal em 320px.
   `select` nativo com a classe `select`, botões "Filtrar" e "Limpar filtros" com texto.
 - Lista com nome (`aria-label`), horário em `<time>`, paginação num `<nav>` com nome; vazio com o
   `EmptyState`.
+
+## Mesa de testes solo (26/11/2026)
+
+- Tudo por botões e menus (React Aria `Menu`): cada carta é um botão "Ações: {carta}, virada,
+  ficha…" que abre as ações; nada depende de arrastar.
+- Zonas são `<section>` com título e a contagem; a barra do turno tem nome; vida com botões
+  "Perder/Ganhar 1 de vida". Cada ação é anunciada em `role="status"` ("Forest virada.", "Turno 2:
+  tudo desvirado e 1 carta comprada.").
+- Carta virada: além da rotação (sem animação com "reduzir movimento"), o estado vai no nome.
+- "Procurar no grimório" numa janela (`Modal`), com filtro rotulado e botões com o nome da carta.
+- axe no componente e na página (claro/escuro, desktop/celular).

@@ -15,6 +15,7 @@ import { ProductTour } from './home/product-tour';
 import { LanguageSwitcher } from './language-switcher';
 import { AnnouncementsAdmin } from './announcements-admin';
 import { CostsAdmin } from './costs-admin';
+import { PlaytestTable } from './playtest/playtest-table';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
 import { TitleWithTip } from './tip';
@@ -761,6 +762,32 @@ describe('acessibilidade dos componentes (axe-core)', () => {
               brlCents: 11_000,
               note: 'Pro',
             },
+          ]}
+        />,
+      ),
+    ).toEqual([]);
+  });
+
+  it('mesa de testes sem violações (mão inicial e depois de manter)', async () => {
+    const line = (name: string, quantity: number, isLand = false) => ({
+      name,
+      board: 'mainboard' as const,
+      quantity,
+      isLand,
+      imageUri: null,
+      typeLine: isLand ? 'Basic Land — Forest' : 'Creature — Elf',
+      manaCost: isLand ? null : '{G}',
+      oracleText: '',
+      colorIdentity: ['G'],
+    });
+    expect(
+      await audit(
+        <PlaytestTable
+          startingLife={40}
+          lines={[
+            line('Forest', 30, true),
+            line('Llanowar Elves', 20),
+            { ...line('Omnath, Locus of Mana', 1), board: 'commander' as const },
           ]}
         />,
       ),

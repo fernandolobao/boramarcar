@@ -71,6 +71,7 @@ const AUTH_PAGES = [
   '/decks',
   `/decks/${E2E_IDS.deck}`,
   `/decks/${E2E_IDS.deck}/imprimir?which=all`,
+  `/decks/${E2E_IDS.deck}/testar`,
   '/decks/importar',
   '/decks/novo',
   '/colecao',

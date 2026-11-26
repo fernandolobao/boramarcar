@@ -22,6 +22,7 @@ export const SECTIONS = [
   'deck',
   'deckImport',
   'deckPrint',
+  'deckPlaytest',
   'collection',
   'group',
   'profile',

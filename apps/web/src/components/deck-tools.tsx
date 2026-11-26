@@ -41,6 +41,7 @@ export function DeckActions({
   edit?: { name: string; format: GameFormat; visibility: DeckVisibility; draft?: boolean };
 }) {
   const t = useTranslations('decks');
+  const tTable = useTranslations('playtest');
   const trigger = useRef<HTMLButtonElement>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [message, setMessage] = useState('');
@@ -84,6 +85,8 @@ export function DeckActions({
       ...(isOwner && edit
         ? [{ key: 'edit', label: t('settings'), icon: 'edit' as const, dialog: true }]
         : []),
+      // Mesa de testes solo (11.4): também na aba "Mão inicial" da análise.
+      { key: 'playtest', label: tTable('open'), icon: 'play', href: `/decks/${deckId}/testar` },
       { key: 'copy', label: t('exportPlain'), icon: 'copy' },
       { key: 'copyProxies', label: t('exportProxies'), icon: 'copy' },
       {
