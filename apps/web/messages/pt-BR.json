@@ -1185,6 +1185,10 @@
       "learn_commander": {
         "name": "Pronto para o Commander",
         "description": "Concluir todas as lições de \"Commander para iniciantes\"."
+      },
+      "learn_challenges": {
+        "name": "Desafios vencidos",
+        "description": "Acertar todos os desafios de \"Aprender a jogar\"."
       }
     },
     "tabsLabel": "Conquistas",
@@ -2762,6 +2766,25 @@
       "keyword": "palavra-chave",
       "seeLesson": "Ver a lição",
       "open": "Glossário"
+    },
+    "challenges": {
+      "title": "Desafios",
+      "intro": "Situações de mesa com uma pergunta: escolha o que fazer e veja o porquê. Acertou, fica salvo no seu progresso.",
+      "of": "Desafio {n} de {total}",
+      "solved": "Resolvido",
+      "all": "Todos os desafios",
+      "board": "A mesa",
+      "you": "Você",
+      "opponent": "Oponente",
+      "life": "de vida",
+      "answer": "Responder",
+      "right": "Certo!",
+      "wrong": "Ainda não.",
+      "correctAnswer": "Resposta certa",
+      "yourAnswer": "Sua resposta",
+      "tryAgain": "Escolha outra resposta e tente de novo.",
+      "saved": "Desafio resolvido e salvo no seu progresso.",
+      "review": "Rever a lição: {lesson}"
     }
   }
 }

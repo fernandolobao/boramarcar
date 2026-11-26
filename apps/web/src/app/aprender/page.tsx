@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { pageMetadata } from '@/server/seo';
-import { TRACK_IDS } from '@boramarcar/core/learn';
+import { CHALLENGES, isLessonId, TRACK_IDS } from '@boramarcar/core/learn';
 import { learnContext } from './content';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
  * leitura e, para quem tem conta, o progresso (texto + barra decorativa).
  */
 export default async function LearnPage() {
-  const { content, links, user, completed } = await learnContext();
+  const { content, links, user, completed: done, locale } = await learnContext();
+  /** Só as lições contam no progresso da trilha (os desafios têm o próprio bloco). */
+  const completed = done.filter(isLessonId);
   const t = await getTranslations('learn');
   const tc = await getTranslations('common');
   const total = content.lessons.length;
@@ -138,6 +140,58 @@ export default async function LearnPage() {
           </section>
         );
       })}
+
+      {/* Desafios guiados (12.4): situações de mesa com respostas comentadas. */}
+      <section aria-labelledby="bloco-desafios" className="space-y-3">
+        <div className="space-y-1">
+          <h2 id="bloco-desafios" className="section-title mb-0">
+            {t('challenges.title')}
+          </h2>
+          <p className="text-sm">{t('challenges.intro')}</p>
+          {user && (
+            <p className="muted text-sm">
+              {t('trackProgress', {
+                done: CHALLENGES.filter((c) => done.includes(c.id)).length,
+                total: CHALLENGES.length,
+              })}
+            </p>
+          )}
+        </div>
+        <ol className="grid gap-3 sm:grid-cols-2">
+          {CHALLENGES.map((c, i) => {
+            const solved = done.includes(c.id);
+            return (
+              <li key={c.id}>
+                <Link
+                  href={`/aprender/desafios/${c.id}`}
+                  className="card flex h-full items-start gap-4 hover:border-line-strong"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-full border font-semibold ${
+                      solved ? 'border-primary bg-primary text-on-primary' : 'border-line-strong'
+                    }`}
+                  >
+                    {solved ? <Icon name="done" /> : i + 1}
+                  </span>
+                  <span className="min-w-0 space-y-1">
+                    <span className="block font-semibold">
+                      <span className="sr-only">
+                        {t('challenges.of', { n: i + 1, total: CHALLENGES.length })}:{' '}
+                      </span>
+                      {c[locale].title}
+                    </span>
+                    <span className="block text-sm">{c[locale].question}</span>
+                    {solved && (
+                      <span className="muted block text-sm">{t('challenges.solved')}</span>
+                    )}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
 
       <section aria-labelledby="oficial" className="card space-y-2">
         <h2 id="oficial" className="section-title mb-0">

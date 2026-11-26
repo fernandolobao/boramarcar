@@ -764,6 +764,14 @@ sem rolagem horizontal em 320px.
 - Validação: "Mover para Talvez" e "Remover" com nome em contexto ("Remover Lightning Bolt do
   deck"); remover pede dois cliques.
 
+## Desafios guiados (25/11/2026)
+
+- A mesa do desafio tem duas regiões com nome ("Oponente", "Você"), vida em texto e cartas em
+  `figure` com nome e estado ("virada", "atacando") no `figcaption`; a imagem é decorativa.
+- As respostas são um radiogroup com a pergunta como rótulo; "Responder" fica desabilitado até
+  escolher. O resultado ("Certo!" / "Ainda não.", com ícone e texto) e os comentários aparecem numa
+  região `role="status"`.
+
 ## Primeira mesa (25/11/2026)
 
 - Convite: bloco "Nunca jogou Magic?" como `section` com título (`h2`) e link com texto.

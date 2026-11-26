@@ -326,6 +326,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-25',
+    pt: 'Desafios em "Aprender a jogar": situações de mesa com uma pergunta e a resposta comentada, com uma conquista para quem acertar todos.',
+    en: 'Challenges in "Learn to play": table situations with a question and an explained answer, plus an achievement for getting them all right.',
+  },
+  {
+    date: '2026-11-25',
     pt: 'O convite do grupo agora oferece "Aprender a jogar", e quem conclui o básico e ainda não jogou aparece no grupo como pronto para a primeira mesa.',
     en: 'Group invites now offer "Learn to play", and whoever completes the basics and hasn’t played yet shows up in the group as ready for the first table.',
   },
