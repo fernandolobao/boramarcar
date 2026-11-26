@@ -2916,6 +2916,12 @@
       "tryAgain": "Choose another answer and try again.",
       "saved": "Challenge solved and saved to your progress.",
       "review": "Review the lesson: {lesson}"
+    },
+    "practice": {
+      "title": "Practice on your own",
+      "text": "Open one of your decks and play a few turns on the playtest table: opening hand, lands, mana and what each keyword does, with no one on the other side.",
+      "link": "Choose a deck",
+      "signIn": "Sign in and choose a deck"
     }
   },
   "scan": {
@@ -3015,6 +3021,15 @@
     "toBattlefield": "To battlefield",
     "toHandLabel": "{name} to hand",
     "toBattlefieldLabel": "{name} to battlefield",
-    "searched": "{name} → {zone}; library shuffled."
+    "searched": "{name} → {zone}; library shuffled.",
+    "view": "View card",
+    "keywords": "Keywords on this card",
+    "inGlossary": "See in the glossary",
+    "lesson": "Lesson: {title}",
+    "whatIs": "What is {term}?",
+    "gotIt": "Got it",
+    "hintTurn": "New to Magic? Each turn has steps: untap, upkeep, draw, main phases, combat and end.",
+    "hintMana": "Available mana counts your untapped lands; tap a land to \"spend\" its mana.",
+    "hintTax": "Commander tax: each time your commander goes back to the command zone and is cast again, it costs {2} more."
   }
 }

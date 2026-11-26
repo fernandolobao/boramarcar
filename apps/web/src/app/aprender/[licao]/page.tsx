@@ -11,6 +11,7 @@ import { getDb } from '@/server/db';
 import { exampleCardImages } from '@/server/learn-cards';
 import { pageMetadata } from '@/server/seo';
 import { learnContext } from '../content';
+import { PracticeCallout } from '@/components/practice-callout';
 
 type Props = { params: Promise<{ licao: string }> };
 
@@ -143,6 +144,9 @@ export default async function LessonPage({ params }: Props) {
           ))}
         </ul>
       </aside>
+
+      {/* Última lição da trilha: convite para praticar na mesa de testes (11.4). */}
+      {inTrack.at(-1)?.id === lesson.id && <PracticeCallout signedIn={Boolean(user)} />}
 
       {/* Rodapé da lição: concluir à esquerda, anterior/próxima à direita (a próxima em destaque). */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">

@@ -246,6 +246,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Na página do deck, abra "Opções do deck" → "Testar o deck" (ou o botão na aba "Mão inicial" da análise).',
               'Mantenha a mão ou faça mulligan; depois, toque numa carta para jogar, virar ou mandar para o cemitério, o exílio ou o grimório. "Próximo turno" desvira tudo e compra uma carta.',
               'A barra mostra o turno, a vida e a mana disponível (terrenos desvirados). Há "Procurar no grimório", "Criar ficha" e "Desfazer". Não há regras automáticas e nada é gravado.',
+              'Não sabe o que uma palavra faz? Em "Ver carta", as palavras-chave da carta (voar, atropelar…) aparecem com a explicação e o link para o glossário e a lição; o "?" ao lado de cemitério, exílio, grimório e outras zonas explica o termo.',
             ],
           },
           {
@@ -686,6 +687,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'On the deck page, open "Deck options" → "Playtest the deck" (or the button in the analysis "Opening hand" tab).',
               'Keep the hand or mulligan; then tap a card to play it, tap it, or send it to the graveyard, exile or library. "Next turn" untaps everything and draws a card.',
               'The bar shows the turn, life and available mana (untapped lands). There is "Search library", "Create token" and "Undo". There are no automatic rules and nothing is saved.',
+              'Not sure what a word means? In "View card", the card\u2019s keywords (flying, trample…) show up with the explanation and links to the glossary and the lesson; the "?" next to graveyard, exile, library and other zones explains the term.',
             ],
           },
           {

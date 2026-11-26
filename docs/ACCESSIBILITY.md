@@ -834,3 +834,7 @@ sem rolagem horizontal em 320px.
 - Carta virada: além da rotação (sem animação com "reduzir movimento"), o estado vai no nome.
 - "Procurar no grimório" numa janela (`Modal`), com filtro rotulado e botões com o nome da carta.
 - axe no componente e na página (claro/escuro, desktop/celular).
+- Mesa de testes e o glossário (26/11/2026): "?" ao lado dos termos é um botão com nome ("O que é
+  Cemitério?") e `aria-expanded`, que mostra a definição logo abaixo (sem janela). "Ver carta" abre
+  numa janela; os links "Ver no glossário" levam o termo no nome (`sr-only`). Os avisos da trilha
+  são texto comum com "Entendi" (dispensados neste aparelho), sem roubar o foco.

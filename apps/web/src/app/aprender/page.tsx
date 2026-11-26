@@ -6,6 +6,7 @@ import { Logo } from '@/components/logo';
 import { pageMetadata } from '@/server/seo';
 import { CHALLENGES, isLessonId, TRACK_IDS } from '@boramarcar/core/learn';
 import { learnContext } from './content';
+import { PracticeCallout } from '@/components/practice-callout';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { content } = await learnContext();
@@ -192,6 +193,9 @@ export default async function LearnPage() {
           })}
         </ol>
       </section>
+
+      {/* Pratique sozinho: a mesa de testes com um deck (11.4). */}
+      <PracticeCallout signedIn={Boolean(user)} />
 
       <section aria-labelledby="oficial" className="card space-y-2">
         <h2 id="oficial" className="section-title mb-0">

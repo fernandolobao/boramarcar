@@ -2,6 +2,11 @@
 
 import {
   commanderTax,
+  GLOSSARY,
+  glossaryKeywordsIn,
+  LEARN,
+  type LearnLocale,
+  type LessonId,
   manaAvailable,
   playtest,
   startPlaytest,
@@ -11,11 +16,12 @@ import {
   type PlaytestState,
   type PlaytestZone,
 } from '@boramarcar/core';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useId, useMemo, useRef, useState } from 'react';
 import { Button, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components';
 import { Icon } from '@/components/icons';
-import { ManaSymbol } from '@/components/mana';
+import { ManaCost, ManaSymbol, ManaText } from '@/components/mana';
 import { Modal } from '@/components/modal-button';
 
 const menuItem =
@@ -37,6 +43,112 @@ function targetsFor(card: PlaytestCard, zone: PlaytestZone): Target[] {
   if (card.isCommander && zone !== 'command') list.push('command');
   if (zone === 'command') return ['battlefield'];
   return card.isToken ? list.filter((t) => t !== 'libraryTop' && t !== 'libraryBottom') : list;
+}
+
+/** Idioma do conteúdo da trilha e do glossário. */
+const learnLocale = (locale: string): LearnLocale => (locale === 'en' ? 'en' : 'pt-BR');
+
+function useLessonTitle() {
+  const locale = learnLocale(useLocale());
+  return (id: LessonId) => LEARN[locale].lessons.find((l) => l.id === id)?.title ?? id;
+}
+
+/** Avisos da trilha já dispensados neste aparelho (conveniência local; sem conta). */
+const HINTS_KEY = 'arcanakin:playtest-hints';
+type HintId = 'turn' | 'mana' | 'tax';
+function useDismissedHints() {
+  // Lido na criação do estado: os avisos só aparecem depois de jogar, então a primeira
+  // renderização (servidor e navegador) é a mesma.
+  const [dismissed, setDismissed] = useState<HintId[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(HINTS_KEY) ?? '[]') as unknown;
+      return Array.isArray(saved) ? (saved as HintId[]) : [];
+    } catch {
+      // Sem armazenamento (janela privada): os avisos só não ficam dispensados.
+      return [];
+    }
+  });
+  const dismiss = (id: HintId) =>
+    setDismissed((list) => {
+      const next = [...new Set([...list, id])];
+      try {
+        localStorage.setItem(HINTS_KEY, JSON.stringify(next));
+      } catch {
+        // Idem.
+      }
+      return next;
+    });
+  return { dismissed, dismiss };
+}
+
+/**
+ * "?" ao lado de um termo do jogo: abre a definição do glossário logo abaixo, com o link para o
+ * glossário (e a lição, se houver).
+ */
+function TermHelp({ id }: { id: string }) {
+  const t = useTranslations('playtest');
+  const locale = learnLocale(useLocale());
+  const lessonTitle = useLessonTitle();
+  const panel = useId();
+  const [open, setOpen] = useState(false);
+  const entry = GLOSSARY.find((e) => e.id === id);
+  if (!entry) return null;
+  const text = entry[locale];
+  return (
+    <span className="inline-flex flex-col">
+      <button
+        type="button"
+        className="inline-flex size-8 items-center justify-center rounded-full border border-line-strong text-sm font-bold text-link hover:bg-surface-muted"
+        aria-expanded={open}
+        aria-controls={open ? panel : undefined}
+        aria-label={t('whatIs', { term: text.term })}
+        title={t('whatIs', { term: text.term })}
+        onClick={() => setOpen((o) => !o)}
+      >
+        ?
+      </button>
+      {open && (
+        <span
+          id={panel}
+          className="mt-2 block max-w-sm rounded-xl border border-line-strong bg-surface p-3 text-sm font-normal"
+        >
+          <strong>{text.term}:</strong> {text.text}{' '}
+          <Link
+            href={`/aprender/glossario#${entry.id}`}
+            className="text-link underline underline-offset-2"
+          >
+            {t('inGlossary')}
+          </Link>
+          {entry.lesson && (
+            <>
+              {' · '}
+              <Link
+                href={`/aprender/${entry.lesson}`}
+                className="text-link underline underline-offset-2"
+              >
+                {t('lesson', { title: lessonTitle(entry.lesson) })}
+              </Link>
+            </>
+          )}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** Aviso da trilha no momento certo (dispensável; fica dispensado neste aparelho). */
+function Hint({ children, onDismiss }: { children: React.ReactNode; onDismiss: () => void }) {
+  const t = useTranslations('playtest');
+  return (
+    <div className="flex flex-wrap items-start gap-3 rounded-2xl border border-line-strong bg-surface p-3 text-sm">
+      <Icon name="learn" className="mt-0.5 size-5 shrink-0 text-link" />
+      <p className="min-w-0 flex-1">{children}</p>
+      <button type="button" className="btn-secondary text-sm" onClick={onDismiss}>
+        {t('gotIt')}
+      </button>
+    </div>
+  );
 }
 
 /**
@@ -81,6 +193,11 @@ export function PlaytestTable({
   };
 
   const mana = manaAvailable(state);
+  const hints = useDismissedHints();
+  const lessonTitle = useLessonTitle();
+  const taxed =
+    state.zones.command.some((c) => commanderTax(state, c.uid) > 0) ||
+    state.zones.battlefield.some((c) => c.isCommander && commanderTax(state, c.uid) > 0);
   const zoneName = (z: Target) => t(`zones.${z}`);
   const move = (card: PlaytestCard, to: Target) => {
     const action: PlaytestAction =
@@ -140,7 +257,10 @@ export function PlaytestTable({
             ))}
           </span>
         </p>
-        <p className="muted">{t('library', { count: state.zones.library.length })}</p>
+        <p className="muted inline-flex items-center gap-2">
+          {t('library', { count: state.zones.library.length })}
+          <TermHelp id="grimorio" />
+        </p>
         <div className="flex flex-wrap gap-2 sm:ms-auto">
           {!choosing && (
             <button
@@ -191,11 +311,50 @@ export function PlaytestTable({
         {status}
       </p>
 
+      {/* Avisos da trilha no momento certo (uma vez por aparelho). */}
+      {state.turn >= 2 && !hints.dismissed.includes('turn') && (
+        <Hint onDismiss={() => hints.dismiss('turn')}>
+          {t('hintTurn')}{' '}
+          <Link href="/aprender/o-turno" className="text-link underline underline-offset-2">
+            {t('lesson', { title: lessonTitle('o-turno') })}
+          </Link>
+        </Hint>
+      )}
+      {mana.total > 0 && !hints.dismissed.includes('mana') && (
+        <Hint onDismiss={() => hints.dismiss('mana')}>
+          {t('hintMana')}{' '}
+          <Link href="/aprender/mana-e-terrenos" className="text-link underline underline-offset-2">
+            {t('lesson', { title: lessonTitle('mana-e-terrenos') })}
+          </Link>
+        </Hint>
+      )}
+      {taxed && !hints.dismissed.includes('tax') && (
+        <Hint onDismiss={() => hints.dismiss('tax')}>
+          {t('hintTax')}{' '}
+          <Link
+            href="/aprender/glossario#imposto-do-comandante"
+            className="text-link underline underline-offset-2"
+          >
+            {t('inGlossary')}
+          </Link>
+          {' · '}
+          <Link
+            href="/aprender/commander-o-formato"
+            className="text-link underline underline-offset-2"
+          >
+            {t('lesson', { title: lessonTitle('commander-o-formato') })}
+          </Link>
+        </Hint>
+      )}
+
       {choosing && (
         <section className="card space-y-3" aria-labelledby="mesa-mulligan">
-          <h2 id="mesa-mulligan" className="section-title mb-0">
-            {t('mulliganTitle', { count: state.mulligans })}
-          </h2>
+          <div className="flex flex-wrap items-start gap-2">
+            <h2 id="mesa-mulligan" className="section-title mb-0">
+              {t('mulliganTitle', { count: state.mulligans })}
+            </h2>
+            <TermHelp id="mulligan" />
+          </div>
           {state.toBottom > 0 ? (
             <p className="font-semibold">{t('chooseBottom', { count: state.toBottom })}</p>
           ) : (
@@ -233,7 +392,11 @@ export function PlaytestTable({
       )}
 
       {state.zones.command.length > 0 && (
-        <Zone title={t('zones.command')} count={state.zones.command.length}>
+        <Zone
+          title={t('zones.command')}
+          count={state.zones.command.length}
+          term="imposto-do-comandante"
+        >
           {state.zones.command.map((c) => (
             <CardMenu
               key={c.uid}
@@ -248,7 +411,7 @@ export function PlaytestTable({
         </Zone>
       )}
 
-      <Zone title={t('lands')} count={lands.length}>
+      <Zone title={t('lands')} count={lands.length} term="virar">
         {lands.map((c) => (
           <CardMenu
             key={c.uid}
@@ -270,6 +433,7 @@ export function PlaytestTable({
       <Zone
         title={t('permanents')}
         count={permanents.length}
+        term="ficha"
         action={
           <CreateToken
             onCreate={(name, count) =>
@@ -325,7 +489,12 @@ export function PlaytestTable({
 
       <div className="grid gap-6 md:grid-cols-2">
         {(['graveyard', 'exile'] as const).map((zone) => (
-          <Zone key={zone} title={t(`zones.${zone}`)} count={state.zones[zone].length}>
+          <Zone
+            key={zone}
+            title={t(`zones.${zone}`)}
+            count={state.zones[zone].length}
+            term={zone === 'graveyard' ? 'cemiterio' : 'exilio'}
+          >
             {state.zones[zone].map((c) => (
               <CardMenu
                 key={c.uid}
@@ -361,11 +530,14 @@ function Zone({
   title,
   count,
   action,
+  term,
   children,
 }: {
   title: string;
   count: number;
   action?: React.ReactNode;
+  /** Termo do glossário explicado no "?" ao lado do título. */
+  term?: string;
   children: React.ReactNode;
 }) {
   const t = useTranslations('playtest');
@@ -373,9 +545,12 @@ function Zone({
   return (
     <section className="card space-y-3" aria-labelledby={id}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id={id} className="section-title mb-0">
-          {title} <span className="muted text-base font-normal">({count})</span>
-        </h2>
+        <div className="flex flex-wrap items-start gap-2">
+          <h2 id={id} className="section-title mb-0">
+            {title} <span className="muted text-base font-normal">({count})</span>
+          </h2>
+          {term && <TermHelp id={term} />}
+        </div>
         {action}
       </div>
       {count === 0 ? (
@@ -434,6 +609,7 @@ function CardMenu({
   note?: string;
 }) {
   const t = useTranslations('playtest');
+  const [viewing, setViewing] = useState(false);
   const label = [
     card.name,
     card.tapped ? t('isTapped') : '',
@@ -443,48 +619,126 @@ function CardMenu({
     .filter(Boolean)
     .join(', ');
   return (
-    <MenuTrigger>
-      <Button
-        aria-label={t('cardActions', { card: label })}
-        className="cursor-pointer rounded-lg outline-none data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-focus"
-      >
-        <CardFace card={card} />
-        {note && <span className="muted mt-1 block text-center text-xs">{note}</span>}
-      </Button>
-      <Popover
-        placement="bottom start"
-        className="min-w-56 rounded-xl border border-line-strong bg-surface p-1 text-fg shadow-xl"
-      >
-        <Menu
-          aria-label={t('cardActions', { card: card.name })}
-          className="outline-none"
-          onAction={(key) => {
-            if (key === 'tap') onTap?.();
-            else onMove(key as Target);
-          }}
+    <>
+      <MenuTrigger>
+        <Button
+          aria-label={t('cardActions', { card: label })}
+          className="cursor-pointer rounded-lg outline-none data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-focus"
         >
-          {onTap && (
-            <MenuItem id="tap" textValue={t(card.tapped ? 'untap' : 'tap')} className={menuItem}>
-              <Icon name="flip" />
-              {t(card.tapped ? 'untap' : 'tap')}
+          <CardFace card={card} />
+          {note && <span className="muted mt-1 block text-center text-xs">{note}</span>}
+        </Button>
+        <Popover
+          placement="bottom start"
+          className="min-w-56 rounded-xl border border-line-strong bg-surface p-1 text-fg shadow-xl"
+        >
+          <Menu
+            aria-label={t('cardActions', { card: card.name })}
+            className="outline-none"
+            onAction={(key) => {
+              if (key === 'view') setViewing(true);
+              else if (key === 'tap') onTap?.();
+              else onMove(key as Target);
+            }}
+          >
+            <MenuItem id="view" textValue={t('view')} className={menuItem}>
+              <Icon name="info" />
+              {t('view')}…
             </MenuItem>
+            {onTap && (
+              <MenuItem id="tap" textValue={t(card.tapped ? 'untap' : 'tap')} className={menuItem}>
+                <Icon name="flip" />
+                {t(card.tapped ? 'untap' : 'tap')}
+              </MenuItem>
+            )}
+            {targets.map((to) => (
+              <MenuItem
+                key={to}
+                id={to}
+                textValue={t('moveTo', { zone: zoneName(to) })}
+                className={menuItem}
+              >
+                <Icon name="next" />
+                {zone === 'hand' && to === 'battlefield'
+                  ? t('play')
+                  : t('moveTo', { zone: zoneName(to) })}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Popover>
+      </MenuTrigger>
+      <CardDetail card={card} open={viewing} onClose={() => setViewing(false)} />
+    </>
+  );
+}
+
+/**
+ * A carta aberta: imagem, custo, tipo, texto e as palavras-chave dela, com a definição do
+ * glossário e os links para o glossário e a lição (ensina enquanto joga).
+ */
+function CardDetail({
+  card,
+  open,
+  onClose,
+}: {
+  card: PlaytestCard;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const t = useTranslations('playtest');
+  const locale = learnLocale(useLocale());
+  const lessonTitle = useLessonTitle();
+  const keywords = glossaryKeywordsIn(card.oracleText, locale);
+  return (
+    <Modal open={open} onClose={onClose} title={card.name}>
+      <div className="grid gap-4 sm:grid-cols-[12rem_1fr]">
+        {card.imageUri ? (
+          // eslint-disable-next-line @next/next/no-img-element -- imagem do Scryfall, já em cache
+          <img src={card.imageUri} alt="" className="aspect-[63/88] w-48 rounded-xl shadow" />
+        ) : null}
+        <div className="min-w-0 space-y-3">
+          <p className="muted flex flex-wrap items-center gap-2 text-sm">
+            {card.typeLine}
+            <ManaCost cost={card.manaCost} />
+          </p>
+          {card.oracleText ? (
+            <div className="space-y-1 text-sm whitespace-pre-line">
+              <ManaText text={card.oracleText} />
+            </div>
+          ) : null}
+          {keywords.length > 0 && (
+            <section aria-label={t('keywords')} className="space-y-2">
+              <h3 className="font-semibold">{t('keywords')}</h3>
+              <ul className="space-y-2 text-sm">
+                {keywords.map((k) => (
+                  <li key={k.id}>
+                    <strong>{k.term}:</strong> {k.text}{' '}
+                    <Link
+                      href={`/aprender/glossario#${k.id}`}
+                      className="text-link underline underline-offset-2"
+                    >
+                      {t('inGlossary')}
+                      <span className="sr-only"> ({k.term})</span>
+                    </Link>
+                    {k.lesson && (
+                      <>
+                        {' · '}
+                        <Link
+                          href={`/aprender/${k.lesson}`}
+                          className="text-link underline underline-offset-2"
+                        >
+                          {t('lesson', { title: lessonTitle(k.lesson) })}
+                        </Link>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-          {targets.map((to) => (
-            <MenuItem
-              key={to}
-              id={to}
-              textValue={t('moveTo', { zone: zoneName(to) })}
-              className={menuItem}
-            >
-              <Icon name="next" />
-              {zone === 'hand' && to === 'battlefield'
-                ? t('play')
-                : t('moveTo', { zone: zoneName(to) })}
-            </MenuItem>
-          ))}
-        </Menu>
-      </Popover>
-    </MenuTrigger>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
