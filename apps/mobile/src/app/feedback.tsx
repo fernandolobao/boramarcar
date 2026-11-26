@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Choices } from '@/components/ds/choices';
+import { useLayout } from '@/lib/layout';
 
 type Kind = 'problem' | 'idea' | 'other';
 const KINDS: { kind: Kind; label: () => string }[] = [
@@ -16,6 +17,7 @@ const KINDS: { kind: Kind; label: () => string }[] = [
 
 /** Feedback do beta (8.4), pela tela Conta. */
 export default function FeedbackScreen() {
+  const layout = useLayout();
   const colors = useColors();
   const [kind, setKind] = useState<Kind>('problem');
   const [message, setMessage] = useState('');
@@ -37,7 +39,7 @@ export default function FeedbackScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView contentContainerStyle={[layout.readableStyle, { gap: 16 }]}>
       <AppText muted>{t('feedbackIntro')}</AppText>
       <Card>
         <View style={{ gap: 12 }}>

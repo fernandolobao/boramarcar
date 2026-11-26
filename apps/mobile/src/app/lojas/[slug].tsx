@@ -8,9 +8,12 @@ import { formatDateTime, t } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { Icon } from '@/components/icons';
 import { useColors } from '@/lib/theme';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 /** Perfil da loja (10.1, no app): dados, contatos, formatos e os próximos eventos. */
 export default function StoreScreen() {
+  const layout = useLayout();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const colors = useColors();
   const view = useAsync(() => api.stores.get(slug), [slug]);
@@ -39,7 +42,7 @@ export default function StoreScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       refreshControl={<RefreshControl refreshing={view.refreshing} onRefresh={view.refresh} />}
     >
       <Stack.Screen options={{ title: store.name }} />
@@ -87,66 +90,80 @@ export default function StoreScreen() {
           </AppText>
         ) : null}
       </View>
-      {store.about ? (
-        <Card style={{ gap: 6 }}>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {t('storeAbout')}
-          </AppText>
-          <AppText>{store.about}</AppText>
-        </Card>
-      ) : null}
-      {store.address || store.hours ? (
-        <Card style={{ gap: 6 }}>
-          {store.address ? <AppText>{store.address}</AppText> : null}
-          {store.hours ? (
-            <AppText>
-              {t('storeHours')}: {store.hours}
-            </AppText>
-          ) : null}
-        </Card>
-      ) : null}
-      {contacts.length > 0 && (
-        <View style={{ gap: 8 }}>
-          {contacts.map((c) => (
-            <Button
-              key={c.url}
-              label={c.label}
-              variant="secondary"
-              accessibilityHint={t('storeOpensOutside')}
-              onPress={() => open(c.url)}
-              style={{ alignSelf: 'flex-start' }}
-            />
-          ))}
-        </View>
-      )}
-      {store.formats.length > 0 && (
-        <AppText muted>
-          {t('storeFormats')}: {store.formats.map(formatLabel).join(', ')}
-        </AppText>
-      )}
-      <AppText accessibilityRole="header" style={styles.sectionTitle}>
-        {t('storeEvUpcoming')}
-      </AppText>
-      {upcoming.length === 0 ? (
-        <AppText muted>{t('storeEvNone')}</AppText>
-      ) : (
-        upcoming.map((ev) => (
-          <Pressable
-            key={ev.id}
-            accessibilityRole="button"
-            accessibilityLabel={`${ev.title}. ${formatDateTime(ev.startsAt)}. ${formatLabel(ev.format)}`}
-            onPress={() => router.push({ pathname: '/eventos-loja/[id]', params: { id: ev.id } })}
-            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-          >
-            <Card style={{ gap: 2 }}>
-              <AppText style={{ fontWeight: '700' }}>{ev.title}</AppText>
+      {/* Tablet: sobre a loja à esquerda; eventos à direita. */}
+      <SplitColumns
+        gap={16}
+        left={
+          <>
+            {store.about ? (
+              <Card style={{ gap: 6 }}>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                  {t('storeAbout')}
+                </AppText>
+                <AppText>{store.about}</AppText>
+              </Card>
+            ) : null}
+            {store.address || store.hours ? (
+              <Card style={{ gap: 6 }}>
+                {store.address ? <AppText>{store.address}</AppText> : null}
+                {store.hours ? (
+                  <AppText>
+                    {t('storeHours')}: {store.hours}
+                  </AppText>
+                ) : null}
+              </Card>
+            ) : null}
+            {contacts.length > 0 && (
+              <View style={{ gap: 8 }}>
+                {contacts.map((c) => (
+                  <Button
+                    key={c.url}
+                    label={c.label}
+                    variant="secondary"
+                    accessibilityHint={t('storeOpensOutside')}
+                    onPress={() => open(c.url)}
+                    style={{ alignSelf: 'flex-start' }}
+                  />
+                ))}
+              </View>
+            )}
+            {store.formats.length > 0 && (
               <AppText muted>
-                {formatDateTime(ev.startsAt)} · {formatLabel(ev.format)}
+                {t('storeFormats')}: {store.formats.map(formatLabel).join(', ')}
               </AppText>
-            </Card>
-          </Pressable>
-        ))
-      )}
+            )}
+          </>
+        }
+        right={
+          <>
+            <AppText accessibilityRole="header" style={styles.sectionTitle}>
+              {t('storeEvUpcoming')}
+            </AppText>
+            {upcoming.length === 0 ? (
+              <AppText muted>{t('storeEvNone')}</AppText>
+            ) : (
+              upcoming.map((ev) => (
+                <Pressable
+                  key={ev.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${ev.title}. ${formatDateTime(ev.startsAt)}. ${formatLabel(ev.format)}`}
+                  onPress={() =>
+                    router.push({ pathname: '/eventos-loja/[id]', params: { id: ev.id } })
+                  }
+                  style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+                >
+                  <Card style={{ gap: 2 }}>
+                    <AppText style={{ fontWeight: '700' }}>{ev.title}</AppText>
+                    <AppText muted>
+                      {formatDateTime(ev.startsAt)} · {formatLabel(ev.format)}
+                    </AppText>
+                  </Card>
+                </Pressable>
+              ))
+            )}
+          </>
+        }
+      />
     </ScrollView>
   );
 }

@@ -9,13 +9,15 @@ import { useGroup } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { disablePush } from '@/lib/push';
 import { Choices } from '@/components/ds/choices';
+import { useLayout } from '@/lib/layout';
 
 /** Conta: quem está conectado, grupo ativo, avisos neste celular, sair e privacidade (LGPD). */
 export default function AccountScreen() {
+  const layout = useLayout();
   const { data: session, refetch } = authClient.useSession();
   const { groups, group, select } = useGroup();
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView contentContainerStyle={[layout.readableStyle, { gap: 16 }]}>
       <Card>
         <AppText muted>{t('signedInAs')}</AppText>
         <AppText style={{ fontWeight: '700' }}>{session?.user.name}</AppText>

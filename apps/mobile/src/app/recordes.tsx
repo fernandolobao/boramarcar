@@ -6,11 +6,13 @@ import { useGroup } from '@/lib/group';
 import { formatDateMedium, formatPercent, t, type MessageKey } from '@/lib/i18n';
 import { useAsync } from '@/lib/use-async';
 import { EmptyState } from '@/components/empty-state';
+import { useLayout } from '@/lib/layout';
 
 const COLOR_KEYS = ['W', 'U', 'B', 'R', 'G', 'C'] as const;
 
 /** Recordes e "cara do grupo" (8.12), com os mesmos dados do site. */
 export default function RecordsScreen() {
+  const layout = useLayout();
   const { group, loading } = useGroup();
   const view = useAsync(
     () => (group ? api.stats.records(group.id) : Promise.resolve(null)),
@@ -87,7 +89,7 @@ export default function RecordsScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.readableStyle, { gap: 16 }]}
       refreshControl={<RefreshControl refreshing={view.refreshing} onRefresh={view.refresh} />}
     >
       <AppText accessibilityRole="header" style={styles.title}>

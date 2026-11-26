@@ -13,6 +13,8 @@ import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 const STATUS: Record<string, MessageKey> = {
   registration: 'tourStatusRegistration',
@@ -125,6 +127,7 @@ const STAGE: Record<'quarterfinal' | 'semifinal' | 'final', MessageKey> = {
   final: 'tourStageFinal',
 };
 export default function TournamentScreen() {
+  const layout = useLayout();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: session } = authClient.useSession();
   const me = session?.user.id ?? '';
@@ -177,7 +180,7 @@ export default function TournamentScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       refreshControl={<RefreshControl refreshing={view.refreshing} onRefresh={view.refresh} />}
     >
       <Stack.Screen options={{ title: tour.name }} />
@@ -195,243 +198,266 @@ export default function TournamentScreen() {
       </View>
       {error ? <AppText accessibilityRole="alert">{error}</AppText> : null}
 
-      {tour.status === 'registration' && (
-        <Card style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {t('tourEntrantsTitle')} · {t('tourEntrants', { count: v.entrants.length })}
-          </AppText>
-          {v.entrants.length === 0 ? <AppText muted>{t('tourNoEntrants')}</AppText> : null}
-          {v.entrants.map((e) => (
-            <View key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <AppText style={{ flex: 1, fontWeight: '600' }}>{e.name}</AppText>
-              {(v.canManage || e.memberIds.includes(me)) && (
-                <ConfirmButton
-                  label={t('tourRemove')}
-                  confirmLabel={t('tourRemoveConfirm')}
-                  context={e.name}
-                  disabled={busy}
-                  onConfirm={() => act(() => api.tournaments.removeEntrant(tour.id, e.id))}
-                />
-              )}
-            </View>
-          ))}
-          {tour.entrantSize === 1 && !taken.has(me) && (
-            <Button
-              label={t('tourJoinMe')}
-              disabled={busy}
-              onPress={() => void act(() => api.tournaments.addEntrant(tour.id, [me]))}
-            />
-          )}
-          {(v.canManage || tour.entrantSize === 2) && free.length >= tour.entrantSize && (
-            <View style={{ gap: 8 }}>
-              {(v.canManage || tour.entrantSize === 1) && (
-                <Select
-                  label={t('tourAddPerson')}
-                  value={person}
-                  onChange={setPerson}
-                  options={free.map((m) => ({ value: m.userId, label: m.name }))}
-                />
-              )}
-              {tour.entrantSize === 2 && (
-                <Select
-                  label={t('tourAddPartner')}
-                  value={partner}
-                  onChange={setPartner}
-                  options={free
-                    .filter((m) => m.userId !== (v.canManage ? person : me))
-                    .map((m) => ({ value: m.userId, label: m.name }))}
-                />
-              )}
-              <Button
-                label={t('tourAddEntrant')}
-                variant="secondary"
-                disabled={
-                  busy ||
-                  (tour.entrantSize === 1
-                    ? !person
-                    : !partner || (v.canManage ? !person : taken.has(me)))
-                }
-                onPress={() =>
-                  void act(async () => {
-                    await api.tournaments.addEntrant(
-                      tour.id,
-                      tour.entrantSize === 1 ? [person!] : [v.canManage ? person! : me, partner!],
-                    );
-                    setPerson(null);
-                    setPartner(null);
-                  })
-                }
-              />
-            </View>
-          )}
-        </Card>
-      )}
-
-      {v.champion && (
-        <Card>
-          <AppText accessibilityLiveRegion="polite" style={{ fontWeight: '700', fontSize: 18 }}>
-            🏆{' '}
-            {t('tourChampion', { name: v.entrants.find((e) => e.id === v.champion)?.name ?? '—' })}
-          </AppText>
-        </Card>
-      )}
-
-      {[...v.rounds].reverse().map((round, index) => (
-        <Card key={round.id} style={{ gap: 12 }}>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {tour.structure === 'double_elimination'
-              ? round.tables.some((x) => x.bracket === 'final')
-                ? t('tourBracketFinal')
-                : t('tourRoundSimple', { number: round.number })
-              : round.stageName && tour.structure === 'single_elimination'
-                ? t(STAGE[round.stageName])
-                : round.stageName && tour.topCut
-                  ? t('tourStageHeading', {
-                      size: tour.topCut,
-                      stage: t(STAGE[round.stageName]),
-                    })
-                  : t('tourRoundOf', { number: round.number, total: tour.rounds ?? round.number })}
-          </AppText>
-          {round.tables.map((table) => {
-            const seated = table.entrants.map(
-              (eid) =>
-                v.entrants.find((e) => e.id === eid) ?? { id: eid, name: '—', memberIds: [] },
-            );
-            if (seated.length === 1) {
-              return (
-                <AppText key={table.id} muted>
-                  {t('tourBye', { name: seated[0]!.name })}
-                </AppText>
-              );
-            }
-            const atTable = seated.some((s) => s.memberIds.includes(me));
-            const canReport =
-              index === 0 &&
-              tour.status === 'running' &&
-              (v.canManage || (atTable && !table.reported));
-            return (
-              <View key={table.id} style={{ gap: 6 }}>
+      {/* Tablet: inscrições, campeão e rodadas à esquerda; classificação e organização à direita. */}
+      <SplitColumns
+        gap={16}
+        left={
+          <>
+            {tour.status === 'registration' && (
+              <Card style={{ gap: 10 }}>
                 <AppText accessibilityRole="header" style={styles.sectionTitle}>
-                  {t('tourTable', { number: table.number })}
-                  {table.bracket && table.bracket !== 'final'
-                    ? ` · ${t(table.bracket === 'winners' ? 'tourBracketWinners' : 'tourBracketLosers')}`
-                    : ''}
+                  {t('tourEntrantsTitle')} · {t('tourEntrants', { count: v.entrants.length })}
                 </AppText>
-                <AppText>{seated.map((s, i) => `${i + 1}. ${s.name}`).join('\n')}</AppText>
-                <AppText
-                  accessibilityLiveRegion="polite"
-                  style={{ fontWeight: table.reported ? '600' : '400' }}
-                  muted={!table.reported}
-                >
-                  {table.reported ? `${t('tourResult')}: ${resultText(table)}` : t('tourWaiting')}
-                </AppText>
-                {/* Modo mesa (pod ou melhor de 1): jogadores já na mesa; o resultado volta para cá. */}
-                {canReport && tour.eventId && tableModeEligible(tour, table) && (
+                {v.entrants.length === 0 ? <AppText muted>{t('tourNoEntrants')}</AppText> : null}
+                {v.entrants.map((e) => (
+                  <View key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <AppText style={{ flex: 1, fontWeight: '600' }}>{e.name}</AppText>
+                    {(v.canManage || e.memberIds.includes(me)) && (
+                      <ConfirmButton
+                        label={t('tourRemove')}
+                        confirmLabel={t('tourRemoveConfirm')}
+                        context={e.name}
+                        disabled={busy}
+                        onConfirm={() => act(() => api.tournaments.removeEntrant(tour.id, e.id))}
+                      />
+                    )}
+                  </View>
+                ))}
+                {tour.entrantSize === 1 && !taken.has(me) && (
                   <Button
-                    label={t('tourOpenInTable')}
-                    accessibilityLabel={`${t('tourOpenInTable')} (${t('tourTable', { number: table.number })})`}
-                    onPress={() =>
-                      router.push({
-                        pathname: '/mesa/[id]',
-                        params: { id: tour.eventId!, torneio: tour.id, mesa: table.id },
-                      })
-                    }
+                    label={t('tourJoinMe')}
+                    disabled={busy}
+                    onPress={() => void act(() => api.tournaments.addEntrant(tour.id, [me]))}
                   />
                 )}
-                {canReport &&
-                  (table.reported && correcting !== table.id ? (
+                {(v.canManage || tour.entrantSize === 2) && free.length >= tour.entrantSize && (
+                  <View style={{ gap: 8 }}>
+                    {(v.canManage || tour.entrantSize === 1) && (
+                      <Select
+                        label={t('tourAddPerson')}
+                        value={person}
+                        onChange={setPerson}
+                        options={free.map((m) => ({ value: m.userId, label: m.name }))}
+                      />
+                    )}
+                    {tour.entrantSize === 2 && (
+                      <Select
+                        label={t('tourAddPartner')}
+                        value={partner}
+                        onChange={setPartner}
+                        options={free
+                          .filter((m) => m.userId !== (v.canManage ? person : me))
+                          .map((m) => ({ value: m.userId, label: m.name }))}
+                      />
+                    )}
                     <Button
-                      label={t('tourCorrect')}
-                      accessibilityLabel={`${t('tourCorrect')} (${t('tourTable', { number: table.number })})`}
+                      label={t('tourAddEntrant')}
                       variant="secondary"
-                      onPress={() => setCorrecting(table.id)}
-                      style={{ alignSelf: 'flex-start' }}
+                      disabled={
+                        busy ||
+                        (tour.entrantSize === 1
+                          ? !person
+                          : !partner || (v.canManage ? !person : taken.has(me)))
+                      }
+                      onPress={() =>
+                        void act(async () => {
+                          await api.tournaments.addEntrant(
+                            tour.id,
+                            tour.entrantSize === 1
+                              ? [person!]
+                              : [v.canManage ? person! : me, partner!],
+                          );
+                          setPerson(null);
+                          setPartner(null);
+                        })
+                      }
                     />
-                  ) : (
-                    <ResultForm
-                      view={v}
-                      table={table}
-                      seated={seated}
-                      onSaved={async () => {
-                        setCorrecting(null);
-                        await view.refresh();
-                      }}
+                  </View>
+                )}
+              </Card>
+            )}
+
+            {v.champion && (
+              <Card>
+                <AppText
+                  accessibilityLiveRegion="polite"
+                  style={{ fontWeight: '700', fontSize: 18 }}
+                >
+                  🏆{' '}
+                  {t('tourChampion', {
+                    name: v.entrants.find((e) => e.id === v.champion)?.name ?? '—',
+                  })}
+                </AppText>
+              </Card>
+            )}
+
+            {[...v.rounds].reverse().map((round, index) => (
+              <Card key={round.id} style={{ gap: 12 }}>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                  {tour.structure === 'double_elimination'
+                    ? round.tables.some((x) => x.bracket === 'final')
+                      ? t('tourBracketFinal')
+                      : t('tourRoundSimple', { number: round.number })
+                    : round.stageName && tour.structure === 'single_elimination'
+                      ? t(STAGE[round.stageName])
+                      : round.stageName && tour.topCut
+                        ? t('tourStageHeading', {
+                            size: tour.topCut,
+                            stage: t(STAGE[round.stageName]),
+                          })
+                        : t('tourRoundOf', {
+                            number: round.number,
+                            total: tour.rounds ?? round.number,
+                          })}
+                </AppText>
+                {round.tables.map((table) => {
+                  const seated = table.entrants.map(
+                    (eid) =>
+                      v.entrants.find((e) => e.id === eid) ?? { id: eid, name: '—', memberIds: [] },
+                  );
+                  if (seated.length === 1) {
+                    return (
+                      <AppText key={table.id} muted>
+                        {t('tourBye', { name: seated[0]!.name })}
+                      </AppText>
+                    );
+                  }
+                  const atTable = seated.some((s) => s.memberIds.includes(me));
+                  const canReport =
+                    index === 0 &&
+                    tour.status === 'running' &&
+                    (v.canManage || (atTable && !table.reported));
+                  return (
+                    <View key={table.id} style={{ gap: 6 }}>
+                      <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                        {t('tourTable', { number: table.number })}
+                        {table.bracket && table.bracket !== 'final'
+                          ? ` · ${t(table.bracket === 'winners' ? 'tourBracketWinners' : 'tourBracketLosers')}`
+                          : ''}
+                      </AppText>
+                      <AppText>{seated.map((s, i) => `${i + 1}. ${s.name}`).join('\n')}</AppText>
+                      <AppText
+                        accessibilityLiveRegion="polite"
+                        style={{ fontWeight: table.reported ? '600' : '400' }}
+                        muted={!table.reported}
+                      >
+                        {table.reported
+                          ? `${t('tourResult')}: ${resultText(table)}`
+                          : t('tourWaiting')}
+                      </AppText>
+                      {/* Modo mesa (pod ou melhor de 1): jogadores já na mesa; o resultado volta para cá. */}
+                      {canReport && tour.eventId && tableModeEligible(tour, table) && (
+                        <Button
+                          label={t('tourOpenInTable')}
+                          accessibilityLabel={`${t('tourOpenInTable')} (${t('tourTable', { number: table.number })})`}
+                          onPress={() =>
+                            router.push({
+                              pathname: '/mesa/[id]',
+                              params: { id: tour.eventId!, torneio: tour.id, mesa: table.id },
+                            })
+                          }
+                        />
+                      )}
+                      {canReport &&
+                        (table.reported && correcting !== table.id ? (
+                          <Button
+                            label={t('tourCorrect')}
+                            accessibilityLabel={`${t('tourCorrect')} (${t('tourTable', { number: table.number })})`}
+                            variant="secondary"
+                            onPress={() => setCorrecting(table.id)}
+                            style={{ alignSelf: 'flex-start' }}
+                          />
+                        ) : (
+                          <ResultForm
+                            view={v}
+                            table={table}
+                            seated={seated}
+                            onSaved={async () => {
+                              setCorrecting(null);
+                              await view.refresh();
+                            }}
+                          />
+                        ))}
+                    </View>
+                  );
+                })}
+              </Card>
+            ))}
+          </>
+        }
+        right={
+          <>
+            {tour.status !== 'registration' &&
+              tour.structure !== 'single_elimination' &&
+              tour.structure !== 'double_elimination' && (
+                <Card style={{ gap: 8 }}>
+                  <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                    {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}
+                  </AppText>
+                  {v.standings.map((s) => {
+                    const line = t('tourStandingRow', {
+                      rank: s.rank,
+                      name: nameOf.get(s.entrant) ?? '—',
+                      points: s.points,
+                      record: `${s.wins + s.byes}-${s.draws}-${s.losses}`,
+                    });
+                    const tie = `OMW ${percent(s.omw)} · GW ${percent(s.gw)} · OGW ${percent(s.ogw)}`;
+                    return (
+                      <View key={s.entrant} accessible accessibilityLabel={`${line}. ${tie}`}>
+                        <AppText style={{ fontWeight: '600' }}>{line}</AppText>
+                        <AppText muted>{tie}</AppText>
+                      </View>
+                    );
+                  })}
+                  <AppText muted>{t('tourTiebreakers')}</AppText>
+                </Card>
+              )}
+
+            {v.canManage && tour.status !== 'finished' && (
+              <Card style={{ gap: 10 }}>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                  {t('tourManage')}
+                </AppText>
+                {tour.status === 'registration' && (
+                  <Button
+                    label={t('tourStart')}
+                    disabled={busy || v.entrants.length < 2}
+                    onPress={() => void act(() => api.tournaments.start(tour.id))}
+                  />
+                )}
+                {tour.status === 'running' && (
+                  <>
+                    <Button
+                      label={
+                        nextStep === 'finish'
+                          ? t('tourFinish')
+                          : nextStep === 'topCut'
+                            ? t('tourStartTopCut', { count: tour.topCut ?? 0 })
+                            : current?.stage === 'top'
+                              ? t('tourNextStage')
+                              : t('tourNext')
+                      }
+                      disabled={busy || !nextStep}
+                      onPress={() => void act(() => api.tournaments.next(tour.id))}
                     />
-                  ))}
-              </View>
-            );
-          })}
-        </Card>
-      ))}
-
-      {tour.status !== 'registration' &&
-        tour.structure !== 'single_elimination' &&
-        tour.structure !== 'double_elimination' && (
-          <Card style={{ gap: 8 }}>
-            <AppText accessibilityRole="header" style={styles.sectionTitle}>
-              {tour.topCut ? t('tourStandingsSwiss') : t('tourStandings')}
-            </AppText>
-            {v.standings.map((s) => {
-              const line = t('tourStandingRow', {
-                rank: s.rank,
-                name: nameOf.get(s.entrant) ?? '—',
-                points: s.points,
-                record: `${s.wins + s.byes}-${s.draws}-${s.losses}`,
-              });
-              const tie = `OMW ${percent(s.omw)} · GW ${percent(s.gw)} · OGW ${percent(s.ogw)}`;
-              return (
-                <View key={s.entrant} accessible accessibilityLabel={`${line}. ${tie}`}>
-                  <AppText style={{ fontWeight: '600' }}>{line}</AppText>
-                  <AppText muted>{tie}</AppText>
-                </View>
-              );
-            })}
-            <AppText muted>{t('tourTiebreakers')}</AppText>
-          </Card>
-        )}
-
-      {v.canManage && tour.status !== 'finished' && (
-        <Card style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {t('tourManage')}
-          </AppText>
-          {tour.status === 'registration' && (
-            <Button
-              label={t('tourStart')}
-              disabled={busy || v.entrants.length < 2}
-              onPress={() => void act(() => api.tournaments.start(tour.id))}
-            />
-          )}
-          {tour.status === 'running' && (
-            <>
-              <Button
-                label={
-                  nextStep === 'finish'
-                    ? t('tourFinish')
-                    : nextStep === 'topCut'
-                      ? t('tourStartTopCut', { count: tour.topCut ?? 0 })
-                      : current?.stage === 'top'
-                        ? t('tourNextStage')
-                        : t('tourNext')
-                }
-                disabled={busy || !nextStep}
-                onPress={() => void act(() => api.tournaments.next(tour.id))}
-              />
-              {!nextStep && <AppText muted>{t('tourNextHint')}</AppText>}
-            </>
-          )}
-          <ConfirmButton
-            label={t('tourDelete')}
-            confirmLabel={t('tourDeleteConfirm')}
-            context={tour.name}
-            disabled={busy}
-            onConfirm={async () => {
-              await act(() => api.tournaments.remove(tour.id));
-              router.back();
-            }}
-          />
-        </Card>
-      )}
+                    {!nextStep && <AppText muted>{t('tourNextHint')}</AppText>}
+                  </>
+                )}
+                <ConfirmButton
+                  label={t('tourDelete')}
+                  confirmLabel={t('tourDeleteConfirm')}
+                  context={tour.name}
+                  disabled={busy}
+                  onConfirm={async () => {
+                    await act(() => api.tournaments.remove(tour.id));
+                    router.back();
+                  }}
+                />
+              </Card>
+            )}
+          </>
+        }
+      />
     </ScrollView>
   );
 }

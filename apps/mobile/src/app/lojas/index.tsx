@@ -13,6 +13,8 @@ import { API_URL } from '@/lib/config';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Icon } from '@/components/icons';
+import { useLayout } from '@/lib/layout';
+import { ResponsiveGrid } from '@/components/responsive-grid';
 
 const OFFER: Record<string, MessageKey> = {
   singles: 'discOfferSingles',
@@ -26,6 +28,7 @@ const OFFER: Record<string, MessageKey> = {
  * ou, ao tocar, pela localização do aparelho (arredondada; não é guardada).
  */
 export default function DiscoveryScreen() {
+  const layout = useLayout();
   const colors = useColors();
   const [city, setCity] = useState<Municipality | null>(null);
   const [data, setData] = useState<Discovery | null>(null);
@@ -88,7 +91,7 @@ export default function DiscoveryScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView contentContainerStyle={[layout.contentStyle, { gap: 16 }]}>
       <AppText accessibilityRole="header" style={styles.title}>
         {city ? t('discTitleCity', { city: `${city.name}, ${city.uf}` }) : t('discTitle')}
       </AppText>
@@ -165,32 +168,37 @@ export default function DiscoveryScreen() {
           {data.stores.length === 0 ? (
             <AppText muted>{t('discNoStores')}</AppText>
           ) : (
-            data.stores.map((s) => (
-              <Pressable
-                key={s.id}
-                accessibilityRole="button"
-                accessibilityLabel={`${s.name}, ${s.municipality.name}. ${t('discKm', { km: s.distanceKm })}`}
-                onPress={() => router.push({ pathname: '/lojas/[slug]', params: { slug: s.slug } })}
-              >
-                <Card style={{ gap: 2 }}>
-                  <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
-                    <AppText style={{ fontWeight: '700' }}>{s.name}</AppText>
-                    {s.verified ? <Icon name="done" color={colors.text} /> : null}
-                  </View>
-                  <AppText muted>
-                    {s.municipality.name}, {s.municipality.uf} · {t('discKm', { km: s.distanceKm })}
-                  </AppText>
-                  {s.offers.length > 0 && (
-                    <AppText>
-                      {s.offers
-                        .filter((o) => OFFER[o])
-                        .map((o) => t(OFFER[o]!))
-                        .join(' · ')}
+            <ResponsiveGrid>
+              {data.stores.map((s) => (
+                <Pressable
+                  key={s.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${s.name}, ${s.municipality.name}. ${t('discKm', { km: s.distanceKm })}`}
+                  onPress={() =>
+                    router.push({ pathname: '/lojas/[slug]', params: { slug: s.slug } })
+                  }
+                >
+                  <Card style={{ gap: 2 }}>
+                    <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                      <AppText style={{ fontWeight: '700' }}>{s.name}</AppText>
+                      {s.verified ? <Icon name="done" color={colors.text} /> : null}
+                    </View>
+                    <AppText muted>
+                      {s.municipality.name}, {s.municipality.uf} ·{' '}
+                      {t('discKm', { km: s.distanceKm })}
                     </AppText>
-                  )}
-                </Card>
-              </Pressable>
-            ))
+                    {s.offers.length > 0 && (
+                      <AppText>
+                        {s.offers
+                          .filter((o) => OFFER[o])
+                          .map((o) => t(OFFER[o]!))
+                          .join(' · ')}
+                      </AppText>
+                    )}
+                  </Card>
+                </Pressable>
+              ))}
+            </ResponsiveGrid>
           )}
         </>
       )}

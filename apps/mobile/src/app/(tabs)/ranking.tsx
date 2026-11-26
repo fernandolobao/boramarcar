@@ -14,9 +14,11 @@ import { NoGroup } from '@/components/no-group';
 import { Choices } from '@/components/ds/choices';
 import { Select } from '@/components/ds/select';
 import { EmptyState } from '@/components/empty-state';
+import { useLayout } from '@/lib/layout';
 
 /** Ranking do grupo ativo (todas as partidas). */
 export default function RankingScreen() {
+  const layout = useLayout();
   const { group } = useGroup();
   const [period, setPeriod] = useState('all');
   const [format, setFormat] = useState<GameFormat | undefined>();
@@ -51,7 +53,7 @@ export default function RankingScreen() {
     <FlatList
       data={ranking.data?.standings ?? []}
       keyExtractor={(s) => s.userId}
-      contentContainerStyle={{ padding: 16, gap: 8 }}
+      contentContainerStyle={[layout.readableStyle, { gap: 8 }]}
       refreshControl={
         <RefreshControl refreshing={ranking.refreshing} onRefresh={ranking.refresh} />
       }

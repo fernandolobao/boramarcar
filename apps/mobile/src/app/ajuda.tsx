@@ -5,6 +5,7 @@ import { Pressable, ScrollView, View } from 'react-native';
 import { AppText, Card, styles } from '@/components/ui';
 import { locale } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { useLayout } from '@/lib/layout';
 
 /** Pergunta que abre e fecha ao toque (estado anunciado pelo leitor de tela). */
 function Question({ q }: { q: HelpQuestion }) {
@@ -54,9 +55,10 @@ function Question({ q }: { q: HelpQuestion }) {
 
 /** Ajuda (FAQ): o mesmo texto da página /ajuda do site, vindo do core. */
 export default function HelpScreen() {
+  const layout = useLayout();
   const h = HELP[locale === 'en' ? 'en' : 'pt-BR'];
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+    <ScrollView contentContainerStyle={[layout.readableStyle, { gap: 16 }]}>
       <Stack.Screen options={{ title: h.title }} />
       <AppText muted>{h.intro}</AppText>
       {h.sections.map((s) => (
