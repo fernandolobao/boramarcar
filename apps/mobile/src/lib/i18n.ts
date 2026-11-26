@@ -852,6 +852,8 @@ const pt = {
   achievement_learn_commander_name: 'Pronto para o Commander',
   achievement_learn_commander_description:
     'Concluir todas as lições de "Commander para iniciantes".',
+  achievement_learn_challenges_name: 'Desafios vencidos',
+  achievement_learn_challenges_description: 'Acertar todos os desafios de "Aprender a jogar".',
   eventTitleLabel: 'Título',
   eventDefaultTitle: 'Commander',
   eventDay: 'Dia',
@@ -1923,6 +1925,8 @@ const en: Messages = {
   achievement_learn_to_table_description: 'Play a game after completing the "Learn to play" path.',
   achievement_learn_commander_name: 'Ready for Commander',
   achievement_learn_commander_description: 'Complete every lesson of "Commander for beginners".',
+  achievement_learn_challenges_name: 'Challenges cleared',
+  achievement_learn_challenges_description: 'Get every "Learn to play" challenge right.',
   eventTitleLabel: 'Title',
   eventDefaultTitle: 'Commander',
   eventDay: 'Day',

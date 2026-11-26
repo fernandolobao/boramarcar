@@ -215,6 +215,7 @@ export const ACHIEVEMENT_IDS = [
   'learn_path',
   'learn_to_table',
   'learn_commander',
+  'learn_challenges',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 

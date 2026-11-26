@@ -1,9 +1,9 @@
-import { LESSON_IDS } from '@boramarcar/core';
+import { LEARN_ITEM_IDS } from '@boramarcar/core';
 import { getLearnProgress, setLessonCompleted } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
 
-const schema = z.object({ lessonId: z.enum(LESSON_IDS), completed: z.boolean() });
+const schema = z.object({ lessonId: z.enum(LEARN_ITEM_IDS), completed: z.boolean() });
 
 /** Lições da trilha "Aprender a jogar" (12.1) que a pessoa já concluiu. */
 export const GET = authed(async ({ db, user }) => ({
