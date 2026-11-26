@@ -791,3 +791,11 @@ sem rolagem horizontal em 320px.
 - Leitura contínua (26/11/2026): ligada por padrão; é um botão de alternar ("Leitura contínua",
   `aria-pressed`). Ela só anuncia em `role="status"` quando uma carta nova entra na lista (nada de
   avisos a cada volta). "Ler carta" continua para quem prefere ler uma por vez.
+
+## Campos com 16 px em telas de toque (26/11/2026)
+
+- No iOS, campo com fonte menor que 16 px faz o navegador dar zoom ao receber o foco, e o zoom fica
+  (a página passa a ser cortada à direita). Em `@media (pointer: coarse)`, todo campo de texto,
+  seleção e área de texto tem 16 px (regra global em `globals.css`, fora das camadas do Tailwind).
+- O zoom da página **continua permitido** (sem `maximum-scale` nem `user-scalable=no`, WCAG 1.4.4).
+- E2E `campos-celular.spec.ts` confere o tamanho no projeto de celular.

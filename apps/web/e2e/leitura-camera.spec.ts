@@ -124,14 +124,16 @@ test.describe('leitura de cartas pela câmera', () => {
     await page.getByRole('button', { name: 'Ler pela câmera' }).click();
     const dialog = page.getByRole('dialog', { name: 'Ler cartas pela câmera' });
     const toggle = dialog.getByRole('button', { name: 'Leitura contínua' });
-    await expect(toggle).toBeEnabled();
+    // Espera a câmera mostrar a carta (a contínua lê sozinha); no CI, o primeiro quadro demora.
+    await expect(dialog.getByRole('heading', { name: '1 carta lida' })).toBeVisible({
+      timeout: 60_000,
+    });
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    // A contínua pode ter lido antes de desligar: começa da lista atual.
     const before = calls.length;
     await dialog.getByRole('button', { name: 'Ler carta' }).click();
     await expect.poll(() => calls.length, { timeout: 60_000 }).toBeGreaterThan(before);
     expect(calls.at(-1)).toMatch(/Sol\s*Ring/);
-    await expect(dialog.getByRole('status')).toContainText('Achei: Sol Ring');
+    await expect(dialog.getByRole('heading', { name: '2 cartas lidas' })).toBeVisible();
   });
 });
