@@ -1973,6 +1973,66 @@
       "deleteConfirm": "Confirmar exclusão",
       "kindChangelog": "novidades da semana",
       "sent": "{count, plural, =1 {Publicado para 1 pessoa.} other {Publicado para # pessoas.}}"
+    },
+    "costs": {
+      "title": "Custos da plataforma",
+      "intro": "Quanto custa manter o ArcanaKin por mês e quanto precisa entrar para cobrir. Lance as faturas de cada serviço; anuidades e pagamentos únicos são divididos por 12 meses.",
+      "costOf": "Custo de {month}",
+      "target": "Meta de receita (custo + {percent}% de impostos e taxas)",
+      "revenue": "Receita do mês",
+      "revenueHint": "Os pagamentos ainda não existem (item 13.4).",
+      "breakEven": "Conta de padeiro: a meta equivale a {stores, plural, one {# loja} other {# lojas}} no plano ({storePrice}/mês) ou {supporters, plural, one {# apoiador} other {# apoiadores}} ({supporterPrice}/mês), ou uma mistura. Preços de exemplo, ainda não decididos.",
+      "byService": "Por serviço em {month}",
+      "monthsCaption": "Últimos meses",
+      "cols": {
+        "month": "Mês",
+        "cost": "Custo",
+        "target": "Meta",
+        "revenue": "Receita"
+      },
+      "newTitle": "Lançar custo",
+      "formHint": "Em dólar, use a cotação da fatura (com IOF e a taxa do cartão), se tiver; sem ela, vale a cotação do dia do Banco Central.",
+      "service": "Serviço",
+      "services": {
+        "vercel": "Vercel (hospedagem)",
+        "neon": "Neon (banco de dados)",
+        "resend": "Resend (e-mails)",
+        "blob": "Vercel Blob (imagens)",
+        "sentry": "Sentry (erros)",
+        "domain": "Domínio",
+        "apple": "Apple (conta de desenvolvedor)",
+        "google": "Google Play (conta de desenvolvedor)",
+        "other": "Outro"
+      },
+      "month": "Mês",
+      "period": "Cobrança",
+      "periods": {
+        "month": "Do mês",
+        "year": "Anual (dividida por 12)",
+        "once": "Única (dividida por 12)"
+      },
+      "currency": "Moeda",
+      "currencies": {
+        "BRL": "Real (R$)",
+        "USD": "Dólar (US$)"
+      },
+      "amount": "Valor ({currency})",
+      "rate": "Cotação do dólar (opcional)",
+      "rateHint": "Em branco: {rate} (PTAX de hoje).",
+      "rateMissing": "A cotação de hoje não está disponível: informe a da fatura.",
+      "note": "Observação (opcional)",
+      "add": "Lançar",
+      "copy": "Repetir os custos do mês anterior em {month}",
+      "copied": "{count, plural, =0 {Nada para repetir: o mês já tem custos mensais ou {from} não tem.} one {# custo repetido de {from}.} other {# custos repetidos de {from}.}}",
+      "saved": "Custo lançado.",
+      "deleted": "Lançamento apagado.",
+      "invalidAmount": "Digite um valor maior que zero (ex.: 110,50).",
+      "invalidRate": "Cotação inválida (ex.: 5,62).",
+      "entries": "Lançamentos",
+      "noEntries": "Nenhum custo lançado ainda.",
+      "usdValue": "{usd} = {brl} (cotação {rate})",
+      "delete": "Apagar",
+      "deleteConfirm": "Confirmar: apagar"
     }
   },
   "meta": {

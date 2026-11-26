@@ -12,6 +12,7 @@ export * from './achievements';
 export * from './notifications';
 export * from './changelog';
 export * from './currency';
+export * from './costs';
 export * from './places';
 export * from './table';
 export * from './help';

@@ -1973,6 +1973,66 @@
       "deleteConfirm": "Confirm delete",
       "kindChangelog": "weekly news",
       "sent": "{count, plural, =1 {Published to 1 person.} other {Published to # people.}}"
+    },
+    "costs": {
+      "title": "Platform costs",
+      "intro": "How much it costs to run ArcanaKin each month and how much needs to come in to cover it. Enter each service's invoices; yearly and one-time payments are spread over 12 months.",
+      "costOf": "Cost for {month}",
+      "target": "Revenue target (cost + {percent}% taxes and fees)",
+      "revenue": "Revenue this month",
+      "revenueHint": "Payments don't exist yet (item 13.4).",
+      "breakEven": "Back-of-the-envelope: the target equals {stores, plural, one {# store} other {# stores}} on the plan ({storePrice}/month) or {supporters, plural, one {# supporter} other {# supporters}} ({supporterPrice}/month), or a mix. Example prices, not decided yet.",
+      "byService": "By service in {month}",
+      "monthsCaption": "Last months",
+      "cols": {
+        "month": "Month",
+        "cost": "Cost",
+        "target": "Target",
+        "revenue": "Revenue"
+      },
+      "newTitle": "Add cost",
+      "formHint": "In dollars, use the invoice rate (with IOF and card fees) if you have it; otherwise today's Central Bank rate is used.",
+      "service": "Service",
+      "services": {
+        "vercel": "Vercel (hosting)",
+        "neon": "Neon (database)",
+        "resend": "Resend (emails)",
+        "blob": "Vercel Blob (images)",
+        "sentry": "Sentry (errors)",
+        "domain": "Domain",
+        "apple": "Apple (developer account)",
+        "google": "Google Play (developer account)",
+        "other": "Other"
+      },
+      "month": "Month",
+      "period": "Billing",
+      "periods": {
+        "month": "Monthly",
+        "year": "Yearly (spread over 12)",
+        "once": "One-time (spread over 12)"
+      },
+      "currency": "Currency",
+      "currencies": {
+        "BRL": "Real (R$)",
+        "USD": "Dollar (US$)"
+      },
+      "amount": "Amount ({currency})",
+      "rate": "Dollar rate (optional)",
+      "rateHint": "Leave blank: {rate} (today's PTAX).",
+      "rateMissing": "Today's rate isn't available: enter the invoice rate.",
+      "note": "Note (optional)",
+      "add": "Add",
+      "copy": "Repeat last month's costs in {month}",
+      "copied": "{count, plural, =0 {Nothing to repeat: the month already has monthly costs or {from} has none.} one {# cost repeated from {from}.} other {# costs repeated from {from}.}}",
+      "saved": "Cost added.",
+      "deleted": "Entry deleted.",
+      "invalidAmount": "Enter an amount above zero (e.g. 110.50).",
+      "invalidRate": "Invalid rate (e.g. 5.62).",
+      "entries": "Entries",
+      "noEntries": "No costs entered yet.",
+      "usdValue": "{usd} = {brl} (rate {rate})",
+      "delete": "Delete",
+      "deleteConfirm": "Confirm: delete"
     }
   },
   "meta": {

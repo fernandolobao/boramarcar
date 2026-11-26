@@ -24,6 +24,7 @@ export * from './services/records';
 export * from './services/admin-access';
 export * from './services/monthly';
 export * from './services/announcements';
+export * from './services/costs';
 export * from './services/achievements';
 export * from './services/privacy';
 export * from './services/external';
