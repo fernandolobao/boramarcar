@@ -122,6 +122,12 @@ describe('API v1 — decks', () => {
 
     const list = await call(decks.GET);
     expect(list.body!.decks[0]).toMatchObject({ name: 'Omnath Ramp', proxyCount: 1 });
+    // Capa (14.2, app): o comandante e as cores, como nas capas do site.
+    expect(list.body!.decks[0].cover).toMatchObject({
+      names: ['Omnath, Locus of Mana'],
+      colorIdentity: ['G'],
+    });
+    expect(list.body!.decks[0].cover).toHaveProperty('artUri');
 
     // Segunda importação usa o cache local: Scryfall não é chamado de novo
     fetchMock.mockClear();

@@ -36,6 +36,42 @@ describe('cliente da API', () => {
     expect(events[0]).toMatchObject({ locationId: 'l1' });
   });
 
+  it('lista de decks com capa (servidor novo) e sem capa (servidor antigo)', async () => {
+    const deck = {
+      id: 'd1',
+      name: 'Omnath',
+      format: 'commander',
+      visibility: 'group',
+      cardCount: 100,
+      proxyCount: 0,
+      updatedAt: '2026-11-26T12:00:00.000Z',
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        json({
+          decks: [
+            {
+              ...deck,
+              cover: {
+                artUri: 'https://cards.scryfall.io/art_crop/x.jpg',
+                names: ['Omnath, Locus of Mana'],
+                colorIdentity: ['G'],
+              },
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(json({ decks: [deck] }));
+    const api = createApiClient({ baseUrl: 'http://x', fetch: fetchMock });
+    expect((await api.decks.list())[0]!.cover).toEqual({
+      artUri: 'https://cards.scryfall.io/art_crop/x.jpg',
+      names: ['Omnath, Locus of Mana'],
+      colorIdentity: ['G'],
+    });
+    expect((await api.decks.list())[0]!.cover).toBeUndefined();
+  });
+
   it('envia o corpo em JSON e traduz erros da API', async () => {
     const fetchMock = vi
       .fn()

@@ -1,5 +1,5 @@
 import { DomainError, formatRules, GAME_FORMATS } from '@boramarcar/core';
-import { createDeck, getDeckRatings, listDecks } from '@boramarcar/db';
+import { createDeck, getDeckCovers, getDeckRatings, listDecks } from '@boramarcar/db';
 import { z } from 'zod';
 import { runAfterResponse } from '@/server/background';
 import { refreshDeckAnalysis } from '@/server/deck-analysis';
@@ -9,16 +9,26 @@ import { rateLimit } from '@/server/limits';
 
 export const GET = authed(async ({ db, user }) => {
   const decks = await listDecks(db, user.id);
-  const ratings = await getDeckRatings(
-    db,
-    decks.map((d) => d.id),
-  );
+  const ids = decks.map((d) => d.id);
+  // Os decks são da própria pessoa: capa sem filtro de visibilidade.
+  const [ratings, covers] = await Promise.all([getDeckRatings(db, ids), getDeckCovers(db, ids)]);
   return {
-    decks: decks.map((d) => ({
-      ...d,
-      score: ratings.get(d.id)?.score ?? null,
-      bracket: ratings.get(d.id)?.bracket ?? null,
-    })),
+    decks: decks.map((d) => {
+      const cover = covers.get(d.id);
+      return {
+        ...d,
+        score: ratings.get(d.id)?.score ?? null,
+        bracket: ratings.get(d.id)?.bracket ?? null,
+        /** Capa (como no site): arte recortada, nome do(s) comandante(s) — ou da carta de capa — e cores. */
+        cover: cover
+          ? {
+              artUri: cover.artUri,
+              names: cover.cards.map((c) => c.name),
+              colorIdentity: cover.colorIdentity,
+            }
+          : null,
+      };
+    }),
   };
 });
 
