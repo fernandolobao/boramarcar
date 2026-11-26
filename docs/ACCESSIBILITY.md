@@ -777,3 +777,11 @@ sem rolagem horizontal em 320px.
 - Convite: bloco "Nunca jogou Magic?" como `section` com título (`h2`) e link com texto.
 - Página do grupo: o selo "Pronto para a primeira mesa" tem ícone decorativo e texto, dentro do item
   do membro.
+
+## Campos com 16 px em telas de toque (26/11/2026)
+
+- No iOS, campo com fonte menor que 16 px faz o navegador dar zoom ao receber o foco, e o zoom fica
+  (a página passa a ser cortada à direita). Em `@media (pointer: coarse)`, todo campo de texto,
+  seleção e área de texto tem 16 px (regra global em `globals.css`, fora das camadas do Tailwind).
+- O zoom da página **continua permitido** (sem `maximum-scale` nem `user-scalable=no`, WCAG 1.4.4).
+- E2E `campos-celular.spec.ts` confere o tamanho no projeto de celular.

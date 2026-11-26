@@ -334,6 +334,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'O convite do grupo agora oferece "Aprender a jogar", e quem conclui o básico e ainda não jogou aparece no grupo como pronto para a primeira mesa.',
     en: 'Group invites now offer "Learn to play", and whoever completes the basics and hasn’t played yet shows up in the group as ready for the first table.',
   },
+  {
+    date: '2026-11-26',
+    pt: 'No iPhone, tocar num campo não dá mais zoom na página: o site deixava de caber na tela e ficava cortado à direita.',
+    en: 'On iPhone, tapping a field no longer zooms the page in: the site used to stop fitting the screen and got cut off on the right.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
