@@ -10,7 +10,7 @@ próprio site ou app (Conta → Feedback): o texto chega no `/admin` com a tela 
 - **Pessoas:** pelo menos **6** (com 4, o top cut não roda). Uma delas faz a loja, outra fica
   sem conta para abrir os links públicos.
 - **Aparelhos:** 1 iPhone e 1 Android, cada um com o app no **Expo Go** (até sair o build de
-  dezembro) e o site no navegador; um computador para o site.
+  dezembro) e o site no navegador; **1 iPad** (layout de tablet do app); um computador para o site.
 - **Loja de teste:** um admin cria em `/admin` → Lojas, com o e-mail de quem vai ser dona.
 - **Servidor:** Blob store público ligado ao projeto (fotos e logo), e-mails pelo Resend.
 - **Tempo:** umas 2 horas, de preferência numa noite de jogo de verdade.
@@ -39,6 +39,10 @@ próprio site ou app (Conta → Feedback): o texto chega no `/admin` com a tela 
 - [ ] A partida aparece no encontro, no ranking e nas estatísticas? A janela de conquistas novas
       aparece para quem ganhou alguma?
 - [ ] Resumo do encontro: finalizar o encontro e abrir o `/resumo/…` no aparelho sem conta.
+- [ ] **Comandantes parceiros:** numa mesa com um deck de dois comandantes, o dano de comandante
+      aparece separado por comandante (21 de um só mata; 11 + 11 não)?
+- [ ] **Painel:** o destaque mostra as fotos de quem confirmou, o botão dourado "Ver o encontro" e
+      "Sua resposta: Vou" como selo (site e app).
 
 ## 4. Torneio do grupo
 
@@ -77,6 +81,47 @@ próprio site ou app (Conta → Feedback): o texto chega no `/admin` com a tela 
 - [ ] No app: Conta → "Lojas e eventos"; escolher a cidade (fica salva) e usar a localização (a permissão explica que ela não é guardada).
 - [ ] A página da cidade da loja de teste (`/lojas/em/<uf>/<cidade>`) aparece no Google algumas semanas depois (só confirmar mais tarde).
 
+## 5c. Decks, coleção e leitura pela câmera
+
+- [ ] **Deck do zero** (`/decks/novo`): nome, formato e comandante; nasce como **rascunho**
+      (privado, sem entrar na coleção). Publicar pergunta a visibilidade e soma as cartas à
+      coleção.
+- [ ] **Identidade de cor** (Commander): adicionar uma carta fora das cores avisa antes, com
+      "Adicionar mesmo assim" e "Adicionar ao Talvez"; o selo "Fora da identidade" aparece na
+      carta e na validação.
+- [ ] **Análise em abas** (Visão geral, Mana, Mão inicial, Funções, Bracket) e o endereço muda
+      (`?aba=`); **"Sortear mão inicial"** abre a janela, com mulligan de Londres.
+- [ ] Opções do deck no menu "Opções do deck" (editar, exportar, imprimir proxies, apagar).
+- [ ] No app: capas dos decks com a arte, galeria das cartas com selos (quantidade, proxy,
+      foil), brilho nas foil (parado com "reduzir movimento"), custo de mana nas linhas.
+- [ ] **Leitura pela câmera** (site no celular, só o seu grupo, flag `card-scanner`): coleção →
+      "Adicionar cartas" → "Ler pela câmera"; com a **leitura contínua**, ir trocando as cartas e
+      ver cada uma entrar na lista sozinha; conferir edição e foil; "Adicionar N cartas". Testar
+      com carta em português, foil e luz fraca, e anotar quantas acertou.
+
+## 5d. Aprender a jogar
+
+- [ ] Trilha "Aprender a jogar" do começo ao fim (lições, botões de avançar, "Voltar" leva ao
+      painel); a trilha de **Commander**; o **glossário** com busca; os **desafios**; a
+      **primeira mesa** (quem terminou aparece como "pronto para a primeira mesa" no grupo).
+- [ ] As conquistas da trilha chegam?
+
+## 5e. iPad (app)
+
+- [ ] Em pé e deitado: painel (números em 4, duas colunas), meus decks (2 ou 3 colunas), um
+      deck (análise à esquerda, cartas à direita), coleção (mais cartas por linha), grupo,
+      encontros, um encontro, disponibilidade, perfil, um torneio e uma loja. Nada esticado
+      numa coluna só? Ranking, conta e ajuda ficam numa largura confortável?
+- [ ] No celular, as mesmas telas continuam iguais (o deck com as seções em pilha).
+
+## 5f. Admin (quem está em ADMIN_EMAILS)
+
+- [ ] `/admin` abre em "Métricas do beta"; as abas mudam o endereço (`?aba=`).
+- [ ] **Atividade:** depois do ensaio, filtrar pelo seu nome e conferir as entradas (entrar pelo
+      site e pelo app, decks, cartas adicionadas, disponibilidade, presença, partidas), agrupadas
+      por hora ("adicionou 37 cartas à coleção").
+- [ ] **Custos:** lançar o custo do mês (Vercel em dólar, com a cotação da fatura) e ver a meta.
+
 ## 6. Acessibilidade (rápido, em 3 telas: encontro, torneio, evento de loja)
 
 - [ ] **VoiceOver** (iPhone) ou **TalkBack** (Android): os botões dizem o que fazem? Os avisos
@@ -93,6 +138,11 @@ Estas só passaram por tipos e testes; capricho redobrado nelas:
 - App: torneio com top cut, eliminação simples e todos contra todos (títulos das fases, botão de
   quem organiza, campeão).
 - App: aviso "Abriu vaga…" no sino, abrindo o evento.
+- App (fase 14, a cara do site): títulos na fonte Fraunces (no Android, conferir que não caem na
+  fonte do sistema), ícones iguais aos do site (abas, sino, conquistas, validação do deck),
+  estados vazios com os símbolos de mana, painel (destaque, números, pódio em degraus) e grupo
+  (membros com foto e "Gerenciar").
+- App (fase 15): todo o layout de tablet (ver 5e).
 
 ## Depois do ensaio
 
