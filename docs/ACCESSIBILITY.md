@@ -744,3 +744,12 @@ sem rolagem horizontal em 320px.
   motivo em texto na descrição do radiogroup.
 - "Publicar deck" abre sempre a janela; o primeiro campo é o radiogroup "Quem vê o deck depois de
   publicado" (padrão: Grupo), depois as cartas da coleção, quando houver.
+
+## Análise do deck em abas (25/11/2026)
+
+- `PillTabs` (`components/ds/tabs.tsx`, React Aria): `tablist` com rótulo "Partes da análise",
+  setas trocam de aba e Tab entra no painel; o mesmo visual das abas de conquistas do perfil.
+- O número de problemas da validação na aba "Visão geral" é decorativo; o texto ("2 problemas na
+  validação") vai em `sr-only` dentro da aba.
+- A aba escolhida fica no endereço (`?aba=mao`) sem rolar a página; links e a ajuda abrem direto
+  nela.

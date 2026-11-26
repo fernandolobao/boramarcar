@@ -802,8 +802,15 @@
     "legalityNote": "Banned and restricted cards checked with Scryfall legality data, updated daily.",
     "legalityMissing": "{count, plural, =1 {1 card is} other {# cards are}} still missing legality data: refresh the analysis.",
     "targetPercent": "target: {percent}%",
-    "moreDetails": "More analysis details",
-    "moreDetailsHint": "Card roles, mana base, opening hand odds and comparison with other decks."
+    "tabsLabel": "Analysis sections",
+    "tabs": {
+      "overview": "Overview",
+      "mana": "Mana",
+      "hand": "Opening hand",
+      "roles": "Roles",
+      "bracket": "Bracket",
+      "issues": "{count, plural, =1 {1 validation issue} other {# validation issues}}"
+    }
   },
   "errors": {
     "invalid_input": "Please check the data you entered.",
@@ -2188,7 +2195,7 @@
     "label": "Tip",
     "dismiss": "Got it",
     "dismissLabel": "Got it, dismiss the tip",
-    "deck-analysis": "The score compares the deck with the format’s reference targets: in Commander, lands, ramp, card draw, removal, board wipes and curve; in 60-card formats, lands, curve, interaction and consistency; in 40-card ones, creatures instead of consistency. Tap an item to see the math and which cards count. Roles, mana base and opening hand are under \"More details\". It’s a guide, not a rule.",
+    "deck-analysis": "The score compares the deck with the format’s reference targets: in Commander, lands, ramp, card draw, removal, board wipes and curve; in 60-card formats, lands, curve, interaction and consistency; in 40-card ones, creatures instead of consistency. Tap an item to see the math and which cards count. Curve, mana base, opening hand, roles and bracket are in the tabs. It’s a guide, not a rule.",
     "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo, swap seats and the keyword glossary.",
     "collection": "Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.",
     "toggle": "Tip about this screen"

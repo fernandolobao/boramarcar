@@ -314,6 +314,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Deck em rascunho agora é sempre privado. Ao publicar, você escolhe quem vê: só você, o grupo ou qualquer pessoa com o link.',
     en: 'Draft decks are now always private. When you publish, you choose who sees it: only you, the group or anyone with the link.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'A análise do deck agora fica num card só, com abas: visão geral, mana, mão inicial, funções e bracket. Nada fica escondido em "mais detalhes".',
+    en: 'The deck analysis now lives in a single card with tabs: overview, mana, opening hand, roles and bracket. Nothing is hidden under "more details".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

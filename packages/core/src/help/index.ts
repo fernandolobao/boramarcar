@@ -224,7 +224,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'mao-inicial',
             question: 'Como testo a mão inicial do deck?',
             steps: [
-              'Na página do deck, em "Mão inicial" (nos detalhes da análise), toque em "Sortear mão inicial": abre uma janela com 7 cartas do deck principal (comandante, reserva e "talvez" ficam de fora).',
+              'Na página do deck, na aba "Mão inicial" da análise, toque em "Sortear mão inicial": abre uma janela com 7 cartas do deck principal (comandante, reserva e "talvez" ficam de fora).',
               'Não gostou? "Mulligan" compra 7 de novo; escolha uma carta para o fundo do grimório para cada mulligan e toque em "Manter".',
               '"Comprar carta" mostra as próximas compras. As chances de terrenos ficam na mesma seção.',
             ],
@@ -277,7 +277,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Commander, Brawl e Oathbreaker: terrenos, ramp, compra, remoção, board wipes e curva.',
               'Formatos de 60 cartas (Standard, Pioneer, Modern, Pauper…): terrenos (22 a 26), curva, interação (remoção e board wipes) e consistência (mágicas em 3 ou 4 cópias).',
               'Draft e Sealed (40 cartas): terrenos (16 a 18), curva, interação e criaturas (15 a 17).',
-              'Toque num item da nota para ver o cálculo e as cartas que contam. Funções das cartas, base de mana e chances da mão inicial ficam em "Mais detalhes da análise".',
+              'Toque num item da nota para ver o cálculo e as cartas que contam. A análise tem abas: "Visão geral" (nota e validação), "Mana" (curva, cores e base de mana), "Mão inicial", "Funções" (e sugestões) e "Bracket".',
             ],
           },
           {
@@ -645,7 +645,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'mao-inicial',
             question: 'How do I test the deck\u2019s opening hand?',
             steps: [
-              'On the deck page, under "Opening hand" (in the analysis details), tap "Draw a sample hand": a window opens with 7 cards from the main deck (commander, sideboard and "maybe" stay out).',
+              'On the deck page, in the analysis "Opening hand" tab, tap "Draw a sample hand": a window opens with 7 cards from the main deck (commander, sideboard and "maybe" stay out).',
               'Don\u2019t like it? "Mulligan" draws 7 again; choose one card to put on the bottom of your library for each mulligan and tap "Keep".',
               '"Draw a card" shows the next draws. Land odds are in the same section.',
             ],
@@ -698,7 +698,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
               'Commander, Brawl and Oathbreaker: lands, ramp, card draw, removal, board wipes and curve.',
               '60-card formats (Standard, Pioneer, Modern, Pauper…): lands (22 to 26), curve, interaction (removal and board wipes) and consistency (spells running 3 or 4 copies).',
               'Draft and Sealed (40 cards): lands (16 to 18), curve, interaction and creatures (15 to 17).',
-              'Tap a score item to see the math and which cards count. Card roles, mana base and opening hand odds are under "More analysis details".',
+              'Tap a score item to see the math and which cards count. The analysis has tabs: "Overview" (score and validation), "Mana" (curve, colors and mana base), "Opening hand", "Roles" (and suggestions) and "Bracket".',
             ],
           },
           {

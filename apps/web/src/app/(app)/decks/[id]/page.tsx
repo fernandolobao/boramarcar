@@ -54,7 +54,7 @@ import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { getUsdBrlRate } from '@/server/exchange-rate';
 import { getDb } from '@/server/db';
 import { CardNames, DeckPrintsProvider } from '@/components/card-dialog';
-import { StackSections } from '@/components/stack-sections';
+import { PillTabs } from '@/components/ds/tabs';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { deckBarBackground, deckBarEdge, deckFlow } from '@boramarcar/tokens/flow';
 import { deckMetadata } from '@/server/seo-pages';
@@ -346,89 +346,127 @@ export default async function DeckPage({ params, searchParams }: Props) {
           </p>
         )}
 
-        {/* Análise em pilha de cartas: cada seção desliza por cima da anterior ao rolar. */}
-        <StackSections>
-          <section className="card space-y-4">
-            <TitleWithTip id="deck-analysis" dismissed={!showTip}>
-              <h2 className="section-title mb-0">{ta('title')}</h2>
-            </TitleWithTip>
-            <DeckScore analysis={analysis} formatName={formatName} />
-            <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
-          </section>
-          <section className="card space-y-6">
-            <ManaCurve curve={analysis.manaCurve} cardsByCurve={analysis.cardsByCurve} />
-            <p className="text-sm">
-              {ta('averageCmc')}: <strong>{analysis.averageCmc}</strong> · {ta('lands')}:{' '}
-              <strong>{analysis.lands}</strong>
-            </p>
-            <ColorPips pips={analysis.colorPips} />
-          </section>
-          <section className="card">
-            <DeckValidation analysis={analysis} formatName={formatName} />
-          </section>
-          {analysis.suggestions.length > 0 && (
-            <section className="card">
-              <DeckSuggestions analysis={analysis} />
-            </section>
-          )}
-          {deck.bracket && (
-            <section className="card">
-              <BracketCard bracket={deck.bracket} />
-            </section>
-          )}
-        </StackSections>
-
-        {/* Detalhes para quem quer ir fundo; fechados por padrão para a página não cansar. */}
-        <details className="card">
-          <summary className="cursor-pointer font-semibold">{ta('moreDetails')}</summary>
-          <p className="muted mt-2 text-sm">{ta('moreDetailsHint')}</p>
-          <div className="mt-6 space-y-6">
-            <section className="border-t border-line pt-6">
-              <DeckRoles
-                deckId={deck.id}
-                roles={analysis.roles}
-                cardsByRole={analysis.cardsByRole}
-                targets={profile.roleTargets}
-                tagged={analysis.rolesTagged}
-              />
-            </section>
-            <section className="border-t border-line pt-6">
-              <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
-            </section>
-            {analysis.commanders.length > 0 && (
-              <section className="border-t border-line pt-6">
-                <DeckComparisonCard
-                  commanders={analysis.commanders}
-                  comparison={comparison}
-                  edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
-                  leastPopular={leastPopularCards(deck.entries)}
-                />
-              </section>
-            )}
-            {analysis.handOdds && (
-              <section className="border-t border-line pt-6">
-                <HandOdds
-                  odds={analysis.handOdds}
-                  action={
-                    <ModalButton label={t('hand.open')} title={t('hand.title')} icon="openingHand">
-                      <p className="muted text-sm">{t('hand.intro')}</p>
-                      {/* Só o deck principal; a face da frente diz se é terreno. */}
-                      <OpeningHand
-                        lines={deck.lines.map((l) => ({
-                          name: l.name,
-                          board: l.board,
-                          quantity: l.quantity,
-                          isLand: (l.card?.typeLine ?? '').split('//')[0]!.includes('Land'),
-                          imageUri: l.card?.imageUri ?? null,
-                        }))}
-                      />
-                    </ModalButton>
-                  }
-                />
-              </section>
-            )}
-          </div>
-        </details>
+        {/* Análise num card só, com abas (a escolhida fica no endereço: ?aba=mana). */}
+        <section className="card space-y-4" aria-labelledby="deck-analysis-title">
+          <TitleWithTip id="deck-analysis" dismissed={!showTip}>
+            <h2 id="deck-analysis-title" className="section-title mb-0">
+              {ta('title')}
+            </h2>
+          </TitleWithTip>
+          <PillTabs
+            label={ta('tabsLabel')}
+            param="aba"
+            tabs={[
+              {
+                id: 'geral',
+                title: ta('tabs.overview'),
+                badge: analysis.validation.length,
+                badgeLabel: ta('tabs.issues', { count: analysis.validation.length }),
+                content: (
+                  <div className="space-y-6">
+                    <DeckScore analysis={analysis} formatName={formatName} />
+                    <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
+                    <section className="border-t border-line pt-6">
+                      <DeckValidation analysis={analysis} formatName={formatName} />
+                    </section>
+                  </div>
+                ),
+              },
+              {
+                id: 'mana',
+                title: ta('tabs.mana'),
+                content: (
+                  <div className="space-y-6">
+                    <ManaCurve curve={analysis.manaCurve} cardsByCurve={analysis.cardsByCurve} />
+                    <p className="text-sm">
+                      {ta('averageCmc')}: <strong>{analysis.averageCmc}</strong> · {ta('lands')}:{' '}
+                      <strong>{analysis.lands}</strong>
+                    </p>
+                    <ColorPips pips={analysis.colorPips} />
+                    <section className="border-t border-line pt-6">
+                      <ManaBaseTable rows={analysis.manaBase} missing={analysis.manaDataMissing} />
+                    </section>
+                  </div>
+                ),
+              },
+              ...(analysis.handOdds
+                ? [
+                    {
+                      id: 'mao',
+                      title: ta('tabs.hand'),
+                      content: (
+                        <HandOdds
+                          odds={analysis.handOdds}
+                          action={
+                            <ModalButton
+                              label={t('hand.open')}
+                              title={t('hand.title')}
+                              icon="openingHand"
+                            >
+                              <p className="muted text-sm">{t('hand.intro')}</p>
+                              {/* Só o deck principal; a face da frente diz se é terreno. */}
+                              <OpeningHand
+                                lines={deck.lines.map((l) => ({
+                                  name: l.name,
+                                  board: l.board,
+                                  quantity: l.quantity,
+                                  isLand: (l.card?.typeLine ?? '').split('//')[0]!.includes('Land'),
+                                  imageUri: l.card?.imageUri ?? null,
+                                }))}
+                              />
+                            </ModalButton>
+                          }
+                        />
+                      ),
+                    },
+                  ]
+                : []),
+              {
+                id: 'funcoes',
+                title: ta('tabs.roles'),
+                content: (
+                  <div className="space-y-6">
+                    <DeckRoles
+                      deckId={deck.id}
+                      roles={analysis.roles}
+                      cardsByRole={analysis.cardsByRole}
+                      targets={profile.roleTargets}
+                      tagged={analysis.rolesTagged}
+                    />
+                    {analysis.suggestions.length > 0 && (
+                      <section className="border-t border-line pt-6">
+                        <DeckSuggestions analysis={analysis} />
+                      </section>
+                    )}
+                  </div>
+                ),
+              },
+              ...(deck.bracket || analysis.commanders.length > 0
+                ? [
+                    {
+                      id: 'bracket',
+                      title: ta('tabs.bracket'),
+                      content: (
+                        <div className="space-y-6">
+                          {deck.bracket && <BracketCard bracket={deck.bracket} />}
+                          {analysis.commanders.length > 0 && (
+                            <section className={deck.bracket ? 'border-t border-line pt-6' : ''}>
+                              <DeckComparisonCard
+                                commanders={analysis.commanders}
+                                comparison={comparison}
+                                edhrecUrl={edhrecCommanderUrl(analysis.commanders)}
+                                leastPopular={leastPopularCards(deck.entries)}
+                              />
+                            </section>
+                          )}
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        </section>
 
         <DeckCards
           deckId={deck.id}

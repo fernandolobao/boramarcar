@@ -802,8 +802,15 @@
     "legalityNote": "Banidas e restritas conferidas pelos dados de legalidade do Scryfall, atualizados todos os dias.",
     "legalityMissing": "{count, plural, =1 {1 carta ainda está} other {# cartas ainda estão}} sem os dados de legalidade: atualize a análise.",
     "targetPercent": "meta: {percent}%",
-    "moreDetails": "Mais detalhes da análise",
-    "moreDetailsHint": "Funções das cartas, base de mana, chances da mão inicial e comparação com outros decks."
+    "tabsLabel": "Partes da análise",
+    "tabs": {
+      "overview": "Visão geral",
+      "mana": "Mana",
+      "hand": "Mão inicial",
+      "roles": "Funções",
+      "bracket": "Bracket",
+      "issues": "{count, plural, =1 {1 problema na validação} other {# problemas na validação}}"
+    }
   },
   "errors": {
     "invalid_input": "Confira os dados informados.",
@@ -2188,7 +2195,7 @@
     "label": "Dica",
     "dismiss": "Entendi",
     "dismissLabel": "Entendi, dispensar a dica",
-    "deck-analysis": "A nota compara o deck com metas de referência do formato: em Commander, terrenos, ramp, compra, remoção, board wipes e curva; em 60 cartas, terrenos, curva, interação e consistência; em 40, criaturas no lugar da consistência. Toque num item para ver o cálculo e as cartas que contam. Funções, base de mana e mão inicial ficam em \"Mais detalhes\". É um guia, não uma regra.",
+    "deck-analysis": "A nota compara o deck com metas de referência do formato: em Commander, terrenos, ramp, compra, remoção, board wipes e curva; em 60 cartas, terrenos, curva, interação e consistência; em 40, criaturas no lugar da consistência. Toque num item para ver o cálculo e as cartas que contam. Curva, base de mana, mão inicial, funções e bracket ficam nas abas. É um guia, não uma regra.",
     "table": "Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer, trocar lugares e o glossário de palavras-chave.",
     "collection": "As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.",
     "toggle": "Dica sobre esta tela"
