@@ -144,4 +144,32 @@ test.describe('leitura de cartas pela câmera', () => {
     expect(calls.at(-1)).toMatch(/Sol\s*Ring/);
     await expect(dialog.getByRole('heading', { name: '2 cartas lidas' })).toBeVisible();
   });
+
+  test('celular: câmera em tela cheia e a moldura avisa cada etapa', async ({ page }) => {
+    test.skip(test.info().project.name !== 'mobile', 'layout do celular');
+    test.setTimeout(180_000);
+    await fakeCamera(page, null);
+    await fakeLookup(page);
+    await page.goto('/colecao');
+    await page.getByText('Adicionar cartas').first().click();
+    await page.getByRole('button', { name: 'Ler pela câmera' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Ler cartas pela câmera' });
+    // Sem caixa de modal: a janela ocupa a tela toda.
+    const viewport = page.viewportSize()!;
+    const box = (await dialog.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(viewport.width - 1);
+    expect(box.height).toBeGreaterThanOrEqual(viewport.height - 1);
+    // Moldura vazia: branca ("aponte"). Com a carta: dourada quando entra na lista.
+    const guide = dialog.locator('[data-phase]');
+    await expect(guide).toHaveAttribute('data-phase', 'idle', { timeout: 90_000 });
+    await showCard(page, 'Sol Ring');
+    await expect(guide).toHaveAttribute('data-phase', 'found', { timeout: 60_000 });
+    await expect(dialog.getByRole('heading', { name: '1 carta lida' })).toBeVisible();
+    // A lista abre por cima da câmera.
+    await dialog.getByRole('button', { name: 'Ver lista' }).click();
+    await expect(dialog.getByText('Sol Ring').first()).toBeVisible();
+    // Tirando a carta, a moldura volta a esperar.
+    await showCard(page, null);
+    await expect(guide).toHaveAttribute('data-phase', 'idle', { timeout: 60_000 });
+  });
 });

@@ -780,7 +780,7 @@ sem rolagem horizontal em 320px.
 
 ## Leitura de cartas pela câmera (26/11/2026, atrás da flag `card-scanner`)
 
-- "Ler pela câmera" abre um `<dialog>` (`ModalButton`; o foco volta ao botão e a câmera desliga ao
+- "Ler pela câmera" abre um `<dialog>` modal (o foco volta ao botão e a câmera desliga ao
   fechar). O vídeo tem nome ("Imagem da câmera"); a moldura é decorativa.
 - "Ler carta" e "Tirar foto" são botões com texto (o campo de arquivo fica escondido e fora do Tab).
   O andamento e o resultado ("Achei: …", "Não reconheci…") são anunciados em `role="status"`; câmera
@@ -791,6 +791,14 @@ sem rolagem horizontal em 320px.
 - Leitura contínua (26/11/2026): ligada por padrão; é um botão de alternar ("Leitura contínua",
   `aria-pressed`). Ela só anuncia em `role="status"` quando uma carta nova entra na lista (nada de
   avisos a cada volta). "Ler carta" continua para quem prefere ler uma por vez.
+- Tela cheia e etapas da leitura (26/11/2026): no celular o `<dialog>` ocupa a tela toda (sem caixa),
+  com o título e "Fechar" por cima da câmera e os controles numa faixa embaixo; a lista abre por um
+  botão "Ver lista" com `aria-expanded`. No desktop continua uma janela (fundo clicável fecha; Esc
+  sempre). A moldura muda com a etapa: branca ("Aponte para uma carta"), **roxa** com brilho
+  pulsando enquanto lê ("Lendo… segure firme"), dourada quando a carta entra ("Pronto! Pode trocar
+  de carta"). A cor nunca é a única pista: cada etapa tem um aviso escrito com ícone sobre o vídeo
+  (`aria-hidden`, porque o mesmo texto vai para `role="status"` só na mudança de etapa). O pulso
+  para com "reduzir movimento". O botão desabilitado deixou de ser a única indicação de leitura.
 
 ## Campos com 16 px em telas de toque (26/11/2026)
 

@@ -2980,7 +2980,13 @@
     "add": "{count, plural, =0 {Adicionar} =1 {Adicionar 1 carta} other {Adicionar # cartas}}",
     "saveError": "Não deu para adicionar as cartas. Tente de novo.",
     "added": "{count, plural, =1 {1 carta adicionada.} other {# cartas adicionadas.}}",
-    "continuous": "Leitura contínua"
+    "continuous": "Leitura contínua",
+    "aim": "Aponte para uma carta",
+    "holdSteady": "Lendo… segure firme",
+    "nextCard": "Pronto! Pode trocar de carta",
+    "tryAgain": "Não reconheci: ajuste a luz ou o ângulo",
+    "showList": "Ver lista",
+    "hideList": "Ocultar lista"
   },
   "playtest": {
     "title": "Mesa de testes",

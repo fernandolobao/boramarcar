@@ -2980,7 +2980,13 @@
     "add": "{count, plural, =0 {Add} =1 {Add 1 card} other {Add # cards}}",
     "saveError": "Couldn't add the cards. Try again.",
     "added": "{count, plural, =1 {1 card added.} other {# cards added.}}",
-    "continuous": "Continuous scan"
+    "continuous": "Continuous scan",
+    "aim": "Point at a card",
+    "holdSteady": "Reading… hold steady",
+    "nextCard": "Done! Next card",
+    "tryAgain": "Not recognized: adjust light or angle",
+    "showList": "Show list",
+    "hideList": "Hide list"
   },
   "playtest": {
     "title": "Playtest table",
