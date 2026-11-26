@@ -9,4 +9,5 @@ export * from './presentation';
 export * from './editing';
 export * from './proxies';
 export * from './hand';
+export * from './playtest';
 export * from './scan';
