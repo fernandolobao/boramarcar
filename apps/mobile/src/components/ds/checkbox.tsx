@@ -19,7 +19,8 @@ export function Checkbox({
   return (
     <Button
       // Marca visível além da cor (WCAG 1.4.1); o nome acessível fica sem ela.
-      label={`${checked ? '✓ ' : ''}${label}`}
+      label={label}
+      icon={checked ? 'done' : undefined}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={description}
       variant="secondary"

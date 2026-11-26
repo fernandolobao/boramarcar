@@ -7,6 +7,10 @@ import { View } from 'react-native';
 import { AppText } from '@/components/ui';
 import { t, type MessageKey } from '@/lib/i18n';
 import { useColors, type Colors } from '@/lib/theme';
+import { Icon } from '@/components/icons';
+
+/** Ícone de cada estado do critério, como no site. */
+const STATUS_ICON = { counted: 'ok', clear: 'unmarked', unchecked: 'rsvpMaybe' } as const;
 
 const TITLES: Record<BracketCriterion, MessageKey> = {
   game_changers: 'bracketGameChangers',
@@ -53,10 +57,13 @@ export function BracketChecklist({
             backgroundColor: item.status === 'counted' ? colors.surface : colors.surfaceMuted,
           }}
         >
-          <AppText style={{ fontWeight: '700' }}>
-            {item.status === 'counted' ? '✓ ' : ''}
-            {t(TITLES[item.code])}
-          </AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon
+              name={STATUS_ICON[item.status]}
+              color={item.status === 'counted' ? colors.success : colors.muted}
+            />
+            <AppText style={{ fontWeight: '700', flex: 1 }}>{t(TITLES[item.code])}</AppText>
+          </View>
           <AppText muted>
             {t(STATUS[item.status])}
             {item.status === 'counted'

@@ -6,6 +6,8 @@ import { AppText, Button } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDateMedium, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Icon } from '@/components/icons';
+import { ACHIEVEMENT_ICON } from '@/components/achievement-icons';
 
 /**
  * Janela de conquistas novas (painel e perfil próprio): ao abrir a tela, mostra juntas as
@@ -84,7 +86,7 @@ export function NewAchievements() {
                     backgroundColor: colors.accent,
                   }}
                 >
-                  <AppText style={{ fontWeight: '800', color: colors.onAccent }}>★</AppText>
+                  <Icon name={ACHIEVEMENT_ICON[a.id]} size={20} color={colors.onAccent} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText style={{ fontWeight: '700' }}>{name}</AppText>

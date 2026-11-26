@@ -11,6 +11,8 @@ import { AppText, Button, Card, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
+import { useColors } from '@/lib/theme';
+import { Icon } from '@/components/icons';
 
 const OFFER: Record<string, MessageKey> = {
   singles: 'discOfferSingles',
@@ -24,6 +26,7 @@ const OFFER: Record<string, MessageKey> = {
  * ou, ao tocar, pela localização do aparelho (arredondada; não é guardada).
  */
 export default function DiscoveryScreen() {
+  const colors = useColors();
   const [city, setCity] = useState<Municipality | null>(null);
   const [data, setData] = useState<Discovery | null>(null);
   const [loading, setLoading] = useState(true);
@@ -172,7 +175,7 @@ export default function DiscoveryScreen() {
                 <Card style={{ gap: 2 }}>
                   <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
                     <AppText style={{ fontWeight: '700' }}>{s.name}</AppText>
-                    {s.verified ? <AppText>✓</AppText> : null}
+                    {s.verified ? <Icon name="done" color={colors.text} /> : null}
                   </View>
                   <AppText muted>
                     {s.municipality.name}, {s.municipality.uf} · {t('discKm', { km: s.distanceKm })}

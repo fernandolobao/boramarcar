@@ -16,6 +16,8 @@ import { authClient } from '@/lib/auth';
 import { headToHeadBetween } from '@boramarcar/core/integration';
 import { Stat } from '@/components/ds/stat';
 import { Avatar } from '@/components/avatar';
+import { Icon } from '@/components/icons';
+import { ACHIEVEMENT_ICON } from '@/components/achievement-icons';
 
 const ROLE_LABEL: Record<PlayerProfile['groups'][number]['role'], MessageKey> = {
   owner: 'roleOwner',
@@ -100,11 +102,11 @@ function Achievements({ achievements }: { achievements: readonly Achievement[] }
                 backgroundColor: a.unlocked ? colors.accent : colors.surfaceMuted,
               }}
             >
-              <AppText
-                style={{ fontWeight: '800', color: a.unlocked ? colors.onAccent : colors.muted }}
-              >
-                {a.unlocked ? '★' : '☆'}
-              </AppText>
+              <Icon
+                name={a.unlocked ? ACHIEVEMENT_ICON[a.id] : 'private'}
+                size={20}
+                color={a.unlocked ? colors.onAccent : colors.muted}
+              />
             </View>
             <View style={{ flex: 1 }}>
               <AppText style={{ fontWeight: '600' }}>{name}</AppText>
