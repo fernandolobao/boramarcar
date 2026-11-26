@@ -18,6 +18,8 @@ const fromTokens = (t: (typeof themes)['light']) => ({
   link: t.link,
   accent: t.accent,
   onAccent: t.onAccent,
+  /** Texto e ícones dourados sobre o fundo (contraste AA, como `text-accent-text` no site). */
+  accentText: t.accentText,
   danger: t.danger,
   success: t.success,
   /** Quantidade sobre a carta (×2): escuro translúcido, igual ao do site nos dois temas. */

@@ -16,6 +16,7 @@ import { Tip } from '@/components/tip';
 import { AppText, Button, styles } from '@/components/ui';
 import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Icon } from '@/components/icons';
 
 const cap = (s: string) =>
   s
@@ -254,12 +255,20 @@ export function DeckBody({
 
       <Section title={t('deckValidation')} index={next()}>
         {a.validation.length === 0 ? (
-          <AppText style={{ color: colors.success }}>✓ {t('deckValid')}</AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon name="ok" color={colors.success} />
+            <AppText style={{ color: colors.success, flex: 1 }}>{t('deckValid')}</AppText>
+          </View>
         ) : (
           a.validation.map((issue, i) => (
-            <AppText key={i} style={{ color: colors.danger }}>
-              ⚠ {tKey('deckIssue', issue.code, issue as Record<string, string | number>)}
-            </AppText>
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6 }}>
+              <View style={{ paddingTop: 3 }}>
+                <Icon name="warning" color={colors.danger} />
+              </View>
+              <AppText style={{ color: colors.danger, flex: 1 }}>
+                {tKey('deckIssue', issue.code, issue as Record<string, string | number>)}
+              </AppText>
+            </View>
           ))
         )}
       </Section>

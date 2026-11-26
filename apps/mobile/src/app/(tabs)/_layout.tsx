@@ -1,23 +1,16 @@
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router/js-tabs';
-import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
+import { Icon, type IconName } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { NotificationsBell } from '@/components/notifications-bell';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 
-type IconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
-
+/** Ícone da aba: o mesmo da navegação do site (Lucide). */
 const icon =
   (name: IconName) =>
   ({ color, size }: { color: ColorValue; size: number }) => (
-    <MaterialCommunityIcons
-      name={name}
-      color={typeof color === 'number' ? undefined : (color ?? undefined)}
-      size={size}
-      accessibilityElementsHidden
-    />
+    <Icon name={name} size={size} color={typeof color === 'string' ? color : '#888'} />
   );
 
 /** A aba inicial é o painel (as outras continuam acessíveis pela barra e pelos links). */
@@ -43,33 +36,24 @@ export default function TabsLayout() {
         name="painel"
         options={{
           title: t('tabHome'),
-          tabBarIcon: icon('view-dashboard-outline'),
+          tabBarIcon: icon('dashboard'),
           // Na aba inicial, o cabeçalho mostra o logotipo (a tela tem o próprio título).
           headerTitle: () => <Logo height={20} />,
           // Sino da central de notificações.
           headerRight: () => <NotificationsBell />,
         }}
       />
-      <Tabs.Screen
-        name="index"
-        options={{ title: t('tabEvents'), tabBarIcon: icon('calendar-month') }}
-      />
+      <Tabs.Screen name="index" options={{ title: t('tabEvents'), tabBarIcon: icon('events') }} />
       <Tabs.Screen
         name="disponibilidade"
-        options={{ title: t('tabAvailability'), tabBarIcon: icon('clock-outline') }}
+        options={{ title: t('tabAvailability'), tabBarIcon: icon('availability') }}
       />
       <Tabs.Screen
         name="ranking"
-        options={{ title: t('tabRanking'), tabBarIcon: icon('trophy') }}
+        options={{ title: t('tabRanking'), tabBarIcon: icon('ranking') }}
       />
-      <Tabs.Screen
-        name="decks"
-        options={{ title: t('tabDecks'), tabBarIcon: icon('cards-outline') }}
-      />
-      <Tabs.Screen
-        name="conta"
-        options={{ title: t('tabAccount'), tabBarIcon: icon('account-circle') }}
-      />
+      <Tabs.Screen name="decks" options={{ title: t('tabDecks'), tabBarIcon: icon('decks') }} />
+      <Tabs.Screen name="conta" options={{ title: t('tabAccount'), tabBarIcon: icon('profile') }} />
     </Tabs>
   );
 }

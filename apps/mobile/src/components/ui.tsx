@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
+import { Icon, type IconName } from '@/components/icons';
 import { fonts } from '@/lib/fonts';
 
 /** Texto com a cor do tema; `muted` para texto secundário (contraste AA). */
@@ -57,12 +58,15 @@ export function Button({
   label,
   variant = 'primary',
   selected,
+  icon,
   style,
   ...props
 }: PressableProps & {
   label: string;
   variant?: 'primary' | 'secondary';
   selected?: boolean;
+  /** Ícone à esquerda do texto (o mesmo do site para a mesma ação). */
+  icon?: IconName;
 }) {
   const colors = useColors();
   const primary = variant === 'primary' || selected;
@@ -84,12 +88,15 @@ export function Button({
         typeof style === 'function' ? style(state) : style,
       ]}
     >
-      <Text
-        style={[styles.buttonText, { color: primary ? colors.brandText : colors.text }]}
-        maxFontSizeMultiplier={2}
-      >
-        {label}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        {icon ? <Icon name={icon} color={primary ? colors.brandText : colors.text} /> : null}
+        <Text
+          style={[styles.buttonText, { color: primary ? colors.brandText : colors.text }]}
+          maxFontSizeMultiplier={2}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
