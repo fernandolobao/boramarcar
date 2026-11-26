@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { resolveCardById } from '@/server/deck-import';
 import { authed, parseJson, scryfallIdSchema } from '@/server/http';
 import { rateLimit } from '@/server/limits';
+import { track } from '@/server/activity';
 
 const schema = z
   .object({
@@ -40,4 +41,5 @@ export const PATCH = authed<{ entryId: string }>(async ({ req, db, user, params 
 
 export const DELETE = authed<{ entryId: string }>(async ({ db, user, params }) => {
   await removeCollectionCard(db, { userId: user.id, id: params.entryId });
+  track({ userId: user.id, kind: 'collection_removed' });
 });

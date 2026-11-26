@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authed, isoDate, parseJson, parseQuery } from '@/server/http';
 import { notifyNewWindows } from '@/server/notify';
 import { runAfterResponse } from '@/server/background';
+import { track } from '@/server/activity';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -32,6 +33,7 @@ export const POST = authed<{ groupId: string }>(
     const body = await parseJson(req, createSchema);
     const slot = await addAvailability(db, { ...body, groupId: params.groupId, userId: user.id });
     runAfterResponse(() => notifyNewWindows(db, { groupId: params.groupId, actorId: user.id }));
+    track({ userId: user.id, kind: 'availability_changed', groupId: params.groupId });
     return { slot };
   },
   { status: 201 },

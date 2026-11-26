@@ -435,3 +435,17 @@ next-intl sem prefixo de idioma na URL. O idioma vem do cookie `NEXT_LOCALE`; se
   adicionar à coleção ou ao deck.
 - Para o WebAssembly, a CSP tem `'wasm-unsafe-eval'` (só compilar WASM, sem `eval`); a câmera é
   liberada só para o próprio site (`Permissions-Policy: camera=(self)`).
+
+## Registro de atividade (Admin → Atividade)
+
+- Tabela `activity_log`: uma linha por **pessoa × ação × alvo × hora** (`bucket`, hora cheia UTC), com a
+  contagem. `recordActivity` faz um `INSERT … ON CONFLICT DO UPDATE count = count + n` (um comando só).
+- Gravado **depois da resposta** (`track()` em `server/activity.ts`, via `runAfterResponse`): nunca
+  atrasa quem usa, e falha só vai para o log. Só registra depois de a ação dar certo.
+- Ações (`ACTIVITY_KINDS` em `core/activity`): entrar (site ou app, pelo navegador da sessão, que não é
+  guardado), decks (criar, importar, editar, publicar, apagar), coleção (adicionar com a quantidade,
+  remover), disponibilidade, encontro, presença, partida, grupo (criar, entrar). Ação nova = um tipo
+  novo e uma chamada `track()` na rota.
+- Retenção de 90 dias (`purgeActivity` no cron diário de limpeza). LGPD: sai na exportação e é apagado
+  com a conta; sem IP e sem conteúdo (só o nome do deck); só admins veem.
+- Custo: ~5 linhas por pessoa ativa por dia; índices por `last_at` e `group_id`.

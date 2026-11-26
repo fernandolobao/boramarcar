@@ -13,6 +13,7 @@ export * from './notifications';
 export * from './changelog';
 export * from './currency';
 export * from './costs';
+export * from './activity';
 export * from './places';
 export * from './table';
 export * from './help';

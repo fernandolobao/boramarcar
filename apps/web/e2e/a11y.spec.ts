@@ -86,6 +86,7 @@ const AUTH_PAGES = [
   '/feedback?de=/painel',
   '/notificacoes',
   '/admin',
+  '/admin?aba=atividade',
   '/admin?aba=beta',
   '/admin?aba=avisos',
   '/admin?aba=lojas',

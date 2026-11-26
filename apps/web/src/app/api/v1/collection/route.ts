@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { resolveCardById, resolveCardByName } from '@/server/deck-import';
 import { authed, parseJson, scryfallIdSchema } from '@/server/http';
 import { rateLimit } from '@/server/limits';
+import { track } from '@/server/activity';
 
 /** A coleção inteira de quem pede (filtros e ordem ficam no cliente). */
 export const GET = authed(async ({ db, user }) => ({
@@ -34,6 +35,7 @@ export const POST = authed(
       quantity: body.quantity,
       foil: body.foil,
     });
+    track({ userId: user.id, kind: 'collection_added', count: body.quantity });
     return { added: true, name: card.name };
   },
   { status: 201 },

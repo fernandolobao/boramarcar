@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authed, isoDate, parseJson, parseQuery } from '@/server/http';
 import { notifyEvent } from '@/server/notify';
 import { runAfterResponse } from '@/server/background';
+import { track } from '@/server/activity';
 
 const listSchema = z.object({ when: z.enum(['upcoming', 'past', 'all']).default('all') });
 
@@ -32,6 +33,13 @@ export const POST = authed<{ groupId: string }>(
     runAfterResponse(() =>
       notifyEvent(db, { eventId: event.id, kind: 'created', actorId: user.id }),
     );
+    track({
+      userId: user.id,
+      kind: 'event_created',
+      groupId: params.groupId,
+      targetId: event.id,
+      label: event.title,
+    });
     return { event };
   },
   { status: 201 },

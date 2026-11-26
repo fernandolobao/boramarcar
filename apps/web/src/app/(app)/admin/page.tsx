@@ -24,11 +24,17 @@ import { AnnouncementsAdmin } from '@/components/announcements-admin';
 import { StoresAdmin } from '@/components/stores/stores-admin';
 import { sectionMetadata } from '@/server/seo';
 import { PillTabs } from '@/components/ds/tabs';
+import { ActivityLog, type ActivityFilters } from '@/components/admin/activity-log';
 
 export const generateMetadata = sectionMetadata('admin', '/admin');
 
-/** Admin (só ADMIN_EMAILS): métricas do beta (8.3), beta, avisos, lojas, custos, contas e feedback (8.4), em abas. */
-export default async function AdminPage() {
+/** Admin (só ADMIN_EMAILS): métricas do beta (8.3), atividade, beta, avisos, lojas, custos, contas e feedback (8.4), em abas. */
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<ActivityFilters & { aba?: string }>;
+}) {
+  const filters = await searchParams;
   await requireAdmin();
   const db = getDb();
   const now = new Date();
@@ -174,6 +180,16 @@ export default async function AdminPage() {
                   ))}
                 </div>
               </div>
+            ),
+          },
+          {
+            id: 'atividade',
+            title: t('tabs.activity'),
+            content: (
+              <ActivityLog
+                filters={filters}
+                groups={betaGroups.map((g) => ({ id: g.id, name: g.name }))}
+              />
             ),
           },
           {

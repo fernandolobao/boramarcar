@@ -8,6 +8,7 @@ import { runAfterResponse } from '@/server/background';
 import { gameSchema } from '@/server/game-schema';
 import { authed, parseJson } from '@/server/http';
 import { sendEventRecap } from '@/server/recap';
+import { track } from '@/server/activity';
 
 export const POST = authed<{ eventId: string }>(
   async ({ req, db, user, params }) => {
@@ -20,6 +21,12 @@ export const POST = authed<{ eventId: string }>(
       await notifyGameRecorded(db, { gameId: game.id, actorId: user.id });
       await notifyAchievementsFromGame(db, { gameId: game.id });
       await checkPodium(db, { groupId: game.groupId, actorId: user.id });
+    });
+    track({
+      userId: user.id,
+      kind: 'game_recorded',
+      groupId: game.groupId,
+      targetId: params.eventId,
     });
     return { game };
   },
