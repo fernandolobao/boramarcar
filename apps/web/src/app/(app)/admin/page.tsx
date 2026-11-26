@@ -2,9 +2,11 @@ import { BETA_WEEKS } from '@boramarcar/core';
 import {
   getBeta,
   getBetaGroupStats,
+  getCostSummary,
   getProductMetrics,
   type TipId,
   listAnnouncements,
+  listCostEntries,
   listStoresForAdmin,
   listGroupsForBeta,
   listRecentFeedback,
@@ -14,6 +16,8 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { getDb } from '@/server/db';
 import { formatMinutes } from '@/server/metrics-email';
 import { requireAdmin } from '@/server/admin';
+import { getUsdBrlRate } from '@/server/exchange-rate';
+import { CostsAdmin } from '@/components/costs-admin';
 import { AdminUsers } from '@/components/admin-users';
 import { BetaControl } from '@/components/beta-control';
 import { AnnouncementsAdmin } from '@/components/announcements-admin';
@@ -27,15 +31,19 @@ export default async function AdminPage() {
   await requireAdmin();
   const db = getDb();
   const now = new Date();
-  const [m, recent, beta, betaGroups, users, notices, storeList] = await Promise.all([
-    getProductMetrics(db, now),
-    listRecentFeedback(db, 30),
-    getBeta(db, now),
-    listGroupsForBeta(db),
-    listUsersForAdmin(db),
-    listAnnouncements(db),
-    listStoresForAdmin(db),
-  ]);
+  const [m, recent, beta, betaGroups, users, notices, storeList, costs, costEntries, rate] =
+    await Promise.all([
+      getProductMetrics(db, now),
+      listRecentFeedback(db, 30),
+      getBeta(db, now),
+      listGroupsForBeta(db),
+      listUsersForAdmin(db),
+      listAnnouncements(db),
+      listStoresForAdmin(db),
+      getCostSummary(db, now),
+      listCostEntries(db),
+      getUsdBrlRate({ db }),
+    ]);
   const betaStats = await getBetaGroupStats(db, beta.state, now);
   const t = await getTranslations('admin');
   const ts = await getTranslations('stores');
@@ -132,6 +140,31 @@ export default async function AdminPage() {
           announcements={notices.map((a) => ({
             ...a,
             publishedAt: a.publishedAt?.toISOString() ?? null,
+          }))}
+        />
+      </section>
+
+      {/* Custos da plataforma (13.1). */}
+      <section className="card space-y-4" aria-labelledby="admin-custos">
+        <div>
+          <h2 id="admin-custos" className="section-title mb-1">
+            {t('costs.title')}
+          </h2>
+          <p className="muted max-w-2xl">{t('costs.intro')}</p>
+        </div>
+        <CostsAdmin
+          summary={costs}
+          usdRate={rate?.rate ?? null}
+          entries={costEntries.map((e) => ({
+            id: e.id,
+            service: e.service,
+            period: e.period,
+            month: e.month,
+            currency: e.currency,
+            amountCents: e.amountCents,
+            usdRate: e.usdRate,
+            brlCents: e.brlCents,
+            note: e.note,
           }))}
         />
       </section>

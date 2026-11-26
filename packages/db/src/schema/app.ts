@@ -645,6 +645,30 @@ export const announcements = pgTable('announcements', {
 });
 
 /**
+ * Custos da plataforma (13.1), lançados por admins no `/admin`. Em dólar, guarda a cotação usada e
+ * o valor em reais na hora do lançamento. `year`/`once` são divididos por 12 a partir de `month`.
+ */
+export const costEntries = pgTable(
+  'cost_entries',
+  {
+    id: id(),
+    service: text('service').notNull(),
+    period: text('period').notNull().default('month'),
+    /** "AAAA-MM". */
+    month: text('month').notNull(),
+    currency: text('currency').notNull().default('BRL'),
+    amountCents: integer('amount_cents').notNull(),
+    /** Reais por dólar usados na conversão; `null` em real. */
+    usdRate: doublePrecision('usd_rate'),
+    brlCents: integer('brl_cents').notNull(),
+    note: text('note'),
+    createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+  },
+  (t) => [index('cost_entries_month_idx').on(t.month)],
+);
+
+/**
  * Acessos de admins da plataforma a dados que a pessoa não deixou visíveis (ex.: deck privado ou
  * de grupo), para suporte e moderação. Fica registrado para transparência (LGPD): sai na
  * exportação de dados da pessoa e some com a conta dela.

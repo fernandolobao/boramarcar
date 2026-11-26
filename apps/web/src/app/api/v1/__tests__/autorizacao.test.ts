@@ -101,6 +101,9 @@ const r = {
   next: await import('../tournaments/[tournamentId]/next/route'),
   tournamentTable: await import('../tournaments/[tournamentId]/tables/[tableId]/route'),
   adminStores: await import('../admin/stores/route'),
+  costs: await import('../admin/costs/route'),
+  cost: await import('../admin/costs/[entryId]/route'),
+  costsCopy: await import('../admin/costs/copy/route'),
   adminStore: await import('../admin/stores/[storeId]/route'),
   store: await import('../stores/[storeId]/route'),
   storeInvites: await import('../stores/[storeId]/invites/route'),
@@ -837,6 +840,22 @@ const outsiderCases: Case[] = [
     r.publish.POST as Handler,
     'POST',
     () => ({ announcementId: ids.announcement! }),
+  ], // Custos da plataforma (13.1): só admins da plataforma.
+  ['GET custos (admin)', r.costs.GET as Handler, 'GET', () => ({})],
+  [
+    'POST custo (admin)',
+    r.costs.POST as Handler,
+    'POST',
+    () => ({}),
+    { service: 'vercel', period: 'month', month: '2026-11', currency: 'BRL', amountCents: 100 },
+  ],
+  ['DELETE custo (admin)', r.cost.DELETE as Handler, 'DELETE', () => ({ entryId: 'qualquer' })],
+  [
+    'POST copiar custos (admin)',
+    r.costsCopy.POST as Handler,
+    'POST',
+    () => ({}),
+    { month: '2026-11' },
   ],
 ];
 

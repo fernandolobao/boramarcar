@@ -799,3 +799,13 @@ sem rolagem horizontal em 320px.
   seleção e área de texto tem 16 px (regra global em `globals.css`, fora das camadas do Tailwind).
 - O zoom da página **continua permitido** (sem `maximum-scale` nem `user-scalable=no`, WCAG 1.4.4).
 - E2E `campos-celular.spec.ts` confere o tamanho no projeto de celular.
+
+## Custos da plataforma no `/admin` (26/11/2026)
+
+- Seção com `aria-labelledby`; os números do mês são texto (sem gráfico), e os últimos meses estão
+  numa `<table>` com legenda e `<th scope>`.
+- Formulário com rótulo em todos os campos (seleções do design system, mês com `type="month"`,
+  valores com `inputMode="decimal"`); a cotação tem dica ligada por `aria-describedby`. Erros em
+  `FormError`, confirmações em `role="status"`.
+- "Apagar" em dois cliques, com o serviço e o mês no nome acessível. axe no componente e no E2E do
+  `/admin` (claro/escuro).

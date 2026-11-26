@@ -14,6 +14,7 @@ import { AvailabilityForm, CreateEventFromWindowButton, DeleteButton } from './a
 import { ProductTour } from './home/product-tour';
 import { LanguageSwitcher } from './language-switcher';
 import { AnnouncementsAdmin } from './announcements-admin';
+import { CostsAdmin } from './costs-admin';
 import { AttendanceCard } from './attendance-card';
 import { GuideFinish, GuideHeading, GuideSkip } from './guide-actions';
 import { TitleWithTip } from './tip';
@@ -731,6 +732,34 @@ describe('acessibilidade dos componentes (axe-core)', () => {
               groupName: 'Mesa de Quinta',
               status: 'published',
               publishedAt: '2026-11-17T12:00:00Z',
+            },
+          ]}
+        />,
+      ),
+    ).toEqual([]);
+  });
+
+  it('custos da plataforma (admin) sem violações', async () => {
+    const month = { month: '2026-11', costCents: 16_000, revenueCents: 0, targetCents: 18_824 };
+    expect(
+      await audit(
+        <CostsAdmin
+          usdRate={5.42}
+          summary={{
+            months: [month, { ...month, month: '2026-10', costCents: 0, targetCents: 0 }],
+            current: { ...month, byService: [{ service: 'vercel', costCents: 11_000 }] },
+          }}
+          entries={[
+            {
+              id: 'c1',
+              service: 'vercel',
+              period: 'month',
+              month: '2026-11',
+              currency: 'USD',
+              amountCents: 2_000,
+              usdRate: 5.5,
+              brlCents: 11_000,
+              note: 'Pro',
             },
           ]}
         />,
