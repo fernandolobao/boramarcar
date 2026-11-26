@@ -18,6 +18,8 @@ import { useGroup } from '@/lib/group';
 import { formatMonthYear, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 type Role = Member['role'];
 const ROLE_LABEL: Record<Role, MessageKey> = {
@@ -164,6 +166,7 @@ function MemberRow({
 
 /** Seu grupo (paridade com /grupo do site): convite, membros e locais do grupo ativo. */
 export default function GroupScreen() {
+  const layout = useLayout();
   const { group, groups, loading: loadingGroup, error: groupError, reload } = useGroup();
   const recapMonth = previousMonth(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone);
   const { data: session } = authClient.useSession();
@@ -225,7 +228,7 @@ export default function GroupScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       keyboardShouldPersistTaps="handled"
       refreshControl={
         <RefreshControl refreshing={members.refreshing} onRefresh={() => void refresh()} />
@@ -265,127 +268,143 @@ export default function GroupScreen() {
         </View>
       </Card>
 
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('groupInviteTitle')}
-        </AppText>
-        <AppText muted>{t('groupInviteHint')}</AppText>
-        <AppText selectable accessibilityLabel={`${t('groupInviteLink')}: ${url}`}>
-          {url}
-        </AppText>
-        <AppText accessibilityLabel={`${t('groupInviteCode')}: ${code.split('').join(' ')}`}>
-          {t('groupInviteCode')}:{' '}
-          <AppText style={{ fontWeight: '700', letterSpacing: 2 }}>{code}</AppText>
-        </AppText>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Button label={t('groupShareInvite')} variant="secondary" onPress={share} />
-          {canManage && (
-            <ConfirmButton
-              label={t('groupRegenerate')}
-              confirmLabel={t('groupRegenerateConfirm')}
-              context={group.name}
-              onConfirm={regenerate}
-            />
-          )}
-        </View>
-        <AppText muted accessibilityLiveRegion="polite">
-          {inviteMessage}
-        </AppText>
-      </Card>
-
-      <Card style={{ gap: 4 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('groupMembers')}
-        </AppText>
-        {members.loading ? (
-          <Loading />
-        ) : (
-          (members.data ?? []).map((m) => (
-            <MemberRow
-              key={m.userId}
-              groupId={group.id}
-              member={m}
-              actorId={me}
-              actorRole={group.role}
-              memberCount={members.data?.length ?? 0}
-              onChanged={async (left) => {
-                await reload();
-                if (left) {
-                  if (router.canGoBack()) router.back();
-                  return;
-                }
-                await members.refresh();
-              }}
-            />
-          ))
-        )}
-      </Card>
-
-      {canManage && <AttendanceCard groupId={group.id} viewerId={me} />}
-
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('groupLocations')}
-        </AppText>
-        {locations.error ? (
-          <ErrorState error={locations.error} onRetry={locations.refresh} />
-        ) : (locations.data?.length ?? 0) === 0 ? (
-          <AppText muted>{t('groupNoLocations')}</AppText>
-        ) : (
-          (locations.data ?? []).map((l) => (
-            <View
-              key={l.id}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}
-            >
-              <View style={{ flex: 1 }}>
-                <AppText style={{ fontWeight: '600' }}>{l.name}</AppText>
-                {l.address && <AppText muted>{l.address}</AppText>}
+      {/* Tablet: convite e membros à esquerda; o resto à direita. */}
+      <SplitColumns
+        gap={16}
+        left={
+          <>
+            <Card style={{ gap: 10 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('groupInviteTitle')}
+              </AppText>
+              <AppText muted>{t('groupInviteHint')}</AppText>
+              <AppText selectable accessibilityLabel={`${t('groupInviteLink')}: ${url}`}>
+                {url}
+              </AppText>
+              <AppText accessibilityLabel={`${t('groupInviteCode')}: ${code.split('').join(' ')}`}>
+                {t('groupInviteCode')}:{' '}
+                <AppText style={{ fontWeight: '700', letterSpacing: 2 }}>{code}</AppText>
+              </AppText>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                <Button label={t('groupShareInvite')} variant="secondary" onPress={share} />
+                {canManage && (
+                  <ConfirmButton
+                    label={t('groupRegenerate')}
+                    confirmLabel={t('groupRegenerateConfirm')}
+                    context={group.name}
+                    onConfirm={regenerate}
+                  />
+                )}
               </View>
-              {canManage && (
-                <ConfirmButton
-                  label={t('groupRemoveLocation')}
-                  confirmLabel={t('groupConfirmRemove')}
-                  context={l.name}
-                  onConfirm={async () => {
-                    setLocationMessage('');
-                    try {
-                      await api.locations.remove(group.id, l.id);
-                      await locations.refresh();
-                      setLocationMessage(t('groupLocationRemoved', { name: l.name }));
-                    } catch {
-                      setLocationMessage(t('loadError'));
-                    }
-                  }}
-                />
-              )}
-            </View>
-          ))
-        )}
-        <TextField
-          label={t('groupLocationName')}
-          value={locationName}
-          onChangeText={setLocationName}
-          maxLength={80}
-        />
-        <TextField
-          label={t('groupLocationAddress')}
-          value={locationAddress}
-          onChangeText={setLocationAddress}
-          maxLength={200}
-        />
-        <Button
-          label={busy ? t('groupAddingLocation') : t('groupAddLocation')}
-          variant="secondary"
-          disabled={busy || !locationName.trim()}
-          onPress={() => void addLocation()}
-        />
-        <AppText muted accessibilityLiveRegion="polite">
-          {locationMessage}
-        </AppText>
-      </Card>
+              <AppText muted accessibilityLiveRegion="polite">
+                {inviteMessage}
+              </AppText>
+            </Card>
 
-      <GroupSettingsCard groupId={group.id} canManage={canManage} />
-      <SeasonsCard groupId={group.id} canManage={canManage} />
+            <Card style={{ gap: 4 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('groupMembers')}
+              </AppText>
+              {members.loading ? (
+                <Loading />
+              ) : (
+                (members.data ?? []).map((m) => (
+                  <MemberRow
+                    key={m.userId}
+                    groupId={group.id}
+                    member={m}
+                    actorId={me}
+                    actorRole={group.role}
+                    memberCount={members.data?.length ?? 0}
+                    onChanged={async (left) => {
+                      await reload();
+                      if (left) {
+                        if (router.canGoBack()) router.back();
+                        return;
+                      }
+                      await members.refresh();
+                    }}
+                  />
+                ))
+              )}
+            </Card>
+          </>
+        }
+        right={
+          <>
+            {canManage && <AttendanceCard groupId={group.id} viewerId={me} />}
+
+            <Card style={{ gap: 10 }}>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('groupLocations')}
+              </AppText>
+              {locations.error ? (
+                <ErrorState error={locations.error} onRetry={locations.refresh} />
+              ) : (locations.data?.length ?? 0) === 0 ? (
+                <AppText muted>{t('groupNoLocations')}</AppText>
+              ) : (
+                (locations.data ?? []).map((l) => (
+                  <View
+                    key={l.id}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                      paddingVertical: 4,
+                    }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <AppText style={{ fontWeight: '600' }}>{l.name}</AppText>
+                      {l.address && <AppText muted>{l.address}</AppText>}
+                    </View>
+                    {canManage && (
+                      <ConfirmButton
+                        label={t('groupRemoveLocation')}
+                        confirmLabel={t('groupConfirmRemove')}
+                        context={l.name}
+                        onConfirm={async () => {
+                          setLocationMessage('');
+                          try {
+                            await api.locations.remove(group.id, l.id);
+                            await locations.refresh();
+                            setLocationMessage(t('groupLocationRemoved', { name: l.name }));
+                          } catch {
+                            setLocationMessage(t('loadError'));
+                          }
+                        }}
+                      />
+                    )}
+                  </View>
+                ))
+              )}
+              <TextField
+                label={t('groupLocationName')}
+                value={locationName}
+                onChangeText={setLocationName}
+                maxLength={80}
+              />
+              <TextField
+                label={t('groupLocationAddress')}
+                value={locationAddress}
+                onChangeText={setLocationAddress}
+                maxLength={200}
+              />
+              <Button
+                label={busy ? t('groupAddingLocation') : t('groupAddLocation')}
+                variant="secondary"
+                disabled={busy || !locationName.trim()}
+                onPress={() => void addLocation()}
+              />
+              <AppText muted accessibilityLiveRegion="polite">
+                {locationMessage}
+              </AppText>
+            </Card>
+
+            <GroupSettingsCard groupId={group.id} canManage={canManage} />
+            <SeasonsCard groupId={group.id} canManage={canManage} />
+          </>
+        }
+      />
 
       {groups.length > 0 && (
         <Button

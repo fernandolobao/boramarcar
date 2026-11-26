@@ -16,11 +16,14 @@ import { formatDateTime, t, type MessageKey } from '@/lib/i18n';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
 import { Choices } from '@/components/ds/choices';
+import { SplitColumns } from '@/components/split-columns';
+import { useLayout } from '@/lib/layout';
 
 const RSVP_LABEL: Record<Rsvp, MessageKey> = { yes: 'rsvpYes', maybe: 'rsvpMaybe', no: 'rsvpNo' };
 
 /** Detalhe do encontro: participantes, partidas e a resposta de presença. */
 export default function EventScreen() {
+  const layout = useLayout();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: session } = authClient.useSession();
   const colors = useColors();
@@ -63,7 +66,7 @@ export default function EventScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16, gap: 16 }}
+      contentContainerStyle={[layout.contentStyle, { gap: 16 }]}
       refreshControl={<RefreshControl refreshing={event.refreshing} onRefresh={event.refresh} />}
     >
       <Stack.Screen options={{ title: e.title }} />
@@ -88,138 +91,153 @@ export default function EventScreen() {
         </View>
       </View>
 
-      {e.status === 'scheduled' && (
-        <Card>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {t('rsvpTitle')}
-          </AppText>
-          <Choices
-            label={t('rsvpTitle')}
-            hideLabel
-            value={mine ?? null}
-            disabled={saving}
-            onChange={(value) => void answer(value)}
-            options={(['yes', 'maybe', 'no'] as const).map((value) => ({
-              value,
-              label: t(RSVP_LABEL[value]),
-            }))}
-          />
-          <AppText muted accessibilityLiveRegion="polite">
-            {message}
-          </AppText>
-        </Card>
-      )}
-      {offerPush && <PushOffer onClose={() => setOfferPush(false)} />}
-
-      {e.status !== 'cancelled' && (
-        <Card style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {t('gameRecord')}
-          </AppText>
-          <AppText muted>{t('tableOpenHint')}</AppText>
-          <Button
-            label={t('tableOpen')}
-            onPress={() => router.push({ pathname: '/mesa/[id]', params: { id: e.id } })}
-          />
-          <AppText muted>{t('gameRecordHint')}</AppText>
-          <Button
-            label={t('gameRecord')}
-            variant="secondary"
-            onPress={() =>
-              router.push({ pathname: '/partida/[eventId]', params: { eventId: e.id } })
-            }
-          />
-        </Card>
-      )}
-
-      {/* Organizador: finalizar depois do início (manda o resumo da noite). */}
-      {e.canManage && e.status === 'scheduled' && e.startsAt.getTime() <= Date.now() && (
-        <FinishEvent event={e} onDone={() => void event.refresh()} />
-      )}
-      {/* Torneio neste encontro (9.1): quem organiza cria; a lista fica em Grupo → Torneios. */}
-      {e.canManage && e.status !== 'cancelled' && (
-        <Button
-          label={t('tourCreateHere')}
-          variant="secondary"
-          onPress={() => router.push({ pathname: '/torneios/novo', params: { encontro: e.id } })}
-          style={{ alignSelf: 'flex-start' }}
-        />
-      )}
-      {e.canManage && (
-        <EventManage key={e.id + e.status} event={e} onDone={() => void event.refresh()} />
-      )}
-      {e.status === 'finished' && e.games.length > 0 && <EventRecap event={e} />}
-
-      <Card>
-        <AppText accessibilityRole="header" style={styles.sectionTitle}>
-          {t('participants')}
-        </AppText>
-        {e.participants.map((p) => (
-          <AppText key={p.userId}>
-            {p.name} · {t(RSVP_LABEL[p.rsvp])}
-          </AppText>
-        ))}
-      </Card>
-
-      {e.status === 'scheduled' && (
-        <TableSuggestions
-          eventId={e.id}
-          confirmed={e.participants.filter((p) => p.rsvp === 'yes').length}
-        />
-      )}
-
-      {e.games.length > 0 && (
-        <Card>
-          <AppText accessibilityRole="header" style={styles.sectionTitle}>
-            {t('games')}
-          </AppText>
-          {e.games.map((g) => (
-            <View key={g.id} style={{ gap: 6 }}>
-              <AppText style={{ fontWeight: '600' }}>{t('game', { number: g.number })}</AppText>
-              <AppText muted>
-                {g.isDraw
-                  ? t('draw')
-                  : t('winner', { names: g.winners.map((w) => w.name).join(', ') })}
-              </AppText>
-              {g.canEdit && (
-                <Button
-                  label={t('gameEdit')}
-                  variant="secondary"
-                  accessibilityLabel={`${t('gameEdit')}: ${t('game', { number: g.number })}`}
-                  onPress={() =>
-                    router.push({
-                      pathname: '/partida/[eventId]',
-                      params: { eventId: e.id, gameId: g.id },
-                    })
-                  }
-                  style={{ alignSelf: 'flex-start' }}
+      {/* Tablet: ações à esquerda; participantes, mesas e partidas à direita. */}
+      <SplitColumns
+        gap={16}
+        left={
+          <>
+            {e.status === 'scheduled' && (
+              <Card>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                  {t('rsvpTitle')}
+                </AppText>
+                <Choices
+                  label={t('rsvpTitle')}
+                  hideLabel
+                  value={mine ?? null}
+                  disabled={saving}
+                  onChange={(value) => void answer(value)}
+                  options={(['yes', 'maybe', 'no'] as const).map((value) => ({
+                    value,
+                    label: t(RSVP_LABEL[value]),
+                  }))}
                 />
-              )}
-              {e.canManage && (
-                <View style={{ alignSelf: 'flex-start' }}>
-                  <ConfirmButton
-                    label={t('gameRemove')}
-                    confirmLabel={t('gameRemoveConfirm')}
-                    context={t('game', { number: g.number })}
-                    onConfirm={async () => {
-                      try {
-                        await api.games.remove(g.id);
-                        setMessage(t('gameRemoved', { number: g.number }));
-                        await event.refresh();
-                      } catch {
-                        setMessage(t('loadError'));
-                      }
-                    }}
-                  />
-                </View>
-              )}
-            </View>
-          ))}
-          <AppText muted accessibilityLiveRegion="polite">
-            {message}
-          </AppText>
-        </Card>
-      )}
+                <AppText muted accessibilityLiveRegion="polite">
+                  {message}
+                </AppText>
+              </Card>
+            )}
+            {offerPush && <PushOffer onClose={() => setOfferPush(false)} />}
+
+            {e.status !== 'cancelled' && (
+              <Card style={{ gap: 10 }}>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                  {t('gameRecord')}
+                </AppText>
+                <AppText muted>{t('tableOpenHint')}</AppText>
+                <Button
+                  label={t('tableOpen')}
+                  onPress={() => router.push({ pathname: '/mesa/[id]', params: { id: e.id } })}
+                />
+                <AppText muted>{t('gameRecordHint')}</AppText>
+                <Button
+                  label={t('gameRecord')}
+                  variant="secondary"
+                  onPress={() =>
+                    router.push({ pathname: '/partida/[eventId]', params: { eventId: e.id } })
+                  }
+                />
+              </Card>
+            )}
+
+            {/* Organizador: finalizar depois do início (manda o resumo da noite). */}
+            {e.canManage && e.status === 'scheduled' && e.startsAt.getTime() <= Date.now() && (
+              <FinishEvent event={e} onDone={() => void event.refresh()} />
+            )}
+            {/* Torneio neste encontro (9.1): quem organiza cria; a lista fica em Grupo → Torneios. */}
+            {e.canManage && e.status !== 'cancelled' && (
+              <Button
+                label={t('tourCreateHere')}
+                variant="secondary"
+                onPress={() =>
+                  router.push({ pathname: '/torneios/novo', params: { encontro: e.id } })
+                }
+                style={{ alignSelf: 'flex-start' }}
+              />
+            )}
+            {e.canManage && (
+              <EventManage key={e.id + e.status} event={e} onDone={() => void event.refresh()} />
+            )}
+            {e.status === 'finished' && e.games.length > 0 && <EventRecap event={e} />}
+          </>
+        }
+        right={
+          <>
+            <Card>
+              <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                {t('participants')}
+              </AppText>
+              {e.participants.map((p) => (
+                <AppText key={p.userId}>
+                  {p.name} · {t(RSVP_LABEL[p.rsvp])}
+                </AppText>
+              ))}
+            </Card>
+
+            {e.status === 'scheduled' && (
+              <TableSuggestions
+                eventId={e.id}
+                confirmed={e.participants.filter((p) => p.rsvp === 'yes').length}
+              />
+            )}
+
+            {e.games.length > 0 && (
+              <Card>
+                <AppText accessibilityRole="header" style={styles.sectionTitle}>
+                  {t('games')}
+                </AppText>
+                {e.games.map((g) => (
+                  <View key={g.id} style={{ gap: 6 }}>
+                    <AppText style={{ fontWeight: '600' }}>
+                      {t('game', { number: g.number })}
+                    </AppText>
+                    <AppText muted>
+                      {g.isDraw
+                        ? t('draw')
+                        : t('winner', { names: g.winners.map((w) => w.name).join(', ') })}
+                    </AppText>
+                    {g.canEdit && (
+                      <Button
+                        label={t('gameEdit')}
+                        variant="secondary"
+                        accessibilityLabel={`${t('gameEdit')}: ${t('game', { number: g.number })}`}
+                        onPress={() =>
+                          router.push({
+                            pathname: '/partida/[eventId]',
+                            params: { eventId: e.id, gameId: g.id },
+                          })
+                        }
+                        style={{ alignSelf: 'flex-start' }}
+                      />
+                    )}
+                    {e.canManage && (
+                      <View style={{ alignSelf: 'flex-start' }}>
+                        <ConfirmButton
+                          label={t('gameRemove')}
+                          confirmLabel={t('gameRemoveConfirm')}
+                          context={t('game', { number: g.number })}
+                          onConfirm={async () => {
+                            try {
+                              await api.games.remove(g.id);
+                              setMessage(t('gameRemoved', { number: g.number }));
+                              await event.refresh();
+                            } catch {
+                              setMessage(t('loadError'));
+                            }
+                          }}
+                        />
+                      </View>
+                    )}
+                  </View>
+                ))}
+                <AppText muted accessibilityLiveRegion="polite">
+                  {message}
+                </AppText>
+              </Card>
+            )}
+          </>
+        }
+      />
     </ScrollView>
   );
 }

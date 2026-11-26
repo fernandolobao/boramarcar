@@ -6,6 +6,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { AppText, Card, styles } from '@/components/ui';
 import { fonts } from '@/lib/fonts';
+import { useLayout } from '@/lib/layout';
 import { formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { EmptyState } from '@/components/empty-state';
@@ -218,9 +219,17 @@ function Tile({
   detail?: string;
   ring?: number;
 }) {
+  const { wide } = useLayout();
   return (
     <Card
-      style={{ flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}
+      style={{
+        // Celular: 2 por linha; tablet: os 4 numa linha (como no site em telas largas).
+        flexBasis: wide ? '22%' : '47%',
+        flexGrow: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+      }}
       accessible
       accessibilityLabel={[label, value, detail].filter(Boolean).join(', ')}
     >
