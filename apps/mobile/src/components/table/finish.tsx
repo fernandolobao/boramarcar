@@ -75,7 +75,7 @@ export function TableFinishScreen({
         {t('tableFinishTitle')}
       </AppText>
       <Card>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={ui.sectionTitle}>
           {t('tableWinner')}
         </AppText>
         <AppText muted>{t('tableWinnerHint')}</AppText>
@@ -102,7 +102,7 @@ export function TableFinishScreen({
       </Card>
 
       <Card>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={ui.sectionTitle}>
           {t('tableFirstPlayer')}
         </AppText>
         <Choices
@@ -119,7 +119,7 @@ export function TableFinishScreen({
       </Card>
 
       <Card>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={ui.sectionTitle}>
           {t('tableWinningTurn')}
         </AppText>
         <TextInput

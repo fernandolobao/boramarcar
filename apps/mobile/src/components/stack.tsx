@@ -212,7 +212,7 @@ export function StackSection({
         report?.(index, { y, height });
       }}
     >
-      <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {title}
       </AppText>
       <Animated.View style={[{ gap: 8 }, bodyStyle]}>{children}</Animated.View>

@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { AppText, Button, Card, ErrorState, Loading } from '@/components/ui';
+import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { deviceTimeZone } from '@/lib/dates';
 import { t } from '@/lib/i18n';
@@ -56,7 +56,7 @@ export default function SettingsScreen() {
       <AppText muted>{t('settingsIntro')}</AppText>
 
       <Card style={{ gap: 8 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('settingsTimeZone')}
         </AppText>
         <AppText accessibilityLabel={`${t('settingsTimeZone')}: ${timeZone}`}>{timeZone}</AppText>
@@ -71,7 +71,7 @@ export default function SettingsScreen() {
       </Card>
 
       <Card style={{ gap: 8 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('settingsLanguage')}
         </AppText>
         <AppText muted>{t('settingsLanguageHint')}</AppText>

@@ -56,7 +56,7 @@ export function NoGroup({
       </AppText>
       <AppText muted>{t('noGroupIntro')}</AppText>
       <Card style={{ gap: 12 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('groupJoinTitle')}
         </AppText>
         <TextField
@@ -80,7 +80,7 @@ export function NoGroup({
         )}
       </Card>
       <Card style={{ gap: 12 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('groupCreateTitle')}
         </AppText>
         <TextField

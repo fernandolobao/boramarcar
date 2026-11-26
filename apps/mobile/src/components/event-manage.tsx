@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Share, View } from 'react-native';
 import { ConfirmButton } from '@/components/confirm-button';
 import { TextField, TimeStepper } from '@/components/fields';
-import { AppText, Button, Card } from '@/components/ui';
+import { AppText, Button, Card, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { deviceTimeZone, localDate, nextDays, rangeLabel } from '@/lib/dates';
@@ -98,7 +98,7 @@ export function EventManage({ event, onDone }: { event: EventDetail; onDone: () 
 
   return (
     <Card style={{ gap: 12 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('eventManage')}
       </AppText>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>

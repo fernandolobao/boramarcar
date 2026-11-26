@@ -23,7 +23,7 @@ export default function AccountScreen() {
       </Card>
       {session?.user && (
         <Card>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('avatarTitle')}
           </AppText>
           <AvatarPicker

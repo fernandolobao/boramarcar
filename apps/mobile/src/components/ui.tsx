@@ -13,6 +13,7 @@ import {
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Icon, type IconName } from '@/components/icons';
+import { fonts } from '@/lib/fonts';
 
 /** Texto com a cor do tema; `muted` para texto secundário (contraste AA). */
 export function AppText({ muted, style, ...props }: TextProps & { muted?: boolean }) {
@@ -125,7 +126,10 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => 
 
 export const styles = StyleSheet.create({
   text: { fontSize: 16 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
+  /** Título da página (Fraunces, como `page-title` no site). */
+  title: { fontSize: 26, fontFamily: fonts.display, marginBottom: 12 },
+  /** Título de seção (Fraunces, como `section-title` no site). */
+  sectionTitle: { fontSize: 19, fontFamily: fonts.display },
   card: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 6 },
   button: {
     minHeight: 44,

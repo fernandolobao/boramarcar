@@ -112,7 +112,7 @@ export default function StoreEventScreen() {
 
       {event.prizes ? (
         <Card style={{ gap: 6 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('storeEvPrizes')}
           </AppText>
           <AppText>{event.prizes}</AppText>
@@ -120,7 +120,7 @@ export default function StoreEventScreen() {
       ) : null}
       {event.rules ? (
         <Card style={{ gap: 6 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('storeEvRules')}
           </AppText>
           <AppText>{event.rules}</AppText>

@@ -6,7 +6,7 @@ import { Aura } from '@/components/aura';
 import { BetaBanner } from '@/components/beta-banner';
 import { NewAchievements } from '@/components/new-achievements';
 import { NoGroup } from '@/components/no-group';
-import { AppText, Button, Card, ErrorState, Loading } from '@/components/ui';
+import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
 import { useGroup } from '@/lib/group';
@@ -19,7 +19,7 @@ function Windows({ windows }: { windows: GameWindow[] | null }) {
   const top = windows?.slice(0, 3) ?? [];
   return (
     <Card style={{ gap: 8 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('dashBestWindows')}
       </AppText>
       {top.length === 0 ? (
@@ -48,7 +48,7 @@ function Commanders({ stats }: { stats: GroupStats | null }) {
   const top = stats?.commanders.slice(0, 4) ?? [];
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('dashHotCommanders')}
       </AppText>
       {top.length === 0 ? (
@@ -91,7 +91,7 @@ function Partners({ hints }: { hints: PartnerHint[] | null }) {
   if (!hints || hints.length === 0) return null;
   return (
     <Card style={{ gap: 8 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('partnersTitle')}
       </AppText>
       <AppText muted>{t('partnersHint')}</AppText>
@@ -150,7 +150,7 @@ function Rivalries({ stats, userId }: { stats: GroupStats | null; userId: string
   ].filter((x): x is { id: string; text: string } => x !== null);
   return (
     <Card style={{ gap: 8 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('rivalriesTitle')}
       </AppText>
       <AppText muted>{t('rivalriesHint')}</AppText>
@@ -250,7 +250,7 @@ export default function DashboardScreen() {
           userId={userId}
         />
         <BetaBanner groupId={group.id} />
-        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 20 }}>
+        <AppText accessibilityRole="header" style={[styles.sectionTitle, { fontSize: 21 }]}>
           {t('dashYourNumbers')}
         </AppText>
         <NumberTiles
@@ -267,7 +267,7 @@ export default function DashboardScreen() {
         <Commanders stats={stats.data} />
         {upcoming.length > 1 && (
           <Card style={{ gap: 8 }}>
-            <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+            <AppText accessibilityRole="header" style={styles.sectionTitle}>
               {t('dashMoreEvents')}
             </AppText>
             {upcoming.slice(1, 4).map((e) => (

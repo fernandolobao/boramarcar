@@ -6,6 +6,7 @@ import { authClient } from '@/lib/auth';
 import { GroupProvider, takePendingInvite } from '@/lib/group';
 import { t } from '@/lib/i18n';
 import { usePushNotifications } from '@/lib/push';
+import { useBrandFonts } from '@/lib/fonts';
 import { useColors } from '@/lib/theme';
 import { Loading } from '@/components/ui';
 import { initSentry, Sentry } from '@/lib/sentry';
@@ -49,7 +50,9 @@ function PendingInvite() {
 function RootLayout() {
   const { data: session, isPending } = authClient.useSession();
   const colors = useColors();
-  if (isPending) return <Loading />;
+  // Fonte dos títulos (Fraunces): empacotada, carrega na hora; com erro, segue com a do sistema.
+  const fontsReady = useBrandFonts();
+  if (isPending || !fontsReady) return <Loading />;
   const signedIn = Boolean(session);
   const content = (
     <Stack

@@ -73,7 +73,7 @@ export default function AvailabilityScreen() {
       )}
 
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('availWindows')}
         </AppText>
         {windows.length === 0 ? (
@@ -127,7 +127,7 @@ export default function AvailabilityScreen() {
       />
 
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('availMyRules')}
         </AppText>
         {myRules.length === 0 ? (
@@ -176,7 +176,7 @@ export default function AvailabilityScreen() {
       </Card>
 
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('availEveryone')}
         </AppText>
         {slots.length === 0 ? (

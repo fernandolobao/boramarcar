@@ -2,7 +2,7 @@ import type { Location } from '@boramarcar/api-client';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { TextField, TimeStepper } from '@/components/fields';
-import { AppText, Button, Card } from '@/components/ui';
+import { AppText, Button, Card, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { deviceTimeZone, nextDays, slotRange, WEEKDAY_ORDER, weekdayName } from '@/lib/dates';
 import { t } from '@/lib/i18n';
@@ -83,7 +83,7 @@ export function AddAvailability({
 
   return (
     <Card style={{ gap: 14 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('availAdd')}
       </AppText>
 

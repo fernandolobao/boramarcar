@@ -7,7 +7,7 @@ import { View } from 'react-native';
 import { ConfirmButton } from '@/components/confirm-button';
 import { TextField } from '@/components/fields';
 import { formatLabel } from '@/components/table/labels';
-import { AppText, Button, Card, Loading } from '@/components/ui';
+import { AppText, Button, Card, Loading, styles } from '@/components/ui';
 import { api } from '@/lib/api';
 import { addDays, deviceTimeZone, localDate } from '@/lib/dates';
 import { formatDateMedium, t } from '@/lib/i18n';
@@ -38,7 +38,7 @@ export function GroupSettingsCard({ groupId, canManage }: { groupId: string; can
 
   return (
     <Card style={{ gap: 12 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('groupSettingsTitle')}
       </AppText>
       {!canManage && <AppText muted>{t('groupSettingsReadOnly')}</AppText>}
@@ -161,7 +161,7 @@ export function SeasonsCard({ groupId, canManage }: { groupId: string; canManage
 
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('seasonsTitle')}
       </AppText>
       <AppText muted>{t('seasonsHint')}</AppText>

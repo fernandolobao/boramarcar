@@ -22,7 +22,7 @@ const FORMATS = GAME_FORMATS.filter(tableSupportsFormat);
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Card>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={ui.sectionTitle}>
         {title}
       </AppText>
       {children}

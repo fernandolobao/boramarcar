@@ -90,7 +90,7 @@ export default function EventScreen() {
 
       {e.status === 'scheduled' && (
         <Card>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('rsvpTitle')}
           </AppText>
           <Choices
@@ -113,7 +113,7 @@ export default function EventScreen() {
 
       {e.status !== 'cancelled' && (
         <Card style={{ gap: 10 }}>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('gameRecord')}
           </AppText>
           <AppText muted>{t('tableOpenHint')}</AppText>
@@ -151,7 +151,7 @@ export default function EventScreen() {
       {e.status === 'finished' && e.games.length > 0 && <EventRecap event={e} />}
 
       <Card>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('participants')}
         </AppText>
         {e.participants.map((p) => (
@@ -170,7 +170,7 @@ export default function EventScreen() {
 
       {e.games.length > 0 && (
         <Card>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('games')}
           </AppText>
           {e.games.map((g) => (

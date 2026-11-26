@@ -53,7 +53,7 @@ function Achievements({ achievements }: { achievements: readonly Achievement[] }
   const shown = tab === 'pending' ? pending : done;
   return (
     <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+      <AppText accessibilityRole="header" style={styles.sectionTitle}>
         {t('achievementsTitle')}
       </AppText>
       <AppText muted>
@@ -187,7 +187,7 @@ export default function PlayerScreen() {
       </View>
 
       <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('profileSummary')}
         </AppText>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -225,7 +225,7 @@ export default function PlayerScreen() {
       <Achievements achievements={p.achievements} />
 
       <View style={{ gap: 8 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 18 }}>
+        <AppText accessibilityRole="header" style={styles.sectionTitle}>
           {t('profileDecks')}
         </AppText>
         {p.decks.length === 0 ? (

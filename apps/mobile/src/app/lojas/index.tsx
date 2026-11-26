@@ -119,7 +119,7 @@ export default function DiscoveryScreen() {
         <AppText muted>{t('discPickCity')}</AppText>
       ) : (
         <>
-          <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('discEvents')}
           </AppText>
           {data.events.length === 0 ? (
@@ -156,7 +156,7 @@ export default function DiscoveryScreen() {
             ))
           )}
 
-          <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 17 }}>
+          <AppText accessibilityRole="header" style={styles.sectionTitle}>
             {t('discStores')}
           </AppText>
           {data.stores.length === 0 ? (
