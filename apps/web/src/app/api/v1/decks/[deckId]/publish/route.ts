@@ -2,6 +2,7 @@ import { DECK_BOARDS, DECK_VISIBILITIES } from '@boramarcar/core';
 import { publishDeck } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
+import { track } from '@/server/activity';
 
 const schema = z.object({
   /** Por carta com cópias livres na coleção: usar uma delas (`use`) ou entrar como nova (`null`). */
@@ -26,7 +27,12 @@ export const POST = authed<{ deckId: string }>(async ({ req, db, user, params })
   const { choices, visibility } = hasBody
     ? await parseJson(req, schema)
     : { choices: [], visibility: undefined };
-  return {
-    deck: await publishDeck(db, { deckId: params.deckId, userId: user.id, choices, visibility }),
-  };
+  const deck = await publishDeck(db, {
+    deckId: params.deckId,
+    userId: user.id,
+    choices,
+    visibility,
+  });
+  track({ userId: user.id, kind: 'deck_published', targetId: params.deckId });
+  return { deck };
 });

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
 import { notifyNewWindows } from '@/server/notify';
 import { runAfterResponse } from '@/server/background';
+import { track } from '@/server/activity';
 
 export const GET = authed<{ groupId: string }>(async ({ db, user, params }) => ({
   rules: await listAvailabilityRules(db, { groupId: params.groupId, userId: user.id }),
@@ -35,6 +36,7 @@ export const POST = authed<{ groupId: string }>(
       );
     }
     runAfterResponse(() => notifyNewWindows(db, { groupId: params.groupId, actorId: user.id }));
+    track({ userId: user.id, kind: 'availability_changed', groupId: params.groupId });
     return { rules };
   },
   { status: 201 },

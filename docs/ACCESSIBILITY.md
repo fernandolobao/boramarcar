@@ -815,3 +815,11 @@ sem rolagem horizontal em 320px.
 - Decorativo e escondido dos leitores de tela; o "Foil" já está no nome da carta e no selo.
 - Com "reduzir movimento" ligado no aparelho (`AccessibilityInfo`), a faixa fica parada.
 - Sem piscar: um movimento lento (9–13 s por volta) e uma variação de opacidade suave (75–100%).
+
+## Admin em abas e aba "Atividade" (26/11/2026)
+
+- Abas no padrão ARIA (React Aria `PillTabs`), com a aba no endereço (`?aba=`); axe em cada aba.
+- Filtros da atividade num formulário GET comum (funciona sem JavaScript): rótulos em todos os campos,
+  `select` nativo com a classe `select`, botões "Filtrar" e "Limpar filtros" com texto.
+- Lista com nome (`aria-label`), horário em `<time>`, paginação num `<nav>` com nome; vazio com o
+  `EmptyState`.

@@ -645,6 +645,36 @@ export const announcements = pgTable('announcements', {
 });
 
 /**
+ * Registro de atividade (aba "Atividade" do Admin): uma linha por pessoa × ação × alvo × hora,
+ * com a contagem (ex.: "adicionou 37 cartas"). 90 dias; sai com a conta (LGPD). Sem IP.
+ */
+export const activityLog = pgTable(
+  'activity_log',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    groupId: text('group_id').references(() => groups.id, { onDelete: 'set null' }),
+    kind: text('kind').notNull(),
+    /** Deck, encontro, grupo… (vazio quando a ação não tem alvo, ex.: entrar). */
+    targetId: text('target_id').notNull().default(''),
+    /** Nome legível do alvo (ex.: nome do deck), o mais recente da hora. */
+    label: text('label'),
+    count: integer('count').notNull().default(1),
+    /** Hora cheia (UTC): a chave do agrupamento. */
+    bucket: timestamp('bucket', { withTimezone: true }).notNull(),
+    firstAt: timestamp('first_at', { withTimezone: true }).notNull(),
+    lastAt: timestamp('last_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    uniqueIndex('activity_log_key').on(t.userId, t.kind, t.targetId, t.bucket),
+    index('activity_log_last_at_idx').on(t.lastAt),
+    index('activity_log_group_idx').on(t.groupId),
+  ],
+);
+
+/**
  * Custos da plataforma (13.1), lançados por admins no `/admin`. Em dólar, guarda a cotação usada e
  * o valor em reais na hora do lançamento. `year`/`once` são divididos por 12 a partir de `month`.
  */

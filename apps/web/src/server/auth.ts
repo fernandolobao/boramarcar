@@ -13,6 +13,8 @@ import { sendResetPasswordEmail, sendVerificationEmail } from './auth-emails';
 import { GOOGLE_SIGN_IN_OPTIONS, syncGoogleProfileImage } from './google-picture';
 import { allowedSignUpImage, cleanUserName } from './user-fields';
 import { hashedKey } from './limits';
+import { track } from './activity';
+import { loginPlatform } from '@boramarcar/core';
 
 function createAuth() {
   const env = getEnv();
@@ -106,6 +108,18 @@ function createAuth() {
               image: allowedSignUpImage(user.image),
             },
           }),
+        },
+      },
+      session: {
+        // Registro de atividade (Admin): cada entrada, só "site" ou "app" (sem IP nem navegador).
+        create: {
+          after: async (session) => {
+            track({
+              userId: session.userId,
+              kind: 'login',
+              label: loginPlatform(session.userAgent),
+            });
+          },
         },
       },
       account: {

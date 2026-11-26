@@ -9,6 +9,7 @@ import {
   decks,
   eventNudges,
   notifications,
+  activityLog,
   adminAccessLog,
   storeMembers,
   stores,
@@ -235,6 +236,19 @@ export async function exportUserData(db: Database, userId: string) {
     .where(eq(adminAccessLog.targetUserId, userId))
     .orderBy(asc(adminAccessLog.createdAt));
 
+  // Registro de atividade (Admin, 90 dias): ação, alvo, contagem e hora.
+  const activity = await db
+    .select({
+      kind: activityLog.kind,
+      label: activityLog.label,
+      count: activityLog.count,
+      firstAt: activityLog.firstAt,
+      lastAt: activityLog.lastAt,
+    })
+    .from(activityLog)
+    .where(eq(activityLog.userId, userId))
+    .orderBy(asc(activityLog.firstAt));
+
   // Torneios em que a pessoa se inscreveu (sem quem mais entrou: dado de outras pessoas).
   const tournamentRows = await db
     .select({
@@ -295,6 +309,7 @@ export async function exportUserData(db: Database, userId: string) {
     invitations,
     notifications: inbox,
     adminAccess,
+    activity,
     tournaments: tournamentRows,
     storeMemberships,
     storeEventEntries: storeEventRows,
@@ -374,6 +389,7 @@ export async function deleteUserAccount(db: Database, userId: string, now = new 
     await tx.delete(eventNudges).where(eq(eventNudges.userId, userId));
     await tx.delete(notifications).where(eq(notifications.userId, userId));
     await tx.delete(adminAccessLog).where(eq(adminAccessLog.targetUserId, userId));
+    await tx.delete(activityLog).where(eq(activityLog.userId, userId));
     await tx.delete(storeMembers).where(eq(storeMembers.userId, userId));
     await tx.delete(storeEventEntries).where(eq(storeEventEntries.userId, userId));
     await tx.update(eventNudges).set({ sentBy: null }).where(eq(eventNudges.sentBy, userId));

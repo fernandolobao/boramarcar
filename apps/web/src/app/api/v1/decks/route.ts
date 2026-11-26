@@ -6,6 +6,7 @@ import { refreshDeckAnalysis } from '@/server/deck-analysis';
 import { importDeck, resolveCardByName } from '@/server/deck-import';
 import { authed, parseJson } from '@/server/http';
 import { rateLimit } from '@/server/limits';
+import { track } from '@/server/activity';
 
 export const GET = authed(async ({ db, user }) => {
   const decks = await listDecks(db, user.id);
@@ -78,6 +79,7 @@ export const POST = authed(
         commander,
         draft: body.draft,
       });
+      track({ userId: user.id, kind: 'deck_created', targetId: deck.id, label: deck.name });
       return { deck, notFound: [] };
     }
     const { format, draft, ...input } = body;
@@ -85,6 +87,7 @@ export const POST = authed(
     const result = await importDeck(db, user.id, input, fetch, format, { draft });
     // Tagger e Spellbook em segundo plano: a importação não espera por eles.
     runAfterResponse(() => refreshDeckAnalysis(db, { deckId: result.deck.id, viewerId: user.id }));
+    track({ userId: user.id, kind: 'deck_imported', targetId: result.deck.id });
     return result;
   },
   { status: 201 },

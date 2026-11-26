@@ -2,6 +2,7 @@ import { DECK_BOARDS } from '@boramarcar/core';
 import { moveDeckCard } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
+import { track } from '@/server/activity';
 
 const schema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -16,5 +17,7 @@ const schema = z.object({
  */
 export const POST = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, schema);
-  return moveDeckCard(db, { ...body, deckId: params.deckId, userId: user.id });
+  const moved = await moveDeckCard(db, { ...body, deckId: params.deckId, userId: user.id });
+  track({ userId: user.id, kind: 'deck_updated', targetId: params.deckId });
+  return moved;
 });

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { resolveCardById, resolveCardByName, resolveDefaultCardByName } from '@/server/deck-import';
 import { authed, parseJson, scryfallIdSchema } from '@/server/http';
 import { rateLimit } from '@/server/limits';
+import { track } from '@/server/activity';
 
 const schema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -31,6 +32,7 @@ export const PUT = authed<{ deckId: string }>(async ({ req, db, user, params }) 
         ? await resolveCardById(db, body.scryfallId)
         : await resolveCardByName(db, body.name);
   const line = await setDeckLine(db, { ...body, card, deckId: params.deckId, userId: user.id });
+  track({ userId: user.id, kind: 'deck_updated', targetId: params.deckId });
   return { line, found: body.quantity === 0 || card !== null };
 });
 
@@ -51,5 +53,6 @@ export const POST = authed<{ deckId: string }>(async ({ req, db, user, params })
   await rateLimit(db, user.id, 'search');
   const card = await resolveDefaultCardByName(db, body.name);
   const line = await addDeckCopies(db, { ...body, card, deckId: params.deckId, userId: user.id });
+  track({ userId: user.id, kind: 'deck_updated', targetId: params.deckId });
   return { line, found: card !== null };
 });

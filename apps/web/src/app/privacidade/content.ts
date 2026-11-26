@@ -21,7 +21,7 @@ export interface PrivacyPolicy {
   sections: PolicySection[];
 }
 
-export const PRIVACY_UPDATED = '2026-11-20';
+export const PRIVACY_UPDATED = '2026-11-26';
 
 export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
   'pt-BR': {
@@ -49,6 +49,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
           'Lojas que você segue: quais e desde quando, para mandar no sino (e no celular, se você ligou os avisos) os eventos novos e os avisos delas. A loja vê só quantas pessoas a seguem, nunca quem. Você deixa de seguir quando quiser, e a lista sai com a exportação e é apagada com a conta.',
           'Foto do perfil que você envia (e o logo da loja, enviado pela equipe dela): guardamos só uma cópia quadrada e reduzida, sem a localização e os outros dados do arquivo (câmera, data). Você troca ou remove quando quiser, e ela é apagada junto com a conta.',
           'Feedback que você envia pelo site ou pelo app: o texto, o tipo, a página de onde veio e a plataforma, junto com a sua conta.',
+          'Registro de atividade: as ações principais que você faz (entrar, criar ou editar decks, adicionar cartas à coleção, mudar a disponibilidade, criar encontros, responder presença, registrar partidas, criar ou entrar em grupos), agrupadas por hora e com a contagem (ex.: "adicionou 37 cartas"), sem IP e sem o conteúdo (só o nome do deck). Serve para suporte e segurança, só a equipe do ArcanaKin vê, fica 90 dias, sai na exportação e é apagado com a conta.',
           'Dados técnicos: cookies de sessão, endereço IP e registros de acesso mantidos pelo provedor de hospedagem, métricas de uso agregadas do Vercel Analytics (sem cookies e sem identificar você) e, quando algo dá errado, o registro do erro no Sentry, sem nome nem e-mail.',
           'Só com o seu consentimento: gravação de como as telas são usadas (cliques, rolagem, navegação e mapas de calor) pelo Hotjar (Contentsquare). O que você digita em campos de formulário não é gravado, e o seu e-mail é mascarado na tela.',
         ],
@@ -184,6 +185,7 @@ export const PRIVACY_POLICY: Record<'pt-BR' | 'en', PrivacyPolicy> = {
           'Stores you follow: which ones and since when, to send their new events and notices to your bell (and phone, if you turned notifications on). A store only sees how many people follow it, never who. You can unfollow anytime, and the list is included in your data export and deleted with your account.',
           'A profile photo you upload (and a store’s logo, uploaded by its team): we keep only a reduced square copy, without the location and other file data (camera, date). You can change or remove it anytime, and it is deleted with your account.',
           'Feedback you send from the website or the app: the text, the type, the page you came from and the platform, with your account.',
+          'Activity log: the main actions you take (signing in, creating or editing decks, adding cards to your collection, changing availability, creating meetups, answering RSVPs, recording games, creating or joining groups), grouped by hour with a count (e.g. "added 37 cards"), with no IP and no content (only the deck name). It is used for support and security, only the ArcanaKin team sees it, it is kept for 90 days, it is included in your data export and deleted with your account.',
           'Technical data: session cookies, IP address and access logs kept by the hosting provider, aggregated usage metrics from Vercel Analytics (no cookies, doesn’t identify you) and, when something goes wrong, the error log in Sentry, without name or e-mail.',
           'Only with your consent: recordings of how screens are used (clicks, scrolling, navigation and heatmaps) by Hotjar (Contentsquare). What you type in form fields isn’t recorded, and your e-mail is masked on screen.',
         ],

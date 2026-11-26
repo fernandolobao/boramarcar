@@ -1,6 +1,7 @@
 import { setRuleException } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
+import { track } from '@/server/activity';
 
 const schema = z.object({ date: z.string(), skip: z.boolean() });
 
@@ -8,5 +9,6 @@ const schema = z.object({ date: z.string(), skip: z.boolean() });
 export const PUT = authed<{ ruleId: string }>(async ({ req, db, user, params }) => {
   const body = await parseJson(req, schema);
   await setRuleException(db, { ...body, ruleId: params.ruleId, userId: user.id });
+  track({ userId: user.id, kind: 'availability_changed' });
   return body;
 });
