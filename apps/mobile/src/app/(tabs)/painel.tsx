@@ -1,10 +1,4 @@
-import type {
-  EventSummary,
-  GameWindow,
-  GroupStats,
-  PartnerHint,
-  Ranking,
-} from '@boramarcar/api-client';
+import type { GameWindow, GroupStats, PartnerHint } from '@boramarcar/api-client';
 import { isNewMember, rivalriesFor } from '@boramarcar/core/integration';
 import { Link, router } from 'expo-router';
 import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
@@ -12,148 +6,14 @@ import { Aura } from '@/components/aura';
 import { BetaBanner } from '@/components/beta-banner';
 import { NewAchievements } from '@/components/new-achievements';
 import { NoGroup } from '@/components/no-group';
-import { AppText, Button, Card, ErrorState, Loading, styles } from '@/components/ui';
+import { AppText, Button, Card, ErrorState, Loading } from '@/components/ui';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
 import { useGroup } from '@/lib/group';
 import { formatDate, formatDateTime, formatPercent, t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
-import { Stat } from '@/components/ds/stat';
-
-function NextEvent({ event }: { event: EventSummary | undefined }) {
-  if (!event) {
-    return (
-      <Card style={{ gap: 10 }}>
-        <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-          {t('dashNextEvent')}
-        </AppText>
-        <AppText muted>{t('dashNoEvents')}</AppText>
-        <Button
-          label={t('availTitle')}
-          variant="secondary"
-          onPress={() => router.push('/disponibilidade')}
-        />
-      </Card>
-    );
-  }
-  return (
-    <Link href={{ pathname: '/encontros/[id]', params: { id: event.id } }} asChild>
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel={`${t('dashNextEvent')}: ${event.title}, ${formatDateTime(event.startsAt)}, ${event.locationName ?? t('locationTbd')}`}
-        style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-      >
-        <Card style={{ gap: 4 }}>
-          <AppText muted>{t('dashNextEvent')}</AppText>
-          <AppText style={{ fontSize: 20, fontWeight: '700' }}>{event.title}</AppText>
-          <AppText>{formatDateTime(event.startsAt)}</AppText>
-          <AppText muted>{event.locationName ?? t('locationTbd')}</AppText>
-          <AppText style={{ fontWeight: '600', marginTop: 4 }}>{t('dashOpenEvent')}</AppText>
-        </Card>
-      </Pressable>
-    </Link>
-  );
-}
-
-function MyNumbers({
-  ranking,
-  stats,
-  userId,
-}: {
-  ranking: Ranking | null;
-  stats: GroupStats | null;
-  userId: string;
-}) {
-  const me = ranking?.standings.find((s) => s.userId === userId);
-  const mine = stats?.players.find((p) => p.userId === userId);
-  return (
-    <Card style={{ gap: 10 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-        {t('dashYourNumbers')}
-      </AppText>
-      {!me ? (
-        <AppText muted>{t('dashNoGamesYet')}</AppText>
-      ) : (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <Stat
-            label={t('dashPosition')}
-            value={`${me.position}º`}
-            hint={t('dashOfPlayers', { count: ranking?.standings.length ?? 0 })}
-          />
-          <Stat label={t('points')} value={String(me.points)} />
-          <Stat
-            label={t('dashWinRate')}
-            value={formatPercent(me.winRate)}
-            hint={t('dashWinsOf', { wins: me.wins, games: me.games })}
-          />
-          <Stat
-            label={t('dashStreak')}
-            value={String(mine?.currentStreak ?? 0)}
-            hint={t('dashBestStreak', { count: mine?.bestStreak ?? 0 })}
-          />
-        </View>
-      )}
-      {mine && mine.recent.length > 0 && (
-        <AppText
-          muted
-          accessibilityLabel={`${t('dashForm')}: ${mine.recent.map((r) => t(`dashForm_${r}`)).join(', ')}`}
-        >
-          {t('dashForm')}: {mine.recent.map((r) => t(`dashFormShort_${r}`)).join(' ')}
-        </AppText>
-      )}
-    </Card>
-  );
-}
-
-function Podium({ ranking }: { ranking: Ranking | null }) {
-  const top = ranking?.standings.slice(0, 3) ?? [];
-  return (
-    <Card style={{ gap: 8 }}>
-      <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
-        {t('dashPodium')}
-      </AppText>
-      {top.length === 0 ? (
-        <AppText muted>{t('rankingEmpty')}</AppText>
-      ) : (
-        top.map((s) => (
-          <Pressable
-            key={s.userId}
-            accessibilityRole="button"
-            accessibilityLabel={t('rankingRow', {
-              position: s.position,
-              name: s.name,
-              points: s.points,
-              wins: s.wins,
-              games: s.games,
-            })}
-            onPress={() => router.push({ pathname: '/jogadores/[id]', params: { id: s.userId } })}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 12,
-              minHeight: 44,
-              opacity: pressed ? 0.8 : 1,
-            })}
-          >
-            <AppText style={{ fontSize: 20, fontWeight: '800', minWidth: 32 }}>
-              {s.position}º
-            </AppText>
-            <AppText style={{ flex: 1, fontWeight: '600' }}>{s.name}</AppText>
-            <AppText style={{ fontWeight: '700' }}>
-              {t('dashPointsShort', { count: s.points })}
-            </AppText>
-          </Pressable>
-        ))
-      )}
-      <Button
-        label={t('dashFullRanking')}
-        variant="secondary"
-        onPress={() => router.push('/ranking')}
-      />
-    </Card>
-  );
-}
+import { DashboardHero, NumberTiles, Podium, RecentForm } from '@/components/dashboard';
 
 function Windows({ windows }: { windows: GameWindow[] | null }) {
   const top = windows?.slice(0, 3) ?? [];
@@ -333,6 +193,12 @@ export default function DashboardScreen() {
     () => (group ? api.availability.windows(group.id) : Promise.resolve(null)),
     [group?.id],
   );
+  // Detalhe do próximo encontro (quem confirmou e a sua resposta), para o destaque.
+  const nextId = events.data?.[0]?.id ?? null;
+  const nextDetail = useAsync(
+    () => (nextId ? api.events.get(nextId) : Promise.resolve(null)),
+    [nextId],
+  );
   const partners = useAsync(
     () => (group ? api.groups.partners(group.id) : Promise.resolve(null)),
     [group?.id],
@@ -340,6 +206,7 @@ export default function DashboardScreen() {
   const refresh = () => {
     void Promise.all([
       events.refresh(),
+      nextDetail.refresh(),
       ranking.refresh(),
       stats.refresh(),
       windows.refresh(),
@@ -355,6 +222,9 @@ export default function DashboardScreen() {
   if (events.error) return <ErrorState error={events.error} onRetry={refresh} />;
   const upcoming = events.data ?? [];
   const firstName = session?.user.name?.split(' ')[0] ?? '';
+  const userId = session?.user.id ?? '';
+  const me = ranking.data?.standings.find((st) => st.userId === userId) ?? null;
+  const mine = stats.data?.players.find((p) => p.userId === userId) ?? null;
 
   return (
     <>
@@ -370,20 +240,29 @@ export default function DashboardScreen() {
           />
         }
       >
-        <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
-          {t('dashHello', { name: firstName })}
-        </AppText>
-        <AppText muted>{group.name}</AppText>
-        {/* Quem entrou há menos de 30 dias: boas-vindas e o convite para o próximo encontro. */}
-        {isNewMember(group.joinedAt, new Date()) ? (
-          <AppText style={{ fontSize: 16 }}>{t('dashWelcomeNew')}</AppText>
-        ) : null}
+        <DashboardHero
+          groupName={group.name}
+          firstName={firstName}
+          welcome={isNewMember(group.joinedAt, new Date()) ? t('dashWelcomeNew') : undefined}
+          art={stats.data?.commanders.find((c) => c.artUri)?.artUri ?? null}
+          event={upcoming[0]}
+          detail={nextDetail.data ?? null}
+          userId={userId}
+        />
         <BetaBanner groupId={group.id} />
-        <NextEvent event={upcoming[0]} />
-        <MyNumbers ranking={ranking.data} stats={stats.data} userId={session?.user.id ?? ''} />
-        <Rivalries stats={stats.data} userId={session?.user.id ?? ''} />
-        <Partners hints={partners.data} />
+        <AppText accessibilityRole="header" style={{ fontWeight: '700', fontSize: 20 }}>
+          {t('dashYourNumbers')}
+        </AppText>
+        <NumberTiles
+          me={me}
+          playerCount={ranking.data?.standings.length ?? 0}
+          streak={mine?.currentStreak ?? 0}
+          bestStreak={mine?.bestStreak ?? 0}
+        />
+        <RecentForm recent={mine?.recent ?? []} />
         <Podium ranking={ranking.data} />
+        <Rivalries stats={stats.data} userId={userId} />
+        <Partners hints={partners.data} />
         <Windows windows={windows.data} />
         <Commanders stats={stats.data} />
         {upcoming.length > 1 && (

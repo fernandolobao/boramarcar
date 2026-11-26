@@ -27,6 +27,16 @@ export const palette = {
   pergaminho: '#f4ebdb',
 } as const;
 
+/**
+ * Degraus do pódio (ouro, prata e bronze): os degradês metálicos do site (`.podium-*`), de cima
+ * para baixo, com o número em Noite (contraste AA em todos os tons, testado).
+ */
+export const podium = {
+  gold: ['#fff1c1', palette.dourado, '#d99a1e', '#f6c65b'],
+  silver: ['#ffffff', '#d9d6e0', '#b5b0bf', '#e4e1ea'],
+  bronze: ['#f6d3b0', '#d99a63', '#c2834e', '#e3ae7d'],
+} as const;
+
 /** Função de cada cor da paleta, como no `palette.json` (slug). */
 export const paletteRoles = {
   primary: 'arcano',

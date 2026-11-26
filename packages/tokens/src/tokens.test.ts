@@ -4,6 +4,7 @@ import {
   contrastRatio,
   palette,
   paletteRoles,
+  podium,
   renderCss,
   scales,
   themes,
@@ -90,5 +91,15 @@ describe('CSS do site', () => {
     expect(css).toContain('--color-fg-muted: var(--ak-fg-muted);');
     expect(css).toMatch(/:root \{\n {2}--ak-canvas: #f4ebdb;/);
     expect(css).toContain('--ak-canvas: #0b0716;');
+  });
+});
+
+describe('pódio', () => {
+  it('ouro passa pelo Dourado, e o número em Noite tem contraste AA em todos os tons', () => {
+    expect(podium.gold).toContain(palette.dourado);
+    for (const stops of Object.values(podium)) {
+      for (const stop of stops)
+        expect(contrastRatio(palette.noite, stop)).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });
