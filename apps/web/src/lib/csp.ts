@@ -49,6 +49,8 @@ export function buildCsp({ nonce, dev = false }: { nonce: string; dev?: boolean 
       "'self'",
       `'nonce-${nonce}'`,
       "'strict-dynamic'",
+      // Leitor de texto (Tesseract, WebAssembly) do teste da câmera: compilar WASM, sem eval.
+      "'wasm-unsafe-eval'",
       "'unsafe-inline'",
       'https:',
       // O modo de desenvolvimento do Next (recarregar ao salvar) usa eval.

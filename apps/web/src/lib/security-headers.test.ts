@@ -6,7 +6,7 @@ const header = (key: string) => SECURITY_HEADERS.find((h) => h.key === key)?.val
 describe('cabeçalhos de segurança', () => {
   it('"Usar minha localização" (busca de lojas) pode pedir a posição: geolocalização só para o próprio site', () => {
     expect(header('Permissions-Policy')).toContain('geolocation=(self)');
-    expect(header('Permissions-Policy')).toContain('camera=()');
+    expect(header('Permissions-Policy')).toContain('camera=(self)');
   });
 
   it('o resto continua: nosniff, referrer e HSTS', () => {
