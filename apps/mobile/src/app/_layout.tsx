@@ -70,6 +70,7 @@ function RootLayout() {
         <Stack.Screen name="partida/[eventId]" options={{ title: t('gameTitle') }} />
         <Stack.Screen name="mesa/[id]" options={{ title: t('tableTitle') }} />
         <Stack.Screen name="decks/[id]" options={{ title: t('tabDecks') }} />
+        <Stack.Screen name="testar/[id]" options={{ title: t('ptTitle') }} />
         <Stack.Screen name="decks/importar" options={{ title: t('deckImportTitle') }} />
         <Stack.Screen name="colecao" options={{ title: t('collectionTitle') }} />
         <Stack.Screen name="jogadores/[id]" options={{ title: t('profileTitle') }} />

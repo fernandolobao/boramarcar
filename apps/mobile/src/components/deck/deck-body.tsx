@@ -18,6 +18,7 @@ import { locale, t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { Icon } from '@/components/icons';
 import { useLayout } from '@/lib/layout';
+import { router } from 'expo-router';
 
 const cap = (s: string) =>
   s
@@ -374,6 +375,14 @@ export function DeckBody({
             })}
           </AppText>
           {a.proxies > 0 && <AppText muted>{t('deckProxiesCount', { count: a.proxies })}</AppText>}
+          {/* Mesa de testes solo (11.4). */}
+          <Button
+            label={t('ptOpen')}
+            icon="play"
+            variant="secondary"
+            onPress={() => router.push({ pathname: '/testar/[id]', params: { id: deck.id } })}
+            style={{ alignSelf: 'flex-start', marginTop: 4 }}
+          />
         </View>
       </View>
 
