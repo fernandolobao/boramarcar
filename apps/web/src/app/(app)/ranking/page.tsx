@@ -16,6 +16,9 @@ import { StackSections } from '@/components/stack-sections';
 import { EmptyState } from '@/components/empty-state';
 import { Select } from '@/components/ds/select';
 
+/** Pódio na tabela: os três primeiros com a medalha (o número continua escrito). */
+const MEDAL = ['podium-gold', 'podium-silver', 'podium-bronze'];
+
 export const generateMetadata = navMetadata('ranking');
 
 type Props = { searchParams: Promise<{ periodo?: string; tipo?: string }> };
@@ -174,9 +177,21 @@ export default async function RankingPage({ searchParams }: Props) {
                   {ranking.standings.map((s) => (
                     <tr
                       key={s.userId}
-                      className={`border-t border-ink-200 dark:border-ink-800 ${s.userId === user.id ? 'font-semibold' : ''}`}
+                      className={`border-t border-line ${s.userId === user.id ? 'font-semibold' : ''}`}
                     >
-                      <td className="py-2 pr-2">{s.position}</td>
+                      <td className="py-2 pr-2">
+                        {s.position <= 3 ? (
+                          <span
+                            className={`${MEDAL[s.position - 1]} inline-flex size-7 items-center justify-center rounded-full text-xs font-bold`}
+                          >
+                            {s.position}
+                          </span>
+                        ) : (
+                          <span className="inline-flex size-7 items-center justify-center">
+                            {s.position}
+                          </span>
+                        )}
+                      </td>
                       <th scope="row" className="py-2 pr-2 text-left font-[inherit]">
                         <Link
                           href={s.userId === user.id ? '/perfil' : `/jogadores/${s.userId}`}
@@ -436,7 +451,7 @@ export default async function RankingPage({ searchParams }: Props) {
           {seasons.length === 0 ? (
             <p className="muted text-sm">{tsn('empty')}</p>
           ) : (
-            <ul className="divide-y divide-ink-200 text-sm dark:divide-ink-800">
+            <ul className="divide-y divide-line text-sm">
               {seasons.map((s) => (
                 <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
                   <span>
@@ -466,7 +481,14 @@ export default async function RankingPage({ searchParams }: Props) {
               ))}
             </ul>
           )}
-          {canManage && <SeasonForm groupId={group.id} />}
+          {canManage && (
+            <details className="rounded-xl border border-line px-4 py-3">
+              <summary className="font-medium">{tsn('new')}</summary>
+              <div className="mt-3">
+                <SeasonForm groupId={group.id} />
+              </div>
+            </details>
+          )}
         </section>
       </StackSections>
     </>

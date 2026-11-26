@@ -74,7 +74,8 @@ export async function DeckGrid({
         return (
           <li
             key={deck.id}
-            className="group relative flex flex-col overflow-hidden rounded-2xl border border-ink-200 bg-surface shadow-sm transition-shadow hover:shadow-md has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-500 motion-reduce:transition-none dark:border-ink-800 dark:bg-ink-900"
+            data-card-link
+            className="card group relative flex flex-col overflow-hidden p-0 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-focus"
           >
             <div className="relative aspect-[16/10] bg-gradient-to-br from-ink-200 to-ink-300 dark:from-ink-800 dark:to-ink-700">
               {cover?.artUri && (

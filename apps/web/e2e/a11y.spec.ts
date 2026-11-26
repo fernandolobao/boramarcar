@@ -7,7 +7,19 @@ import { E2E_IDS, E2E_INVITE_CODE } from './support/seed';
 /** Regras WCAG 2.0/2.1/2.2 nível A e AA. */
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
+/** Espera as animações de entrada (finitas) terminarem: o contraste é medido no estado final. */
+async function settled(page: Page) {
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .every(
+        (a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity,
+      ),
+  );
+}
+
 async function expectNoViolations(page: Page) {
+  await settled(page);
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   const summary = results.violations.map((v) => ({
     rule: v.id,
@@ -30,6 +42,7 @@ const PAST_MONTH = new Intl.DateTimeFormat('en-CA', {
 const PUBLIC_PAGES = [
   '/',
   '/privacidade',
+  '/metodologia',
   '/ajuda',
   '/aprender',
   '/aprender/combate',
@@ -124,15 +137,6 @@ for (const scheme of ['light', 'dark'] as const) {
           // A página chega em etapas (esqueleto do `loading.tsx` e animação de entrada): mede o
           // contraste só com o conteúdo final, sem nada no meio de um esmaecimento.
           await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
-          await page.waitForFunction(() =>
-            document
-              .getAnimations()
-              .every(
-                (a) =>
-                  a.playState !== 'running' ||
-                  a.effect?.getComputedTiming().iterations === Infinity,
-              ),
-          );
           await expectNoViolations(page);
         });
       }

@@ -15,19 +15,19 @@ const renderTour = () =>
 afterEach(cleanup);
 
 describe('ProductTour', () => {
-  it('mostra uma aba por tela, começando pelo painel', () => {
+  it('mostra uma aba por tela, começando pelas que o topo da página ainda não mostrou', () => {
     renderTour();
     const tabs = screen.getAllByRole('tab');
     expect(tabs.map((t) => t.textContent)).toEqual([
-      'Painel',
-      'Agenda',
-      'Análise de deck',
-      'Coleção',
       'Modo mesa',
-      'Ranking',
+      'Coleção',
       'Torneio',
       'Lojas perto',
       'Página da loja',
+      'Painel',
+      'Agenda',
+      'Análise de deck',
+      'Ranking',
     ]);
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     const panel = screen.getByRole('tabpanel');
@@ -36,16 +36,13 @@ describe('ProductTour', () => {
 
   it('troca de tela pelas setas e vai ao fim com End', () => {
     renderTour();
-    const first = screen.getByRole('tab', { name: 'Painel' });
+    const first = screen.getByRole('tab', { name: 'Modo mesa' });
     act(() => first.focus());
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' });
-    expect(screen.getByRole('tab', { name: 'Agenda' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('tabpanel')).toHaveTextContent(/mesa fecha/i);
+    expect(screen.getByRole('tab', { name: 'Coleção' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel')).toHaveTextContent(/valor estimado/i);
     fireEvent.keyDown(document.activeElement!, { key: 'End' });
-    expect(screen.getByRole('tab', { name: 'Página da loja' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
+    expect(screen.getByRole('tab', { name: 'Ranking' })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('cada tela tem a captura clara e a escura com o mesmo texto alternativo', () => {
@@ -53,8 +50,8 @@ describe('ProductTour', () => {
     const images = screen.getByRole('tabpanel').querySelectorAll('img');
     expect(images).toHaveLength(2);
     const [light, dark] = [...images];
-    expect(light!.getAttribute('src')).toContain('painel-light.webp');
-    expect(dark!.getAttribute('src')).toContain('painel-dark.webp');
+    expect(light!.getAttribute('src')).toContain('mesa-light.webp');
+    expect(dark!.getAttribute('src')).toContain('mesa-dark.webp');
     expect(light!.alt).toBe(dark!.alt);
     expect(light!.alt.length).toBeGreaterThan(30);
   });

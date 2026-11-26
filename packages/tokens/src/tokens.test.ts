@@ -5,6 +5,7 @@ import {
   palette,
   paletteRoles,
   podium,
+  radius,
   renderCss,
   scales,
   themes,
@@ -101,5 +102,21 @@ describe('pódio', () => {
       for (const stop of stops)
         expect(contrastRatio(palette.noite, stop)).toBeGreaterThanOrEqual(4.5);
     }
+  });
+});
+
+describe('cantos e sombras', () => {
+  it('as classes de canto do Tailwind caem em poucos valores', () => {
+    const css = renderCss();
+    const values = new Set([...css.matchAll(/--radius-[\w-]+: ([\d.]+rem);/g)].map((m) => m[1]));
+    expect(values.size).toBeLessThanOrEqual(4);
+    expect(css).toContain(`--radius-2xl: ${radius.card / 16}rem;`);
+    expect(css).toContain(`--radius-xl: ${radius.control / 16}rem;`);
+  });
+
+  it('há só duas sombras', () => {
+    const css = renderCss();
+    const values = new Set([...css.matchAll(/--shadow-[\w-]+: ([^;]+);/g)].map((m) => m[1]));
+    expect(values.size).toBe(2);
   });
 });

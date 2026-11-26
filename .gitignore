@@ -30,3 +30,6 @@ blob-report
 !.vscode/extensions.json
 !.vscode/settings.json
 **/e2e/.auth/
+
+# Estado local da taste-skill (perfil do Chrome, checagens)
+.taste-skill/

@@ -41,6 +41,7 @@ test.describe('ranking e estatísticas', () => {
   test('admin cria uma temporada e ela aparece no filtro', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto('/ranking');
+    await page.getByText('Nova temporada').click();
     await page.getByLabel('Nome').fill('Temporada E2E');
     await fillDate(page, 'Primeiro dia', '2026-01-01');
     await fillDate(page, 'Último dia', '2026-12-31');

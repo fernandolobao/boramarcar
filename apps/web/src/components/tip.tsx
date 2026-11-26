@@ -57,17 +57,20 @@ export function TitleWithTip({
         <section
           id={panelId}
           aria-labelledby={labelId}
-          className="flex items-start gap-3 rounded-2xl border border-line-strong bg-surface p-4"
+          className="flex items-start gap-3 rounded-xl bg-surface-muted px-4 py-3"
         >
-          <Icon name="learn" className="mt-0.5 size-5 shrink-0 text-link" />
-          <div className="min-w-0 flex-1 space-y-3">
-            <h2 id={labelId} className="text-sm font-semibold">
-              {t('label')}
-            </h2>
-            <p className="text-sm">{t(id)}</p>
+          <Icon name="learn" className="mt-0.5 size-5 shrink-0 text-link" aria-hidden="true" />
+          <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <h2 id={labelId} className="text-sm font-semibold">
+                {t('label')}
+              </h2>
+              <p className="text-sm">{t(id)}</p>
+              <FormError message={error} />
+            </div>
             <button
               type="button"
-              className="btn-secondary text-sm"
+              className="btn-secondary min-h-8 self-start px-3 text-sm"
               aria-label={t('dismissLabel')}
               disabled={pending}
               onClick={() =>
@@ -88,7 +91,6 @@ export function TitleWithTip({
             >
               {t('dismiss')}
             </button>
-            <FormError message={error} />
           </div>
         </section>
       )}

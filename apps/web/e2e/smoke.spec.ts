@@ -16,9 +16,8 @@ test.describe('smoke', () => {
     for (const section of [
       'Funcionalidades',
       'Veja por dentro',
-      'De onde vêm as informações',
-      'Como avaliamos e sugerimos',
       'No que a gente acredita',
+      'Perguntas frequentes',
       'Participe dos testes',
     ]) {
       await expect(page.getByRole('heading', { level: 2, name: section })).toBeVisible();
@@ -27,9 +26,24 @@ test.describe('smoke', () => {
       'href',
       /^mailto:contato@arcanakin\.com\.br\?subject=/,
     );
-    // Sem vídeo no topo: a prévia do app é lida como uma imagem só.
+    // Sem vídeo no topo: o produto aparece numa tela real do painel.
     await expect(page.locator('video')).toHaveCount(0);
-    await expect(page.getByRole('img', { name: /Exemplo do ArcanaKin/ })).toBeVisible();
+    await expect(page.getByRole('img', { name: /Painel da Ana/ }).first()).toBeVisible();
+    // FAQ abre e fecha pelo teclado.
+    const faq = page.getByText('O ArcanaKin é pago?');
+    await faq.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Hoje tudo no ArcanaKin é gratuito.')).toBeVisible();
+  });
+
+  test('metodologia: fontes e regras da análise numa página própria', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('contentinfo').getByRole('link', { name: 'Metodologia' }).click();
+    await expect(page).toHaveURL(/\/metodologia$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Metodologia' })).toBeVisible();
+    for (const section of ['De onde vêm as informações', 'Como avaliamos e sugerimos']) {
+      await expect(page.getByRole('heading', { level: 2, name: section })).toBeVisible();
+    }
   });
 
   test('navegador em inglês no Brasil abre em português; o seletor troca e lembra', async ({

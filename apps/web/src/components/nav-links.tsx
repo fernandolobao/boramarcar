@@ -2,6 +2,7 @@
 
 import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { Icon, type IconName } from './icons';
 
 /**
@@ -34,8 +35,52 @@ export function NavLinks({
   links: { href: string; label: string; icon?: IconName }[];
 }) {
   const pathname = usePathname();
+  const navRef = useRef<HTMLElement>(null);
+  // Há mais itens escondidos à esquerda/direita? (no celular as abas rolam para o lado)
+  const [more, setMore] = useState({ start: false, end: false });
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const update = () => {
+      const max = nav.scrollWidth - nav.clientWidth;
+      setMore({ start: nav.scrollLeft > 4, end: nav.scrollLeft < max - 4 });
+    };
+    const frame = requestAnimationFrame(update);
+    nav.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      cancelAnimationFrame(frame);
+      nav.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  // A aba da seção atual fica à vista (sem rolar a página, só a faixa de abas).
+  useEffect(() => {
+    const nav = navRef.current;
+    const current = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !current) return;
+    const left = current.offsetLeft - nav.offsetLeft;
+    if (left < nav.scrollLeft || left + current.offsetWidth > nav.scrollLeft + nav.clientWidth) {
+      nav.scrollLeft = left - 16;
+    }
+  }, [pathname]);
+
+  // Degradê nas bordas que têm mais abas: a pista de que a faixa rola.
+  const fade = (on: boolean) => (on ? 'transparent' : '#000');
+  const mask =
+    more.start || more.end
+      ? `linear-gradient(to right, ${fade(more.start)} 0, #000 2.5rem, #000 calc(100% - 2.5rem), ${fade(more.end)} 100%)`
+      : undefined;
+
   return (
-    <nav aria-label={label} className="-mx-2 overflow-x-auto px-2 pb-2">
+    <nav
+      ref={navRef}
+      aria-label={label}
+      className="-mx-2 overflow-x-auto px-2 pb-2"
+      style={mask ? { maskImage: mask, WebkitMaskImage: mask } : undefined}
+    >
       <ul className="flex gap-1 text-sm">
         {links.map((link) => {
           const current = pathname === link.href || pathname.startsWith(`${link.href}/`);

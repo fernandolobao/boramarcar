@@ -7,7 +7,7 @@ import type { StatProps } from '@boramarcar/ui';
 export function Stat({ label, value, hint, size = 'md' }: StatProps & { size?: 'sm' | 'md' }) {
   const small = size === 'sm';
   return (
-    <div className={`rounded-xl bg-surface-muted ${small ? 'p-2' : 'p-3'}`}>
+    <div className={`rounded-xl bg-canvas ${small ? 'p-2' : 'p-3'}`}>
       <dt className={`muted ${small ? 'text-xs' : 'text-sm'}`}>{label}</dt>
       <dd>
         <span

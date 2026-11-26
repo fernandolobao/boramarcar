@@ -124,15 +124,19 @@ export function CollectionView({
 
   return (
     <div className="space-y-6">
-      <section aria-labelledby="colecao-totais" className="grid gap-3 sm:grid-cols-3">
+      {/* Totais numa faixa só: as cartas (o conteúdo) sobem para a primeira tela. */}
+      <section
+        aria-labelledby="colecao-totais"
+        className="card flex flex-wrap gap-x-10 gap-y-3 py-4"
+      >
         <h2 id="colecao-totais" className="sr-only">
           {t('value')}
         </h2>
-        <div className="card">
+        <div>
           <p className="text-2xl font-bold tabular-nums">{t('copies', { count: totals.copies })}</p>
           <p className="muted text-sm">{t('unique', { count: totals.unique })}</p>
         </div>
-        <div className="card sm:col-span-2">
+        <div className="min-w-0 flex-1 basis-64">
           <p className="muted text-sm">{t('value')}</p>
           <p className="text-2xl font-bold tabular-nums" data-testid="collection-value">
             {brlRate ? brl(totals.valueUsd * brlRate) : usd(totals.valueUsd)}

@@ -18,6 +18,7 @@ import { GameEditor } from '@/components/game-editor';
 import { GameForm } from '@/components/game-form';
 import { GamePlayers } from '@/components/game-players';
 import { EventManage, EventStatusBadge } from '@/components/event-manage';
+import { AvatarImage } from '@/components/avatar-image';
 import { ShareButtons } from '@/components/share-buttons';
 import { Icon } from '@/components/icons';
 import { DirectionsLinks } from '@/components/places/directions';
@@ -36,6 +37,10 @@ import { HeroArt } from '@/components/hero-art';
 type Props = { params: Promise<{ id: string }> };
 
 /** Título da aba com o nome do encontro (WCAG 2.4.2). */
+
+/** Quem vai primeiro, depois talvez, depois quem não vai. */
+const RSVP_ORDER: Record<string, number> = { yes: 0, maybe: 1, no: 2 };
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await requireUser();
@@ -156,217 +161,240 @@ export default async function EventPage({ params }: Props) {
         </p>
       )}
 
-      {/* Seções em pilha de cartas: cada uma desliza por cima da anterior ao rolar. */}
-      <StackSections>
-        {event.location && (
-          <section className="card space-y-3" aria-labelledby="event-location-title">
-            <h2 id="event-location-title" className="section-title mb-0">
-              {tp('where')}: {event.location.name}
+      {/* Desktop: informações à esquerda (quem vai, onde, compartilhar) e o jogo à direita. No
+          celular, uma coluna, com quem vai primeiro. */}
+      <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start">
+        <div className="space-y-6">
+          <section className="card space-y-4" aria-labelledby="encontro-participantes">
+            <h2 id="encontro-participantes" className="section-title mb-0">
+              {t('participants')}
             </h2>
-            {event.location.address && <p className="text-sm">{event.location.address}</p>}
-            {event.location.details && <p className="muted text-sm">{event.location.details}</p>}
-            {event.location.lat !== null && event.location.lng !== null && (
-              <LocationMap
-                points={[
-                  {
-                    id: event.location.id,
-                    name: event.location.name,
-                    lat: event.location.lat,
-                    lng: event.location.lng,
-                  },
-                ]}
-                label={tp('mapOf', { name: event.location.name })}
-                className="h-56"
-              />
-            )}
-            <DirectionsLinks place={event.location} />
-          </section>
-        )}
-
-        <section className="card space-y-3">
-          <h2 className="section-title">{t('share')}</h2>
-          <ShareButtons
-            text={shareText}
-            url={eventUrl(event.id)}
-            title={event.title}
-            icsHref={`/api/v1/events/${event.id}/ics`}
-          />
-          {event.status === 'finished' && event.games.length > 0 && (
-            <div className="space-y-1 border-t border-line pt-3">
-              <Link href={`/resumo/${event.id}`} className="btn-secondary">
-                <Icon name="ranking" />
-                {tr('link')}
-              </Link>
-              <p className="muted">{tr('linkHint')}</p>
-            </div>
-          )}
-        </section>
-
-        <section className="card space-y-4">
-          <h2 className="section-title">{t('participants')}</h2>
-          <RsvpButtons eventId={event.id} current={me?.rsvp ?? null} />
-          <ul className="flex flex-wrap gap-2">
-            {event.participants.map((p) => (
-              <li
-                key={p.userId}
-                className="rounded-full bg-ink-100 px-3 py-1 text-sm dark:bg-ink-800"
-              >
-                <PlayerLink userId={p.userId} name={p.name} /> ·{' '}
-                <span className="muted">{t(`rsvp.${p.rsvp}`)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {pairings && tableLimits && (
-          <TableSuggestions
-            players={pairings.players}
-            pairs={pairings.pairs}
-            min={tableLimits.min}
-            max={tableLimits.max}
-          />
-        )}
-
-        <section className="card">
-          <h2 className="section-title">{t('games')}</h2>
-          {event.games.length === 0 ? (
-            <EmptyState>{t('noGames')}</EmptyState>
-          ) : (
-            <ol className="space-y-4">
-              {event.games.map((game) => {
-                const format = isGameFormat(game.format) ? game.format : 'other';
-                const summary = [
-                  game.firstPlayerName && t('firstSummary', { name: game.firstPlayerName }),
-                  game.winningTurn && t('turnSummary', { turn: game.winningTurn }),
-                  game.durationMinutes && t('durationSummary', { minutes: game.durationMinutes }),
-                ].filter(Boolean);
-                return (
-                  <li
-                    key={game.id}
-                    className="rounded-xl border border-ink-200 p-4 dark:border-ink-800"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <h3 className="font-semibold">
-                          {t('game', { number: game.number })}{' '}
-                          <span className="ms-1 rounded-full bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
-                            {tf(format)}
-                          </span>
-                        </h3>
-                        <p className="mt-0.5 text-sm">
-                          {game.isDraw ? (
-                            t('draw')
-                          ) : (
-                            <>
-                              {t('winnersLabel', { count: game.winners.length })}{' '}
-                              <PlayerLinks players={game.winners} />
-                            </>
-                          )}
-                        </p>
-                        {summary.length > 0 && (
-                          <p className="muted text-sm">{summary.join(' · ')}</p>
-                        )}
-                      </div>
-                      {game.canEdit && (
-                        <DeleteButton
-                          path={`/api/v1/games/${game.id}`}
-                          label={t('removeGame', { number: game.number })}
-                        />
-                      )}
-                    </div>
-                    <GamePlayers
-                      players={game.players}
-                      showTeams={formatRules(format).structure === 'teams'}
-                    />
-                    {game.notes && <p className="muted mt-2 text-sm">{game.notes}</p>}
-                    {game.canEdit && (
-                      <GameEditor
-                        gameId={game.id}
-                        number={game.number}
-                        players={players}
-                        initial={{
-                          format,
-                          firstPlayerId: game.firstPlayerId,
-                          winningTurn: game.winningTurn,
-                          durationMinutes: game.durationMinutes,
-                          notes: game.notes,
-                          players: game.players.map((p) => ({
-                            userId: p.userId,
-                            result: p.result,
-                            deckId: p.deckId,
-                            team: p.team,
-                            eliminatedOrder: p.eliminatedOrder,
-                          })),
-                        }}
-                      />
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-        </section>
-
-        {event.status !== 'cancelled' && (
-          <section className="card">
-            <h2 className="section-title">{t('recordGame')}</h2>
-            <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl bg-brand-50 p-4 dark:bg-brand-700/20">
-              <Link href={`/mesa/${event.id}`} className="btn-primary">
-                <Icon name="table" />
-                {tt('open')}
-              </Link>
-              <p className="text-sm">{tt('openHint')}</p>
-            </div>
-            <GameForm eventId={event.id} players={players} defaultFormat={settings.defaultFormat} />
-          </section>
-        )}
-
-        {/* Torneios do encontro (9.1), e criar um aqui (quem organiza). */}
-        {(eventTournaments.length > 0 || (event.canManage && event.status !== 'cancelled')) && (
-          <section className="card space-y-3" aria-labelledby="encontro-torneios">
-            <h2 id="encontro-torneios" className="section-title mb-0">
-              {tt9('eventSection')}
-            </h2>
-            {eventTournaments.length === 0 ? (
-              <p className="muted">{tt9('eventEmpty')}</p>
-            ) : (
-              <ul className="space-y-1">
-                {eventTournaments.map((x) => (
-                  <li key={x.id}>
-                    <Link href={`/torneios/${x.id}`} className="underline underline-offset-2">
-                      {x.name}
-                    </Link>{' '}
-                    <span className="muted text-sm">
-                      · {tt9(`status.${x.status as 'registration' | 'running' | 'finished'}`)}
+            <RsvpButtons eventId={event.id} current={me?.rsvp ?? null} />
+            <ul className="divide-y divide-line">
+              {[...event.participants]
+                .sort((a, b) => (RSVP_ORDER[a.rsvp] ?? 3) - (RSVP_ORDER[b.rsvp] ?? 3))
+                .map((p) => (
+                  <li key={p.userId} className="flex items-center gap-3 py-2">
+                    <span className="relative inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-muted text-xs font-semibold">
+                      <AvatarImage name={p.name} image={p.image} sizes="32px" />
                     </span>
+                    <span className="min-w-0 flex-1 truncate">
+                      <PlayerLink userId={p.userId} name={p.name} />
+                    </span>
+                    <span className="muted shrink-0">{t(`rsvp.${p.rsvp}`)}</span>
                   </li>
                 ))}
-              </ul>
-            )}
-            {event.canManage && event.status !== 'cancelled' && (
-              <Link href={`/torneios/novo?encontro=${event.id}`} className="btn-secondary">
-                <Icon name="ranking" />
-                {tt9('createHere')}
-              </Link>
-            )}
+            </ul>
           </section>
-        )}
+          {event.location && (
+            <section className="card space-y-3" aria-labelledby="event-location-title">
+              <h2 id="event-location-title" className="section-title mb-0">
+                {tp('where')}: {event.location.name}
+              </h2>
+              {event.location.address && <p className="text-sm">{event.location.address}</p>}
+              {event.location.details && <p className="muted text-sm">{event.location.details}</p>}
+              {event.location.lat !== null && event.location.lng !== null && (
+                <LocationMap
+                  points={[
+                    {
+                      id: event.location.id,
+                      name: event.location.name,
+                      lat: event.location.lat,
+                      lng: event.location.lng,
+                    },
+                  ]}
+                  label={tp('mapOf', { name: event.location.name })}
+                  className="h-56"
+                />
+              )}
+              <DirectionsLinks place={event.location} />
+            </section>
+          )}
 
-        {event.canManage && (
-          <section className="card">
-            <h2 className="section-title">{t('edit')}</h2>
-            <EventManage
-              eventId={event.id}
+          <section className="card space-y-3">
+            <h2 className="section-title">{t('share')}</h2>
+            <ShareButtons
+              text={shareText}
+              url={eventUrl(event.id)}
               title={event.title}
-              startsAt={event.startsAt.toISOString()}
-              endsAt={event.endsAt?.toISOString() ?? null}
-              locationId={event.locationId}
-              status={event.status}
-              locations={locations.map((l) => ({ id: l.id, name: l.name }))}
+              icsHref={`/api/v1/events/${event.id}/ics`}
             />
+            {event.status === 'finished' && event.games.length > 0 && (
+              <div className="space-y-1 border-t border-line pt-3">
+                <Link href={`/resumo/${event.id}`} className="btn-secondary">
+                  <Icon name="ranking" />
+                  {tr('link')}
+                </Link>
+                <p className="muted">{tr('linkHint')}</p>
+              </div>
+            )}
           </section>
-        )}
-      </StackSections>
+        </div>
+
+        <div className="min-w-0">
+          {/* Seções em pilha de cartas: cada uma desliza por cima da anterior ao rolar. */}
+          <StackSections>
+            {pairings && tableLimits && (
+              <TableSuggestions
+                players={pairings.players}
+                pairs={pairings.pairs}
+                min={tableLimits.min}
+                max={tableLimits.max}
+              />
+            )}
+
+            <section className="card">
+              <h2 className="section-title">{t('games')}</h2>
+              {event.games.length === 0 ? (
+                <EmptyState>{t('noGames')}</EmptyState>
+              ) : (
+                <ol className="space-y-4">
+                  {event.games.map((game) => {
+                    const format = isGameFormat(game.format) ? game.format : 'other';
+                    const summary = [
+                      game.firstPlayerName && t('firstSummary', { name: game.firstPlayerName }),
+                      game.winningTurn && t('turnSummary', { turn: game.winningTurn }),
+                      game.durationMinutes &&
+                        t('durationSummary', { minutes: game.durationMinutes }),
+                    ].filter(Boolean);
+                    return (
+                      <li key={game.id} className="rounded-xl border border-line p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-semibold">
+                              {t('game', { number: game.number })}{' '}
+                              <span className="ms-1 rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-fg">
+                                {tf(format)}
+                              </span>
+                            </h3>
+                            <p className="mt-0.5 text-sm">
+                              {game.isDraw ? (
+                                t('draw')
+                              ) : (
+                                <>
+                                  {t('winnersLabel', { count: game.winners.length })}{' '}
+                                  <PlayerLinks players={game.winners} />
+                                </>
+                              )}
+                            </p>
+                            {summary.length > 0 && (
+                              <p className="muted text-sm">{summary.join(' · ')}</p>
+                            )}
+                          </div>
+                          {game.canEdit && (
+                            <DeleteButton
+                              path={`/api/v1/games/${game.id}`}
+                              label={t('removeGame', { number: game.number })}
+                            />
+                          )}
+                        </div>
+                        <GamePlayers
+                          players={game.players}
+                          showTeams={formatRules(format).structure === 'teams'}
+                        />
+                        {game.notes && <p className="muted mt-2 text-sm">{game.notes}</p>}
+                        {game.canEdit && (
+                          <GameEditor
+                            gameId={game.id}
+                            number={game.number}
+                            players={players}
+                            initial={{
+                              format,
+                              firstPlayerId: game.firstPlayerId,
+                              winningTurn: game.winningTurn,
+                              durationMinutes: game.durationMinutes,
+                              notes: game.notes,
+                              players: game.players.map((p) => ({
+                                userId: p.userId,
+                                result: p.result,
+                                deckId: p.deckId,
+                                team: p.team,
+                                eliminatedOrder: p.eliminatedOrder,
+                              })),
+                            }}
+                          />
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </section>
+
+            {event.status !== 'cancelled' && (
+              <section className="card">
+                <h2 className="section-title">{t('recordGame')}</h2>
+                <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl bg-brand-50 p-4 dark:bg-brand-700/20">
+                  <Link href={`/mesa/${event.id}`} className="btn-primary">
+                    <Icon name="table" />
+                    {tt('open')}
+                  </Link>
+                  <p className="text-sm">{tt('openHint')}</p>
+                </div>
+                <GameForm
+                  eventId={event.id}
+                  players={players}
+                  defaultFormat={settings.defaultFormat}
+                />
+              </section>
+            )}
+
+            {/* Torneios do encontro (9.1), e criar um aqui (quem organiza). */}
+            {(eventTournaments.length > 0 || (event.canManage && event.status !== 'cancelled')) && (
+              <section className="card space-y-3" aria-labelledby="encontro-torneios">
+                <h2 id="encontro-torneios" className="section-title mb-0">
+                  {tt9('eventSection')}
+                </h2>
+                {eventTournaments.length === 0 ? (
+                  <p className="muted">{tt9('eventEmpty')}</p>
+                ) : (
+                  <ul className="space-y-1">
+                    {eventTournaments.map((x) => (
+                      <li key={x.id}>
+                        <Link href={`/torneios/${x.id}`} className="underline underline-offset-2">
+                          {x.name}
+                        </Link>{' '}
+                        <span className="muted text-sm">
+                          · {tt9(`status.${x.status as 'registration' | 'running' | 'finished'}`)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {event.canManage && event.status !== 'cancelled' && (
+                  <Link href={`/torneios/novo?encontro=${event.id}`} className="btn-secondary">
+                    <Icon name="ranking" />
+                    {tt9('createHere')}
+                  </Link>
+                )}
+              </section>
+            )}
+
+            {event.canManage && (
+              <section className="card" aria-labelledby="encontro-editar">
+                <details>
+                  <summary className="rounded-lg focus-visible:outline-2 focus-visible:outline-focus">
+                    <h2 id="encontro-editar" className="section-title mb-0 inline">
+                      {t('edit')}
+                    </h2>
+                  </summary>
+                  <div className="mt-4">
+                    <EventManage
+                      eventId={event.id}
+                      title={event.title}
+                      startsAt={event.startsAt.toISOString()}
+                      endsAt={event.endsAt?.toISOString() ?? null}
+                      locationId={event.locationId}
+                      status={event.status}
+                      locations={locations.map((l) => ({ id: l.id, name: l.name }))}
+                    />
+                  </div>
+                </details>
+              </section>
+            )}
+          </StackSections>
+        </div>
+      </div>
     </>
   );
 }

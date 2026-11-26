@@ -369,6 +369,7 @@
       "start": "Primeiro dia",
       "end": "Último dia",
       "create": "Criar temporada",
+      "new": "Nova temporada",
       "range": "{start} a {end}",
       "remove": "Remover temporada {name}",
       "created": "Temporada criada."
@@ -1264,12 +1265,10 @@
     "metaDescription": "Marque o próximo Commander com a sua mesa: disponibilidade, encontros, partidas, ranking, decks com análise e folha de proxies.",
     "nav": {
       "label": "Seções da página",
-      "features": "Funcionalidades",
+      "features": "Recursos",
       "tour": "Veja por dentro",
-      "sources": "De onde vêm os dados",
-      "method": "Metodologia",
-      "values": "Valores",
-      "join": "Participe"
+      "faq": "Perguntas",
+      "methodology": "Metodologia"
     },
     "goToDashboard": "Ir para o painel",
     "signInToDashboard": "Entrar no painel",
@@ -1278,18 +1277,7 @@
     "hero": {
       "eyebrow": "Em testes com grupos de Commander",
       "title": "A mesa fecha. O ArcanaKin cuida do resto.",
-      "subtitle": "Cada um marca quando e onde pode jogar. O app encontra o horário em que a mesa fecha, registra as partidas, mantém o ranking e ajuda a melhorar os seus decks.",
-      "join": "Participar dos testes"
-    },
-    "intro": {
-      "title": "O que é o ArcanaKin",
-      "body": "Um lugar para o seu grupo de Magic organizar a vida fora da mesa: chega de enquete no grupo de mensagens, de ranking em planilha e de lista de deck perdida. Ele nasceu numa mesa de Commander de quatro amigos e está crescendo com a ajuda de quem joga.",
-      "stats": {
-        "formats": "formatos de jogo",
-        "roles": "funções de carta analisadas",
-        "languages": "idiomas (português e inglês)"
-      },
-      "name": "O nome junta arcana, os segredos da magia, e kin, a sua gente: é a casa da sua família de Magic."
+      "subtitle": "Cada um marca quando e onde pode jogar. O app encontra o horário em que a mesa fecha, registra as partidas, mantém o ranking e ajuda a melhorar os seus decks."
     },
     "features": {
       "title": "Funcionalidades",
@@ -1331,6 +1319,23 @@
           "title": "App para Android e iOS",
           "body": "Em desenvolvimento: encontros, presença, ranking e decks no bolso, com login pelo Google."
         }
+      },
+      "spotlights": {
+        "agenda": {
+          "eyebrow": "Agenda",
+          "title": "Do “quem pode?” à mesa marcada",
+          "body": "Sem enquete no grupo de mensagens: cada pessoa marca quando pode, e o ArcanaKin mostra quando a mesa fecha. Daí é um toque para criar o encontro."
+        },
+        "decks": {
+          "eyebrow": "Decks",
+          "title": "Decks que você entende",
+          "body": "Importe a lista e veja a nota explicada, parte por parte. Antes da noite, teste a mão inicial na mesa de testes."
+        },
+        "group": {
+          "eyebrow": "Grupo",
+          "title": "O ranking da mesa, sem planilha",
+          "body": "Cada partida registrada atualiza o ranking, as temporadas e as conquistas de todo mundo, e o grupo ainda pode montar torneios."
+        }
       }
     },
     "tour": {
@@ -1356,7 +1361,7 @@
         "colecao": {
           "tab": "Coleção",
           "caption": "As cartas que você tem, com o valor estimado em reais e em quais decks cada uma está.",
-          "alt": "Coleção com 136 cópias de 84 cartas, valor estimado de R$ 16.178,39, e a galeria das cartas com quantidade, foil e em quantos decks cada uma está."
+          "alt": "Coleção com 136 cópias de 84 cartas, o valor estimado em reais e a galeria das cartas com quantidade, foil e em quantos decks cada uma está."
         },
         "mesa": {
           "tab": "Modo mesa",
@@ -1385,6 +1390,78 @@
         }
       }
     },
+    "values": {
+      "title": "No que a gente acredita",
+      "subtitle": "O ArcanaKin nasceu numa mesa de amigos que queria completar os próprios decks e entender melhor o jogo. É isso que guia cada escolha.",
+      "items": {
+        "fun": {
+          "title": "Diversão acima de tudo",
+          "body": "Magic é encontro de amigos. Tudo aqui existe para sobrar mais tempo para jogar: marcar a noite sem enquete, contar a vida sem papel e levar o ranking na brincadeira. Se algo deixa a mesa mais chata, não entra."
+        },
+        "learn": {
+          "title": "Decks melhores, jogo melhor",
+          "body": "Tudo começou com uma pergunta: o que falta no meu deck? A análise mostra terrenos, ramp, compra, remoção e curva, e explica cada nota, para você entender e decidir. É um guia, não uma regra."
+        },
+        "transparency": {
+          "title": "Transparência",
+          "body": "Você sabe de onde vem cada número: a metodologia é aberta, as fontes recebem crédito e os preços avisam que são estimativas. Não vendemos dados, e você decide quem vê os seus decks.",
+          "link": "Ver a metodologia"
+        },
+        "accessible": {
+          "title": "Todo mundo na mesa",
+          "body": "Ninguém fica de fora: seguimos a WCAG 2.2 nível AA, com teclado, leitor de tela e bom contraste nos temas claro e escuro. Cada tela nova passa por auditoria antes de ir ao ar."
+        }
+      }
+    },
+    "join": {
+      "title": "Participe dos testes",
+      "body": "O ArcanaKin está em testes com grupos de Commander. Use com a sua mesa, conte o que funcionou, o que faltou e o que deu errado: cada mensagem vira melhoria.",
+      "email": "Enviar feedback por e-mail",
+      "emailSubject": "ArcanaKin — testes",
+      "or": "ou comece agora:"
+    },
+    "footer": {
+      "credits": "Dados de cartas pelo Scryfall; combos pelo Commander Spellbook; cotação do dólar pelo Banco Central do Brasil.",
+      "disclaimer": "ArcanaKin é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
+      "contact": "Contato"
+    },
+    "signUpEmail": "Criar conta com e-mail",
+    "faq": {
+      "title": "Perguntas frequentes",
+      "methodLink": "Ver a metodologia completa",
+      "items": {
+        "free": {
+          "q": "O ArcanaKin é pago?",
+          "a": "Não. Hoje tudo no ArcanaKin é gratuito."
+        },
+        "account": {
+          "q": "Todo mundo do grupo precisa de conta?",
+          "a": "Sim: cada pessoa entra com o Google ou com e-mail e senha. Quem cria o grupo manda um link de convite, e quem abre o link entra no grupo."
+        },
+        "formats": {
+          "q": "Serve só para Commander?",
+          "a": "Não. Dá para registrar partidas de Commander, Brawl, Oathbreaker, Two-Headed Giant, Standard, Modern, Draft e outros formatos. A validação do deck segue as regras de cada formato."
+        },
+        "mobile": {
+          "q": "Funciona no celular?",
+          "a": "Sim, o site funciona no celular e no tablet. O app para Android e iOS está em desenvolvimento."
+        },
+        "data": {
+          "q": "De onde vêm os dados das cartas?",
+          "a": "Do Scryfall (cartas, imagens e preços em dólar), do Commander Spellbook (combos) e do Banco Central do Brasil (cotação do dólar). A metodologia explica cada número."
+        },
+        "wizards": {
+          "q": "O ArcanaKin é da Wizards of the Coast?",
+          "a": "Não. É um projeto de fãs, sem afiliação com a Wizards of the Coast, dona de Magic: The Gathering."
+        }
+      }
+    }
+  },
+  "methodology": {
+    "metaTitle": "Metodologia — de onde vêm os dados e como o ArcanaKin avalia decks",
+    "metaDescription": "As fontes de dados do ArcanaKin e as regras da análise de deck: nota de 0 a 100, funções das cartas, bracket, base de mana e sugestões.",
+    "title": "Metodologia",
+    "intro": "De onde vem cada número que o ArcanaKin mostra e como a análise de deck chega à nota e às sugestões.",
     "sources": {
       "title": "De onde vêm as informações",
       "subtitle": "Usamos só fontes que permitem esse uso e damos o crédito. O que é do seu grupo fica no seu grupo.",
@@ -1462,55 +1539,7 @@
         "curve": "Curva (CMC médio até 3)"
       },
       "points": "{count} pontos"
-    },
-    "values": {
-      "title": "No que a gente acredita",
-      "subtitle": "O ArcanaKin nasceu numa mesa de amigos que queria completar os próprios decks e entender melhor o jogo. É isso que guia cada escolha.",
-      "items": {
-        "fun": {
-          "title": "Diversão acima de tudo",
-          "body": "Magic é encontro de amigos. Tudo aqui existe para sobrar mais tempo para jogar: marcar a noite sem enquete, contar a vida sem papel e levar o ranking na brincadeira. Se algo deixa a mesa mais chata, não entra."
-        },
-        "learn": {
-          "title": "Decks melhores, jogo melhor",
-          "body": "Tudo começou com uma pergunta: o que falta no meu deck? A análise mostra terrenos, ramp, compra, remoção e curva, e explica cada nota, para você entender e decidir. É um guia, não uma regra."
-        },
-        "transparency": {
-          "title": "Transparência",
-          "body": "Você sabe de onde vem cada número: a metodologia é aberta, as fontes recebem crédito e os preços avisam que são estimativas. Não vendemos dados, e você decide quem vê os seus decks.",
-          "link": "Ver a metodologia"
-        },
-        "accessible": {
-          "title": "Todo mundo na mesa",
-          "body": "Ninguém fica de fora: seguimos a WCAG 2.2 nível AA, com teclado, leitor de tela e bom contraste nos temas claro e escuro. Cada tela nova passa por auditoria antes de ir ao ar."
-        }
-      }
-    },
-    "join": {
-      "title": "Participe dos testes",
-      "body": "O ArcanaKin está em testes com grupos de Commander. Use com a sua mesa, conte o que funcionou, o que faltou e o que deu errado: cada mensagem vira melhoria.",
-      "email": "Enviar feedback por e-mail",
-      "emailSubject": "ArcanaKin — testes",
-      "or": "ou comece agora:"
-    },
-    "footer": {
-      "credits": "Dados de cartas pelo Scryfall; combos pelo Commander Spellbook; cotação do dólar pelo Banco Central do Brasil.",
-      "disclaimer": "ArcanaKin é um projeto de fãs e não é afiliado à Wizards of the Coast. Magic: The Gathering é marca registrada da Wizards of the Coast LLC.",
-      "contact": "Contato"
-    },
-    "preview": {
-      "label": "Exemplo do ArcanaKin: o próximo encontro com quem confirmou, o aviso de que a mesa fechou e o placar da noite.",
-      "nextEvent": "Próximo encontro",
-      "eventTitle": "Commander de sexta",
-      "eventWhen": "Sexta, 20:00",
-      "eventWhere": "Casa da Ana",
-      "confirmed": "4 confirmados",
-      "windowTitle": "A mesa fechou!",
-      "windowBody": "4 jogadores podem no sábado, 15:00–19:00",
-      "recap": "Placar da noite",
-      "wins": "{wins, plural, =1 {1 vitória} other {# vitórias}}"
-    },
-    "signUpEmail": "Criar conta com e-mail"
+    }
   },
   "places": {
     "name": "Nome do local",
@@ -1670,7 +1699,8 @@
     "help": "Ajuda",
     "feedback": "Feedback",
     "stores": "Lojas e eventos",
-    "learn": "Aprender a jogar"
+    "learn": "Aprender a jogar",
+    "methodology": "Metodologia"
   },
   "collection": {
     "title": "Coleção",
