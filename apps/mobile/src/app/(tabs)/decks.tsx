@@ -10,6 +10,9 @@ import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { EmptyState } from '@/components/empty-state';
+import { gridColumns, useLayout } from '@/lib/layout';
+
+const GAP = 12;
 
 /** Rótulo curto do bracket mínimo (2 = "1–2", 4 = "4–5"). */
 const BRACKET_SHORT = { 2: '1–2', 3: '3', 4: '4–5' } as const;
@@ -17,15 +20,23 @@ const BRACKET_SHORT = { 2: '1–2', 3: '3', 4: '4–5' } as const;
 /** Meus decks: o detalhe abre no app (5.8); editar continua no site. */
 export default function DecksScreen() {
   const decks = useAsync(() => api.decks.list(), []);
+  // Tablet: cartões de deck em 2 ou 3 colunas, como no site.
+  const layout = useLayout();
+  const columns = gridColumns(layout.innerWidth, { min: 300, max: 3, gap: GAP });
+  const itemWidth = (layout.innerWidth - GAP * (columns - 1)) / columns;
   // Deck importado ou apagado aparece ao voltar para a lista.
   useRefreshOnFocus(decks.refresh);
   if (decks.loading) return <Loading />;
   if (decks.error) return <ErrorState error={decks.error} onRetry={decks.refresh} />;
   return (
     <FlatList
+      // Trocar o número de colunas exige uma lista nova (o React Native não muda ao vivo).
+      key={`cols-${columns}`}
       data={decks.data ?? []}
       keyExtractor={(d) => d.id}
-      contentContainerStyle={{ padding: 16, gap: 12 }}
+      numColumns={columns}
+      columnWrapperStyle={columns > 1 ? { gap: GAP } : undefined}
+      contentContainerStyle={[layout.contentStyle, { gap: GAP }]}
       refreshControl={<RefreshControl refreshing={decks.refreshing} onRefresh={decks.refresh} />}
       ListHeaderComponent={
         <View style={{ gap: 12, marginBottom: 4 }}>
@@ -43,7 +54,11 @@ export default function DecksScreen() {
         </View>
       }
       ListEmptyComponent={<EmptyState>{t('decksEmpty')}</EmptyState>}
-      renderItem={({ item }) => <DeckCard deck={item} />}
+      renderItem={({ item }) => (
+        <View style={{ width: itemWidth }}>
+          <DeckCard deck={item} />
+        </View>
+      )}
     />
   );
 }
