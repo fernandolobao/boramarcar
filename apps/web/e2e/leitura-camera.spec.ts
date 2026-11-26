@@ -36,6 +36,11 @@ async function fakeCamera(page: Page, first: string | null) {
           ctx.fillStyle = '#111';
           ctx.font = `bold ${Math.round(ch * 0.045)}px serif`;
           ctx.fillText(w.__card, x + cw * 0.08, y + ch * 0.07);
+          // Linha de tipo e texto de regras, como numa carta de verdade: com só o nome numa carta
+          // em branco, o leitor de texto às vezes não lê nada (no Linux do CI, "Sol Ring" falha).
+          ctx.font = `${Math.round(ch * 0.035)}px serif`;
+          ctx.fillText('Artifact', x + cw * 0.08, y + ch * 0.6);
+          ctx.fillText('Tap: Add three colorless mana.', x + cw * 0.08, y + ch * 0.68);
         }
         requestAnimationFrame(draw);
       };
