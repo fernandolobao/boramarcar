@@ -521,3 +521,27 @@ export function searchGlossary(locale: LearnLocale, query: string) {
     return [entry['pt-BR'].term, entry.en.term, e.text].some((s) => fold(s).includes(q));
   });
 }
+
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Palavras-chave do glossário que aparecem no texto de uma carta (mesa de testes): procura o termo
+ * em inglês e em português como palavra inteira, sem maiúsculas; devolve na ordem em que aparecem,
+ * no idioma pedido. Só as palavras-chave impressas (`kind: 'keyword'`), não os termos do jogo.
+ */
+export function glossaryKeywordsIn(text: string, locale: LearnLocale) {
+  if (!text.trim()) return [];
+  const found: { index: number; entry: GlossaryEntry }[] = [];
+  for (const entry of GLOSSARY) {
+    if (entry.kind !== 'keyword') continue;
+    let first = -1;
+    for (const term of [entry.en.term, entry['pt-BR'].term]) {
+      const match = new RegExp(`(?<!\\p{L})${escapeRegExp(term)}(?!\\p{L})`, 'iu').exec(text);
+      if (match && (first < 0 || match.index < first)) first = match.index;
+    }
+    if (first >= 0) found.push({ index: first, entry });
+  }
+  return found
+    .sort((a, b) => a.index - b.index)
+    .map(({ entry }) => ({ id: entry.id, lesson: entry.lesson, ...entry[locale] }));
+}

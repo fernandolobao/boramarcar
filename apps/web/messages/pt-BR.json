@@ -2916,6 +2916,12 @@
       "tryAgain": "Escolha outra resposta e tente de novo.",
       "saved": "Desafio resolvido e salvo no seu progresso.",
       "review": "Rever a lição: {lesson}"
+    },
+    "practice": {
+      "title": "Pratique sozinho",
+      "text": "Abra um dos seus decks e jogue alguns turnos na mesa de testes: mão inicial, terrenos, mana e o que cada palavra-chave faz, sem ninguém do outro lado.",
+      "link": "Escolher um deck",
+      "signIn": "Entrar e escolher um deck"
     }
   },
   "scan": {
@@ -3015,6 +3021,15 @@
     "toBattlefield": "Para o campo",
     "toHandLabel": "{name} para a mão",
     "toBattlefieldLabel": "{name} para o campo",
-    "searched": "{name} → {zone}; grimório embaralhado."
+    "searched": "{name} → {zone}; grimório embaralhado.",
+    "view": "Ver carta",
+    "keywords": "Palavras-chave nesta carta",
+    "inGlossary": "Ver no glossário",
+    "lesson": "Lição: {title}",
+    "whatIs": "O que é {term}?",
+    "gotIt": "Entendi",
+    "hintTurn": "Novo no Magic? Cada turno tem etapas: desvirar, manutenção, comprar, fases principais, combate e final.",
+    "hintMana": "A mana disponível conta os terrenos desvirados; vire um terreno para \"gastar\" a mana dele.",
+    "hintTax": "Imposto do comandante: cada vez que o comandante volta para a zona de comando e é jogado de novo, custa {2} a mais."
   }
 }

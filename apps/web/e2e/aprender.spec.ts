@@ -25,7 +25,10 @@ test.describe('aprender a jogar (12.1)', () => {
       commander.getByRole('link', { name: /Lição 2 de 4: Identidade de cor/ }),
     ).toBeVisible();
     await page.goto('/aprender/como-se-vence');
+    // Última lição da trilha básica: convite para praticar na mesa de testes.
+    await expect(page.getByRole('region', { name: 'Pratique sozinho' })).toBeVisible();
     await page.getByRole('link', { name: /Próxima: O que é Commander/ }).click();
+    await expect(page.getByRole('region', { name: 'Pratique sozinho' })).toHaveCount(0);
     await expect(page.getByText(/Commander para iniciantes · Lição 1 de 4/)).toBeVisible();
     expect((await page.goto('/aprender/nao-existe'))?.status()).toBe(404);
   });

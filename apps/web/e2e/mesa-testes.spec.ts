@@ -45,6 +45,24 @@ test.describe('mesa de testes solo (11.4)', () => {
     await page.getByRole('button', { name: 'Criar', exact: true }).click();
     await expect(page.getByRole('button', { name: /Elf Warrior, ficha/ })).toHaveCount(2);
 
+    // "?" do cemitério: a definição do glossário, com o link.
+    await page.getByRole('button', { name: 'O que é Cemitério?' }).click();
+    await expect(page.getByRole('link', { name: 'Ver no glossário' }).first()).toHaveAttribute(
+      'href',
+      '/aprender/glossario#cemiterio',
+    );
+
+    // "Ver carta": a carta aberta numa janela.
+    await hand
+      .getByRole('button', { name: /^Ações:/ })
+      .first()
+      .click();
+    await page.getByRole('menuitem', { name: 'Ver carta…' }).click();
+    const card = page.getByRole('dialog');
+    await expect(card).toBeVisible();
+    await card.getByRole('button', { name: /Fechar/ }).click();
+    await expect(card).toBeHidden();
+
     // Procurar no grimório: a carta vai para a mão.
     await page.getByRole('button', { name: 'Procurar no grimório' }).click();
     const dialog = page.getByRole('dialog', { name: 'Procurar no grimório' });

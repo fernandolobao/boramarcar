@@ -344,6 +344,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Mesa de testes: jogue turnos de mentira com o seu deck (mão inicial, terrenos, mana disponível, fichas e desfazer) para ver se ele gira bem. Fica em "Opções do deck" → "Testar o deck".',
     en: 'Playtest table: play fake turns with your deck (opening hand, lands, available mana, tokens and undo) to see if it runs well. It\u2019s in "Deck options" → "Playtest the deck".',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Na mesa de testes, "Ver carta" explica as palavras-chave da carta e leva ao glossário e à lição; a trilha "Aprender a jogar" termina com um convite para praticar sozinho.',
+    en: 'On the playtest table, "View card" explains the card\u2019s keywords and links to the glossary and the lesson; the "Learn to play" path ends with an invitation to practice on your own.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
