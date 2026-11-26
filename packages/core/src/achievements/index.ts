@@ -1,4 +1,4 @@
-import { LEARN_TRACKS, LESSON_IDS } from '../learn';
+import { CHALLENGE_IDS, LEARN_TRACKS, LESSON_IDS } from '../learn';
 import type { GameResult } from '../ranking';
 
 /** Partida do ponto de vista de um jogador (para calcular conquistas). */
@@ -76,6 +76,7 @@ export const ACHIEVEMENT_IDS = [
   'learn_path',
   'learn_to_table',
   'learn_commander',
+  'learn_challenges',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -286,6 +287,14 @@ export function computeAchievements(
   const commanderTrack = track(LEARN_TRACKS.commander);
   const pathDone = basics.at;
   if (commanderTrack.at) unlock('learn_commander', commanderTrack.at);
+  // Desafios guiados (12.4): ficam na mesma lista de progresso, mas não contam como lição.
+  const challengesDone = (context.lessons ?? [])
+    .filter((l) => (CHALLENGE_IDS as readonly string[]).includes(l.lessonId))
+    .sort((a, b) => a.completedAt.getTime() - b.completedAt.getTime());
+  const challengeCount = new Set(challengesDone.map((l) => l.lessonId)).size;
+  if (challengeCount === CHALLENGE_IDS.length) {
+    unlock('learn_challenges', challengesDone.at(-1)!.completedAt);
+  }
   if (pathDone) unlock('learn_path', pathDone);
   const firstTable = pathDone
     ? ordered.find((g) => g.playedAt.getTime() >= pathDone.getTime())
@@ -329,6 +338,7 @@ export function computeAchievements(
     learn_path: [basics.count, basics.total],
     learn_to_table: [firstTable ? 1 : 0, 1],
     learn_commander: [commanderTrack.count, commanderTrack.total],
+    learn_challenges: [challengeCount, CHALLENGE_IDS.length],
   };
 
   return ACHIEVEMENT_IDS.map((id) => {

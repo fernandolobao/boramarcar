@@ -366,6 +366,27 @@ describe('conquistas da trilha "Aprender a jogar" (12.1)', () => {
     expect(find(onlyCommander, 'learn_path')).toMatchObject({ unlocked: false, progress: 0 });
   });
 
+  it('"desafios vencidos": acertar todos os desafios; desafio não conta como lição', () => {
+    const challenges = [
+      'desafio-voar',
+      'desafio-pilha',
+      'desafio-toque-mortifero',
+      'desafio-atropelar',
+      'desafio-enjoo',
+      'desafio-mana',
+      'desafio-dano-de-comandante',
+    ];
+    const list = computeAchievements('me', [], [], { lessons: lessons(challenges) });
+    expect(find(list, 'learn_challenges')).toMatchObject({ unlocked: true, unlockedAt: at(7) });
+    expect(find(list, 'learn_first').unlocked).toBe(false);
+    const some = computeAchievements('me', [], [], { lessons: lessons(challenges.slice(0, 2)) });
+    expect(find(some, 'learn_challenges')).toMatchObject({
+      unlocked: false,
+      progress: 2,
+      target: 7,
+    });
+  });
+
   it('lição que não existe mais não conta', () => {
     const list = computeAchievements('me', [], [], {
       lessons: lessons([...all.slice(0, 6), 'licao-antiga']),

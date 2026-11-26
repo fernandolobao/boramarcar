@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { LESSON_IDS } from '@boramarcar/core/learn';
+import { CHALLENGE_IDS, LESSON_IDS } from '@boramarcar/core/learn';
 import { citiesWithStores } from '@boramarcar/db';
 import { getDb } from '@/server/db';
 
@@ -27,6 +27,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: `${base()}/aprender`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${base()}/aprender/glossario`, changeFrequency: 'monthly', priority: 0.6 },
+    ...CHALLENGE_IDS.map((id) => ({
+      url: `${base()}/aprender/desafios/${id}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    })),
     ...LESSON_IDS.map((id) => ({
       url: `${base()}/aprender/${id}`,
       changeFrequency: 'monthly' as const,

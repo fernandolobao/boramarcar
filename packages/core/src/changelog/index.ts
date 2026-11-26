@@ -324,6 +324,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No Commander, a busca de "Adicionar carta" mostra só cartas da identidade do comandante, e o ArcanaKin avisa antes de pôr uma carta fora dela, com as cores que quebram a regra.',
     en: 'In Commander, "Add card" search shows only cards in the commander’s identity, and ArcanaKin warns before adding a card outside it, with the colors that break the rule.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Desafios em "Aprender a jogar": situações de mesa com uma pergunta e a resposta comentada, com uma conquista para quem acertar todos.',
+    en: 'Challenges in "Learn to play": table situations with a question and an explained answer, plus an achievement for getting them all right.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

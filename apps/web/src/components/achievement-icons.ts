@@ -24,6 +24,7 @@ export const ACHIEVEMENT_ICON: Record<AchievementId, IconName> = {
   learn_path: 'lessons',
   learn_to_table: 'table',
   learn_commander: 'lessons',
+  learn_challenges: 'table',
   games_100: 'veteran',
   wins_25: 'ranking',
   wins_50: 'ranking',

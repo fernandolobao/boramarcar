@@ -41,6 +41,24 @@ test.describe('aprender a jogar (12.1)', () => {
     await expect(page.getByRole('term').first()).toContainText('Ímpeto');
   });
 
+  test('desafios: a mesa, a pergunta e a resposta comentada (12.4)', async ({ page }) => {
+    await page.goto('/aprender');
+    const block = page.getByRole('region', { name: 'Desafios' });
+    await block.getByRole('link', { name: /Desafio 1 de 7: Um anjo no ar/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Um anjo no ar' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Oponente' })).toContainText('Serra Angel');
+    await page.getByRole('radio', { name: 'Bloqueio com Grizzly Bears.' }).check({ force: true });
+    await page.getByRole('button', { name: 'Responder' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Ainda não.' })).toBeVisible();
+    await page
+      .getByRole('radio', { name: 'Não bloqueio e perco 4 de vida.' })
+      .check({ force: true });
+    await page.getByRole('button', { name: 'Responder' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Certo!' })).toBeVisible();
+    await page.getByRole('link', { name: /Próxima: Raio nos Ursos/ }).click();
+    await expect(page).toHaveURL(/desafio-pilha$/);
+  });
+
   test.describe('com conta', () => {
     test.use({ storageState: AUTH_STATE });
 

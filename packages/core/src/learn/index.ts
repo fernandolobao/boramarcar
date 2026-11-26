@@ -12,6 +12,8 @@
 export type LearnLocale = 'pt-BR' | 'en';
 
 export * from './glossary';
+export * from './challenges';
+import { CHALLENGE_IDS } from './challenges';
 
 export interface LessonSection {
   id: string;
@@ -61,6 +63,10 @@ export const TRACK_IDS = ['basics', 'commander'] as const satisfies readonly Tra
 
 export const LESSON_IDS = [...LEARN_TRACKS.basics, ...LEARN_TRACKS.commander] as const;
 export type LessonId = (typeof LESSON_IDS)[number];
+
+/** Tudo o que tem progresso na trilha: lições e desafios (12.4). */
+export const LEARN_ITEM_IDS = [...LESSON_IDS, ...CHALLENGE_IDS] as const;
+export type LearnItemId = (typeof LEARN_ITEM_IDS)[number];
 
 export const isLessonId = (value: string): value is LessonId =>
   (LESSON_IDS as readonly string[]).includes(value);

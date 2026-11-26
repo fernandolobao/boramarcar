@@ -1181,6 +1181,10 @@
       "learn_commander": {
         "name": "Ready for Commander",
         "description": "Complete every lesson of \"Commander for beginners\"."
+      },
+      "learn_challenges": {
+        "name": "Challenges cleared",
+        "description": "Get every \"Learn to play\" challenge right."
       }
     },
     "tabsLabel": "Achievements",
@@ -2758,6 +2762,25 @@
       "keyword": "keyword",
       "seeLesson": "See the lesson",
       "open": "Glossary"
+    },
+    "challenges": {
+      "title": "Challenges",
+      "intro": "Table situations with a question: choose what to do and see why. Get it right and it's saved to your progress.",
+      "of": "Challenge {n} of {total}",
+      "solved": "Solved",
+      "all": "All challenges",
+      "board": "The table",
+      "you": "You",
+      "opponent": "Opponent",
+      "life": "life",
+      "answer": "Answer",
+      "right": "Right!",
+      "wrong": "Not quite.",
+      "correctAnswer": "Right answer",
+      "yourAnswer": "Your answer",
+      "tryAgain": "Choose another answer and try again.",
+      "saved": "Challenge solved and saved to your progress.",
+      "review": "Review the lesson: {lesson}"
     }
   }
 }
