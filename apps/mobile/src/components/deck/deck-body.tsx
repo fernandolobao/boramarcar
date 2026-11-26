@@ -5,6 +5,8 @@ import type { GameFormat } from '@boramarcar/core/games';
 import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { BracketChecklist } from './bracket-checklist';
+import { CardGrid, CardTile } from '@/components/card-tile';
+import { Choices } from '@/components/ds/choices';
 import { CardViewer } from './card-viewer';
 import { AddCardForm, LineEditor, usePrintPicker } from './deck-edit';
 import { ManaCost, manaCostLabel } from '@/components/mana';
@@ -123,12 +125,36 @@ export function DeckBody({
   const colors = useColors();
   const [open, setOpen] = useState<DeckLine | null>(null);
   const [editing, setEditing] = useState(false);
+  const [view, setView] = useState<'list' | 'gallery'>('list');
+  // Editando, sempre em lista (cada linha tem os controles).
+  const gallery = view === 'gallery' && !editing;
   const [editMessage, setEditMessage] = useState('');
   const changed = async (message?: string) => {
     if (message) setEditMessage(message);
     await onChanged?.();
   };
   const printPicker = usePrintPicker(deck.id, changed);
+  const tile = (line: DeckLine) => (
+    <CardTile
+      name={line.name}
+      imageUri={line.card?.imageUri}
+      quantity={line.quantity}
+      proxies={line.proxies}
+      foil={line.foils > 0}
+      accessibilityLabel={[
+        t('deckLine', { quantity: line.quantity, name: line.name }),
+        line.card?.setCode?.toUpperCase(),
+        line.proxies ? t('deckProxiesOf', { count: line.proxies }) : '',
+        line.foils ? t('collectionFoil') : '',
+      ]
+        .filter(Boolean)
+        .join(', ')}
+      onPress={() => setOpen(line)}
+    />
+  );
+  /** As cartas de um grupo: grade (galeria) ou linhas. */
+  const list = (lines: readonly DeckLine[]) =>
+    gallery ? <CardGrid items={lines} keyOf={(l) => l.key} render={tile} /> : lines.map(row);
   const row = (line: DeckLine) =>
     editing ? (
       <LineEditor
@@ -294,6 +320,17 @@ export function DeckBody({
             {editing && <AddCardForm deckId={deck.id} onChanged={changed} />}
           </View>
         )}
+        {!editing && (
+          <Choices
+            label={t('deckViewLabel')}
+            value={view}
+            options={[
+              { value: 'list', label: t('deckViewList') },
+              { value: 'gallery', label: t('deckViewGallery') },
+            ]}
+            onChange={setView}
+          />
+        )}
         {commanders.length > 0 && (
           <View>
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 4 }}>
@@ -302,7 +339,7 @@ export function DeckBody({
                 count: count(commanders),
               })}
             </AppText>
-            {commanders.map(row)}
+            {list(commanders)}
           </View>
         )}
         {groups.map(({ group, entries, count: total }) => (
@@ -310,7 +347,7 @@ export function DeckBody({
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
               {t('deckGroupCount', { group: tKey('deckType', group), count: total })}
             </AppText>
-            {entries.map(row)}
+            {list(entries)}
           </View>
         ))}
         {others.map(({ board, lines }) => (
@@ -318,7 +355,7 @@ export function DeckBody({
             <AppText accessibilityRole="header" style={{ fontWeight: '700', marginTop: 8 }}>
               {t('deckGroupCount', { group: tKey('deckBoard', board), count: count(lines) })}
             </AppText>
-            {lines.map(row)}
+            {list(lines)}
           </View>
         ))}
       </Section>
