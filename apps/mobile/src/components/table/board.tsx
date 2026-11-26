@@ -29,6 +29,7 @@ import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { counterLabel, defeatLabel } from './labels';
 import { NumberField } from '@/components/ds/number-field';
+import { Icon } from '@/components/icons';
 
 /** Soma das mudanças recentes ("−3"), que some 1,5 s depois da última (como no Lotus). */
 function useRecentDelta(value: number) {
@@ -132,12 +133,15 @@ function PlayerOptions({
         { opacity: pressed ? 0.7 : 1 },
       ]}
     >
-      <Text
-        style={[board.panelToggleText, on && board.panelToggleTextOn]}
-        maxFontSizeMultiplier={1.4}
-      >
-        {on ? `✓ ${label}` : label}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        {on ? <Icon name="done" color={board.panelToggleTextOn.color} /> : null}
+        <Text
+          style={[board.panelToggleText, on && board.panelToggleTextOn]}
+          maxFontSizeMultiplier={1.4}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
   return (
@@ -396,9 +400,12 @@ function PlayerPanel({
             swap.selected && { borderColor: '#ffffff', backgroundColor: 'rgba(0,0,0,0.4)' },
           ]}
         >
-          <Text style={board.swapText} maxFontSizeMultiplier={1.5}>
-            {swap.selected ? `✓ ${player.name}` : `⇄ ${player.name}`}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Icon name={swap.selected ? 'done' : 'swap'} size={22} color={board.swapText.color} />
+            <Text style={board.swapText} maxFontSizeMultiplier={1.5}>
+              {player.name}
+            </Text>
+          </View>
         </Pressable>
       )}
     </View>
