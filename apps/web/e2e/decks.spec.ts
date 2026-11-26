@@ -8,7 +8,8 @@ test.describe('deck', () => {
   test.use({ storageState: AUTH_STATE });
 
   test('curva de mana desenha barras com altura proporcional', async ({ page }) => {
-    await page.goto(`/decks/${E2E_IDS.deck}`);
+    // A curva fica na aba "Mana" da análise.
+    await page.goto(`/decks/${E2E_IDS.deck}?aba=mana`);
     const curve = page.getByRole('list', { name: 'Curva de mana' });
     await expect(curve.getByRole('listitem', { name: 'Custo 1: 1 carta' })).toBeVisible();
     await expect(curve.getByRole('listitem', { name: 'Custo 3: 1 carta' })).toBeVisible();
@@ -113,11 +114,18 @@ test.describe('deck', () => {
 
   test('análise: funções, bracket, base de mana e mão inicial', async ({ page }) => {
     await page.goto(`/decks/${E2E_IDS.deck}`);
-    // Funções, base de mana, mão inicial e comparação ficam em "Mais detalhes", fechado.
-    await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toBeHidden();
-    await page.getByText('Mais detalhes da análise').click();
+    // Análise em abas: "Visão geral" abre por padrão; a aba fica no endereço.
+    const tabs = page.getByRole('tablist', { name: 'Partes da análise' });
+    await expect(tabs.getByRole('tab', { name: /Visão geral/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toHaveCount(0);
+    await tabs.getByRole('tab', { name: 'Funções' }).click();
+    await expect(page).toHaveURL(/aba=funcoes/);
     await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toBeVisible();
     await expect(page.getByRole('heading', { name: /^Ramp/ })).toContainText('meta: 10');
+    await tabs.getByRole('tab', { name: 'Bracket' }).click();
     await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toBeVisible();
     await expect(page.getByTestId('deck-bracket')).toHaveText('1–2 · Exhibition ou Core');
     // Lista de progresso: trilha com o deck no 1–2 e um card por critério oficial.
@@ -134,9 +142,13 @@ test.describe('deck', () => {
       'Com mais 1, o deck vai para o Bracket 3.',
     );
     await expect(page.getByTestId('bracket-item-two_card_combo')).toBeVisible();
+    await tabs.getByRole('tab', { name: 'Mana' }).click();
     await expect(page.getByRole('heading', { name: 'Base de mana' })).toBeVisible();
+    // Link direto para a aba (ex.: da ajuda) abre nela.
+    await page.goto(`/decks/${E2E_IDS.deck}?aba=mao`);
     const drops = page.getByRole('table', { name: 'Ter terreno para jogar em todos os turnos' });
     await expect(drops.getByRole('row')).toHaveCount(5);
+    await tabs.getByRole('tab', { name: /Visão geral/ }).click();
     await expect(page.getByRole('button', { name: 'Atualizar análise' })).toBeVisible();
   });
 
@@ -160,8 +172,7 @@ test.describe('deck', () => {
   test('mão inicial: botão abre o teste numa janela; mulligan com carta para o fundo (11.3)', async ({
     page,
   }) => {
-    await page.goto(`/decks/${E2E_IDS.deck}`);
-    await page.getByText('Mais detalhes da análise').click();
+    await page.goto(`/decks/${E2E_IDS.deck}?aba=mao`);
     await page.getByRole('button', { name: 'Sortear mão inicial' }).click();
     const dialog = page.getByRole('dialog', { name: 'Testar a mão inicial' });
     await dialog.getByRole('button', { name: 'Comprar mão inicial' }).click();

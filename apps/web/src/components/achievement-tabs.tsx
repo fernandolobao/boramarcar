@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components';
+import { TAB_CLASS } from './ds/tabs';
 
 /**
  * Abas das conquistas no perfil: "Em aberto" abre por padrão; "Finalizadas" ao lado.
@@ -18,11 +19,7 @@ export function AchievementTabs({
     <Tabs defaultSelectedKey="pending" className="mt-4 space-y-4">
       <TabList aria-label={label} className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
-          <Tab
-            key={tab.id}
-            id={tab.id}
-            className="inline-flex min-h-10 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold transition motion-reduce:transition-none hover:bg-surface-muted data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-focus data-[selected]:border-primary data-[selected]:bg-primary data-[selected]:text-on-primary"
-          >
+          <Tab key={tab.id} id={tab.id} className={TAB_CLASS}>
             {tab.title}
           </Tab>
         ))}

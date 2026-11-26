@@ -309,6 +309,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Na análise do deck, em "Mão inicial", o botão "Sortear mão inicial" abre o teste da mão: compre 7, faça mulligan escolhendo as cartas do fundo e veja as próximas compras.',
     en: 'In the deck analysis, under "Opening hand", the "Draw a sample hand" button opens the hand test: draw 7, mulligan by choosing the bottom cards and see the next draws.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'A análise do deck agora fica num card só, com abas: visão geral, mana, mão inicial, funções e bracket. Nada fica escondido em "mais detalhes".',
+    en: 'The deck analysis now lives in a single card with tabs: overview, mana, opening hand, roles and bracket. Nothing is hidden under "more details".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
