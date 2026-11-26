@@ -505,3 +505,60 @@ export async function fetchScryfallCard(
   }
   return mapScryfallCard(await response.json());
 }
+
+/**
+ * Carta pelo nome aproximado (`/cards/named?fuzzy=`), para a leitura pela câmera: tolera letras
+ * trocadas. `null` quando o Scryfall não acha (ou acha várias e não decide).
+ */
+export async function fetchScryfallFuzzy(
+  name: string,
+  {
+    fetch: fetchFn,
+    userAgent = 'ArcanaKin/0.1',
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
+): Promise<CardData | null> {
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.scryfall,
+    'Scryfall',
+  )(`${SCRYFALL_API}/cards/named?fuzzy=${encodeURIComponent(name)}`, {
+    headers: { Accept: 'application/json', 'User-Agent': userAgent },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  return mapScryfallCard(await response.json());
+}
+
+/**
+ * Impressão exata pela edição e número de colecionador, na língua impressa quando houver
+ * (`/cards/{set}/{número}/{língua}`, com a de inglês de reserva). Traz também o nome impresso
+ * (ex.: "Infantaria dos Mil Luas") para conferir com o que foi lido.
+ */
+export async function fetchScryfallBySetNumber(
+  input: { set: string; number: string; lang?: string },
+  {
+    fetch: fetchFn,
+    userAgent = 'ArcanaKin/0.1',
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'>,
+): Promise<{ card: CardData; printedName: string | null } | null> {
+  const base = `${SCRYFALL_API}/cards/${encodeURIComponent(input.set.toLowerCase())}/${encodeURIComponent(input.number)}`;
+  const urls = input.lang && input.lang !== 'en' ? [`${base}/${input.lang}`, base] : [base];
+  for (const url of urls) {
+    const response = await withTimeout(
+      fetchFn,
+      EXTERNAL_TIMEOUT_MS.scryfall,
+      'Scryfall',
+    )(url, {
+      headers: { Accept: 'application/json', 'User-Agent': userAgent },
+    });
+    if (response.status === 404) continue;
+    if (!response.ok) {
+      throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+    }
+    const raw = (await response.json()) as { printed_name?: string };
+    return { card: mapScryfallCard(raw), printedName: raw.printed_name ?? null };
+  }
+  return null;
+}

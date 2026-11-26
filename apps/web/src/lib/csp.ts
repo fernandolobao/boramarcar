@@ -49,6 +49,9 @@ export function buildCsp({ nonce, dev = false }: { nonce: string; dev?: boolean 
       "'self'",
       `'nonce-${nonce}'`,
       "'strict-dynamic'",
+      // Leitura de cartas pela câmera: o leitor de texto (Tesseract) compila WebAssembly. Só
+      // permite compilar WASM, não libera `eval`.
+      "'wasm-unsafe-eval'",
       "'unsafe-inline'",
       'https:',
       // O modo de desenvolvimento do Next (recarregar ao salvar) usa eval.

@@ -19,6 +19,8 @@ export const RATE_LIMITS = {
   analysis: { limit: 20, windowMs: 10 * MINUTE },
   /** Buscas pequenas: autocompletar, edições, alternativas, endereços, adicionar carta. */
   search: { limit: 120, windowMs: MINUTE },
+  /** Leitura de carta pela câmera: cada leitura faz algumas buscas no Scryfall. */
+  scan: { limit: 40, windowMs: MINUTE },
   /** Entrar por convite: também impede tentar códigos no chute. */
   join: { limit: 20, windowMs: 10 * MINUTE },
   /** Criar grupo e trocar o código de convite. */
