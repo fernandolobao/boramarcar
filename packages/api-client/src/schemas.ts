@@ -177,6 +177,14 @@ export const deckSummarySchema = z
       .nullable()
       .optional(),
     updatedAt: date,
+    /** Capa (14.2): arte recortada, nome(s) da capa e cores. Servidores antigos não mandam. */
+    cover: z
+      .object({
+        artUri: z.string().nullable(),
+        names: z.array(z.string()),
+        colorIdentity: z.array(z.string()),
+      })
+      .nullish(),
   })
   .loose();
 export type DeckSummary = z.infer<typeof deckSummarySchema>;
