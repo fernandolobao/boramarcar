@@ -2,7 +2,7 @@ import type { DeckLine } from '@boramarcar/api-client';
 import { useState } from 'react';
 import { Image, Modal, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ManaText } from '@/components/mana';
+import { ManaCost, ManaText } from '@/components/mana';
 import { AppText, Button, styles } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -49,7 +49,12 @@ export function CardViewer({ line, onClose }: { line: DeckLine | null; onClose: 
           )}
           {card && (
             <View style={{ gap: 4 }}>
-              <AppText style={{ fontWeight: '600' }}>{card.typeLine}</AppText>
+              <View
+                style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}
+              >
+                <AppText style={{ fontWeight: '600' }}>{card.typeLine}</AppText>
+                <ManaCost cost={card.manaCost} />
+              </View>
               {card.setName && (
                 <AppText muted>
                   {t('deckSet', {

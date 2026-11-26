@@ -7,6 +7,7 @@ import { Image, Pressable, View } from 'react-native';
 import { BracketChecklist } from './bracket-checklist';
 import { CardViewer } from './card-viewer';
 import { AddCardForm, LineEditor, usePrintPicker } from './deck-edit';
+import { ManaCost, manaCostLabel } from '@/components/mana';
 import { formatLabel } from '@/components/table/labels';
 import { StackSection } from '@/components/stack';
 import { Tip } from '@/components/tip';
@@ -60,6 +61,7 @@ function LineRow({ line, onOpen }: { line: DeckLine; onOpen: () => void }) {
       accessibilityRole="button"
       accessibilityLabel={[
         t('deckLine', { quantity: line.quantity, name: line.name }),
+        manaCostLabel(line.card?.manaCost),
         set,
         line.proxies ? t('deckProxiesOf', { count: line.proxies }) : '',
       ]
@@ -82,6 +84,7 @@ function LineRow({ line, onOpen }: { line: DeckLine; onOpen: () => void }) {
       <AppText style={{ flex: 1 }} numberOfLines={2}>
         {line.name}
       </AppText>
+      <ManaCost cost={line.card?.manaCost} size={14} />
       {line.proxies > 0 && (
         <AppText
           style={{
