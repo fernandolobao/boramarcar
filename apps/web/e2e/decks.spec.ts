@@ -1,7 +1,18 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import { AUTH_STATE } from './support/global-setup';
 import { E2E_IDS } from './support/seed';
 import { pick } from './support/select';
+
+/**
+ * Escolhe uma aba da análise. As abas (React Aria) só respondem depois da hidratação: num CI lento,
+ * o primeiro clique pode acontecer antes. Repete até a aba ficar selecionada.
+ */
+async function chooseTab(tab: Locator) {
+  await expect(async () => {
+    await tab.click();
+    await expect(tab).toHaveAttribute('aria-selected', 'true', { timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
+}
 
 test.describe('deck', () => {
   test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
@@ -121,11 +132,11 @@ test.describe('deck', () => {
       'true',
     );
     await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toHaveCount(0);
-    await tabs.getByRole('tab', { name: 'Funções' }).click();
+    await chooseTab(tabs.getByRole('tab', { name: 'Funções' }));
     await expect(page).toHaveURL(/aba=funcoes/);
     await expect(page.getByRole('heading', { name: 'Funções das cartas' })).toBeVisible();
     await expect(page.getByRole('heading', { name: /^Ramp/ })).toContainText('meta: 10');
-    await tabs.getByRole('tab', { name: 'Bracket' }).click();
+    await chooseTab(tabs.getByRole('tab', { name: 'Bracket' }));
     await expect(page.getByRole('heading', { name: 'Bracket estimado' })).toBeVisible();
     await expect(page.getByTestId('deck-bracket')).toHaveText('1–2 · Exhibition ou Core');
     // Lista de progresso: trilha com o deck no 1–2 e um card por critério oficial.
@@ -142,13 +153,13 @@ test.describe('deck', () => {
       'Com mais 1, o deck vai para o Bracket 3.',
     );
     await expect(page.getByTestId('bracket-item-two_card_combo')).toBeVisible();
-    await tabs.getByRole('tab', { name: 'Mana' }).click();
+    await chooseTab(tabs.getByRole('tab', { name: 'Mana' }));
     await expect(page.getByRole('heading', { name: 'Base de mana' })).toBeVisible();
     // Link direto para a aba (ex.: da ajuda) abre nela.
     await page.goto(`/decks/${E2E_IDS.deck}?aba=mao`);
     const drops = page.getByRole('table', { name: 'Ter terreno para jogar em todos os turnos' });
     await expect(drops.getByRole('row')).toHaveCount(5);
-    await tabs.getByRole('tab', { name: /Visão geral/ }).click();
+    await chooseTab(tabs.getByRole('tab', { name: /Visão geral/ }));
     await expect(page.getByRole('button', { name: 'Atualizar análise' })).toBeVisible();
   });
 
