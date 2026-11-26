@@ -444,6 +444,8 @@ export const deckCardSchema = z
     setName: z.string().nullish(),
     collectorNumber: z.string().nullish(),
     priceUsd: z.string().nullish(),
+    /** Identidade de cor (mesa de testes: as cores de cada terreno). Servidores antigos: vazia. */
+    colorIdentity: z.array(z.string()).default([]),
   })
   .loose();
 export type DeckCard = z.infer<typeof deckCardSchema>;

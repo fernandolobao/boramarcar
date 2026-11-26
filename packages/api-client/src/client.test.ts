@@ -330,6 +330,8 @@ describe('cliente da API', () => {
     expect(deck.lines[0]!.card?.typeLine).toContain('Creature');
     // Servidor antigo sem `foils`: nenhuma cópia foil.
     expect(deck.lines[0]!.foils).toBe(0);
+    // Sem `colorIdentity` (servidor antigo): lista vazia (a mesa de testes conta como incolor).
+    expect(deck.lines[0]!.card?.colorIdentity).toEqual([]);
     expect(deck.analysis.score).toBe(82);
     expect(deck.analysis.validation[0]).toMatchObject({ code: 'banned', name: 'X' });
   });
