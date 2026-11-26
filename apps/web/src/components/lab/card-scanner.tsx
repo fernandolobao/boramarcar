@@ -57,7 +57,8 @@ function prepare(src: HTMLCanvasElement, maxWidth = 1600) {
 }
 
 /** Palavra com cara de nome de carta: "Ring", "Sol", "of", "Llanowar", "Praetors'". */
-const NAME_WORD = /^([A-Z][a-z'’,-]+[a-zA-Z'’,-]*|of|the|and|to|a|in|from|for|with|on)$/;
+const NAME_WORD =
+  /^([A-ZÀ-Ý][a-zà-ÿ'’,-]+[a-zA-Zà-ÿÀ-Ý'’,-]*|of|the|and|to|a|in|from|for|with|on|de|do|da|dos|das|e|o|os|as|no|na|em)$/;
 /** Palavras da linha de tipo: não são nome de carta. */
 const TYPE_WORDS = new Set(
   'Artifact Creature Instant Sorcery Enchantment Land Legendary Basic Token Planeswalker Battle Tribal Kindred Snow World Aura Equipment Vehicle'.split(
@@ -86,15 +87,108 @@ function nameCandidate(text: string) {
   return best.join(' ').replace(/,$/, '');
 }
 
-/** Variações para a busca aproximada: o nome lido e, se tiver 3+ palavras, sem a última. */
+/** Variações para a busca: o nome lido e ele sem palavras do fim (lixo colado), até 2 palavras. */
 const variants = (name: string) => {
   const words = name.split(' ');
-  return words.length >= 3 ? [name, words.slice(0, -1).join(' ')] : [name];
+  const out = [name];
+  for (let n = words.length - 1; n >= 2; n--) out.push(words.slice(0, n).join(' '));
+  return out;
 };
 
+/** Quantas letras (o candidato "com mais nome" vem primeiro). */
+const letters = (s: string) => s.replace(/[^A-Za-zÀ-ÿ]/g, '').length;
+
+/** Semelhança entre dois nomes (0–1), pela distância de edição sem acentos nem maiúsculas. */
+function similarity(a: string, b: string) {
+  const norm = (s: string) =>
+    s
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+      .replace(/[^a-z ]/g, '');
+  const x = norm(a);
+  const y = norm(b);
+  const d: number[] = Array.from({ length: y.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= x.length; i++) {
+    let prev = d[0]!;
+    d[0] = i;
+    for (let j = 1; j <= y.length; j++) {
+      const tmp = d[j]!;
+      d[j] = Math.min(d[j]! + 1, d[j - 1]! + 1, prev + (x[i - 1] === y[j - 1] ? 0 : 1));
+      prev = tmp;
+    }
+  }
+  return 1 - d[y.length]! / Math.max(x.length, y.length, 1);
+}
+
+/** Carta pelo nome impresso em português (o fuzzy do Scryfall só conhece os nomes em inglês). */
+async function byPrintedName(candidate: string) {
+  const q = `lang:pt ${candidate.replace(/[^\p{L}\s'-]/gu, ' ')}`;
+  const res = await politeFetch(
+    `https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}&include_multilingual=true&unique=prints&order=released`,
+  );
+  if (!res?.ok) return null;
+  const body = (await res.json()) as {
+    data: {
+      name: string;
+      printed_name?: string;
+      set: string;
+      collector_number: string;
+      image_uris?: { small?: string };
+    }[];
+  };
+  const c = body.data.find((x) => x.printed_name && similarity(x.printed_name, candidate) >= 0.7);
+  return c
+    ? {
+        name: `${c.name} (${c.printed_name})`,
+        set: c.set.toUpperCase(),
+        number: c.collector_number,
+        image: c.image_uris?.small ?? null,
+      }
+    : null;
+}
+
+/** Espera entre consultas: o Scryfall pede no máximo 10 por segundo. */
+let lastCall = 0;
+async function politeFetch(url: string) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const wait = Math.max(0, lastCall + 150 - Date.now()) + attempt * 600;
+    if (wait) await new Promise((r) => setTimeout(r, wait));
+    lastCall = Date.now();
+    try {
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (res.status !== 429) return res;
+    } catch {
+      // Limite do Scryfall (a resposta 429 vem sem CORS e vira erro de rede): tenta de novo.
+    }
+  }
+  return null;
+}
+
+/** Carta por endereço, com o nome impresso (cartas em outra língua). */
+async function scryfallPrinted(url: string) {
+  const res = await politeFetch(url);
+  if (!res?.ok) return null;
+  const c = (await res.json()) as {
+    name: string;
+    printed_name?: string;
+    set: string;
+    collector_number: string;
+    image_uris?: { small?: string };
+    card_faces?: { image_uris?: { small?: string } }[];
+  };
+  return {
+    name: c.name,
+    printed: c.printed_name ?? null,
+    set: c.set.toUpperCase(),
+    number: c.collector_number,
+    image: c.image_uris?.small ?? c.card_faces?.[0]?.image_uris?.small ?? null,
+  };
+}
+
 async function scryfall(url: string) {
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!res.ok) return null;
+  const res = await politeFetch(url);
+  if (!res?.ok) return null;
   const c = (await res.json()) as {
     name: string;
     set: string;
@@ -178,39 +272,64 @@ export function CardScanner() {
       // Nome: linhas na parte de cima (na moldura) ou em qualquer lugar (na foto), de cima para baixo.
       const lines = [...(data.lines ?? [])]
         .filter((l) => l.bbox.y0 < prepared.height * nameZone)
+        // Linha de copyright e do ilustrador não são nome de carta.
+        .filter((l) => !/wizards|coast|©|™|illus/i.test(l.text))
+        // Linha de tipo ("Legendary Creature — Angel") também não.
+        .filter((l) => !TYPE_WORDS.has(nameCandidate(l.text).split(' ')[0] ?? ''))
         .sort((a, b) => a.bbox.y0 - b.bbox.y0);
-      const candidates = [
-        ...new Set(
-          lines.flatMap((l) => variants(nameCandidate(l.text))).filter((n) => n.length >= 3),
-        ),
-      ].slice(0, 5);
+      // Os nomes lidos, os mais longos primeiro (lixo costuma ser curto), com as variações.
+      const names = [
+        ...new Set(lines.map((l) => nameCandidate(l.text)).filter((n) => letters(n) >= 4)),
+      ]
+        .sort((a, b) => letters(b) - letters(a))
+        .slice(0, 3);
+      const candidates = [...new Set(names.flatMap(variants))].slice(0, 4);
       // Edição e número (cartas novas): "0123 C … DMU • EN" ou "190/332 M … 2XM • EN".
-      const setMatch = /\b([A-Z0-9]{3,5})\W{0,3}(EN|PT|ES|JP|DE|FR|IT)\b/.exec(text);
-      const set = setMatch?.[1];
+      const setMatch = /\b([A-Za-z0-9]{3,5})\W{0,3}(EN|PT|ES|JP|DE|FR|IT)\b/.exec(text);
+      const set = setMatch?.[1]?.toUpperCase();
+      const lang = setMatch?.[2]?.toLowerCase() ?? 'en';
       const before = setMatch ? text.slice(Math.max(0, setMatch.index - 40), setMatch.index) : '';
       // Número de colecionador: "190/332", "0499" (zero à esquerda) ou seguido da raridade;
       // anos ("© 2026") não contam.
       const numbers = [...before.matchAll(/\b(\d{1,4})\b(\s*[CURMSLT]\b)?/g)].filter(
         (m) => !/^(19|20)\d\d$/.test(m[1]!),
       );
-      const number =
-        /\b(\d{1,4})\s*\/\s*\d{1,4}\b/.exec(before)?.[1] ??
-        numbers.find((m) => m[1]!.startsWith('0') || m[2])?.[1] ??
-        numbers.at(-1)?.[1];
+      const slash = /\b(\d{1,4})\s*\/\s*\d{1,4}\b/.exec(before)?.[1];
+      const marked = numbers.find((m) => m[1]!.startsWith('0') || m[2])?.[1];
+      const number = slash ?? marked ?? numbers.at(-1)?.[1];
+      /** Número no formato da linha de colecionador ("0499", "190/332"): sinal forte. */
+      const strongNumber = Boolean(slash ?? marked);
       const tried: string[] = [];
       let match: Result['match'] = null;
+      /** Edição + número que não bateram com o nome lido: último recurso. */
+      let unverified: Awaited<ReturnType<typeof scryfallPrinted>> = null;
       if (number && set) {
         tried.push(`${set} #${Number(number)}`);
-        const exact = await scryfall(
-          `https://api.scryfall.com/cards/${set.toLowerCase()}/${Number(number)}`,
-        );
+        // Na língua impressa (o nome lido é o dessa língua), com a de inglês de reserva.
+        const base = `https://api.scryfall.com/cards/${set.toLowerCase()}/${Number(number)}`;
+        const exact =
+          (lang !== 'en' ? await scryfallPrinted(`${base}/${lang}`) : null) ??
+          (await scryfallPrinted(base));
         // Confere com algum nome lido: se não bate, a edição/número foi mal lida.
         const agrees =
-          !candidates.length ||
-          candidates.some((c) =>
-            exact?.name.toLowerCase().includes(c.split(' ')[0]!.toLowerCase()),
+          !names.length ||
+          names.some(
+            (c) =>
+              similarity(c, exact?.printed ?? '') >= 0.6 || similarity(c, exact?.name ?? '') >= 0.6,
           );
-        if (exact && agrees) match = { ...exact, how: 'edição + número' };
+        if (exact && !agrees && strongNumber) unverified = exact;
+        if (exact && agrees) {
+          match = {
+            name:
+              exact.printed && exact.printed !== exact.name
+                ? `${exact.name} (${exact.printed})`
+                : exact.name,
+            set: exact.set,
+            number: exact.number,
+            image: exact.image,
+            how: 'edição + número',
+          };
+        }
       }
       for (const candidate of candidates) {
         if (match) break;
@@ -218,7 +337,30 @@ export function CardScanner() {
         const fuzzy = await scryfall(
           `https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(candidate)}`,
         );
-        if (fuzzy) match = { ...fuzzy, how: 'nome (aproximado)' };
+        // Só vale se o nome achado for parecido com o lido ("Giant" não vale por "Doomwake Gian").
+        if (fuzzy && similarity(candidate, fuzzy.name) >= 0.6) {
+          match = { ...fuzzy, how: 'nome (aproximado)' };
+        }
+      }
+      // Cartas em português: pelo nome impresso.
+      for (const candidate of names) {
+        if (match) break;
+        tried.push(`pt: ${candidate}`);
+        const pt = await byPrintedName(candidate);
+        if (pt) match = { ...pt, how: 'nome em português' };
+      }
+      // Nada pelo nome: a edição + número lidos no formato da linha de colecionador.
+      if (!match && unverified) {
+        match = {
+          name:
+            unverified.printed && unverified.printed !== unverified.name
+              ? `${unverified.name} (${unverified.printed})`
+              : unverified.name,
+          set: unverified.set,
+          number: unverified.number,
+          image: unverified.image,
+          how: 'edição + número (sem conferir o nome)',
+        };
       }
       setResults((r) => [
         {
