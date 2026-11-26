@@ -328,6 +328,8 @@ describe('cliente da API', () => {
     });
     const deck = await api.decks.get('d1');
     expect(deck.lines[0]!.card?.typeLine).toContain('Creature');
+    // Servidor antigo sem `foils`: nenhuma cópia foil.
+    expect(deck.lines[0]!.foils).toBe(0);
     expect(deck.analysis.score).toBe(82);
     expect(deck.analysis.validation[0]).toMatchObject({ code: 'banned', name: 'X' });
   });

@@ -455,6 +455,8 @@ export const deckLineSchema = z
     board: z.enum(['commander', 'mainboard', 'sideboard', 'maybeboard', 'tokens']),
     quantity: z.number(),
     proxies: z.number(),
+    /** Cópias foil (das reais). Servidores antigos não mandam: nenhuma. */
+    foils: z.number().default(0),
     scryfallId: z.string().nullable(),
     card: deckCardSchema.nullable(),
   })

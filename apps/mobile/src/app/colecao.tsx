@@ -2,8 +2,9 @@ import type { CollectionEntry } from '@boramarcar/api-client';
 import { ApiError } from '@boramarcar/api-client';
 import { Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, Modal, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { FlatList, Image, Modal, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CARD_RATIO, CardTile } from '@/components/card-tile';
 import { ConfirmButton } from '@/components/confirm-button';
 import { TextField } from '@/components/fields';
 import { Tip } from '@/components/tip';
@@ -18,7 +19,6 @@ import { Checkbox } from '@/components/ds/checkbox';
 
 type Sort = 'name' | 'value' | 'recent';
 type FoilFilter = 'all' | 'foil' | 'nonfoil';
-const CARD_RATIO = 63 / 88;
 
 const usd = (value: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
@@ -252,7 +252,6 @@ function EntrySheet({
 
 /** Coleção (paridade com /colecao): o que a pessoa tem de verdade, com busca, filtros e totais. */
 export default function CollectionScreen() {
-  const colors = useColors();
   const collection = useAsync(() => api.collection.list(), []);
   const [search, setSearch] = useState('');
   const [foilFilter, setFoilFilter] = useState<FoilFilter>('all');
@@ -356,8 +355,12 @@ export default function CollectionScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <Pressable
-            accessibilityRole="button"
+          <CardTile
+            name={item.name}
+            imageUri={item.card?.imageUri}
+            quantity={item.quantity}
+            foil={item.foil}
+            showName
             accessibilityLabel={t('collectionOpen', {
               name: item.name,
               count: item.quantity,
@@ -369,62 +372,7 @@ export default function CollectionScreen() {
                 .join(', '),
             })}
             onPress={() => setOpenId(item.id)}
-            style={({ pressed }) => ({ flex: 1, gap: 4, opacity: pressed ? 0.8 : 1 })}
-          >
-            <View
-              style={{
-                aspectRatio: CARD_RATIO,
-                borderRadius: 10,
-                overflow: 'hidden',
-                backgroundColor: colors.surfaceMuted,
-              }}
-            >
-              {item.card?.imageUri && (
-                <Image
-                  source={{ uri: item.card.imageUri }}
-                  style={{ width: '100%', height: '100%' }}
-                />
-              )}
-              <View
-                style={{
-                  position: 'absolute',
-                  left: 4,
-                  top: 4,
-                  paddingHorizontal: 6,
-                  borderRadius: 6,
-                  backgroundColor: colors.badgeBg,
-                }}
-              >
-                <AppText style={{ fontSize: 12, fontWeight: '700', color: colors.badgeText }}>
-                  ×{item.quantity}
-                </AppText>
-              </View>
-              {/* Selo de foil no canto inferior esquerdo, como no site (deck e coleção): as legendas ficam com a mesma altura
-                  em todas as cartas (o "foil" já está no nome acessível do botão). */}
-              {item.foil && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    left: 6,
-                    bottom: '6%',
-                    paddingHorizontal: 6,
-                    paddingVertical: 2,
-                    borderRadius: 6,
-                    backgroundColor: colors.foilBg,
-                  }}
-                  importantForAccessibility="no-hide-descendants"
-                  accessibilityElementsHidden
-                >
-                  <AppText style={{ fontSize: 12, fontWeight: '700', color: colors.foilText }}>
-                    ✦ {t('collectionFoil')}
-                  </AppText>
-                </View>
-              )}
-            </View>
-            <AppText numberOfLines={1} style={{ fontSize: 13, fontWeight: '600' }}>
-              {item.name}
-            </AppText>
-          </Pressable>
+          />
         )}
         ListFooterComponent={
           visible.length > limit ? (
