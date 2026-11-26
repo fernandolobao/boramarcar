@@ -86,6 +86,12 @@ const AUTH_PAGES = [
   '/feedback?de=/painel',
   '/notificacoes',
   '/admin',
+  '/admin?aba=beta',
+  '/admin?aba=avisos',
+  '/admin?aba=lojas',
+  '/admin?aba=custos',
+  '/admin?aba=contas',
+  '/admin?aba=feedback',
   '/jogadores/e2e-bia',
   `/convite/${E2E_INVITE_CODE}`,
 ];

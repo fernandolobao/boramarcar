@@ -9,7 +9,7 @@ test.describe('custos da plataforma (admin, 13.1)', () => {
   test('admin lança um custo em real, vê no mês e apaga em dois cliques', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
     const note = `E2E ${Date.now()}`;
-    await page.goto('/admin');
+    await page.goto('/admin?aba=custos');
     const section = page.getByRole('region', { name: 'Custos da plataforma' });
     await pick(section, 'Serviço', 'Neon (banco de dados)');
     await pick(section, 'Moeda', 'Real (R$)');

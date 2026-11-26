@@ -20,13 +20,23 @@ test.describe('feedback', () => {
     await expect(page.getByText('Obrigado! Recebemos o seu feedback.')).toBeFocused();
   });
 
-  test('métricas do beta e feedback recente para quem está em ADMIN_EMAILS', async ({ page }) => {
+  test('Admin em abas: métricas do beta, feedback e contas para quem está em ADMIN_EMAILS', async ({
+    page,
+  }) => {
     await page.goto('/painel');
     await page.getByRole('button', { name: /Menu da conta/ }).click();
-    await page.getByRole('link', { name: 'Métricas do beta' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Métricas do beta' })).toBeVisible();
+    await page.getByRole('link', { name: 'Admin' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Admin' })).toBeVisible();
+    // Aba padrão: métricas do beta.
+    await expect(page.getByRole('tab', { name: 'Métricas do beta' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
     await expect(page.getByRole('heading', { name: 'Métrica norte' })).toBeVisible();
+    await page.getByRole('tab', { name: 'Feedback' }).click();
+    await expect(page).toHaveURL(/aba=feedback/);
     await expect(page.getByRole('heading', { name: 'Feedback recente' })).toBeVisible();
+    await page.getByRole('tab', { name: 'Contas' }).click();
     // Lista de contas, com busca por nome ou e-mail.
     const accounts = page.getByRole('region', { name: 'Contas' });
     await accounts.getByLabel('Buscar por nome ou e-mail').fill('bia@e2e');

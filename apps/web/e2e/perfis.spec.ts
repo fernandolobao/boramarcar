@@ -120,7 +120,7 @@ test.describe('perfis e conquistas', () => {
       page.getByRole('heading', { level: 1, name: 'Deck secreto da Bia' }),
     ).toBeVisible();
     await expect(page.getByRole('note')).toContainText('como admin do ArcanaKin');
-    await page.goto('/admin');
+    await page.goto('/admin?aba=contas');
     const bia = page.getByRole('listitem').filter({ hasText: 'bia@e2e.test' });
     await expect(bia.getByText('Decks', { exact: true })).toBeVisible();
     await expect(bia.getByText('Cartas na coleção')).toBeVisible();

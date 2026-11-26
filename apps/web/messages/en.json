@@ -32,7 +32,7 @@
     "signedInAs": "Signed in as",
     "collection": "Collection",
     "feedback": "Send feedback",
-    "admin": "Beta metrics",
+    "admin": "Admin",
     "notifications": "Notifications"
   },
   "dashboard": {
@@ -1856,7 +1856,7 @@
     "privacy": "We keep the text, the type, the page you came from and the platform, with your account, to reply and improve the app."
   },
   "admin": {
-    "title": "Beta metrics",
+    "title": "Admin",
     "intro": "Aggregated counts for the last {days} days, computed straight from the database (no personal data). Only people in ADMIN_EMAILS see this page.",
     "northStar": "North star metric",
     "activeGroups": "Active groups (with a recorded game)",
@@ -2033,6 +2033,16 @@
       "usdValue": "{usd} = {brl} (rate {rate})",
       "delete": "Delete",
       "deleteConfirm": "Confirm: delete"
+    },
+    "tabsLabel": "Admin sections",
+    "tabs": {
+      "metrics": "Beta metrics",
+      "beta": "Beta",
+      "announcements": "Notices",
+      "stores": "Stores",
+      "costs": "Costs",
+      "accounts": "Accounts",
+      "feedback": "Feedback"
     }
   },
   "meta": {
@@ -2123,8 +2133,8 @@
       "description": "Each player's life, poison and monarch, right from your phone at the table."
     },
     "admin": {
-      "title": "Beta metrics",
-      "description": "ArcanaKin beta metrics."
+      "title": "Admin",
+      "description": "ArcanaKin administration: beta metrics, notices, stores, costs, accounts and feedback."
     },
     "homeImage": "Schedule your next Commander night.",
     "homeImageSubtitle": "Times when everyone can play, meetups, rankings, decks and games in one place.",

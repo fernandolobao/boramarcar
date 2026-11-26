@@ -32,7 +32,7 @@
     "signedInAs": "Conectado como",
     "collection": "Coleção",
     "feedback": "Enviar feedback",
-    "admin": "Métricas do beta",
+    "admin": "Admin",
     "notifications": "Notificações"
   },
   "dashboard": {
@@ -1856,7 +1856,7 @@
     "privacy": "Guardamos o texto, o tipo, a página de onde você veio e a plataforma, junto com a sua conta, para responder e melhorar o app."
   },
   "admin": {
-    "title": "Métricas do beta",
+    "title": "Admin",
     "intro": "Contagens agregadas dos últimos {days} dias, calculadas direto do banco (sem dados de pessoas). Só quem está em ADMIN_EMAILS vê esta página.",
     "northStar": "Métrica norte",
     "activeGroups": "Grupos ativos (com partida registrada)",
@@ -2033,6 +2033,16 @@
       "usdValue": "{usd} = {brl} (cotação {rate})",
       "delete": "Apagar",
       "deleteConfirm": "Confirmar: apagar"
+    },
+    "tabsLabel": "Seções do Admin",
+    "tabs": {
+      "metrics": "Métricas do beta",
+      "beta": "Beta",
+      "announcements": "Avisos",
+      "stores": "Lojas",
+      "costs": "Custos",
+      "accounts": "Contas",
+      "feedback": "Feedback"
     }
   },
   "meta": {
@@ -2123,8 +2133,8 @@
       "description": "Vida, veneno e monarca de cada jogador, direto do celular na mesa."
     },
     "admin": {
-      "title": "Métricas do beta",
-      "description": "Métricas do beta do ArcanaKin."
+      "title": "Admin",
+      "description": "Administração do ArcanaKin: métricas do beta, avisos, lojas, custos, contas e feedback."
     },
     "homeImage": "Marque o próximo Commander com a sua mesa.",
     "homeImageSubtitle": "Horários em que todo mundo pode, encontros, ranking, decks e partidas num lugar só.",
