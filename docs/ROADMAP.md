@@ -267,7 +267,7 @@ Objetivo: o app ter o mesmo apelo visual do site — hoje está cru. Trabalho nu
 
 ## Fase 15 — Layout para tablet (pedido de 26/11/2026)
 
-Objetivo: tablet ter um layout próprio. Hoje o site e o app têm layouts para celular e computador, e o tablet (768–1024 px, em pé ou deitado) cai nas regras do celular e fica ruim: colunas estreitas e muito espaço sobrando. No app, `supportsTablet` está ligado, mas nenhuma tela se adapta à largura.
+Objetivo: tablet ter um layout próprio. Hoje o site e o app têm layouts para celular e computador, e o tablet (768–1024 px, em pé ou deitado) cai nas regras do celular e fica ruim: colunas estreitas e muito espaço sobrando. No app, `supportsTablet` está ligado, mas nenhuma tela se adapta à largura. O dono viu problemas **em todas as telas e em todos os modais**, no site e no app: a correção começa pela base (layout comum, navegação, diálogos e grades do design system), não tela a tela.
 
 | #    | Item                                                                                                                                                                                                                                    | Tamanho | Status   |
 | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------- |
