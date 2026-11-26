@@ -1,4 +1,8 @@
-import { Image, Pressable, View } from 'react-native';
+import { palette } from '@boramarcar/tokens';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, Image, Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { useReduceMotion } from '@/components/stack';
 import { AppText } from '@/components/ui';
 import { t } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
@@ -56,7 +60,9 @@ export function CardTile({
       >
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%' }} />
-        ) : (
+        ) : null}
+        {imageUri && foil ? <FoilSheen /> : null}
+        {imageUri ? null : (
           <AppText style={{ textAlign: 'center', fontSize: 12, padding: 6 }} numberOfLines={4}>
             {name}
           </AppText>
@@ -128,6 +134,121 @@ export function CardGrid<T>({
           ))}
         </View>
       ))}
+    </View>
+  );
+}
+
+/** Uma faixa do brilho (uma largura de carta): dourado, mana e éter, como no site. */
+const SHEEN_STOPS = [
+  { offset: 0, color: palette.dourado, opacity: 0 },
+  { offset: 0.25, color: palette.dourado, opacity: 0.45 },
+  { offset: 0.4, color: palette.mana, opacity: 0.4 },
+  { offset: 0.55, color: palette.eter, opacity: 0.45 },
+  { offset: 0.8, color: palette.eter, opacity: 0 },
+] as const;
+
+/**
+ * Brilho das cartas foil (decorativo, como `.foil-sheen` no site): a faixa repetida anda uma
+ * largura de carta em loop, inclinada, e "respira" na opacidade com outro período. Cada carta tem
+ * ritmo e atraso próprios; com "reduzir movimento", fica parado.
+ */
+function FoilSheen() {
+  const reduce = useReduceMotion();
+  // `useId` traz ":", que o `url(#…)` do SVG não aceita bem.
+  const id = `foil${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const [width, setWidth] = useState(0);
+  const shift = useRef(new Animated.Value(0)).current;
+  const breath = useRef(new Animated.Value(0)).current;
+  const rhythm = useMemo(
+    () => ({
+      shift: 9_000 + Math.random() * 4_000,
+      breath: 6_000 + Math.random() * 2_000,
+      delay: Math.random() * 3_000,
+    }),
+    [],
+  );
+  useEffect(() => {
+    if (reduce || !width) return;
+    const move = Animated.loop(
+      Animated.timing(shift, {
+        toValue: 1,
+        duration: rhythm.shift,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    );
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(breath, {
+          toValue: 1,
+          duration: rhythm.breath,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(breath, {
+          toValue: 0,
+          duration: rhythm.breath,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    const start = setTimeout(() => {
+      move.start();
+      pulse.start();
+    }, rhythm.delay);
+    return () => {
+      clearTimeout(start);
+      move.stop();
+      pulse.stop();
+    };
+  }, [reduce, width, shift, breath, rhythm]);
+
+  // Três faixas lado a lado; andar uma largura de carta fecha o ciclo sem emenda.
+  const translateX = reduce
+    ? -width * 0.7
+    : shift.interpolate({ inputRange: [0, 1], outputRange: [-width, 0] });
+  const opacity = reduce ? 1 : breath.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] });
+  return (
+    <View
+      pointerEvents="none"
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={[StyleSheet.absoluteFill, { overflow: 'hidden', mixBlendMode: 'color-dodge' }]}
+    >
+      {width > 0 && (
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: '-20%',
+            bottom: '-20%',
+            left: 0,
+            width: width * 3,
+            flexDirection: 'row',
+            opacity,
+            transform: [{ translateX }, { skewX: '-20deg' }],
+          }}
+        >
+          {[0, 1, 2].map((i) => (
+            <Svg key={i} width={width} height="100%">
+              <Defs>
+                <LinearGradient id={`${id}-${i}`} x1="0" y1="0" x2="1" y2="0">
+                  {SHEEN_STOPS.map((stop) => (
+                    <Stop
+                      key={stop.offset}
+                      offset={stop.offset}
+                      stopColor={stop.color}
+                      stopOpacity={stop.opacity}
+                    />
+                  ))}
+                </LinearGradient>
+              </Defs>
+              <Rect width="100%" height="100%" fill={`url(#${id}-${i})`} />
+            </Svg>
+          ))}
+        </Animated.View>
+      )}
     </View>
   );
 }
