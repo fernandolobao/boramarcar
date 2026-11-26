@@ -668,3 +668,16 @@ button[aria-busy='true']::before {
     animation: bracket-glow 2.4s ease-in-out 700ms 2;
   }
 }
+
+/*
+ * iPhone: tocar num campo com fonte menor que 16 px faz o Safari/Chrome do iOS dar zoom na página
+ * (e o zoom fica, cortando o layout à direita). Em telas de toque, todo campo de texto tem 16 px.
+ * Fora das camadas do Tailwind de propósito: vale por cima de `text-sm`/`text-xs` nos campos.
+ */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
