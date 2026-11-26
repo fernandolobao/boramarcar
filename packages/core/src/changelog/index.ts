@@ -319,6 +319,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'A análise do deck agora fica num card só, com abas: visão geral, mana, mão inicial, funções e bracket. Nada fica escondido em "mais detalhes".',
     en: 'The deck analysis now lives in a single card with tabs: overview, mana, opening hand, roles and bracket. Nothing is hidden under "more details".',
   },
+  {
+    date: '2026-11-25',
+    pt: 'No Commander, a busca de "Adicionar carta" mostra só cartas da identidade do comandante, e o ArcanaKin avisa antes de pôr uma carta fora dela, com as cores que quebram a regra.',
+    en: 'In Commander, "Add card" search shows only cards in the commander’s identity, and ArcanaKin warns before adding a card outside it, with the colors that break the rule.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

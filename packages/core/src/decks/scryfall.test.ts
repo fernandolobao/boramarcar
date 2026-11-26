@@ -91,6 +91,31 @@ describe('attachCardData', () => {
   });
 });
 
+describe('fetchScryfallNamesInIdentity (11.5)', () => {
+  it('busca nomes só dentro da identidade, mais jogadas primeiro, e ignora sintaxe digitada', async () => {
+    const { fetchScryfallNamesInIdentity, identityQuery } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json({ data: [{ name: 'Llanowar Elves' }, { name: 'Elvish Mystic' }] }),
+    );
+    expect(await fetchScryfallNamesInIdentity('elv (x)', ['G'], { fetch: fetchMock })).toEqual([
+      'Llanowar Elves',
+      'Elvish Mystic',
+    ]);
+    const url = new URL(fetchMock.mock.calls[0]![0]);
+    expect(url.searchParams.get('q')).toBe('elv x id<=g');
+    expect(url.searchParams.get('order')).toBe('edhrec');
+    expect(identityQuery([])).toBe('id:c');
+    expect(identityQuery(['W', 'U'])).toBe('id<=wu');
+    // Nada encontrado (404 do Scryfall) é lista vazia; menos de 2 letras, nem consulta.
+    expect(
+      await fetchScryfallNamesInIdentity('zzz', ['G'], {
+        fetch: async () => new Response('{}', { status: 404 }),
+      }),
+    ).toEqual([]);
+    expect(await fetchScryfallNamesInIdentity('e', ['G'], { fetch: fetchMock })).toEqual([]);
+  });
+});
+
 describe('fetchScryfallAutocomplete', () => {
   it('consulta o autocomplete e ignora buscas curtas', async () => {
     const { fetchScryfallAutocomplete } = await import('./scryfall');

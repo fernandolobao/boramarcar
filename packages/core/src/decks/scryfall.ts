@@ -332,6 +332,53 @@ export async function fetchScryfallPrintedNames(
   return out;
 }
 
+/** Filtro de identidade de cor do Scryfall: `id<=wu`; comandante incolor, `id:c`. */
+export function identityQuery(identity: readonly string[]): string {
+  const colors = identity
+    .map((c) => c.toLowerCase())
+    .filter((c) => 'wubrg'.includes(c))
+    .join('');
+  return colors ? `id<=${colors}` : 'id:c';
+}
+
+/**
+ * Nomes de carta dentro da identidade de cor do comandante (11.5), para o "Adicionar carta" com
+ * o filtro ligado: o autocomplete do Scryfall não filtra, então usa a busca (`/cards/search`),
+ * mais jogadas primeiro. Só palavras do que foi digitado, nada da sintaxe de busca.
+ */
+export async function fetchScryfallNamesInIdentity(
+  query: string,
+  identity: readonly string[],
+  {
+    fetch: fetchFn,
+    userAgent = 'ArcanaKin/0.1',
+    limit = 10,
+  }: Pick<ScryfallClientOptions, 'fetch' | 'userAgent'> & { limit?: number },
+): Promise<string[]> {
+  const words = query
+    .normalize('NFC')
+    .replace(/[^\p{L}\p{N}\s'-]/gu, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !w.startsWith('-'));
+  if (words.join('').length < 2) return [];
+  const q = `${words.join(' ')} ${identityQuery(identity)}`;
+  const response = await withTimeout(
+    fetchFn,
+    EXTERNAL_TIMEOUT_MS.scryfall,
+    'Scryfall',
+  )(`${SCRYFALL_API}/cards/search?q=${encodeURIComponent(q)}&unique=cards&order=edhrec`, {
+    headers: { Accept: 'application/json', 'User-Agent': userAgent },
+  });
+  if (response.status === 404) return [];
+  if (!response.ok) {
+    throw new DomainError('upstream_error', `Scryfall respondeu ${response.status}`);
+  }
+  const body = z
+    .object({ data: z.array(z.object({ name: z.string() }).loose()) })
+    .parse(await response.json());
+  return body.data.slice(0, limit).map((c) => c.name);
+}
+
 const searchSchema = z.object({
   data: z.array(z.unknown()),
   has_more: z.boolean().optional(),

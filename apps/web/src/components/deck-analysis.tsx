@@ -7,6 +7,7 @@ import type {
 } from '@boramarcar/core';
 import { bracketChecklist, deckFormatProfile } from '@boramarcar/core';
 import { ScoreBreakdown } from './analysis-charts';
+import { IdentityFix } from './identity-fix';
 
 export { ManaCurve } from './analysis-charts';
 import { useFormatter, useTranslations } from 'next-intl';
@@ -86,9 +87,14 @@ export function DeckScore({
 export function DeckValidation({
   analysis,
   formatName,
+  deckId,
+  canEdit = false,
 }: {
   analysis: DeckAnalysis;
   formatName: string;
+  /** Com o deck, carta fora da identidade ganha "Mover para Talvez"/"Remover" (dono). */
+  deckId?: string;
+  canEdit?: boolean;
 }) {
   const t = useTranslations('analysis');
   return (
@@ -102,7 +108,8 @@ export function DeckValidation({
       ) : (
         <ul className="list-disc space-y-1 pl-5 text-sm">
           {analysis.validation.map((issue, index) => {
-            const { code, ...params } = issue;
+            const { code, ...rest } = issue;
+            const { colors, ...params } = rest as { colors?: string[] };
             return (
               <li key={index}>
                 {t.rich(`validation.${code}`, {
@@ -116,6 +123,14 @@ export function DeckValidation({
                     />
                   ),
                 })}
+                {issue.code === 'color_identity' && deckId && (
+                  <IdentityFix
+                    deckId={deckId}
+                    name={issue.name}
+                    colors={colors ?? []}
+                    canEdit={canEdit}
+                  />
+                )}
               </li>
             );
           })}

@@ -810,6 +810,20 @@
       "roles": "Funções",
       "bracket": "Bracket",
       "issues": "{count, plural, =1 {1 problema na validação} other {# problemas na validação}}"
+    },
+    "identity": {
+      "colors": "Cores fora da identidade:",
+      "toMaybe": "Mover para Talvez",
+      "toMaybeLabel": "Mover {name} para Talvez",
+      "remove": "Remover",
+      "removeLabel": "Remover {name} do deck",
+      "confirmRemove": "Confirmar remoção de {name}",
+      "badge": "Fora da identidade",
+      "badgeLabel": "Fora da identidade do comandante: {colors}",
+      "onlyIdentity": "Só cartas da identidade de {commander}",
+      "warning": "{card} está fora da identidade de {commander} (<identity></identity>): a carta tem <colors></colors>.",
+      "addAnyway": "Adicionar mesmo assim",
+      "addToMaybe": "Adicionar ao Talvez"
     }
   },
   "errors": {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { printLabel } from '@/lib/print-label';
-import { outsideDeck } from '@boramarcar/core';
+import { formatRules, outsideDeck } from '@boramarcar/core';
 import { PublishDeck } from '@/components/deck-forms';
 import {
   artCropUrl,
@@ -126,6 +126,16 @@ export default async function DeckPage({ params, searchParams }: Props) {
   const fmt = await getFormatter();
   const { analysis } = deck;
   const format = isGameFormat(deck.format) ? deck.format : 'other';
+  /**
+   * Identidade de cor do(s) comandante(s), para avisar no editor quem fica de fora (11.5). Só em
+   * formatos com comandante e com o comandante já no deck (e com os dados da carta).
+   */
+  const commanderCards = deck.lines.filter((l) => l.board === 'commander' && l.card);
+  const commanderIdentity =
+    formatRules(format).usesCommander && commanderCards.length
+      ? [...new Set(commanderCards.flatMap((l) => l.card!.colorIdentity ?? []))]
+      : null;
+  const commanderLabel = commanderCards.map((l) => l.name).join(' & ');
   const commanderEntries = deck.entries.filter((e) => e.board === 'commander');
   const hero = commanderEntries.find((e) => e.card?.imageUri) ?? null;
   const identity = [
@@ -367,7 +377,12 @@ export default async function DeckPage({ params, searchParams }: Props) {
                     <DeckScore analysis={analysis} formatName={formatName} />
                     <RefreshAnalysis deckId={deck.id} stale={deck.analysisStale} />
                     <section className="border-t border-line pt-6">
-                      <DeckValidation analysis={analysis} formatName={formatName} />
+                      <DeckValidation
+                        analysis={analysis}
+                        formatName={formatName}
+                        deckId={deck.id}
+                        canEdit={deck.isOwner}
+                      />
                     </section>
                   </div>
                 ),
@@ -473,6 +488,8 @@ export default async function DeckPage({ params, searchParams }: Props) {
           lines={deck.lines}
           isOwner={deck.isOwner}
           inCollection={inCollection}
+          identity={commanderIdentity}
+          commanderLabel={commanderLabel}
           usdBrl={rate?.rate ?? null}
         />
       </div>

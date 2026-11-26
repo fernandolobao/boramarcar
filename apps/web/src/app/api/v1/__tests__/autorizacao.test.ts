@@ -52,6 +52,7 @@ const r = {
   collectionMatches: await import('../decks/[deckId]/collection-matches/route'),
   linePrint: await import('../decks/[deckId]/lines/print/route'),
   lines: await import('../decks/[deckId]/lines/route'),
+  moveLine: await import('../decks/[deckId]/lines/move/route'),
   proxies: await import('../decks/[deckId]/proxies/route'),
   deck: await import('../decks/[deckId]/route'),
   sync: await import('../decks/[deckId]/sync/route'),
@@ -380,6 +381,13 @@ const deckCases = (key: 'privateDeck' | 'groupDeck'): Case[] => [
   [`análise (${key})`, r.analysis.POST as Handler, 'POST', () => ({ deckId: ids[key]! })],
   [`sync (${key})`, r.sync.POST as Handler, 'POST', () => ({ deckId: ids[key]! }), {}],
   [`linha PUT (${key})`, r.lines.PUT as Handler, 'PUT', () => ({ deckId: ids[key]! }), deckLine],
+  [
+    `mover carta (${key})`,
+    r.moveLine.POST as Handler,
+    'POST',
+    () => ({ deckId: ids[key]! }),
+    { name: 'Sol Ring', from: 'mainboard', to: 'maybeboard' },
+  ],
   [
     `linha POST (${key})`,
     r.lines.POST as Handler,

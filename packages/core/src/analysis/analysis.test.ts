@@ -10,6 +10,7 @@ import {
   makeCard,
 } from '../test/fixtures';
 import {
+  outsideIdentity,
   analyzeDeck,
   buildReplacementQuery,
   classifyCard,
@@ -78,7 +79,14 @@ describe('validateCommanderDeck', () => {
 
   it('detecta carta fora da identidade de cor do comandante', () => {
     const issues = validateCommanderDeck([entry(OMNATH, 1, 'commander'), entry(WRATH)]);
-    expect(issues).toContainEqual({ code: 'color_identity', name: 'Wrath of God' });
+    // Diz quais cores quebram a regra (Wrath of God é branca; Omnath, verde).
+    expect(issues).toContainEqual({ code: 'color_identity', name: 'Wrath of God', colors: ['W'] });
+  });
+
+  it('outsideIdentity: as cores da carta fora da identidade, na ordem WUBRG', () => {
+    expect(outsideIdentity(['R', 'U', 'G'], ['G'])).toEqual(['U', 'R']);
+    expect(outsideIdentity(['G'], ['G', 'W'])).toEqual([]);
+    expect(outsideIdentity([], [])).toEqual([]);
   });
 
   it('permite cartas "any number"', () => {

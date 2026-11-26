@@ -810,6 +810,20 @@
       "roles": "Roles",
       "bracket": "Bracket",
       "issues": "{count, plural, =1 {1 validation issue} other {# validation issues}}"
+    },
+    "identity": {
+      "colors": "Colors outside the identity:",
+      "toMaybe": "Move to Maybe",
+      "toMaybeLabel": "Move {name} to Maybe",
+      "remove": "Remove",
+      "removeLabel": "Remove {name} from the deck",
+      "confirmRemove": "Confirm removing {name}",
+      "badge": "Outside identity",
+      "badgeLabel": "Outside the commander's identity: {colors}",
+      "onlyIdentity": "Only cards in {commander}'s identity",
+      "warning": "{card} is outside {commander}'s identity (<identity></identity>): the card has <colors></colors>.",
+      "addAnyway": "Add anyway",
+      "addToMaybe": "Add to Maybe"
     }
   },
   "errors": {

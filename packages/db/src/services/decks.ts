@@ -1202,6 +1202,61 @@ export async function setDeckLine(
 }
 
 /**
+ * Move todas as cópias de uma carta de um board para outro (ex.: fora da identidade de cor →
+ * "talvez", 11.5), juntando com as linhas iguais (edição, proxy e foil) que já estiverem lá.
+ * `to: null` remove a carta do board. Só o dono.
+ */
+export async function moveDeckCard(
+  db: Database,
+  input: { deckId: string; userId: string; name: string; from: DeckBoard; to: DeckBoard | null },
+) {
+  await requireOwnedDeck(db, input.deckId, input.userId);
+  const sameCard = (board: DeckBoard) =>
+    and(
+      eq(deckCards.deckId, input.deckId),
+      eq(deckCards.board, board),
+      sql`lower(${deckCards.cardName}) = ${input.name.trim().toLowerCase()}`,
+    );
+  const rows = await db.select().from(deckCards).where(sameCard(input.from));
+  if (!rows.length) throw new DomainError('not_found', 'A carta não está nesse board');
+  if (input.to === input.from) return { moved: 0 };
+  await db.transaction(async (tx) => {
+    for (const row of rows) {
+      if (input.to === null) {
+        await tx.delete(deckCards).where(eq(deckCards.id, row.id));
+        continue;
+      }
+      const [target] = await tx
+        .select({ id: deckCards.id, quantity: deckCards.quantity })
+        .from(deckCards)
+        .where(
+          and(
+            sameCard(input.to),
+            row.scryfallId === null
+              ? isNull(deckCards.scryfallId)
+              : eq(deckCards.scryfallId, row.scryfallId),
+            eq(deckCards.isProxy, row.isProxy),
+            eq(deckCards.isFoil, row.isFoil),
+          ),
+        )
+        .limit(1);
+      if (target) {
+        await tx
+          .update(deckCards)
+          .set({ quantity: target.quantity + row.quantity })
+          .where(eq(deckCards.id, target.id));
+        await tx.delete(deckCards).where(eq(deckCards.id, row.id));
+      } else {
+        await tx.update(deckCards).set({ board: input.to }).where(eq(deckCards.id, row.id));
+      }
+    }
+    await tx.update(decks).set({ updatedAt: new Date() }).where(eq(decks.id, input.deckId));
+  });
+  await syncCollectionFromDecks(db, input.userId);
+  return { moved: rows.reduce((n, r) => n + r.quantity, 0) };
+}
+
+/**
  * Adicionar cópias de uma carta (formulário "Adicionar carta"): as cópias novas entram na
  * impressão de `card` (a padrão do Scryfall para o nome) e só somam com uma linha da mesma
  * impressão. Nunca entram numa edição que a pessoa escolheu para outras cópias — senão as

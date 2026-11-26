@@ -1,6 +1,12 @@
 'use client';
 
-import { DECK_BOARDS, groupEntriesByType, MAX_COPIES, type DeckBoard } from '@boramarcar/core';
+import {
+  DECK_BOARDS,
+  groupEntriesByType,
+  MAX_COPIES,
+  outsideIdentity,
+  type DeckBoard,
+} from '@boramarcar/core';
 import Image from 'next/image';
 import { HoloLayers } from './holo-effects';
 import { useFormatter, useTranslations } from 'next-intl';
@@ -10,7 +16,7 @@ import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
 import { flipCard } from './card-flip';
 import { Icon } from './icons';
-import { ManaCost } from './mana';
+import { ManaCost, ManaText } from './mana';
 import { printLabel, PrintPicker } from './print-picker';
 import { FormError, useApiAction } from './use-api-action';
 import { NumberField } from './ds/number-field';
@@ -40,6 +46,8 @@ export interface DeckLineView {
     collectorNumber?: string | null;
     backImageUri?: string | null;
     backName?: string | null;
+    /** Identidade de cor (para o aviso de fora da identidade do comandante). */
+    colorIdentity?: string[];
   } | null;
 }
 
@@ -131,10 +139,19 @@ export function DeckCards({
   isOwner,
   usdBrl = null,
   inCollection = {},
+  identity = null,
+  commanderLabel = '',
 }: {
   deckId: string;
   lines: DeckLineView[];
   isOwner: boolean;
+  /**
+   * Identidade de cor do comandante (formatos com comandante): carta do deck com cores fora dela
+   * ganha o aviso "Fora da identidade" com as cores (11.5). `null` = sem comandante.
+   */
+  identity?: readonly string[] | null;
+  /** Nome(s) do comandante, para o aviso e o filtro da busca. */
+  commanderLabel?: string;
   /** Rascunho: cópias livres na coleção por carta (nome em minúsculas), em qualquer edição. */
   inCollection?: Record<string, number>;
   /** Cotação do dólar para mostrar o preço da carta também em reais. */
@@ -145,6 +162,11 @@ export function DeckCards({
   const [view, setView] = useState<View>('visual');
   const [zoomed, setZoomed] = useState<DeckTile | null>(null);
   const tiles = lines.flatMap(tilesOf);
+  /** Cores fora da identidade do comandante (só no deck principal e na reserva). */
+  const outsideOf = (line: DeckLineView) =>
+    identity && line.card && (line.board === 'mainboard' || line.board === 'sideboard')
+      ? outsideIdentity(line.card.colorIdentity ?? [], identity)
+      : [];
   /** Cartas de duas faces mostrando o verso (na grade e no diálogo). */
   const [flipped, setFlipped] = useState<ReadonlySet<string>>(new Set());
   const toggleFlip = (key: string) =>
@@ -216,7 +238,9 @@ export function DeckCards({
         </div>
       </div>
 
-      {isOwner && <AddCardForm deckId={deckId} />}
+      {isOwner && (
+        <AddCardForm deckId={deckId} identity={identity} commanderLabel={commanderLabel} />
+      )}
 
       {groups.map((group) => (
         <section key={group.key} aria-labelledby={`${titleId}-${group.key}`}>
@@ -354,6 +378,7 @@ export function DeckCards({
                       </span>
                     )}
                   </p>
+                  <OutsideIdentity colors={outsideOf(line)} />
                 </li>
               ))}
             </ul>
@@ -395,6 +420,7 @@ export function DeckCards({
                         <span className="muted text-xs"> · {printLabel(line.card)}</span>
                       )}
                       {!line.card && <span className="muted"> ({t('notFoundCard')})</span>}
+                      <OutsideIdentity colors={outsideOf(line)} />
                       {inCollection[line.name.toLowerCase()] && (
                         <span className="muted text-xs">
                           {' '}
@@ -653,49 +679,112 @@ function LineEditor({ deckId, tile }: { deckId: string; tile: DeckTile }) {
  * Adicionar carta: busca com autocompletar do Scryfall, board e quantidade. As cópias entram na
  * edição padrão e somam só com a pilha dessa edição.
  */
-function AddCardForm({ deckId }: { deckId: string }) {
+function AddCardForm({
+  deckId,
+  identity = null,
+  commanderLabel = '',
+}: {
+  deckId: string;
+  identity?: readonly string[] | null;
+  commanderLabel?: string;
+}) {
   const t = useTranslations('decks');
+  const ti = useTranslations('analysis.identity');
   const { run, error, pending } = useApiAction();
   const [name, setName] = useState('');
   const [board, setBoard] = useState<DeckBoard>('mainboard');
   const [quantity, setQuantity] = useState<number | null>(1);
   const [proxy, setProxy] = useState(false);
   const [status, setStatus] = useState('');
+  /** Busca só cartas da identidade do comandante (11.5); ligado por padrão. */
+  const [onlyIdentity, setOnlyIdentity] = useState(true);
+  /** Carta escolhida fora da identidade: as cores que quebram a regra. */
+  const [warning, setWarning] = useState<{ name: string; colors: string[] } | null>(null);
   const id = useId();
+  const playing = board === 'mainboard' || board === 'sideboard';
+
+  /** Cores fora da identidade da carta com esse nome (vazio = cabe, ou não deu para saber). */
+  const checkIdentity = async (cardName: string) => {
+    if (!identity) return [];
+    try {
+      const { card } = await api<{ card: { colorIdentity?: string[] } | null }>(
+        `/api/v1/cards/named?${new URLSearchParams({ name: cardName })}`,
+      );
+      return card ? outsideIdentity(card.colorIdentity ?? [], identity) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const add = (target: DeckBoard) => {
+    const copies = quantity ?? 0;
+    if (!name.trim() || copies < 1) return;
+    setStatus('');
+    void run(
+      () =>
+        // Cópias novas entram na edição padrão (pilha própria), não numa edição já trocada.
+        api<{ found: boolean; line: { name: string } }>(`/api/v1/decks/${deckId}/lines`, {
+          method: 'POST',
+          body: { name: name.trim(), board: target, quantity: copies, proxies: proxy ? copies : 0 },
+        }),
+      (result) => {
+        setStatus(
+          result.found
+            ? t('cardAdded', { name: result.line.name })
+            : t('cardAddedNotFound', { name: result.line.name }),
+        );
+        setName('');
+        setQuantity(1);
+        setProxy(false);
+        setWarning(null);
+      },
+    );
+  };
 
   return (
     <form
       className="grid gap-3 rounded-xl bg-ink-50 p-4 sm:grid-cols-[2fr_1fr_auto] lg:grid-cols-[2fr_1fr_auto_auto_auto] lg:items-end dark:bg-ink-800/60"
       aria-labelledby={`${id}-title`}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        const add = quantity ?? 0;
-        if (!name.trim() || add < 1) return;
-        setStatus('');
-        void run(
-          () =>
-            // Cópias novas entram na edição padrão (pilha própria), não numa edição já trocada.
-            api<{ found: boolean; line: { name: string } }>(`/api/v1/decks/${deckId}/lines`, {
-              method: 'POST',
-              body: { name: name.trim(), board, quantity: add, proxies: proxy ? add : 0 },
-            }),
-          (result) => {
-            setStatus(
-              result.found
-                ? t('cardAdded', { name: result.line.name })
-                : t('cardAddedNotFound', { name: result.line.name }),
-            );
-            setName('');
-            setQuantity(1);
-            setProxy(false);
-          },
-        );
+        if (!name.trim()) return;
+        // Antes de pôr no deck uma carta fora da identidade, avisa uma vez (11.5).
+        if (identity && playing && warning?.name !== name.trim()) {
+          const colors = await checkIdentity(name.trim());
+          if (colors.length) return setWarning({ name: name.trim(), colors });
+        }
+        add(board);
       }}
     >
       <h3 id={`${id}-title`} className="font-semibold sm:col-span-3 lg:col-span-5">
         {t('addCard')}
       </h3>
-      <CardSearch id={`${id}-name`} label={t('cardName')} value={name} onChange={setName} />
+      {/* Antes da busca: o filtro muda as sugestões (ordem de leitura e de foco). */}
+      {identity && (
+        <div className="sm:col-span-3 lg:col-span-5">
+          <Checkbox
+            label={ti('onlyIdentity', { commander: commanderLabel })}
+            checked={onlyIdentity}
+            onChange={setOnlyIdentity}
+          />
+        </div>
+      )}
+      <CardSearch
+        id={`${id}-name`}
+        label={t('cardName')}
+        value={name}
+        onChange={(v) => {
+          setName(v);
+          if (warning && v.trim() !== warning.name) setWarning(null);
+        }}
+        onPick={(picked) => {
+          if (!identity || !playing) return;
+          void checkIdentity(picked).then((colors) =>
+            setWarning(colors.length ? { name: picked, colors } : null),
+          );
+        }}
+        identity={identity && onlyIdentity ? identity.join('') || 'C' : undefined}
+      />
       <div>
         <Select
           label={t('board')}
@@ -718,12 +807,51 @@ function AddCardForm({ deckId }: { deckId: string }) {
       <Checkbox label={t('addAsProxy')} checked={proxy} onChange={setProxy} />
       <button className="btn-primary" disabled={pending || !name.trim()}>
         <Icon name="add" />
-        {t('addCard')}
+        {warning && playing ? ti('addAnyway') : t('addCard')}
       </button>
-      <div className="sm:col-span-3 lg:col-span-5" aria-live="polite">
+      <div className="space-y-2 sm:col-span-3 lg:col-span-5" aria-live="polite">
+        {warning && playing && (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-line-strong bg-surface p-3 text-sm">
+            <Icon name="warning" className="size-4 shrink-0 text-danger" />
+            <span>
+              {ti.rich('warning', {
+                card: warning.name,
+                commander: commanderLabel,
+                identity: () => (
+                  <ManaText text={identity!.map((c) => `{${c}}`).join('') || '{C}'} />
+                ),
+                colors: () => <ManaText text={warning.colors.map((c) => `{${c}}`).join('')} />,
+              })}
+            </span>
+            <button
+              type="button"
+              className="btn-secondary min-h-9 px-3 text-xs"
+              disabled={pending}
+              onClick={() => add('maybeboard')}
+            >
+              {ti('addToMaybe')}
+            </button>
+          </div>
+        )}
         {status && !error && <p className="muted text-sm">{status}</p>}
         <FormError message={error} />
       </div>
     </form>
+  );
+}
+
+/**
+ * Aviso de carta fora da identidade de cor do comandante (11.5): ícone, texto e as cores que
+ * quebram a regra (símbolos com o nome por extenso), sem depender só da cor.
+ */
+function OutsideIdentity({ colors }: { colors: readonly string[] }) {
+  const t = useTranslations('analysis.identity');
+  if (!colors.length) return null;
+  return (
+    <span className="flex items-center gap-1 text-xs font-medium text-danger">
+      <Icon name="warning" className="size-3.5 shrink-0" />
+      {t('badge')}
+      <ManaText text={colors.map((c) => `{${c}}`).join('')} />
+    </span>
   );
 }
