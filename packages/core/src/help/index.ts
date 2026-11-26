@@ -244,6 +244,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             intro: [
               'É um deck para testar ideias. As cartas dele não entram na sua coleção, ninguém mais vê o deck e ele não pode ser escolhido em partidas. Deck novo começa como rascunho (dá para desmarcar ao criar ou importar).',
               'Quando o deck estiver pronto, toque em "Publicar deck" na página dele: as cartas passam a contar na sua coleção (menos proxies e "talvez") e o deck aparece para quem você escolheu.',
+              'Enquanto é rascunho, o deck é sempre privado (em "Editar deck" a visibilidade fica travada). Ao publicar, a janela pergunta quem vê o deck: só você, o grupo ou qualquer pessoa com o link.',
               'No rascunho, as cartas que você já tem livres na coleção (em qualquer edição e sem uso em outro deck publicado) aparecem com o selo da coleção. Ao publicar, para cada uma delas você escolhe: usar a que já tem (a carta do deck passa para essa edição) ou adicionar uma nova à coleção.',
             ],
           },
@@ -664,6 +665,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             intro: [
               'It is a deck for trying ideas. Its cards don\u2019t go into your collection, nobody else sees the deck and it can\u2019t be picked in games. A new deck starts as a draft (you can uncheck it when creating or importing).',
               'When the deck is ready, tap "Publish deck" on its page: the cards start counting in your collection (except proxies and "maybe") and the deck is shown to whoever you chose.',
+              'While it is a draft, the deck is always private (in "Edit deck" the visibility is locked). When publishing, the window asks who sees the deck: only you, the group or anyone with the link.',
               'In a draft, cards you already have free in your collection (any edition, unused by other published decks) show the collection badge. When publishing, for each of them you choose: use the one you have (the deck card switches to that edition) or add a new one to your collection.',
             ],
           },

@@ -309,6 +309,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Na análise do deck, em "Mão inicial", o botão "Sortear mão inicial" abre o teste da mão: compre 7, faça mulligan escolhendo as cartas do fundo e veja as próximas compras.',
     en: 'In the deck analysis, under "Opening hand", the "Draw a sample hand" button opens the hand test: draw 7, mulligan by choosing the bottom cards and see the next draws.',
   },
+  {
+    date: '2026-11-25',
+    pt: 'Deck em rascunho agora é sempre privado. Ao publicar, você escolhe quem vê: só você, o grupo ou qualquer pessoa com o link.',
+    en: 'Draft decks are now always private. When you publish, you choose who sees it: only you, the group or anyone with the link.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

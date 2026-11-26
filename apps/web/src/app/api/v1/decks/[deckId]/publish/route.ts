@@ -1,4 +1,4 @@
-import { DECK_BOARDS } from '@boramarcar/core';
+import { DECK_BOARDS, DECK_VISIBILITIES } from '@boramarcar/core';
 import { publishDeck } from '@boramarcar/db';
 import { z } from 'zod';
 import { authed, parseJson } from '@/server/http';
@@ -16,11 +16,17 @@ const schema = z.object({
     )
     .max(250)
     .default([]),
+  /** Quem vê o deck publicado (o rascunho é sempre privado); sem escolha, o grupo. */
+  visibility: z.enum(DECK_VISIBILITIES).optional(),
 });
 
 /** Publica o rascunho (11.2): o deck vira de verdade e as cartas entram na coleção. Só o dono. */
 export const POST = authed<{ deckId: string }>(async ({ req, db, user, params }) => {
   const hasBody = req.headers.get('content-type')?.includes('application/json');
-  const { choices } = hasBody ? await parseJson(req, schema) : { choices: [] };
-  return { deck: await publishDeck(db, { deckId: params.deckId, userId: user.id, choices }) };
+  const { choices, visibility } = hasBody
+    ? await parseJson(req, schema)
+    : { choices: [], visibility: undefined };
+  return {
+    deck: await publishDeck(db, { deckId: params.deckId, userId: user.id, choices, visibility }),
+  };
 });
