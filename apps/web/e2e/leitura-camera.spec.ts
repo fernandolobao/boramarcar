@@ -7,45 +7,48 @@ import { AUTH_STATE } from './support/global-setup';
  * A busca no Scryfall é simulada (o CI não tem rede).
  */
 
-/** Câmera falsa: troca o que está na moldura conforme o tempo (`null` = moldura vazia). */
-async function fakeCamera(page: Page, script: { name: string | null; ms: number }[]) {
-  await page.addInitScript((steps) => {
+/**
+ * Câmera falsa: desenha a carta de `window.__card` (`null` = moldura vazia). O teste troca a carta
+ * quando quer, sem depender do tempo (no CI, o leitor de texto demora a carregar).
+ */
+async function fakeCamera(page: Page, first: string | null) {
+  await page.addInitScript((card) => {
+    const w = window as unknown as { __card: string | null };
+    w.__card = card;
     navigator.mediaDevices.getUserMedia = async () => {
-      const w = 1080;
-      const h = 1920;
+      const width = 1080;
+      const height = 1920;
       const c = document.createElement('canvas');
-      c.width = w;
-      c.height = h;
-      // Na página (fora da tela): canvas solto pode parar de mandar quadros novos ao vídeo.
-      c.style.cssText = 'position:fixed;left:-99999px;top:0';
-      document.body.appendChild(c);
+      c.width = width;
+      c.height = height;
       const ctx = c.getContext('2d')!;
-      const start = performance.now();
-      const total = steps.reduce((n, s) => n + s.ms, 0);
       const draw = () => {
-        let t = Math.min(performance.now() - start, total - 1);
-        const step = steps.find((s) => (t -= s.ms) < 0) ?? steps.at(-1)!;
         ctx.fillStyle = '#6b4f3a';
-        ctx.fillRect(0, 0, w, h);
-        if (step.name) {
+        ctx.fillRect(0, 0, width, height);
+        if (w.__card) {
           // Cabe na moldura (em pé, ela é limitada pela largura).
-          const ch = Math.min(h * 0.76, (w * 0.8) / (63 / 88));
+          const ch = Math.min(height * 0.76, (width * 0.8) / (63 / 88));
           const cw = ch * (63 / 88);
-          const x = (w - cw) / 2;
-          const y = (h - ch) / 2;
+          const x = (width - cw) / 2;
+          const y = (height - ch) / 2;
           ctx.fillStyle = '#f4efe2';
           ctx.fillRect(x, y, cw, ch);
           ctx.fillStyle = '#111';
           ctx.font = `bold ${Math.round(ch * 0.045)}px serif`;
-          ctx.fillText(step.name, x + cw * 0.08, y + ch * 0.07);
+          ctx.fillText(w.__card, x + cw * 0.08, y + ch * 0.07);
         }
         requestAnimationFrame(draw);
       };
       draw();
       return c.captureStream(15);
     };
-  }, script);
+  }, first);
 }
+
+const showCard = (page: Page, card: string | null) =>
+  page.evaluate((c) => {
+    (window as unknown as { __card: string | null }).__card = c;
+  }, card);
 
 /** Simula a busca da carta: devolve a carta pelo nome lido; conta as consultas. */
 async function fakeLookup(page: Page) {
@@ -82,12 +85,8 @@ test.describe('leitura de cartas pela câmera', () => {
     page,
   }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
-    test.setTimeout(120_000);
-    await fakeCamera(page, [
-      { name: 'Sol Ring', ms: 6000 },
-      { name: null, ms: 2500 },
-      { name: 'Llanowar Elves', ms: 60_000 },
-    ]);
+    test.setTimeout(180_000);
+    await fakeCamera(page, 'Sol Ring');
     const calls = await fakeLookup(page);
     await page.goto('/colecao');
     await page.getByText('Adicionar cartas').first().click();
@@ -97,7 +96,11 @@ test.describe('leitura de cartas pela câmera', () => {
       'aria-pressed',
       'true',
     );
-    // Sem clicar em nada: Sol Ring entra, a moldura esvazia, Llanowar Elves entra.
+    // Sem clicar em nada: Sol Ring entra; trocando a carta, Llanowar Elves entra.
+    await expect(dialog.getByRole('heading', { name: '1 carta lida' })).toBeVisible({
+      timeout: 90_000,
+    });
+    await showCard(page, 'Llanowar Elves');
     await expect(dialog.getByRole('heading', { name: '2 cartas lidas' })).toBeVisible({
       timeout: 60_000,
     });
@@ -116,8 +119,8 @@ test.describe('leitura de cartas pela câmera', () => {
 
   test('leitura manual: desliga a contínua e lê com "Ler carta"', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados: só no desktop');
-    test.setTimeout(120_000);
-    await fakeCamera(page, [{ name: 'Sol Ring', ms: 120_000 }]);
+    test.setTimeout(180_000);
+    await fakeCamera(page, 'Sol Ring');
     const calls = await fakeLookup(page);
     await page.goto('/colecao');
     await page.getByText('Adicionar cartas').first().click();
@@ -126,7 +129,7 @@ test.describe('leitura de cartas pela câmera', () => {
     const toggle = dialog.getByRole('button', { name: 'Leitura contínua' });
     // Espera a câmera mostrar a carta (a contínua lê sozinha); no CI, o primeiro quadro demora.
     await expect(dialog.getByRole('heading', { name: '1 carta lida' })).toBeVisible({
-      timeout: 60_000,
+      timeout: 90_000,
     });
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
