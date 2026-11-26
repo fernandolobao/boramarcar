@@ -10,10 +10,12 @@ import {
 import Image from 'next/image';
 import { HoloLayers } from './holo-effects';
 import { useFormatter, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { api } from '@/lib/api';
 import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
+import { CardScanButton } from './card-scanner';
 import { flipCard } from './card-flip';
 import { Icon } from './icons';
 import { ManaCost, ManaText } from './mana';
@@ -141,9 +143,12 @@ export function DeckCards({
   inCollection = {},
   identity = null,
   commanderLabel = '',
+  canScan = false,
 }: {
   deckId: string;
   lines: DeckLineView[];
+  /** Leitura pela câmera liberada (flag `card-scanner`). */
+  canScan?: boolean;
   isOwner: boolean;
   /**
    * Identidade de cor do comandante (formatos com comandante): carta do deck com cores fora dela
@@ -239,7 +244,13 @@ export function DeckCards({
       </div>
 
       {isOwner && (
-        <AddCardForm deckId={deckId} identity={identity} commanderLabel={commanderLabel} />
+        <AddCardForm
+          deckId={deckId}
+          identity={identity}
+          commanderLabel={commanderLabel}
+          canScan={canScan}
+          lines={lines}
+        />
       )}
 
       {groups.map((group) => (
@@ -683,11 +694,18 @@ function AddCardForm({
   deckId,
   identity = null,
   commanderLabel = '',
+  canScan = false,
+  lines = [],
 }: {
   deckId: string;
   identity?: readonly string[] | null;
   commanderLabel?: string;
+  canScan?: boolean;
+  /** Linhas atuais do deck: a leitura soma às cópias que já existem na mesma edição. */
+  lines?: DeckLineView[];
 }) {
+  const ts = useTranslations('scan');
+  const router = useRouter();
   const t = useTranslations('decks');
   const ti = useTranslations('analysis.identity');
   const { run, error, pending } = useApiAction();
@@ -759,6 +777,46 @@ function AddCardForm({
       <h3 id={`${id}-title`} className="font-semibold sm:col-span-3 lg:col-span-5">
         {t('addCard')}
       </h3>
+      {canScan && (
+        <div className="sm:col-span-3 lg:col-span-5">
+          <CardScanButton
+            onAdd={async (cards) => {
+              // Soma às cópias que já existem da mesma carta, edição e board (a linha é gravada
+              // inteira: total, proxies e foils).
+              const current = new Map<
+                string,
+                { quantity: number; proxies: number; foils: number }
+              >();
+              for (const l of lines) {
+                if (l.board !== board) continue;
+                const k = `${l.name.toLowerCase()}|${l.scryfallId ?? ''}`;
+                const c = current.get(k) ?? { quantity: 0, proxies: 0, foils: 0 };
+                current.set(k, {
+                  quantity: c.quantity + l.quantity,
+                  proxies: c.proxies + l.proxies,
+                  foils: c.foils + (l.foils ?? (l.foil ? l.quantity - l.proxies : 0)),
+                });
+              }
+              for (const card of cards) {
+                const k = `${card.name.toLowerCase()}|${card.scryfallId}`;
+                const c = current.get(k) ?? { quantity: 0, proxies: 0, foils: 0 };
+                const next = {
+                  quantity: c.quantity + 1,
+                  proxies: c.proxies,
+                  foils: c.foils + (card.foil ? 1 : 0),
+                };
+                await api(`/api/v1/decks/${deckId}/lines`, {
+                  method: 'PUT',
+                  body: { name: card.name, board, scryfallId: card.scryfallId, ...next },
+                });
+                current.set(k, next);
+              }
+              setStatus(ts('added', { count: cards.length }));
+              router.refresh();
+            }}
+          />
+        </div>
+      )}
       {/* Antes da busca: o filtro muda as sugestões (ordem de leitura e de foco). */}
       {identity && (
         <div className="sm:col-span-3 lg:col-span-5">

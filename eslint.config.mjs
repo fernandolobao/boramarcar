@@ -22,6 +22,8 @@ export default tseslint.config(
       'packages/db/drizzle/**',
       '**/.expo/**',
       '**/expo-env.d.ts',
+      // Arquivos prontos do leitor de texto (Tesseract), copiados do pacote.
+      'apps/web/public/ocr/**',
     ],
   },
   js.configs.recommended,

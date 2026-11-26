@@ -51,6 +51,7 @@ import {
   CalendarDays,
   CalendarPlus,
   CalendarX2,
+  Camera,
   Check,
   GraduationCap,
   ChevronDown,
@@ -225,6 +226,8 @@ export const Icons = {
   guide: Compass,
   info: Info,
   learn: Lightbulb,
+  /** Ler cartas pela câmera. */
+  camera: Camera,
   /** Trilha "Aprender a jogar" (12.1). */
   lessons: GraduationCap,
   transparency: Eye,

@@ -8,3 +8,4 @@ playwright-report
 test-results
 .expo
 .superpowers
+apps/web/public/ocr

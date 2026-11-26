@@ -4,6 +4,7 @@ import { CollectionView } from '@/components/collection-view';
 import { ManaFlowColors } from '@/components/mana-flow';
 import { collectionFlow } from '@boramarcar/tokens/flow';
 import { requireUser } from '@/server/current-user';
+import { canScanCards } from '@/server/features';
 import { TitleWithTip } from '@/components/tip';
 import { getDb } from '@/server/db';
 import { getUsdBrlRate } from '@/server/exchange-rate';
@@ -36,6 +37,7 @@ export default async function CollectionPage() {
         entries={entries.map((e) => ({ ...e, addedAt: e.addedAt.toISOString() }))}
         brlRate={rate?.rate ?? null}
         rateDate={rate?.date ?? null}
+        canScan={await canScanCards(user)}
       />
     </>
   );

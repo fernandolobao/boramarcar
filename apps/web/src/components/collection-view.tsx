@@ -22,10 +22,12 @@ import Image from 'next/image';
 import { HoloLayers } from './holo-effects';
 import Link from 'next/link';
 import { useFormatter, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { CardDialog } from './card-dialog';
 import { CardSearch } from './card-search';
+import { CardScanButton } from './card-scanner';
 import { Icon } from './icons';
 import { ManaSymbol, useColorName } from './mana';
 import { fetchPrints, printLabel, PrintPicker } from './print-picker';
@@ -79,8 +81,11 @@ export function CollectionView({
   entries,
   brlRate,
   rateDate,
+  canScan = false,
 }: {
   entries: CollectionViewEntry[];
+  /** Leitura pela câmera liberada (flag `card-scanner`). */
+  canScan?: boolean;
   /** Cotação USD→BRL; sem ela, só dólar. */
   brlRate: number | null;
   rateDate: string | null;
@@ -147,7 +152,7 @@ export function CollectionView({
         </div>
       </section>
 
-      <AddToCollection empty={entries.length === 0} />
+      <AddToCollection empty={entries.length === 0} canScan={canScan} />
 
       {entries.length === 0 ? (
         <EmptyState>{t('empty')}</EmptyState>
@@ -627,8 +632,10 @@ function PrintSummary({ print }: { print: ChosenPrint }) {
  * uma pilha), cópias e foil. Sem resposta do Scryfall para as edições, dá para adicionar sem
  * escolher (fica a impressão padrão) e trocar depois.
  */
-function AddToCollection({ empty }: { empty: boolean }) {
+function AddToCollection({ empty, canScan }: { empty: boolean; canScan: boolean }) {
   const t = useTranslations('collection');
+  const ts = useTranslations('scan');
+  const router = useRouter();
   const id = useId();
   const { run, error, pending } = useApiAction();
   const [name, setName] = useState('');
@@ -650,6 +657,23 @@ function AddToCollection({ empty }: { empty: boolean }) {
         <Icon name="add" className="me-1 inline size-4 align-[-2px]" />
         {t('addTitle')}
       </summary>
+      {canScan && (
+        <div className="mt-4">
+          <CardScanButton
+            onAdd={async (cards) => {
+              // Uma por vez: cada carta é uma edição (pilha) da coleção.
+              for (const c of cards) {
+                await api('/api/v1/collection', {
+                  method: 'POST',
+                  body: { name: c.name, scryfallId: c.scryfallId, quantity: 1, foil: c.foil },
+                });
+              }
+              setDone(ts('added', { count: cards.length }));
+              router.refresh();
+            }}
+          />
+        </div>
+      )}
       <form
         className="mt-4 space-y-4"
         aria-label={t('addTitle')}

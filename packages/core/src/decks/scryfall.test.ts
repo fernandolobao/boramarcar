@@ -387,3 +387,55 @@ describe('fetchScryfallAutocomplete', () => {
     expect(split).toMatchObject({ imageUri: 'https://x/split.jpg', backImageUri: null });
   });
 });
+
+describe('buscas da leitura pela câmera', () => {
+  const card = (extra: Record<string, unknown> = {}) => ({
+    id: 'x1',
+    name: 'Thousand Moons Infantry',
+    cmc: 3,
+    type_line: 'Creature — Human Soldier',
+    color_identity: ['W'],
+    set: 'lci',
+    collector_number: '38',
+    ...extra,
+  });
+
+  it('nome aproximado: acha, e 404 vira null', async () => {
+    const { fetchScryfallFuzzy } = await import('./scryfall');
+    const fetchMock = vi.fn(async (_url: string) =>
+      Response.json(card({ name: 'Doomwake Giant' })),
+    );
+    expect((await fetchScryfallFuzzy('Doomwake Gian', { fetch: fetchMock }))?.name).toBe(
+      'Doomwake Giant',
+    );
+    expect(fetchMock.mock.calls[0]![0]).toBe(
+      'https://api.scryfall.com/cards/named?fuzzy=Doomwake%20Gian',
+    );
+    expect(
+      await fetchScryfallFuzzy('zzz', { fetch: async () => new Response('{}', { status: 404 }) }),
+    ).toBeNull();
+  });
+
+  it('edição + número na língua impressa, com o nome impresso; sem a língua, a de inglês', async () => {
+    const { fetchScryfallBySetNumber } = await import('./scryfall');
+    const fetchMock = vi.fn(async (url: string) =>
+      url.endsWith('/pt')
+        ? new Response('{}', { status: 404 })
+        : Response.json(card({ printed_name: undefined })),
+    );
+    const r = await fetchScryfallBySetNumber(
+      { set: 'LCI', number: '38', lang: 'pt' },
+      { fetch: fetchMock },
+    );
+    expect(fetchMock.mock.calls.map((c) => c[0])).toEqual([
+      'https://api.scryfall.com/cards/lci/38/pt',
+      'https://api.scryfall.com/cards/lci/38',
+    ]);
+    expect(r).toMatchObject({ card: { name: 'Thousand Moons Infantry' }, printedName: null });
+    const pt = await fetchScryfallBySetNumber(
+      { set: 'lci', number: '38', lang: 'pt' },
+      { fetch: async () => Response.json(card({ printed_name: 'Infantaria dos Mil Luas' })) },
+    );
+    expect(pt?.printedName).toBe('Infantaria dos Mil Luas');
+  });
+});

@@ -2786,5 +2786,32 @@
       "saved": "Desafio resolvido e salvo no seu progresso.",
       "review": "Rever a lição: {lesson}"
     }
+  },
+  "scan": {
+    "open": "Ler pela câmera",
+    "title": "Ler cartas pela câmera",
+    "hint": "Encaixe a carta na moldura, com boa luz e sem reflexo, e toque em “Ler carta”. Leia quantas quiser e confira a lista antes de adicionar. A imagem fica no seu aparelho: só o texto lido vai para o ArcanaKin achar a carta.",
+    "preview": "Imagem da câmera",
+    "read": "Ler carta",
+    "photo": "Tirar foto",
+    "loading": "Preparando o leitor de texto (só na primeira vez)…",
+    "reading": "Lendo a carta…",
+    "found": "Achei: {name}.",
+    "notFound": "Não reconheci a carta. Aproxime, melhore a luz ou digite o nome no campo de busca.",
+    "error": "Não deu para ler agora. Tente de novo.",
+    "cameraError": "Não deu para abrir a câmera. Confira a permissão do navegador ou use “Tirar foto”.",
+    "listTitle": "{count, plural, =0 {Cartas lidas} =1 {1 carta lida} other {# cartas lidas}}",
+    "empty": "As cartas lidas aparecem aqui para você conferir antes de adicionar.",
+    "print": "{set} #{number}",
+    "unverified": "Li a edição, mas não o nome: confira se é esta carta.",
+    "foil": "Foil",
+    "foilLabel": "{name} é foil",
+    "changePrint": "Trocar edição",
+    "usePrint": "Usar esta edição",
+    "remove": "Remover",
+    "removeLabel": "Remover {name} da lista",
+    "add": "{count, plural, =0 {Adicionar} =1 {Adicionar 1 carta} other {Adicionar # cartas}}",
+    "saveError": "Não deu para adicionar as cartas. Tente de novo.",
+    "added": "{count, plural, =1 {1 carta adicionada.} other {# cartas adicionadas.}}"
   }
 }

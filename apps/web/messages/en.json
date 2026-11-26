@@ -2786,5 +2786,32 @@
       "saved": "Challenge solved and saved to your progress.",
       "review": "Review the lesson: {lesson}"
     }
+  },
+  "scan": {
+    "open": "Scan with camera",
+    "title": "Scan cards with the camera",
+    "hint": "Fit the card in the frame, with good light and no glare, and tap “Scan card”. Scan as many as you like and check the list before adding. The image stays on your device: only the text read is sent to ArcanaKin to find the card.",
+    "preview": "Camera image",
+    "read": "Scan card",
+    "photo": "Take photo",
+    "loading": "Getting the text reader ready (first time only)…",
+    "reading": "Reading the card…",
+    "found": "Found: {name}.",
+    "notFound": "I couldn't recognize the card. Get closer, improve the light or type the name in the search field.",
+    "error": "Couldn't read right now. Try again.",
+    "cameraError": "Couldn't open the camera. Check the browser permission or use “Take photo”.",
+    "listTitle": "{count, plural, =0 {Cards read} =1 {1 card read} other {# cards read}}",
+    "empty": "Cards you scan show up here so you can check them before adding.",
+    "print": "{set} #{number}",
+    "unverified": "I read the edition but not the name: check that this is the card.",
+    "foil": "Foil",
+    "foilLabel": "{name} is foil",
+    "changePrint": "Change edition",
+    "usePrint": "Use this edition",
+    "remove": "Remove",
+    "removeLabel": "Remove {name} from the list",
+    "add": "{count, plural, =0 {Add} =1 {Add 1 card} other {Add # cards}}",
+    "saveError": "Couldn't add the cards. Try again.",
+    "added": "{count, plural, =1 {1 card added.} other {# cards added.}}"
   }
 }
