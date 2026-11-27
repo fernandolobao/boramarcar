@@ -166,7 +166,13 @@
     "inviteButton": "Invite",
     "settingsButton": "Settings",
     "membersCount": "{count, plural, =1 {1 person} other {# people}} in the group",
-    "readyForFirstTable": "Ready for the first table"
+    "readyForFirstTable": "Ready for the first table",
+    "tabsLabel": "Group page sections",
+    "tabs": {
+      "group": "Group",
+      "locations": "Places"
+    },
+    "settingsTitle": "Groups"
   },
   "availability": {
     "title": "Availability",
