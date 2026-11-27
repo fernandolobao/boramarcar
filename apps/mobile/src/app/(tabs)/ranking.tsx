@@ -17,8 +17,9 @@ import { Select } from '@/components/ds/select';
 import { EmptyState } from '@/components/empty-state';
 import { useLayout } from '@/lib/layout';
 import { Tip } from '@/components/tip';
+import { RankingStats } from '@/components/ranking-stats';
 
-/** Ranking do grupo ativo (todas as partidas). */
+/** Ranking do grupo ativo: classificação e, abaixo, as estatísticas do mesmo filtro. */
 
 /** Cor de cada medalha (o tom do meio do degradê do pódio do site; número em Noite, AA). */
 const MEDAL = [podium.gold[1], podium.silver[1], podium.bronze[1]];
@@ -44,6 +45,14 @@ export default function RankingScreen() {
         : Promise.resolve(null),
     [group?.id, period, format, seasons.data],
   );
+  // Estatísticas do mesmo período e tipo de jogo (abaixo da classificação, como no site).
+  const stats = useAsync(
+    () =>
+      group
+        ? api.stats.get(group.id, { from: range.from, to: range.to, format })
+        : Promise.resolve(null),
+    [group?.id, period, format, seasons.data],
+  );
   const periods = [
     { value: 'all', label: t('rankingPeriodAll') },
     { value: 'last30', label: t('rankingPeriodLast30') },
@@ -61,8 +70,15 @@ export default function RankingScreen() {
       keyExtractor={(s) => s.userId}
       contentContainerStyle={[layout.readableStyle, { gap: 8 }]}
       refreshControl={
-        <RefreshControl refreshing={ranking.refreshing} onRefresh={ranking.refresh} />
+        <RefreshControl
+          refreshing={ranking.refreshing}
+          onRefresh={() => {
+            void ranking.refresh();
+            void stats.refresh();
+          }}
+        />
       }
+      ListFooterComponent={stats.data ? <RankingStats stats={stats.data} /> : undefined}
       ListHeaderComponent={
         <View style={{ gap: 12, marginBottom: 8 }}>
           <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>

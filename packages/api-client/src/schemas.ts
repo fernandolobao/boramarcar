@@ -305,17 +305,39 @@ export const groupStatsSchema = z
     /** Confronto direto entre cada par (rivalidades no painel). */
     headToHead: z
       .array(
-        z.object({
-          userId: z.string(),
-          opponentId: z.string(),
-          games: z.number(),
-          wins: z.number(),
-          losses: z.number(),
-        }),
+        z
+          .object({
+            userId: z.string(),
+            opponentId: z.string(),
+            games: z.number(),
+            wins: z.number(),
+            losses: z.number(),
+          })
+          .loose(),
       )
       .optional(),
     averageWinningTurn: z.number().nullable().optional(),
     averageDurationMinutes: z.number().nullable().optional(),
+    /** % de vitórias de quem começou e em quantas partidas (servidores antigos não mandam). */
+    firstPlayerWinRate: z.number().nullable().optional().catch(undefined),
+    firstPlayerSample: z.number().optional().catch(undefined),
+    /** Decks mais jogados no período (ranking completo no app). */
+    decks: z
+      .array(
+        z
+          .object({
+            deckId: z.string(),
+            name: z.string(),
+            userId: z.string(),
+            ownerName: z.string(),
+            games: z.number(),
+            wins: z.number(),
+            winRate: z.number(),
+          })
+          .loose(),
+      )
+      .optional()
+      .catch(undefined),
     players: z.array(
       z
         .object({

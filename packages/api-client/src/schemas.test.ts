@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { achievementSchema, deckDetailSchema, playerProfileSchema } from './schemas';
+import {
+  achievementSchema,
+  deckDetailSchema,
+  groupStatsSchema,
+  playerProfileSchema,
+} from './schemas';
 
 const analysis = {
   totalCards: 100,
@@ -74,5 +79,30 @@ describe('esquemas do app', () => {
       ).toBe(true);
     }
     expect(playerProfileSchema).toBeDefined();
+  });
+
+  it('estatísticas: decks e quem começa chegam ao app; servidor antigo não derruba', () => {
+    const base = { totalGames: 3, players: [], commanders: [], activity: [] };
+    const full = groupStatsSchema.parse({
+      ...base,
+      firstPlayerWinRate: 0.5,
+      firstPlayerSample: 2,
+      decks: [
+        {
+          deckId: 'd1',
+          name: 'Omnath',
+          userId: 'u1',
+          ownerName: 'Ana',
+          games: 2,
+          wins: 1,
+          winRate: 0.5,
+        },
+      ],
+    });
+    expect(full.decks?.[0]?.ownerName).toBe('Ana');
+    expect(full.firstPlayerSample).toBe(2);
+    const old = groupStatsSchema.parse(base);
+    expect(old.decks).toBeUndefined();
+    expect(groupStatsSchema.parse({ ...base, decks: 'x' }).decks).toBeUndefined();
   });
 });
