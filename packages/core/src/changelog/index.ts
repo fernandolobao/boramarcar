@@ -441,6 +441,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-27',
+    pt: 'Encontro que já começou continua em "Próximos" e no painel (como "Acontecendo agora") até terminar, e não vai mais para o histórico logo depois do horário de início.',
+    en: 'A game night that has started stays in "Upcoming" and on the dashboard (as "Happening now") until it ends, instead of moving to history right after its start time.',
+  },
+  {
+    date: '2026-11-27',
+    pt: 'Página do grupo em abas: "Grupo" e "Locais". Criar um grupo novo ou entrar em outro agora fica em Configurações → Grupos.',
+    en: 'The group page now has tabs: "Group" and "Places". Creating a new group or joining another one is now under Settings → Groups.',
+  },
+  {
+    date: '2026-11-27',
     pt: 'O site não "treme" mais ao trocar de seção pelo menu: os itens e o conteúdo ficam no lugar.',
     en: 'The site no longer "shakes" when you switch sections from the menu: items and content stay in place.',
   },

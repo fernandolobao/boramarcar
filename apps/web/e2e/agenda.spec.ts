@@ -120,7 +120,7 @@ test.describe('locais do grupo (2.14)', () => {
 
   test('lista com mapa e rotas; edita o complemento', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
-    await page.goto('/grupo');
+    await page.goto('/grupo?aba=locais');
     await expect(page.getByRole('region', { name: 'Mapa dos locais do grupo' })).toBeVisible();
     // Na lista, os apps de mapa ficam atrás de "Como chegar" (no celular eram 4 botões por local).
     const howToGet = page.getByRole('button', { name: /^Como chegar ?\(Casa da Ana\)$/ });

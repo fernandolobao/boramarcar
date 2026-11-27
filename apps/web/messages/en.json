@@ -102,7 +102,8 @@
       "rival": "Your biggest rival: <name></name> won {losses, plural, =1 {1 game} other {# games}} of the {games} you played together.",
       "prey": "Your favorite target: you beat <name></name> in {wins, plural, =1 {1 game} other {# games}} of {games}.",
       "versus": "Between you two: you won {wins}, {name} won {losses} (in {games, plural, =1 {1 game} other {# games}})."
-    }
+    },
+    "happeningNow": "Happening now"
   },
   "group": {
     "title": "Your group",
@@ -165,7 +166,13 @@
     "inviteButton": "Invite",
     "settingsButton": "Settings",
     "membersCount": "{count, plural, =1 {1 person} other {# people}} in the group",
-    "readyForFirstTable": "Ready for the first table"
+    "readyForFirstTable": "Ready for the first table",
+    "tabsLabel": "Group page sections",
+    "tabs": {
+      "group": "Group",
+      "locations": "Places"
+    },
+    "settingsTitle": "Groups"
   },
   "availability": {
     "title": "Availability",
@@ -300,7 +307,8 @@
       "newPairs": "{count, plural, =0 {Everyone has played together} one {1 pair that never played together} other {# pairs that never played together}}",
       "reroll": "Shuffle again",
       "rerolled": "New table suggestion."
-    }
+    },
+    "happeningNow": "Happening now"
   },
   "ranking": {
     "title": "Ranking",

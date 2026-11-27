@@ -34,6 +34,7 @@ const pt = {
   rivalryPrey: 'Seu freguês: você venceu {name} em {wins} das {games} partidas.',
   dashWelcomeNew:
     'Boas-vindas ao grupo! Confirme presença no próximo encontro e venha jogar com a gente.',
+  dashHappeningNow: 'Acontecendo agora',
   dashNextEvent: 'Próximo encontro',
   dashNoEvents: 'Nenhum encontro marcado ainda. Marque quando você pode jogar e a mesa se forma.',
   dashOpenEvent: 'Ver o encontro',
@@ -1324,6 +1325,7 @@ const en: Messages = {
   rivalryPrey: 'Your favorite target: you beat {name} in {wins} of {games} games.',
   dashWelcomeNew:
     'Welcome to the group! Confirm you’re coming to the next meetup and come play with us.',
+  dashHappeningNow: 'Happening now',
   dashNextEvent: 'Next meetup',
   dashNoEvents: 'No meetup scheduled yet. Mark when you can play and the table forms.',
   dashOpenEvent: 'Open meetup',
