@@ -78,7 +78,9 @@ export function GamePlayers({
                       <PlayerLink
                         userId={p.userId}
                         name={p.name}
-                        className={p.result === 'win' ? 'font-semibold' : 'font-medium'}
+                        // Alvo de toque de 24 px (WCAG 2.5.8): o nome fica logo acima dos botões
+                        // dos comandantes, e com a linha estreita os dois alvos se encostavam.
+                        className={`inline-flex min-h-6 items-center ${p.result === 'win' ? 'font-semibold' : 'font-medium'}`}
                       />
                       <span className="muted">
                         · {t(`result.${p.result}`)}
