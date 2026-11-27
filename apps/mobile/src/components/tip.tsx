@@ -1,3 +1,4 @@
+import { radius } from '@boramarcar/tokens';
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { AppText, Button } from '@/components/ui';
@@ -58,11 +59,11 @@ export function Tip({ id }: { id: TipId }) {
         <View
           style={{
             gap: 8,
-            padding: 12,
-            borderRadius: 16,
-            borderWidth: 1,
-            borderColor: colors.border,
-            backgroundColor: colors.surface,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+            borderRadius: radius.control,
+            // Compacta e sem borda forte, como a dica do site.
+            backgroundColor: colors.surfaceMuted,
           }}
         >
           <AppText accessibilityRole="header" style={{ fontWeight: '700' }}>
@@ -73,7 +74,7 @@ export function Tip({ id }: { id: TipId }) {
             label={t('tipDismiss')}
             accessibilityLabel={t('tipDismissLabel')}
             variant="secondary"
-            style={{ alignSelf: 'flex-start' }}
+            style={{ alignSelf: 'flex-start', minHeight: 40 }}
             onPress={() => {
               setOpen(false);
               if (!saved) {
