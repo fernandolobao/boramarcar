@@ -414,6 +414,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, o deck mostra a base de mana e as chances da mão inicial, como no site, e as conquistas novas da trilha aparecem no perfil.',
     en: 'In the app, decks show the mana base and opening hand odds, like on the site, and the new learning path achievements show on profiles.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'No app, o ranking ganhou as estatísticas do site: destaques, sequências de vitórias, confronto direto, decks e comandantes mais jogados, com os mesmos filtros.',
+    en: 'In the app, the ranking now has the site\u2019s stats: highlights, win streaks, head to head, most played decks and commanders, with the same filters.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

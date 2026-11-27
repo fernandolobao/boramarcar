@@ -886,3 +886,7 @@ sem rolagem horizontal em 320px.
 ## App: base de mana e mão inicial no deck (27/11/2026)
 
 - Duas seções novas na pilha do deck, com título (`header`): cada cor da base de mana é uma linha acessível com o nome da cor por extenso, as fontes, a meta e a fatia dos símbolos; o aviso "Faltam fontes" vem em texto (não só na cor). A mão inicial é texto (porcentagens), sem gráfico.
+
+## App: estatísticas no ranking (27/11/2026)
+
+- Abaixo da classificação, cartões com título (`header`): destaques (rótulo e valor lidos juntos), sequências (cada linha lida como "Fulano: sequência atual 2, melhor 4"), confronto direto em texto ("Ana 2 × 1 Caio"), decks mais jogados (botões de 44 pt que abrem o deck, com o nome e os números no rótulo) e comandantes. Sem gráficos: tudo em texto, com números tabulares.
