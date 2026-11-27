@@ -449,6 +449,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Página do grupo em abas: "Grupo" e "Locais". Criar um grupo novo ou entrar em outro agora fica em Configurações → Grupos.',
     en: 'The group page now has tabs: "Group" and "Places". Creating a new group or joining another one is now under Settings → Groups.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'O site não "treme" mais ao trocar de seção pelo menu: os itens e o conteúdo ficam no lugar.',
+    en: 'The site no longer "shakes" when you switch sections from the menu: items and content stay in place.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

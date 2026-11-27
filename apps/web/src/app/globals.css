@@ -34,6 +34,9 @@
 
 :root {
   color-scheme: light dark;
+  /* Espaço da barra de rolagem sempre reservado: trocar entre uma página curta e uma longa (ou o
+     esqueleto de carregamento) não muda a largura útil, e o conteúdo não pula para o lado. */
+  scrollbar-gutter: stable;
 }
 :root[data-theme='light'] {
   color-scheme: light;

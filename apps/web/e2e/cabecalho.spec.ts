@@ -112,3 +112,32 @@ test.describe('página inicial com sessão', () => {
     await expect(page).toHaveURL(/\/painel$/);
   });
 });
+
+test.describe('menu sem tremer', () => {
+  test.skip(!process.env.E2E_DATABASE_URL, 'requer banco (E2E_DATABASE_URL)');
+  test.use({ storageState: AUTH_STATE });
+
+  test('trocar de seção pelo menu não mexe na posição do menu nem do conteúdo', async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== 'chromium', 'barra de rolagem fixa: desktop');
+    const nav = page.getByRole('navigation', { name: 'Navegação principal' });
+    const box = async () => {
+      const ranking = (await nav.getByRole('link', { name: 'Ranking' }).boundingBox())!;
+      const main = (await page.locator('main#conteudo').boundingBox())!;
+      return {
+        ranking: Math.round(ranking.x),
+        width: Math.round(ranking.width),
+        main: Math.round(main.x),
+      };
+    };
+    // Página curta (decks) e longa (ranking): a barra de rolagem aparece numa e não na outra.
+    await page.goto('/decks');
+    const short = await box();
+    await nav.getByRole('link', { name: 'Ranking' }).click();
+    await expect(page).toHaveURL(/\/ranking$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Ranking' })).toBeVisible();
+    // O item ativo fica em negrito sem ficar mais largo; o conteúdo não pula para o lado.
+    expect(await box()).toEqual(short);
+  });
+});
