@@ -143,6 +143,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'Como cancelo ou finalizo um encontro?',
             intro: [
               'Quem criou o encontro, ou um admin do grupo, pode cancelar (o botão pede confirmação em dois toques) ou marcar como finalizado depois do início. Finalizar manda o resumo da noite para o grupo. Um encontro cancelado pode ser reaberto.',
+              'Depois de começar, o encontro continua em "Próximos" e no painel ("Acontecendo agora") até o horário de término, ou 4 horas depois do início quando não há término, com 2 horas de folga. Depois vai para o histórico. Marcar como finalizado manda para o histórico na hora.',
             ],
           },
           {
@@ -585,6 +586,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'How do I cancel or finish a meetup?',
             intro: [
               'Whoever created the meetup, or a group admin, can cancel it (the button asks for a two-tap confirmation) or mark it as finished after it starts. Finishing sends the night’s recap to the group. A cancelled meetup can be reopened.',
+              'Once it starts, the meetup stays in "Upcoming" and on the dashboard ("Happening now") until its end time, or 4 hours after the start when there is no end time, plus 2 hours of slack. Then it moves to history. Marking it as finished moves it to history right away.',
             ],
           },
           {

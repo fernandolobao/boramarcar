@@ -174,6 +174,50 @@ describe('eventos, partidas e ranking', () => {
     expect((await getEventDetail(db, { eventId: event.id, userId: p1 })).games).toEqual([]);
   });
 
+  it('encontro em andamento continua nos próximos até o fim (+2 h); finalizado vai para o histórico', async () => {
+    const { group, players } = await seedGroup(db, 1);
+    const [p1] = players.map((p) => p.id) as [string];
+    const at = (iso: string) => new Date(iso);
+    const make = (title: string, startsAt: string, endsAt?: string) =>
+      createEvent(db, {
+        groupId: group.id,
+        userId: p1,
+        title,
+        startsAt: at(startsAt),
+        ...(endsAt ? { endsAt: at(endsAt) } : {}),
+      });
+    // Começou às 18h (sem término): às 18h15 ainda é um dos próximos (o caso relatado).
+    await make('Sem término', '2026-11-26T21:00:00Z');
+    // Com término às 23h: vale o término + 2 h.
+    await make('Com término', '2026-11-26T21:00:00Z', '2026-11-27T02:00:00Z');
+    const finished = await make('Finalizado', '2026-11-26T21:00:00Z');
+    await updateEvent(db, { eventId: finished.id, userId: p1, status: 'finished' });
+    const titles = async (when: 'upcoming' | 'past', iso: string) =>
+      (await listEvents(db, { groupId: group.id, userId: p1, when, now: at(iso) }))
+        .map((e) => e.title)
+        .sort();
+
+    // 18h15: os dois em andamento seguem nos próximos; o finalizado já está no histórico.
+    expect(await titles('upcoming', '2026-11-26T21:15:00Z')).toEqual([
+      'Com término',
+      'Sem término',
+    ]);
+    expect(await titles('past', '2026-11-26T21:15:00Z')).toEqual(['Finalizado']);
+    // Sem término: 4 h de duração padrão + 2 h de folga = até 0h; à 0h01 vai para o histórico.
+    expect(await titles('upcoming', '2026-11-27T02:59:00Z')).toEqual([
+      'Com término',
+      'Sem término',
+    ]);
+    expect(await titles('upcoming', '2026-11-27T03:01:00Z')).toEqual(['Com término']);
+    // Com término às 23h: até 1h.
+    expect(await titles('upcoming', '2026-11-27T04:01:00Z')).toEqual([]);
+    expect(await titles('past', '2026-11-27T04:01:00Z')).toEqual([
+      'Com término',
+      'Finalizado',
+      'Sem término',
+    ]);
+  });
+
   it('lista eventos futuros/passados e atualiza RSVP', async () => {
     const { group, players } = await seedGroup(db, 2);
     const [p1, p2] = players.map((p) => p.id) as [string, string];
