@@ -1,4 +1,5 @@
 import type { LearnLocale, LessonId } from './index';
+import { INTERMEDIATE_CHALLENGES } from './challenges-intermediate';
 
 /**
  * Desafios guiados (12.4): uma situação de mesa (a sua área e a do oponente), uma pergunta e
@@ -13,6 +14,14 @@ export const CHALLENGE_IDS = [
   'desafio-enjoo',
   'desafio-mana',
   'desafio-dano-de-comandante',
+  // Além do básico (trilha intermediária).
+  'desafio-resposta-a-resposta',
+  'desafio-iniciativa',
+  'desafio-dois-bloqueadores',
+  'desafio-gatilho',
+  'desafio-fim-do-turno',
+  'desafio-dois-por-um',
+  'desafio-parceiros',
 ] as const;
 export type ChallengeId = (typeof CHALLENGE_IDS)[number];
 
@@ -43,15 +52,21 @@ export interface ChallengeText {
   options: { text: string; correct: boolean; why: string }[];
 }
 
+/** Nível do desafio: o básico (12.4) ou "Além do básico" (trilha intermediária). */
+export const CHALLENGE_LEVELS = ['basic', 'intermediate'] as const;
+export type ChallengeLevel = (typeof CHALLENGE_LEVELS)[number];
+
 export interface Challenge {
   id: ChallengeId;
   /** Lição que explica o assunto. */
   lesson: LessonId;
+  /** Sem valor: básico. */
+  level?: ChallengeLevel;
   'pt-BR': ChallengeText;
   en: ChallengeText;
 }
 
-export const CHALLENGES: readonly Challenge[] = [
+const BASIC_CHALLENGES: readonly Challenge[] = [
   {
     id: 'desafio-voar',
     lesson: 'combate',
@@ -471,6 +486,15 @@ export const CHALLENGES: readonly Challenge[] = [
     },
   },
 ];
+
+/** Todos os desafios, na ordem de `CHALLENGE_IDS`: os básicos e depois os intermediários. */
+export const CHALLENGES: readonly Challenge[] = [...BASIC_CHALLENGES, ...INTERMEDIATE_CHALLENGES];
+
+export const challengeLevel = (challenge: Challenge): ChallengeLevel => challenge.level ?? 'basic';
+
+/** Ids dos desafios de um nível (ex.: para a conquista de cada nível). */
+export const challengeIdsOf = (level: ChallengeLevel): ChallengeId[] =>
+  CHALLENGES.filter((c) => challengeLevel(c) === level).map((c) => c.id);
 
 /** Desafio no idioma pedido, com o id e a lição. */
 export const challengeFor = (challenge: Challenge, locale: LearnLocale) => ({

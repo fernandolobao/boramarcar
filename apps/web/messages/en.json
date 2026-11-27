@@ -1190,7 +1190,19 @@
       },
       "learn_challenges": {
         "name": "Challenges cleared",
-        "description": "Get every \"Learn to play\" challenge right."
+        "description": "Get every basic \"Learn to play\" challenge right."
+      },
+      "learn_intermediate": {
+        "name": "Beyond the basics",
+        "description": "Complete every lesson of \"Beyond the basics\"."
+      },
+      "learn_challenges_intermediate": {
+        "name": "Challenges for players",
+        "description": "Get every \"Beyond the basics\" challenge right."
+      },
+      "learn_master": {
+        "name": "Path master",
+        "description": "Complete every lesson and get every challenge right in \"Learn to play\"."
       }
     },
     "tabsLabel": "Achievements",
@@ -2967,7 +2979,11 @@
       "yourAnswer": "Your answer",
       "tryAgain": "Choose another answer and try again.",
       "saved": "Challenge solved and saved to your progress.",
-      "review": "Review the lesson: {lesson}"
+      "review": "Review the lesson: {lesson}",
+      "levels": {
+        "basic": "Basics",
+        "intermediate": "Beyond the basics"
+      }
     },
     "practice": {
       "title": "Practice on your own",

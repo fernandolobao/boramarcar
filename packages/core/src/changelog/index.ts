@@ -399,6 +399,16 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Mão inicial mais legível: as cartas ficaram bem maiores e tocar numa carta mostra ela grande para ler o texto.',
     en: 'A more readable opening hand: cards are much bigger, and tapping a card shows it large so you can read the text.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'Nova trilha "Além do básico" em Aprender a jogar, para quem já joga: prioridade, combate avançado, habilidades, ações baseadas em estado, vantagem de cartas e Commander a fundo.',
+    en: 'New "Beyond the basics" path in Learn to play, for players who already play: priority, advanced combat, abilities, state-based actions, card advantage and Commander in depth.',
+  },
+  {
+    date: '2026-11-27',
+    pt: 'Sete desafios novos para quem já joga e três conquistas: "Além do básico", "Desafios de quem já joga" e "Mestre da trilha".',
+    en: 'Seven new challenges for players who already play and three achievements: "Beyond the basics", "Challenges for players" and "Path master".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

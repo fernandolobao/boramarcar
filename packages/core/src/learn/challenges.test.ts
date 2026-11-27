@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { CHALLENGE_IDS, CHALLENGES, isChallengeId } from './challenges';
-import { isLessonId, LESSON_IDS } from './index';
+import {
+  CHALLENGE_IDS,
+  CHALLENGES,
+  challengeIdsOf,
+  challengeLevel,
+  isChallengeId,
+} from './challenges';
+import { isLessonId, LEARN_TRACKS, LESSON_IDS } from './index';
 
 describe('desafios guiados (12.4)', () => {
   it('na ordem de CHALLENGE_IDS, com lição que existe e ids que não colidem com as lições', () => {
@@ -37,5 +43,22 @@ describe('desafios guiados (12.4)', () => {
 
   it('nenhum endereço no texto', () => {
     expect(JSON.stringify(CHALLENGES)).not.toMatch(/https?:\/\//);
+  });
+
+  it('níveis: os intermediários vêm depois, explicam lições de "Além do básico" e há um por lição ou mais', () => {
+    const intermediate = challengeIdsOf('intermediate');
+    const basic = challengeIdsOf('basic');
+    expect([...basic, ...intermediate]).toEqual([...CHALLENGE_IDS]);
+    expect(basic).toHaveLength(7);
+    for (const c of CHALLENGES) {
+      const inIntermediateTrack = (LEARN_TRACKS.intermediate as readonly string[]).includes(
+        c.lesson,
+      );
+      expect(inIntermediateTrack).toBe(challengeLevel(c) === 'intermediate');
+    }
+    const covered = new Set(
+      CHALLENGES.filter((c) => challengeLevel(c) === 'intermediate').map((c) => c.lesson),
+    );
+    expect(covered.size).toBe(LEARN_TRACKS.intermediate.length);
   });
 });

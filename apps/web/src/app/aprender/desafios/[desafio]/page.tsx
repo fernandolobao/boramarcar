@@ -1,4 +1,9 @@
-import { CHALLENGES, isChallengeId, type ChallengeSide } from '@boramarcar/core/learn';
+import {
+  CHALLENGES,
+  challengeLevel,
+  isChallengeId,
+  type ChallengeSide,
+} from '@boramarcar/core/learn';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -18,9 +23,11 @@ async function challengeOf(params: Props['params']) {
   const { desafio } = await params;
   if (!isChallengeId(desafio)) notFound();
   const ctx = await learnContext();
-  const index = CHALLENGES.findIndex((c) => c.id === desafio);
-  const challenge = CHALLENGES[index]!;
-  return { ...ctx, index, challenge, text: challenge[ctx.locale] };
+  const challenge = CHALLENGES.find((c) => c.id === desafio)!;
+  // Numeração e "próximo" dentro do nível (o básico ou "Além do básico").
+  const level = CHALLENGES.filter((c) => challengeLevel(c) === challengeLevel(challenge));
+  const index = level.indexOf(challenge);
+  return { ...ctx, index, level, challenge, text: challenge[ctx.locale] };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -103,10 +110,10 @@ function Area({
 
 /** Um desafio guiado (12.4): a mesa, a pergunta e as respostas comentadas. */
 export default async function ChallengePage({ params }: Props) {
-  const { challenge, text, index, user, locale } = await challengeOf(params);
+  const { challenge, text, index, level, user, locale } = await challengeOf(params);
   const t = await getTranslations('learn');
   const tc = await getTranslations('common');
-  const next = CHALLENGES[index + 1];
+  const next = level[index + 1];
   const images = await exampleCardImages(getDb(), [
     ...text.you.cards.map((c) => c.name),
     ...text.opponent.cards.map((c) => c.name),
@@ -134,7 +141,8 @@ export default async function ChallengePage({ params }: Props) {
 
       <header className="space-y-2">
         <p className="muted text-sm">
-          {t('challenges.of', { n: index + 1, total: CHALLENGES.length })}
+          {t(`challenges.levels.${challengeLevel(challenge)}`)} ·{' '}
+          {t('challenges.of', { n: index + 1, total: level.length })}
         </p>
         <h1 className="page-title">{text.title}</h1>
         <p>

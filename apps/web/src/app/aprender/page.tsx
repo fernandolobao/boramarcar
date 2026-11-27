@@ -4,7 +4,13 @@ import { getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { pageMetadata } from '@/server/seo';
-import { CHALLENGES, isLessonId, TRACK_IDS } from '@boramarcar/core/learn';
+import {
+  CHALLENGE_LEVELS,
+  CHALLENGES,
+  challengeLevel,
+  isLessonId,
+  TRACK_IDS,
+} from '@boramarcar/core/learn';
 import { learnContext } from './content';
 import { PracticeCallout } from '@/components/practice-callout';
 
@@ -149,49 +155,62 @@ export default async function LearnPage() {
             {t('challenges.title')}
           </h2>
           <p className="text-sm">{t('challenges.intro')}</p>
-          {user && (
-            <p className="muted text-sm">
-              {t('trackProgress', {
-                done: CHALLENGES.filter((c) => done.includes(c.id)).length,
-                total: CHALLENGES.length,
-              })}
-            </p>
-          )}
         </div>
-        <ol className="grid gap-3 sm:grid-cols-2">
-          {CHALLENGES.map((c, i) => {
-            const solved = done.includes(c.id);
-            return (
-              <li key={c.id}>
-                <Link
-                  href={`/aprender/desafios/${c.id}`}
-                  className="card flex h-full items-start gap-4 hover:border-line-strong"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`flex size-9 shrink-0 items-center justify-center rounded-full border font-semibold ${
-                      solved ? 'border-primary bg-primary text-on-primary' : 'border-line-strong'
-                    }`}
-                  >
-                    {solved ? <Icon name="done" /> : i + 1}
-                  </span>
-                  <span className="min-w-0 space-y-1">
-                    <span className="block font-semibold">
-                      <span className="sr-only">
-                        {t('challenges.of', { n: i + 1, total: CHALLENGES.length })}:{' '}
-                      </span>
-                      {c[locale].title}
-                    </span>
-                    <span className="block text-sm">{c[locale].question}</span>
-                    {solved && (
-                      <span className="muted block text-sm">{t('challenges.solved')}</span>
-                    )}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ol>
+        {/* Um grupo por nível: o básico e "Além do básico", cada um com o seu progresso. */}
+        {CHALLENGE_LEVELS.map((level) => {
+          const list = CHALLENGES.filter((c) => challengeLevel(c) === level);
+          return (
+            <section key={level} aria-labelledby={`desafios-${level}`} className="space-y-2">
+              <h3 id={`desafios-${level}`} className="font-semibold">
+                {t(`challenges.levels.${level}`)}
+              </h3>
+              {user && (
+                <p className="muted text-sm">
+                  {t('trackProgress', {
+                    done: list.filter((c) => done.includes(c.id)).length,
+                    total: list.length,
+                  })}
+                </p>
+              )}
+              <ol className="grid gap-3 sm:grid-cols-2">
+                {list.map((c, i) => {
+                  const solved = done.includes(c.id);
+                  return (
+                    <li key={c.id}>
+                      <Link
+                        href={`/aprender/desafios/${c.id}`}
+                        className="card flex h-full items-start gap-4 hover:border-line-strong"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`flex size-9 shrink-0 items-center justify-center rounded-full border font-semibold ${
+                            solved
+                              ? 'border-primary bg-primary text-on-primary'
+                              : 'border-line-strong'
+                          }`}
+                        >
+                          {solved ? <Icon name="done" /> : i + 1}
+                        </span>
+                        <span className="min-w-0 space-y-1">
+                          <span className="block font-semibold">
+                            <span className="sr-only">
+                              {t('challenges.of', { n: i + 1, total: list.length })}:{' '}
+                            </span>
+                            {c[locale].title}
+                          </span>
+                          <span className="block text-sm">{c[locale].question}</span>
+                          {solved && (
+                            <span className="muted block text-sm">{t('challenges.solved')}</span>
+                          )}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          );
+        })}
       </section>
 
       {/* Pratique sozinho: a mesa de testes com um deck (11.4). */}

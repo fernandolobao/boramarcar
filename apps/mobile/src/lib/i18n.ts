@@ -887,7 +887,16 @@ const pt = {
   achievement_learn_commander_description:
     'Concluir todas as lições de "Commander para iniciantes".',
   achievement_learn_challenges_name: 'Desafios vencidos',
-  achievement_learn_challenges_description: 'Acertar todos os desafios de "Aprender a jogar".',
+  achievement_learn_challenges_description:
+    'Acertar todos os desafios do básico de "Aprender a jogar".',
+  achievement_learn_intermediate_name: 'Além do básico',
+  achievement_learn_intermediate_description: 'Concluir todas as lições de "Além do básico".',
+  achievement_learn_challenges_intermediate_name: 'Desafios de quem já joga',
+  achievement_learn_challenges_intermediate_description:
+    'Acertar todos os desafios de "Além do básico".',
+  achievement_learn_master_name: 'Mestre da trilha',
+  achievement_learn_master_description:
+    'Concluir todas as lições e acertar todos os desafios de "Aprender a jogar".',
   eventTitleLabel: 'Título',
   eventDefaultTitle: 'Commander',
   eventDay: 'Dia',
@@ -2077,7 +2086,15 @@ const en: Messages = {
   achievement_learn_commander_name: 'Ready for Commander',
   achievement_learn_commander_description: 'Complete every lesson of "Commander for beginners".',
   achievement_learn_challenges_name: 'Challenges cleared',
-  achievement_learn_challenges_description: 'Get every "Learn to play" challenge right.',
+  achievement_learn_challenges_description: 'Get every basic "Learn to play" challenge right.',
+  achievement_learn_intermediate_name: 'Beyond the basics',
+  achievement_learn_intermediate_description: 'Complete every lesson of "Beyond the basics".',
+  achievement_learn_challenges_intermediate_name: 'Challenges for players',
+  achievement_learn_challenges_intermediate_description:
+    'Get every "Beyond the basics" challenge right.',
+  achievement_learn_master_name: 'Path master',
+  achievement_learn_master_description:
+    'Complete every lesson and get every challenge right in "Learn to play".',
   eventTitleLabel: 'Title',
   eventDefaultTitle: 'Commander',
   eventDay: 'Day',

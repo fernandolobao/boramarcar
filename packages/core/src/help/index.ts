@@ -45,7 +45,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'aprender',
             question: 'Nunca joguei Magic. Por onde começo?',
             intro: [
-              'Abra "Aprender a jogar" (no rodapé de todas as páginas): lições curtas sobre cartas, mana, o turno, combate e a pilha e, depois, "Commander para iniciantes" (comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets), com cartas de exemplo. Não precisa de conta; com conta, o seu progresso fica salvo.',
+              'Abra "Aprender a jogar" (no rodapé de todas as páginas): lições curtas sobre cartas, mana, o turno, combate e a pilha e, depois, "Commander para iniciantes" (comandante, identidade de cor, a mesa com várias pessoas, Rule 0 e brackets) e "Além do básico", para quem já joga (prioridade, combate avançado, habilidades, ações baseadas em estado, vantagem de cartas e Commander a fundo), com cartas de exemplo. Os desafios ficam separados em básico e "Além do básico". Não precisa de conta; com conta, o seu progresso fica salvo.',
               'Depois das lições, os "Desafios" mostram situações de mesa (o oponente ataca com uma criatura que voa, um Raio nos seus Ursos…): escolha o que fazer e veja o porquê de cada resposta.',
               'Quem conclui as lições do básico e ainda não jogou nenhuma partida aparece na página do grupo como "Pronto para a primeira mesa": dá para o grupo chamar a pessoa para o próximo encontro.',
               'Esqueceu o que faz uma palavra-chave (voar, atropelar, toque mortífero…)? O glossário fica em "Aprender a jogar" e também no botão do centro do modo mesa.',
@@ -336,7 +336,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'O que são as conquistas?',
             intro: [
-              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano, estreia em torneio, chegar ao top cut, campeão de torneio, as lições da trilha "Aprender a jogar" e outros. Abra o perfil (toque no seu nome no ranking): a aba "Em aberto" mostra o que falta, as mais perto de sair primeiro, e "Finalizadas" mostra as que você já ganhou, com a data.',
+              'Selos que aparecem no perfil conforme você joga: primeira partida, primeira vitória, sequências, vitória rápida, fiel ao deck, campeão da temporada, 100 partidas, vencer cada pessoa do grupo, jogar em 4 encontros seguidos, jogar os 12 meses do ano, estreia em torneio, chegar ao top cut, campeão de torneio, as lições e os desafios de "Aprender a jogar" (inclusive "Além do básico" e "Mestre da trilha", com tudo) e outros. Abra o perfil (toque no seu nome no ranking): a aba "Em aberto" mostra o que falta, as mais perto de sair primeiro, e "Finalizadas" mostra as que você já ganhou, com a data.',
               'Quando você ganha conquistas novas, uma janela mostra todas juntas na próxima vez que abrir o painel ou o seu perfil, mesmo que tenham vindo de várias partidas.',
             ],
           },
@@ -487,7 +487,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'aprender',
             question: "I've never played Magic. Where do I start?",
             intro: [
-              'Open "Learn to play" (in the footer of every page): short lessons about cards, mana, the turn, combat and the stack, then "Commander for beginners" (the commander, color identity, the multiplayer table, Rule 0 and brackets), with example cards. No account needed; with one, your progress is saved.',
+              'Open "Learn to play" (in the footer of every page): short lessons about cards, mana, the turn, combat and the stack, then "Commander for beginners" (the commander, color identity, the multiplayer table, Rule 0 and brackets) and "Beyond the basics", for players who already play (priority, advanced combat, abilities, state-based actions, card advantage and Commander in depth), with example cards. Challenges are split into basics and "Beyond the basics". No account needed; with one, your progress is saved.',
               'After the lessons, the "Challenges" show table situations (an opponent attacks with a flyer, a Bolt on your Bears…): choose what to do and see why for each answer.',
               'Whoever completes the basics lessons and hasn\u2019t played any game yet shows up on the group page as "Ready for the first table", so the group can invite them to the next meetup.',
               'Forgot what a keyword does (flying, trample, deathtouch…)? The glossary is in "Learn to play" and also in the centre button of table mode.',
@@ -778,7 +778,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'conquistas',
             question: 'What are achievements?',
             intro: [
-              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year, a tournament debut, making the top cut, tournament champion, the "Learn to play" lessons and more. Open a profile (tap a name in the ranking): the "Open" tab shows what is left, closest first, and "Completed" shows the ones you already have, with the date.',
+              'Badges that appear on your profile as you play: first game, first win, streaks, lightning win, loyal to the deck, season champion, 100 games, beating everyone in your group, playing 4 meetups in a row, playing all 12 months of a year, a tournament debut, making the top cut, tournament champion, the "Learn to play" lessons and challenges (including "Beyond the basics" and "Path master", for all of them) and more. Open a profile (tap a name in the ranking): the "Open" tab shows what is left, closest first, and "Completed" shows the ones you already have, with the date.',
               'When you earn new achievements, a window shows them all together the next time you open the dashboard or your profile, even if they came from several games.',
             ],
           },

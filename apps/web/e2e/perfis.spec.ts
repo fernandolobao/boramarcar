@@ -21,7 +21,7 @@ test.describe('perfis e conquistas', () => {
     await achievements.getByRole('tab', { name: /^Finalizadas \(\d+\)$/ }).click();
     await expect(achievements.getByText('Primeira vitória')).toBeVisible();
     await expect(achievements.getByText(/Conquistada em/).first()).toBeVisible();
-    await expect(achievements.getByText(/de 35 conquistadas/)).toBeVisible();
+    await expect(achievements.getByText(/de 38 conquistadas/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Omnath Ramp' })).toBeVisible();
   });
 
