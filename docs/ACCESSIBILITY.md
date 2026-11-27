@@ -865,3 +865,9 @@ sem rolagem horizontal em 320px.
 - Dica das telas compacta, fundo `surfaceMuted` sem borda forte (texto `fg`, AA nos dois temas).
 - Encontro: participantes com foto (decorativa) e a resposta em texto; cada linha é um elemento acessível com "Nome, resposta"; quem vai primeiro.
 - Ranking: os três primeiros com a medalha (ouro, prata, bronze) atrás do número, que continua escrito; número em Noite sobre o metal (contraste AA, o mesmo do pódio do site).
+
+## Mão inicial legível (26/11/2026)
+
+- As cartas da mão viraram botões "Ampliar {carta}" que abrem a carta grande num `<dialog>` modal (nome da carta como nome acessível, imagem com `alt`, "Fechar", Esc e o fundo fecham; o foco volta para a carta).
+- No mulligan, cada carta tem dois botões: "Pôr {carta} no fundo" (`aria-pressed`) e a lupa "Ampliar {carta}" (36 px, com dica no hover), para ler sem escolher.
+- Cartas de 2 a 4 por linha (antes 7): o texto da carta fica legível sem zoom do navegador.
