@@ -155,7 +155,15 @@ export const standingSchema = z
 export type Standing = z.infer<typeof standingSchema>;
 
 export const rankingSchema = z
-  .object({ totalGames: z.number(), standings: z.array(standingSchema) })
+  .object({
+    totalGames: z.number(),
+    standings: z.array(standingSchema),
+    /** Pontos por resultado, definidos pelo grupo (servidores antigos não mandam). */
+    points: z
+      .object({ win: z.number(), draw: z.number(), loss: z.number() })
+      .optional()
+      .catch(undefined),
+  })
   .loose();
 export type Ranking = z.infer<typeof rankingSchema>;
 

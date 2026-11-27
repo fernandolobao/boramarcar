@@ -1,4 +1,8 @@
 import { z } from 'zod';
+
+/** Dicas das telas (7.4) que o app conhece. */
+export const TIP_IDS = ['deck-analysis', 'table', 'collection', 'ranking'] as const;
+export type TipId = (typeof TIP_IDS)[number];
 import {
   groupRecordsSchema,
   tournamentSummarySchema,
@@ -229,9 +233,10 @@ export function createApiClient(options: ApiClientOptions) {
           await request(
             'GET',
             '/me/onboarding',
-            z.object({ tips: z.array(z.enum(['deck-analysis', 'table', 'collection'])) }),
+            // Lista tolerante: dica nova no servidor não quebra uma versão antiga do app.
+            z.object({ tips: z.array(z.string()) }),
           )
-        ).tips,
+        ).tips.filter((id): id is TipId => (TIP_IDS as readonly string[]).includes(id)),
       markOnboarding: (
         flag:
           | 'checklist-dismissed'
@@ -240,7 +245,8 @@ export function createApiClient(options: ApiClientOptions) {
           | 'beta-banner-dismissed'
           | 'tip-deck-analysis'
           | 'tip-table'
-          | 'tip-collection',
+          | 'tip-collection'
+          | 'tip-ranking',
       ) => request('POST', '/me/onboarding', z.object({ flag: z.string() }), { flag }),
       /** Lições da trilha "Aprender a jogar" (12.1) já concluídas. */
       learnProgress: async () =>
