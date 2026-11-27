@@ -426,6 +426,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     date: '2026-11-27',
+    pt: '"Aprender a jogar" chegou ao app (aba Conta): as mesmas lições e desafios do site, com o progresso compartilhado.',
+    en: '"Learn to play" is now in the app (Account tab): the same lessons and challenges as the site, with shared progress.',
+  },
+  {
+    date: '2026-11-27',
     pt: 'Desafios de "Aprender a jogar": a resposta certa não fica mais sempre na mesma posição.',
     en: '"Learn to play" challenges: the right answer no longer always sits in the same position.',
   },

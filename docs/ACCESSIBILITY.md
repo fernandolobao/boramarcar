@@ -895,3 +895,8 @@ sem rolagem horizontal em 320px.
 
 - "Comparação" é uma seção da pilha do deck com título; cada métrica é uma linha lida inteira ("Nota 80, média 72"); "Comuns nos outros decks" e "Escolhas próprias" têm título e explicação em texto.
 - Em cada função, "Ver alternativas" é um botão com a função no nome acessível ("Ver alternativas (Ramp)") e estado `expanded`; o custo máximo é escolhido por chips; o resultado entra numa região viva (carregando, erro, lista).
+
+## App: "Aprender a jogar" (27/11/2026)
+
+- Lista com títulos por bloco; cada lição e desafio é um link com "Lição 2 de 6: título" no nome (e "Concluída" quando feito). Na lição, títulos por seção, símbolos de mana com nome por extenso (`ManaText`), cartas de exemplo com a imagem decorativa e o nome em texto. "Marcar como concluída" é um botão com estado `checked`.
+- Desafio: a mesa em cartões com título (Oponente/Você, vida), as respostas num `radiogroup` (`Choices` vertical), "Responder" desabilitado sem escolha, e o resultado (certo/errado, a resposta certa e o porquê) numa região viva, com ícone e texto (a cor não é a única pista).

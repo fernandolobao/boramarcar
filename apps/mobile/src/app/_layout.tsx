@@ -77,6 +77,12 @@ function RootLayout() {
         <Stack.Screen name="feedback" options={{ title: t('feedbackTitle') }} />
         <Stack.Screen name="notificacoes" options={{ title: t('notifTitle') }} />
         <Stack.Screen name="ajuda" options={{ title: t('helpTitle') }} />
+        <Stack.Screen name="aprender/index" options={{ title: t('learnTitle') }} />
+        <Stack.Screen name="aprender/[licao]" options={{ title: t('learnTitle') }} />
+        <Stack.Screen
+          name="aprender/desafios/[desafio]"
+          options={{ title: t('learnChallenges') }}
+        />
         <Stack.Screen name="boas-vindas" options={{ title: t('guideTitle') }} />
         <Stack.Screen name="grupos" options={{ title: t('groupsManage') }} />
         <Stack.Screen name="grupo" options={{ title: t('groupTitle') }} />
