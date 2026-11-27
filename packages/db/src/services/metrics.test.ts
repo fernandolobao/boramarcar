@@ -127,7 +127,7 @@ describe('métricas do produto', () => {
     expect((await getProductMetrics(fresh)).onboarding).toEqual({
       guideCompleted: 2,
       guideSkipped: 1,
-      tipsDismissed: { 'deck-analysis': 0, table: 2, collection: 1 },
+      tipsDismissed: { 'deck-analysis': 0, table: 2, collection: 1, ranking: 0 },
     });
     await closeFresh();
   });

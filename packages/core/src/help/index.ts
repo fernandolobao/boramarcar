@@ -329,7 +329,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'pontos',
             question: 'Como funciona o ranking?',
             intro: [
-              'Cada partida registrada dá pontos a quem jogou, com mais para quem venceu. O ranking do grupo soma tudo; os filtros mostram um período, uma temporada ou um tipo de jogo. Temporadas são criadas pelo organizador no fim da tela de ranking (em "Nova temporada"), e quem termina em 1º ganha o título no perfil. Os três primeiros da classificação aparecem com a medalha de ouro, prata ou bronze.',
+              'Cada partida registrada dá pontos a quem jogou, com mais para quem venceu. O ranking do grupo soma tudo; empatou em pontos, fica na frente quem tem mais vitórias, depois o melhor % de vitórias, depois quem jogou menos partidas (empatados em tudo dividem a posição). Os filtros mostram um período, uma temporada ou um tipo de jogo, e o botão ⓘ ao lado do título resume essas regras. Temporadas são criadas pelo organizador no fim da tela de ranking (em "Nova temporada"), e quem termina em 1º ganha o título no perfil. Os três primeiros da classificação aparecem com a medalha de ouro, prata ou bronze.',
             ],
           },
           {
@@ -771,7 +771,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'pontos',
             question: 'How does the ranking work?',
             intro: [
-              'Each recorded game gives points to everyone who played, with more for the winner. The group ranking adds it all up; filters show a period, a season or a game type. Seasons are created by the organizer at the bottom of the ranking screen (under "New season"), and whoever finishes 1st gets the title on their profile. The top three in the standings show a gold, silver or bronze medal.',
+              'Each recorded game gives points to everyone who played, with more for the winner. The group ranking adds it all up; tied on points, whoever has more wins goes first, then the better win %, then whoever played fewer games (players tied on everything share the position). Filters show a period, a season or a game type, and the ⓘ button next to the title sums up these rules. Seasons are created by the organizer at the bottom of the ranking screen (under "New season"), and whoever finishes 1st gets the title on their profile. The top three in the standings show a gold, silver or bronze medal.',
             ],
           },
           {

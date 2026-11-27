@@ -165,6 +165,9 @@ const pt = {
     'Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer e trocar lugares.',
   tipCollection:
     'As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.',
+  rankingPointsRule: 'Vitória vale {win}, empate {draw} e derrota {loss}.',
+  tipRanking:
+    'Cada partida dá pontos a todos que jogaram: os valores de vitória, empate e derrota aparecem abaixo do título, e quem organiza o grupo pode mudá-los nas configurações do grupo. Empatou em pontos? Fica na frente quem tem mais vitórias; depois, o melhor % de vitórias; depois, quem jogou menos partidas. Quem empata em tudo divide a posição. Os filtros de período, temporada e tipo de jogo refazem a conta só com aquelas partidas.',
   helpTitle: 'Ajuda',
   groupTitle: 'Seu grupo',
   groupSettingsTitle: 'Configurações do grupo',
@@ -1344,6 +1347,9 @@ const en: Messages = {
     'Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo and swap seats.',
   tipCollection:
     'Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.',
+  rankingPointsRule: 'A win is worth {win}, a draw {draw} and a loss {loss}.',
+  tipRanking:
+    'Every game gives points to everyone who played: the values for a win, draw and loss show below the title, and the group organizer can change them in the group settings. Tied on points? Whoever has more wins goes first; then the better win %; then whoever played fewer games. Players tied on everything share the position. The period, season and game type filters redo the count with just those games.',
   helpTitle: 'Help',
   groupTitle: 'Your group',
   groupSettingsTitle: 'Group settings',

@@ -7,11 +7,12 @@ import { t, type MessageKey } from '@/lib/i18n';
 import { useColors } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
-export type TipId = 'deck-analysis' | 'table' | 'collection';
+export type TipId = 'deck-analysis' | 'table' | 'collection' | 'ranking';
 const TEXT: Record<TipId, MessageKey> = {
   'deck-analysis': 'tipDeckAnalysis',
   table: 'tipTable',
   collection: 'tipCollection',
+  ranking: 'tipRanking',
 };
 
 /**

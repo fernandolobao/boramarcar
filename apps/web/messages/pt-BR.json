@@ -1976,7 +1976,8 @@
     "tipNames": {
       "deck-analysis": "análise de deck",
       "table": "modo mesa",
-      "collection": "coleção"
+      "collection": "coleção",
+      "ranking": "ranking"
     },
     "postGame": "Registro pós-jogo",
     "within24h": "Encontros que registraram em até 24 h",
@@ -2385,7 +2386,8 @@
     "deck-analysis": "A nota compara o deck com metas de referência do formato: em Commander, terrenos, ramp, compra, remoção, board wipes e curva; em 60 cartas, terrenos, curva, interação e consistência; em 40, criaturas no lugar da consistência. Toque num item para ver o cálculo e as cartas que contam. Curva, base de mana, mão inicial, funções e bracket ficam nas abas. É um guia, não uma regra.",
     "table": "Deite o aparelho no meio da mesa: cada área fica virada para quem está daquele lado. Toque para tirar ou somar 1 de vida e segure para 10. A engrenagem (ou deslizar para cima na sua área) abre as suas opções; o botão do centro tem dados, desfazer, trocar lugares e o glossário de palavras-chave.",
     "collection": "As cartas dos seus decks entram sozinhas na coleção; proxies nunca contam. O valor é estimado pelo preço do Scryfall em dólar, convertido pela cotação do Banco Central.",
-    "toggle": "Dica sobre esta tela"
+    "toggle": "Dica sobre esta tela",
+    "ranking": "Cada partida dá pontos a todos que jogaram: os valores de vitória, empate e derrota aparecem abaixo do título, e quem organiza o grupo pode mudá-los nas configurações do grupo. Empatou em pontos? Fica na frente quem tem mais vitórias; depois, o melhor % de vitórias; depois, quem jogou menos partidas. Quem empata em tudo divide a posição. Os filtros de período, temporada e tipo de jogo refazem a conta só com aquelas partidas."
   },
   "languageSwitcher": {
     "label": "Idioma",
