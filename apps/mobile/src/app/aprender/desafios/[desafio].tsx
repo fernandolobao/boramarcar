@@ -1,4 +1,9 @@
-import { challengeLevel, isChallengeId, type ChallengeSide } from '@boramarcar/core/learn';
+import {
+  challengeLevel,
+  challengeOptions,
+  isChallengeId,
+  type ChallengeSide,
+} from '@boramarcar/core/learn';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -51,17 +56,19 @@ export default function ChallengeScreen() {
     return <AppText style={[styles.center, { textAlign: 'center' }]}>{t('learnNotFound')}</AppText>;
   }
   const text = challenge[learnLocale];
+  // Ordem fixa por desafio, embaralhada (a certa não fica sempre no mesmo lugar).
+  const options = challengeOptions(challenge, learnLocale);
   const level = CHALLENGES.filter((c) => challengeLevel(c) === challengeLevel(challenge));
   const index = level.indexOf(challenge);
   const next = level[index + 1];
-  const right = answered !== null && text.options[answered]!.correct;
+  const right = answered !== null && options[answered]!.correct;
   const lesson = learnContent.lessons.find((l) => l.id === challenge.lesson);
 
   const answer = () => {
     if (choice === '') return;
     const i = Number(choice);
     setAnswered(i);
-    if (text.options[i]!.correct) {
+    if (options[i]!.correct) {
       void mark(challenge.id, true)
         .then(() => setSaved(true))
         .catch(() => setSaved(false));
@@ -91,7 +98,7 @@ export default function ChallengeScreen() {
           setChoice(v);
           setAnswered(null);
         }}
-        options={text.options.map((o, i) => ({ value: String(i), label: o.text }))}
+        options={options.map((o, i) => ({ value: String(i), label: o.text }))}
       />
       <Button label={t('learnAnswer')} icon="done" disabled={choice === ''} onPress={answer} />
 
@@ -107,7 +114,7 @@ export default function ChallengeScreen() {
                 {right ? t('learnRight') : t('learnWrong')}
               </AppText>
             </View>
-            {text.options.map((o, i) =>
+            {options.map((o, i) =>
               i === answered || (right && o.correct) ? (
                 <Card key={i} style={{ gap: 4 }}>
                   <AppText style={{ fontWeight: '600' }}>
