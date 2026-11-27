@@ -439,6 +439,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'O glossário de palavras-chave chegou ao app: em "Aprender a jogar" e no botão do centro do modo mesa, sem sair da partida.',
     en: 'The keyword glossary is now in the app: in "Learn to play" and in table mode\u2019s center button, without leaving the game.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'O site não "treme" mais ao trocar de seção pelo menu: os itens e o conteúdo ficam no lugar.',
+    en: 'The site no longer "shakes" when you switch sections from the menu: items and content stay in place.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

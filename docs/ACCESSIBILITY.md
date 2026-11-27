@@ -904,3 +904,7 @@ sem rolagem horizontal em 320px.
 ## App: glossário (27/11/2026)
 
 - Campo de busca com rótulo; a contagem ("12 termos") é uma região viva. Cada termo mostra o nome no outro idioma e "palavra-chave" em texto; "Ver a lição" tem o termo no nome acessível. No menu do modo mesa, "Glossário" é um botão com estado `expanded` e a busca aparece no próprio menu (sem links para lições, que sairiam da partida).
+
+## Menu sem tremer (27/11/2026)
+
+- Cada item do menu principal reserva a largura do texto em negrito com uma cópia invisível do rótulo (`aria-hidden`, então o leitor de tela lê o nome uma vez só); o ponto de carregamento fica sobreposto. O espaço da barra de rolagem fica sempre reservado (`scrollbar-gutter: stable`). Menos movimento inesperado na tela (WCAG 2.3.3, boa prática), sem mudar foco nem ordem.

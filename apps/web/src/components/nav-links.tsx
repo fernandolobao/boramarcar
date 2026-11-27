@@ -15,11 +15,19 @@ function LinkContent({ label, icon }: { label: string; icon?: IconName }) {
   return (
     <span data-pending={pending || undefined} className="flex items-center gap-1.5">
       {icon && <Icon name={icon} />}
-      {label}
+      {/* A largura já é a do texto em negrito: ficar ativo não alarga o item nem empurra os
+          vizinhos (o menu "tremia" a cada troca de seção). */}
+      <span className="grid">
+        <span className="col-start-1 row-start-1">{label}</span>
+        <span aria-hidden="true" className="invisible col-start-1 row-start-1 font-semibold">
+          {label}
+        </span>
+      </span>
+      {/* Ponto de carregamento por cima, no canto: não muda a largura do item. */}
       {pending && (
         <span
           aria-hidden="true"
-          className="size-1.5 rounded-full bg-primary motion-safe:animate-pulse"
+          className="absolute top-1.5 right-1 size-1.5 rounded-full bg-primary motion-safe:animate-pulse"
         />
       )}
     </span>
@@ -90,7 +98,7 @@ export function NavLinks({
                 href={link.href}
                 transitionTypes={['nav-section']}
                 aria-current={current ? 'page' : undefined}
-                className="flex items-center rounded-lg px-2.5 py-2 whitespace-nowrap hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-focus aria-[current=page]:bg-surface-muted aria-[current=page]:font-semibold has-[[data-pending]]:bg-surface-muted has-[[data-pending]]:font-semibold"
+                className="relative flex items-center rounded-lg px-2.5 py-2 whitespace-nowrap hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-focus aria-[current=page]:bg-surface-muted aria-[current=page]:font-semibold has-[[data-pending]]:bg-surface-muted has-[[data-pending]]:font-semibold"
               >
                 <LinkContent label={link.label} icon={link.icon} />
               </Link>
