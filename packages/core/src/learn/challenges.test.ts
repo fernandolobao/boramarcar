@@ -4,6 +4,7 @@ import {
   CHALLENGES,
   challengeIdsOf,
   challengeLevel,
+  challengeOptions,
   isChallengeId,
 } from './challenges';
 import { isLessonId, LEARN_TRACKS, LESSON_IDS } from './index';
@@ -60,5 +61,25 @@ describe('desafios guiados (12.4)', () => {
       CHALLENGES.filter((c) => challengeLevel(c) === 'intermediate').map((c) => c.lesson),
     );
     expect(covered.size).toBe(LEARN_TRACKS.intermediate.length);
+  });
+
+  it('ordem das respostas: a certa não fica sempre no mesmo lugar, e a ordem é estável por desafio', () => {
+    const positions = CHALLENGES.map((c) =>
+      challengeOptions(c, 'pt-BR').findIndex((o) => o.correct),
+    );
+    const counts = new Map<number, number>();
+    for (const p of positions) counts.set(p, (counts.get(p) ?? 0) + 1);
+    // Todas as posições aparecem, e nenhuma tem mais da metade das certas.
+    expect(counts.size).toBe(3);
+    for (const n of counts.values()) expect(n).toBeLessThanOrEqual(CHALLENGES.length / 2);
+    for (const c of CHALLENGES) {
+      // Mesma ordem a cada chamada e nos dois idiomas (a resposta certa casa entre eles).
+      const pt = challengeOptions(c, 'pt-BR');
+      expect(challengeOptions(c, 'pt-BR')).toEqual(pt);
+      expect(challengeOptions(c, 'en').map((o) => o.correct)).toEqual(pt.map((o) => o.correct));
+      expect([...pt].sort((a, b) => a.text.localeCompare(b.text))).toEqual(
+        [...c['pt-BR'].options].sort((a, b) => a.text.localeCompare(b.text)),
+      );
+    }
   });
 });

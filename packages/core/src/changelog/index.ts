@@ -424,6 +424,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, o deck mostra a comparação com outros decks do mesmo comandante e, em cada função, as alternativas para trocar, como no site.',
     en: 'In the app, decks show the comparison with other decks of the same commander and, for each role, alternatives to swap in, like on the site.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'Desafios de "Aprender a jogar": a resposta certa não fica mais sempre na mesma posição.',
+    en: '"Learn to play" challenges: the right answer no longer always sits in the same position.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

@@ -496,6 +496,44 @@ export const challengeLevel = (challenge: Challenge): ChallengeLevel => challeng
 export const challengeIdsOf = (level: ChallengeLevel): ChallengeId[] =>
   CHALLENGES.filter((c) => challengeLevel(c) === level).map((c) => c.id);
 
+/** Número de 32 bits a partir do id (FNV-1a), semente da ordem das respostas. */
+function seedOf(id: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** Gerador simples e determinístico (mulberry32): a mesma semente dá a mesma sequência. */
+function seeded(seed: number) {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Respostas na ordem de exibição. No conteúdo, a certa costuma ser escrita em segundo; aqui elas
+ * são embaralhadas por uma ordem fixa de cada desafio (a mesma no site e no app, nos dois idiomas
+ * e a cada visita, sem diferença entre o servidor e o navegador).
+ */
+export function challengeOptions(challenge: Challenge, locale: LearnLocale) {
+  const options = challenge[locale].options;
+  const order = options.map((_, i) => i);
+  const random = seeded(seedOf(challenge.id));
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [order[i], order[j]] = [order[j]!, order[i]!];
+  }
+  return order.map((i) => options[i]!);
+}
+
 /** Desafio no idioma pedido, com o id e a lição. */
 export const challengeFor = (challenge: Challenge, locale: LearnLocale) => ({
   id: challenge.id,

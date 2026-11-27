@@ -1,6 +1,7 @@
 import {
   CHALLENGES,
   challengeLevel,
+  challengeOptions,
   isChallengeId,
   type ChallengeSide,
 } from '@boramarcar/core/learn';
@@ -172,7 +173,7 @@ export default async function ChallengePage({ params }: Props) {
         key={locale}
         challengeId={challenge.id}
         question={text.question}
-        options={text.options}
+        options={challengeOptions(challenge, locale)}
         signedIn={Boolean(user)}
       />
 
