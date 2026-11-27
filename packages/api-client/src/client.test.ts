@@ -36,6 +36,25 @@ describe('cliente da API', () => {
     expect(events[0]).toMatchObject({ locationId: 'l1' });
   });
 
+  it('comparação do deck: devolve a do servidor; sem rota (servidor antigo) ou erro, null', async () => {
+    const make = (response: Response) =>
+      createApiClient({
+        baseUrl: 'https://x.test',
+        fetch: (async () => response) as unknown as typeof fetch,
+      });
+    const comparison = {
+      decks: 3,
+      metrics: [{ key: 'score', value: 80, average: 72 }],
+      commonMissing: [{ name: 'Sol Ring', share: 0.67 }],
+      unique: ['Forest of Doom'],
+    };
+    expect(await make(json({ comparison })).decks.comparison('d1')).toMatchObject({ decks: 3 });
+    expect(await make(json({ comparison: null })).decks.comparison('d1')).toBeNull();
+    expect(
+      await make(json({ error: { code: 'not_found', message: 'x' } }, 404)).decks.comparison('d1'),
+    ).toBeNull();
+  });
+
   it('recursos por flag: liga o que o servidor diz; servidor antigo ou erro, tudo desligado', async () => {
     const make = (response: Response) =>
       createApiClient({
