@@ -882,3 +882,7 @@ sem rolagem horizontal em 320px.
 - As cartas da mão viraram botões "Ampliar {carta}" que abrem a carta grande num `<dialog>` modal (nome da carta como nome acessível, imagem com `alt`, "Fechar", Esc e o fundo fecham; o foco volta para a carta).
 - No mulligan, cada carta tem dois botões: "Pôr {carta} no fundo" (`aria-pressed`) e a lupa "Ampliar {carta}" (36 px, com dica no hover), para ler sem escolher.
 - Cartas de 2 a 4 por linha (antes 7): o texto da carta fica legível sem zoom do navegador.
+
+## App: base de mana e mão inicial no deck (27/11/2026)
+
+- Duas seções novas na pilha do deck, com título (`header`): cada cor da base de mana é uma linha acessível com o nome da cor por extenso, as fontes, a meta e a fatia dos símbolos; o aviso "Faltam fontes" vem em texto (não só na cor). A mão inicial é texto (porcentagens), sem gráfico.

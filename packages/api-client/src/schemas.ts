@@ -232,6 +232,9 @@ export const ACHIEVEMENT_IDS = [
   'learn_to_table',
   'learn_commander',
   'learn_challenges',
+  'learn_intermediate',
+  'learn_challenges_intermediate',
+  'learn_master',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -541,6 +544,36 @@ export const deckDetailSchema = z
         gameChangers: z.array(z.string()),
         score: z.number().nullable(),
         validation: z.array(z.object({ code: z.string() }).loose()),
+        /** Fontes de mana por cor × símbolos. Servidor antigo ou dado estranho: sem a seção. */
+        manaBase: z
+          .array(
+            z
+              .object({
+                color: z.string(),
+                pips: z.number(),
+                share: z.number(),
+                landSources: z.number(),
+                otherSources: z.number(),
+                recommended: z.number(),
+                status: z.enum(['ok', 'low', 'unknown']),
+              })
+              .loose(),
+          )
+          .optional()
+          .catch(undefined),
+        /** Chances da mão inicial (terrenos). Fora do formato ou servidor antigo: sem a seção. */
+        handOdds: z
+          .object({
+            keepable: z.number(),
+            expectedLands: z.number(),
+            landDrops: z.array(
+              z.object({ turn: z.number(), onPlay: z.number(), onDraw: z.number() }).loose(),
+            ),
+          })
+          .loose()
+          .nullable()
+          .optional()
+          .catch(undefined),
       })
       .loose(),
     bracket: z.object({ minimum: z.number() }).loose().nullable(),

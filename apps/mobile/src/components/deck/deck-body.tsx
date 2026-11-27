@@ -280,6 +280,63 @@ export function DeckBody({
         })}
       </Section>
 
+      {/* Base de mana e mão inicial: as mesmas partes da análise do site. */}
+      {a.manaBase && a.manaBase.length > 0 && (
+        <Section title={t('deckManaBase')} index={next()}>
+          <AppText muted>{t('deckManaBaseHint')}</AppText>
+          {a.manaBase.map((row) => {
+            const sources = row.landSources + row.otherSources;
+            const low = row.status !== 'ok';
+            return (
+              <View
+                key={row.color}
+                accessible
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 32 }}
+              >
+                <ManaCost cost={`{${row.color}}`} size={18} />
+                <AppText style={{ flex: 1 }}>
+                  {t('deckManaRow', {
+                    color: t(`recordsColor${row.color}` as MessageKey),
+                    sources,
+                    target: row.recommended,
+                    share: Math.round(row.share * 100),
+                  })}
+                </AppText>
+                {low && (
+                  <AppText style={{ color: colors.danger, fontWeight: '700' }}>
+                    {t(row.status === 'low' ? 'deckManaLow' : 'deckManaUnknown')}
+                  </AppText>
+                )}
+              </View>
+            );
+          })}
+        </Section>
+      )}
+
+      {a.handOdds && (
+        <Section title={t('deckHandOdds')} index={next()}>
+          <AppText style={{ fontSize: 22, fontWeight: '800' }}>
+            {t('deckHandKeepable', { percent: Math.round(a.handOdds.keepable * 100) })}
+          </AppText>
+          <AppText>
+            {t('deckHandExpected', {
+              count: a.handOdds.expectedLands.toLocaleString(locale, { maximumFractionDigits: 1 }),
+            })}
+          </AppText>
+          {a.handOdds.landDrops
+            .filter((d) => d.turn >= 2 && d.turn <= 4)
+            .map((d) => (
+              <AppText key={d.turn} muted>
+                {t('deckHandLandDrop', {
+                  turn: d.turn,
+                  onPlay: Math.round(d.onPlay * 100),
+                  onDraw: Math.round(d.onDraw * 100),
+                })}
+              </AppText>
+            ))}
+        </Section>
+      )}
+
       {roles.length > 0 && (
         <Section title={t('deckRoles')} index={next()}>
           {roles.map(([role, value]) => (
