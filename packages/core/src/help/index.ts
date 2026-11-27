@@ -235,7 +235,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'mao-inicial',
             question: 'Como testo a mão inicial do deck?',
             steps: [
-              'Na página do deck, na aba "Mão inicial" da análise, toque em "Sortear mão inicial": abre uma janela com 7 cartas do deck principal (comandante, reserva e "talvez" ficam de fora).',
+              'Na página do deck, na aba "Mão inicial" da análise, toque em "Sortear mão inicial": abre uma janela com 7 cartas do deck principal (comandante, reserva e "talvez" ficam de fora). Toque numa carta para vê-la grande e ler o texto.',
               'Não gostou? "Mulligan" compra 7 de novo; escolha uma carta para o fundo do grimório para cada mulligan e toque em "Manter".',
               '"Comprar carta" mostra as próximas compras. As chances de terrenos ficam na mesma seção.',
             ],
@@ -677,7 +677,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'mao-inicial',
             question: 'How do I test the deck\u2019s opening hand?',
             steps: [
-              'On the deck page, in the analysis "Opening hand" tab, tap "Draw a sample hand": a window opens with 7 cards from the main deck (commander, sideboard and "maybe" stay out).',
+              'On the deck page, in the analysis "Opening hand" tab, tap "Draw a sample hand": a window opens with 7 cards from the main deck (commander, sideboard and "maybe" stay out). Tap a card to see it large and read its text.',
               'Don\u2019t like it? "Mulligan" draws 7 again; choose one card to put on the bottom of your library for each mulligan and tap "Keep".',
               '"Draw a card" shows the next draws. Land odds are in the same section.',
             ],

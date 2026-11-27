@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import messages from '../../messages/pt-BR.json';
 import { OpeningHand, type OpeningHandLine } from './opening-hand';
 
@@ -19,6 +19,15 @@ const show = (l = lines) =>
 const status = () => screen.getByRole('status').textContent ?? '';
 const handSize = () => screen.getAllByRole('listitem').length;
 
+beforeAll(() => {
+  HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+    this.setAttribute('open', '');
+  };
+  HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+    this.removeAttribute('open');
+    this.dispatchEvent(new Event('close'));
+  };
+});
 afterEach(cleanup);
 
 describe('OpeningHand (11.3)', () => {
@@ -40,12 +49,41 @@ describe('OpeningHand (11.3)', () => {
     expect(keep).toBeDisabled();
     // Comprar fica bloqueado enquanto a escolha não termina.
     expect(screen.getByRole('button', { name: 'Comprar carta' })).toBeDisabled();
-    const first = within(screen.getAllByRole('listitem')[0]!).getByRole('button');
+    const first = within(screen.getAllByRole('listitem')[0]!).getByRole('button', {
+      name: /no fundo/,
+    });
     fireEvent.click(first);
     expect(first).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(keep);
     expect(handSize()).toBe(6);
     expect(status()).toContain('(depois de 1 mulligan)');
+  });
+
+  it('tocar numa carta amplia para ler; no mulligan, a lupa amplia sem escolher', () => {
+    show();
+    fireEvent.click(screen.getByRole('button', { name: 'Comprar mão inicial' }));
+    const [card] = screen.getAllByRole('button', { name: /^Ampliar / });
+    fireEvent.click(card!);
+    const zoom = screen.getByRole('dialog');
+    expect(zoom).toHaveAttribute('open');
+    fireEvent.click(within(zoom).getByRole('button', { name: 'Fechar' }));
+    expect(zoom).not.toHaveAttribute('open');
+    expect(card).toHaveFocus();
+    // Esc na carta ampliada fecha só ela (o Esc não chega à janela da mão, por baixo).
+    const outerKeys: string[] = [];
+    document.addEventListener('keydown', (e) => outerKeys.push(e.key));
+    fireEvent.click(card!);
+    fireEvent.keyDown(zoom, { key: 'Escape' });
+    expect(zoom).not.toHaveAttribute('open');
+    expect(outerKeys).not.toContain('Escape');
+    // No mulligan, cada carta tem "pôr no fundo" e a lupa; a lupa não escolhe.
+    fireEvent.click(screen.getByRole('button', { name: 'Mulligan' }));
+    const item = screen.getAllByRole('listitem')[0]!;
+    fireEvent.click(within(item).getByRole('button', { name: /^Ampliar / }));
+    expect(within(item).getByRole('button', { name: /no fundo/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 
   it('deck com menos de 7 cartas no deck principal: avisa em vez de comprar', () => {

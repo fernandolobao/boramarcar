@@ -619,7 +619,8 @@
       "keep": "Keep {count, plural, =1 {1 card} other {# cards}}",
       "chooseBottom": "Mulligan {count}: choose {count, plural, =1 {1 card} other {# cards}} to put on the bottom of your library ({chosen} chosen).",
       "summary": "{cards, plural, =1 {1 card} other {# cards}} in hand, {lands, plural, =0 {no lands} =1 {1 land} other {# lands}}{mulligans, plural, =0 {} =1 { (after 1 mulligan)} other { (after # mulligans)}}.",
-      "tooSmall": "The deck needs at least 7 cards in the main deck to test a hand."
+      "tooSmall": "The deck needs at least 7 cards in the main deck to test a hand.",
+      "zoom": "Enlarge {name}"
     }
   },
   "analysis": {

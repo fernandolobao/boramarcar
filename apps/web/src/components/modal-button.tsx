@@ -14,9 +14,12 @@ export function ModalButton({
   title,
   icon,
   variant = 'secondary',
+  wide = false,
   children,
 }: {
   label: string;
+  /** Janela larga (ex.: mão inicial, com as cartas grandes o bastante para ler). */
+  wide?: boolean;
   /** Título do modal (padrão: o texto do botão). */
   title?: string;
   icon?: IconName;
@@ -53,7 +56,7 @@ export function ModalButton({
       <dialog
         ref={ref}
         aria-labelledby={titleId}
-        className="m-auto max-h-[92dvh] w-[min(94vw,44rem)] overflow-y-auto rounded-2xl bg-surface p-5 text-fg shadow-2xl backdrop:bg-noite/70"
+        className={`m-auto max-h-[92dvh] ${wide ? 'w-[min(96vw,72rem)]' : 'w-[min(94vw,44rem)]'} overflow-y-auto rounded-2xl bg-surface p-5 text-fg shadow-2xl backdrop:bg-noite/70`}
         onClose={() => {
           setOpen(false);
           opener.current?.focus();

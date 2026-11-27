@@ -876,3 +876,9 @@ sem rolagem horizontal em 320px.
 
 - Nas opções do jogador, "Cor da sua área": 12 botões redondos de 44 px num `<fieldset>` com `<legend>` (no app, botões com estado `selected`). Cada cor tem nome ("Rosa", "Grafite"…), então a escolha não depende de enxergar a cor; a escolhida tem `aria-pressed` e um ✓.
 - Todas as cores mantêm o texto branco da área com contraste ≥ 4,5:1 (teste em `packages/core/src/table/table.test.ts`).
+
+## Mão inicial legível (26/11/2026)
+
+- As cartas da mão viraram botões "Ampliar {carta}" que abrem a carta grande num `<dialog>` modal (nome da carta como nome acessível, imagem com `alt`, "Fechar", Esc e o fundo fecham; o foco volta para a carta).
+- No mulligan, cada carta tem dois botões: "Pôr {carta} no fundo" (`aria-pressed`) e a lupa "Ampliar {carta}" (36 px, com dica no hover), para ler sem escolher.
+- Cartas de 2 a 4 por linha (antes 7): o texto da carta fica legível sem zoom do navegador.
