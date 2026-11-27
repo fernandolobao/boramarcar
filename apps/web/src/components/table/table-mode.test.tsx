@@ -295,6 +295,59 @@ describe('tela acesa e tela cheia', () => {
     ).toBeInTheDocument();
   });
 
+  it('sortear quem começa fecha o menu e o sorteado brilha até tocar na mesa', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sortear quem começa' }));
+    // O menu fecha; o sorteado é anunciado e a área dele ganha o brilho.
+    expect(screen.queryByRole('dialog', { name: 'Menu da mesa' })).toBeNull();
+    expect(
+      screen.getAllByText(/^(Ana|Bia) começa$/, { selector: '[role="status"]' }).length,
+    ).toBeGreaterThan(0);
+    expect(document.querySelectorAll('.table-spotlight')).toHaveLength(1);
+    // Qualquer toque na mesa encerra o brilho.
+    fireEvent.pointerDown(screen.getByRole('button', { name: /opções de Ana/ }));
+    expect(document.querySelector('.table-spotlight')).toBeNull();
+  });
+
+  it('o brilho do sorteado some sozinho em 5 segundos', () => {
+    vi.useFakeTimers();
+    try {
+      start();
+      fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Sortear quem começa' }));
+      expect(document.querySelector('.table-spotlight')).not.toBeNull();
+      act(() => vi.advanceTimersByTime(5000));
+      expect(document.querySelector('.table-spotlight')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('"Morreu" tira da mesa por outro motivo (sobra o vencedor) e volta ao desmarcar', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    let dialog = screen.getByRole('dialog', { name: 'Bia' });
+    expect(within(dialog).getByRole('button', { name: 'Concedeu' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Morreu' }));
+    // Com dois na mesa, a Ana vence: o menu abre para encerrar.
+    expect(screen.getByText('Ana é o último na mesa!')).toBeInTheDocument();
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Menu da mesa' })).getByRole('button', {
+        name: 'Fechar',
+      }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    dialog = screen.getByRole('dialog', { name: 'Bia' });
+    const died = within(dialog).getByRole('button', { name: 'Morreu' });
+    expect(died).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(died);
+    expect(died).toHaveAttribute('aria-pressed', 'false');
+  });
+
   it('sem API de tela cheia (iPhone), explica como instalar na tela inicial', () => {
     start();
     fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));

@@ -72,7 +72,7 @@ test.describe('modo mesa', () => {
       .getByRole('button', { name: 'Dano de comandante, marcadores e opções de Bia' })
       .click();
     const bia = page.getByRole('dialog', { name: 'Bia', exact: true });
-    await bia.getByRole('button', { name: 'Desistir da partida' }).click();
+    await bia.getByRole('button', { name: 'Concedeu' }).click();
     await bia.getByRole('button', { name: 'Fechar' }).click();
     // Caio cai por vida: segurar o "−" tira 10 de cada vez.
     const minus = page.getByRole('button', { name: /^Tirar 1 de vida de Caio/ });

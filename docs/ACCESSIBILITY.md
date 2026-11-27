@@ -865,3 +865,9 @@ sem rolagem horizontal em 320px.
 - Dica das telas compacta, fundo `surfaceMuted` sem borda forte (texto `fg`, AA nos dois temas).
 - Encontro: participantes com foto (decorativa) e a resposta em texto; cada linha é um elemento acessível com "Nome, resposta"; quem vai primeiro.
 - Ranking: os três primeiros com a medalha (ouro, prata, bronze) atrás do número, que continua escrito; número em Noite sobre o metal (contraste AA, o mesmo do pódio do site).
+
+## Modo mesa: sorteio, "Saiu do jogo" e marcadores maiores (26/11/2026)
+
+- Sortear quem começa fecha o menu (o foco volta ao botão do centro) e anuncia "Fulano começa" na região de status da mesa. O brilho de foil na área do sorteado é decorativo (`aria-hidden`), some em 5 s ou no primeiro toque na mesa, e fica parado com "reduzir movimento" (site e app).
+- "Saiu do jogo" fica no fim das opções do jogador (depois do dano de comandante e dos marcadores, os mais usados): "Morreu" e "Concedeu" são botões de alternar (`aria-pressed` no site, `switch` no app), com uma explicação em texto; a área mostra o motivo escrito ("Morreu", "Concedeu").
+- Dano de comandante e marcadores: rótulo em 16 px (antes 14), botões de − e + com 48 px (antes 40) e o número em 24 px; com o deck escolhido, o rótulo é só o nome do comandante, e os botões continuam com nome completo ("Aumentar Omnath, Locus of Mana").

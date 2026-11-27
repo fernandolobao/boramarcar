@@ -25,6 +25,8 @@ export interface TablePlayer {
   /** Quantos comandantes o jogador tem (2 com parceiros); sem valor, o que o deck diz ou 1. */
   commanderCount?: 1 | 2;
   conceded: boolean;
+  /** Morreu por outro motivo (deck vazio, efeito de carta…); vida, veneno e comandante contam sozinhos. */
+  died?: boolean;
   /** Passo do histórico em que caiu (para a ordem de eliminação); `null` = na mesa. */
   defeatedAt: number | null;
 }
@@ -54,6 +56,8 @@ export type TableAction =
   /** Quantos comandantes o jogador tem (para quem não escolheu deck com dois). */
   | { type: 'commanders'; userId: string; count: 1 | 2 }
   | { type: 'concede'; userId: string; conceded: boolean }
+  /** Morreu por outro motivo que o contador não vê (deck vazio, efeito de carta). */
+  | { type: 'died'; userId: string; died: boolean }
   | { type: 'monarch'; userId: string | null }
   | { type: 'first'; userId: string | null }
   /** Troca dois jogadores de lugar na mesa (as áreas acompanham onde cada um está sentado). */
@@ -138,8 +142,9 @@ export function createTable(input: {
 export function defeatReason(
   player: TablePlayer,
   format: GameFormat,
-): 'life' | 'poison' | 'commander' | 'conceded' | null {
+): 'life' | 'poison' | 'commander' | 'conceded' | 'died' | null {
   if (player.conceded) return 'conceded';
+  if (player.died) return 'died';
   if (player.life <= 0) return 'life';
   if (player.counters.poison >= 10) return 'poison';
   if (
@@ -244,6 +249,8 @@ export function tableReducer(state: TableState, action: TableAction): TableState
       return withDefeats(
         updatePlayer(base, action.userId, (p) => ({ ...p, conceded: action.conceded })),
       );
+    case 'died':
+      return withDefeats(updatePlayer(base, action.userId, (p) => ({ ...p, died: action.died })));
     case 'monarch':
       return { ...base, monarchId: action.userId };
     case 'first':

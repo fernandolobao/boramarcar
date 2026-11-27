@@ -384,6 +384,16 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Ranking explicado: o botão ⓘ ao lado do título mostra como os pontos são contados e como funciona o desempate (site e app).',
     en: 'The ranking explained: the ⓘ button next to the title shows how points are counted and how ties are broken (site and app).',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Modo mesa: ao sortear quem começa, o menu fecha e a área do sorteado brilha como carta foil. O dano de comandante e os marcadores ficaram maiores e mostram só o nome do comandante.',
+    en: 'Table mode: when you draw who goes first, the menu closes and that player\u2019s area glows like a foil card. Commander damage and counters are bigger and show just the commander\u2019s name.',
+  },
+  {
+    date: '2026-11-26',
+    pt: 'Modo mesa: "Saiu do jogo" nas opções de cada jogador, para quem morreu por outro motivo (deck vazio, efeito de carta) ou concedeu.',
+    en: 'Table mode: "Out of the game" in each player\u2019s options, for a player who died another way (empty library, a card effect) or conceded.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
