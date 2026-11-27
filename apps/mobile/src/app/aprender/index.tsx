@@ -78,6 +78,13 @@ export default function LearnScreen() {
         {content.title}
       </AppText>
       <AppText>{content.intro}</AppText>
+      <Button
+        label={t('glossaryTitle')}
+        variant="secondary"
+        icon="lessons"
+        style={{ alignSelf: 'flex-start' }}
+        onPress={() => router.push('/aprender/glossario')}
+      />
 
       {TRACK_IDS.map((track) => {
         const lessons = content.lessons.filter((l) => l.track === track);

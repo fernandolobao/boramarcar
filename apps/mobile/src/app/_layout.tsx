@@ -78,6 +78,7 @@ function RootLayout() {
         <Stack.Screen name="notificacoes" options={{ title: t('notifTitle') }} />
         <Stack.Screen name="ajuda" options={{ title: t('helpTitle') }} />
         <Stack.Screen name="aprender/index" options={{ title: t('learnTitle') }} />
+        <Stack.Screen name="aprender/glossario" options={{ title: t('glossaryTitle') }} />
         <Stack.Screen name="aprender/[licao]" options={{ title: t('learnTitle') }} />
         <Stack.Screen
           name="aprender/desafios/[desafio]"
