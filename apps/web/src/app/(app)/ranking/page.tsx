@@ -1,5 +1,5 @@
 import { isGameFormat, resolvePeriod } from '@boramarcar/core';
-import { getGroupRanking, getGroupStats, listSeasons } from '@boramarcar/db';
+import { getGroupRanking, getGroupStats, listSeasons, listDismissedTips } from '@boramarcar/db';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getFormatter, getTimeZone, getTranslations } from 'next-intl/server';
@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { DeleteButton } from '@/components/availability-forms';
 import { Icon } from '@/components/icons';
 import { SeasonForm } from '@/components/season-form';
+import { TitleWithTip } from '@/components/tip';
 import { getDb } from '@/server/db';
 import { navMetadata } from '@/server/metadata';
 import { requireUserAndGroup } from '@/server/require-group';
@@ -54,9 +55,10 @@ export default async function RankingPage({ searchParams }: Props) {
     to: range.to,
     format: formatFilter,
   };
-  const [ranking, stats] = await Promise.all([
+  const [ranking, stats, dismissed] = await Promise.all([
     getGroupRanking(db, filter),
     getGroupStats(db, filter),
+    listDismissedTips(db, { userId: user.id }),
   ]);
 
   const t = await getTranslations('ranking');
@@ -81,13 +83,14 @@ export default async function RankingPage({ searchParams }: Props) {
 
   return (
     <>
-      <div>
+      {/* ⓘ: como a classificação é feita (pontos e desempate). */}
+      <TitleWithTip id="ranking" dismissed={dismissed.includes('ranking')}>
         <h1 className="page-title">{t('title')}</h1>
         <p className="muted">
           {t('totalGames', { count: ranking.totalGames })} ·{' '}
           {t('pointsRule', { ...ranking.points })}
         </p>
-      </div>
+      </TitleWithTip>
 
       <StackSections>
         <form

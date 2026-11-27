@@ -379,6 +379,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Inscrições de torneio: a pessoa escolhida para inscrever não some mais se você escolher logo depois de "Me inscrever".',
     en: 'Tournament sign-ups: the person you pick no longer disappears if you pick right after "Enter myself".',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Ranking explicado: o botão ⓘ ao lado do título mostra como os pontos são contados e como funciona o desempate (site e app).',
+    en: 'The ranking explained: the ⓘ button next to the title shows how points are counted and how ties are broken (site and app).',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
