@@ -900,3 +900,7 @@ sem rolagem horizontal em 320px.
 
 - Lista com títulos por bloco; cada lição e desafio é um link com "Lição 2 de 6: título" no nome (e "Concluída" quando feito). Na lição, títulos por seção, símbolos de mana com nome por extenso (`ManaText`), cartas de exemplo com a imagem decorativa e o nome em texto. "Marcar como concluída" é um botão com estado `checked`.
 - Desafio: a mesa em cartões com título (Oponente/Você, vida), as respostas num `radiogroup` (`Choices` vertical), "Responder" desabilitado sem escolha, e o resultado (certo/errado, a resposta certa e o porquê) numa região viva, com ícone e texto (a cor não é a única pista).
+
+## App: glossário (27/11/2026)
+
+- Campo de busca com rótulo; a contagem ("12 termos") é uma região viva. Cada termo mostra o nome no outro idioma e "palavra-chave" em texto; "Ver a lição" tem o termo no nome acessível. No menu do modo mesa, "Glossário" é um botão com estado `expanded` e a busca aparece no próprio menu (sem links para lições, que sairiam da partida).

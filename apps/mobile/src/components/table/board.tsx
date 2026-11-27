@@ -33,6 +33,7 @@ import { counterLabel, defeatLabel } from './labels';
 import { NumberField } from '@/components/ds/number-field';
 import { Icon } from '@/components/icons';
 import { Spotlight } from './spotlight';
+import { GlossarySearch } from '@/components/glossary';
 
 /** Soma das mudanças recentes ("−3"), que some 1,5 s depois da última (como no Lotus). */
 function useRecentDelta(value: number) {
@@ -563,11 +564,15 @@ function TableMenu({
 }) {
   const colors = useColors();
   const [result, setResult] = useState('');
+  const [glossary, setGlossary] = useState(false);
   const { winnerId } = tableResult(state);
   const winner = state.players.find((p) => p.userId === winnerId);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 10 }}>
+      <ScrollView
+        contentContainerStyle={{ padding: 16, gap: 10 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <AppText accessibilityRole="header" style={ui.title}>
           {t('tableMenu')}
         </AppText>
@@ -617,6 +622,14 @@ function TableMenu({
           accessibilityHint={t('tableSwapHint')}
           onPress={onSwap}
         />
+        {/* Glossário (12.3), como no site: tirar a dúvida de uma palavra-chave sem sair da mesa. */}
+        <Button
+          label={t('glossaryTitle')}
+          variant={glossary ? 'primary' : 'secondary'}
+          accessibilityState={{ expanded: glossary }}
+          onPress={() => setGlossary((g) => !g)}
+        />
+        {glossary && <GlossarySearch showLessons={false} />}
         <View style={{ gap: 8, paddingVertical: 4 }}>
           <AppText accessibilityRole="header" style={ui.sectionTitle}>
             {t('tableLayoutTitle')}
