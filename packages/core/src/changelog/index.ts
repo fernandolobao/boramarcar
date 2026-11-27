@@ -409,6 +409,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Sete desafios novos para quem já joga e três conquistas: "Além do básico", "Desafios de quem já joga" e "Mestre da trilha".',
     en: 'Seven new challenges for players who already play and three achievements: "Beyond the basics", "Challenges for players" and "Path master".',
   },
+  {
+    date: '2026-11-27',
+    pt: 'No app, o deck mostra a base de mana e as chances da mão inicial, como no site, e as conquistas novas da trilha aparecem no perfil.',
+    en: 'In the app, decks show the mana base and opening hand odds, like on the site, and the new learning path achievements show on profiles.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
