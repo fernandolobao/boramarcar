@@ -17,9 +17,12 @@ import { useAsync, useRefreshOnFocus } from '@/lib/use-async';
 import { useColors } from '@/lib/theme';
 import { Choices } from '@/components/ds/choices';
 import { SplitColumns } from '@/components/split-columns';
+import { Avatar } from '@/components/avatar';
 import { useLayout } from '@/lib/layout';
 
 const RSVP_LABEL: Record<Rsvp, MessageKey> = { yes: 'rsvpYes', maybe: 'rsvpMaybe', no: 'rsvpNo' };
+/** Quem vai primeiro, depois talvez, depois quem não vai. */
+const RSVP_ORDER: Record<Rsvp, number> = { yes: 0, maybe: 1, no: 2 };
 
 /** Detalhe do encontro: participantes, partidas e a resposta de presença. */
 export default function EventScreen() {
@@ -167,11 +170,27 @@ export default function EventScreen() {
               <AppText accessibilityRole="header" style={styles.sectionTitle}>
                 {t('participants')}
               </AppText>
-              {e.participants.map((p) => (
-                <AppText key={p.userId}>
-                  {p.name} · {t(RSVP_LABEL[p.rsvp])}
-                </AppText>
-              ))}
+              {[...e.participants]
+                .sort((a, b) => RSVP_ORDER[a.rsvp] - RSVP_ORDER[b.rsvp])
+                .map((p) => (
+                  <View
+                    key={p.userId}
+                    accessible
+                    accessibilityLabel={`${p.name}, ${t(RSVP_LABEL[p.rsvp])}`}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 12,
+                      paddingVertical: 4,
+                    }}
+                  >
+                    <Avatar name={p.name} image={p.image} size={32} />
+                    <AppText style={{ flex: 1 }} numberOfLines={1}>
+                      {p.name}
+                    </AppText>
+                    <AppText muted>{t(RSVP_LABEL[p.rsvp])}</AppText>
+                  </View>
+                ))}
             </Card>
 
             {e.status === 'scheduled' && (

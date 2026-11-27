@@ -857,3 +857,11 @@ sem rolagem horizontal em 320px.
 - **Ranking:** os três primeiros com medalha (ouro, prata, bronze) atrás do número, que continua escrito: a cor não é a única pista. "Nova temporada" recolhida em `<details>`.
 - **Dica das telas:** fundo `surface-muted` sem borda forte, texto `fg` (contraste ≥ 4,5:1 nos dois temas), botão "Entendi" ao lado no desktop.
 - **Ladrilhos de número (`Stat`):** fundo `canvas` dentro do cartão (`fg-muted` sobre `canvas` ≥ 4,5:1, testado nos tokens).
+
+## Base visual no app (26/11/2026)
+
+- Cartões com a sombra de repouso dos tokens (`elevation.rest` em `components/ui.tsx`); cantos pela escala dos tokens (`radius.control`, `radius.card`).
+- Botões afundam 1 pt ao tocar (sem animação: só a posição no estado pressionado), além do esmaecer de antes; alvo continua ≥ 44 pt.
+- Dica das telas compacta, fundo `surfaceMuted` sem borda forte (texto `fg`, AA nos dois temas).
+- Encontro: participantes com foto (decorativa) e a resposta em texto; cada linha é um elemento acessível com "Nome, resposta"; quem vai primeiro.
+- Ranking: os três primeiros com a medalha (ouro, prata, bronze) atrás do número, que continua escrito; número em Noite sobre o metal (contraste AA, o mesmo do pódio do site).

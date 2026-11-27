@@ -1,3 +1,4 @@
+import { palette, podium } from '@boramarcar/tokens';
 import { GAME_FORMATS, type GameFormat } from '@boramarcar/core/games';
 import { resolvePeriod } from '@boramarcar/core/stats';
 import { router } from 'expo-router';
@@ -17,6 +18,10 @@ import { EmptyState } from '@/components/empty-state';
 import { useLayout } from '@/lib/layout';
 
 /** Ranking do grupo ativo (todas as partidas). */
+
+/** Cor de cada medalha (o tom do meio do degradê do pódio do site; número em Noite, AA). */
+const MEDAL = [podium.gold[1], podium.silver[1], podium.bronze[1]];
+
 export default function RankingScreen() {
   const layout = useLayout();
   const { group } = useGroup();
@@ -109,9 +114,27 @@ export default function RankingScreen() {
           style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
         >
           <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <AppText style={{ fontSize: 20, fontWeight: '800', minWidth: 32 }}>
-              {item.position}º
-            </AppText>
+            {/* Pódio: os três primeiros com a medalha (ouro, prata, bronze); o número continua. */}
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: MEDAL[item.position - 1] ?? 'transparent',
+              }}
+            >
+              <AppText
+                style={{
+                  fontSize: item.position <= 3 ? 16 : 20,
+                  fontWeight: '800',
+                  ...(item.position <= 3 ? { color: palette.noite } : {}),
+                }}
+              >
+                {item.position}º
+              </AppText>
+            </View>
             <View style={{ flex: 1 }}>
               <AppText style={{ fontWeight: '600' }}>{item.name}</AppText>
               <AppText muted>

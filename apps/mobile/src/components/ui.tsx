@@ -1,4 +1,5 @@
 import { ApiError } from '@boramarcar/api-client';
+import { palette, radius } from '@boramarcar/tokens';
 import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
@@ -43,12 +44,38 @@ export function Title({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Sombras do sistema (as mesmas duas do site, `shadow.rest` e `shadow.raised` nos tokens), no
+ * formato do React Native: iOS usa `shadow*`, Android usa `elevation`.
+ */
+export const elevation = {
+  rest: {
+    shadowColor: palette.noite,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  raised: {
+    shadowColor: palette.noite,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.22,
+    shadowRadius: 18,
+    elevation: 6,
+  },
+} as const;
+
 export function Card({ style, ...props }: ViewProps) {
   const colors = useColors();
   return (
     <View
       {...props}
-      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }, style]}
+      style={[
+        styles.card,
+        elevation.rest,
+        { backgroundColor: colors.surface, borderColor: colors.line },
+        style,
+      ]}
     />
   );
 }
@@ -83,7 +110,9 @@ export function Button({
         {
           backgroundColor: primary ? colors.brand : colors.surface,
           borderColor: primary ? colors.brand : colors.border,
-          opacity: props.disabled ? 0.5 : state.pressed ? 0.8 : 1,
+          opacity: props.disabled ? 0.5 : state.pressed ? 0.9 : 1,
+          // Afunda 1 pt no toque, como o botão do site no clique.
+          transform: [{ translateY: state.pressed && !props.disabled ? 1 : 0 }],
         },
         typeof style === 'function' ? style(state) : style,
       ]}
@@ -130,11 +159,11 @@ export const styles = StyleSheet.create({
   title: { fontSize: 26, fontFamily: fonts.display, marginBottom: 12 },
   /** Título de seção (Fraunces, como `section-title` no site). */
   sectionTitle: { fontSize: 19, fontFamily: fonts.display },
-  card: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 6 },
+  card: { borderWidth: 1, borderRadius: radius.card, padding: 16, gap: 6 },
   button: {
     minHeight: 44,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: radius.control,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',

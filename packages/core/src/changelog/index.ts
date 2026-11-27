@@ -369,6 +369,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, quem está na lateral do modo mesa pode deslizar no próprio cartão sem fechar a mesa sem querer. Para sair, use "Sair" no botão do centro.',
     en: 'In the app, players on the sides of table mode can swipe on their own area without closing the table by accident. To leave, use "Leave" in the center button.',
   },
+  {
+    date: '2026-11-26',
+    pt: 'No app, o visual acompanha o site novo: no encontro, quem vai aparece com foto; no ranking, os três primeiros ganham medalha.',
+    en: 'The app now matches the new site: on a game night, who is coming shows with photos; in the ranking, the top three get medals.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
