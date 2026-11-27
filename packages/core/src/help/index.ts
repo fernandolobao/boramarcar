@@ -207,6 +207,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             notes: [
               'A tela fica acesa enquanto a mesa está aberta. No iPhone, para usar a tela toda, adicione o ArcanaKin à tela inicial pelo botão Compartilhar.',
               'A partida fica salva no aparelho até você registrar ou descartar: dá para fechar e voltar depois.',
+              'No app, durante a partida, o gesto de voltar do celular não fecha a mesa (quem está na lateral desliza no próprio cartão sem sair sem querer). Para sair, use "Sair" no botão do centro.',
             ],
           },
           {
@@ -648,6 +649,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             notes: [
               'The screen stays on while the table is open. On iPhone, to use the whole screen, add ArcanaKin to your Home Screen from the Share button.',
               'The game stays saved on the device until you record or discard it: you can close and come back later.',
+              'In the app, during a game, the phone\u2019s back gesture does not close the table (players on the sides can swipe on their own area without leaving by accident). To leave, use "Leave" in the center button.',
             ],
           },
           {

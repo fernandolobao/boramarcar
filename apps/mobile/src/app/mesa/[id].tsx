@@ -4,7 +4,8 @@ import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { BackHandler, Platform, ToastAndroid } from 'react-native';
 import { AppText, ErrorState, Loading, styles } from '@/components/ui';
 import { TableBoard } from '@/components/table/board';
 import { TableFinishScreen } from '@/components/table/finish';
@@ -17,6 +18,23 @@ import { useAsync } from '@/lib/use-async';
 /** Mantém a tela acesa enquanto a mesa está aberta. */
 function KeepAwake() {
   useKeepAwake();
+  return null;
+}
+
+/**
+ * Durante a partida, o "voltar" do sistema não fecha a mesa. Quem está na lateral desliza no
+ * próprio cartão a partir da borda da tela, e o aparelho lia isso como o gesto de voltar. No iOS o
+ * gesto da tela fica desligado (opções da tela); no Android, o voltar do sistema (botão ou gesto da
+ * borda) só mostra como sair. Para sair: "Sair" no botão do centro.
+ */
+function BlockSystemBack() {
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (Platform.OS === 'android') ToastAndroid.show(t('tableBackBlocked'), ToastAndroid.SHORT);
+      return true;
+    });
+    return () => sub.remove();
+  }, []);
   return null;
 }
 
@@ -79,8 +97,15 @@ export default function TableScreen() {
         {/* Fundo da tela inteira escuro: nenhuma faixa clara aparece se o tabuleiro não cobrir tudo
             (ex.: altura ainda não recalculada ao esconder a barra de status no iPad). */}
         <Stack.Screen
-          options={{ headerShown: false, contentStyle: { backgroundColor: '#09090b' } }}
+          options={{
+            headerShown: false,
+            contentStyle: { backgroundColor: '#09090b' },
+            // Sem o gesto de voltar (borda da tela): ele fechava a mesa no meio da partida.
+            gestureEnabled: false,
+            fullScreenGestureEnabled: false,
+          }}
         />
+        <BlockSystemBack />
         <StatusBar hidden />
         {/* Android: a barra de navegação some também (volta com um gesto da borda). */}
         <NavigationBar hidden />
@@ -97,7 +122,9 @@ export default function TableScreen() {
   if (phase === 'finish' && state) {
     return (
       <>
-        <Stack.Screen options={{ headerShown: true, title: t('tableFinishTitle') }} />
+        <Stack.Screen
+          options={{ headerShown: true, title: t('tableFinishTitle'), gestureEnabled: true }}
+        />
         <TableFinishScreen
           eventId={eventId}
           tournament={tournament}
@@ -131,7 +158,7 @@ export default function TableScreen() {
   }
   return (
     <>
-      <Stack.Screen options={{ headerShown: true, title: t('tableTitle') }} />
+      <Stack.Screen options={{ headerShown: true, title: t('tableTitle'), gestureEnabled: true }} />
       <TableSetupScreen
         setup={setup.data}
         saved={saved}

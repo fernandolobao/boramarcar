@@ -454,6 +454,7 @@ const pt = {
   tableFinish: 'Encerrar e registrar',
   tableExit: 'Sair (a partida fica salva)',
   tableExitHint: 'A partida fica salva neste aparelho até você registrar ou descartar.',
+  tableBackBlocked: 'Para sair da mesa, use “Sair” no botão do centro.',
   tableFinishTitle: 'Registrar a partida',
   tableWinner: 'Vencedor',
   tableWinnerHint:
@@ -1625,6 +1626,7 @@ const en: Messages = {
   tableFinish: 'End and record',
   tableExit: 'Leave (the game stays saved)',
   tableExitHint: 'The game stays saved on this device until you record or discard it.',
+  tableBackBlocked: 'To leave the table, use “Leave” in the center button.',
   tableFinishTitle: 'Record the game',
   tableWinner: 'Winner',
   tableWinnerHint:
