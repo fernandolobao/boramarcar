@@ -1609,7 +1609,8 @@
       "life": "Sem vida",
       "poison": "10 de veneno",
       "commander": "21 de dano de comandante",
-      "conceded": "Desistiu"
+      "conceded": "Concedeu",
+      "died": "Morreu"
     },
     "decrease": "Diminuir {label}",
     "increase": "Aumentar {label}",
@@ -1625,7 +1626,7 @@
       "experience": "Experiência",
       "tax": "Imposto do comandante"
     },
-    "concede": "Desistir da partida",
+    "concede": "Concedeu",
     "menu": "Menu da mesa",
     "winnerFound": "{name} é o último na mesa!",
     "undo": "Desfazer",
@@ -1663,10 +1664,13 @@
     "awakeUnavailable": "Não deu para manter a tela acesa: desligue o bloqueio automático nos ajustes do celular ou saia do modo de baixo consumo.",
     "tournamentIntro": "{name} · mesa {table}: os jogadores e o formato já vêm do torneio. Ao registrar, o resultado vai para a mesa do torneio.",
     "backToTournament": "Voltar ao torneio",
-    "fromCommander": "De {name} — {commander}",
     "fromNth": "De {name} — {n}º comandante",
     "twoCommanders": "Dois comandantes (parceiros)",
-    "twoCommandersHint": "Ligue quando o deck de {name} tem dois comandantes: o dano de cada um conta à parte nas outras áreas."
+    "twoCommandersHint": "Ligue quando o deck de {name} tem dois comandantes: o dano de cada um conta à parte nas outras áreas.",
+    "died": "Morreu",
+    "outTitle": "Saiu do jogo",
+    "outHint": "Vida, veneno e dano de comandante já contam sozinhos. Use para deck vazio, efeito de carta ou concessão; toque de novo para voltar.",
+    "firstBadge": "Você começa!"
   },
   "consent": {
     "title": "Cookies e gravação de sessão",

@@ -33,5 +33,5 @@ export const formatLabel = (format: GameFormat | string) =>
   t(FORMAT_LABEL[format as GameFormat] ?? 'formatOther');
 export const counterLabel = (counter: TableCounter) =>
   t(`tableCounters${cap(counter)}` as MessageKey);
-export const defeatLabel = (reason: 'life' | 'poison' | 'commander' | 'conceded') =>
+export const defeatLabel = (reason: 'life' | 'poison' | 'commander' | 'conceded' | 'died') =>
   t(`tableDefeat${cap(reason)}` as MessageKey);

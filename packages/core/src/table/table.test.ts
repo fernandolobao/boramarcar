@@ -64,6 +64,24 @@ describe('modo mesa', () => {
     expect(run(createTable({ format: 'commander', players }), { type: 'undo' }).step).toBe(0);
   });
 
+  it('morreu por outro motivo (deck vazio, efeito de carta): sai da mesa e volta se desmarcar', () => {
+    let t = createTable({ format: 'commander', players });
+    t = run(t, { type: 'died', userId: 'c', died: true });
+    expect(defeatReason(t.players[2]!, t.format)).toBe('died');
+    expect(tableResult(t).eliminated).toEqual([{ userId: 'c', order: 1 }]);
+    // A vida continua a mesma: só a situação muda.
+    expect(t.players[2]!.life).toBe(40);
+    t = run(t, { type: 'undo' });
+    expect(defeatReason(t.players[2]!, t.format)).toBeNull();
+    t = run(
+      t,
+      { type: 'died', userId: 'c', died: true },
+      { type: 'died', userId: 'c', died: false },
+    );
+    expect(alivePlayers(t).map((p) => p.userId)).toContain('c');
+    expect(tableResult(t).eliminated).toEqual([]);
+  });
+
   it('derrotas: vida, 10 de veneno, 21 de comandante (só em formatos com comandante) e concessão', () => {
     let t = createTable({ format: 'commander', players });
     t = run(
