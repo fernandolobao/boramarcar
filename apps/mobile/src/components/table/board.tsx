@@ -8,6 +8,8 @@ import {
   seatSwipe,
   rollDie,
   SEAT_COLORS,
+  TABLE_COLORS,
+  seatColor,
   TABLE_COUNTERS,
   tableLayouts,
   tableResult,
@@ -30,6 +32,7 @@ import { useColors } from '@/lib/theme';
 import { counterLabel, defeatLabel } from './labels';
 import { NumberField } from '@/components/ds/number-field';
 import { Icon } from '@/components/icons';
+import { Spotlight } from './spotlight';
 
 /** Soma das mudanças recentes ("−3"), que some 1,5 s depois da última (como no Lotus). */
 function useRecentDelta(value: number) {
@@ -113,6 +116,7 @@ function PlayerOptions({
   rotate,
   dispatch,
   onClose,
+  canChooseColors,
 }: {
   player: TablePlayer;
   state: TableState;
@@ -120,6 +124,8 @@ function PlayerOptions({
   rotate: SeatRotation;
   dispatch: (action: TableAction) => void;
   onClose: () => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors: boolean;
 }) {
   const usesCommander = formatRules(state.format).usesCommander;
   const toggle = (label: string, on: boolean, onPress: () => void) => (
@@ -160,14 +166,15 @@ function PlayerOptions({
           <Text style={board.optionsCloseText}>×</Text>
         </Pressable>
       </View>
-      <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 8 }}>
+      <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 8 }}>
         {usesCommander && (
           <View style={{ gap: 6 }}>
             <Text style={board.panelSection}>{t('tableCommanderDamage')}</Text>
             {commanderSources(state, player.userId).map((source, _i, all) => {
               const twoFromSame = all.filter((s) => s.fromUserId === source.fromUserId).length > 1;
+              // Com o deck escolhido, o nome do comandante basta (sem o do jogador).
               const label = source.commander
-                ? t('tableFromCommander', { name: source.name, commander: source.commander })
+                ? source.commander
                 : twoFromSame
                   ? t('tableFromNth', { name: source.name, n: source.index + 1 })
                   : t('tableFrom', { name: source.name });
@@ -176,7 +183,6 @@ function PlayerOptions({
                 <NumberField
                   key={source.key}
                   tone="onDark"
-                  compact
                   min={0}
                   label={label}
                   value={current}
@@ -215,7 +221,6 @@ function PlayerOptions({
             <NumberField
               key={counter}
               tone="onDark"
-              compact
               min={0}
               label={counterLabel(counter)}
               value={player.counters[counter]}
@@ -229,15 +234,62 @@ function PlayerOptions({
             />
           ))}
         </View>
+        {canChooseColors && (
+          <View style={{ gap: 6 }}>
+            <Text style={board.panelSection} accessibilityRole="header">
+              {t('tableColorTitle')}
+            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {TABLE_COLORS.map((color, n) => {
+                const current = seatColor(state, seat) === color;
+                const isDefault = color === SEAT_COLORS[seat % SEAT_COLORS.length];
+                return (
+                  <Pressable
+                    key={color}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: current }}
+                    accessibilityLabel={t(`tableColor${n}` as MessageKey)}
+                    onPress={() =>
+                      dispatch({
+                        type: 'color',
+                        userId: player.userId,
+                        color: isDefault ? null : color,
+                      })
+                    }
+                    style={[
+                      board.swatch,
+                      { backgroundColor: color },
+                      current && { borderColor: '#ffffff', borderWidth: 3 },
+                    ]}
+                  >
+                    {current ? <Icon name="done" color="#ffffff" /> : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
+        {/* Saiu do jogo: vida, veneno e comandante já derrubam sozinhos; aqui o resto. */}
+        <View style={{ gap: 6 }}>
+          <Text style={board.panelSection} accessibilityRole="header">
+            {t('tableOutTitle')}
+          </Text>
+          <Text style={board.panelHint}>{t('tableOutHint')}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {toggle(t('tableDied'), Boolean(player.died), () =>
+              dispatch({ type: 'died', userId: player.userId, died: !player.died }),
+            )}
+            {toggle(t('tableConcede'), player.conceded, () =>
+              dispatch({ type: 'concede', userId: player.userId, conceded: !player.conceded }),
+            )}
+          </View>
+        </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {toggle(t('tableMonarch'), state.monarchId === player.userId, () =>
             dispatch({
               type: 'monarch',
               userId: state.monarchId === player.userId ? null : player.userId,
             }),
-          )}
-          {toggle(t('tableConcede'), player.conceded, () =>
-            dispatch({ type: 'concede', userId: player.userId, conceded: !player.conceded }),
           )}
           <Pressable
             accessibilityRole="button"
@@ -264,17 +316,23 @@ function PlayerPanel({
   rotate,
   swap,
   dispatch,
+  spotlight = false,
+  canChooseColors = false,
 }: {
   player: TablePlayer;
   state: TableState;
   color: string;
   size: { w: number; h: number };
+  /** Sorteado para começar: brilho de carta foil por cima da área. */
+  spotlight?: boolean;
   /** Posição na mesa (índice no estado) e rotação atual da área. */
   seat: number;
   rotate: SeatRotation;
   /** Modo "trocar lugares": a área inteira vira um botão para escolher o jogador. */
   swap: { selected: boolean; onPick: () => void } | null;
   dispatch: (action: TableAction) => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
 }) {
   const [options, setOptions] = useState(false);
   const onOpen = () => setOptions(true);
@@ -376,6 +434,7 @@ function PlayerPanel({
       <Text style={board.badges} numberOfLines={2} maxFontSizeMultiplier={1.5}>
         {reason ? defeatLabel(reason) : badges.join(' · ') || ' '}
       </Text>
+      {spotlight && <Spotlight label={t('tableFirstBadge')} />}
       {options && !swap && (
         <PlayerOptions
           player={player}
@@ -384,6 +443,7 @@ function PlayerPanel({
           rotate={rotate}
           dispatch={dispatch}
           onClose={() => setOptions(false)}
+          canChooseColors={canChooseColors}
         />
       )}
       {swap && (
@@ -486,6 +546,7 @@ function LayoutPreview({
 function TableMenu({
   state,
   dispatch,
+  onPickedFirst,
   onSwap,
   onFinish,
   onExit,
@@ -493,6 +554,8 @@ function TableMenu({
 }: {
   state: TableState;
   dispatch: (action: TableAction) => void;
+  /** Sorteou quem começa: a mesa fecha o menu e destaca o jogador. */
+  onPickedFirst: (player: TablePlayer) => void;
   onSwap: () => void;
   onFinish: () => void;
   onExit: () => void;
@@ -545,6 +608,7 @@ function TableMenu({
             const p = state.players[rollDie(state.players.length) - 1]!;
             dispatch({ type: 'first', userId: p.userId });
             setResult(t('tableFirstIs', { name: p.name }));
+            onPickedFirst(p);
           }}
         />
         <Button
@@ -604,11 +668,14 @@ export function TableBoard({
   dispatch,
   onFinish,
   onExit,
+  canChooseColors = false,
 }: {
   state: TableState;
   dispatch: (action: TableAction) => void;
   onFinish: () => void;
   onExit: () => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
 }) {
   const [menu, setMenu] = useState(false);
   /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
@@ -623,6 +690,13 @@ export function TableBoard({
     setSwapMessage(t('tableSwapped', { a: a.name, b: b.name }));
     setSwapping(null);
   };
+  /** Sorteado para começar: brilha por 5 s ou até o primeiro toque na mesa (o que vier antes). */
+  const [spotlight, setSpotlight] = useState<string | null>(null);
+  useEffect(() => {
+    if (!spotlight) return;
+    const timer = setTimeout(() => setSpotlight(null), 5000);
+    return () => clearTimeout(timer);
+  }, [spotlight]);
   const { winnerId } = tableResult(state);
   // Quando sobra um só na mesa, abre o menu para encerrar (como no site).
   const [lastWinner, setLastWinner] = useState(winnerId);
@@ -635,7 +709,14 @@ export function TableBoard({
   const layout = tableLayout(state.players.length, state.layoutId, state.rotations);
 
   return (
-    <View style={[StyleSheet.absoluteFill, { backgroundColor: '#09090b' }]}>
+    <View
+      style={[StyleSheet.absoluteFill, { backgroundColor: '#09090b' }]}
+      // Qualquer toque na mesa encerra o brilho do sorteado (sem tomar o toque para si).
+      onStartShouldSetResponderCapture={() => {
+        if (spotlight) setSpotlight(null);
+        return false;
+      }}
+    >
       <SafeAreaView style={{ flex: 1, gap: 4, padding: 4 }}>
         {tableRows(state.players.length, layout).map((row, r) => (
           <View key={r} style={{ flex: tableRowWeights(layout)[r], flexDirection: 'row', gap: 4 }}>
@@ -649,7 +730,7 @@ export function TableBoard({
                     <PlayerPanel
                       player={player}
                       state={state}
-                      color={SEAT_COLORS[index % SEAT_COLORS.length]!}
+                      color={seatColor(state, index)}
                       size={size}
                       seat={index}
                       rotate={layout.seats[index]!.rotate}
@@ -662,6 +743,8 @@ export function TableBoard({
                             }
                       }
                       dispatch={dispatch}
+                      spotlight={spotlight === player.userId}
+                      canChooseColors={canChooseColors}
                     />
                   )}
                 </Rotated>
@@ -705,6 +788,12 @@ export function TableBoard({
         <TableMenu
           state={state}
           dispatch={dispatch}
+          onPickedFirst={(p) => {
+            // Fecha o menu e mostra o sorteado na mesa (anunciado também em texto).
+            setMenu(false);
+            setSwapMessage(t('tableFirstIs', { name: p.name }));
+            setSpotlight(p.userId);
+          }}
           onSwap={() => {
             setMenu(false);
             setSwapMessage(t('tableSwapHint'));
@@ -727,6 +816,15 @@ export function TableBoard({
 
 const board = StyleSheet.create({
   panel: { flex: 1, borderRadius: 18, padding: 8, justifyContent: 'space-between' },
+  swatch: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   // Nome no canto (do ponto de vista do jogador), longe do botão central da mesa.
   name: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center', paddingHorizontal: 12 },
   nameText: { color: '#ffffff', fontSize: 18, fontWeight: '700' },
@@ -786,8 +884,8 @@ const board = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   optionsCloseText: { color: '#ffffff', fontSize: 26, fontWeight: '700', lineHeight: 28 },
-  panelSection: { color: '#ffffff', fontSize: 13, fontWeight: '800', opacity: 0.8 },
-  panelHint: { color: '#ffffff', fontSize: 12, opacity: 0.8 },
+  panelSection: { color: '#ffffff', fontSize: 16, fontWeight: '800', opacity: 0.9 },
+  panelHint: { color: '#ffffff', fontSize: 14, opacity: 0.85 },
   panelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   panelLabel: { flex: 1, color: '#ffffff', fontSize: 15 },
   panelStep: {

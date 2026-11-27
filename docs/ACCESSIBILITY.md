@@ -866,6 +866,17 @@ sem rolagem horizontal em 320px.
 - Encontro: participantes com foto (decorativa) e a resposta em texto; cada linha é um elemento acessível com "Nome, resposta"; quem vai primeiro.
 - Ranking: os três primeiros com a medalha (ouro, prata, bronze) atrás do número, que continua escrito; número em Noite sobre o metal (contraste AA, o mesmo do pódio do site).
 
+## Modo mesa: sorteio, "Saiu do jogo" e marcadores maiores (26/11/2026)
+
+- Sortear quem começa fecha o menu (o foco volta ao botão do centro) e anuncia "Fulano começa" na região de status da mesa. O brilho de foil na área do sorteado é decorativo (`aria-hidden`), some em 5 s ou no primeiro toque na mesa, e fica parado com "reduzir movimento" (site e app).
+- "Saiu do jogo" fica no fim das opções do jogador (depois do dano de comandante e dos marcadores, os mais usados): "Morreu" e "Concedeu" são botões de alternar (`aria-pressed` no site, `switch` no app), com uma explicação em texto; a área mostra o motivo escrito ("Morreu", "Concedeu").
+- Dano de comandante e marcadores: rótulo em 16 px (antes 14), botões de − e + com 48 px (antes 40) e o número em 24 px; com o deck escolhido, o rótulo é só o nome do comandante, e os botões continuam com nome completo ("Aumentar Omnath, Locus of Mana").
+
+## Modo mesa: cor da área (26/11/2026, atrás da flag `table-colors`)
+
+- Nas opções do jogador, "Cor da sua área": 12 botões redondos de 44 px num `<fieldset>` com `<legend>` (no app, botões com estado `selected`). Cada cor tem nome ("Rosa", "Grafite"…), então a escolha não depende de enxergar a cor; a escolhida tem `aria-pressed` e um ✓.
+- Todas as cores mantêm o texto branco da área com contraste ≥ 4,5:1 (teste em `packages/core/src/table/table.test.ts`).
+
 ## Mão inicial legível (26/11/2026)
 
 - As cartas da mão viraram botões "Ampliar {carta}" que abrem a carta grande num `<dialog>` modal (nome da carta como nome acessível, imagem com `alt`, "Fechar", Esc e o fundo fecham; o foco volta para a carta).

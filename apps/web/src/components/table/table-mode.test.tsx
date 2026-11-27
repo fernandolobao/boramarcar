@@ -163,10 +163,15 @@ describe('modo mesa', () => {
 });
 
 describe('tela acesa e tela cheia', () => {
-  const start = () => {
+  const start = (canChooseColors = false) => {
     const utils = render(
       <NextIntlClientProvider locale="pt-BR" messages={messages} timeZone="America/Sao_Paulo">
-        <TableMode eventId="e1" players={players} defaultFormat="commander" />
+        <TableMode
+          eventId="e1"
+          players={players}
+          defaultFormat="commander"
+          canChooseColors={canChooseColors}
+        />
       </NextIntlClientProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }));
@@ -293,6 +298,83 @@ describe('tela acesa e tela cheia', () => {
     expect(
       within(dialog).getByRole('button', { name: 'Aumentar De Bia — 1º comandante' }),
     ).toBeInTheDocument();
+  });
+
+  it('sortear quem começa fecha o menu e o sorteado brilha até tocar na mesa', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sortear quem começa' }));
+    // O menu fecha; o sorteado é anunciado e a área dele ganha o brilho.
+    expect(screen.queryByRole('dialog', { name: 'Menu da mesa' })).toBeNull();
+    expect(
+      screen.getAllByText(/^(Ana|Bia) começa$/, { selector: '[role="status"]' }).length,
+    ).toBeGreaterThan(0);
+    expect(document.querySelectorAll('.table-spotlight')).toHaveLength(1);
+    // Qualquer toque na mesa encerra o brilho.
+    fireEvent.pointerDown(screen.getByRole('button', { name: /opções de Ana/ }));
+    expect(document.querySelector('.table-spotlight')).toBeNull();
+  });
+
+  it('o brilho do sorteado some sozinho em 5 segundos', () => {
+    vi.useFakeTimers();
+    try {
+      start();
+      fireEvent.click(screen.getByRole('button', { name: 'Menu da mesa' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Sortear quem começa' }));
+      expect(document.querySelector('.table-spotlight')).not.toBeNull();
+      act(() => vi.advanceTimersByTime(5000));
+      expect(document.querySelector('.table-spotlight')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('"Morreu" tira da mesa por outro motivo (sobra o vencedor) e volta ao desmarcar', () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    let dialog = screen.getByRole('dialog', { name: 'Bia' });
+    expect(within(dialog).getByRole('button', { name: 'Concedeu' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Morreu' }));
+    // Com dois na mesa, a Ana vence: o menu abre para encerrar.
+    expect(screen.getByText('Ana é o último na mesa!')).toBeInTheDocument();
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Menu da mesa' })).getByRole('button', {
+        name: 'Fechar',
+      }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    dialog = screen.getByRole('dialog', { name: 'Bia' });
+    const died = within(dialog).getByRole('button', { name: 'Morreu' });
+    expect(died).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(died);
+    expect(died).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('cor da área: só com a flag; a cor escolhida pinta a área do jogador e volta à padrão', async () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    expect(screen.queryByRole('group', { name: 'Cor da sua área' })).toBeNull();
+    cleanup();
+
+    start(true);
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    const colors = screen.getByRole('group', { name: 'Cor da sua área' });
+    expect(within(colors).getAllByRole('button')).toHaveLength(12);
+    const area = screen.getByRole('region', { name: /Bia/ });
+    const before = area.style.backgroundColor;
+    fireEvent.click(within(colors).getByRole('button', { name: 'Rosa' }));
+    expect(within(colors).getByRole('button', { name: 'Rosa' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(area.style.backgroundColor).not.toBe(before);
+    // A cor padrão da posição (Bia é a 2ª: azul) volta ao normal.
+    fireEvent.click(within(colors).getByRole('button', { name: 'Azul' }));
+    expect(area.style.backgroundColor).toBe(before);
+    expect(await audit(colors)).toEqual([]);
   });
 
   it('sem API de tela cheia (iPhone), explica como instalar na tela inicial', () => {

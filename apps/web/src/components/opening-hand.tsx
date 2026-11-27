@@ -219,12 +219,31 @@ function CardZoom({
     if (card && !d.open) d.showModal();
     if (!card && d.open) d.close();
   }, [card]);
+  // Esc fecha só a carta ampliada (o evento não segue para a janela da mão, por baixo).
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      d.close();
+    };
+    d.addEventListener('keydown', onKey);
+    return () => d.removeEventListener('keydown', onKey);
+  }, []);
   return (
     <dialog
       ref={ref}
       aria-label={card?.name ?? t('title')}
       className="m-auto max-h-[96dvh] w-[min(94vw,26rem)] overflow-visible bg-transparent p-0 backdrop:bg-noite/80"
       onClose={onClose}
+      // Esc fecha só a carta ampliada: sem isto, a janela da mão (por baixo) às vezes fecha junto.
+      onCancel={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        ref.current?.close();
+      }}
     >
       {card && (
         <div className="flex flex-col items-end gap-2">

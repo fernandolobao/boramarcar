@@ -1,5 +1,5 @@
 import { formatRules, type GameFormat, type GamePlayerInput } from '../games';
-import type { SeatRotation } from './layout';
+import { SEAT_COLORS, TABLE_COLORS, type SeatRotation } from './layout';
 
 /**
  * Modo mesa (5.6): contador de vida no estilo dos apps de mesa (Lotus) e o resultado da partida.
@@ -25,6 +25,8 @@ export interface TablePlayer {
   /** Quantos comandantes o jogador tem (2 com parceiros); sem valor, o que o deck diz ou 1. */
   commanderCount?: 1 | 2;
   conceded: boolean;
+  /** Morreu por outro motivo (deck vazio, efeito de carta…); vida, veneno e comandante contam sozinhos. */
+  died?: boolean;
   /** Passo do histórico em que caiu (para a ordem de eliminação); `null` = na mesa. */
   defeatedAt: number | null;
 }
@@ -44,6 +46,8 @@ export interface TableState {
   layoutId?: string | null;
   /** Giro individual por posição na mesa, por cima da disposição. */
   rotations?: Record<number, SeatRotation>;
+  /** Cor escolhida por jogador (id → cor de `TABLE_COLORS`); sem valor, a da posição. */
+  colors?: Record<string, string>;
 }
 
 export type TableAction =
@@ -54,6 +58,8 @@ export type TableAction =
   /** Quantos comandantes o jogador tem (para quem não escolheu deck com dois). */
   | { type: 'commanders'; userId: string; count: 1 | 2 }
   | { type: 'concede'; userId: string; conceded: boolean }
+  /** Morreu por outro motivo que o contador não vê (deck vazio, efeito de carta). */
+  | { type: 'died'; userId: string; died: boolean }
   | { type: 'monarch'; userId: string | null }
   | { type: 'first'; userId: string | null }
   /** Troca dois jogadores de lugar na mesa (as áreas acompanham onde cada um está sentado). */
@@ -62,6 +68,8 @@ export type TableAction =
   | { type: 'layout'; layoutId: string }
   /** Gira a área de uma posição da mesa. Não entra no "desfazer". */
   | { type: 'rotate'; seat: number; rotate: SeatRotation }
+  /** Cor da área do jogador (`null` = a padrão da posição). Não entra no "desfazer". */
+  | { type: 'color'; userId: string; color: string | null }
   | { type: 'undo' };
 
 /** Vida inicial por formato: 40 em Commander e Brawl, 20 nos demais. */
@@ -138,8 +146,9 @@ export function createTable(input: {
 export function defeatReason(
   player: TablePlayer,
   format: GameFormat,
-): 'life' | 'poison' | 'commander' | 'conceded' | null {
+): 'life' | 'poison' | 'commander' | 'conceded' | 'died' | null {
   if (player.conceded) return 'conceded';
+  if (player.died) return 'died';
   if (player.life <= 0) return 'life';
   if (player.counters.poison >= 10) return 'poison';
   if (
@@ -179,11 +188,19 @@ export function tableReducer(state: TableState, action: TableAction): TableState
           ...previous,
           layoutId: state.layoutId,
           rotations: state.rotations,
+          colors: state.colors,
           undo: state.undo.slice(0, -1),
         }
       : state;
   }
   if (action.type === 'layout') return { ...state, layoutId: action.layoutId, rotations: {} };
+  if (action.type === 'color') {
+    if (action.color !== null && !TABLE_COLORS.includes(action.color)) return state;
+    const colors = { ...state.colors };
+    if (action.color === null) delete colors[action.userId];
+    else colors[action.userId] = action.color;
+    return { ...state, colors };
+  }
   if (action.type === 'rotate') {
     if (action.seat < 0 || action.seat >= state.players.length) return state;
     return { ...state, rotations: { ...state.rotations, [action.seat]: action.rotate } };
@@ -244,6 +261,8 @@ export function tableReducer(state: TableState, action: TableAction): TableState
       return withDefeats(
         updatePlayer(base, action.userId, (p) => ({ ...p, conceded: action.conceded })),
       );
+    case 'died':
+      return withDefeats(updatePlayer(base, action.userId, (p) => ({ ...p, died: action.died })));
     case 'monarch':
       return { ...base, monarchId: action.userId };
     case 'first':
@@ -258,6 +277,10 @@ export function tableReducer(state: TableState, action: TableAction): TableState
     }
   }
 }
+
+/** Cor da área de quem está na posição `index`: a escolhida pelo jogador ou a da posição. */
+export const seatColor = (state: TableState, index: number) =>
+  state.colors?.[state.players[index]?.userId ?? ''] ?? SEAT_COLORS[index % SEAT_COLORS.length]!;
 
 /** Jogadores ainda na mesa. */
 export const alivePlayers = (state: TableState) =>

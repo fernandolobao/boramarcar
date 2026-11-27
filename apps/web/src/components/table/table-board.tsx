@@ -7,6 +7,8 @@ import {
   formatRules,
   rollDie,
   SEAT_COLORS,
+  TABLE_COLORS,
+  seatColor,
   tableLayout,
   tableRowWeights,
   type SeatRotation,
@@ -81,6 +83,7 @@ function PlayerPanel({
   rotate,
   swap,
   dispatch,
+  spotlight = false,
   onOpen,
 }: {
   player: TablePlayer;
@@ -90,6 +93,8 @@ function PlayerPanel({
   /** Modo "trocar lugares": a área inteira vira um botão para escolher o jogador. */
   swap: { selected: boolean; onPick: () => void } | null;
   dispatch: (a: TableAction) => void;
+  /** Sorteado para começar: brilho de carta foil por cima da área. */
+  spotlight?: boolean;
   onOpen: () => void;
 }) {
   const t = useTranslations('table');
@@ -208,6 +213,16 @@ function PlayerPanel({
             </span>
           </button>
         )}
+        {spotlight && (
+          <div
+            className="table-spotlight pointer-events-none absolute inset-0 flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <span className="rounded-full bg-white px-4 py-1.5 text-lg font-extrabold text-ink-950 shadow-xl">
+              {t('firstBadge')}
+            </span>
+          </div>
+        )}
         {reason && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/55">
             <span
@@ -234,23 +249,23 @@ function Stepper({
 }) {
   const t = useTranslations('table');
   return (
-    <li className="flex items-center justify-between gap-3 py-1.5">
-      <span className="text-sm">{label}</span>
-      <span className="flex items-center gap-2">
+    <li className="flex items-center justify-between gap-3 py-2">
+      <span className="min-w-0 text-base font-medium">{label}</span>
+      <span className="flex shrink-0 items-center gap-2">
         <button
           type="button"
-          className="btn-secondary size-10 p-0"
+          className="btn-secondary size-12 p-0 text-2xl"
           aria-label={t('decrease', { label })}
           onClick={() => onChange(-1)}
         >
           −
         </button>
-        <span className="w-8 text-center text-lg font-bold tabular-nums" aria-live="polite">
+        <span className="w-10 text-center text-2xl font-bold tabular-nums" aria-live="polite">
           {value}
         </span>
         <button
           type="button"
-          className="btn-secondary size-10 p-0"
+          className="btn-secondary size-12 p-0 text-2xl"
           aria-label={t('increase', { label })}
           onClick={() => onChange(1)}
         >
@@ -333,11 +348,14 @@ export function TableBoard({
   onFinish,
   onExit,
   screen,
+  canChooseColors = false,
 }: {
   state: TableState;
   dispatch: (a: TableAction) => void;
   onFinish: () => void;
   onExit: () => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
   /** Tela acesa e tela cheia (ver `useKeepAwake`/`useFullscreen`). */
   screen: TableScreen;
 }) {
@@ -351,6 +369,16 @@ export function TableBoard({
   /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
   const [swapping, setSwapping] = useState<string | null>(null);
   const [swapMessage, setSwapMessage] = useState('');
+  /**
+   * Sorteado para começar: a área dele brilha (como carta foil) por 5 s ou até a primeira
+   * interação na mesa, o que vier antes.
+   */
+  const [spotlight, setSpotlight] = useState<string | null>(null);
+  useEffect(() => {
+    if (!spotlight) return;
+    const timer = setTimeout(() => setSpotlight(null), 5000);
+    return () => clearTimeout(timer);
+  }, [spotlight]);
   const pickSwap = (userId: string) => {
     if (!swapping) return setSwapping(userId);
     if (swapping === userId) return setSwapping('');
@@ -376,6 +404,9 @@ export function TableBoard({
 
   return (
     <div
+      // Qualquer toque na mesa encerra o brilho do sorteado (o botão do sorteio fica no menu,
+      // que já fechou).
+      onPointerDownCapture={() => setSpotlight(null)}
       className="fixed inset-0 z-40 bg-ink-950"
       // Como app instalado ou em tela cheia, não desenha sob o recorte da câmera nem a barra inferior.
       style={{
@@ -402,7 +433,7 @@ export function TableBoard({
               <PlayerPanel
                 player={player}
                 state={state}
-                color={SEAT_COLORS[i % SEAT_COLORS.length]!}
+                color={seatColor(state, i)}
                 rotate={seat.rotate}
                 swap={
                   swapping === null
@@ -413,6 +444,7 @@ export function TableBoard({
                       }
                 }
                 dispatch={dispatch}
+                spotlight={spotlight === player.userId}
                 onOpen={() => setPlayerOpen(player.userId)}
               />
             </div>
@@ -463,11 +495,9 @@ export function TableBoard({
                       <Stepper
                         key={source.key}
                         label={
+                          // Com o deck escolhido, o nome do comandante basta (sem o do jogador).
                           source.commander
-                            ? t('fromCommander', {
-                                name: source.name,
-                                commander: source.commander,
-                              })
+                            ? source.commander
                             : twoFromSame
                               ? t('fromNth', { name: source.name, n: source.index + 1 })
                               : t('from', { name: source.name })
@@ -521,6 +551,69 @@ export function TableBoard({
                 )}
               </ul>
             </section>
+            {canChooseColors && (
+              <fieldset>
+                <legend className="font-semibold">{t('colorTitle')}</legend>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {TABLE_COLORS.map((color, n) => {
+                    const index = state.players.indexOf(selected);
+                    const current = seatColor(state, index);
+                    const isDefault = color === SEAT_COLORS[index % SEAT_COLORS.length];
+                    return (
+                      <button
+                        key={color}
+                        type="button"
+                        aria-pressed={current === color}
+                        aria-label={t(`colorNames.${n}` as 'colorNames.0')}
+                        title={t(`colorNames.${n}` as 'colorNames.0')}
+                        onClick={() =>
+                          dispatch({
+                            type: 'color',
+                            userId: selected.userId,
+                            color: isDefault ? null : color,
+                          })
+                        }
+                        className="inline-flex size-11 items-center justify-center rounded-full text-white ring-offset-2 ring-offset-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-pressed:ring-4 aria-pressed:ring-fg"
+                        style={{ backgroundColor: color }}
+                      >
+                        {current === color && <Icon name="done" className="size-5" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
+            {/* Saiu do jogo: vida, veneno e comandante já derrubam sozinhos; aqui o resto. */}
+            <section>
+              <h3 className="font-semibold">{t('outTitle')}</h3>
+              <p className="muted text-sm">{t('outHint')}</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  className={selected.died ? 'btn-primary' : 'btn-secondary'}
+                  aria-pressed={Boolean(selected.died)}
+                  onClick={() =>
+                    dispatch({ type: 'died', userId: selected.userId, died: !selected.died })
+                  }
+                >
+                  {t('died')}
+                </button>
+                <button
+                  type="button"
+                  className={selected.conceded ? 'btn-primary' : 'btn-secondary'}
+                  aria-pressed={selected.conceded}
+                  onClick={() =>
+                    dispatch({
+                      type: 'concede',
+                      userId: selected.userId,
+                      conceded: !selected.conceded,
+                    })
+                  }
+                >
+                  {t('concede')}
+                </button>
+              </div>
+            </section>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -535,20 +628,6 @@ export function TableBoard({
               >
                 <Icon name="monarch" />
                 {t('monarch')}
-              </button>
-              <button
-                type="button"
-                className={selected.conceded ? 'btn-primary' : 'btn-secondary'}
-                aria-pressed={selected.conceded}
-                onClick={() =>
-                  dispatch({
-                    type: 'concede',
-                    userId: selected.userId,
-                    conceded: !selected.conceded,
-                  })
-                }
-              >
-                {t('concede')}
               </button>
             </div>
           </>
@@ -595,6 +674,10 @@ export function TableBoard({
               const p = state.players[rollDie(state.players.length) - 1]!;
               dispatch({ type: 'first', userId: p.userId });
               setRoll(t('firstIs', { name: p.name }));
+              // Fecha o menu e mostra o sorteado na mesa (anunciado também em texto).
+              setMenuOpen(false);
+              setSwapMessage(t('firstIs', { name: p.name }));
+              setSpotlight(p.userId);
             }}
           >
             {t('pickFirst')}

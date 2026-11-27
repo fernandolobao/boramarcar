@@ -69,6 +69,13 @@ describe('OpeningHand (11.3)', () => {
     fireEvent.click(within(zoom).getByRole('button', { name: 'Fechar' }));
     expect(zoom).not.toHaveAttribute('open');
     expect(card).toHaveFocus();
+    // Esc na carta ampliada fecha só ela (o Esc não chega à janela da mão, por baixo).
+    const outerKeys: string[] = [];
+    document.addEventListener('keydown', (e) => outerKeys.push(e.key));
+    fireEvent.click(card!);
+    fireEvent.keyDown(zoom, { key: 'Escape' });
+    expect(zoom).not.toHaveAttribute('open');
+    expect(outerKeys).not.toContain('Escape');
     // No mulligan, cada carta tem "pôr no fundo" e a lupa; a lupa não escolhe.
     fireEvent.click(screen.getByRole('button', { name: 'Mulligan' }));
     const item = screen.getAllByRole('listitem')[0]!;

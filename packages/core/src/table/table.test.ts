@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  SEAT_COLORS,
+  TABLE_COLORS,
+  seatColor,
   fieldDelta,
   nextRotation,
   seatSwipe,
@@ -62,6 +65,24 @@ describe('modo mesa', () => {
     t = run(t, { type: 'undo' });
     expect(t.players[0]).toMatchObject({ life: 35, commanderDamage: {} });
     expect(run(createTable({ format: 'commander', players }), { type: 'undo' }).step).toBe(0);
+  });
+
+  it('morreu por outro motivo (deck vazio, efeito de carta): sai da mesa e volta se desmarcar', () => {
+    let t = createTable({ format: 'commander', players });
+    t = run(t, { type: 'died', userId: 'c', died: true });
+    expect(defeatReason(t.players[2]!, t.format)).toBe('died');
+    expect(tableResult(t).eliminated).toEqual([{ userId: 'c', order: 1 }]);
+    // A vida continua a mesma: só a situação muda.
+    expect(t.players[2]!.life).toBe(40);
+    t = run(t, { type: 'undo' });
+    expect(defeatReason(t.players[2]!, t.format)).toBeNull();
+    t = run(
+      t,
+      { type: 'died', userId: 'c', died: true },
+      { type: 'died', userId: 'c', died: false },
+    );
+    expect(alivePlayers(t).map((p) => p.userId)).toContain('c');
+    expect(tableResult(t).eliminated).toEqual([]);
   });
 
   it('derrotas: vida, 10 de veneno, 21 de comandante (só em formatos com comandante) e concessão', () => {
@@ -335,5 +356,41 @@ describe('dano de comandante por comandante (parceiros)', () => {
       players: old.players.map(({ commanders: _c, commanderCount: _n, ...p }) => p),
     };
     expect(commanderSources(legacy, 'a').map((s) => s.key)).toEqual(['b', 'c', 'd']);
+  });
+});
+
+/** Contraste WCAG entre uma cor `#rrggbb` e o branco do texto da área. */
+const contrastWithWhite = (hex: string) => {
+  const ch = (i: number) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const l = 0.2126 * ch(1) + 0.7152 * ch(3) + 0.0722 * ch(5);
+  return 1.05 / (l + 0.05);
+};
+
+describe('cores das áreas', () => {
+  it('todas as cores que dá para escolher têm texto branco legível (≥ 4,5:1) e não se repetem', () => {
+    for (const color of TABLE_COLORS)
+      expect(contrastWithWhite(color), color).toBeGreaterThanOrEqual(4.5);
+    expect(new Set(TABLE_COLORS).size).toBe(TABLE_COLORS.length);
+    expect(TABLE_COLORS.slice(0, SEAT_COLORS.length)).toEqual(SEAT_COLORS);
+  });
+
+  it('a cor escolhida vale para o jogador (acompanha a troca de lugar) e não entra no desfazer', () => {
+    let t = createTable({ format: 'commander', players });
+    expect(seatColor(t, 1)).toBe(SEAT_COLORS[1]);
+    t = tableReducer(t, { type: 'color', userId: 'b', color: TABLE_COLORS[8]! });
+    expect(seatColor(t, 1)).toBe(TABLE_COLORS[8]);
+    expect(t.undo).toHaveLength(0);
+    // Trocou de lugar: a cor vai junto com o jogador.
+    t = tableReducer(t, { type: 'swap', userId: 'b', withUserId: 'c' });
+    expect(seatColor(t, 2)).toBe(TABLE_COLORS[8]);
+    // Desfazer a troca mantém a cor; cor fora da lista é ignorada; `null` volta à padrão.
+    t = tableReducer(t, { type: 'undo' });
+    expect(seatColor(t, 1)).toBe(TABLE_COLORS[8]);
+    expect(tableReducer(t, { type: 'color', userId: 'b', color: '#ffffff' })).toBe(t);
+    t = tableReducer(t, { type: 'color', userId: 'b', color: null });
+    expect(seatColor(t, 1)).toBe(SEAT_COLORS[1]);
   });
 });

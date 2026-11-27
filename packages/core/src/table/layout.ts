@@ -302,6 +302,20 @@ export const nextRotation = (rotate: SeatRotation): SeatRotation =>
 export const SEAT_COLORS = ['#5b21b6', '#1d4ed8', '#047857', '#b91c1c', '#b45309', '#0e7490'];
 
 /**
+ * Cores que cada jogador pode escolher para a sua área (atrás da flag `table-colors`, futuro
+ * pacote pago): as padrão e mais seis, todas com texto branco AA (testado).
+ */
+export const TABLE_COLORS = [
+  ...SEAT_COLORS,
+  '#7e22ce',
+  '#be185d',
+  '#4d7c0f',
+  '#334155',
+  '#9f1239',
+  '#0f766e',
+];
+
+/**
  * A mesma disposição em linhas, para telas sem grade CSS (app): cada linha lista os índices dos
  * jogadores da esquerda para a direita; `-1` é um canto vazio.
  */
