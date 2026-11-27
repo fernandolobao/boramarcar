@@ -11,8 +11,9 @@ import {
 } from '@boramarcar/core';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './icons';
+import { useLightDismiss } from './use-light-dismiss';
 
 export interface OpeningHandLine {
   name: string;
@@ -34,6 +35,13 @@ export function OpeningHand({ lines }: { lines: OpeningHandLine[] }) {
   const [mulligans, setMulligans] = useState(0);
   /** Cartas escolhidas para o fundo, enquanto o mulligan não termina. */
   const [bottom, setBottom] = useState<string[] | null>(null);
+  /** Carta ampliada (para ler o texto) e o botão que a abriu (o foco volta para ele). */
+  const [zoom, setZoom] = useState<{ name: string; imageUri: string | null } | null>(null);
+  const zoomOpener = useRef<HTMLElement | null>(null);
+  const openZoom = (card: { name: string; imageUri: string | null }, el: HTMLElement) => {
+    zoomOpener.current = el;
+    setZoom(card);
+  };
 
   if (library.length < OPENING_HAND_SIZE) return <p className="muted">{t('tooSmall')}</p>;
 
@@ -92,7 +100,8 @@ export function OpeningHand({ lines }: { lines: OpeningHandLine[] }) {
       </p>
 
       {state && (
-        <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-7">
+        // Cartas grandes o bastante para ler (2 a 4 por linha); tocar amplia.
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {state.hand.map((card) => {
             const picked = bottom?.includes(card.id) ?? false;
             const face = (
@@ -103,11 +112,11 @@ export function OpeningHand({ lines }: { lines: OpeningHandLine[] }) {
                     alt=""
                     fill
                     unoptimized
-                    sizes="(min-width: 768px) 14vw, 33vw"
+                    sizes="(min-width: 1024px) 17rem, (min-width: 640px) 30vw, 46vw"
                     className="object-cover"
                   />
                 ) : (
-                  <span className="grid h-full place-items-center p-2 text-center text-xs font-medium">
+                  <span className="grid h-full place-items-center p-2 text-center text-sm font-medium">
                     {card.name}
                   </span>
                 )}
@@ -119,32 +128,50 @@ export function OpeningHand({ lines }: { lines: OpeningHandLine[] }) {
               </span>
             );
             return (
-              <li key={card.id}>
+              <li key={card.id} className="relative">
                 {choosing ? (
+                  <>
+                    <button
+                      type="button"
+                      aria-pressed={picked}
+                      className={`block w-full rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${picked ? 'ring-4 ring-primary' : ''}`}
+                      onClick={() =>
+                        setBottom((b) =>
+                          !b
+                            ? b
+                            : b.includes(card.id)
+                              ? b.filter((id) => id !== card.id)
+                              : b.length < mulligans
+                                ? [...b, card.id]
+                                : b,
+                        )
+                      }
+                    >
+                      {face}
+                      <span className="sr-only">{t('pickBottom', { name: card.name })}</span>
+                    </button>
+                    {/* Ampliar sem escolher: botão próprio no canto da carta. */}
+                    <button
+                      type="button"
+                      aria-haspopup="dialog"
+                      aria-label={t('zoom', { name: card.name })}
+                      title={t('zoom', { name: card.name })}
+                      className="absolute top-[4%] right-[5%] inline-flex size-9 items-center justify-center rounded-full bg-noite/80 text-pergaminho hover:bg-noite focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                      onClick={(e) => openZoom(card, e.currentTarget)}
+                    >
+                      <Icon name="zoom" className="size-4" />
+                    </button>
+                  </>
+                ) : (
                   <button
                     type="button"
-                    aria-pressed={picked}
-                    className={`block w-full rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${picked ? 'ring-4 ring-primary' : ''}`}
-                    onClick={() =>
-                      setBottom((b) =>
-                        !b
-                          ? b
-                          : b.includes(card.id)
-                            ? b.filter((id) => id !== card.id)
-                            : b.length < mulligans
-                              ? [...b, card.id]
-                              : b,
-                      )
-                    }
+                    aria-haspopup="dialog"
+                    aria-label={t('zoom', { name: card.name })}
+                    className="block w-full cursor-zoom-in rounded-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                    onClick={(e) => openZoom(card, e.currentTarget)}
                   >
                     {face}
-                    <span className="sr-only">{t('pickBottom', { name: card.name })}</span>
                   </button>
-                ) : (
-                  <figure>
-                    {face}
-                    <figcaption className="sr-only">{card.name}</figcaption>
-                  </figure>
                 )}
               </li>
             );
@@ -162,6 +189,63 @@ export function OpeningHand({ lines }: { lines: OpeningHandLine[] }) {
           {t('keep', { count: OPENING_HAND_SIZE - mulligans })}
         </button>
       )}
+
+      <CardZoom
+        card={zoom}
+        onClose={() => {
+          setZoom(null);
+          zoomOpener.current?.focus();
+        }}
+      />
     </div>
+  );
+}
+
+/** A carta grande, para ler o texto (Esc, "Fechar" ou o fundo fecham). */
+function CardZoom({
+  card,
+  onClose,
+}: {
+  card: { name: string; imageUri: string | null } | null;
+  onClose: () => void;
+}) {
+  const t = useTranslations('decks.hand');
+  const tc = useTranslations('common');
+  const ref = useRef<HTMLDialogElement>(null);
+  useLightDismiss(ref);
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (card && !d.open) d.showModal();
+    if (!card && d.open) d.close();
+  }, [card]);
+  return (
+    <dialog
+      ref={ref}
+      aria-label={card?.name ?? t('title')}
+      className="m-auto max-h-[96dvh] w-[min(94vw,26rem)] overflow-visible bg-transparent p-0 backdrop:bg-noite/80"
+      onClose={onClose}
+    >
+      {card && (
+        <div className="flex flex-col items-end gap-2">
+          <button type="button" className="btn-secondary" onClick={() => ref.current?.close()}>
+            <Icon name="close" />
+            {tc('close')}
+          </button>
+          {card.imageUri ? (
+            // eslint-disable-next-line @next/next/no-img-element -- imagem do Scryfall, já em cache
+            <img
+              src={card.imageUri}
+              alt={card.name}
+              className="aspect-[488/680] max-h-[85dvh] w-full rounded-[4.5%/3.2%] object-contain shadow-2xl"
+            />
+          ) : (
+            <p className="w-full rounded-2xl bg-surface p-6 text-center text-lg font-semibold text-fg">
+              {card.name}
+            </p>
+          )}
+        </div>
+      )}
+    </dialog>
   );
 }

@@ -189,10 +189,23 @@ test.describe('deck', () => {
     await dialog.getByRole('button', { name: 'Comprar mão inicial' }).click();
     await expect(dialog.getByRole('listitem')).toHaveCount(7);
     await dialog.getByRole('button', { name: 'Mulligan' }).click();
-    await dialog.getByRole('listitem').first().getByRole('button').click();
+    await dialog
+      .getByRole('listitem')
+      .first()
+      .getByRole('button', { name: /no fundo/ })
+      .click();
     await dialog.getByRole('button', { name: 'Manter com 6 cartas' }).click();
     await expect(dialog.getByRole('listitem')).toHaveCount(6);
     await expect(dialog.getByRole('status')).toContainText('depois de 1 mulligan');
+    // Tocar numa carta amplia para ler; Esc fecha e volta para a mão.
+    await dialog
+      .getByRole('button', { name: /^Ampliar / })
+      .first()
+      .click();
+    const zoom = page.getByRole('dialog').last();
+    await expect(zoom.getByRole('button', { name: 'Fechar' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog.getByRole('listitem')).toHaveCount(6);
   });
 
   test('folha de proxies em PDF', async ({ page }) => {

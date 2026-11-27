@@ -384,6 +384,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'Ranking explicado: o botão ⓘ ao lado do título mostra como os pontos são contados e como funciona o desempate (site e app).',
     en: 'The ranking explained: the ⓘ button next to the title shows how points are counted and how ties are broken (site and app).',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Mão inicial mais legível: as cartas ficaram bem maiores e tocar numa carta mostra ela grande para ler o texto.',
+    en: 'A more readable opening hand: cards are much bigger, and tapping a card shows it large so you can read the text.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

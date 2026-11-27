@@ -22,6 +22,7 @@ import {
   Store,
   Maximize,
   Minimize,
+  ZoomIn,
   Navigation,
   Accessibility,
   Mail,
@@ -235,6 +236,8 @@ export const Icons = {
   feedback: MessageSquareText,
   pause: Pause,
   fullscreen: Maximize,
+  /** Ampliar uma carta para ler o texto. */
+  zoom: ZoomIn,
   exitFullscreen: Minimize,
   play: Play,
   // Tema

@@ -424,6 +424,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
                                 label={t('hand.open')}
                                 title={t('hand.title')}
                                 icon="openingHand"
+                                wide
                               >
                                 <p className="muted text-sm">{t('hand.intro')}</p>
                                 {/* Só o deck principal; a face da frente diz se é terreno. */}
