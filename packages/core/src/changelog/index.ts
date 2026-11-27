@@ -424,6 +424,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, o deck mostra a comparação com outros decks do mesmo comandante e, em cada função, as alternativas para trocar, como no site.',
     en: 'In the app, decks show the comparison with other decks of the same commander and, for each role, alternatives to swap in, like on the site.',
   },
+  {
+    date: '2026-11-27',
+    pt: '"Aprender a jogar" chegou ao app (aba Conta): as mesmas lições e desafios do site, com o progresso compartilhado.',
+    en: '"Learn to play" is now in the app (Account tab): the same lessons and challenges as the site, with shared progress.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
