@@ -237,8 +237,13 @@ function CardZoom({
       ref={ref}
       aria-label={card?.name ?? t('title')}
       className="m-auto max-h-[96dvh] w-[min(94vw,26rem)] overflow-visible bg-transparent p-0 backdrop:bg-noite/80"
-      onClose={onClose}
-      // Esc fecha só a carta ampliada: sem isto, a janela da mão (por baixo) às vezes fecha junto.
+      // O React faz `close` e `cancel` "subirem" pela árvore de componentes: sem parar aqui, a
+      // janela da mão (o `<dialog>` de fora) fecharia junto com a carta.
+      onClose={(e) => {
+        e.stopPropagation();
+        onClose();
+      }}
+      // Esc fecha só a carta ampliada.
       onCancel={(e) => {
         e.preventDefault();
         e.stopPropagation();
