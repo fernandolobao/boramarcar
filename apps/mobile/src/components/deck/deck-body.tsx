@@ -5,6 +5,9 @@ import type { GameFormat } from '@boramarcar/core/games';
 import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { BracketChecklist } from './bracket-checklist';
+import { DeckCompare, RoleAlternatives } from './deck-compare';
+import { api } from '@/lib/api';
+import { useAsync } from '@/lib/use-async';
 import { CardGrid, CardTile } from '@/components/card-tile';
 import { Choices } from '@/components/ds/choices';
 import { CardViewer } from './card-viewer';
@@ -172,6 +175,11 @@ export function DeckBody({
       <LineRow key={line.key} line={line} onOpen={() => setOpen(line)} />
     );
   const a = deck.analysis;
+  // Comparação com outros decks do mesmo comandante (só com comandante; carrega depois).
+  const comparison = useAsync(
+    () => (a.commanders.length ? api.decks.comparison(deck.id) : Promise.resolve(null)),
+    [deck.id, a.commanders.join('|')],
+  );
   const commanders = deck.lines.filter((l) => l.board === 'commander');
   const art = commanders.find((l) => l.card?.imageUri)?.card?.imageUri;
   const maxCurve = Math.max(1, ...CURVE.map((b) => a.manaCurve[b] ?? 0));
@@ -340,10 +348,17 @@ export function DeckBody({
       {roles.length > 0 && (
         <Section title={t('deckRoles')} index={next()}>
           {roles.map(([role, value]) => (
-            <AppText key={role}>
-              {t('deckRoleRow', { role: tKey('role', role), count: value })}
-            </AppText>
+            <View key={role} style={{ gap: 4, paddingVertical: 2 }}>
+              <AppText>{t('deckRoleRow', { role: tKey('role', role), count: value })}</AppText>
+              <RoleAlternatives deckId={deck.id} role={role} />
+            </View>
           ))}
+        </Section>
+      )}
+
+      {comparison.data && (
+        <Section title={t('compareTitle')} index={next()}>
+          <DeckCompare comparison={comparison.data} commander={a.commanders.join(' & ')} />
         </Section>
       )}
     </>

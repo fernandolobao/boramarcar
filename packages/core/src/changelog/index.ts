@@ -419,6 +419,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, o ranking ganhou as estatísticas do site: destaques, sequências de vitórias, confronto direto, decks e comandantes mais jogados, com os mesmos filtros.',
     en: 'In the app, the ranking now has the site\u2019s stats: highlights, win streaks, head to head, most played decks and commanders, with the same filters.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'No app, o deck mostra a comparação com outros decks do mesmo comandante e, em cada função, as alternativas para trocar, como no site.',
+    en: 'In the app, decks show the comparison with other decks of the same commander and, for each role, alternatives to swap in, like on the site.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

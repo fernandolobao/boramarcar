@@ -603,6 +603,23 @@ export const deckDetailSchema = z
   .loose();
 export type DeckDetail = z.infer<typeof deckDetailSchema>;
 
+/** Comparação com outros decks do mesmo comandante (4.10). */
+export const deckComparisonSchema = z
+  .object({
+    decks: z.number(),
+    metrics: z.array(
+      z.object({
+        key: z.string(),
+        value: z.number().nullable(),
+        average: z.number().nullable(),
+      }),
+    ),
+    commonMissing: z.array(z.object({ name: z.string(), share: z.number() })),
+    unique: z.array(z.string()),
+  })
+  .loose();
+export type DeckComparison = z.infer<typeof deckComparisonSchema>;
+
 export const errorBodySchema = z.object({
   error: z.object({ code: z.string(), message: z.string(), details: z.unknown().optional() }),
 });
