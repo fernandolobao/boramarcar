@@ -891,6 +891,11 @@ sem rolagem horizontal em 320px.
 
 - Abaixo da classificação, cartões com título (`header`): destaques (rótulo e valor lidos juntos), sequências (cada linha lida como "Fulano: sequência atual 2, melhor 4"), confronto direto em texto ("Ana 2 × 1 Caio"), decks mais jogados (botões de 44 pt que abrem o deck, com o nome e os números no rótulo) e comandantes. Sem gráficos: tudo em texto, com números tabulares.
 
+## App: comparação e alternativas no deck (27/11/2026)
+
+- "Comparação" é uma seção da pilha do deck com título; cada métrica é uma linha lida inteira ("Nota 80, média 72"); "Comuns nos outros decks" e "Escolhas próprias" têm título e explicação em texto.
+- Em cada função, "Ver alternativas" é um botão com a função no nome acessível ("Ver alternativas (Ramp)") e estado `expanded`; o custo máximo é escolhido por chips; o resultado entra numa região viva (carregando, erro, lista).
+
 ## App: "Aprender a jogar" (27/11/2026)
 
 - Lista com títulos por bloco; cada lição e desafio é um link com "Lição 2 de 6: título" no nome (e "Concluída" quando feito). Na lição, títulos por seção, símbolos de mana com nome por extenso (`ManaText`), cartas de exemplo com a imagem decorativa e o nome em texto. "Marcar como concluída" é um botão com estado `checked`.

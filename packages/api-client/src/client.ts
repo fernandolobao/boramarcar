@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const TIP_IDS = ['deck-analysis', 'table', 'collection', 'ranking'] as const;
 export type TipId = (typeof TIP_IDS)[number];
 import {
+  deckComparisonSchema,
   groupRecordsSchema,
   tournamentSummarySchema,
   storePublicSchema,
@@ -1028,6 +1029,37 @@ export function createApiClient(options: ApiClientOptions) {
         ),
     },
     decks: {
+      /**
+       * Comparação com outros decks do mesmo comandante (4.10): médias, cartas comuns que faltam
+       * e escolhas próprias. Sem comandante (ou servidor antigo), `null`.
+       */
+      comparison: async (deckId: string) =>
+        (
+          await request(
+            'GET',
+            `/decks/${encodeURIComponent(deckId)}/comparison`,
+            z.object({ comparison: deckComparisonSchema.nullable().catch(null) }),
+          ).catch(() => ({ comparison: null }))
+        ).comparison,
+      /** Cartas alternativas para uma função do deck (4.6), até o custo `maxCmc`. */
+      alternatives: async (deckId: string, role: string, maxCmc: number) =>
+        request(
+          'GET',
+          `/decks/${encodeURIComponent(deckId)}/alternatives${q({ role, maxCmc: String(maxCmc) })}`,
+          z.object({
+            query: z.string(),
+            cards: z.array(
+              z
+                .object({
+                  name: z.string(),
+                  manaCost: z.string().nullable().optional(),
+                  typeLine: z.string().nullable().optional(),
+                  imageUri: z.string().nullable().optional(),
+                })
+                .loose(),
+            ),
+          }),
+        ),
       list: async () =>
         (await request('GET', '/decks', z.object({ decks: z.array(deckSummarySchema) }))).decks,
       /** Importa pelo link (Archidekt) ou por uma lista colada; devolve o deck e as cartas não achadas. */
