@@ -80,7 +80,11 @@ export function DashboardHero({
             style={{ color: gold, fontWeight: '700', letterSpacing: 0.6, fontSize: 13 }}
             accessibilityRole="header"
           >
-            {t('dashNextEvent').toUpperCase()}
+            {/* Já começou (e ainda não acabou): "Acontecendo agora". */}
+            {(event.startsAt <= new Date()
+              ? t('dashHappeningNow')
+              : t('dashNextEvent')
+            ).toUpperCase()}
           </AppText>
           <AppText style={{ color: palette.pergaminho, fontSize: 22, fontWeight: '700' }}>
             {event.title}

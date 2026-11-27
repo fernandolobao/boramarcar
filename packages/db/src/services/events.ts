@@ -1,12 +1,14 @@
 import {
+  DEFAULT_EVENT_DURATION_MINUTES,
   DomainError,
+  EVENT_LIVE_GRACE_MINUTES,
   formatRules,
   isGameFormat,
   validateGame,
   type GameFormat,
   type GamePlayerInput,
 } from '@boramarcar/core';
-import { and, asc, desc, eq, gte, ilike, inArray, lt, max, ne, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, inArray, max, ne, or, sql } from 'drizzle-orm';
 import type { Database } from '../client';
 import {
   decks,
@@ -82,6 +84,18 @@ export async function createEvent(db: Database, input: CreateEventInput) {
   });
 }
 
+/**
+ * Quando o encontro termina para as listas: o término informado (ou início + duração padrão)
+ * mais a folga. Até lá ele segue nos "próximos" e no painel, mesmo depois de começar.
+ */
+const overAt = sql`coalesce(${events.endsAt}, ${events.startsAt} + ${sql.raw(
+  `interval '${DEFAULT_EVENT_DURATION_MINUTES} minutes'`,
+)}) + ${sql.raw(`interval '${EVENT_LIVE_GRACE_MINUTES} minutes'`)}`;
+/** Ainda nos próximos: não foi finalizado e não passou do fim + folga. */
+const eventIsOn = (now: Date) => and(ne(events.status, 'finished'), sql`${overAt} >= ${now}`);
+/** No histórico: finalizado, ou já passou do fim + folga. */
+const eventIsOver = (now: Date) => or(eq(events.status, 'finished'), sql`${overAt} < ${now}`);
+
 export async function listEvents(
   db: Database,
   input: {
@@ -96,9 +110,9 @@ export async function listEvents(
   const now = input.now ?? new Date();
   const timeFilter =
     input.when === 'past'
-      ? lt(events.startsAt, now)
+      ? eventIsOver(now)
       : input.when === 'upcoming'
-        ? gte(events.startsAt, now)
+        ? eventIsOn(now)
         : undefined;
   return db
     .select({
@@ -470,7 +484,7 @@ export async function searchEventHistory(
     .where(
       and(
         eq(events.groupId, input.groupId),
-        lt(events.startsAt, now),
+        eventIsOver(now),
         like ? or(ilike(events.title, like), ilike(locations.name, like)) : undefined,
         input.status ? eq(events.status, input.status) : undefined,
         input.playerId

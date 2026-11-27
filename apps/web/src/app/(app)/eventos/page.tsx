@@ -38,6 +38,11 @@ export default async function EventsPage() {
               <p className="flex items-center gap-2 font-medium">
                 {event.title}{' '}
                 {event.status !== 'scheduled' && <EventStatusBadge status={event.status} />}
+                {event.status === 'scheduled' && event.startsAt <= now && (
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-on-accent">
+                    {t('happeningNow')}
+                  </span>
+                )}
               </p>
               <p className="muted">
                 {format.dateTime(event.startsAt, { dateStyle: 'full', timeStyle: 'short' })} ·{' '}

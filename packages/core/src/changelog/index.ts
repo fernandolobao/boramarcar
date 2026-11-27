@@ -439,6 +439,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'O glossário de palavras-chave chegou ao app: em "Aprender a jogar" e no botão do centro do modo mesa, sem sair da partida.',
     en: 'The keyword glossary is now in the app: in "Learn to play" and in table mode\u2019s center button, without leaving the game.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'Encontro que já começou continua em "Próximos" e no painel (como "Acontecendo agora") até terminar, e não vai mais para o histórico logo depois do horário de início.',
+    en: 'A game night that has started stays in "Upcoming" and on the dashboard (as "Happening now") until it ends, instead of moving to history right after its start time.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

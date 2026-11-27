@@ -218,7 +218,10 @@ export default async function DashboardPage() {
           <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="space-y-2">
               <p className="text-sm font-semibold tracking-wide text-gold-300 uppercase">
-                {t('nextEvent')} · {format.relativeTime(next.startsAt, now)}
+                {/* Já começou (e ainda não acabou): "Acontecendo agora", não "há 15 minutos". */}
+                {next.startsAt <= now
+                  ? t('happeningNow')
+                  : `${t('nextEvent')} · ${format.relativeTime(next.startsAt, now)}`}
               </p>
               <h2 className="text-2xl font-bold">
                 <Link href={`/eventos/${next.id}`} className="underline-offset-4 hover:underline">

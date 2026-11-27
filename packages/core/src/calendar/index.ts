@@ -16,6 +16,21 @@ export interface CalendarEvent {
 
 export const DEFAULT_EVENT_DURATION_MINUTES = 240;
 
+/**
+ * Folga depois do fim do encontro em que ele ainda conta como "próximo" (em andamento): a mesa
+ * costuma passar do horário. Sem término informado, o fim é o início + a duração padrão.
+ */
+export const EVENT_LIVE_GRACE_MINUTES = 120;
+
+/** Quando o encontro deixa de estar em andamento (e vai para o histórico). */
+export const eventOverAt = (event: { startsAt: Date; endsAt?: Date | null }) =>
+  new Date(
+    (
+      event.endsAt ?? new Date(event.startsAt.getTime() + DEFAULT_EVENT_DURATION_MINUTES * 60_000)
+    ).getTime() +
+      EVENT_LIVE_GRACE_MINUTES * 60_000,
+  );
+
 const toIcsDate = (date: Date) =>
   date
     .toISOString()
