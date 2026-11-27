@@ -165,7 +165,13 @@
     "inviteButton": "Convidar",
     "settingsButton": "Configurações",
     "membersCount": "{count, plural, =1 {1 pessoa} other {# pessoas}} no grupo",
-    "readyForFirstTable": "Pronto para a primeira mesa"
+    "readyForFirstTable": "Pronto para a primeira mesa",
+    "tabsLabel": "Partes da página do grupo",
+    "tabs": {
+      "group": "Grupo",
+      "locations": "Locais"
+    },
+    "settingsTitle": "Grupos"
   },
   "availability": {
     "title": "Disponibilidade",

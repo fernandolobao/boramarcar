@@ -439,6 +439,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'O glossário de palavras-chave chegou ao app: em "Aprender a jogar" e no botão do centro do modo mesa, sem sair da partida.',
     en: 'The keyword glossary is now in the app: in "Learn to play" and in table mode\u2019s center button, without leaving the game.',
   },
+  {
+    date: '2026-11-27',
+    pt: 'Página do grupo em abas: "Grupo" e "Locais". Criar um grupo novo ou entrar em outro agora fica em Configurações → Grupos.',
+    en: 'The group page now has tabs: "Group" and "Places". Creating a new group or joining another one is now under Settings → Groups.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

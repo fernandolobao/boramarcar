@@ -56,7 +56,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'Como entro no grupo da minha mesa?',
             steps: [
               'Peça o link ou o código de convite para quem organiza o grupo.',
-              'Abra o link (ele já leva ao grupo) ou, no app ou no site, toque em "Entrar ou criar grupo" e digite o código.',
+              'Abra o link (ele já leva ao grupo) ou digite o código: no app, em "Entrar ou criar grupo" (aba Conta); no site, em Configurações → Grupos.',
               'Entre com a sua conta Google ou com e-mail e senha. Pronto: você já vê os encontros e a disponibilidade do grupo.',
             ],
             notes: [
@@ -67,7 +67,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'criar-grupo',
             question: 'Como crio um grupo novo e convido as pessoas?',
             steps: [
-              'Toque em "Entrar ou criar grupo" e depois em "Criar grupo". Dê um nome (ex.: "Mesa de Terça").',
+              'No app, toque em "Entrar ou criar grupo" (aba Conta) e depois em "Criar grupo"; no site, vá em Configurações → Grupos → "Criar grupo". Dê um nome (ex.: "Mesa de Terça").',
               'Abra "Seu grupo" (app) ou o menu Grupo (site) e toque em "Convidar": ali estão o link, o código e o QR Code do convite.',
               'Toque em "Compartilhar convite" para mandar pelo WhatsApp ou por onde preferir. No site, "Copiar link" fica ao lado do link, e "Baixar QR Code" logo abaixo do QR Code, para imprimir.',
             ],
@@ -498,7 +498,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             question: 'How do I join my table’s group?',
             steps: [
               'Ask whoever runs the group for the invite link or code.',
-              'Open the link (it takes you straight to the group) or, in the app or on the website, tap "Join or create a group" and type the code.',
+              'Open the link (it takes you straight to the group) or type the code: in the app, under "Join or create a group" (Account tab); on the website, under Settings → Groups.',
               'Sign in with your Google account or with e-mail and password. Done: you can already see the group’s meetups and availability.',
             ],
             notes: [
@@ -509,7 +509,7 @@ export const HELP: Record<HelpLocale, HelpContent> = {
             id: 'criar-grupo',
             question: 'How do I create a new group and invite people?',
             steps: [
-              'Tap "Join or create a group", then "Create group". Give it a name (e.g. "Tuesday Table").',
+              'In the app, tap "Join or create a group" (Account tab), then "Create group"; on the website, go to Settings → Groups → "Create group". Give it a name (e.g. "Tuesday Table").',
               'Open "Your group" (app) or the Group menu (website) and tap "Invite": the invite link, code and QR code are there.',
               'Tap "Share invite" to send it on WhatsApp or wherever you like. On the website, "Copy link" sits next to the link and "Download QR code" right below the QR code, to print.',
             ],

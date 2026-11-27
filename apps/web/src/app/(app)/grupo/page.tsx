@@ -25,6 +25,7 @@ import { AvatarImage } from '@/components/avatar-image';
 import { GroupRecords } from '@/components/group-records';
 import { ModalButton } from '@/components/modal-button';
 import { StackSections } from '@/components/stack-sections';
+import { PillTabs } from '@/components/ds/tabs';
 
 export const generateMetadata = navMetadata('group');
 
@@ -76,221 +77,252 @@ export default async function GroupPage() {
       <h1 className="page-title">{t('title')}</h1>
       {!active && <p className="muted">{t('noGroup')}</p>}
       {/* Seções em pilha de cartas: cada uma desliza por cima da anterior ao rolar. */}
-      <StackSections>
-        {active && (
-          <>
-            <section className="card">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-display text-2xl font-semibold">{active.name}</h2>
-                {/* Ações do grupo em modais: a página fica para o grupo em si, não para administrar. */}
-                <div className="flex flex-wrap gap-2">
-                  {invite && (
-                    <ModalButton
-                      label={t('inviteButton')}
-                      title={t('inviteTitle')}
-                      icon="join"
-                      variant="primary"
-                    >
-                      <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
-                        {/* QR Code com o botão de baixar logo abaixo. */}
-                        <figure className="mx-auto w-48 space-y-2 sm:mx-0">
-                          <div
-                            role="img"
-                            aria-label={t('qrCode', { group: active.name })}
-                            data-testid="invite-qr"
-                            className="overflow-hidden rounded-2xl border border-ink-200 bg-white p-2 dark:border-ink-700 [&>svg]:h-auto [&>svg]:w-full"
-                            // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
-                            dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
-                          />
-                          <a
-                            className="btn-secondary w-full"
-                            href={invite.qr.png}
-                            download={`convite-${active.inviteCode}.png`}
-                          >
-                            <Icon name="download" />
-                            {t('downloadQr')}
-                          </a>
-                          <figcaption className="muted text-center text-sm">
-                            {t('qrHint')}
-                          </figcaption>
-                        </figure>
-                        {/* Link com o botão de copiar ao lado; depois, enviar pelo WhatsApp ou pelo
-                      menu do celular. */}
-                        <div className="min-w-0 space-y-4">
-                          <div>
-                            <CopyField label={t('inviteLink')} value={invite.url} />
-                            <p className="muted mt-2 text-sm">
-                              {t('inviteCode')}:{' '}
-                              <span className="font-mono tracking-widest" data-testid="invite-code">
-                                {active.inviteCode}
-                              </span>
-                            </p>
-                          </div>
-                          <ShareButtons
-                            text={invite.text}
-                            url={invite.url}
-                            title={active.name}
-                            copy={false}
-                          />
-                          {active.role !== 'member' && (
-                            <div>
-                              <RegenerateInviteButton groupId={active.id} />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </ModalButton>
-                  )}
-                  <ModalButton label={t('settingsButton')} title={tg('title')} icon="settings">
-                    <GroupSettingsForm
-                      groupId={active.id}
-                      canEdit={active.role !== 'member'}
-                      settings={{
-                        tableSize: active.tableSize,
-                        minDurationMinutes: active.minDurationMinutes,
-                        pointsWin: active.pointsWin,
-                        pointsDraw: active.pointsDraw,
-                        pointsLoss: active.pointsLoss,
-                        defaultFormat: isGameFormat(active.defaultFormat)
-                          ? active.defaultFormat
-                          : 'commander',
-                      }}
-                    />
-                  </ModalButton>
-                  {/* Retrospectiva do mês que passou (8.12). */}
-                  {recapMonth && (
-                    <Link
-                      href={`/retrospectiva/${active.id}/${recapMonth.value}`}
-                      className="btn-secondary"
-                    >
-                      <Icon name="events" />
-                      {tm('link', { month: recapMonth.label })}
-                    </Link>
-                  )}
-                </div>
-              </div>
-              <p className="muted mt-2">{t('membersCount', { count: members.length })}</p>
-            </section>
-            {/* Recordes e a cara do grupo (8.12), logo no começo. */}
-            <GroupRecords groupId={active.id} userId={user.id} />
-            <section className="card">
-              <h2 className="section-title">{t('members')}</h2>
-              <ul className="divide-y divide-ink-200 dark:divide-ink-800">
-                {members.map((m) => (
-                  <li
-                    key={m.userId}
-                    className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 text-sm"
-                  >
-                    {/* O nome ocupa o que sobra; "Gerenciar" fica sempre na mesma linha. */}
-                    <span className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-700 dark:text-white">
-                        <AvatarImage name={m.name} image={m.image} sizes="40px" />
-                      </span>
-                      <span className="min-w-0">
-                        <Link
-                          href={m.userId === user.id ? '/perfil' : `/jogadores/${m.userId}`}
-                          className="font-medium underline-offset-2 hover:underline"
+      {(() => {
+        const groupSections = (
+          <StackSections>
+            {active && (
+              <>
+                <section className="card">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="font-display text-2xl font-semibold">{active.name}</h2>
+                    {/* Ações do grupo em modais: a página fica para o grupo em si, não para administrar. */}
+                    <div className="flex flex-wrap gap-2">
+                      {invite && (
+                        <ModalButton
+                          label={t('inviteButton')}
+                          title={t('inviteTitle')}
+                          icon="join"
+                          variant="primary"
                         >
-                          {m.name}
+                          <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
+                            {/* QR Code com o botão de baixar logo abaixo. */}
+                            <figure className="mx-auto w-48 space-y-2 sm:mx-0">
+                              <div
+                                role="img"
+                                aria-label={t('qrCode', { group: active.name })}
+                                data-testid="invite-qr"
+                                className="overflow-hidden rounded-2xl border border-ink-200 bg-white p-2 dark:border-ink-700 [&>svg]:h-auto [&>svg]:w-full"
+                                // SVG gerado no servidor pela biblioteca qrcode a partir do link do convite.
+                                dangerouslySetInnerHTML={{ __html: invite.qr.svg }}
+                              />
+                              <a
+                                className="btn-secondary w-full"
+                                href={invite.qr.png}
+                                download={`convite-${active.inviteCode}.png`}
+                              >
+                                <Icon name="download" />
+                                {t('downloadQr')}
+                              </a>
+                              <figcaption className="muted text-center text-sm">
+                                {t('qrHint')}
+                              </figcaption>
+                            </figure>
+                            {/* Link com o botão de copiar ao lado; depois, enviar pelo WhatsApp ou pelo
+                      menu do celular. */}
+                            <div className="min-w-0 space-y-4">
+                              <div>
+                                <CopyField label={t('inviteLink')} value={invite.url} />
+                                <p className="muted mt-2 text-sm">
+                                  {t('inviteCode')}:{' '}
+                                  <span
+                                    className="font-mono tracking-widest"
+                                    data-testid="invite-code"
+                                  >
+                                    {active.inviteCode}
+                                  </span>
+                                </p>
+                              </div>
+                              <ShareButtons
+                                text={invite.text}
+                                url={invite.url}
+                                title={active.name}
+                                copy={false}
+                              />
+                              {active.role !== 'member' && (
+                                <div>
+                                  <RegenerateInviteButton groupId={active.id} />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </ModalButton>
+                      )}
+                      <ModalButton label={t('settingsButton')} title={tg('title')} icon="settings">
+                        <GroupSettingsForm
+                          groupId={active.id}
+                          canEdit={active.role !== 'member'}
+                          settings={{
+                            tableSize: active.tableSize,
+                            minDurationMinutes: active.minDurationMinutes,
+                            pointsWin: active.pointsWin,
+                            pointsDraw: active.pointsDraw,
+                            pointsLoss: active.pointsLoss,
+                            defaultFormat: isGameFormat(active.defaultFormat)
+                              ? active.defaultFormat
+                              : 'commander',
+                          }}
+                        />
+                      </ModalButton>
+                      {/* Retrospectiva do mês que passou (8.12). */}
+                      {recapMonth && (
+                        <Link
+                          href={`/retrospectiva/${active.id}/${recapMonth.value}`}
+                          className="btn-secondary"
+                        >
+                          <Icon name="events" />
+                          {tm('link', { month: recapMonth.label })}
                         </Link>
-                        {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
-                        <span className="muted block">{t(`roles.${m.role}`)}</span>
-                        {ready.has(m.userId) && (
-                          <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-line-strong bg-surface px-2 py-0.5 text-xs font-medium">
-                            <Icon name="lessons" className="size-3.5 shrink-0" />
-                            {t('readyForFirstTable')}
+                      )}
+                    </div>
+                  </div>
+                  <p className="muted mt-2">{t('membersCount', { count: members.length })}</p>
+                </section>
+                {/* Recordes e a cara do grupo (8.12), logo no começo. */}
+                <GroupRecords groupId={active.id} userId={user.id} />
+                <section className="card">
+                  <h2 className="section-title">{t('members')}</h2>
+                  <ul className="divide-y divide-ink-200 dark:divide-ink-800">
+                    {members.map((m) => (
+                      <li
+                        key={m.userId}
+                        className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 text-sm"
+                      >
+                        {/* O nome ocupa o que sobra; "Gerenciar" fica sempre na mesma linha. */}
+                        <span className="flex min-w-0 flex-1 items-center gap-3">
+                          <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-700 dark:text-white">
+                            <AvatarImage name={m.name} image={m.image} sizes="40px" />
                           </span>
-                        )}
-                      </span>
-                    </span>
-                    <MemberActions
-                      groupId={active.id}
-                      actorId={user.id}
-                      actorRole={active.role}
-                      member={{ userId: m.userId, name: m.name, role: m.role }}
-                      memberCount={members.length}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
-            {attendance && (
-              <AttendanceCard
-                groupId={active.id}
-                members={attendance.members.map((m) => ({
-                  ...m,
-                  lastGameAt: m.lastGameAt?.toISOString() ?? null,
-                  awaySince: m.awaySince?.toISOString() ?? null,
-                }))}
-                nextEvent={
-                  attendance.nextEvent
-                    ? {
-                        ...attendance.nextEvent,
-                        startsAt: attendance.nextEvent.startsAt.toISOString(),
-                      }
-                    : null
-                }
-                nudged={attendance.nudged}
-                confirmedNext={attendance.confirmedNext}
-                viewerId={user.id}
-                now={now.toISOString()}
-              />
+                          <span className="min-w-0">
+                            <Link
+                              href={m.userId === user.id ? '/perfil' : `/jogadores/${m.userId}`}
+                              className="font-medium underline-offset-2 hover:underline"
+                            >
+                              {m.name}
+                            </Link>
+                            {m.userId === user.id && <span className="muted"> ({t('you')})</span>}
+                            <span className="muted block">{t(`roles.${m.role}`)}</span>
+                            {ready.has(m.userId) && (
+                              <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-line-strong bg-surface px-2 py-0.5 text-xs font-medium">
+                                <Icon name="lessons" className="size-3.5 shrink-0" />
+                                {t('readyForFirstTable')}
+                              </span>
+                            )}
+                          </span>
+                        </span>
+                        <MemberActions
+                          groupId={active.id}
+                          actorId={user.id}
+                          actorRole={active.role}
+                          member={{ userId: m.userId, name: m.name, role: m.role }}
+                          memberCount={members.length}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+                {attendance && (
+                  <AttendanceCard
+                    groupId={active.id}
+                    members={attendance.members.map((m) => ({
+                      ...m,
+                      lastGameAt: m.lastGameAt?.toISOString() ?? null,
+                      awaySince: m.awaySince?.toISOString() ?? null,
+                    }))}
+                    nextEvent={
+                      attendance.nextEvent
+                        ? {
+                            ...attendance.nextEvent,
+                            startsAt: attendance.nextEvent.startsAt.toISOString(),
+                          }
+                        : null
+                    }
+                    nudged={attendance.nudged}
+                    confirmedNext={attendance.confirmedNext}
+                    viewerId={user.id}
+                    now={now.toISOString()}
+                  />
+                )}
+              </>
             )}
-            <section className="card" aria-labelledby="group-locations-title">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <h2 id="group-locations-title" className="section-title mb-0">
-                  {t('locations')}
-                </h2>
-                <AddLocationButton
-                  groupId={active.id}
-                  members={members.map((m) => ({ userId: m.userId, name: m.name }))}
-                  near={
-                    locations.find((l) => l.lat !== null && l.lng !== null)
-                      ? {
-                          lat: locations.find((l) => l.lat !== null)!.lat!,
-                          lng: locations.find((l) => l.lng !== null)!.lng!,
+
+            {groups.length > 1 && (
+              <section className="card">
+                <ul className="space-y-2">
+                  {groups.map((g) => (
+                    <li key={g.id} className="flex items-center justify-between">
+                      <span>{g.name}</span>
+                      {g.id === active?.id ? (
+                        <span className="muted">{t('active')}</span>
+                      ) : (
+                        <SwitchGroupButton groupId={g.id} />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* Sem grupo: criar ou entrar aqui mesmo (com grupo, fica em Configurações → Grupos). */}
+            {!active && (
+              <>
+                <section className="card">
+                  <h2 className="section-title">{t('create')}</h2>
+                  <CreateGroupForm />
+                </section>
+                <section className="card">
+                  <h2 className="section-title">{t('join')}</h2>
+                  <JoinGroupForm />
+                </section>
+              </>
+            )}
+          </StackSections>
+        );
+        if (!active) return groupSections;
+        // Com grupo: o grupo (membros, recordes, presença) e os locais em abas (`?aba=locais`).
+        return (
+          <PillTabs
+            label={t('tabsLabel')}
+            param="aba"
+            defaultId="grupo"
+            className="space-y-6"
+            tabs={[
+              { id: 'grupo', title: t('tabs.group'), content: groupSections },
+              {
+                id: 'locais',
+                title: t('tabs.locations'),
+                content: (
+                  <section className="card" aria-labelledby="group-locations-title">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                      <h2 id="group-locations-title" className="section-title mb-0">
+                        {t('locations')}
+                      </h2>
+                      <AddLocationButton
+                        groupId={active.id}
+                        members={members.map((m) => ({ userId: m.userId, name: m.name }))}
+                        near={
+                          locations.find((l) => l.lat !== null && l.lng !== null)
+                            ? {
+                                lat: locations.find((l) => l.lat !== null)!.lat!,
+                                lng: locations.find((l) => l.lng !== null)!.lng!,
+                              }
+                            : null
                         }
-                      : null
-                  }
-                />
-              </div>
-              <LocationsSection
-                groupId={active.id}
-                locations={locations}
-                members={members.map((m) => ({ userId: m.userId, name: m.name }))}
-                canManageAll={active.role !== 'member'}
-                userId={user.id}
-              />
-            </section>
-          </>
-        )}
-
-        {groups.length > 1 && (
-          <section className="card">
-            <ul className="space-y-2">
-              {groups.map((g) => (
-                <li key={g.id} className="flex items-center justify-between">
-                  <span>{g.name}</span>
-                  {g.id === active?.id ? (
-                    <span className="muted">{t('active')}</span>
-                  ) : (
-                    <SwitchGroupButton groupId={g.id} />
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <section className="card">
-          <h2 className="section-title">{t('create')}</h2>
-          <CreateGroupForm />
-        </section>
-        <section className="card">
-          <h2 className="section-title">{t('join')}</h2>
-          <JoinGroupForm />
-        </section>
-      </StackSections>
+                      />
+                    </div>
+                    <LocationsSection
+                      groupId={active.id}
+                      locations={locations}
+                      members={members.map((m) => ({ userId: m.userId, name: m.name }))}
+                      canManageAll={active.role !== 'member'}
+                      userId={user.id}
+                    />
+                  </section>
+                ),
+              },
+            ]}
+          />
+        );
+      })()}
     </>
   );
 }

@@ -35,7 +35,10 @@ test.describe('página do grupo', () => {
     page,
   }) => {
     test.skip(test.info().project.name !== 'chromium', 'cria dados: só no desktop');
+    // Locais ficam na aba própria da página do grupo.
     await page.goto('/grupo');
+    await page.getByRole('tab', { name: 'Locais' }).click();
+    await expect(page).toHaveURL(/aba=locais/);
     const section = page.getByRole('region', { name: 'Locais' });
     await section.getByRole('button', { name: 'Adicionar local' }).click();
     const dialog = page.getByRole('dialog', { name: 'Cadastrar local' });
@@ -81,5 +84,20 @@ test.describe('página do grupo', () => {
       await pool.query(`delete from "user" where id = $1`, [id]);
       await pool.end();
     }
+  });
+});
+
+test.describe('grupos nas configurações', () => {
+  test.use({ storageState: AUTH_STATE });
+
+  test('criar e entrar em grupo ficam em Configurações → Grupos (não mais no fim da página do grupo)', async ({
+    page,
+  }) => {
+    await page.goto('/configuracoes');
+    const groups = page.getByRole('region', { name: 'Grupos' });
+    await expect(groups.getByRole('heading', { name: 'Criar grupo' })).toBeVisible();
+    await expect(groups.getByRole('heading', { name: 'Entrar em um grupo' })).toBeVisible();
+    await page.goto('/grupo');
+    await expect(page.getByRole('heading', { name: 'Criar grupo' })).toHaveCount(0);
   });
 });

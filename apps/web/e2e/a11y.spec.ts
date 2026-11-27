@@ -91,6 +91,7 @@ const AUTH_PAGES = [
   '/decks/novo',
   '/colecao',
   '/grupo',
+  '/grupo?aba=locais',
   '/torneios',
   '/torneios/novo',
   `/torneios/${E2E_IDS.tournament}`,
