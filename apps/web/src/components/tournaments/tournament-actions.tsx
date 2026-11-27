@@ -49,9 +49,12 @@ export function TournamentEntrants({
           method: 'POST',
           body: { memberIds },
         }),
+      // Limpa só quem acabou de entrar: a confirmação chega depois da página atualizar, e quem
+      // foi escolhido nesse meio-tempo (ex.: logo depois de "Me inscrever") continua escolhido.
       () => {
-        setPerson(null);
-        setPartner(null);
+        const added = (id: string | null) => (id && memberIds.includes(id) ? null : id);
+        setPerson(added);
+        setPartner(added);
       },
     );
   const iAmIn = taken.has(me);
