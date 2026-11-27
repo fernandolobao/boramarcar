@@ -8,6 +8,8 @@ import {
   seatSwipe,
   rollDie,
   SEAT_COLORS,
+  TABLE_COLORS,
+  seatColor,
   TABLE_COUNTERS,
   tableLayouts,
   tableResult,
@@ -114,6 +116,7 @@ function PlayerOptions({
   rotate,
   dispatch,
   onClose,
+  canChooseColors,
 }: {
   player: TablePlayer;
   state: TableState;
@@ -121,6 +124,8 @@ function PlayerOptions({
   rotate: SeatRotation;
   dispatch: (action: TableAction) => void;
   onClose: () => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors: boolean;
 }) {
   const usesCommander = formatRules(state.format).usesCommander;
   const toggle = (label: string, on: boolean, onPress: () => void) => (
@@ -229,6 +234,41 @@ function PlayerOptions({
             />
           ))}
         </View>
+        {canChooseColors && (
+          <View style={{ gap: 6 }}>
+            <Text style={board.panelSection} accessibilityRole="header">
+              {t('tableColorTitle')}
+            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {TABLE_COLORS.map((color, n) => {
+                const current = seatColor(state, seat) === color;
+                const isDefault = color === SEAT_COLORS[seat % SEAT_COLORS.length];
+                return (
+                  <Pressable
+                    key={color}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: current }}
+                    accessibilityLabel={t(`tableColor${n}` as MessageKey)}
+                    onPress={() =>
+                      dispatch({
+                        type: 'color',
+                        userId: player.userId,
+                        color: isDefault ? null : color,
+                      })
+                    }
+                    style={[
+                      board.swatch,
+                      { backgroundColor: color },
+                      current && { borderColor: '#ffffff', borderWidth: 3 },
+                    ]}
+                  >
+                    {current ? <Icon name="done" color="#ffffff" /> : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
         {/* Saiu do jogo: vida, veneno e comandante já derrubam sozinhos; aqui o resto. */}
         <View style={{ gap: 6 }}>
           <Text style={board.panelSection} accessibilityRole="header">
@@ -277,6 +317,7 @@ function PlayerPanel({
   swap,
   dispatch,
   spotlight = false,
+  canChooseColors = false,
 }: {
   player: TablePlayer;
   state: TableState;
@@ -290,6 +331,8 @@ function PlayerPanel({
   /** Modo "trocar lugares": a área inteira vira um botão para escolher o jogador. */
   swap: { selected: boolean; onPick: () => void } | null;
   dispatch: (action: TableAction) => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
 }) {
   const [options, setOptions] = useState(false);
   const onOpen = () => setOptions(true);
@@ -400,6 +443,7 @@ function PlayerPanel({
           rotate={rotate}
           dispatch={dispatch}
           onClose={() => setOptions(false)}
+          canChooseColors={canChooseColors}
         />
       )}
       {swap && (
@@ -624,11 +668,14 @@ export function TableBoard({
   dispatch,
   onFinish,
   onExit,
+  canChooseColors = false,
 }: {
   state: TableState;
   dispatch: (action: TableAction) => void;
   onFinish: () => void;
   onExit: () => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
 }) {
   const [menu, setMenu] = useState(false);
   /** Trocar lugares: `null` = desligado; `''` = escolhendo o primeiro; id = primeiro escolhido. */
@@ -683,7 +730,7 @@ export function TableBoard({
                     <PlayerPanel
                       player={player}
                       state={state}
-                      color={SEAT_COLORS[index % SEAT_COLORS.length]!}
+                      color={seatColor(state, index)}
                       size={size}
                       seat={index}
                       rotate={layout.seats[index]!.rotate}
@@ -697,6 +744,7 @@ export function TableBoard({
                       }
                       dispatch={dispatch}
                       spotlight={spotlight === player.userId}
+                      canChooseColors={canChooseColors}
                     />
                   )}
                 </Rotated>
@@ -768,6 +816,15 @@ export function TableBoard({
 
 const board = StyleSheet.create({
   panel: { flex: 1, borderRadius: 18, padding: 8, justifyContent: 'space-between' },
+  swatch: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   // Nome no canto (do ponto de vista do jogador), longe do botão central da mesa.
   name: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center', paddingHorizontal: 12 },
   nameText: { color: '#ffffff', fontSize: 18, fontWeight: '700' },

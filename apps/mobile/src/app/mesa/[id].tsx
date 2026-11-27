@@ -52,6 +52,8 @@ export default function TableScreen() {
   // Mesa de torneio (9.1): a partida salva no aparelho fica separada da do encontro.
   const id = torneio && mesa ? `${eventId}:${mesa}` : eventId;
   const setup = useAsync(() => api.table.get(eventId), [eventId]);
+  // Recursos por flag (cor da área: futuro pacote pago). Sem resposta, desligado.
+  const features = useAsync(() => api.me.features(), []);
   const cup = useAsync(
     async () => (torneio && mesa ? api.tournaments.get(torneio) : null),
     [torneio, mesa],
@@ -115,6 +117,7 @@ export default function TableScreen() {
           dispatch={dispatch}
           onFinish={() => setPhase('finish')}
           onExit={leave}
+          canChooseColors={Boolean(features.data?.tableColors)}
         />
       </>
     );

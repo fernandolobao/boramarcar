@@ -7,6 +7,8 @@ import {
   formatRules,
   rollDie,
   SEAT_COLORS,
+  TABLE_COLORS,
+  seatColor,
   tableLayout,
   tableRowWeights,
   type SeatRotation,
@@ -346,11 +348,14 @@ export function TableBoard({
   onFinish,
   onExit,
   screen,
+  canChooseColors = false,
 }: {
   state: TableState;
   dispatch: (a: TableAction) => void;
   onFinish: () => void;
   onExit: () => void;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
   /** Tela acesa e tela cheia (ver `useKeepAwake`/`useFullscreen`). */
   screen: TableScreen;
 }) {
@@ -428,7 +433,7 @@ export function TableBoard({
               <PlayerPanel
                 player={player}
                 state={state}
-                color={SEAT_COLORS[i % SEAT_COLORS.length]!}
+                color={seatColor(state, i)}
                 rotate={seat.rotate}
                 swap={
                   swapping === null
@@ -546,6 +551,38 @@ export function TableBoard({
                 )}
               </ul>
             </section>
+            {canChooseColors && (
+              <fieldset>
+                <legend className="font-semibold">{t('colorTitle')}</legend>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {TABLE_COLORS.map((color, n) => {
+                    const index = state.players.indexOf(selected);
+                    const current = seatColor(state, index);
+                    const isDefault = color === SEAT_COLORS[index % SEAT_COLORS.length];
+                    return (
+                      <button
+                        key={color}
+                        type="button"
+                        aria-pressed={current === color}
+                        aria-label={t(`colorNames.${n}` as 'colorNames.0')}
+                        title={t(`colorNames.${n}` as 'colorNames.0')}
+                        onClick={() =>
+                          dispatch({
+                            type: 'color',
+                            userId: selected.userId,
+                            color: isDefault ? null : color,
+                          })
+                        }
+                        className="inline-flex size-11 items-center justify-center rounded-full text-white ring-offset-2 ring-offset-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-pressed:ring-4 aria-pressed:ring-fg"
+                        style={{ backgroundColor: color }}
+                      >
+                        {current === color && <Icon name="done" className="size-5" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
             {/* Saiu do jogo: vida, veneno e comandante já derrubam sozinhos; aqui o resto. */}
             <section>
               <h3 className="font-semibold">{t('outTitle')}</h3>

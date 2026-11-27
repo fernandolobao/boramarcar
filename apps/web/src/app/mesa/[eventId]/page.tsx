@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { TableMode, type TableTournament } from '@/components/table/table-mode';
 import { requireUser } from '@/server/current-user';
+import { canChooseTableColors } from '@/server/features';
 import { getDb } from '@/server/db';
 import { getTableSetup } from '@/server/table-setup';
 import { pageMetadata } from '@/server/seo';
@@ -73,6 +74,7 @@ export default async function TablePage({ params, searchParams }: Props) {
       defaultFormat={setup.defaultFormat}
       showTip={!dismissed.includes('table')}
       tournament={tournament}
+      canChooseColors={await canChooseTableColors(user)}
     />
   );
 }

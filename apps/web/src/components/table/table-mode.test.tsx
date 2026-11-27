@@ -163,10 +163,15 @@ describe('modo mesa', () => {
 });
 
 describe('tela acesa e tela cheia', () => {
-  const start = () => {
+  const start = (canChooseColors = false) => {
     const utils = render(
       <NextIntlClientProvider locale="pt-BR" messages={messages} timeZone="America/Sao_Paulo">
-        <TableMode eventId="e1" players={players} defaultFormat="commander" />
+        <TableMode
+          eventId="e1"
+          players={players}
+          defaultFormat="commander"
+          canChooseColors={canChooseColors}
+        />
       </NextIntlClientProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }));
@@ -346,6 +351,30 @@ describe('tela acesa e tela cheia', () => {
     expect(died).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(died);
     expect(died).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('cor da área: só com a flag; a cor escolhida pinta a área do jogador e volta à padrão', async () => {
+    start();
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    expect(screen.queryByRole('group', { name: 'Cor da sua área' })).toBeNull();
+    cleanup();
+
+    start(true);
+    fireEvent.click(screen.getByRole('button', { name: /opções de Bia/ }));
+    const colors = screen.getByRole('group', { name: 'Cor da sua área' });
+    expect(within(colors).getAllByRole('button')).toHaveLength(12);
+    const area = screen.getByRole('region', { name: /Bia/ });
+    const before = area.style.backgroundColor;
+    fireEvent.click(within(colors).getByRole('button', { name: 'Rosa' }));
+    expect(within(colors).getByRole('button', { name: 'Rosa' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(area.style.backgroundColor).not.toBe(before);
+    // A cor padrão da posição (Bia é a 2ª: azul) volta ao normal.
+    fireEvent.click(within(colors).getByRole('button', { name: 'Azul' }));
+    expect(area.style.backgroundColor).toBe(before);
+    expect(await audit(colors)).toEqual([]);
   });
 
   it('sem API de tela cheia (iPhone), explica como instalar na tela inicial', () => {
