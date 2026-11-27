@@ -1,4 +1,4 @@
-import { CHALLENGE_IDS, LEARN_TRACKS, LESSON_IDS } from '../learn';
+import { CHALLENGE_IDS, challengeIdsOf, LEARN_TRACKS, LESSON_IDS } from '../learn';
 import type { GameResult } from '../ranking';
 
 /** Partida do ponto de vista de um jogador (para calcular conquistas). */
@@ -77,6 +77,9 @@ export const ACHIEVEMENT_IDS = [
   'learn_to_table',
   'learn_commander',
   'learn_challenges',
+  'learn_intermediate',
+  'learn_challenges_intermediate',
+  'learn_master',
 ] as const;
 export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
@@ -287,14 +290,26 @@ export function computeAchievements(
   const commanderTrack = track(LEARN_TRACKS.commander);
   const pathDone = basics.at;
   if (commanderTrack.at) unlock('learn_commander', commanderTrack.at);
+  const intermediateTrack = track(LEARN_TRACKS.intermediate);
+  if (intermediateTrack.at) unlock('learn_intermediate', intermediateTrack.at);
   // Desafios guiados (12.4): ficam na mesma lista de progresso, mas não contam como lição.
-  const challengesDone = (context.lessons ?? [])
-    .filter((l) => (CHALLENGE_IDS as readonly string[]).includes(l.lessonId))
-    .sort((a, b) => a.completedAt.getTime() - b.completedAt.getTime());
-  const challengeCount = new Set(challengesDone.map((l) => l.lessonId)).size;
-  if (challengeCount === CHALLENGE_IDS.length) {
-    unlock('learn_challenges', challengesDone.at(-1)!.completedAt);
-  }
+  const items = [...(context.lessons ?? [])].sort(
+    (a, b) => a.completedAt.getTime() - b.completedAt.getTime(),
+  );
+  /** Itens feitos de uma lista e quando ela ficou completa (o último item). */
+  const doneOf = (ids: readonly string[]) => {
+    const done = items.filter((l) => ids.includes(l.lessonId));
+    const count = new Set(done.map((l) => l.lessonId)).size;
+    return { count, total: ids.length, at: count === ids.length ? done.at(-1)!.completedAt : null };
+  };
+  // "Desafios vencidos" é só do básico: os intermediários têm conquista própria (quem já tinha
+  // a conquista não a perde quando entram desafios novos).
+  const basicChallenges = doneOf(challengeIdsOf('basic'));
+  const hardChallenges = doneOf(challengeIdsOf('intermediate'));
+  if (basicChallenges.at) unlock('learn_challenges', basicChallenges.at);
+  if (hardChallenges.at) unlock('learn_challenges_intermediate', hardChallenges.at);
+  const master = doneOf([...LESSON_IDS, ...CHALLENGE_IDS]);
+  if (master.at) unlock('learn_master', master.at);
   if (pathDone) unlock('learn_path', pathDone);
   const firstTable = pathDone
     ? ordered.find((g) => g.playedAt.getTime() >= pathDone.getTime())
@@ -338,7 +353,10 @@ export function computeAchievements(
     learn_path: [basics.count, basics.total],
     learn_to_table: [firstTable ? 1 : 0, 1],
     learn_commander: [commanderTrack.count, commanderTrack.total],
-    learn_challenges: [challengeCount, CHALLENGE_IDS.length],
+    learn_challenges: [basicChallenges.count, basicChallenges.total],
+    learn_intermediate: [intermediateTrack.count, intermediateTrack.total],
+    learn_challenges_intermediate: [hardChallenges.count, hardChallenges.total],
+    learn_master: [master.count, master.total],
   };
 
   return ACHIEVEMENT_IDS.map((id) => {

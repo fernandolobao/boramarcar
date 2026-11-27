@@ -7,6 +7,7 @@ import {
   type AchievementGame,
   type AchievementId,
 } from '.';
+import { challengeIdsOf, LEARN_TRACKS, LESSON_IDS } from '../learn';
 
 let day = 0;
 const game = (
@@ -384,6 +385,35 @@ describe('conquistas da trilha "Aprender a jogar" (12.1)', () => {
       unlocked: false,
       progress: 2,
       target: 7,
+    });
+  });
+
+  it('"além do básico": as lições intermediárias; os desafios intermediários; e "mestre da trilha" com tudo', () => {
+    const intermediate = [...LEARN_TRACKS.intermediate];
+    const basicChallenges = challengeIdsOf('basic');
+    const hardChallenges = challengeIdsOf('intermediate');
+    // Só as lições intermediárias.
+    let list = computeAchievements('me', [], [], { lessons: lessons(intermediate) });
+    expect(find(list, 'learn_intermediate')).toMatchObject({
+      unlocked: true,
+      unlockedAt: at(intermediate.length),
+    });
+    expect(find(list, 'learn_master').unlocked).toBe(false);
+    // Desafios intermediários não contam para "desafios vencidos" (só os básicos).
+    list = computeAchievements('me', [], [], { lessons: lessons(hardChallenges) });
+    expect(find(list, 'learn_challenges_intermediate')).toMatchObject({
+      unlocked: true,
+      target: hardChallenges.length,
+    });
+    expect(find(list, 'learn_challenges')).toMatchObject({ unlocked: false, progress: 0 });
+    // Mestre: todas as lições e todos os desafios; a data é a do último item.
+    const everything = [...LESSON_IDS, ...basicChallenges, ...hardChallenges];
+    list = computeAchievements('me', [], [], { lessons: lessons(everything) });
+    expect(find(list, 'learn_master')).toMatchObject({
+      unlocked: true,
+      unlockedAt: at(everything.length),
+      progress: everything.length,
+      target: everything.length,
     });
   });
 

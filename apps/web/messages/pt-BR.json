@@ -1190,7 +1190,19 @@
       },
       "learn_challenges": {
         "name": "Desafios vencidos",
-        "description": "Acertar todos os desafios de \"Aprender a jogar\"."
+        "description": "Acertar todos os desafios do básico de \"Aprender a jogar\"."
+      },
+      "learn_intermediate": {
+        "name": "Além do básico",
+        "description": "Concluir todas as lições de \"Além do básico\"."
+      },
+      "learn_challenges_intermediate": {
+        "name": "Desafios de quem já joga",
+        "description": "Acertar todos os desafios de \"Além do básico\"."
+      },
+      "learn_master": {
+        "name": "Mestre da trilha",
+        "description": "Concluir todas as lições e acertar todos os desafios de \"Aprender a jogar\"."
       }
     },
     "tabsLabel": "Conquistas",
@@ -2967,7 +2979,11 @@
       "yourAnswer": "Sua resposta",
       "tryAgain": "Escolha outra resposta e tente de novo.",
       "saved": "Desafio resolvido e salvo no seu progresso.",
-      "review": "Rever a lição: {lesson}"
+      "review": "Rever a lição: {lesson}",
+      "levels": {
+        "basic": "Básico",
+        "intermediate": "Além do básico"
+      }
     },
     "practice": {
       "title": "Pratique sozinho",

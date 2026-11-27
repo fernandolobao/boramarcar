@@ -49,6 +49,8 @@ const PUBLIC_PAGES = [
   '/aprender/identidade-de-cor',
   '/aprender/glossario',
   '/aprender/desafios/desafio-pilha',
+  '/aprender/combate-avancado',
+  '/aprender/desafios/desafio-dois-bloqueadores',
   `/convite/${E2E_INVITE_CODE}`,
   '/convite/NAOEXISTE',
   `/resumo/${E2E_IDS.pastEvent}`,

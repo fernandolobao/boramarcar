@@ -14,6 +14,7 @@ export type LearnLocale = 'pt-BR' | 'en';
 export * from './glossary';
 export * from './challenges';
 import { CHALLENGE_IDS } from './challenges';
+import { INTERMEDIATE_LESSONS, INTERMEDIATE_TRACK } from './intermediate';
 
 export interface LessonSection {
   id: string;
@@ -26,7 +27,7 @@ export interface LessonSection {
 export interface Lesson {
   /** Vira o endereço (`/aprender/<id>`) e a chave do progresso. */
   id: LessonId;
-  /** Bloco da trilha: o básico (12.1) ou Commander para iniciantes (12.2). */
+  /** Bloco da trilha: o básico (12.1), Commander para iniciantes (12.2) ou além do básico. */
   track: TrackId;
   title: string;
   summary: string;
@@ -57,11 +58,28 @@ export const LEARN_TRACKS = {
     'como-se-vence',
   ],
   commander: ['commander-o-formato', 'identidade-de-cor', 'mesa-de-commander', 'rule-0-e-brackets'],
+  /** Trilha intermediária: para quem já joga (`intermediate.ts`). */
+  intermediate: [
+    'prioridade-e-respostas',
+    'combate-avancado',
+    'habilidades',
+    'acoes-de-estado',
+    'vantagem-de-cartas',
+    'commander-a-fundo',
+  ],
 } as const;
 export type TrackId = keyof typeof LEARN_TRACKS;
-export const TRACK_IDS = ['basics', 'commander'] as const satisfies readonly TrackId[];
+export const TRACK_IDS = [
+  'basics',
+  'commander',
+  'intermediate',
+] as const satisfies readonly TrackId[];
 
-export const LESSON_IDS = [...LEARN_TRACKS.basics, ...LEARN_TRACKS.commander] as const;
+export const LESSON_IDS = [
+  ...LEARN_TRACKS.basics,
+  ...LEARN_TRACKS.commander,
+  ...LEARN_TRACKS.intermediate,
+] as const;
 export type LessonId = (typeof LESSON_IDS)[number];
 
 /** Tudo o que tem progresso na trilha: lições e desafios (12.4). */
@@ -87,7 +105,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
   'pt-BR': {
     title: 'Aprender a jogar',
     intro:
-      'Lições curtas para quem nunca jogou Magic: The Gathering. Em meia hora você entende o jogo e chega pronto para a primeira mesa do grupo; depois, o Commander, o formato mais jogado em grupo.',
+      'Lições curtas para quem nunca jogou Magic: The Gathering. Em meia hora você entende o jogo e chega pronto para a primeira mesa do grupo; depois, o Commander, o formato mais jogado em grupo, e, para quem já joga, o que vem além do básico.',
     official: {
       title: 'Regras oficiais',
       text: 'Estas lições explicam o jogo com as nossas palavras. As regras completas e o glossário oficial estão no site da Wizards of the Coast.',
@@ -104,6 +122,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
         intro:
           'O formato mais jogado em grupo: comandante, identidade de cor, a mesa com várias pessoas e a conversa antes do jogo.',
       },
+      intermediate: INTERMEDIATE_TRACK['pt-BR'],
     },
     lessons: [
       {
@@ -530,12 +549,13 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
           'O ArcanaKin estima o bracket do seu deck.',
         ],
       },
+      ...INTERMEDIATE_LESSONS['pt-BR'],
     ],
   },
   en: {
     title: 'Learn to play',
     intro:
-      'Short lessons for anyone who has never played Magic: The Gathering. In half an hour you understand the game and are ready for your first table with the group; then Commander, the format most played in groups.',
+      'Short lessons for anyone who has never played Magic: The Gathering. In half an hour you understand the game and are ready for your first table with the group; then Commander, the format most played in groups, and, for those who already play, what lies beyond the basics.',
     official: {
       title: 'Official rules',
       text: 'These lessons explain the game in our own words. The full rules and the official glossary are on the Wizards of the Coast website.',
@@ -552,6 +572,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
         intro:
           'The format most played in groups: the commander, color identity, the multiplayer table and the talk before the game.',
       },
+      intermediate: INTERMEDIATE_TRACK.en,
     },
     lessons: [
       {
@@ -978,6 +999,7 @@ export const LEARN: Record<LearnLocale, LearnContent> = {
           'ArcanaKin estimates the bracket of your deck.',
         ],
       },
+      ...INTERMEDIATE_LESSONS.en,
     ],
   },
 };

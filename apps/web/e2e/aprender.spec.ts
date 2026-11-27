@@ -63,6 +63,22 @@ test.describe('aprender a jogar (12.1)', () => {
     await expect(page).toHaveURL(/desafio-pilha$/);
   });
 
+  test('além do básico: bloco próprio de lições e desafios do nível, numerados dentro dele', async ({
+    page,
+  }) => {
+    await page.goto('/aprender');
+    const block = page.getByRole('region', { name: 'Além do básico' }).first();
+    await expect(block.getByRole('link', { name: /Lição 2 de 6: Combate avançado/ })).toBeVisible();
+    const hard = page.getByRole('region', { name: 'Desafios' }).getByRole('region', {
+      name: 'Além do básico',
+    });
+    await hard.getByRole('link', { name: /Desafio 3 de 7: Dois na frente do Wurm/ }).click();
+    await expect(page.getByText('Além do básico · Desafio 3 de 7')).toBeVisible();
+    await page.getByRole('radio', { name: /^3: 2 nos Ursos/ }).check({ force: true });
+    await page.getByRole('button', { name: 'Responder' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Certo!' })).toBeVisible();
+  });
+
   test('o convite do grupo oferece a trilha (12.5)', async ({ page }) => {
     await page.goto(`/convite/${E2E_INVITE_CODE}`);
     const block = page.getByRole('region', { name: 'Nunca jogou Magic?' });
@@ -85,7 +101,7 @@ test.describe('aprender a jogar (12.1)', () => {
         'true',
       );
       await page.goto('/aprender');
-      await expect(page.getByText(/de 11 lições concluídas/)).toBeVisible();
+      await expect(page.getByText(/de 17 lições concluídas/)).toBeVisible();
       await expect(page.getByRole('link', { name: /A pilha e as respostas/ })).toContainText(
         'Concluída',
       );
