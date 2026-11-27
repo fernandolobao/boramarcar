@@ -419,6 +419,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, o ranking ganhou as estatísticas do site: destaques, sequências de vitórias, confronto direto, decks e comandantes mais jogados, com os mesmos filtros.',
     en: 'In the app, the ranking now has the site\u2019s stats: highlights, win streaks, head to head, most played decks and commanders, with the same filters.',
   },
+  {
+    date: '2026-11-27',
+    pt: '"Aprender a jogar" chegou ao app (aba Conta): as mesmas lições e desafios do site, com o progresso compartilhado.',
+    en: '"Learn to play" is now in the app (Account tab): the same lessons and challenges as the site, with shared progress.',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */

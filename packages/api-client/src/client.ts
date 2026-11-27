@@ -650,6 +650,20 @@ export function createApiClient(options: ApiClientOptions) {
         ),
     },
     cards: {
+      /** Carta pelo nome (imagem e dados), para as cartas de exemplo; desconhecida: `null`. */
+      named: async (name: string) =>
+        (
+          await request(
+            'GET',
+            `/cards/named${q({ name })}`,
+            z.object({
+              card: z
+                .object({ name: z.string(), imageUri: z.string().nullable().optional() })
+                .loose()
+                .nullable(),
+            }),
+          ).catch(() => ({ card: null }))
+        ).card,
       /** Sugestões de nomes de carta (Scryfall), para adicionar à coleção ou a um deck. */
       /**
        * Sugestões: nome em inglês (o que se guarda) e, quando a sugestão veio da busca em

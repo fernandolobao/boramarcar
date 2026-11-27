@@ -890,3 +890,8 @@ sem rolagem horizontal em 320px.
 ## App: estatísticas no ranking (27/11/2026)
 
 - Abaixo da classificação, cartões com título (`header`): destaques (rótulo e valor lidos juntos), sequências (cada linha lida como "Fulano: sequência atual 2, melhor 4"), confronto direto em texto ("Ana 2 × 1 Caio"), decks mais jogados (botões de 44 pt que abrem o deck, com o nome e os números no rótulo) e comandantes. Sem gráficos: tudo em texto, com números tabulares.
+
+## App: "Aprender a jogar" (27/11/2026)
+
+- Lista com títulos por bloco; cada lição e desafio é um link com "Lição 2 de 6: título" no nome (e "Concluída" quando feito). Na lição, títulos por seção, símbolos de mana com nome por extenso (`ManaText`), cartas de exemplo com a imagem decorativa e o nome em texto. "Marcar como concluída" é um botão com estado `checked`.
+- Desafio: a mesa em cartões com título (Oponente/Você, vida), as respostas num `radiogroup` (`Choices` vertical), "Responder" desabilitado sem escolha, e o resultado (certo/errado, a resposta certa e o porquê) numa região viva, com ícone e texto (a cor não é a única pista).
