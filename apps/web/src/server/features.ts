@@ -12,16 +12,17 @@ const norm = (s: string) =>
     .toLowerCase();
 
 /**
- * Leitura de cartas pela câmera: na Vercel, a flag `card-scanner` (regra por nome do grupo no
- * painel). Fora da Vercel (dev, testes, E2E), a lista vem de `FLAG_CARD_SCANNER_GROUPS`
- * (nomes separados por vírgula; `*` libera todos).
+ * Flag por grupo: na Vercel, a flag do painel (regras por pessoa ou nome do grupo). Fora da
+ * Vercel (dev, testes, E2E), a lista de nomes de grupo vem de uma variável de ambiente
+ * (separados por vírgula; `*` libera todos).
  */
-export async function canScanCards(user: { id: string }): Promise<boolean> {
-  if (process.env.VERCEL) {
-    const { cardScannerFlag } = await import('@/flags');
-    return cardScannerFlag().catch(() => false);
-  }
-  const list = (process.env.FLAG_CARD_SCANNER_GROUPS ?? '').split(',').map(norm).filter(Boolean);
+async function groupFlag(
+  user: { id: string },
+  env: string,
+  vercel: () => Promise<boolean>,
+): Promise<boolean> {
+  if (process.env.VERCEL) return vercel().catch(() => false);
+  const list = (process.env[env] ?? '').split(',').map(norm).filter(Boolean);
   if (!list.length) return false;
   if (list.includes('*')) return true;
   // Sem requisição (testes), o primeiro grupo da pessoa.
@@ -30,3 +31,18 @@ export async function canScanCards(user: { id: string }): Promise<boolean> {
     .catch(async () => (await listGroupsForUser(getDb(), user.id))[0] ?? null);
   return active ? list.includes(norm(active.name)) : false;
 }
+
+/** Leitura de cartas pela câmera: flag `card-scanner` (fora da Vercel, `FLAG_CARD_SCANNER_GROUPS`). */
+export const canScanCards = (user: { id: string }) =>
+  groupFlag(user, 'FLAG_CARD_SCANNER_GROUPS', async () =>
+    (await import('@/flags')).cardScannerFlag(),
+  );
+
+/**
+ * Modo mesa, cor da área de cada jogador (futuro pacote pago): flag `table-colors` (fora da
+ * Vercel, `FLAG_TABLE_COLORS_GROUPS`).
+ */
+export const canChooseTableColors = (user: { id: string }) =>
+  groupFlag(user, 'FLAG_TABLE_COLORS_GROUPS', async () =>
+    (await import('@/flags')).tableColorsFlag(),
+  );

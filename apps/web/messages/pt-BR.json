@@ -1670,7 +1670,22 @@
     "died": "Morreu",
     "outTitle": "Saiu do jogo",
     "outHint": "Vida, veneno e dano de comandante já contam sozinhos. Use para deck vazio, efeito de carta ou concessão; toque de novo para voltar.",
-    "firstBadge": "Você começa!"
+    "firstBadge": "Você começa!",
+    "colorTitle": "Cor da sua área",
+    "colorNames": {
+      "0": "Roxo",
+      "1": "Azul",
+      "2": "Verde",
+      "3": "Vermelho",
+      "4": "Laranja",
+      "5": "Azul-petróleo",
+      "6": "Violeta",
+      "7": "Rosa",
+      "8": "Verde-oliva",
+      "9": "Grafite",
+      "10": "Vinho",
+      "11": "Verde-água"
+    }
   },
   "consent": {
     "title": "Cookies e gravação de sessão",

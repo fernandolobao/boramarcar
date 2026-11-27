@@ -36,6 +36,22 @@ describe('cliente da API', () => {
     expect(events[0]).toMatchObject({ locationId: 'l1' });
   });
 
+  it('recursos por flag: liga o que o servidor diz; servidor antigo ou erro, tudo desligado', async () => {
+    const make = (response: Response) =>
+      createApiClient({
+        baseUrl: 'https://x.test',
+        fetch: (async () => response) as unknown as typeof fetch,
+      });
+    expect(await make(json({ cardScanner: false, tableColors: true })).me.features()).toEqual({
+      cardScanner: false,
+      tableColors: true,
+    });
+    expect(await make(json({ error: { code: 'not_found' } }, 404)).me.features()).toEqual({
+      cardScanner: false,
+      tableColors: false,
+    });
+  });
+
   it('lista de decks com capa (servidor novo) e sem capa (servidor antigo)', async () => {
     const deck = {
       id: 'd1',

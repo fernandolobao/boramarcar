@@ -434,11 +434,13 @@ function Finish({
 function Playing({
   eventId,
   initial,
+  canChooseColors,
   onFinish,
   onExit,
 }: {
   eventId: string;
   initial: TableState;
+  canChooseColors: boolean;
   onFinish: (state: TableState) => void;
   onExit: () => void;
 }) {
@@ -455,6 +457,7 @@ function Playing({
         onFinish={() => onFinish(state)}
         onExit={onExit}
         screen={{ awake, fullscreen }}
+        canChooseColors={canChooseColors}
       />
       {/* Vídeo mudo de poucos pixels, só para a tela não bloquear onde não há wake lock. */}
       <video
@@ -480,10 +483,13 @@ export function TableMode({
   defaultFormat,
   showTip = false,
   tournament,
+  canChooseColors = false,
 }: {
   eventId: string;
   players: readonly TablePlayerOption[];
   defaultFormat: GameFormat;
+  /** Escolher a cor da área (flag `table-colors`, futuro pacote pago). */
+  canChooseColors?: boolean;
   /** Dica do modo mesa (7.4), enquanto a pessoa não a dispensar. */
   showTip?: boolean;
   /** Mesa de torneio (9.1): jogadores e formato já definidos; o resultado vai para a mesa. */
@@ -501,6 +507,7 @@ export function TableMode({
       <Playing
         eventId={storageKeyOf(eventId, tournament)}
         initial={phase.state}
+        canChooseColors={canChooseColors}
         onFinish={(state) => setPhase({ kind: 'finish', state })}
         onExit={() =>
           router.push(tournament ? `/torneios/${tournament.id}` : `/eventos/${eventId}`)

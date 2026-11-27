@@ -41,3 +41,20 @@ export const cardScannerFlag = flag<boolean, FlagEntities>({
     { value: true, label: 'Ligada' },
   ],
 });
+
+/**
+ * `table-colors` (Vercel Flags): escolher a cor da área no modo mesa (futuro pacote pago, 13.3).
+ * Desligada por padrão; no painel, a regra libera pessoas ou grupos. Se o serviço não responder,
+ * ninguém vê.
+ */
+export const tableColorsFlag = flag<boolean, FlagEntities>({
+  key: 'table-colors',
+  description: 'Modo mesa: escolher a cor da área de cada jogador (futuro pacote pago)',
+  adapter: vercelAdapter,
+  identify,
+  defaultValue: false,
+  options: [
+    { value: false, label: 'Desligada' },
+    { value: true, label: 'Ligada' },
+  ],
+});

@@ -1670,7 +1670,22 @@
     "died": "Died",
     "outTitle": "Out of the game",
     "outHint": "Life, poison and commander damage already count on their own. Use this for an empty library, a card effect or a concession; tap again to undo.",
-    "firstBadge": "You go first!"
+    "firstBadge": "You go first!",
+    "colorTitle": "Your area color",
+    "colorNames": {
+      "0": "Purple",
+      "1": "Blue",
+      "2": "Green",
+      "3": "Red",
+      "4": "Orange",
+      "5": "Teal",
+      "6": "Violet",
+      "7": "Pink",
+      "8": "Olive",
+      "9": "Graphite",
+      "10": "Wine",
+      "11": "Sea green"
+    }
   },
   "consent": {
     "title": "Cookies and session recording",

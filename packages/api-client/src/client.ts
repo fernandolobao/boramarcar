@@ -223,6 +223,19 @@ export function createApiClient(options: ApiClientOptions) {
             }),
           )
         ).guide,
+      /**
+       * Recursos liberados por flag (o app não avalia as flags da Vercel). Servidor antigo ou
+       * resposta estranha: tudo desligado.
+       */
+      features: async () =>
+        request(
+          'GET',
+          '/me/features',
+          z.object({
+            cardScanner: z.boolean().catch(false),
+            tableColors: z.boolean().catch(false),
+          }),
+        ).catch(() => ({ cardScanner: false, tableColors: false })),
       /** Dicas das telas (análise de deck, modo mesa, coleção) que a pessoa já dispensou. */
       dismissedTips: async () =>
         (
