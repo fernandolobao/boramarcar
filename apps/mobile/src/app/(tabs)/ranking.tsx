@@ -16,6 +16,7 @@ import { Choices } from '@/components/ds/choices';
 import { Select } from '@/components/ds/select';
 import { EmptyState } from '@/components/empty-state';
 import { useLayout } from '@/lib/layout';
+import { Tip } from '@/components/tip';
 
 /** Ranking do grupo ativo (todas as partidas). */
 
@@ -67,6 +68,11 @@ export default function RankingScreen() {
           <AppText accessibilityRole="header" style={[styles.title, { marginBottom: 0 }]}>
             {t('rankingTitle')}
           </AppText>
+          {ranking.data?.points && (
+            <AppText muted>{t('rankingPointsRule', ranking.data.points)}</AppText>
+          )}
+          {/* Como a classificação é feita: pontos e critérios de desempate. */}
+          <Tip id="ranking" />
           <View style={{ gap: 6 }}>
             <Choices
               label={t('rankingPeriod')}

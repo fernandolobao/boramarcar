@@ -38,6 +38,18 @@ test.describe('ranking e estatísticas', () => {
     await expect(region).toBeFocused();
   });
 
+  test('o ⓘ do título explica os pontos e o desempate', async ({ page }) => {
+    await page.goto('/ranking');
+    const toggle = page.getByRole('button', { name: 'Dica sobre esta tela' });
+    // Na primeira visita a dica já vem aberta; fecha e abre pelo botão.
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+    const tip = page.getByRole('region', { name: 'Dica' });
+    await expect(tip).toContainText('mais vitórias');
+    await expect(tip).toContainText('menos partidas');
+    await toggle.click();
+    await expect(tip).toBeHidden();
+  });
+
   test('admin cria uma temporada e ela aparece no filtro', async ({ page }) => {
     test.skip(test.info().project.name !== 'chromium', 'muda dados compartilhados: só no desktop');
     await page.goto('/ranking');

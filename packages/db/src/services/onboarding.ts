@@ -22,6 +22,7 @@ export const ONBOARDING_FLAGS = [
   'tip-deck-analysis',
   'tip-table',
   'tip-collection',
+  'tip-ranking',
   'beta-banner-dismissed',
 ] as const;
 export type OnboardingFlag = (typeof ONBOARDING_FLAGS)[number];
@@ -122,7 +123,7 @@ export async function getGuideState(db: Database, input: { userId: string }) {
 }
 
 /** Dicas das telas densas (7.4): uma vez por pessoa, dispensadas com "Entendi" (marca `tip-<id>`). */
-export const TIP_IDS = ['deck-analysis', 'table', 'collection'] as const;
+export const TIP_IDS = ['deck-analysis', 'table', 'collection', 'ranking'] as const;
 export type TipId = (typeof TIP_IDS)[number];
 
 /** Dicas que a pessoa já dispensou. */

@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { Icon } from './icons';
 import { FormError, useApiAction } from './use-api-action';
 
-export type TipId = 'deck-analysis' | 'table' | 'collection';
+export type TipId = 'deck-analysis' | 'table' | 'collection' | 'ranking';
 
 /**
  * Título de uma tela densa com a dica (onboarding 7.4): um botão ⓘ ao lado do título abre e fecha

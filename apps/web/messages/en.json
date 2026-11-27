@@ -1991,7 +1991,8 @@
     "tipNames": {
       "deck-analysis": "deck analysis",
       "table": "table mode",
-      "collection": "collection"
+      "collection": "collection",
+      "ranking": "ranking"
     },
     "postGame": "Post-game recording",
     "within24h": "Meetups recorded within 24 h",
@@ -2400,7 +2401,8 @@
     "deck-analysis": "The score compares the deck with the format’s reference targets: in Commander, lands, ramp, card draw, removal, board wipes and curve; in 60-card formats, lands, curve, interaction and consistency; in 40-card ones, creatures instead of consistency. Tap an item to see the math and which cards count. Curve, mana base, opening hand, roles and bracket are in the tabs. It’s a guide, not a rule.",
     "table": "Lay the device in the middle of the table: each area faces the person on that side. Tap to lose or gain 1 life and hold for 10. The gear (or swiping up in your area) opens your options; the centre button has dice, undo, swap seats and the keyword glossary.",
     "collection": "Cards from your decks go into your collection automatically; proxies never count. The value is estimated from Scryfall’s US dollar prices, converted at the Central Bank of Brazil rate.",
-    "toggle": "Tip about this screen"
+    "toggle": "Tip about this screen",
+    "ranking": "Every game gives points to everyone who played: the values for a win, draw and loss show below the title, and the group organizer can change them in the group settings. Tied on points? Whoever has more wins goes first; then the better win %; then whoever played fewer games. Players tied on everything share the position. The period, season and game type filters redo the count with just those games."
   },
   "languageSwitcher": {
     "label": "Language",
