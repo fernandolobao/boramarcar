@@ -374,6 +374,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     pt: 'No app, o visual acompanha o site novo: no encontro, quem vai aparece com foto; no ranking, os três primeiros ganham medalha.',
     en: 'The app now matches the new site: on a game night, who is coming shows with photos; in the ranking, the top three get medals.',
   },
+  {
+    date: '2026-11-26',
+    pt: 'Inscrições de torneio: a pessoa escolhida para inscrever não some mais se você escolher logo depois de "Me inscrever".',
+    en: 'Tournament sign-ups: the person you pick no longer disappears if you pick right after "Enter myself".',
+  },
 ];
 
 /** Entradas depois do dia `after` (exclusive) até `until` (inclusive), em AAAA-MM-DD. */
